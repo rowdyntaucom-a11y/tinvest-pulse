@@ -513,6 +513,8 @@ async function getInstrumentMeta(figi, instrumentType) {
   }
 }
 
+const candleDiagnostics = [];
+
 async function getDailyCandles(instrumentId, from, to) {
   try {
     const data = await tbankRequest('tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles', {
@@ -523,9 +525,13 @@ async function getDailyCandles(instrumentId, from, to) {
       candleSourceType: 'CANDLE_SOURCE_EXCHANGE',
       limit: 300
     });
-    return Array.isArray(data?.candles) ? data.candles : [];
+    const candles = Array.isArray(data?.candles) ? data.candles : [];
+    candleDiagnostics.push({ instrumentId, ok: true, count: candles.length });
+    return candles;
   } catch (err) {
+    const info = errorInfo(err);
     console.warn(`Candles failed for ${instrumentId}: ${err.message}`);
+    candleDiagnostics.push({ instrumentId, ok: false, error: info });
     return [];
   }
 }
@@ -752,6 +758,7 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     method: 'daily_time_weighted_return_from_operations_and_historical_closes_v35',
     debug: {
       instruments: instrumentRows.map(r => ({figi:r.figi, instrumentId:r.instrumentId, instrumentType:r.instrumentType, candles:r.candles.length})),
+      candleDiagnostics: candleDiagnostics.slice(-50),
       rawFirst: raw[0] || null,
       rawLast: raw[raw.length - 1] || null
     }
