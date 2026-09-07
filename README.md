@@ -16,3 +16,6 @@ Mobile-first T-Invest portfolio dashboard.
 ## Deploy
 Build: `npm install`
 Start: `node server.js`
+
+
+Version 4.5: VS MOEX compares the actual plotted portfolio and IMOEX series without requiring identical date serialization.
