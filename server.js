@@ -513,8 +513,6 @@ async function getInstrumentMeta(figi, instrumentType) {
   }
 }
 
-const candleDiagnostics = [];
-
 async function getDailyCandles(instrumentId, from, to) {
   try {
     const data = await tbankRequest('tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles', {
@@ -522,15 +520,12 @@ async function getDailyCandles(instrumentId, from, to) {
       to: to.toISOString(),
       interval: 'CANDLE_INTERVAL_DAY',
       instrumentId: instrumentId,
-      candleSourceType: 'CANDLE_SOURCE_EXCHANGE'
+      candleSourceType: 'CANDLE_SOURCE_EXCHANGE',
+      limit: 300
     });
-    const candles = Array.isArray(data?.candles) ? data.candles : [];
-    candleDiagnostics.push({ instrumentId, ok: true, count: candles.length });
-    return candles;
+    return Array.isArray(data?.candles) ? data.candles : [];
   } catch (err) {
-    const info = errorInfo(err);
     console.warn(`Candles failed for ${instrumentId}: ${err.message}`);
-    candleDiagnostics.push({ instrumentId, ok: false, error: info });
     return [];
   }
 }
@@ -563,20 +558,95 @@ function businessDates(from, to) {
 }
 
 async function getMoexHistory(from, to) {
-  const url =
-    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
+  const fromKey = dateKey(from);
+  const toKey = dateKey(to);
+
+  // Prefer MOEX candles: the response is compact and gives the closing value
+  // for each trading day. Fall back to the history endpoint if needed.
+  const candlesUrl =
+    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/IMOEX/candles.json` +
+    `?iss.meta=off&from=${encodeURIComponent(fromKey)}&till=${encodeURIComponent(toKey)}&interval=24`;
+  const candlesResult = await safeFetch(candlesUrl);
+  if (candlesResult.ok) {
+    try {
+      const data = JSON.parse(candlesResult.text);
+      const block = data?.candles;
+      const cols = block?.columns || [];
+      const rows = block?.data || [];
+      const idxBegin = cols.indexOf('begin');
+      const idxClose = cols.indexOf('close');
+      if (idxBegin >= 0 && idxClose >= 0) {
+        const parsed = rows.map(r => ({
+          date: String(r?.[idxBegin] || '').slice(0, 10),
+          value: Number(r?.[idxClose])
+        })).filter(x => x.date && Number.isFinite(x.value));
+        if (parsed.length) return parsed;
+      }
+    } catch {}
+  }
+
+  const historyUrl =
+    `${MOEX_BASE}history/engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
     `?iss.meta=off&iss.only=history&history.columns=TRADEDATE,CLOSE` +
-    `&from=${encodeURIComponent(dateKey(from))}&till=${encodeURIComponent(dateKey(to))}`;
-  const result = await safeFetch(url);
+    `&from=${encodeURIComponent(fromKey)}&till=${encodeURIComponent(toKey)}`;
+  const result = await safeFetch(historyUrl);
   if (!result.ok) return [];
   try {
     const data = JSON.parse(result.text);
-    const rows = data?.history?.data || [];
-    return rows.map(r => ({ date: String(r?.[0] || ''), value: Number(r?.[1]) })).filter(x => x.date && Number.isFinite(x.value));
+    const block = data?.history;
+    const cols = block?.columns || [];
+    const rows = block?.data || [];
+    const idxDate = cols.indexOf('TRADEDATE');
+    const idxClose = cols.indexOf('CLOSE');
+    if (idxDate < 0 || idxClose < 0) return [];
+    return rows.map(r => ({
+      date: String(r?.[idxDate] || ''),
+      value: Number(r?.[idxClose])
+    })).filter(x => x.date && Number.isFinite(x.value));
   } catch {
     return [];
   }
 }
+
+async function getCbrMacro() {
+  const fallback = { available: false, rate: null, rateDate: null, nextMeeting: '2026-09-11' };
+  try {
+    const [home, keyrate] = await Promise.all([
+      safeFetch('https://www.cbr.ru/'),
+      safeFetch('https://www.cbr.ru/hd_base/keyrate/')
+    ]);
+
+    let rate = null;
+    let rateDate = null;
+    if (keyrate.ok) {
+      const text = keyrate.text
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style[\s\\S]*?<\/style>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ');
+      const m = text.match(/(\\d{2}\\.\\d{2}\\.\\d{4})\\s+([0-9]+(?:[.,][0-9]+)?)/);
+      if (m) { rateDate = m[1].split('.').reverse().join('-'); rate = Number(m[2].replace(',', '.')); }
+    }
+
+    let nextMeeting = null;
+    if (home.ok) {
+      const text = home.text
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style[\s\\S]*?<\/style>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ');
+      const m = text.match(/Следующее заседание Совета директоров по ключевой ставке\\s+([0-9]{2}\\.[0-9]{2}\\.[0-9]{4})/i);
+      if (m) nextMeeting = m[1].split('.').reverse().join('-');
+    }
+    if (!rate || !nextMeeting) return { ...fallback, rate, rateDate, nextMeeting: nextMeeting || fallback.nextMeeting, available: Boolean(rate) };
+    return { available: true, rate, rateDate, nextMeeting };
+  } catch (err) {
+    return { ...fallback, error: errorInfo(err) };
+  }
+}
+
 
 const HISTORY_CACHE = new Map();
 const HISTORY_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -757,7 +827,6 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     method: 'daily_time_weighted_return_from_operations_and_historical_closes_v35',
     debug: {
       instruments: instrumentRows.map(r => ({figi:r.figi, instrumentId:r.instrumentId, instrumentType:r.instrumentType, candles:r.candles.length})),
-      candleDiagnostics: candleDiagnostics.slice(-50),
       rawFirst: raw[0] || null,
       rawLast: raw[raw.length - 1] || null
     }
@@ -803,10 +872,11 @@ async function buildDashboard() {
     };
   }
 
-  const [portfolio, operations, moex] = await Promise.all([
+  const [portfolio, operations, moex, cbr] = await Promise.all([
     getPortfolio(account.id),
     getOperations(account.id),
-    getMoex()
+    getMoex(),
+    getCbrMacro()
   ]);
 
   const positions = (portfolio?.positions || []).map(p => ({
@@ -948,6 +1018,7 @@ async function buildDashboard() {
     },
     laggards,
     moex,
+    cbr,
     history,
     assets: positions,
     note: 'CAGR is intentionally not calculated for a portfolio with multiple external cash flows. XIRR is the annualized money-weighted return.'
@@ -965,7 +1036,7 @@ app.get('/api/history-debug', async (req, res) => {
     const firstInvestment = operations.filter(isExternalCashOperation).map(op => ({date:safeDate(op.date), amount:operationCash(op)})).filter(x=>x.date && x.amount>0).sort((a,b)=>a.date-b.date)[0];
     const value = moneyValue(portfolio?.totalAmountPortfolio);
     const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
-    res.json({ok:true,version:'3.5.1-history-diagnostics-fix',positions,history});
+    res.json({ok:true,version:'3.6-cbr-imoex',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
   }
@@ -1043,7 +1114,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.5.1-history-diagnostics-fix' });
+  res.json({ ok: true, version: '3.6-cbr-imoex' });
 });
 
 
