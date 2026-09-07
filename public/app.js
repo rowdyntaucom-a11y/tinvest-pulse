@@ -88,8 +88,20 @@ function render(d){
   setText('xirr',p.xirr==null?'—':pct(p.xirr));
 
   const hp=Array.isArray(dashboardData.history?.points)?dashboardData.history.points:[];
-  const common=hp.filter(x=>Number.isFinite(Number(x.portfolio))&&Number.isFinite(Number(x.imoex))).slice(-1)[0];
-  const vs=common?Number(common.portfolio)-Number(common.imoex):null;
+  // Compare cumulative returns, not the raw/normalized index levels.
+  // This stays correct whether the server sends IMOEX as raw points or starts it at 100.
+  const commonPoints=hp.filter(x=>Number.isFinite(Number(x.portfolio))&&Number.isFinite(Number(x.imoex)));
+  let vs=null;
+  if(commonPoints.length>=2){
+    const first=commonPoints[0], last=commonPoints[commonPoints.length-1];
+    const p0=Number(first.portfolio), p1=Number(last.portfolio);
+    const m0=Number(first.imoex), m1=Number(last.imoex);
+    if(p0>0&&p1>0&&m0>0&&m1>0){
+      const portfolioReturn=(p1/p0)-1;
+      const moexReturn=(m1/m0)-1;
+      vs=(portfolioReturn-moexReturn)*100;
+    }
+  }
   setText('vsMoex',vs==null?'—':`${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} п.п.`);
   setStyle('vsMoex','color',vs==null?'#fff':(vs>=0?'var(--accent)':'#ff6575'));
   setText('vsMoexCaption',vs==null?'ждём индекс':(vs>=0?'обгоняем индекс':'отстаём от индекса'));
