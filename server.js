@@ -360,13 +360,15 @@ function isExternalCashOperation(op) {
   const type = String(op?.type || '').toUpperCase();
   const name = String(op?.name || '').toLowerCase();
 
+  // Only real cash deposits/withdrawals count as external portfolio flows.
+  // BUY/SELL, coupons, fees and internal cash movements must not be treated as contributions.
   return (
-    type.includes('BROKER_ACCOUNT') ||
-    type.includes('TRANSFER') ||
-    type.includes('CASH') ||
+    type === 'OPERATION_TYPE_INPUT' ||
+    type === 'OPERATION_TYPE_OUTPUT' ||
+    type === 'OPERATION_TYPE_BROKER_ACCOUNT_INPUT' ||
+    type === 'OPERATION_TYPE_BROKER_ACCOUNT_OUTPUT' ||
     name.includes('пополн') ||
-    name.includes('вывод') ||
-    name.includes('перевод')
+    name.includes('вывод')
   );
 }
 
@@ -673,7 +675,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '2.8-operations-route-fixed' });
+  res.json({ ok: true, version: '2.9-external-cash-fixed' });
 });
 
 
