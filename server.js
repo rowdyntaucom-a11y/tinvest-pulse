@@ -1181,7 +1181,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '4.4-vs-moex-fix' });
+  res.json({ ok: true, version: '4.6-visual-pulse-polish' });
 });
 
 
