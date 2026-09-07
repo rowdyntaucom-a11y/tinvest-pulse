@@ -203,7 +203,7 @@ function enterPulse(){
   setText('pulsePain',st.maxDD>0?`−${st.maxDD.toFixed(1).replace('.',',')}%`:'0,0%');
   setText('pulsePainText',st.maxDD>0?'макс. просадка':'без просадки');
   setText('pulseSpeed',Number.isFinite(st.monthly)?rub(st.monthly/30.4375):'—');
-  setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);setText('pulseAssets',`${assets.length||0} АКТИВОВ`);setText('pulseAgeTop',st.ageDays==null?'—':`${st.ageDays} ДН.`);setText('pulseUpdated',`ОБНОВЛЕНО ${new Date(d.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`);
+  setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);const assetCount=Array.isArray(d?.assets)?d.assets.length:(Array.isArray(p.assets)?p.assets.length:0);setText('pulseAssets',`${assetCount} АКТИВОВ`);setText('pulseAgeTop',st.ageDays==null?'—':`${st.ageDays} ДН.`);setText('pulseUpdated',`ОБНОВЛЕНО ${new Date(d.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`);
   setText('pulseCharacterName',st.character);setText('pulseCharacterText',st.text);
   const dna=[['dnaIncome','dnaIncomeVal',st.dnaIncome],['dnaStability','dnaStabilityVal',st.dnaStability],['dnaGrowth','dnaGrowthVal',st.dnaGrowth],['dnaDivers','dnaDiversVal',st.dnaDivers]];
   for(const [bar,val,n] of dna){setStyle(bar,'width',`${n}%`);setText(val,`${n}`);}
