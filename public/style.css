@@ -57,3 +57,9 @@ footer{letter-spacing:.15px}
 @keyframes pulseShotGlow{0%,100%{transform:scale(.92);opacity:.55}50%{transform:scale(1.06);opacity:1}}
 body[data-theme=graphite] .pulse-capture .pulseShot{background:linear-gradient(145deg,#11100d,#070707)}body[data-theme=cyber] .pulse-capture .pulseShot{background:linear-gradient(145deg,#070a18,#03040a)}body[data-theme=aurora] .pulse-capture .pulseShot{background:radial-gradient(circle at 20% 20%,rgba(255,107,184,.18),transparent 28%),linear-gradient(145deg,#120d1b,#060913)}
 @media(max-height:700px){.pulse-capture .pulseShot{padding:24px 18px}.pulseShotLabel{margin-top:38px}.pulseShotValue{font-size:44px}.pulseShotGain{font-size:20px}.pulseShotLine{margin:22px 0 13px}.pulseMetrics>div{padding:9px 7px}.pulseMetrics b{font-size:14px}}
+
+/* v4.8 — PULSE is now a visible screenshot mode; tap again to exit */
+.pulse-active .pulseBtn{box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 28%,transparent),0 0 34px color-mix(in srgb,var(--hot) 42%,transparent);}
+.pulse-active{background:#030608;}
+.pulse-capture .pulseShot{animation:pulseIn .28s ease-out both;}
+@keyframes pulseIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
