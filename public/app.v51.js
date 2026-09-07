@@ -203,16 +203,14 @@ function enterPulse(){
   setText('pulsePain',st.maxDD>0?`−${st.maxDD.toFixed(1).replace('.',',')}%`:'0,0%');
   setText('pulsePainText',st.maxDD>0?'макс. просадка':'без просадки');
   setText('pulseSpeed',Number.isFinite(st.monthly)?rub(st.monthly/30.4375):'—');
-  setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);setText('pulseAssets',`${assets.length||0} АКТИВОВ`);setText('pulseAgeTop',st.ageDays==null?'—':`${st.ageDays} ДН.`);setText('pulseUpdated',`ОБНОВЛЕНО ${new Date(d.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`);
+  setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);
   setText('pulseCharacterName',st.character);setText('pulseCharacterText',st.text);
   const dna=[['dnaIncome','dnaIncomeVal',st.dnaIncome],['dnaStability','dnaStabilityVal',st.dnaStability],['dnaGrowth','dnaGrowthVal',st.dnaGrowth],['dnaDivers','dnaDiversVal',st.dnaDivers]];
   for(const [bar,val,n] of dna){setStyle(bar,'width',`${n}%`);setText(val,`${n}`);}
   setText('pulseDiagnosisTitle',st.diagnosisTitle);setText('pulseDiagnosisText',st.diagnosisText);
   setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`);
   setStyle('battlePortfolio','width',`${st.pBar}%`);setStyle('battleMoex','width',`${st.mBar}%`);
-  setText('pulseBattleText',st.pReturn-st.mReturn>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');setText('pulsePortfolioReturn',`${st.pReturn>=0?'+':''}${st.pReturn.toFixed(1).replace('.',',')}%`);setText('pulseMoexReturn',`${st.mReturn>=0?'+':''}${st.mReturn.toFixed(1).replace('.',',')}%`);
-  const tempo=Number.isFinite(st.pReturn)?Math.abs(st.pReturn):0;setText('pulseTempo',`${tempo.toFixed(1).replace('.',',')}%`);setText('pulseTempoText',st.pReturn>=0?'темп роста':'темп просадки');
-  const ticker=st.pReturn-st.mReturn>=2?'ФОНД НАБИРАЕТ ХОД':st.pReturn-st.mReturn<=-2?'Индекс ВПЕРЕДИ — ДОГОНЯЕМ':st.incomeYield>=5?'ДИВИДЕНДЫ ДЕРЖАТ ПУЛЬС':'ПУЛЬС СТАБИЛЬНЫЙ';setText('pulseTicker',ticker);
+  setText('pulseBattleText',st.pReturn-st.mReturn>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');
   setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
   root.classList.add('pulse-capture');shot.setAttribute('aria-hidden','false');pulseMode=true;
   setText('pulseBtn','✕ PULSE');document.body.classList.add('pulse-active');

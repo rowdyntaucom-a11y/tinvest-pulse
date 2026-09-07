@@ -107,36 +107,3 @@ body[data-theme=graphite] .pulse-capture .pulseShot{background:linear-gradient(1
 .pulseDiagnosis{margin-top:7px;min-height:45px;padding:7px 9px;display:flex;align-items:center;justify-content:space-between;border-left:2px solid var(--accent);border-top:1px solid rgba(255,255,255,.045);border-bottom:1px solid rgba(255,255,255,.045);background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 7%,transparent),transparent 72%)}
 .pulseDiagnosis small{display:block;color:var(--muted);font-size:6px;letter-spacing:1px;font-weight:950}.pulseDiagnosis b{display:block;color:var(--accent);font-size:13px;line-height:1.05;margin-top:2px}.pulseDiagnosis span{max-width:54%;text-align:right;color:#8d9b96;font-size:7px;line-height:1.25}
 @media(max-height:760px){.pulseDNA{margin-top:5px;padding:6px 8px}.pulseSectionHead{margin-bottom:5px}.dnaGrid{gap:5px 9px}.dnaItem{grid-template-columns:59px 1fr 17px;font-size:4.5px}.pulseDiagnosis{margin-top:5px;min-height:39px;padding:5px 8px}.pulseDiagnosis b{font-size:11px}.pulseDiagnosis span{font-size:6px}}
-/* v5.2 — PULSE MODERN: telemetry / lab / premium glass */
-.pulse-capture>.pulseShot{padding:14px 16px 9px;background:radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 25%),radial-gradient(circle at 8% 76%,color-mix(in srgb,var(--hot) 13%,transparent),transparent 30%),linear-gradient(145deg,#050b0a 0%,var(--bg) 52%,#030509 100%)}
-.pulse-capture .pulseShotFooter{margin-top:6px}
-.pulse-capture .pulseHero{margin-top:7px}
-.pulse-capture .pulseShotValue{font-size:42px;letter-spacing:-2.8px}
-.pulse-capture .scoreRing{width:86px;height:86px}
-.pulseTelemetry{display:flex;align-items:center;gap:6px;margin-top:8px;overflow:hidden;white-space:nowrap}
-.pulseTelemetry span{display:inline-flex;align-items:center;gap:4px;padding:4px 6px;border:1px solid rgba(255,255,255,.07);border-radius:999px;background:rgba(255,255,255,.025);color:#788783;font-size:5px;font-weight:950;letter-spacing:.8px}
-.pulseTelemetry span:first-child{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 28%,transparent);box-shadow:0 0 12px var(--glow)}
-.pulseTelemetry i{width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:liveDot 1.2s ease-in-out infinite}
-@keyframes liveDot{50%{opacity:.35;transform:scale(.7)}}
-.pulse-capture .heartbeat{height:113px;margin-top:9px;border-radius:16px;background:linear-gradient(180deg,rgba(84,246,197,.06),rgba(0,0,0,.12));box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 35px rgba(0,0,0,.16)}
-.pulse-capture .heartbeat:after{content:"";position:absolute;top:23px;bottom:12px;left:68%;width:1px;background:linear-gradient(transparent,var(--accent),transparent);opacity:.32;animation:sweep 2.8s ease-in-out infinite}
-@keyframes sweep{0%,100%{transform:translateX(-170px);opacity:0}25%{opacity:.3}55%{opacity:.15}75%{transform:translateX(130px);opacity:0}}
-.pulse-capture .pulseLine{filter:drop-shadow(0 0 8px var(--glow));stroke-width:3.7}
-.pulse-capture .pulseBattle{margin-top:7px;padding:7px 9px;border-radius:15px;background:linear-gradient(90deg,rgba(84,246,197,.035),rgba(255,255,255,.018));}
-.battleNumbers{display:flex;align-items:baseline;gap:5px;margin-top:2px}
-.battleNumbers strong{font-size:10px;letter-spacing:-.2px}.battleNumbers strong:first-child{color:var(--accent)}.battleNumbers strong:last-child{color:#b6c0d1}.battleNumbers span{color:#596660;font-size:5px;font-weight:900}
-.pulse-capture .battleBar{height:13px;margin-top:4px}.pulse-capture .battleBar i,.pulse-capture .battleBar em{top:2px;height:9px}
-.pulse-capture .battleBar span{top:3px}
-.pulse-capture .pulseGrid{gap:6px;margin-top:7px}.pulse-capture .pulseTile{min-height:47px;padding:7px 9px;border-radius:15px;background:linear-gradient(135deg,rgba(255,255,255,.022),rgba(255,255,255,.008));box-shadow:inset 0 1px rgba(255,255,255,.025)}
-.pulse-capture .pulseTile b{font-size:14px}.pulse-capture .pulseTile small{font-size:6px}
-.pulseLabGrid{display:grid;grid-template-columns:1.35fr .8fr;gap:6px;margin-top:7px}
-.pulse-capture .pulseDNA{margin-top:0;padding:7px 9px;border-radius:15px}
-.pulse-capture .dnaGrid{gap:6px 10px}.pulse-capture .dnaItem{grid-template-columns:54px 1fr 17px;gap:4px}.pulse-capture .dnaItem i{height:4px}
-.pulseLabSide{display:flex;flex-direction:column;gap:6px;min-width:0}
-.pulseTelemetryBox{flex:1;border:1px solid var(--line);border-radius:15px;padding:8px 9px;background:linear-gradient(145deg,rgba(84,246,197,.055),rgba(255,255,255,.012));display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.pulseTelemetryBox:after{content:"";position:absolute;right:-18px;bottom:-28px;width:72px;height:72px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);box-shadow:0 0 22px var(--glow)}
-.pulseTelemetryBox small{font-size:5px;color:var(--muted);letter-spacing:1px;font-weight:950}.pulseTelemetryBox b{font-size:16px;color:var(--accent);line-height:1;margin-top:4px}.pulseTelemetryBox span{font-size:6px;color:#82908b;margin-top:3px;max-width:90%}
-.pulseTicker{border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:12px;padding:6px 7px;text-align:center;color:var(--accent);font-size:5px;letter-spacing:.7px;font-weight:950;background:color-mix(in srgb,var(--accent) 4%,transparent)}
-.pulse-capture .pulseDiagnosis{margin-top:7px;min-height:44px;padding:7px 9px;border-radius:0 14px 14px 0;border-left:2px solid var(--accent);background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 8%,transparent),rgba(255,255,255,.012) 60%,transparent)}
-.pulse-capture .pulseDiagnosis b{font-size:13px}.pulse-capture .pulseDiagnosis span{font-size:6.5px}
-@media(max-height:760px){.pulse-capture>.pulseShot{padding:10px 13px 6px}.pulse-capture .pulseShotValue{font-size:35px}.pulse-capture .scoreRing{width:72px;height:72px}.pulseTelemetry{margin-top:5px}.pulse-capture .heartbeat{height:92px;margin-top:6px}.pulse-capture .pulseBattle{margin-top:5px;padding:6px 8px}.pulse-capture .pulseGrid{margin-top:5px}.pulse-capture .pulseTile{min-height:41px;padding:6px 8px}.pulseLabGrid{margin-top:5px}.pulse-capture .pulseDNA{padding:6px 8px}.pulseTelemetryBox{padding:6px 8px}.pulseTelemetryBox b{font-size:13px}.pulseTicker{padding:5px 6px}.pulse-capture .pulseDiagnosis{margin-top:5px;min-height:37px;padding:5px 8px}.pulse-capture .pulseShotFooter{margin-top:4px}}
