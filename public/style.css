@@ -1,0 +1,446 @@
+:root {
+  --bg: #07100d;
+  --card: #101b17;
+  --card2: #14221d;
+  --line: rgba(255,255,255,.08);
+  --text: #f4f7f5;
+  --muted: #8d9b95;
+  --green: #35e58b;
+  --green2: #20b96d;
+  --red: #ff5c70;
+  --yellow: #ffd166;
+  --shadow: 0 14px 40px rgba(0,0,0,.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Основной экран */
+#app,
+.app,
+.dashboard {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+/* Верхняя панель */
+.header,
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.logo,
+.title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+/* Кнопки */
+button {
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  color: white;
+  background: var(--card2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  transition: .18s ease;
+}
+
+button:active {
+  transform: scale(.96);
+}
+
+.pulse,
+#pulse {
+  background: linear-gradient(135deg, #35e58b, #159b5a);
+  color: #04120b;
+  box-shadow: 0 8px 24px rgba(53,229,139,.22);
+}
+
+/* Главная карточка */
+.hero,
+.portfolio-card,
+.portfolio {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(53,229,139,.15), transparent 38%),
+    linear-gradient(145deg, #14251e, #0d1713);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+
+.hero::after {
+  content: "₽";
+  position: absolute;
+  right: 15px;
+  bottom: -25px;
+  font-size: 120px;
+  font-weight: 900;
+  color: rgba(255,255,255,.025);
+  pointer-events: none;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.value,
+.portfolio-value {
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: -1.5px;
+}
+
+.profit,
+.growth,
+.positive {
+  color: var(--green);
+}
+
+.negative {
+  color: var(--red);
+}
+
+/* Статистика */
+.stats,
+.stat-grid,
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.stat,
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  min-width: 0;
+}
+
+.stat-title {
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* График */
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.chart-period {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+canvas {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  height: 150px !important;
+}
+
+/* Активы */
+.assets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.asset,
+.asset-row,
+.holding {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 11px 12px;
+}
+
+.asset-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.asset-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: #1b3027;
+  font-weight: 900;
+}
+
+.asset-name {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.asset-count {
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.asset-price {
+  text-align: right;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* Топ победители / проигравшие */
+.winners,
+.losers,
+.top-list {
+  display: flex;
+  gap: 9px;
+}
+
+.winner,
+.loser,
+.top-item {
+  flex: 1;
+  padding: 13px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.winner {
+  border-color: rgba(53,229,139,.16);
+}
+
+.loser {
+  border-color: rgba(255,92,112,.16);
+}
+
+.ticker {
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.percent {
+  margin-top: 5px;
+  font-size: 18px;
+  font-weight: 850;
+}
+
+/* Секции */
+.section {
+  margin-bottom: 12px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 2px 9px;
+}
+
+.section-title h2 {
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.section-title span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* Доход */
+.income {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background:
+    linear-gradient(135deg, rgba(53,229,139,.09), rgba(53,229,139,.025)),
+    var(--card);
+  border: 1px solid rgba(53,229,139,.12);
+  border-radius: 18px;
+  padding: 15px;
+}
+
+.income-value {
+  font-size: 22px;
+  font-weight: 850;
+  color: var(--green);
+}
+
+.income-label {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Индекс MOEX */
+.index-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.index-row:last-child {
+  border-bottom: 0;
+}
+
+.index-name {
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.index-value {
+  font-size: 13px;
+  font-weight: 850;
+}
+
+/* Дата */
+.date-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 12px;
+}
+
+.date-row strong {
+  color: var(--text);
+}
+
+/* Загрузка */
+.loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+/* Ошибка */
+.error {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,92,112,.08);
+  border: 1px solid rgba(255,92,112,.18);
+  color: var(--red);
+  font-size: 13px;
+}
+
+/* Адаптация под маленький телефон */
+@media (max-width: 380px) {
+  #app,
+  .app,
+  .dashboard {
+    padding: 10px;
+  }
+
+  .hero,
+  .portfolio-card,
+  .portfolio {
+    padding: 16px;
+  }
+
+  .value,
+  .portfolio-value {
+    font-size: 31px;
+  }
+
+  .stat,
+  .card {
+    padding: 11px;
+  }
+
+  canvas {
+    height: 125px !important;
+  }
+}
+
+/* Убираем выделение на телефоне */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  -webkit-touch-callout: none;
+}
