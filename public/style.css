@@ -163,3 +163,21 @@ body[data-theme=graphite] .pulse-capture .pulseShot{background:linear-gradient(1
 @keyframes areaIn{from{opacity:0}to{opacity:.10}}
 @keyframes tileIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.pulse-capture .pulseShot:after,.pulse-capture .scoreRing,.pulse-capture .pulseLine,.pulse-capture .pulseMoex,.pulse-capture .pulseArea,.pulse-capture .pulseTile,.pulse-capture .pulseDNA,.pulse-capture .pulseDiagnosis{animation:none}.pulse-capture .pulseLine,.pulse-capture .pulseMoex{stroke-dashoffset:0}}
+
+/* PULSE 5.4 — scanner layer */
+.pulseScan{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:26px;background:radial-gradient(circle at 50% 44%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 42%),rgba(2,6,6,.96);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .18s ease,visibility .18s ease}
+.pulse-capture.is-scanning .pulseScan{opacity:1;visibility:visible}
+.pulse-capture.is-scanning>.pulseShot>*:not(.pulseScan){filter:blur(4px);opacity:.08}
+.pulseScanCore{width:min(100%,280px);text-align:center;position:relative}
+.pulseScanMark{display:flex;align-items:baseline;justify-content:center;gap:5px;color:var(--accent);letter-spacing:1.8px;margin-bottom:16px}
+.pulseScanMark i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:scanDot .7s ease-in-out infinite alternate}
+.pulseScanMark b{font-size:16px}.pulseScanMark span{font-size:8px;opacity:.7}
+.pulseScanTitle{font-size:11px;font-weight:950;letter-spacing:2px;color:#f4f8f7}
+.pulseScanSub{font-size:7px;color:#7e918b;margin-top:7px;min-height:10px;letter-spacing:.4px}
+.pulseScanTrack{height:3px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;margin:16px 8px 13px;box-shadow:0 0 18px color-mix(in srgb,var(--accent) 8%,transparent)}
+.pulseScanTrack i{display:block;width:0;height:100%;background:linear-gradient(90deg,transparent,var(--accent),#fff);box-shadow:0 0 12px var(--accent);transition:width .16s linear}
+.pulseScanRows{display:grid;gap:7px;text-align:left;padding:0 9px}.pulseScanRows span{font-size:6px;letter-spacing:1px;color:#53635f;transition:color .2s ease,transform .2s ease}.pulseScanRows span.done{color:var(--accent);transform:translateX(3px)}
+.pulse-capture.is-scanning .pulseShot:after{animation:pulseScanFast 1.15s linear infinite}
+@keyframes scanDot{from{opacity:.35;transform:scale(.75)}to{opacity:1;transform:scale(1.25)}}
+@keyframes pulseScanFast{from{top:-5%}to{top:105%}}
+@media(max-height:760px){.pulseScan{padding:18px}.pulseScanMark{margin-bottom:11px}.pulseScanTrack{margin:11px 8px 10px}}

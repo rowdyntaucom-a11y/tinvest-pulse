@@ -11,6 +11,19 @@
 <body data-theme="neon">
   <main class="phone" id="pulse">
     <section class="pulseShot" id="pulseShot" aria-hidden="true">
+      <div class="pulseScan" id="pulseScan" aria-hidden="true">
+        <div class="pulseScanCore">
+          <div class="pulseScanMark"><i></i><b>PULSE</b><span>RÖNTGEN</span></div>
+          <div class="pulseScanTitle">СКАНИРОВАНИЕ ПОРТФЕЛЯ</div>
+          <div class="pulseScanSub" id="pulseScanSub">Считываем состояние активов…</div>
+          <div class="pulseScanTrack"><i id="pulseScanProgress"></i></div>
+          <div class="pulseScanRows">
+            <span id="scanRow1">◌ СОСТОЯНИЕ АКТИВОВ</span>
+            <span id="scanRow2">◌ ДИНАМИКА И IMOEX</span>
+            <span id="scanRow3">◌ ДЕНЕЖНЫЙ ПОТОК</span>
+          </div>
+        </div>
+      </div>
       <div class="pulseGlow"></div>
       <div class="pulseHeader"><div><span class="pulseKicker">PULSE <b>RÖNTGEN</b></span><small>ВНУТРИ ПОРТФЕЛЯ</small></div><button class="pulseBack" id="pulseBack" type="button">↩ PULSE</button></div>
       <div class="pulseTelemetry"><span><i></i> LIVE</span><span id="pulseAssets">15 АКТИВОВ</span><span id="pulseAgeTop">43 ДН.</span><span id="pulseUpdated">ОБНОВЛЕНО —</span></div>
@@ -105,6 +118,6 @@
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=5.2.3"></script>
+  <script src="/app.js?v=5.4.0"></script>
 </body>
 </html>

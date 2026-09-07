@@ -185,6 +185,11 @@ function drawPulsePath(key,pts){
 }
 function enterPulse(){
   const root=$('pulse'),shot=$('pulseShot'),d=dashboardData||{};
+  // Reset the scanner every time PULSE is opened so each capture feels fresh.
+  root.classList.remove('is-scanning');
+  ['scanRow1','scanRow2','scanRow3'].forEach(id=>$(id)?.classList.remove('done'));
+  setStyle('pulseScanProgress','width','0%');
+  setText('pulseScanSub','Считываем состояние активов…');
   const p=d.portfolio||{}, st=pulseStats(d);
   setText('pulseValue',rub(p.value));
   setText('pulseGain',p.profitPercent==null?'—':`${p.profitPercent>=0?'+':''}${pct(p.profitPercent)}`);
@@ -216,9 +221,44 @@ function enterPulse(){
   setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
   root.classList.add('pulse-capture');shot.setAttribute('aria-hidden','false');pulseMode=true;
   setText('pulseBtn','✕ PULSE');document.body.classList.add('pulse-active');
+  runPulseScan(st);
+}
+function runPulseScan(st){
+  const root=$('pulse'), progress=$('pulseScanProgress'), sub=$('pulseScanSub');
+  if(!root||!progress)return;
+  root.classList.add('is-scanning');
+  const steps=[
+    [180,18,'Проверяем состав и вес активов…','scanRow1'],
+    [470,46,'Сверяем динамику портфеля с IMOEX…','scanRow2'],
+    [760,76,'Оцениваем денежный поток и просадку…','scanRow3'],
+    [1080,100,'Формируем персональный диагноз…',null]
+  ];
+  steps.forEach(([delay,pct,msg,id])=>setTimeout(()=>{
+    if(!pulseMode)return;
+    setStyle('pulseScanProgress','width',pct+'%');
+    setText('pulseScanSub',msg);
+    if(id)$(id)?.classList.add('done');
+  },delay));
+  setTimeout(()=>{
+    if(!pulseMode)return;
+    setText('pulseScanSub','СКАН ГОТОВ');
+    root.classList.remove('is-scanning');
+    animatePulseScore(st?.score||0);
+  },1320);
+}
+function animatePulseScore(target){
+  const el=$('pulseScore');
+  if(!el)return;
+  const start=0, duration=650, t0=performance.now();
+  const tick=(now)=>{
+    const k=clamp((now-t0)/duration,0,1), e=1-Math.pow(1-k,3), n=Math.round(start+(target-start)*e);
+    setText('pulseScore',String(n));
+    if(k<1)requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 }
 function exitPulse(){
-  const root=$('pulse'),shot=$('pulseShot');root.classList.remove('pulse-capture');shot.setAttribute('aria-hidden','true');pulseMode=false;
+  const root=$('pulse'),shot=$('pulseShot');root.classList.remove('pulse-capture','is-scanning');shot.setAttribute('aria-hidden','true');pulseMode=false;
   setText('pulseBtn','PULSE');document.body.classList.remove('pulse-active');
 }
 function togglePulse(){pulseMode?exitPulse():enterPulse();}
