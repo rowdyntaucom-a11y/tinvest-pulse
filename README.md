@@ -1,34 +1,18 @@
-# T-Invest Pocket Dashboard
+# tinvest-pulse v3.7 final
 
-Мобильный одностраничный дашборд для T-Invest API. Токен хранится только на сервере через переменную окружения `TINvest_API_TOKEN` и не попадает в HTML/JavaScript.
+Mobile single-screen T-Invest portfolio dashboard.
 
-## Что есть
-- текущая стоимость портфеля;
-- текущая прибыль и доходность по данным T-Invest;
-- дата первой операции и длительность истории;
-- активы портфеля;
-- топ роста и топ падения по текущей доходности позиций;
-- средний месячный пассивный доход по полученным дивидендам/купонам за период;
-- мобильный график;
-- заготовка сравнения с IMOEX и годовой доходности.
+## What's fixed
+- CBR key rate is parsed automatically from the official Bank of Russia pages; no hardcoded current rate.
+- Next CBR board meeting is parsed automatically from the official Bank of Russia homepage.
+- Portfolio history cache is versioned to prevent an older in-process history from being reused.
+- Dashboard and history API responses are explicitly no-cache.
+- Frontend `app.js` has a version query string to prevent an old browser bundle from being reused.
+- IMOEX history uses MOEX candles first with the official history endpoint as fallback.
 
-## Важно про расчёты
-T-Invest API отдаёт текущий портфель, позиции, операции и котировки. Для полноценного исторического графика стоимости с учётом пополнений нужна отдельная история дневных снимков или реконструкция портфеля по историческим свечам. В этой первой версии график — визуальный mobile-first блок, а показатели текущей стоимости/позиции/операций берутся из API.
+## Render
+Build: `npm install`
+Start: `node server.js`
+Environment variable: `TINvest_API_TOKEN`
 
-## Запуск локально
-1. Установить Node.js 20+.
-2. Скопировать `.env.example` в `.env`.
-3. В `.env` указать новый read-only токен T-Invest.
-4. `npm install`
-5. `npm start`
-6. Открыть `http://localhost:10000`.
-
-## Развёртывание на Render
-- Создать Web Service из этого проекта.
-- Build command: `npm install`
-- Start command: `node server.js`
-- Добавить Environment Variable `TINvest_API_TOKEN` со своим токеном.
-- Открыть выданный `onrender.com` адрес на смартфоне.
-- В браузере можно выбрать «Добавить на главный экран», чтобы запускать как приложение.
-
-Никогда не коммитьте `.env` и токен в Git.
+Never commit a real API token to GitHub.

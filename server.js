@@ -609,7 +609,7 @@ async function getMoexHistory(from, to) {
 }
 
 async function getCbrMacro() {
-  const fallback = { available: false, rate: null, rateDate: null, nextMeeting: '2026-09-11' };
+  const fallback = { available: false, rate: null, rateDate: null, nextMeeting: null };
   try {
     const [home, keyrate] = await Promise.all([
       safeFetch('https://www.cbr.ru/'),
@@ -621,23 +621,27 @@ async function getCbrMacro() {
     if (keyrate.ok) {
       const text = keyrate.text
         .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-        .replace(/<style[\s\\S]*?<\/style>/gi, ' ')
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
         .replace(/<[^>]+>/g, ' ')
         .replace(/&nbsp;/gi, ' ')
         .replace(/\s+/g, ' ');
-      const m = text.match(/(\\d{2}\\.\\d{2}\\.\\d{4})\\s+([0-9]+(?:[.,][0-9]+)?)/);
-      if (m) { rateDate = m[1].split('.').reverse().join('-'); rate = Number(m[2].replace(',', '.')); }
+      const matches = [...text.matchAll(/(\d{2}\.\d{2}\.\d{4})\s+([0-9]+(?:[.,][0-9]+)?)/g)];
+      if (matches.length) {
+        const latest = matches.reduce((best, item) => item[1].split('.').reverse().join('-') > best[1].split('.').reverse().join('-') ? item : best, matches[0]);
+        rateDate = latest[1].split('.').reverse().join('-');
+        rate = Number(latest[2].replace(',', '.'));
+      }
     }
 
     let nextMeeting = null;
     if (home.ok) {
       const text = home.text
         .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-        .replace(/<style[\s\\S]*?<\/style>/gi, ' ')
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
         .replace(/<[^>]+>/g, ' ')
         .replace(/&nbsp;/gi, ' ')
         .replace(/\s+/g, ' ');
-      const m = text.match(/Следующее заседание Совета директоров по ключевой ставке\\s+([0-9]{2}\\.[0-9]{2}\\.[0-9]{4})/i);
+      const m = text.match(/Следующее\s+заседание\s+Совета\s+директоров\s+по\s+ключевой\s+ставке\s+([0-9]{2}\.[0-9]{2}\.[0-9]{4})/i);
       if (m) nextMeeting = m[1].split('.').reverse().join('-');
     }
     if (!rate || !nextMeeting) return { ...fallback, rate, rateDate, nextMeeting: nextMeeting || fallback.nextMeeting, available: Boolean(rate) };
@@ -681,7 +685,7 @@ function signedTradeCash(op) {
 async function buildPortfolioHistory(accountId, operations, firstInvestment, portfolioValue) {
   if (!firstInvestment?.date) return { available: false, points: [], reason: 'no_start_date' };
 
-  const cacheKey = String(accountId || 'default');
+  const cacheKey = `${String(accountId || 'default')}:3.7`;
   const cached = HISTORY_CACHE.get(cacheKey);
   if (cached && Date.now() - cached.createdAt < HISTORY_CACHE_TTL_MS) return cached.data;
 
@@ -824,7 +828,7 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     startDate: points[0]?.date || null,
     endDate: points[points.length - 1]?.date || null,
     points,
-    method: 'daily_time_weighted_return_from_operations_and_historical_closes_v35',
+    method: 'daily_time_weighted_return_from_operations_and_historical_closes_v37',
     debug: {
       instruments: instrumentRows.map(r => ({figi:r.figi, instrumentId:r.instrumentId, instrumentType:r.instrumentType, candles:r.candles.length})),
       rawFirst: raw[0] || null,
@@ -1036,7 +1040,8 @@ app.get('/api/history-debug', async (req, res) => {
     const firstInvestment = operations.filter(isExternalCashOperation).map(op => ({date:safeDate(op.date), amount:operationCash(op)})).filter(x=>x.date && x.amount>0).sort((a,b)=>a.date-b.date)[0];
     const value = moneyValue(portfolio?.totalAmountPortfolio);
     const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
-    res.json({ok:true,version:'3.6-cbr-imoex',positions,history});
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.json({ok:true,version:'3.7-final-cbr-imoex',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
   }
@@ -1114,7 +1119,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.6-cbr-imoex' });
+  res.json({ ok: true, version: '3.7-final-cbr-imoex' });
 });
 
 
@@ -1161,6 +1166,7 @@ app.get('/api/operations-summary', async (req, res) => {
 app.get('/api/dashboard', async (req, res) => {
   try {
     const data = await buildDashboard();
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.json(data);
   } catch (err) {
     console.error('Dashboard error:', err);
