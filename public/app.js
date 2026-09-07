@@ -133,7 +133,7 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=5.0&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{const r=await fetch('/api/dashboard?v=5.5&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
 let pulseMode=false;
 let pulseLongTimer=null;
 
@@ -149,19 +149,17 @@ function pulseStats(d){
   for(const v of ps){peak=Math.max(peak,v);if(peak>0)maxDD=Math.max(maxDD,(peak-v)/peak*100);}
   const assets=Array.isArray(d?.assets)?d.assets:((Array.isArray(p.assets)?p.assets:[]));
   const total=Number(p.value)||0;
-  const whale=[...assets].sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0))[0];
+  const byValue=[...assets].sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0));
+  const whale=byValue[0];
   const whaleWeight=whale&&total>0?((Number(whale.currentValue)||0)/total*100):null;
+  const byYield=[...assets].sort((a,b)=>(Number(b.expectedYield)||0)-(Number(a.expectedYield)||0));
+  const strength=byYield[0];
+  const painAsset=byYield[byYield.length-1];
   const monthly=Number(d?.passiveIncome?.averageMonthly);
   const xirr=Number(p.xirr)*100;
   const incomeYield=Number.isFinite(monthly)&&total>0?(monthly*12/total*100):0;
   const score=clamp(Math.round(48 + clamp(pReturn*2.8,-15,18) + clamp(xirr*.45,-8,18) + clamp(incomeYield*.8,0,8) + clamp((assets.length-5)*.7,0,8) - clamp(maxDD*.8,0,12) + clamp((pReturn-mReturn)*1.1,-8,8)),0,100);
   const ageDays=p.startDate?Math.max(0,Math.round((Date.now()-new Date(p.startDate).getTime())/86400000)):null;
-  let character='УПРЯМЫЙ', text='Просадку переживает и продолжает работать.';
-  if(pReturn>=3 && pReturn-mReturn>=0){character='КРЯХТИТ, НО РАСТЁТ';text='Растёт и индекс обгоняет. Так держать.';}
-  else if(incomeYield>=7){character='ДИВИДЕНДНЫЙ';text='Деньги приходят сами. Терпение окупается.';}
-  else if(maxDD>=8){character='ЖЕЛЕЗНЫЙ';text='Видел просадку. Не дрогнул. Вернулся.';}
-  else if(pReturn-mReturn<-2){character='УПРЯМЫЙ';text='Индекс убежал вперёд. Фонд догоняет.';}
-  else if(pReturn>=0){character='КРЕПКИЙ';text='Без суеты. Деньги работают каждый день.';}
   const pulseBeat=pReturn>=0?'ЖИВОЙ':'КРЯХТИТ';
   const totalBase=p1+m1;
   const pBar=totalBase>0?clamp(p1/totalBase*100,18,82):50;
@@ -169,13 +167,44 @@ function pulseStats(d){
   const dnaStability=clamp(Math.round(88 - maxDD*5.2),18,100);
   const dnaGrowth=clamp(Math.round(48 + pReturn*4 + (pReturn-mReturn)*2),0,100);
   const dnaDivers=clamp(Math.round(38 + Math.min(15,Math.max(0,assets.length-1))*3.2),0,100);
-  let diagnosisTitle='КРЯХТИТ, НО ЖИВ';
-  let diagnosisText='Портфель пережил просадку и продолжает работать.';
-  if(pReturn-mReturn>=2){diagnosisTitle='ПОШЁЛ В РАЗНОС';diagnosisText='Портфель обгоняет индекс. Не мешать.';}
-  else if(pReturn-mReturn<=-4){diagnosisTitle='НУЖНО ДОГОНЯТЬ';diagnosisText='IMOEX впереди. Фонд пока держит оборону.';}
-  else if(maxDD>=10){diagnosisTitle='ЖЕЛЕЗНЫЙ';diagnosisText='Просадка серьёзная, но портфель не сломался.';}
-  else if(incomeYield>=5){diagnosisTitle='ДЕНЬГИ РАБОТАЮТ';diagnosisText='Дивидендный поток помогает держать удар.';}
-  return {pts,p1,m1,pReturn,mReturn,maxDD,whale,whaleWeight,monthly,incomeYield,score,ageDays,character,text,pulseBeat,pBar, mBar:100-pBar,dnaIncome,dnaStability,dnaGrowth,dnaDivers,diagnosisTitle,diagnosisText};
+  const strengthTicker=strength?(strength.ticker||strength.name||'—'):'—';
+  const painTicker=painAsset?(painAsset.ticker||painAsset.name||'—'):'—';
+  const strengthYield=Number(strength?.expectedYield)||0;
+  const painYield=Number(painAsset?.expectedYield)||0;
+  const riskLabel=maxDD>=10?'ВЫСОКИЙ':(maxDD>=6||((whaleWeight||0)>=30)?'УМЕРЕННЫЙ':'НИЗКИЙ');
+
+  // The Pulse diagnosis is derived from the live portfolio state rather than fixed copy.
+  let diagnosisTitle='ПУЛЬС СТАБИЛЬНЫЙ';
+  let diagnosisText=`Сила: ${strengthTicker}. Боль: ${painTicker}. Риск: ${riskLabel.toLowerCase()}.`;
+  let character='УПРЯМЫЙ';
+  let text='Портфель держит удар и продолжает работать.';
+  if(pReturn-mReturn>=2){
+    character='ОХОТНИК ЗА РОСТОМ';
+    text=`${strengthTicker} ведёт атаку. Фонд обгоняет индекс.`;
+    diagnosisTitle='ПОШЁЛ В РАЗНОС';
+    diagnosisText=`Сила: ${strengthTicker} +${strengthYield>=0?'+':''}${rub(strengthYield)}. IMOEX позади. Не мешать.`;
+  } else if(incomeYield>=5){
+    character='ДИВИДЕНДНЫЙ ОХОТНИК';
+    text=`${rub(monthly)} в месяц — поток уже работает сам.`;
+    diagnosisTitle='ДЕНЬГИ РАБОТАЮТ';
+    diagnosisText=`Сила: денежный поток. ${rub(monthly)}/мес. Боль: ${painTicker}.`;
+  } else if(pReturn-mReturn<=-4){
+    character='УПРЯМЫЙ ДОГОНЯЛА';
+    text=`${painTicker} тянет вниз. Фонд держит курс и догоняет индекс.`;
+    diagnosisTitle='НУЖНО ДОГОНЯТЬ';
+    diagnosisText=`Боль: ${painTicker} ${painYield>=0?'+':''}${rub(painYield)}. IMOEX впереди на ${Math.abs(pReturn-mReturn).toFixed(1).replace('.',',')} п.п.`;
+  } else if(maxDD>=10 || riskLabel==='ВЫСОКИЙ'){
+    character='ЖЕЛЕЗНЫЙ';
+    text=`Пережил ${maxDD.toFixed(1).replace('.',',')}% просадки. Не дрогнул.`;
+    diagnosisTitle='РЕЖИМ ОБОРОНЫ';
+    diagnosisText=`Риск: высокий. Кит ${strengthTicker==='—'?'портфеля':(whale?.ticker||whale?.name||'—')} — ${whaleWeight?.toFixed(1).replace('.',',')||'—'}% веса.`;
+  } else if(pReturn>=0){
+    character='КРЕПКИЙ';
+    text=`${strengthTicker} даёт импульс. Деньги работают без суеты.`;
+    diagnosisTitle='ДЕНЬГИ РАБОТАЮТ';
+    diagnosisText=`Сила: ${strengthTicker}. Боль: ${painTicker}. Риск: ${riskLabel.toLowerCase()}.`;
+  }
+  return {pts,p1,m1,pReturn,mReturn,maxDD,whale,whaleWeight,strength,painAsset,strengthTicker,painTicker,strengthYield,painYield,riskLabel,monthly,incomeYield,score,ageDays,character,text,pulseBeat,pBar, mBar:100-pBar,dnaIncome,dnaStability,dnaGrowth,dnaDivers,diagnosisTitle,diagnosisText};
 }
 function drawPulsePath(key,pts){
   const a=pts.map(x=>Number(x?.[key])).filter(v=>Number.isFinite(v)&&v>0);
@@ -205,14 +234,14 @@ function enterPulse(){
   const whale=st.whale;
   setText('pulseWhale',whale?(whale.ticker||whale.name||'—'):'—');
   setText('pulseWhaleWeight',st.whaleWeight==null?'—':`${st.whaleWeight.toFixed(1).replace('.',',')}% веса`);
-  setText('pulsePain',st.maxDD>0?`−${st.maxDD.toFixed(1).replace('.',',')}%`:'0,0%');
-  setText('pulsePainText',st.maxDD>0?'макс. просадка':'без просадки');
+  setText('pulsePain',st.painTicker||'—');
+  setText('pulsePainText',st.maxDD>0?`просадка −${st.maxDD.toFixed(1).replace('.',',')}%`:'без просадки');
   setText('pulseSpeed',Number.isFinite(st.monthly)?rub(st.monthly/30.4375):'—');
   setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);const assetCount=Array.isArray(d?.assets)?d.assets.length:(Array.isArray(p.assets)?p.assets.length:0);setText('pulseAssets',`${assetCount} АКТИВОВ`);setText('pulseAgeTop',st.ageDays==null?'—':`${st.ageDays} ДН.`);setText('pulseUpdated',`ОБНОВЛЕНО ${new Date(d.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`);
   setText('pulseCharacterName',st.character);setText('pulseCharacterText',st.text);
   const dna=[['dnaIncome','dnaIncomeVal',st.dnaIncome],['dnaStability','dnaStabilityVal',st.dnaStability],['dnaGrowth','dnaGrowthVal',st.dnaGrowth],['dnaDivers','dnaDiversVal',st.dnaDivers]];
   for(const [bar,val,n] of dna){setStyle(bar,'width',`${n}%`);setText(val,`${n}`);}
-  setText('pulseDiagnosisTitle',st.diagnosisTitle);setText('pulseDiagnosisText',st.diagnosisText);
+  setText('pulseDiagnosisTitle',st.diagnosisTitle);setText('pulseDiagnosisText',st.diagnosisText);root.dataset.pulseRisk=(st.riskLabel||'').toLowerCase();root.dataset.pulseDiagnosis=st.diagnosisTitle;
   setStyle('scoreRing','background',`conic-gradient(var(--accent) 0deg,rgba(255,255,255,.07) 0deg)`); requestAnimationFrame(()=>setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`));
   setStyle('battlePortfolio','width',`${st.pBar}%`);setStyle('battleMoex','width',`${st.mBar}%`);
   setText('pulseBattleText',st.pReturn-st.mReturn>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');setText('pulsePortfolioReturn',`${st.pReturn>=0?'+':''}${st.pReturn.toFixed(1).replace('.',',')}%`);setText('pulseMoexReturn',`${st.mReturn>=0?'+':''}${st.mReturn.toFixed(1).replace('.',',')}%`);
