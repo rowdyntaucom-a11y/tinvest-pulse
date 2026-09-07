@@ -9,3 +9,10 @@ Mobile-first T-Invest portfolio dashboard.
 - All five visual themes remain available.
 - Long press on PULSE adds a subtle deep-pulse visual state.
 - No API token is stored in the frontend.
+
+
+## PULSE 5.4 SCAN
+- Added a 1.3s portfolio scanner on every PULSE entry.
+- Scanner stages use live dashboard data already loaded by the app.
+- Pulse Score counts up after the scan completes.
+- Re-entering PULSE restarts the scan.
