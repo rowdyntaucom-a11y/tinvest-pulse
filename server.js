@@ -1181,7 +1181,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '4.2-final-stable-ui' });
+  res.json({ ok: true, version: '4.4-vs-moex-fix' });
 });
 
 
