@@ -607,12 +607,45 @@ async function getMoexHistory(from, to) {
   }
 }
 
+function cbrHttpsRequest(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const target = new URL(url);
+    const req = https.request({
+      protocol: target.protocol,
+      hostname: target.hostname,
+      port: target.port || 443,
+      path: `${target.pathname}${target.search}`,
+      method: options.method || 'GET',
+      headers: {
+        'User-Agent': 'tinvest-pulse/4.3',
+        'Accept': 'text/html,application/xhtml+xml',
+        ...(options.headers || {})
+      },
+      timeout: options.timeout || 15000
+      // Intentionally use Node's normal system trust store for cbr.ru.
+      // The custom Russian CA bundle above is only for the T-Bank API.
+    }, response => {
+      let data = '';
+      response.setEncoding('utf8');
+      response.on('data', chunk => { data += chunk; });
+      response.on('end', () => resolve({
+        status: response.statusCode,
+        statusText: response.statusMessage,
+        text: data
+      }));
+    });
+    req.on('timeout', () => req.destroy(new Error('CBR HTTPS request timeout')));
+    req.on('error', reject);
+    req.end();
+  });
+}
+
 async function getCbrMacro() {
   const fallback = { available: false, rate: null, rateDate: null, nextMeeting: null };
   try {
     const [home, keyrate] = await Promise.all([
-      httpsJsonRequest('https://www.cbr.ru/'),
-      httpsJsonRequest('https://www.cbr.ru/hd_base/keyrate/')
+      cbrHttpsRequest('https://www.cbr.ru/'),
+      cbrHttpsRequest('https://www.cbr.ru/hd_base/keyrate/')
     ]);
 
     const htmlToText = html => String(html || '')
@@ -1070,7 +1103,7 @@ app.get('/api/history-debug', async (req, res) => {
     const value = moneyValue(portfolio?.totalAmountPortfolio);
     const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.json({ok:true,version:'4.2-final-stable-ui',positions,history});
+    res.json({ok:true,version:'4.3-cbr-system-ca',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
   }
