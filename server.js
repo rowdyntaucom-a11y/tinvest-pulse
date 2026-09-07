@@ -520,8 +520,7 @@ async function getDailyCandles(instrumentId, from, to) {
       to: to.toISOString(),
       interval: 'CANDLE_INTERVAL_DAY',
       instrumentId: instrumentId,
-      candleSourceType: 'CANDLE_SOURCE_EXCHANGE',
-      limit: 300
+      candleSourceType: 'CANDLE_SOURCE_EXCHANGE'
     });
     return Array.isArray(data?.candles) ? data.candles : [];
   } catch (err) {
@@ -685,7 +684,7 @@ function signedTradeCash(op) {
 async function buildPortfolioHistory(accountId, operations, firstInvestment, portfolioValue) {
   if (!firstInvestment?.date) return { available: false, points: [], reason: 'no_start_date' };
 
-  const cacheKey = `${String(accountId || 'default')}:3.7`;
+  const cacheKey = `${String(accountId || 'default')}:3.8`;
   const cached = HISTORY_CACHE.get(cacheKey);
   if (cached && Date.now() - cached.createdAt < HISTORY_CACHE_TTL_MS) return cached.data;
 
@@ -828,7 +827,7 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     startDate: points[0]?.date || null,
     endDate: points[points.length - 1]?.date || null,
     points,
-    method: 'daily_time_weighted_return_from_operations_and_historical_closes_v37',
+    method: 'daily_time_weighted_return_from_operations_and_historical_closes_v38',
     debug: {
       instruments: instrumentRows.map(r => ({figi:r.figi, instrumentId:r.instrumentId, instrumentType:r.instrumentType, candles:r.candles.length})),
       rawFirst: raw[0] || null,
@@ -1041,7 +1040,7 @@ app.get('/api/history-debug', async (req, res) => {
     const value = moneyValue(portfolio?.totalAmountPortfolio);
     const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.json({ok:true,version:'3.7-final-cbr-imoex',positions,history});
+    res.json({ok:true,version:'3.8-final-history-fix',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
   }
@@ -1119,7 +1118,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.7-final-cbr-imoex' });
+  res.json({ ok: true, version: '3.8-final-history-fix' });
 });
 
 
