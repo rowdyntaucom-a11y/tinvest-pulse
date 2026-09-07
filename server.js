@@ -356,6 +356,39 @@ function operationCash(op) {
   return 0;
 }
 
+// For the historical portfolio reconstruction we need a guaranteed cash-flow
+// direction. T-Invest operation amounts are not consistent enough across all
+// operation types to safely rely on the sign of `payment` alone.
+function signedHistoricalCash(op) {
+  const raw = Math.abs(operationCash(op));
+  if (!raw) return 0;
+
+  const type = String(op?.type || '').toUpperCase();
+  const name = String(op?.name || '').toLowerCase();
+
+  if (type === 'OPERATION_TYPE_INPUT' ||
+      type === 'OPERATION_TYPE_BROKER_ACCOUNT_INPUT' ||
+      name.includes('пополн')) return raw;
+
+  if (type === 'OPERATION_TYPE_OUTPUT' ||
+      type === 'OPERATION_TYPE_BROKER_ACCOUNT_OUTPUT' ||
+      name.includes('вывод')) return -raw;
+
+  if (type.includes('BUY') || type === 'OPERATION_TYPE_DELIVERY_BUY' ||
+      type === 'OPERATION_TYPE_PRIMARY_ORDER') return -raw;
+
+  if (type.includes('SELL') || type === 'OPERATION_TYPE_DELIVERY_SELL') return raw;
+
+  if (type.includes('DIVIDEND') || type.includes('COUPON') ||
+      name.includes('дивид') || name.includes('купон')) return raw;
+
+  if (type.includes('TAX') || type.includes('COMMISSION') ||
+      type.includes('FEE') || type.includes('ACCRUED_INTEREST')) return -raw;
+
+  // Preserve the API sign for other cash operations.
+  return operationCash(op);
+}
+
 function isExternalCashOperation(op) {
   const type = String(op?.type || '').toUpperCase();
   const name = String(op?.name || '').toLowerCase();
@@ -596,7 +629,10 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
   if (!dates.length) return { available: false, points: [], reason: 'no_dates' };
 
   // Rebuild cash and security quantities at the end of each trading day.
-  const sortedOps = [...ops].map(op => ({ ...op, _date: safeDate(op.date) })).filter(op => op._date).sort((a, b) => a._date - b._date);
+  const sortedOps = [...ops]
+    .map(op => ({ ...op, _date: safeDate(op.date) }))
+    .filter(op => op._date && op._date >= from)
+    .sort((a, b) => a._date - b._date);
   const qty = new Map();
   let cash = 0;
   let opIndex = 0;
@@ -607,7 +643,7 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     end.setUTCHours(23, 59, 59, 999);
     while (opIndex < sortedOps.length && sortedOps[opIndex]._date <= end) {
       const op = sortedOps[opIndex++];
-      cash += operationCash(op);
+      cash += signedHistoricalCash(op);
       const delta = securityQuantityDelta(op);
       if (delta) qty.set(op.figi, (qty.get(op.figi) || 0) + delta);
     }
@@ -639,7 +675,7 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
   for (const op of sortedOps) {
     if (!isExternalCashOperation(op)) continue;
     const key = dateKey(op._date);
-    externalByDay.set(key, (externalByDay.get(key) || 0) + operationCash(op));
+    externalByDay.set(key, (externalByDay.get(key) || 0) + signedHistoricalCash(op));
   }
 
   // Time-weighted return: remove the effect of deposits/withdrawals from the curve.
@@ -934,7 +970,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.1-history-chart-fixed' });
+  res.json({ ok: true, version: '3.3-history-cash-fixed' });
 });
 
 
