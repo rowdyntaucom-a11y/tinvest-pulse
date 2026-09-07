@@ -165,7 +165,17 @@ function pulseStats(d){
   const pulseBeat=pReturn>=0?'ЖИВОЙ':'КРЯХТИТ';
   const totalBase=p1+m1;
   const pBar=totalBase>0?clamp(p1/totalBase*100,18,82):50;
-  return {pts,p1,m1,pReturn,mReturn,maxDD,whale,whaleWeight,monthly,incomeYield,score,ageDays,character,text,pulseBeat,pBar, mBar:100-pBar};
+  const dnaIncome=clamp(Math.round(35 + incomeYield*7.5),0,100);
+  const dnaStability=clamp(Math.round(88 - maxDD*5.2),18,100);
+  const dnaGrowth=clamp(Math.round(48 + pReturn*4 + (pReturn-mReturn)*2),0,100);
+  const dnaDivers=clamp(Math.round(38 + Math.min(15,Math.max(0,assets.length-1))*3.2),0,100);
+  let diagnosisTitle='КРЯХТИТ, НО ЖИВ';
+  let diagnosisText='Портфель пережил просадку и продолжает работать.';
+  if(pReturn-mReturn>=2){diagnosisTitle='ПОШЁЛ В РАЗНОС';diagnosisText='Портфель обгоняет индекс. Не мешать.';}
+  else if(pReturn-mReturn<=-4){diagnosisTitle='НУЖНО ДОГОНЯТЬ';diagnosisText='IMOEX впереди. Фонд пока держит оборону.';}
+  else if(maxDD>=10){diagnosisTitle='ЖЕЛЕЗНЫЙ';diagnosisText='Просадка серьёзная, но портфель не сломался.';}
+  else if(incomeYield>=5){diagnosisTitle='ДЕНЬГИ РАБОТАЮТ';diagnosisText='Дивидендный поток помогает держать удар.';}
+  return {pts,p1,m1,pReturn,mReturn,maxDD,whale,whaleWeight,monthly,incomeYield,score,ageDays,character,text,pulseBeat,pBar, mBar:100-pBar,dnaIncome,dnaStability,dnaGrowth,dnaDivers,diagnosisTitle,diagnosisText};
 }
 function drawPulsePath(key,pts){
   const a=pts.map(x=>Number(x?.[key])).filter(v=>Number.isFinite(v)&&v>0);
@@ -195,6 +205,9 @@ function enterPulse(){
   setText('pulseSpeed',Number.isFinite(st.monthly)?rub(st.monthly/30.4375):'—');
   setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);
   setText('pulseCharacterName',st.character);setText('pulseCharacterText',st.text);
+  const dna=[['dnaIncome','dnaIncomeVal',st.dnaIncome],['dnaStability','dnaStabilityVal',st.dnaStability],['dnaGrowth','dnaGrowthVal',st.dnaGrowth],['dnaDivers','dnaDiversVal',st.dnaDivers]];
+  for(const [bar,val,n] of dna){setStyle(bar,'width',`${n}%`);setText(val,`${n}`);}
+  setText('pulseDiagnosisTitle',st.diagnosisTitle);setText('pulseDiagnosisText',st.diagnosisText);
   setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`);
   setStyle('battlePortfolio','width',`${st.pBar}%`);setStyle('battleMoex','width',`${st.mBar}%`);
   setText('pulseBattleText',st.pReturn-st.mReturn>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');

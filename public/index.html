@@ -12,7 +12,7 @@
   <main class="phone" id="pulse">
     <section class="pulseShot" id="pulseShot" aria-hidden="true">
       <div class="pulseGlow"></div>
-      <div class="pulseHeader"><div><span class="pulseKicker">КРЯХТЯЩИЙ <b>ФОНД</b></span><small>РЕНТГЕН ПОРТФЕЛЯ</small></div><button class="pulseBack" id="pulseBack" type="button">↩ PULSE</button></div>
+      <div class="pulseHeader"><div><span class="pulseKicker">PULSE <b>RÖNTGEN</b></span><small>ВНУТРИ ПОРТФЕЛЯ</small></div><button class="pulseBack" id="pulseBack" type="button">↩ PULSE</button></div>
       <div class="pulseHero">
         <div class="pulseHeroCopy"><div class="pulseShotLabel">СЕГОДНЯШНИЙ ПУЛЬС</div><div class="pulseShotValue" id="pulseValue">—</div><div class="pulseShotGain" id="pulseGain">—</div></div>
         <div class="scoreRing" id="scoreRing"><div><b id="pulseScore">—</b><span>PULSE<br>SCORE</span></div></div>
@@ -26,6 +26,16 @@
         <div class="pulseTile"><small>🧱 ВОЗРАСТ</small><b id="pulseAge">—</b><span>портфеля</span></div>
       </div>
       <div class="pulseCharacter"><div><small>ХАРАКТЕР ПОРТФЕЛЯ</small><b id="pulseCharacterName">—</b></div><span id="pulseCharacterText">—</span></div>
+      <div class="pulseDNA">
+        <div class="pulseSectionHead"><span>🧬 ДНК ПОРТФЕЛЯ</span><b>РАЗБОР SCORE</b></div>
+        <div class="dnaGrid">
+          <div class="dnaItem"><span>ДИВИДЕНДЫ</span><i><em id="dnaIncome"></em></i><b id="dnaIncomeVal">—</b></div>
+          <div class="dnaItem"><span>СТАБИЛЬНОСТЬ</span><i><em id="dnaStability"></em></i><b id="dnaStabilityVal">—</b></div>
+          <div class="dnaItem"><span>РОСТ</span><i><em id="dnaGrowth"></em></i><b id="dnaGrowthVal">—</b></div>
+          <div class="dnaItem"><span>ДИВЕРСИФ.</span><i><em id="dnaDivers"></em></i><b id="dnaDiversVal">—</b></div>
+        </div>
+      </div>
+      <div class="pulseDiagnosis"><div><small>🩺 ДИАГНОЗ</small><b id="pulseDiagnosisTitle">—</b></div><span id="pulseDiagnosisText">—</span></div>
       <div class="pulseShotFooter"><span>НЕ БАНК · НЕ ФОНД · ПРОСТО КРЯХТИТ</span><time id="pulseTime">—</time></div>
     </section>
     <div class="noise"></div>
@@ -94,6 +104,6 @@
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=5.0"></script>
+  <script src="/app.js?v=5.1"></script>
 </body>
 </html>

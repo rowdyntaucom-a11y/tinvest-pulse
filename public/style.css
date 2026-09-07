@@ -93,3 +93,17 @@ body[data-theme=graphite] .pulse-capture .pulseShot{background:linear-gradient(1
 .pulse-capture>.top .pulseBtn{display:block;pointer-events:auto;background:rgba(3,9,8,.58);border:1px solid color-mix(in srgb,var(--accent) 48%,transparent);box-shadow:0 0 22px var(--glow);color:var(--accent);font-size:10px;padding:9px 12px}
 .pulse-capture .pulseHeader{padding-top:39px}
 .pulse-capture .pulseBack{display:none}
+
+/* v5.1 — DNA + Diagnosis: fill the PULSE screen with useful character */
+.pulseHeader{display:none}
+.pulseDNA{margin-top:7px;padding:8px 9px 7px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(135deg,rgba(255,255,255,.018),color-mix(in srgb,var(--accent) 3%,transparent));}
+.pulseSectionHead{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:6px;letter-spacing:1px;font-weight:950;margin-bottom:7px}
+.pulseSectionHead b{color:var(--accent);font-size:5px;letter-spacing:.8px}
+.dnaGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px}
+.dnaItem{display:grid;grid-template-columns:66px 1fr 19px;align-items:center;gap:5px;font-size:5px;color:#73807d;font-weight:900;letter-spacing:.5px}
+.dnaItem i{height:4px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden}
+.dnaItem i em{display:block;height:100%;width:0;border-radius:4px;background:var(--accent);box-shadow:0 0 7px var(--glow);transition:width .45s ease}
+.dnaItem b{font-size:6px;color:#dfe9e5;text-align:right}
+.pulseDiagnosis{margin-top:7px;min-height:45px;padding:7px 9px;display:flex;align-items:center;justify-content:space-between;border-left:2px solid var(--accent);border-top:1px solid rgba(255,255,255,.045);border-bottom:1px solid rgba(255,255,255,.045);background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 7%,transparent),transparent 72%)}
+.pulseDiagnosis small{display:block;color:var(--muted);font-size:6px;letter-spacing:1px;font-weight:950}.pulseDiagnosis b{display:block;color:var(--accent);font-size:13px;line-height:1.05;margin-top:2px}.pulseDiagnosis span{max-width:54%;text-align:right;color:#8d9b96;font-size:7px;line-height:1.25}
+@media(max-height:760px){.pulseDNA{margin-top:5px;padding:6px 8px}.pulseSectionHead{margin-bottom:5px}.dnaGrid{gap:5px 9px}.dnaItem{grid-template-columns:59px 1fr 17px;font-size:4.5px}.pulseDiagnosis{margin-top:5px;min-height:39px;padding:5px 8px}.pulseDiagnosis b{font-size:11px}.pulseDiagnosis span{font-size:6px}}
