@@ -5,23 +5,26 @@
 }
 
 :root {
-    --bg: #070d12;
-    --card: #101820;
-    --card2: #151f28;
-    --border: rgba(255,255,255,0.08);
-    --text: #f4f7f9;
-    --muted: #8d9aa5;
-    --green: #00d084;
-    --red: #ff5263;
-    --blue: #5ca8ff;
-    --yellow: #ffd166;
+    --bg: #070b12;
+    --card: #101722;
+    --card2: #141d2a;
+    --border: rgba(255,255,255,.08);
+    --text: #f4f7fb;
+    --muted: #8793a5;
+    --green: #19d37a;
+    --red: #ff5b6e;
+    --blue: #4285ff;
+    --yellow: #ffc857;
 }
 
 html,
 body {
     width: 100%;
     min-height: 100%;
-    background: var(--bg);
+    background:
+        radial-gradient(circle at 20% 0%, rgba(66,133,255,.16), transparent 30%),
+        radial-gradient(circle at 100% 30%, rgba(25,211,122,.10), transparent 28%),
+        var(--bg);
     color: var(--text);
     font-family:
         Inter,
@@ -42,16 +45,12 @@ button {
     font-family: inherit;
 }
 
-/* =========================
-   MAIN
-========================= */
-
 #app {
     width: 100%;
     max-width: 520px;
     min-height: 100vh;
     margin: 0 auto;
-    padding: 14px 14px 20px;
+    padding: 12px;
 }
 
 /* =========================
@@ -62,68 +61,37 @@ button {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
 .logo {
-    font-size: 21px;
-    font-weight: 800;
-    letter-spacing: -0.6px;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -.7px;
 }
 
 .subtitle {
-    margin-top: 3px;
+    margin-top: 2px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .pulse {
-    border: 1px solid rgba(0,208,132,0.35);
+    border: 0;
     border-radius: 14px;
-    background: linear-gradient(
-        135deg,
-        rgba(0,208,132,0.20),
-        rgba(0,208,132,0.07)
-    );
-    color: var(--green);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
     padding: 11px 15px;
+    background: linear-gradient(135deg, #1b72ff, #0055d9);
+    color: white;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .8px;
+    box-shadow: 0 8px 25px rgba(0,90,220,.28);
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(0,208,132,0.08);
-    transition: transform .15s ease;
 }
 
 .pulse:active {
-    transform: scale(.94);
-}
-
-/* =========================
-   CARDS
-========================= */
-
-.portfolio-card,
-.card,
-.chart-card,
-.assets-card,
-.income-card,
-.compare-card,
-.top-card {
-    position: relative;
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,0.045),
-            rgba(255,255,255,0.015)
-        ),
-        var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    box-shadow:
-        0 12px 35px rgba(0,0,0,0.22),
-        inset 0 1px 0 rgba(255,255,255,0.025);
+    transform: scale(.95);
 }
 
 /* =========================
@@ -131,134 +99,166 @@ button {
 ========================= */
 
 .portfolio-card {
+    position: relative;
     overflow: hidden;
-    padding: 18px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.015)
+        ),
+        var(--card);
+    box-shadow: 0 15px 40px rgba(0,0,0,.25);
     margin-bottom: 10px;
 }
 
-.portfolio-card::before {
+.portfolio-card::after {
     content: "";
     position: absolute;
-    width: 170px;
-    height: 170px;
-    right: -80px;
-    top: -80px;
+    width: 150px;
+    height: 150px;
+    right: -70px;
+    top: -70px;
     border-radius: 50%;
-    background: rgba(0,208,132,0.12);
-    filter: blur(20px);
+    background: rgba(66,133,255,.12);
+    filter: blur(10px);
 }
 
 .label {
     position: relative;
+    z-index: 1;
     color: var(--muted);
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.value,
 #portfolioValue {
     position: relative;
-    margin-top: 5px;
-    font-size: 32px;
-    line-height: 1.05;
-    font-weight: 850;
-    letter-spacing: -1.3px;
+    z-index: 1;
+    margin-top: 3px;
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -1.5px;
 }
 
-.profit,
 #portfolioProfit {
     position: relative;
-    display: inline-block;
-    margin-top: 8px;
+    z-index: 1;
+    margin-top: 7px;
     color: var(--green);
     font-size: 15px;
-    font-weight: 750;
+    font-weight: 800;
+}
+
+#invested {
+    margin-top: 11px;
+    color: var(--muted);
+    font-size: 10px;
 }
 
 /* =========================
-   METRIC GRID
+   COMMON CARDS
 ========================= */
 
-.metrics {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+.card,
+.chart-card,
+.assets-card,
+.income-card,
+.compare-card,
+.top-card,
+.metric,
+.stat,
+.info-card,
+.date-card,
+.imoex {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: rgba(16,23,34,.92);
+    box-shadow: 0 10px 28px rgba(0,0,0,.18);
+}
+
+.card,
+.chart-card,
+.assets-card,
+.income-card,
+.compare-card,
+.top-card {
+    padding: 13px;
     margin-bottom: 10px;
+}
+
+.card-title,
+.section-title {
+    margin-bottom: 9px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.stats,
+.metrics,
+.info-grid,
+.date-grid,
+.top-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
 }
 
 .metric,
 .stat,
-.info-card {
-    min-width: 0;
-    padding: 13px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 17px;
+.info-card,
+.date-card,
+.imoex {
+    padding: 11px;
 }
 
-.metric-title,
-.stat-title,
-.info-title {
+.metric-label,
+.stat-label {
     color: var(--muted);
-    font-size: 10px;
-    line-height: 1.3;
+    font-size: 9px;
 }
 
 .metric-value,
-.stat-value,
-.info-value {
-    margin-top: 5px;
+.stat-value {
+    margin-top: 4px;
     font-size: 15px;
-    font-weight: 750;
+    font-weight: 850;
 }
 
 /* =========================
-   CHART
+   DATES
 ========================= */
 
-.chart-card {
-    padding: 15px;
-    margin-bottom: 10px;
+.date-card {
+    min-height: 58px;
 }
 
-.chart-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.chart-title {
-    font-size: 14px;
-    font-weight: 750;
-}
-
-.chart-subtitle {
+.date-label {
     color: var(--muted);
-    font-size: 10px;
+    font-size: 9px;
 }
 
-#portfolioChart {
-    display: block;
-    width: 100%;
-    height: 145px;
+.date-value {
     margin-top: 5px;
+    font-size: 13px;
+    font-weight: 800;
 }
 
 /* =========================
    ASSETS
 ========================= */
-
-.assets-card {
-    padding: 15px;
-    margin-bottom: 10px;
-}
-
-.section-title {
-    margin-bottom: 9px;
-    font-size: 14px;
-    font-weight: 750;
-}
 
 #assetsList {
     display: flex;
@@ -267,99 +267,61 @@ button {
 }
 
 .asset-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    min-height: 45px;
+    min-height: 42px;
     padding: 8px 10px;
-    background: var(--card2);
     border-radius: 12px;
+    background: rgba(255,255,255,.035);
 }
 
 .asset-name {
-    min-width: 0;
-}
-
-.asset-name strong {
-    display: block;
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.asset-name small {
-    display: block;
-    margin-top: 2px;
-    color: var(--muted);
-    font-size: 9px;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .asset-value {
-    text-align: right;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.asset-value span {
-    display: block;
+    color: var(--muted);
+    font-size: 9px;
     margin-top: 2px;
-    font-size: 10px;
 }
 
-/* =========================
-   COLORS
-========================= */
+.asset-change {
+    text-align: right;
+    font-size: 11px;
+    font-weight: 900;
+}
 
-.up {
+.positive {
     color: var(--green) !important;
 }
 
-.down {
+.negative {
     color: var(--red) !important;
 }
 
 /* =========================
-   TOP GAINERS / LOSERS
+   CHART
 ========================= */
 
-.top-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
+.chart-card {
+    overflow: hidden;
 }
 
-.top-card {
-    padding: 13px;
+#portfolioChart {
+    display: block;
+    width: 100%;
+    height: 155px;
+    margin-top: 3px;
 }
 
-.top-card h3 {
-    margin-bottom: 8px;
-    font-size: 12px;
-}
-
-.mini-row {
+.chart-legend {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 6px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 10px;
-}
-
-.mini-row:last-child {
-    border-bottom: 0;
-}
-
-.mini-row span {
     color: var(--muted);
-}
-
-.mini-row b {
-    font-size: 10px;
+    font-size: 9px;
+    margin-top: 5px;
 }
 
 /* =========================
@@ -370,118 +332,194 @@ button {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    margin-bottom: 10px;
-}
-
-.income-label {
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.income-value,
-#passiveIncome {
-    margin-top: 4px;
-    font-size: 20px;
-    font-weight: 800;
-}
-
-/* =========================
-   DATES
-========================= */
-
-.dates {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-bottom: 10px;
 }
 
-.date-card {
-    padding: 12px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 15px;
+.income-main {
+    font-size: 22px;
+    font-weight: 900;
 }
 
-.date-label {
+.income-caption {
+    margin-top: 3px;
     color: var(--muted);
     font-size: 9px;
 }
 
-.date-value {
-    margin-top: 4px;
-    font-size: 12px;
-    font-weight: 700;
+.income-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(25,211,122,.12);
+    color: var(--green);
+    font-size: 20px;
 }
 
 /* =========================
-   IMOEX
+   MOEX / IMOEX
 ========================= */
 
+.compare-card {
+    position: relative;
+}
+
+.compare-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.compare-row:last-child {
+    border-bottom: 0;
+}
+
+.compare-name {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.compare-value {
+    font-size: 12px;
+    font-weight: 900;
+}
+
 .imoex {
-    padding: 13px 15px;
-    background: linear-gradient(
-        135deg,
-        rgba(92,168,255,0.12),
-        rgba(92,168,255,0.035)
-    );
-    border: 1px solid rgba(92,168,255,0.15);
-    border-radius: 17px;
-    margin-bottom: 10px;
+    margin-top: 8px;
 }
 
 .imoex-title {
     color: var(--muted);
-    font-size: 10px;
-}
-
-#imoexReturn {
-    display: block;
-    margin-top: 3px;
-    color: var(--blue);
-    font-size: 18px;
-    font-weight: 800;
-}
-
-/* =========================
-   FOOTER
-========================= */
-
-.footer {
-    padding: 10px 0;
-    text-align: center;
-    color: #59646d;
     font-size: 9px;
 }
 
+.imoex-value {
+    margin-top: 3px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
 /* =========================
-   PULSE ANIMATION
+   TOP GAINERS / LOSERS
 ========================= */
 
-.pulse-animation {
+.top-grid {
+    margin-bottom: 10px;
+}
+
+.top-card {
+    min-height: 95px;
+}
+
+.top-card.gainers {
+    border-color: rgba(25,211,122,.15);
+}
+
+.top-card.losers {
+    border-color: rgba(255,91,110,.15);
+}
+
+.top-title {
+    margin-bottom: 8px;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.top-title.green {
+    color: var(--green);
+}
+
+.top-title.red {
+    color: var(--red);
+}
+
+.top-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 4px 0;
+    font-size: 10px;
+}
+
+/* =========================
+   EMPTY DATA
+========================= */
+
+#assetsList:empty::after {
+    content: "Данные портфеля загружаются…";
+    display: block;
+    padding: 12px 5px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 10px;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading {
+    opacity: .55;
+    animation: loadingPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes loadingPulse {
+    0%, 100% {
+        opacity: .45;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* =========================
+   PULSE
+========================= */
+
+.pulse-animation #app {
     animation: pulseScreen .7s ease;
+}
+
+.pulse-animation .portfolio-card {
+    animation: pulseCard .7s ease;
 }
 
 @keyframes pulseScreen {
     0% {
         transform: scale(1);
-        filter: brightness(1);
     }
 
-    25% {
+    35% {
         transform: scale(.985);
-        filter: brightness(1.25);
     }
 
-    50% {
+    65% {
         transform: scale(1.01);
-        filter: brightness(1.08);
     }
 
     100% {
         transform: scale(1);
-        filter: brightness(1);
+    }
+}
+
+@keyframes pulseCard {
+    0% {
+        box-shadow: 0 15px 40px rgba(0,0,0,.25);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 2px rgba(66,133,255,.45),
+            0 0 45px rgba(66,133,255,.35);
+    }
+
+    100% {
+        box-shadow: 0 15px 40px rgba(0,0,0,.25);
     }
 }
 
@@ -489,19 +527,28 @@ button {
    SMALL PHONES
 ========================= */
 
-@media (max-width: 360px) {
+@media (max-width: 380px) {
 
     #app {
-        padding: 10px;
+        padding: 9px;
     }
 
     .portfolio-card {
-        padding: 15px;
+        padding: 13px;
     }
 
-    .value,
     #portfolioValue {
-        font-size: 28px;
+        font-size: 31px;
+    }
+
+    .card,
+    .chart-card,
+    .assets-card,
+    .income-card,
+    .compare-card,
+    .top-card {
+        padding: 10px;
+        border-radius: 15px;
     }
 
     #portfolioChart {
@@ -509,7 +556,7 @@ button {
     }
 
     .asset-row {
-        min-height: 41px;
+        min-height: 38px;
     }
 }
 
@@ -523,58 +570,47 @@ button {
         padding-top: 20px;
     }
 
-    .value,
     #portfolioValue {
-        font-size: 38px;
+        font-size: 40px;
     }
 
     #portfolioChart {
-        height: 170px;
+        height: 175px;
     }
 }
 
 /* =========================
-   SAFETY FOR EMPTY DATA
+   TOUCH
 ========================= */
-
-#assetsList:empty::after {
-    content: "Данные портфеля загружаются…";
-    display: block;
-    padding: 18px 5px;
-    color: var(--muted);
-    text-align: center;
-    font-size: 11px;
-}
-
-/* =========================
-   SMOOTH UI
-========================= */
-
-.portfolio-card,
-.card,
-.chart-card,
-.assets-card,
-.income-card,
-.compare-card,
-.top-card,
-.metric,
-.stat,
-.info-card,
-.date-card,
-.imoex {
-    transition:
-        transform .18s ease,
-        border-color .18s ease,
-        background .18s ease;
-}
 
 @media (hover: hover) {
 
+    .portfolio-card,
+    .card,
+    .chart-card,
+    .assets-card,
+    .income-card,
+    .compare-card,
+    .top-card,
+    .metric,
+    .stat,
+    .info-card,
+    .date-card,
+    .imoex {
+        transition:
+            transform .18s ease,
+            border-color .18s ease,
+            background .18s ease;
+    }
+
     .portfolio-card:hover,
+    .card:hover,
     .chart-card:hover,
     .assets-card:hover,
+    .income-card:hover,
+    .compare-card:hover,
     .top-card:hover {
         transform: translateY(-1px);
-        border-color: rgba(255,255,255,0.13);
+        border-color: rgba(255,255,255,.14);
     }
 }
