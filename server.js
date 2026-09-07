@@ -576,6 +576,33 @@ async function getMoexHistory(from, to) {
 const HISTORY_CACHE = new Map();
 const HISTORY_CACHE_TTL_MS = 5 * 60 * 1000;
 
+
+function tradePriceValue(op) {
+  const p = quotationValue(op?.price);
+  const q = operationQuantity(op);
+  if (!p || !q) return 0;
+  const type = String(op?.instrumentType || '').toUpperCase();
+  // T-Invest quotes shares/funds per security; bonds are quoted in % of nominal.
+  // Operation quantity is already in securities (not lots).
+  if (type.includes('BOND')) {
+    // Prefer accrued interest when available, but keep the market-price component here.
+    const nominal = quotationValue(op?.nominal);
+    if (nominal > 0) return (p / 100) * nominal * q;
+  }
+  return p * q;
+}
+
+function signedTradeCash(op) {
+  const type = String(op?.type || '').toUpperCase();
+  const tradeValue = tradePriceValue(op);
+  const fallback = Math.abs(operationCash(op));
+  const value = tradeValue || fallback;
+  if (!value) return 0;
+  if (type.includes('BUY') || type === 'OPERATION_TYPE_PRIMARY_ORDER' || type === 'OPERATION_TYPE_DELIVERY_BUY') return -value;
+  if (type.includes('SELL') || type === 'OPERATION_TYPE_DELIVERY_SELL') return value;
+  return 0;
+}
+
 async function buildPortfolioHistory(accountId, operations, firstInvestment, portfolioValue) {
   if (!firstInvestment?.date) return { available: false, points: [], reason: 'no_start_date' };
 
@@ -643,7 +670,13 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     end.setUTCHours(23, 59, 59, 999);
     while (opIndex < sortedOps.length && sortedOps[opIndex]._date <= end) {
       const op = sortedOps[opIndex++];
-      cash += signedHistoricalCash(op);
+      const type = String(op?.type || '').toUpperCase();
+      if (type.includes('BUY') || type.includes('SELL') || type === 'OPERATION_TYPE_DELIVERY_BUY' || type === 'OPERATION_TYPE_DELIVERY_SELL' || type === 'OPERATION_TYPE_PRIMARY_ORDER') {
+        cash += signedTradeCash(op);
+        // commissions/fees are separate operations and are handled below.
+      } else {
+        cash += signedHistoricalCash(op);
+      }
       const delta = securityQuantityDelta(op);
       if (delta) qty.set(op.figi, (qty.get(op.figi) || 0) + delta);
     }
@@ -678,16 +711,22 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     externalByDay.set(key, (externalByDay.get(key) || 0) + signedHistoricalCash(op));
   }
 
-  // Time-weighted return: remove the effect of deposits/withdrawals from the curve.
+  // Time-weighted return: remove the effect of external deposits/withdrawals.
+  // A trade changes cash into securities, so it must NOT be treated as an external flow.
   const first = raw[0];
   let index = 100;
-  const points = [{ date: first.date, portfolio: index }];
+  const points = [{ date: first.date, portfolio: 100 }];
   for (let i = 1; i < raw.length; i++) {
     const prev = raw[i - 1];
     const cur = raw[i];
     const flow = externalByDay.get(cur.date) || 0;
     const base = prev.value + flow;
-    if (base > 0) index *= cur.value / base;
+    if (base > 0 && cur.value > 0) {
+      const daily = cur.value / base;
+      // Guard against corrupted reconstruction producing an impossible one-day collapse.
+      // Such a point is skipped rather than poisoning the whole cumulative index.
+      if (daily > 0.2 && daily < 5) index *= daily;
+    }
     points.push({ date: cur.date, portfolio: Number(index.toFixed(4)) });
   }
 
@@ -970,7 +1009,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.3-history-cash-fixed' });
+  res.json({ ok: true, version: '3.4-history-trade-cash-fixed' });
 });
 
 
