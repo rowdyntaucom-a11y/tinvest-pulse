@@ -3,57 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#071019">
+  <meta name="theme-color" content="#070b12">
   <title>T-Invest Pulse</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="/style.css">
 </head>
-<body data-theme="neon">
+<body>
   <main class="phone" id="pulse">
-    <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
     <header class="top">
-      <div class="brandBlock"><div class="brand">TInvest <span>Pulse</span></div><div class="sub">ИНВЕСТИЦИОННАЯ ОБОЛОЧКА</div></div>
-      <div class="topActions"><button id="themeBtn" class="themeBtn" aria-label="Выбрать тему">◈ <span>STYLE</span></button><button id="pulseBtn" class="pulseBtn">PULSE</button></div>
+      <div><div class="brand">TInvest <span>Pulse</span></div><div class="sub">Инвестиционный портфель</div></div>
+      <button id="pulseBtn" class="pulseBtn">PULSE</button>
     </header>
 
     <section class="hero card">
-      <div class="heroGlow"></div><div class="eyebrow">СТОИМОСТЬ ПОРТФЕЛЯ</div>
+      <div class="eyebrow">СТОИМОСТЬ ПОРТФЕЛЯ</div>
       <div class="value" id="value">Загрузка…</div>
       <div class="gain" id="gain">—</div>
       <div class="dates" id="dates">История загружается…</div>
-      <div class="heroMark">↗</div>
     </section>
 
     <section class="grid2">
-      <div class="mini card"><span>ПРИБЫЛЬ</span><b id="profit">—</b><i>₽</i></div>
-      <div class="mini card"><span>ДОХОДНОСТЬ</span><b id="profitPct">—</b><i>%</i></div>
-      <div class="mini card"><span>CAGR</span><b id="cagr">—</b><i>год</i></div>
-      <div class="mini card"><span>XIRR</span><b id="xirr">—</b><i>год</i></div>
+      <div class="mini card"><span>ПРИБЫЛЬ</span><b id="profit">—</b></div>
+      <div class="mini card"><span>ДОХОДНОСТЬ</span><b id="profitPct">—</b></div>
+      <div class="mini card"><span>CAGR</span><b id="cagr">—</b></div>
+      <div class="mini card"><span>XIRR</span><b id="xirr">—</b></div>
     </section>
 
     <section class="chartCard card">
-      <div class="sectionHead"><div><div class="chartTitle">ДИНАМИКА ПОРТФЕЛЯ</div><div class="chartSub">vs IMOEX</div></div><div class="spark">⌁</div></div>
-      <div class="chartWrap"><canvas id="chart"></canvas><div class="chartEmpty" id="chartEmpty">График появится после загрузки истории</div></div>
-      <div class="legend"><span><i></i> Портфель</span><span><em></em> IMOEX</span></div>
+      <div class="chartTitle">РОСТ ПОРТФЕЛЯ <small>vs IMOEX</small></div>
+      <div class="chartWrap"><canvas id="chart"></canvas><div class="chartEmpty" id="chartEmpty">Загружаю историю…</div></div>
+      <div class="legend"><i></i> Портфель <em></em> IMOEX</div>
     </section>
 
     <section class="bottomGrid">
-      <div class="income card"><div class="eyebrow">ПАССИВНЫЙ ДОХОД</div><small>дивиденды + купоны · без пополнений</small><div class="incomeRow"><b id="monthly">—</b><span>/ месяц</span></div><div class="incomeRow"><b id="annual">—</b><span>/ год</span></div></div>
-      <div class="leaders card"><div class="eyebrow">ТОП ДВИЖЕНИЯ</div><div class="lead"><span class="dot up">↗</span><div><small>РОСТ</small><b id="gainer">—</b></div></div><div class="lead"><span class="dot down">↘</span><div><small>СНИЖЕНИЕ</small><b id="loser">—</b></div></div></div>
+      <div class="income card"><div class="eyebrow">ПАССИВНЫЙ ДОХОД</div><small>без пополнений</small><div><b id="monthly">—</b><span> / месяц</span></div><div><b id="annual">—</b><span> / год</span></div></div>
+      <div class="leaders card"><div class="eyebrow">ЛИДЕРЫ</div><div class="lead"><span>🟢</span><div><small>GAINER</small><b id="gainer">—</b></div></div><div class="lead"><span>🔴</span><div><small>LOSER</small><b id="loser">—</b></div></div></div>
     </section>
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
-
-    <div class="themePanel" id="themePanel" aria-hidden="true">
-      <div class="themePanelHead"><b>ОБОЛОЧКА</b><button id="closeTheme">×</button></div>
-      <div class="themeGrid">
-        <button class="themeChoice active" data-theme-choice="neon"><span class="swatch neonSw"></span><b>Neon Finance</b><small>кибер · зелёный</small></button>
-        <button class="themeChoice" data-theme-choice="emerald"><span class="swatch emeraldSw"></span><b>Emerald Glass</b><small>стекло · бирюза</small></button>
-        <button class="themeChoice" data-theme-choice="graphite"><span class="swatch graphiteSw"></span><b>Graphite Gold</b><small>премиум · золото</small></button>
-        <button class="themeChoice" data-theme-choice="cyber"><span class="swatch cyberSw"></span><b>Cyber Blue</b><small>HUD · синий</small></button>
-        <button class="themeChoice" data-theme-choice="aurora"><span class="swatch auroraSw"></span><b>Aurora</b><small>градиент · сияние</small></button>
-      </div>
-    </div>
   </main>
   <script src="/app.js"></script>
 </body>
