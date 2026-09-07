@@ -12,18 +12,21 @@
   <main class="phone" id="pulse">
     <section class="pulseShot" id="pulseShot" aria-hidden="true">
       <div class="pulseGlow"></div>
-      <div class="pulseShotTop"><span>КРЯХТЯЩИЙ <b>ФОНД</b></span><strong>PULSE</strong></div>
-      <div class="pulseShotLabel">СЕГОДНЯШНИЙ ПУЛЬС</div>
-      <div class="pulseShotValue" id="pulseValue">—</div>
-      <div class="pulseShotGain" id="pulseGain">—</div>
-      <div class="pulseShotLine"></div>
-      <div class="pulseMetrics">
-        <div><small>VS MOEX</small><b id="pulseVs">—</b></div>
-        <div><small>XIRR</small><b id="pulseXirr">—</b></div>
-        <div><small>ПАССИВ</small><b id="pulseIncome">—</b></div>
+      <div class="pulseHeader"><div><span class="pulseKicker">КРЯХТЯЩИЙ <b>ФОНД</b></span><small>РЕНТГЕН ПОРТФЕЛЯ</small></div><button class="pulseBack" id="pulseBack" type="button">↩ PULSE</button></div>
+      <div class="pulseHero">
+        <div class="pulseHeroCopy"><div class="pulseShotLabel">СЕГОДНЯШНИЙ ПУЛЬС</div><div class="pulseShotValue" id="pulseValue">—</div><div class="pulseShotGain" id="pulseGain">—</div></div>
+        <div class="scoreRing" id="scoreRing"><div><b id="pulseScore">—</b><span>PULSE<br>SCORE</span></div></div>
       </div>
-      <div class="pulseShotTag">НЕ БАНК · НЕ ФОНД · ПРОСТО КРЯХТИТ</div>
-      <div class="pulseShotTime" id="pulseTime">—</div>
+      <div class="heartbeat"><div class="heartbeatHead"><span>♥ БИЕНИЕ ПОРТФЕЛЯ</span><b id="pulseHeartbeat">ЖИВОЙ</b></div><svg viewBox="0 0 600 105" preserveAspectRatio="none"><path id="heartbeatGrid" d="M0 26H600M0 52H600M0 78H600"/><path id="pulseArea" class="pulseArea" d=""/><path id="pulseLine" class="pulseLine" d=""/><path id="pulseMoex" class="pulseMoex" d=""/></svg><div class="heartbeatMeta"><span>СТАРТ 100</span><span id="pulseTrendEnd">СЕЙЧАС —</span></div></div>
+      <div class="pulseBattle"><div class="battleTitle"><span>⚔ БИТВА С IMOEX</span><b id="pulseBattleText">—</b></div><div class="battleBar"><i id="battlePortfolio"></i><em id="battleMoex"></em><span>ТЫ</span><span>IMOEX</span></div></div>
+      <div class="pulseGrid">
+        <div class="pulseTile"><small>🐋 КИТ ПОРТФЕЛЯ</small><b id="pulseWhale">—</b><span id="pulseWhaleWeight">—</span></div>
+        <div class="pulseTile"><small>📉 БОЛЬ</small><b id="pulsePain">—</b><span id="pulsePainText">—</span></div>
+        <div class="pulseTile"><small>💰 СКОРОСТЬ</small><b id="pulseSpeed">—</b><span>в день</span></div>
+        <div class="pulseTile"><small>🧱 ВОЗРАСТ</small><b id="pulseAge">—</b><span>портфеля</span></div>
+      </div>
+      <div class="pulseCharacter"><div><small>ХАРАКТЕР ПОРТФЕЛЯ</small><b id="pulseCharacterName">—</b></div><span id="pulseCharacterText">—</span></div>
+      <div class="pulseShotFooter"><span>НЕ БАНК · НЕ ФОНД · ПРОСТО КРЯХТИТ</span><time id="pulseTime">—</time></div>
     </section>
     <div class="noise"></div>
     <header class="top">
@@ -91,6 +94,6 @@
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=4.7"></script>
+  <script src="/app.js?v=5.0"></script>
 </body>
 </html>

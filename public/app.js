@@ -133,31 +133,85 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=4.7&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{const r=await fetch('/api/dashboard?v=5.0&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
 let pulseMode=false;
-$('pulseBtn').addEventListener('click',()=>{
-  const root=$('pulse'),shot=$('pulseShot');
-  const p=dashboardData?.portfolio||{};
-  const vsText=$('vsMoex')?.textContent||'—';
-  if(!pulseMode){
-    setText('pulseValue',rub(p.value));
-    setText('pulseGain',p.profitPercent==null?'—':`${p.profitPercent>=0?'+':''}${pct(p.profitPercent)}`);
-    setText('pulseVs',vsText);
-    setText('pulseXirr',p.xirr==null?'—':pct(p.xirr));
-    const monthly=Number(dashboardData?.passiveIncome?.averageMonthly);
-    setText('pulseIncome',Number.isFinite(monthly)?rub(monthly)+'/мес':'—');
-    setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
-    root.classList.add('pulse-capture');
-    shot.setAttribute('aria-hidden','false');
-    pulseMode=true;
-    setText('pulseBtn','✕ PULSE');
-    document.body.classList.add('pulse-active');
-  }else{
-    root.classList.remove('pulse-capture');
-    shot.setAttribute('aria-hidden','true');
-    pulseMode=false;
-    setText('pulseBtn','PULSE');
-    document.body.classList.remove('pulse-active');
-  }
-});
+let pulseLongTimer=null;
+
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function pulseStats(d){
+  const p=d?.portfolio||{};
+  const pts=Array.isArray(d?.history?.points)?d.history.points:[];
+  const ps=pts.map(x=>Number(x?.portfolio)).filter(v=>Number.isFinite(v)&&v>0);
+  const ms=pts.map(x=>Number(x?.imoex)).filter(v=>Number.isFinite(v)&&v>0);
+  const p0=ps[0]||100, p1=ps[ps.length-1]||p0, m0=ms[0]||100, m1=ms[ms.length-1]||m0;
+  const pReturn=(p1/p0-1)*100, mReturn=(m1/m0-1)*100;
+  let peak=p0,maxDD=0;
+  for(const v of ps){peak=Math.max(peak,v);if(peak>0)maxDD=Math.max(maxDD,(peak-v)/peak*100);}
+  const assets=Array.isArray(d?.assets)?d.assets:((Array.isArray(p.assets)?p.assets:[]));
+  const total=Number(p.value)||0;
+  const whale=[...assets].sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0))[0];
+  const whaleWeight=whale&&total>0?((Number(whale.currentValue)||0)/total*100):null;
+  const monthly=Number(d?.passiveIncome?.averageMonthly);
+  const xirr=Number(p.xirr)*100;
+  const incomeYield=Number.isFinite(monthly)&&total>0?(monthly*12/total*100):0;
+  const score=clamp(Math.round(48 + clamp(pReturn*2.8,-15,18) + clamp(xirr*.45,-8,18) + clamp(incomeYield*.8,0,8) + clamp((assets.length-5)*.7,0,8) - clamp(maxDD*.8,0,12) + clamp((pReturn-mReturn)*1.1,-8,8)),0,100);
+  const ageDays=p.startDate?Math.max(0,Math.round((Date.now()-new Date(p.startDate).getTime())/86400000)):null;
+  let character='УПРЯМЫЙ', text='Просадку переживает и продолжает работать.';
+  if(pReturn>=3 && pReturn-mReturn>=0){character='КРЯХТИТ, НО РАСТЁТ';text='Растёт и индекс обгоняет. Так держать.';}
+  else if(incomeYield>=7){character='ДИВИДЕНДНЫЙ';text='Деньги приходят сами. Терпение окупается.';}
+  else if(maxDD>=8){character='ЖЕЛЕЗНЫЙ';text='Видел просадку. Не дрогнул. Вернулся.';}
+  else if(pReturn-mReturn<-2){character='УПРЯМЫЙ';text='Индекс убежал вперёд. Фонд догоняет.';}
+  else if(pReturn>=0){character='КРЕПКИЙ';text='Без суеты. Деньги работают каждый день.';}
+  const pulseBeat=pReturn>=0?'ЖИВОЙ':'КРЯХТИТ';
+  const totalBase=p1+m1;
+  const pBar=totalBase>0?clamp(p1/totalBase*100,18,82):50;
+  return {pts,p1,m1,pReturn,mReturn,maxDD,whale,whaleWeight,monthly,incomeYield,score,ageDays,character,text,pulseBeat,pBar, mBar:100-pBar};
+}
+function drawPulsePath(key,pts){
+  const a=pts.map(x=>Number(x?.[key])).filter(v=>Number.isFinite(v)&&v>0);
+  if(a.length<2)return '';
+  const min=Math.min(...a),max=Math.max(...a),span=Math.max(0.0001,max-min);
+  return a.map((v,i)=>{const x=(i/(a.length-1))*600;const y=10+(1-(v-min)/span)*80;return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}).join(' ');
+}
+function enterPulse(){
+  const root=$('pulse'),shot=$('pulseShot'),d=dashboardData||{};
+  const p=d.portfolio||{}, st=pulseStats(d);
+  setText('pulseValue',rub(p.value));
+  setText('pulseGain',p.profitPercent==null?'—':`${p.profitPercent>=0?'+':''}${pct(p.profitPercent)}`);
+  setText('pulseScore',String(st.score));
+  setText('pulseHeartbeat',st.pulseBeat);
+  setText('pulseVs',st.pReturn-st.mReturn>=0?`+${(st.pReturn-st.mReturn).toFixed(2).replace('.',',')} п.п.`:`${(st.pReturn-st.mReturn).toFixed(2).replace('.',',')} п.п.`);
+  setText('pulseXirr',p.xirr==null?'—':pct(p.xirr));
+  setText('pulseIncome',Number.isFinite(st.monthly)?rub(st.monthly):'—');
+  const pl=$('pulseLine'),pa=$('pulseArea'),pm=$('pulseMoex');
+  const pp=drawPulsePath('portfolio',st.pts),mm=drawPulsePath('imoex',st.pts);
+  if(pl)pl.setAttribute('d',pp); if(pa)pa.setAttribute('d',pp?pp+' L600 105 L0 105 Z':''); if(pm)pm.setAttribute('d',mm);
+  setText('pulseTrendEnd',`СЕЙЧАС ${st.p1.toFixed(1).replace('.',',')}`);
+  const whale=st.whale;
+  setText('pulseWhale',whale?(whale.ticker||whale.name||'—'):'—');
+  setText('pulseWhaleWeight',st.whaleWeight==null?'—':`${st.whaleWeight.toFixed(1).replace('.',',')}% веса`);
+  setText('pulsePain',st.maxDD>0?`−${st.maxDD.toFixed(1).replace('.',',')}%`:'0,0%');
+  setText('pulsePainText',st.maxDD>0?'макс. просадка':'без просадки');
+  setText('pulseSpeed',Number.isFinite(st.monthly)?rub(st.monthly/30.4375):'—');
+  setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);
+  setText('pulseCharacterName',st.character);setText('pulseCharacterText',st.text);
+  setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`);
+  setStyle('battlePortfolio','width',`${st.pBar}%`);setStyle('battleMoex','width',`${st.mBar}%`);
+  setText('pulseBattleText',st.pReturn-st.mReturn>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');
+  setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
+  root.classList.add('pulse-capture');shot.setAttribute('aria-hidden','false');pulseMode=true;
+  setText('pulseBtn','✕ PULSE');document.body.classList.add('pulse-active');
+}
+function exitPulse(){
+  const root=$('pulse'),shot=$('pulseShot');root.classList.remove('pulse-capture');shot.setAttribute('aria-hidden','true');pulseMode=false;
+  setText('pulseBtn','PULSE');document.body.classList.remove('pulse-active');
+}
+function togglePulse(){pulseMode?exitPulse():enterPulse();}
+$('pulseBtn').addEventListener('click',togglePulse);
+$('pulseBack')?.addEventListener('click',togglePulse);
+
+// Long press on PULSE opens the same Röntgen view with a subtle "deep" state for power users.
+$('pulseBtn').addEventListener('pointerdown',()=>{pulseLongTimer=setTimeout(()=>{if(!pulseMode)enterPulse();$('pulseShot').classList.add('deep-pulse');},650);});
+['pointerup','pointercancel','pointerleave'].forEach(ev=>$('pulseBtn').addEventListener(ev,()=>{if(pulseLongTimer){clearTimeout(pulseLongTimer);pulseLongTimer=null;}}));
+
 load();setInterval(load,60000);
