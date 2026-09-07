@@ -4,13 +4,21 @@ const rub=n=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFr
 const pct=n=>Number.isFinite(Number(n))?((Number(n)*100).toFixed(1).replace('.',',')+'%'):'—';
 const shortDate=d=>d?new Date(d).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
 
+const themePanel=$('themePanel'), themeBtn=$('themeBtn');
+const savedTheme=localStorage.getItem('tinvest-pulse-theme')||'neon';
+document.body.dataset.theme=savedTheme;
+document.querySelectorAll('.themeChoice').forEach(b=>b.classList.toggle('active',b.dataset.themeChoice===savedTheme));
+themeBtn.addEventListener('click',()=>{const open=themePanel.classList.toggle('open');themePanel.setAttribute('aria-hidden',String(!open));});
+$('closeTheme').addEventListener('click',()=>{themePanel.classList.remove('open');themePanel.setAttribute('aria-hidden','true');});
+document.querySelectorAll('.themeChoice').forEach(b=>b.addEventListener('click',()=>{const t=b.dataset.themeChoice;document.body.dataset.theme=t;localStorage.setItem('tinvest-pulse-theme',t);document.querySelectorAll('.themeChoice').forEach(x=>x.classList.toggle('active',x===b));themePanel.classList.remove('open');themePanel.setAttribute('aria-hidden','true');}));
+
 function render(d){
   const p=d.portfolio||{};
   $('value').textContent=rub(p.value);
   $('profit').textContent=rub(p.profit);
   $('profitPct').textContent=p.profitPercent==null?'—':pct(p.profitPercent);
   $('gain').textContent=p.profitPercent==null?'—':(p.profitPercent>=0?'+':'')+pct(p.profitPercent);
-  $('gain').style.color=p.profitPercent>=0?'#43f19a':'#ff6575';
+  $('gain').style.color=p.profitPercent>=0?'var(--accent)':'var(--danger)';
   $('cagr').textContent=p.cagr==null?'—':pct(p.cagr);
   $('xirr').textContent=p.xirr==null?'—':pct(p.xirr);
   $('dates').textContent=`Начало: ${shortDate(p.startDate)} • Сегодня: ${shortDate(new Date())}`;
@@ -39,7 +47,7 @@ async function load(){
 $('pulseBtn').addEventListener('click',async()=>{
   try{
     if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';document.head.appendChild(s);await new Promise(r=>s.onload=r)}
-    const canvas=await html2canvas($('pulse'),{backgroundColor:'#050810',scale:2});
+    const canvas=await html2canvas($('pulse'),{backgroundColor:getComputedStyle(document.body).getPropertyValue('--bg').trim()||'#050810',scale:2});
     const a=document.createElement('a');a.download='tinvest-pulse.png';a.href=canvas.toDataURL('image/png');a.click();
   }catch(e){alert('Не удалось сделать Pulse: '+e.message)}
 });
