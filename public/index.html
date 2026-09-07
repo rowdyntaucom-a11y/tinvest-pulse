@@ -1,412 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
-  <meta name="theme-color" content="#07100d">
-
-  <title>TInvest Pulse</title>
-
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#070b12">
+  <title>T-Invest Pulse</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/style.css">
 </head>
-
 <body>
-
-  <main id="app">
-
-    <!-- HEADER -->
-    <header class="header">
-
-      <div>
-        <div class="logo">TInvest Pulse</div>
-        <div class="subtitle">
-          Инвестиционный портфель
-        </div>
-      </div>
-
-      <button id="pulse" class="pulse">
-        PULSE
-      </button>
-
+  <main class="phone" id="pulse">
+    <header class="top">
+      <div><div class="brand">TInvest <span>Pulse</span></div><div class="sub">Инвестиционный портфель</div></div>
+      <button id="pulseBtn" class="pulseBtn">PULSE</button>
     </header>
 
-
-    <!-- PORTFOLIO -->
-    <section class="hero portfolio-card">
-
-      <div class="label">
-        Стоимость портфеля
-      </div>
-
-      <div id="portfolioValue" class="value">
-        — ₽
-      </div>
-
-      <div id="portfolioProfit" class="profit">
-        — %
-      </div>
-
-      <div class="date-row">
-
-        <span>
-          Начало:
-          <strong id="startDate">—</strong>
-        </span>
-
-        <span>
-          Сегодня:
-          <strong id="currentDate">—</strong>
-        </span>
-
-      </div>
-
+    <section class="hero card">
+      <div class="eyebrow">СТОИМОСТЬ ПОРТФЕЛЯ</div>
+      <div class="value" id="value">Загрузка…</div>
+      <div class="gain" id="gain">—</div>
+      <div class="dates" id="dates">История загружается…</div>
     </section>
 
-
-    <!-- MAIN STATS -->
-    <section class="stats">
-
-      <div class="stat">
-
-        <div class="stat-title">
-          Прибыль
-        </div>
-
-        <div
-          id="profitValue"
-          class="stat-value positive"
-        >
-          — ₽
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-title">
-          Доходность
-        </div>
-
-        <div
-          id="returnValue"
-          class="stat-value positive"
-        >
-          — %
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-title">
-          CAGR
-        </div>
-
-        <div
-          id="cagrValue"
-          class="stat-value"
-        >
-          — %
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-title">
-          XIRR
-        </div>
-
-        <div
-          id="xirrValue"
-          class="stat-value"
-        >
-          — %
-        </div>
-
-      </div>
-
+    <section class="grid2">
+      <div class="mini card"><span>ПРИБЫЛЬ</span><b id="profit">—</b></div>
+      <div class="mini card"><span>ДОХОДНОСТЬ</span><b id="profitPct">—</b></div>
+      <div class="mini card"><span>CAGR</span><b id="cagr">—</b></div>
+      <div class="mini card"><span>XIRR</span><b id="xirr">—</b></div>
     </section>
 
-
-    <!-- HISTORICAL CHART -->
-    <section class="chart-card">
-
-      <div class="chart-header">
-
-        <div class="chart-title">
-          Рост портфеля
-        </div>
-
-        <div class="chart-period">
-          Вся история
-        </div>
-
-      </div>
-
-      <canvas id="portfolioChart"></canvas>
-
+    <section class="chartCard card">
+      <div class="chartTitle">РОСТ ПОРТФЕЛЯ <small>vs IMOEX</small></div>
+      <div class="chartWrap"><canvas id="chart"></canvas><div class="chartEmpty" id="chartEmpty">График появится после загрузки истории</div></div>
+      <div class="legend"><i></i> Портфель <em></em> IMOEX</div>
     </section>
 
-
-    <!-- PASSIVE INCOME -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>
-          Пассивный доход
-        </h2>
-
-        <span>
-          без пополнений
-        </span>
-
-      </div>
-
-
-      <div class="income">
-
-        <div>
-
-          <div class="income-label">
-            Средний доход в месяц
-          </div>
-
-          <div
-            id="monthlyIncome"
-            class="income-value"
-          >
-            — ₽
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <div class="income-label">
-            За год
-          </div>
-
-          <div
-            id="annualIncome"
-            class="income-value"
-          >
-            — ₽
-          </div>
-
-        </div>
-
-      </div>
-
+    <section class="bottomGrid">
+      <div class="income card"><div class="eyebrow">ПАССИВНЫЙ ДОХОД</div><small>без пополнений</small><div><b id="monthly">—</b><span> / месяц</span></div><div><b id="annual">—</b><span> / год</span></div></div>
+      <div class="leaders card"><div class="eyebrow">ЛИДЕРЫ</div><div class="lead"><span>🟢</span><div><small>GAINER</small><b id="gainer">—</b></div></div><div class="lead"><span>🔴</span><div><small>LOSER</small><b id="loser">—</b></div></div></div>
     </section>
 
-
-    <!-- MOEX COMPARISON -->
-    <section class="chart-card">
-
-      <div class="chart-header">
-
-        <div class="chart-title">
-          Портфель vs IMOEX
-        </div>
-
-        <div class="chart-period">
-          Средняя годовая доходность
-        </div>
-
-      </div>
-
-
-      <canvas id="comparisonChart"></canvas>
-
-
-      <div class="index-row">
-
-        <div class="index-name">
-          Мой портфель
-        </div>
-
-        <div
-          id="portfolioAnnualReturn"
-          class="index-value positive"
-        >
-          — %
-        </div>
-
-      </div>
-
-
-      <div class="index-row">
-
-        <div class="index-name">
-          IMOEX
-        </div>
-
-        <div
-          id="imoexReturn"
-          class="index-value"
-        >
-          — %
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ASSETS -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>
-          Активы
-        </h2>
-
-        <span id="assetCount">
-          0
-        </span>
-
-      </div>
-
-
-      <div
-        id="assetsList"
-        class="assets"
-      >
-
-        <div class="asset">
-
-          <div class="asset-left">
-
-            <div class="asset-icon">
-              ₽
-            </div>
-
-            <div>
-
-              <div class="asset-name">
-                Загрузка...
-              </div>
-
-              <div class="asset-count">
-                Получаем данные
-              </div>
-
-            </div>
-
-          </div>
-
-          <div class="asset-price">
-            —
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- TOP GAINERS / LOSERS -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>
-          Лидеры портфеля
-        </h2>
-
-      </div>
-
-
-      <div class="winners">
-
-        <div class="winner">
-
-          <div class="label">
-            TOP GAINER
-          </div>
-
-          <div
-            id="topGainer"
-            class="ticker"
-          >
-            —
-          </div>
-
-          <div
-            id="topGainerPercent"
-            class="percent positive"
-          >
-            —
-          </div>
-
-        </div>
-
-
-        <div class="loser">
-
-          <div class="label">
-            TOP LOSER
-          </div>
-
-          <div
-            id="topLoser"
-            class="ticker"
-          >
-            —
-          </div>
-
-          <div
-            id="topLoserPercent"
-            class="percent negative"
-          >
-            —
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- STATUS -->
-    <section class="section">
-
-      <div class="stat">
-
-        <div class="stat-title">
-          Последнее обновление
-        </div>
-
-        <div
-          id="lastUpdate"
-          class="stat-value"
-        >
-          —
-        </div>
-
-      </div>
-
-    </section>
-
+    <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-
-
-  <!-- JAVASCRIPT -->
-  <script src="app.js"></script>
-
+  <script src="/app.js"></script>
 </body>
 </html>

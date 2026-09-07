@@ -1,223 +1,46 @@
-const state = {
-    portfolio: {
-        value: 0,
-        invested: 0,
-        profit: 0,
-        profitPercent: 0,
-        startDate: "—"
-    },
-    assets: [],
-    history: [],
-    income: 0,
-    imoex: 0
-};
+let chart;
+const $=id=>document.getElementById(id);
+const rub=n=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Number(n))+' ₽':'—';
+const pct=n=>Number.isFinite(Number(n))?((Number(n)*100).toFixed(1).replace('.',',')+'%'):'—';
+const shortDate=d=>d?new Date(d).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
 
-function money(value) {
-    return new Intl.NumberFormat("ru-RU", {
-        maximumFractionDigits: 0
-    }).format(value || 0) + " ₽";
+function render(d){
+  const p=d.portfolio||{};
+  $('value').textContent=rub(p.value);
+  $('profit').textContent=rub(p.profit);
+  $('profitPct').textContent=p.profitPercent==null?'—':pct(p.profitPercent);
+  $('gain').textContent=p.profitPercent==null?'—':(p.profitPercent>=0?'+':'')+pct(p.profitPercent);
+  $('gain').style.color=p.profitPercent>=0?'#43f19a':'#ff6575';
+  $('cagr').textContent=p.cagr==null?'—':pct(p.cagr);
+  $('xirr').textContent=p.xirr==null?'—':pct(p.xirr);
+  $('dates').textContent=`Начало: ${shortDate(p.startDate)} • Сегодня: ${shortDate(new Date())}`;
+  $('monthly').textContent=rub(d.income?.monthly);
+  $('annual').textContent=rub(d.income?.annual);
+  const g=d.leaders?.gainers?.[0], l=d.leaders?.losers?.[0];
+  $('gainer').textContent=g?`${g.ticker||g.name} ${g.yieldRub>=0?'+':''}${rub(g.yieldRub)}`:'—';
+  $('loser').textContent=l?`${l.ticker||l.name} ${l.yieldRub>=0?'+':''}${rub(l.yieldRub)}`:'—';
+  $('status').textContent=`✓ Данные загружены • ${d.assets?.length||0} активов`;$('status').className='ok';
+  $('updated').textContent=new Date(d.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  $('chartEmpty').textContent='Исторический ряд подключим следующим шагом';
 }
 
-function percent(value) {
-    const n = Number(value || 0);
-    return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+async function load(){
+  try{
+    const r=await fetch('/api/dashboard',{cache:'no-store'});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`);
+    render(d);
+  }catch(e){
+    $('status').textContent='Ошибка: '+e.message;$('status').className='err';
+    $('value').textContent='Нет данных';
+  }
 }
 
-function dateRu(value) {
-    if (!value) return "—";
-
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return value;
-
-    return d.toLocaleDateString("ru-RU");
-}
-
-function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-}
-
-function renderPortfolio(data) {
-    const p = data.portfolio || {};
-
-    setText("portfolioValue", money(p.value));
-    setText("portfolioProfit", percent(p.profitPercent));
-
-    const invested = Number(p.invested || 0);
-    const value = Number(p.value || 0);
-    const profit = Number(p.profit ?? value - invested);
-
-    setText("invested", money(invested));
-    setText("profitMoney", money(profit));
-    setText("startDate", dateRu(p.startDate));
-    setText("currentDate", new Date().toLocaleDateString("ru-RU"));
-
-    const assets = data.assets || [];
-
-    const list = document.getElementById("assetsList");
-
-    if (list) {
-        list.innerHTML = "";
-
-        assets.slice(0, 6).forEach(asset => {
-            const row = document.createElement("div");
-            row.className = "asset-row";
-
-            const change = Number(asset.change || 0);
-
-            row.innerHTML = `
-                <div class="asset-name">
-                    <strong>${asset.name || asset.ticker || "Актив"}</strong>
-                    <small>${asset.ticker || ""}</small>
-                </div>
-
-                <div class="asset-value">
-                    ${money(asset.value || 0)}
-                    <span class="${change >= 0 ? "up" : "down"}">
-                        ${percent(change)}
-                    </span>
-                </div>
-            `;
-
-            list.appendChild(row);
-        });
-    }
-
-    setText("passiveIncome", money(data.income || 0));
-    setText("imoexReturn", percent(data.imoex || 0));
-
-    renderTopAssets(assets);
-    renderChart(data.history || []);
-}
-
-function renderTopAssets(assets) {
-    const sorted = [...assets].sort(
-        (a, b) => Number(b.change || 0) - Number(a.change || 0)
-    );
-
-    const winners = document.getElementById("topGainers");
-    const losers = document.getElementById("topLosers");
-
-    if (winners) {
-        winners.innerHTML = sorted.slice(0, 3).map(asset => `
-            <div class="mini-row">
-                <span>${asset.ticker || asset.name || "—"}</span>
-                <b class="up">${percent(asset.change)}</b>
-            </div>
-        `).join("");
-    }
-
-    if (losers) {
-        losers.innerHTML = sorted.slice(-3).reverse().map(asset => `
-            <div class="mini-row">
-                <span>${asset.ticker || asset.name || "—"}</span>
-                <b class="down">${percent(asset.change)}</b>
-            </div>
-        `).join("");
-    }
-}
-
-function renderChart(history) {
-    const canvas = document.getElementById("portfolioChart");
-
-    if (!canvas || !history.length) return;
-
-    const ctx = canvas.getContext("2d");
-
-    const width = canvas.width = canvas.clientWidth * devicePixelRatio;
-    const height = canvas.height = canvas.clientHeight * devicePixelRatio;
-
-    ctx.scale(devicePixelRatio, devicePixelRatio);
-
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-
-    ctx.clearRect(0, 0, w, h);
-
-    const values = history.map(x => Number(x.value || 0));
-
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-
-    const range = max - min || 1;
-
-    ctx.beginPath();
-
-    values.forEach((value, index) => {
-        const x = (index / Math.max(values.length - 1, 1)) * w;
-        const y = h - ((value - min) / range) * (h - 20) - 10;
-
-        if (index === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-    });
-
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#00d084";
-    ctx.stroke();
-
-    ctx.lineTo(w, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-
-    ctx.fillStyle = "rgba(0,208,132,0.12)";
-    ctx.fill();
-}
-
-async function loadPortfolio() {
-    try {
-        const response = await fetch("/api/portfolio", {
-            cache: "no-store"
-        });
-
-        if (!response.ok) {
-            throw new Error("API error");
-        }
-
-        const data = await response.json();
-
-        renderPortfolio(data);
-
-    } catch (error) {
-        console.log("API пока недоступен:", error);
-
-        // Временные данные для проверки интерфейса
-        renderPortfolio({
-            portfolio: {
-                value: 0,
-                invested: 0,
-                profit: 0,
-                profitPercent: 0,
-                startDate: "—"
-            },
-            assets: [],
-            history: [],
-            income: 0,
-            imoex: 0
-        });
-    }
-}
-
-function pulse() {
-    document.body.classList.add("pulse-animation");
-
-    setTimeout(() => {
-        document.body.classList.remove("pulse-animation");
-    }, 700);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const pulseButton = document.getElementById("pulse");
-
-    if (pulseButton) {
-        pulseButton.addEventListener("click", pulse);
-    }
-
-    loadPortfolio();
-
-    // Автообновление каждые 60 секунд
-    setInterval(loadPortfolio, 60000);
+$('pulseBtn').addEventListener('click',async()=>{
+  try{
+    if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';document.head.appendChild(s);await new Promise(r=>s.onload=r)}
+    const canvas=await html2canvas($('pulse'),{backgroundColor:'#050810',scale:2});
+    const a=document.createElement('a');a.download='tinvest-pulse.png';a.href=canvas.toDataURL('image/png');a.click();
+  }catch(e){alert('Не удалось сделать Pulse: '+e.message)}
 });
+load();setInterval(load,60000);
