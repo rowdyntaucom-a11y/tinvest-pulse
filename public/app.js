@@ -133,7 +133,7 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=5.0&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{const r=await fetch('/api/dashboard?v=5.2.1&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
 let pulseMode=false;
 let pulseLongTimer=null;
 
@@ -222,8 +222,11 @@ function exitPulse(){
   setText('pulseBtn','PULSE');document.body.classList.remove('pulse-active');
 }
 function togglePulse(){pulseMode?exitPulse():enterPulse();}
-$('pulseBtn').addEventListener('click',togglePulse);
-$('pulseBack')?.addEventListener('click',togglePulse);
+// Robust mobile toggle: expose a global handler for the inline button and keep a delegated listener as a fallback.
+window.__togglePulse=function(ev){if(ev){ev.preventDefault();ev.stopPropagation();}togglePulse();};
+$('pulseBtn')?.addEventListener('click',window.__togglePulse,{passive:false});
+$('pulseBack')?.addEventListener('click',window.__togglePulse,{passive:false});
+document.addEventListener('click',ev=>{const b=ev.target?.closest?.('#pulseBtn,#pulseBack');if(b){window.__togglePulse(ev);}},{capture:true});
 
 // Long press on PULSE opens the same Röntgen view with a subtle "deep" state for power users.
 $('pulseBtn').addEventListener('pointerdown',()=>{pulseLongTimer=setTimeout(()=>{if(!pulseMode)enterPulse();$('pulseShot').classList.add('deep-pulse');},650);});
