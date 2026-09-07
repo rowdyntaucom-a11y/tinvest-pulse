@@ -140,3 +140,26 @@ body[data-theme=graphite] .pulse-capture .pulseShot{background:linear-gradient(1
 .pulse-capture .pulseDiagnosis{margin-top:7px;min-height:44px;padding:7px 9px;border-radius:0 14px 14px 0;border-left:2px solid var(--accent);background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 8%,transparent),rgba(255,255,255,.012) 60%,transparent)}
 .pulse-capture .pulseDiagnosis b{font-size:13px}.pulse-capture .pulseDiagnosis span{font-size:6.5px}
 @media(max-height:760px){.pulse-capture>.pulseShot{padding:10px 13px 6px}.pulse-capture .pulseShotValue{font-size:35px}.pulse-capture .scoreRing{width:72px;height:72px}.pulseTelemetry{margin-top:5px}.pulse-capture .heartbeat{height:92px;margin-top:6px}.pulse-capture .pulseBattle{margin-top:5px;padding:6px 8px}.pulse-capture .pulseGrid{margin-top:5px}.pulse-capture .pulseTile{min-height:41px;padding:6px 8px}.pulseLabGrid{margin-top:5px}.pulse-capture .pulseDNA{padding:6px 8px}.pulseTelemetryBox{padding:6px 8px}.pulseTelemetryBox b{font-size:13px}.pulseTicker{padding:5px 6px}.pulse-capture .pulseDiagnosis{margin-top:5px;min-height:37px;padding:5px 8px}.pulse-capture .pulseShotFooter{margin-top:4px}}
+
+/* PULSE // LIVE POLISH v5.3 */
+.pulse-capture .pulseShot{isolation:isolate}
+.pulse-capture .pulseShot:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(255,255,255,.012) 6px);mask-image:linear-gradient(to bottom,transparent,black 18%,black 82%,transparent);opacity:.45}
+.pulse-capture .pulseShot:after{content:"";position:absolute;left:0;right:0;top:-20%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);box-shadow:0 0 18px var(--accent);opacity:.22;pointer-events:none;z-index:1;animation:pulseScan 4.8s linear infinite}
+.pulse-capture .pulseHeader,.pulse-capture .pulseTelemetry,.pulse-capture .pulseHero,.pulse-capture .heartbeat,.pulse-capture .pulseBattle,.pulse-capture .pulseGrid,.pulse-capture .pulseCharacter,.pulse-capture .pulseLabGrid,.pulse-capture .pulseDiagnosis,.pulse-capture .pulseShotFooter{z-index:2}
+.pulse-capture .pulseShotValue{text-shadow:0 0 28px color-mix(in srgb,var(--accent) 18%,transparent)}
+.pulse-capture .scoreRing{transition:background .7s ease,transform .35s ease;animation:scoreFloat 2.8s ease-in-out infinite}
+.pulse-capture .heartbeat{box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 35px rgba(0,0,0,.16),0 0 22px color-mix(in srgb,var(--accent) 7%,transparent)}
+.pulse-capture .pulseLine{stroke-dasharray:900;stroke-dashoffset:900;animation:drawPulse 1.35s .08s ease-out forwards}
+.pulse-capture .pulseMoex{stroke-dasharray:900;stroke-dashoffset:900;animation:drawPulse 1.7s .18s ease-out forwards}
+.pulse-capture .pulseArea{opacity:.10;animation:areaIn .8s .3s ease-out both}
+.pulse-capture .pulseTile{animation:tileIn .38s ease-out both}
+.pulse-capture .pulseTile:nth-child(2){animation-delay:.05s}.pulse-capture .pulseTile:nth-child(3){animation-delay:.10s}.pulse-capture .pulseTile:nth-child(4){animation-delay:.15s}
+.pulse-capture .pulseDNA{animation:tileIn .4s .18s ease-out both}
+.pulse-capture .pulseDiagnosis{animation:tileIn .42s .24s ease-out both}
+.pulse-capture .battleBar i,.pulse-capture .battleBar em{transition:width .9s cubic-bezier(.2,.8,.2,1)}
+@keyframes pulseScan{0%{top:-10%;opacity:0}12%{opacity:.28}88%{opacity:.18}100%{top:110%;opacity:0}}
+@keyframes scoreFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes drawPulse{to{stroke-dashoffset:0}}
+@keyframes areaIn{from{opacity:0}to{opacity:.10}}
+@keyframes tileIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.pulse-capture .pulseShot:after,.pulse-capture .scoreRing,.pulse-capture .pulseLine,.pulse-capture .pulseMoex,.pulse-capture .pulseArea,.pulse-capture .pulseTile,.pulse-capture .pulseDNA,.pulse-capture .pulseDiagnosis{animation:none}.pulse-capture .pulseLine,.pulse-capture .pulseMoex{stroke-dashoffset:0}}

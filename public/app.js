@@ -208,7 +208,7 @@ function enterPulse(){
   const dna=[['dnaIncome','dnaIncomeVal',st.dnaIncome],['dnaStability','dnaStabilityVal',st.dnaStability],['dnaGrowth','dnaGrowthVal',st.dnaGrowth],['dnaDivers','dnaDiversVal',st.dnaDivers]];
   for(const [bar,val,n] of dna){setStyle(bar,'width',`${n}%`);setText(val,`${n}`);}
   setText('pulseDiagnosisTitle',st.diagnosisTitle);setText('pulseDiagnosisText',st.diagnosisText);
-  setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`);
+  setStyle('scoreRing','background',`conic-gradient(var(--accent) 0deg,rgba(255,255,255,.07) 0deg)`); requestAnimationFrame(()=>setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`));
   setStyle('battlePortfolio','width',`${st.pBar}%`);setStyle('battleMoex','width',`${st.mBar}%`);
   setText('pulseBattleText',st.pReturn-st.mReturn>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');setText('pulsePortfolioReturn',`${st.pReturn>=0?'+':''}${st.pReturn.toFixed(1).replace('.',',')}%`);setText('pulseMoexReturn',`${st.mReturn>=0?'+':''}${st.mReturn.toFixed(1).replace('.',',')}%`);
   const tempo=Number.isFinite(st.pReturn)?Math.abs(st.pReturn):0;setText('pulseTempo',`${tempo.toFixed(1).replace('.',',')}%`);setText('pulseTempoText',st.pReturn>=0?'темп роста':'темп просадки');
