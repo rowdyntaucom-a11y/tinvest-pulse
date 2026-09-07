@@ -14,103 +14,91 @@ app.use(express.static(path.join(__dirname, 'public')));
 const TBANK_BASE = 'https://invest-public-api.tbank.ru/rest/';
 const MOEX_BASE = 'https://iss.moex.com/iss/';
 
-// T-Bank currently uses the Russian Trusted CA chain. Node.js on Render
-// does not necessarily include it in its default trust store.
-// We download the two public CA certificates over HTTPS, verify their
-// SHA-256 fingerprints, and then use them only for T-Bank connections.
-// We NEVER disable certificate verification for the actual T-Bank request.
-const RUSSIAN_ROOT_URL = 'https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer';
-const RUSSIAN_SUB_URL = 'https://gu-st.ru/content/Other/doc/russian_trusted_sub_ca.cer';
+// T-Bank currently uses the Russian Trusted CA chain.
+// The certificates are embedded locally so the server does not need to
+// bootstrap a TLS connection to download its own trust anchors.
+// T-Bank's official documentation says Node.js needs the Russian Trusted
+// Root CA and Russian Trusted Sub CA for this API.
+const RUSSIAN_TRUSTED_CA_ROOT = `-----BEGIN CERTIFICATE-----
+MIIFwjCCA6qgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwcDELMAkGA1UEBhMCUlUx
+PzA9BgNVBAoMNlRoZSBNaW5pc3RyeSBvZiBEaWdpdGFsIERldmVsb3BtZW50IGFu
+ZCBDb21tdW5pY2F0aW9uczEgMB4GA1UEAwwXUnVzc2lhbiBUcnVzdGVkIFJvb3Qg
+Q0EwHhcNMjIwMzAxMjEwNDE1WhcNMzIwMjI3MjEwNDE1WjBwMQswCQYDVQQGEwJS
+VTE/MD0GA1UECgw2VGhlIE1pbmlzdHJ5IG9mIERpZ2l0YWwgRGV2ZWxvcG1lbnQg
+YW5kIENvbW11bmljYXRpb25zMSAwHgYDVQQDDBdSdXNzaWFuIFRydXN0ZWQgUm9v
+dCBDQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAMfFOZ8pUAL3+r2n
+qqE0Zp52selXsKGFYoG0GM5bwz1bSFtCt+AZQMhkWQheI3poZAToYJu69pHLKS6Q
+XBiwBC1cvzYmUYKMYZC7jE5YhEU2bSL0mX7NaMxMDmH2/NwuOVRj8OImVa5s1F4U
+zn4Kv3PFlDBjjSjXKVY9kmjUBsXQrIHeaqmUIsPIlNWUnimXS0I0abExqkbdrXbX
+YwCOXhOO2pDUx3ckmJlCMUGacUTnylyQW2VsJIyIGA8V0xzdaeUXg0VZ6ZmNUr5Y
+Ber/EAOLPb8NYpsAhJe2mXjMB/J9HNsoFMBFJ0lLOT/+dQvjbdRZoOT8eqJpWnVD
+U+QL/qEZnz57N88OWM3rabJkRNdU/Z7x5SFIM9FrqtN8xewsiBWBI0K6XFuOBOTD
+4V08o4TzJ8+Ccq5XlCUW2L48pZNCYuBDfBh7FxkB7qDgGDiaftEkZZfApRg2E+M9
+G8wkNKTPLDc4wH0FDTijhgxR3Y4PiS1HL2Zhw7bD3CbslmEGgfnnZojNkJtcLeBH
+BLa52/dSwNU4WWLubaYSiAmA9IUMX1/RpfpxOxd4Ykmhz97oFbUaDJFipIggx5sX
+ePAlkTdWnv+RWBxlJwMQ25oEHmRguNYf4Zr/Rxr9cS93Y+mdXIZaBEE0KS2iLRqa
+OiWBki9IMQU4phqPOBAaG7A+eP8PAgMBAAGjZjBkMB0GA1UdDgQWBBTh0YHlzlpf
+BKrS6badZrHF+qwshzAfBgNVHSMEGDAWgBTh0YHlzlpfBKrS6badZrHF+qwshzAS
+BgNVHRMBAf8ECDAGAQH/AgEEMA4GA1UdDwEB/wQEAwIBhjANBgkqhkiG9w0BAQsF
+AAOCAgEAALIY1wkilt/urfEVM5vKzr6utOeDWCUczmWX/RX4ljpRdgF+5fAIS4vH
+tmXkqpSCOVeWUrJV9QvZn6L227ZwuE15cWi8DCDal3Ue90WgAJJZMfTshN4OI8cq
+W9E4EG9wglbEtMnObHlms8F3CHmrw3k6KmUkWGoa+/ENmcVl68u/cMRl1JbW2bM+
+/3A+SAg2c6iPDlehczKx2oa95QW0SkPPWGuNA/CE8CpyANIhu9XFrj3RQ3EqeRcS
+AQQod1RNuHpfETLU/A2gMmvn/w/sx7TB3W5BPs6rprOA37tutPq9u6FTZOcG1Oqj
+C/B7yTqgI7rbyvox7DEXoX7rIiEqyNNUguTk/u3SZ4VXE2kmxdmSh3TQvybfbnXV
+4JbCZVaqiZraqc7oZMnRoWrXRG3ztbnbes/9qhRGI7PqXqeKJBztxRTEVj8ONs1d
+WN5szTwaPIvhkhO3CO5ErU2rVdUr89wKpNXbBODFKRtgxUT70YpmJ46VVaqdAhOZ
+D9EUUn4YaeLaS8AjSF/h7UkjOibNc4qVDiPP+rkehFWM66PVnP1Msh93tc+taIfC
+EYVMxjh8zNbFuoc7fzvvrFILLe7ifvEIUqSVIC/AzplM/Jxw7buXFeGP1qVCBEHq
+391d/9RAfaZ12zkwFsl+IKwE/OZxW8AHa9i1p4GO0YSNuczzEm4=
+-----END CERTIFICATE-----`;
+const RUSSIAN_TRUSTED_CA_SUB = `-----BEGIN CERTIFICATE-----
+MIIHQjCCBSqgAwIBAgICEAIwDQYJKoZIhvcNAQELBQAwcDELMAkGA1UEBhMCUlUx
+PzA9BgNVBAoMNlRoZSBNaW5pc3RyeSBvZiBEaWdpdGFsIERldmVsb3BtZW50IGFu
+ZCBDb21tdW5pY2F0aW9uczEgMB4GA1UEAwwXUnVzc2lhbiBUcnVzdGVkIFJvb3Qg
+Q0EwHhcNMjIwMzAyMTEyNTE5WhcNMjcwMzA2MTEyNTE5WjBvMQswCQYDVQQGEwJS
+VTE/MD0GA1UECgw2VGhlIE1pbmlzdHJ5IG9mIERpZ2l0YWwgRGV2ZWxvcG1lbnQg
+YW5kIENvbW11bmljYXRpb25zMR8wHQYDVQQDDBZSdXNzaWFuIFRydXN0ZWQgU3Vi
+IENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA9YPqBKOk19NFymrE
+wehzrhBEgT2atLezpduB24mQ7CiOa/HVpFCDRZzdxqlh8drku408/tTmWzlNH/br
+HuQhZ/miWKOf35lpKzjyBd6TPM23uAfJvEOQ2/dnKGGJbsUo1/udKSvxQwVHpVv3
+S80OlluKfhWPDEXQpgyFqIzPoxIQTLZ0deirZwMVHarZ5u8HqHetRuAtmO2ZDGQn
+vVOYJAjls+Hiueq7Lj7Oce7CQsTwVZeP+XQx28PAaEZ3y6sQEt6rL06ddpSdoTMp
+BnCqTbxW+eWMyjkIn6t9GBtUV45yB1EkHNnj2Ex4GwCiN9T84QQjKSr+8f0psGrZ
+vPbCbQAwNFJjisLixnjlGPLKa5vOmNwIh/LAyUW5DjpkCx004LPDuqPpFsKXNKpa
+L2Dm6uc0x4Jo5m+gUTVORB6hOSzWnWDj2GWfomLzzyjG81DRGFBpco/O93zecsIN
+3SL2Ysjpq1zdoS01CMYxie//9zWvYwzI25/OZigtnpCIrcd2j1Y6dMUFQAzAtHE+
+qsXflSL8HIS+IJEFIQobLlYhHkoE3avgNx5jlu+OLYe0dF0Ykx1PGNjbwqvTX37R
+Cn32NMjlotW2QcGEZhDKj+3urZizp5xdTPZitA+aEjZM/Ni71VOdiOP0igbw6asZ
+2fxdozZ1TnSSYNYvNATwthNmZysCAwEAAaOCAeUwggHhMBIGA1UdEwEB/wQIMAYB
+Af8CAQAwDgYDVR0PAQH/BAQDAgGGMB0GA1UdDgQWBBTR4XENCy2BTm6KSo9MI7NM
+XqtpCzAfBgNVHSMEGDAWgBTh0YHlzlpfBKrS6badZrHF+qwshzCBxwYIKwYBBQUH
+AQEEgbowgbcwOwYIKwYBBQUHMAKGL2h0dHA6Ly9yb3N0ZWxlY29tLnJ1L2NkcC9y
+b290Y2Ffc3NsX3JzYTIwMjIuY3J0MDsGCCsGAQUFBzAChi9odHRwOi8vY29tcGFu
+eS5ydC5ydS9jZHAvcm9vdGNhX3NzbF9yc2EyMDIyLmNydDA7BggrBgEFBQcwAoYv
+aHR0cDovL3JlZXN0ci1wa2kucnUvY2RwL3Jvb3RjYV9zc2xfcnNhMjAyMi5jcnQw
+gbAGA1UdHwSBqDCBpTA1oDOgMYYvaHR0cDovL3Jvc3RlbGVjb20ucnUvY2RwL3Jv
+b3RjYV9zc2xfcnNhMjAyMi5jcmwwNaAzoDGGL2h0dHA6Ly9jb21wYW55LnJ0LnJ1
+L2NkcC9yb290Y2Ffc3NsX3JzYTIwMjIuY3JsMDWgM6Axhi9odHRwOi8vcmVlc3Ry
+LXBraS5ydS9jZHAvcm9vdGNhX3NzbF9yc2EyMDIyLmNybDANBgkqhkiG9w0BAQsF
+AAOCAgEARBVzZls79AdiSCpar15dA5Hr/rrT4WbrOfzlpI+xrLeRPrUG6eUWIW4v
+Sui1yx3iqGLCjPcKb+HOTwoRMbI6ytP/ndp3TlYua2advYBEhSvjs+4vDZNwXr/D
+anbwIWdurZmViQRBDFebpkvnIvru/RpWud/5r624Wp8voZMRtj/cm6aI9LtvBfT9
+cfzhOaexI/99c14dyiuk1+6QhdwKaCRTc1mdfNQmnfWNRbfWhWBlK3h4GGE9JK33
+Gk8ZS8DMrkdAh0xby4xAQ/mSWAfWrBmfzlOqGyoB1U47WTOeqNbWkkoAP2ys94+s
+Jg4NTkiDVtXRF6nr6fYi0bSOvOFg0IQrMXO2Y8gyg9ARdPJwKtvWX8VPADCYMiWH
+h4n8bZokIrImVKLDQKHY4jCsND2HHdJfnrd2LJYw1qFskNO4cSNmZydw0Wkgjv9k
+F+KxqrDKlB8MZu2Hclph6v/CZ0fQ9YuE8/lsHZ0Qc2HyiSMnvjgK5fDc3TD4fa8F
+E8gMNurM+kV8PT8LNIM+4Zs+LKEV8nqRWBaxkIVJGekkVKO8xDBOG/aN62AZKHOe
+GcyIdu7yNMMRihGVZCYr8rYiJoKiOzDqOkPkLOPdhtVlgnhowzHDxMHND/E2WA5p
+ZHuNM/m0TXt2wTTPL7JH2YC0gPz/BvvSzjksgzU5rLbRyUKQkgU=
+-----END CERTIFICATE-----`;
 
-const RUSSIAN_ROOT_SHA256 =
-  'D26D2D0231B7C39F92CC738512BA54103519E4405D68B5BD703E9788CA8ECF31';
-const RUSSIAN_SUB_SHA256 =
-  'BBBDE2103E790B999EC62BD03CF625A5A2E7C316E10AFE6A490EEDEAD8B3FD9B';
-
-let tbankCaPromise = null;
-
-function certificateSha256(pemOrDer) {
-  const text = Buffer.isBuffer(pemOrDer)
-    ? pemOrDer.toString('utf8')
-    : String(pemOrDer);
-
-  let der;
-  if (text.includes('BEGIN CERTIFICATE')) {
-    const base64 = text
-      .replace(/-----BEGIN CERTIFICATE-----/g, '')
-      .replace(/-----END CERTIFICATE-----/g, '')
-      .replace(/\s+/g, '');
-    der = Buffer.from(base64, 'base64');
-  } else {
-    der = Buffer.from(pemOrDer);
-  }
-
-  return crypto.createHash('sha256').update(der).digest('hex').toUpperCase();
-}
-
-function downloadPublicCertificate(url) {
-  return new Promise((resolve, reject) => {
-    const request = https.get(url, {
-      // Bootstrap only: no token or private data is sent here.
-      // The downloaded certificate is accepted only after fingerprint verification.
-      rejectUnauthorized: false,
-      timeout: 15000,
-      headers: { 'User-Agent': 'TInvest-Pulse/2.3' }
-    }, response => {
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        response.resume();
-        reject(new Error(`Certificate download HTTP ${response.statusCode}`));
-        return;
-      }
-
-      const chunks = [];
-      response.on('data', chunk => chunks.push(chunk));
-      response.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-    });
-
-    request.on('timeout', () => {
-      request.destroy(new Error('Certificate download timeout'));
-    });
-
-    request.on('error', reject);
+function loadTBankCA() {
+  return Promise.resolve({
+    rootPem: RUSSIAN_TRUSTED_CA_ROOT,
+    subPem: RUSSIAN_TRUSTED_CA_SUB
   });
-}
-
-async function loadTBankCA() {
-  if (!tbankCaPromise) {
-    tbankCaPromise = (async () => {
-      const [rootPem, subPem] = await Promise.all([
-        downloadPublicCertificate(RUSSIAN_ROOT_URL),
-        downloadPublicCertificate(RUSSIAN_SUB_URL)
-      ]);
-
-      const rootFingerprint = certificateSha256(rootPem);
-      const subFingerprint = certificateSha256(subPem);
-
-      if (rootFingerprint !== RUSSIAN_ROOT_SHA256) {
-        throw new Error(
-          `Russian Trusted Root CA fingerprint mismatch: ${rootFingerprint}`
-        );
-      }
-
-      if (subFingerprint !== RUSSIAN_SUB_SHA256) {
-        throw new Error(
-          `Russian Trusted Sub CA fingerprint mismatch: ${subFingerprint}`
-        );
-      }
-
-      return {
-        rootPem,
-        subPem,
-        fingerprints: {
-          root: rootFingerprint,
-          sub: subFingerprint
-        }
-      };
-    })();
-  }
-
-  return tbankCaPromise;
 }
 
 async function tbankHttpsRequest(method, url, body, extraHeaders = {}) {
@@ -192,6 +180,47 @@ async function safeFetch(url, options = {}) {
       error: errorInfo(err)
     };
   }
+}
+
+function httpsJsonRequest(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const target = new URL(url);
+
+    const req = https.request({
+      protocol: target.protocol,
+      hostname: target.hostname,
+      port: target.port || 443,
+      path: `${target.pathname}${target.search}`,
+      method: options.method || 'GET',
+      headers: options.headers || {},
+      ca: RUSSIAN_TRUSTED_CA,
+      timeout: options.timeout || 20000
+    }, response => {
+      let data = '';
+
+      response.setEncoding('utf8');
+      response.on('data', chunk => {
+        data += chunk;
+      });
+
+      response.on('end', () => {
+        resolve({
+          status: response.statusCode,
+          statusText: response.statusMessage,
+          text: data
+        });
+      });
+    });
+
+    req.on('timeout', () => {
+      req.destroy(new Error('HTTPS request timeout'));
+    });
+
+    req.on('error', reject);
+
+    if (options.body) req.write(options.body);
+    req.end();
+  });
 }
 
 async function tbankRequest(method, body) {
@@ -622,7 +651,7 @@ app.get('/api/network-test', async (req, res) => {
       error: moex.error || null
     },
     ca: {
-      configured: Boolean(tbankCaPromise),
+      configured: true,
       note: 'T-Bank requests use the verified Russian Trusted Root/Sub CA chain.'
     },
     interpretation:
@@ -664,7 +693,7 @@ app.get('*', (req, res) => {
 async function start() {
   try {
     await loadTBankCA();
-    console.log('Russian Trusted CA loaded and fingerprint-verified.');
+    console.log('Russian Trusted CA loaded locally.');
   } catch (err) {
     console.error('WARNING: could not preload Russian Trusted CA:', err.message);
     console.error('T-Bank requests will report the certificate bootstrap error.');
