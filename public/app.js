@@ -88,19 +88,16 @@ function render(d){
   setText('xirr',p.xirr==null?'—':pct(p.xirr));
 
   const hp=Array.isArray(dashboardData.history?.points)?dashboardData.history.points:[];
-  // Compare cumulative returns, not the raw/normalized index levels.
-  // This stays correct whether the server sends IMOEX as raw points or starts it at 100.
-  const commonPoints=hp.filter(x=>Number.isFinite(Number(x.portfolio))&&Number.isFinite(Number(x.imoex)));
+  // Compare cumulative returns using the actual plotted series. We intentionally
+  // do not require identical date strings because MOEX and T-Bank can serialize
+  // the same trading day differently (UTC vs local date).
+  const pSeries=hp.map(x=>Number(x?.portfolio)).filter(Number.isFinite).filter(v=>v>0);
+  const mSeries=hp.map(x=>Number(x?.imoex)).filter(Number.isFinite).filter(v=>v>0);
   let vs=null;
-  if(commonPoints.length>=2){
-    const first=commonPoints[0], last=commonPoints[commonPoints.length-1];
-    const p0=Number(first.portfolio), p1=Number(last.portfolio);
-    const m0=Number(first.imoex), m1=Number(last.imoex);
-    if(p0>0&&p1>0&&m0>0&&m1>0){
-      const portfolioReturn=(p1/p0)-1;
-      const moexReturn=(m1/m0)-1;
-      vs=(portfolioReturn-moexReturn)*100;
-    }
+  if(pSeries.length>=2 && mSeries.length>=2){
+    const pReturn=pSeries[pSeries.length-1]/pSeries[0]-1;
+    const mReturn=mSeries[mSeries.length-1]/mSeries[0]-1;
+    vs=(pReturn-mReturn)*100;
   }
   setText('vsMoex',vs==null?'—':`${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} п.п.`);
   setStyle('vsMoex','color',vs==null?'#fff':(vs>=0?'var(--accent)':'#ff6575'));
@@ -134,6 +131,6 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=4.3&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{const r=await fetch('/api/dashboard?v=4.5&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
 $('pulseBtn').addEventListener('click',async()=>{try{if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js?v=4.3';document.head.appendChild(s);await new Promise(r=>s.onload=r)}const canvas=await html2canvas($('pulse'),{backgroundColor:'#05070b',scale:2});const a=document.createElement('a');a.download='kryahtyashiy-fond-pulse.png';a.href=canvas.toDataURL('image/png');a.click();}catch(e){alert('Не удалось сделать Pulse: '+e.message)}});
 load();setInterval(load,60000);
