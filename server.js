@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const https = require('https');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
@@ -11,6 +13,152 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const TBANK_BASE = 'https://invest-public-api.tbank.ru/rest/';
 const MOEX_BASE = 'https://iss.moex.com/iss/';
+
+// T-Bank currently uses the Russian Trusted CA chain. Node.js on Render
+// does not necessarily include it in its default trust store.
+// We download the two public CA certificates over HTTPS, verify their
+// SHA-256 fingerprints, and then use them only for T-Bank connections.
+// We NEVER disable certificate verification for the actual T-Bank request.
+const RUSSIAN_ROOT_URL = 'https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer';
+const RUSSIAN_SUB_URL = 'https://gu-st.ru/content/Other/doc/russian_trusted_sub_ca.cer';
+
+const RUSSIAN_ROOT_SHA256 =
+  'D26D2D0231B7C39F92CC738512BA54103519E4405D68B5BD703E9788CA8ECF31';
+const RUSSIAN_SUB_SHA256 =
+  'BBBDE2103E790B999EC62BD03CF625A5A2E7C316E10AFE6A490EEDEAD8B3FD9B';
+
+let tbankCaPromise = null;
+
+function certificateSha256(pemOrDer) {
+  const text = Buffer.isBuffer(pemOrDer)
+    ? pemOrDer.toString('utf8')
+    : String(pemOrDer);
+
+  let der;
+  if (text.includes('BEGIN CERTIFICATE')) {
+    const base64 = text
+      .replace(/-----BEGIN CERTIFICATE-----/g, '')
+      .replace(/-----END CERTIFICATE-----/g, '')
+      .replace(/\s+/g, '');
+    der = Buffer.from(base64, 'base64');
+  } else {
+    der = Buffer.from(pemOrDer);
+  }
+
+  return crypto.createHash('sha256').update(der).digest('hex').toUpperCase();
+}
+
+function downloadPublicCertificate(url) {
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, {
+      // Bootstrap only: no token or private data is sent here.
+      // The downloaded certificate is accepted only after fingerprint verification.
+      rejectUnauthorized: false,
+      timeout: 15000,
+      headers: { 'User-Agent': 'TInvest-Pulse/2.3' }
+    }, response => {
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        response.resume();
+        reject(new Error(`Certificate download HTTP ${response.statusCode}`));
+        return;
+      }
+
+      const chunks = [];
+      response.on('data', chunk => chunks.push(chunk));
+      response.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    });
+
+    request.on('timeout', () => {
+      request.destroy(new Error('Certificate download timeout'));
+    });
+
+    request.on('error', reject);
+  });
+}
+
+async function loadTBankCA() {
+  if (!tbankCaPromise) {
+    tbankCaPromise = (async () => {
+      const [rootPem, subPem] = await Promise.all([
+        downloadPublicCertificate(RUSSIAN_ROOT_URL),
+        downloadPublicCertificate(RUSSIAN_SUB_URL)
+      ]);
+
+      const rootFingerprint = certificateSha256(rootPem);
+      const subFingerprint = certificateSha256(subPem);
+
+      if (rootFingerprint !== RUSSIAN_ROOT_SHA256) {
+        throw new Error(
+          `Russian Trusted Root CA fingerprint mismatch: ${rootFingerprint}`
+        );
+      }
+
+      if (subFingerprint !== RUSSIAN_SUB_SHA256) {
+        throw new Error(
+          `Russian Trusted Sub CA fingerprint mismatch: ${subFingerprint}`
+        );
+      }
+
+      return {
+        rootPem,
+        subPem,
+        fingerprints: {
+          root: rootFingerprint,
+          sub: subFingerprint
+        }
+      };
+    })();
+  }
+
+  return tbankCaPromise;
+}
+
+async function tbankHttpsRequest(method, url, body, extraHeaders = {}) {
+  const ca = await loadTBankCA();
+
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(url);
+    const payload = body == null ? null : JSON.stringify(body);
+
+    const request = https.request({
+      protocol: parsed.protocol,
+      hostname: parsed.hostname,
+      port: parsed.port || 443,
+      path: `${parsed.pathname}${parsed.search}`,
+      method,
+      ca: [ca.rootPem, ca.subPem],
+      rejectUnauthorized: true,
+      servername: parsed.hostname,
+      timeout: 20000,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...(payload ? { 'Content-Length': Buffer.byteLength(payload) } : {}),
+        ...extraHeaders
+      }
+    }, response => {
+      const chunks = [];
+      response.on('data', chunk => chunks.push(chunk));
+      response.on('end', () => {
+        const text = Buffer.concat(chunks).toString('utf8');
+        resolve({
+          status: response.statusCode,
+          statusText: response.statusMessage,
+          text
+        });
+      });
+    });
+
+    request.on('timeout', () => {
+      request.destroy(new Error('T-Bank HTTPS request timeout'));
+    });
+
+    request.on('error', reject);
+
+    if (payload) request.write(payload);
+    request.end();
+  });
+}
 
 function errorInfo(err) {
   return {
@@ -53,26 +201,23 @@ async function tbankRequest(method, body) {
     throw err;
   }
 
-  const response = await fetch(`${TBANK_BASE}${method}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${TINVEST_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(20000)
-  });
-
-  const text = await response.text();
+  const response = await tbankHttpsRequest(
+    'POST',
+    `${TBANK_BASE}${method}`,
+    body,
+    {
+      'Authorization': `Bearer ${TINVEST_TOKEN}`
+    }
+  );
 
   let data;
   try {
-    data = JSON.parse(text);
+    data = JSON.parse(response.text);
   } catch {
-    data = { raw: text.slice(0, 4000) };
+    data = { raw: response.text.slice(0, 4000) };
   }
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     const err = new Error(`T-Bank API HTTP ${response.status}`);
     err.status = response.status;
     err.code = data?.code || data?.errorCode || null;
@@ -440,7 +585,24 @@ app.get('/api/health', (req, res) => {
 // Network diagnostic. This does NOT expose the token.
 app.get('/api/network-test', async (req, res) => {
   const [tbank, moex] = await Promise.all([
-    safeFetch('https://invest-public-api.tbank.ru/rest/'),
+    (async () => {
+      try {
+        const r = await tbankHttpsRequest('GET', 'https://invest-public-api.tbank.ru/rest/', null);
+        return {
+          ok: r.status >= 200 && r.status < 500,
+          status: r.status,
+          statusText: r.statusText,
+          error: null
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          status: null,
+          statusText: null,
+          error: errorInfo(err)
+        };
+      }
+    })(),
     safeFetch('https://iss.moex.com/iss/history/engines/stock/markets/index/boards/SNDX/securities/IMOEX.json?iss.meta=off&iss.only=history&history.columns=TRADEDATE,SECID,CLOSE')
   ]);
 
@@ -459,10 +621,14 @@ app.get('/api/network-test', async (req, res) => {
       statusText: moex.statusText,
       error: moex.error || null
     },
+    ca: {
+      configured: Boolean(tbankCaPromise),
+      note: 'T-Bank requests use the verified Russian Trusted Root/Sub CA chain.'
+    },
     interpretation:
       tbank.ok || tbank.status
-        ? 'Render can reach the T-Bank host. If /api/accounts still fails, inspect the authenticated API response.'
-        : 'Render cannot establish a normal HTTPS connection to the T-Bank host. This points to network/TLS/CA connectivity rather than a missing token.'
+        ? 'T-Bank HTTPS connection is working with the Russian Trusted CA. If /api/accounts still fails, inspect the authenticated API response.'
+        : 'T-Bank HTTPS is still failing. Check the error above; the server does not disable TLS verification for T-Bank.'
   });
 });
 
@@ -495,6 +661,18 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`TInvest Pulse listening on port ${PORT}`);
-});
+async function start() {
+  try {
+    await loadTBankCA();
+    console.log('Russian Trusted CA loaded and fingerprint-verified.');
+  } catch (err) {
+    console.error('WARNING: could not preload Russian Trusted CA:', err.message);
+    console.error('T-Bank requests will report the certificate bootstrap error.');
+  }
+
+  app.listen(PORT, () => {
+    console.log(`TInvest Pulse listening on port ${PORT}`);
+  });
+}
+
+start();
