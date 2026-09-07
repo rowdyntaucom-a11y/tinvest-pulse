@@ -133,6 +133,39 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=4.6&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
-$('pulseBtn').addEventListener('click',async()=>{try{if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js?v=4.3';document.head.appendChild(s);await new Promise(r=>s.onload=r)}const canvas=await html2canvas($('pulse'),{backgroundColor:'#05070b',scale:2});const a=document.createElement('a');a.download='kryahtyashiy-fond-pulse.png';a.href=canvas.toDataURL('image/png');a.click();}catch(e){alert('Не удалось сделать Pulse: '+e.message)}});
+async function load(){try{const r=await fetch('/api/dashboard?v=4.7&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+$('pulseBtn').addEventListener('click',async()=>{
+  const root=$('pulse'),shot=$('pulseShot');
+  try{
+    if(!window.html2canvas){
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js?v=4.7';
+      document.head.appendChild(s);
+      await new Promise((resolve,reject)=>{s.onload=resolve;s.onerror=reject});
+    }
+    const p=dashboardData?.portfolio||{};
+    const vsText=$('vsMoex')?.textContent||'—';
+    setText('pulseValue',rub(p.value));
+    setText('pulseGain',p.profitPercent==null?'—':`${p.profitPercent>=0?'+':''}${pct(p.profitPercent)}`);
+    setText('pulseVs',vsText);
+    setText('pulseXirr',p.xirr==null?'—':pct(p.xirr));
+    const monthly=Number(dashboardData?.passiveIncome?.averageMonthly);
+    setText('pulseIncome',Number.isFinite(monthly)?rub(monthly)+'/мес':'—');
+    setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
+    root.classList.add('pulse-capture');
+    shot.setAttribute('aria-hidden','false');
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const canvas=await html2canvas(root,{backgroundColor:'#05070b',scale:2,useCORS:true,logging:false});
+    root.classList.remove('pulse-capture');
+    shot.setAttribute('aria-hidden','true');
+    const a=document.createElement('a');
+    a.download='kryahtyashiy-fond-pulse.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+  }catch(e){
+    root.classList.remove('pulse-capture');
+    shot.setAttribute('aria-hidden','true');
+    alert('Не удалось сделать Pulse: '+e.message);
+  }
+});
 load();setInterval(load,60000);

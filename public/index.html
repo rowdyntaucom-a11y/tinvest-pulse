@@ -10,6 +10,21 @@
 </head>
 <body data-theme="neon">
   <main class="phone" id="pulse">
+    <section class="pulseShot" id="pulseShot" aria-hidden="true">
+      <div class="pulseGlow"></div>
+      <div class="pulseShotTop"><span>КРЯХТЯЩИЙ <b>ФОНД</b></span><strong>PULSE</strong></div>
+      <div class="pulseShotLabel">СЕГОДНЯШНИЙ ПУЛЬС</div>
+      <div class="pulseShotValue" id="pulseValue">—</div>
+      <div class="pulseShotGain" id="pulseGain">—</div>
+      <div class="pulseShotLine"></div>
+      <div class="pulseMetrics">
+        <div><small>VS MOEX</small><b id="pulseVs">—</b></div>
+        <div><small>XIRR</small><b id="pulseXirr">—</b></div>
+        <div><small>ПАССИВ</small><b id="pulseIncome">—</b></div>
+      </div>
+      <div class="pulseShotTag">НЕ БАНК · НЕ ФОНД · ПРОСТО КРЯХТИТ</div>
+      <div class="pulseShotTime" id="pulseTime">—</div>
+    </section>
     <div class="noise"></div>
     <header class="top">
       <div class="brandBlock">
@@ -76,6 +91,6 @@
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=4.6"></script>
+  <script src="/app.js?v=4.7"></script>
 </body>
 </html>
