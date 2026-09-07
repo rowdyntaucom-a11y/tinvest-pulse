@@ -525,7 +525,7 @@ async function getDailyCandles(instrumentId, from, to) {
     });
     return Array.isArray(data?.candles) ? data.candles : [];
   } catch (err) {
-    console.warn(`Candles failed for ${figi}: ${err.message}`);
+    console.warn(`Candles failed for ${instrumentId}: ${err.message}`);
     return [];
   }
 }
@@ -959,7 +959,7 @@ app.get('/api/history-debug', async (req, res) => {
     const firstInvestment = operations.filter(isExternalCashOperation).map(op => ({date:safeDate(op.date), amount:operationCash(op)})).filter(x=>x.date && x.amount>0).sort((a,b)=>a.date-b.date)[0];
     const value = moneyValue(portfolio?.totalAmountPortfolio);
     const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
-    res.json({ok:true,version:'3.5-history-diagnostics',positions,history});
+    res.json({ok:true,version:'3.5.1-history-diagnostics-fix',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
   }
@@ -1037,7 +1037,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.5-history-diagnostics' });
+  res.json({ ok: true, version: '3.5.1-history-diagnostics-fix' });
 });
 
 
