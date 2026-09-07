@@ -673,7 +673,48 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '2.7-operations-https-fixed' });
+  res.json({ ok: true, version: '2.8-operations-route-fixed' });
+});
+
+
+app.get('/api/operations-summary', async (req, res) => {
+  try {
+    const accountsResponse = await getAccounts();
+    const account = selectAccount(accountsResponse);
+    if (!account?.id) {
+      return res.status(404).json({
+        error: 'No open T-Bank investment account was returned for this token.',
+        accounts: accountsResponse?.accounts || []
+      });
+    }
+
+    const operations = await getOperations(account.id);
+    const rows = (Array.isArray(operations) ? operations : []).map(op => ({
+      date: op.date || null,
+      type: op.type || null,
+      name: op.name || null,
+      ticker: op.ticker || null,
+      figi: op.figi || null,
+      payment: operationCash(op),
+      isExternalCash: isExternalCashOperation(op),
+      isIncome: isIncomeOperation(op)
+    }));
+
+    res.json({
+      ok: true,
+      account: { id: account.id, name: account.name || account.type || 'T-Invest account' },
+      count: rows.length,
+      externalCashTotal: rows.filter(x => x.isExternalCash).reduce((s, x) => s + x.payment, 0),
+      passiveIncomeTotal: rows.filter(x => x.isIncome).reduce((s, x) => s + Math.abs(x.payment), 0),
+      operations: rows
+    });
+  } catch (err) {
+    console.error('Operations summary error:', err);
+    res.status(502).json({
+      error: `T-Bank connection/API failed: ${err.message}`,
+      ...errorInfo(err)
+    });
+  }
 });
 
 app.get('/api/dashboard', async (req, res) => {
