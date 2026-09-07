@@ -166,9 +166,26 @@ body[data-theme=graphite] .pulse-capture .pulseShot{background:linear-gradient(1
 
 /* PULSE 5.4 — scanner layer */
 .pulseScan{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:26px;background:radial-gradient(circle at 50% 44%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 42%),rgba(2,6,6,.96);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .18s ease,visibility .18s ease}
-.pulse-capture.is-scanning .pulseScan{opacity:1;visibility:visible}
+.pulse-capture.is-scanning .pulseScan{opacity:1;visibility:visible}.pulse-capture.is-scanning .pulseShot{animation:none}.pulse-capture.is-scanning .pulseScanCore{animation:scanCoreIn .3s ease-out both}
 .pulse-capture.is-scanning>.pulseShot>*:not(.pulseScan){filter:blur(4px);opacity:.08}
-.pulseScanCore{width:min(100%,280px);text-align:center;position:relative}
+
+.pulseScanCore{width:min(100%,300px);text-align:center;position:relative}
+.scanRadar{position:relative;width:122px;height:122px;margin:0 auto 14px;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-radius:50%;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 58%),rgba(0,0,0,.28);box-shadow:0 0 28px color-mix(in srgb,var(--accent) 14%,transparent),inset 0 0 26px rgba(0,0,0,.5);overflow:hidden}
+.scanRadar:before,.scanRadar:after{content:"";position:absolute;inset:10px;border:1px solid color-mix(in srgb,var(--accent) 16%,transparent);border-radius:50%}
+.scanRadar:after{inset:31px;border-color:color-mix(in srgb,var(--accent) 22%,transparent)}
+.scanRadarGrid{position:absolute;inset:0;background:linear-gradient(90deg,transparent 49.5%,color-mix(in srgb,var(--accent) 18%,transparent) 50%,transparent 50.5%),linear-gradient(0deg,transparent 49.5%,color-mix(in srgb,var(--accent) 18%,transparent) 50%,transparent 50.5%);opacity:.7}
+.scanSweep{position:absolute;left:50%;top:50%;width:50%;height:1px;transform-origin:0 50%;background:linear-gradient(90deg,var(--accent),transparent);box-shadow:0 0 9px var(--accent);animation:scanSweep 1.15s linear infinite;z-index:3}
+.scanSweep:after{content:"";position:absolute;right:-1px;top:-3px;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 12px var(--accent)}
+.scanCross{position:absolute;background:color-mix(in srgb,var(--accent) 22%,transparent);z-index:2}.scanCross.h{left:8px;right:8px;top:50%;height:1px}.scanCross.v{top:8px;bottom:8px;left:50%;width:1px}
+.scanCoreDot{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 10%,transparent),0 0 20px var(--accent);animation:scanCorePulse .75s ease-in-out infinite;z-index:4}
+.scanTarget{position:absolute;width:6px;height:6px;border:1px solid var(--accent);box-shadow:0 0 8px var(--glow);opacity:.7;transform:rotate(45deg);animation:scanTarget 1.4s ease-in-out infinite}.scanTarget.t1{left:28px;top:29px}.scanTarget.t2{right:24px;top:48px;animation-delay:.35s}.scanTarget.t3{left:44px;bottom:21px;animation-delay:.7s}
+.scanRadarPct{position:absolute;right:7px;bottom:6px;font-style:normal;font-size:6px;letter-spacing:1px;color:#c9fff0;font-weight:950;z-index:5}
+.scanReadouts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 8px 8px}.scanReadouts span{padding:5px 4px;border:1px solid color-mix(in srgb,var(--accent) 13%,transparent);border-radius:7px;background:rgba(255,255,255,.018);color:#53635f;font-size:5px;letter-spacing:.8px;font-weight:900}.scanReadouts b{display:block;margin-top:2px;color:var(--accent);font-size:7px;letter-spacing:.5px}
+@keyframes scanSweep{to{transform:rotate(360deg)}}
+@keyframes scanCorePulse{0%,100%{transform:scale(.8);opacity:.65}50%{transform:scale(1.25);opacity:1}}
+@keyframes scanTarget{0%,100%{opacity:.2;transform:rotate(45deg) scale(.7)}50%{opacity:1;transform:rotate(45deg) scale(1.2)}}
+@keyframes scanCoreIn{from{opacity:0;transform:scale(.92) translateY(5px)}to{opacity:1;transform:none}}
+
 .pulseScanMark{display:flex;align-items:baseline;justify-content:center;gap:5px;color:var(--accent);letter-spacing:1.8px;margin-bottom:16px}
 .pulseScanMark i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:scanDot .7s ease-in-out infinite alternate}
 .pulseScanMark b{font-size:16px}.pulseScanMark span{font-size:8px;opacity:.7}
@@ -180,4 +197,4 @@ body[data-theme=graphite] .pulse-capture .pulseShot{background:linear-gradient(1
 .pulse-capture.is-scanning .pulseShot:after{animation:pulseScanFast 1.15s linear infinite}
 @keyframes scanDot{from{opacity:.35;transform:scale(.75)}to{opacity:1;transform:scale(1.25)}}
 @keyframes pulseScanFast{from{top:-5%}to{top:105%}}
-@media(max-height:760px){.pulseScan{padding:18px}.pulseScanMark{margin-bottom:11px}.pulseScanTrack{margin:11px 8px 10px}}
+@media(max-height:760px){.pulseScan{padding:18px}.pulseScanMark{margin-bottom:8px}.scanRadar{width:104px;height:104px;margin-bottom:9px}.scanReadouts{margin-bottom:6px}.pulseScanTrack{margin:9px 8px 8px}}

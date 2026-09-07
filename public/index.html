@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07100e">
   <title>Кряхтящий фонд — Pulse</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=5.7">
 </head>
 <body data-theme="neon">
   <main class="phone" id="pulse">
@@ -14,8 +14,17 @@
       <div class="pulseScan" id="pulseScan" aria-hidden="true">
         <div class="pulseScanCore">
           <div class="pulseScanMark"><i></i><b>PULSE</b><span>RÖNTGEN</span></div>
+          <div class="scanRadar" aria-hidden="true">
+            <div class="scanRadarGrid"></div>
+            <i class="scanSweep"></i>
+            <span class="scanCross h"></span><span class="scanCross v"></span>
+            <b class="scanCoreDot"></b>
+            <span class="scanTarget t1"></span><span class="scanTarget t2"></span><span class="scanTarget t3"></span>
+            <em class="scanRadarPct" id="scanPct">0%</em>
+          </div>
           <div class="pulseScanTitle">СКАНИРОВАНИЕ ПОРТФЕЛЯ</div>
           <div class="pulseScanSub" id="pulseScanSub">Считываем состояние активов…</div>
+          <div class="scanReadouts"><span>СИГНАЛ <b id="scanSignal">WAIT</b></span><span>ПОТОК <b id="scanFlux">—</b></span><span>РИСК <b id="scanRisk">—</b></span></div>
           <div class="pulseScanTrack"><i id="pulseScanProgress"></i></div>
           <div class="pulseScanRows">
             <span id="scanRow1">◌ СОСТОЯНИЕ АКТИВОВ</span>
@@ -41,7 +50,7 @@
       </div>
       <div class="pulseCharacter"><div><small>ХАРАКТЕР ПОРТФЕЛЯ</small><b id="pulseCharacterName">—</b></div><span id="pulseCharacterText">—</span></div>
       <div class="pulseLabGrid"><div class="pulseDNA">
-        <div class="pulseSectionHead"><span>🧬 ДНК ПОРТФЕЛЯ</span><b>РАЗБОР SCORE</b></div>
+        <div class="pulseSectionHead"><span>🧬 ДНК ПОРТФЕЛЯ</span><b id="pulseScoreWhy">РАЗБОР SCORE</b></div>
         <div class="dnaGrid">
           <div class="dnaItem"><span>ДИВИДЕНДЫ</span><i><em id="dnaIncome"></em></i><b id="dnaIncomeVal">—</b></div>
           <div class="dnaItem"><span>СТАБИЛЬНОСТЬ</span><i><em id="dnaStability"></em></i><b id="dnaStabilityVal">—</b></div>
