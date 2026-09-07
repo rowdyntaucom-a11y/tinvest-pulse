@@ -11,3 +11,14 @@ body[data-theme=emerald] .art-neon,body[data-theme=graphite] .art-neon,body[data
 @media(min-width:521px){.phone{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
 
 .macro{padding:8px 10px;min-height:79px}.macroRate{font-size:23px;font-weight:950;letter-spacing:-.7px;margin-top:2px;color:var(--accent)}.macroMeta{font-size:7px;color:var(--muted);margin-top:-1px}.macroNext{margin-top:5px;border-top:1px solid var(--line);padding-top:3px}.macroNext span{display:block;font-size:6px;color:var(--muted);letter-spacing:.8px}.macroNext b{font-size:10px;display:block;margin-top:1px}@media(max-height:700px){.macro{min-height:63px;padding:6px 8px}.macroRate{font-size:18px}.macroNext{margin-top:3px}.macroNext b{font-size:9px}}
+.chartTabs{display:flex;gap:5px;margin:6px 0 2px;padding:2px;border:1px solid var(--line);border-radius:10px;background:rgba(0,0,0,.18)}
+.chartTab{flex:1;border:0;background:transparent;color:var(--muted);font:900 8px/1 Inter,system-ui,sans-serif;letter-spacing:.8px;padding:6px 3px;border-radius:7px;cursor:pointer}
+.chartTab.active{color:#06100b;background:var(--accent);box-shadow:0 0 16px var(--glow)}
+.incomeMain{margin-top:2px!important;white-space:nowrap}.incomeMain b{font-size:18px}.incomeMain span{font-size:8px;color:var(--muted)}
+.incomeMeta{display:grid!important;grid-template-columns:auto auto auto auto;align-items:baseline;gap:3px;margin-top:2px!important;border-top:1px solid var(--line);padding-top:3px}.incomeMeta span{font-size:6px!important;color:var(--muted)!important;text-transform:uppercase}.incomeMeta b{font-size:9px!important}
+body[data-theme=neon] .chartCard{box-shadow:0 12px 30px rgba(0,0,0,.38),0 0 24px var(--glow),inset 0 1px rgba(255,255,255,.03)}
+body[data-theme=emerald] .chartTab.active{color:#03130a}
+body[data-theme=graphite] .chartTabs{border-radius:6px}body[data-theme=graphite] .chartTab.active{color:#17120a}
+body[data-theme=cyber] .chartTabs{border-radius:5px;clip-path:polygon(0 2px,2px 0,100% 0,100% calc(100% - 2px),calc(100% - 2px) 100%,0 100%)}body[data-theme=cyber] .chartTab.active{color:#060816}
+body[data-theme=aurora] .chartTab.active{color:#12091c}
+@media(max-height:700px){.chartTabs{margin:3px 0 1px}.chartTab{padding:4px 2px;font-size:7px}.incomeMeta{padding-top:2px}.incomeMain b{font-size:15px}.incomeMeta b{font-size:8px!important}}

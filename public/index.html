@@ -40,21 +40,26 @@
     <section class="grid2">
       <div class="mini card"><span>ПРИБЫЛЬ</span><b id="profit">—</b><i>деньги работают</i></div>
       <div class="mini card"><span>ДОХОДНОСТЬ</span><b id="profitPct">—</b><i>без магии</i></div>
-      <div class="mini card"><span>CAGR</span><b id="cagr">—</b><i>не врём себе</i></div>
+      <div class="mini card"><span>VS MOEX</span><b id="vsMoex">—</b><i id="vsMoexCaption">сравниваем честно</i></div>
       <div class="mini card"><span>XIRR</span><b id="xirr">—</b><i>с учётом пополнений</i></div>
     </section>
 
     <section class="chartCard card">
-      <div class="chartHeader"><div><div class="chartTitle">РОСТ КРЯХТЯЩЕГО ФОНДА</div><small>портфель vs IMOEX • старт = 100</small></div><span class="chartBadge">НЕ СИДИМ</span></div>
+      <div class="chartHeader"><div><div class="chartTitle" id="chartTitle">РОСТ КРЯХТЯЩЕГО ФОНДА</div><small id="chartSubtitle">портфель vs IMOEX • старт = 100</small></div><span class="chartBadge" id="chartBadge">НЕ СИДИМ</span></div>
+      <div class="chartTabs" role="tablist" aria-label="Режим графика">
+        <button class="chartTab active" data-mode="growth">РОСТ</button>
+        <button class="chartTab" data-mode="value">СТОИМОСТЬ</button>
+        <button class="chartTab" data-mode="profit">ПРИБЫЛЬ</button>
+      </div>
       <div class="chartWrap"><canvas id="chart"></canvas><div class="chartEmpty" id="chartEmpty">Загружаю историю…</div></div>
-      <div class="legend"><i></i> Портфель <em></em> IMOEX <span>100 = старт</span></div>
+      <div class="legend" id="chartLegend"><i></i> Портфель <em></em> IMOEX <span>100 = старт</span></div>
     </section>
 
     <section class="bottomGrid">
       <div class="income card">
         <div class="eyebrow">ПАССИВНЫЙ ДОХОД</div><small>дивиденды + купоны • без пополнений</small>
-        <div><b id="monthly">—</b><span> / месяц</span></div>
-        <div><b id="annual">—</b><span> / год</span></div>
+        <div class="incomeMain"><b id="monthly">—</b><span> / мес</span></div>
+        <div class="incomeMeta"><span>в день</span><b id="daily">—</b><span>в год</span><b id="annual">—</b></div>
       </div>
       <div class="leaders card">
         <div class="eyebrow">КТО ТАЩИТ / КТО НОЕТ</div>
@@ -71,6 +76,6 @@
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=3.7"></script>
+  <script src="/app.js?v=4.0"></script>
 </body>
 </html>
