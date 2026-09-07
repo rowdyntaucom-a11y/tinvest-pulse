@@ -1,21 +1,11 @@
-# Кряхтящий фонд — v4.0
+# Кряхтящий фонд — v5.0 PULSE Röntgen
 
 Mobile-first T-Invest portfolio dashboard.
 
-## v4.0
-- Five switchable visual styles: Neon, Emerald, Graphite, Cyber, Aurora.
-- PULSE screenshot button.
-- Accurate TWR portfolio history vs IMOEX.
-- New chart modes: Рост / Стоимость / Прибыль.
-- VS MOEX spread in percentage points on the latest common date.
-- Passive income shows month / day / year.
-- Historical value and invested series are returned by the dashboard.
-- CBR key rate and next meeting are fetched live.
-- Token remains server-side in Render environment variable `TINvest_API_TOKEN`.
-
-## Deploy
-Build: `npm install`
-Start: `node server.js`
-
-
-Version 4.5: VS MOEX compares the actual plotted portfolio and IMOEX series without requiring identical date serialization.
+## v5.0
+- First page remains the live portfolio control dashboard.
+- PULSE is a true two-way page switch: tap PULSE to enter the Röntgen page, tap ↩ PULSE to return.
+- PULSE page adds a proprietary heuristic PULSE SCORE, heartbeat chart, IMOEX battle, largest holding, max drawdown, passive-income speed, portfolio age and character card.
+- All five visual themes remain available.
+- Long press on PULSE adds a subtle deep-pulse visual state.
+- No API token is stored in the frontend.
