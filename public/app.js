@@ -49,6 +49,10 @@ function render(d){
   const monthly=Number(d.passiveIncome?.averageMonthly ?? d.income?.monthly);
   $('monthly').textContent=rub(monthly);
   $('annual').textContent=Number.isFinite(monthly)?rub(monthly*12):'—';
+  const c=d.cbr||{};
+  $('keyRate').textContent=Number.isFinite(Number(c.rate))?`${Number(c.rate).toFixed(2).replace('.',',')}%`:'—';
+  $('keyRateDate').textContent=c.rateDate?`с ${shortDate(c.rateDate)}`:'Банк России';
+  $('nextMeeting').textContent=c.nextMeeting?shortDate(c.nextMeeting):'—';
   const g=d.leaders?.gainers?.[0], l=d.leaders?.losers?.[0];
   $('gainer').textContent=g?`${g.ticker||g.name} ${g.yieldRub>=0?'+':''}${rub(g.yieldRub)}`:'—';
   $('loser').textContent=l?`${l.ticker||l.name} ${l.yieldRub>=0?'+':''}${rub(l.yieldRub)}`:'—';
