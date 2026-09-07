@@ -19,9 +19,7 @@ applyTheme();
 function cleanSeries(points,key){
   const arr=[];
   for(const p of points){const v=Number(p?.[key]);if(Number.isFinite(v)&&v>0)arr.push({date:p.date,value:v});}
-  if(arr.length<2)return [];
-  const base=arr[0].value;
-  return arr.map(x=>({date:x.date,value:(x.value/base)*100}));
+  return arr.length>=2?arr:[];
 }
 function renderChart(history){
   const points=Array.isArray(history?.points)?history.points:[];
