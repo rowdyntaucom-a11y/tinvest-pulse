@@ -611,45 +611,65 @@ async function getCbrMacro() {
   const fallback = { available: false, rate: null, rateDate: null, nextMeeting: null };
   try {
     const [home, keyrate] = await Promise.all([
-      safeFetch('https://www.cbr.ru/'),
-      safeFetch('https://www.cbr.ru/hd_base/keyrate/')
+      httpsJsonRequest('https://www.cbr.ru/'),
+      httpsJsonRequest('https://www.cbr.ru/hd_base/keyrate/')
     ]);
+
+    const htmlToText = html => String(html || '')
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&quot;/gi, '"')
+      .replace(/&amp;/gi, '&')
+      .replace(/&#39;/gi, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
 
     let rate = null;
     let rateDate = null;
-    if (keyrate.ok) {
-      const text = keyrate.text
-        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/&nbsp;/gi, ' ')
-        .replace(/\s+/g, ' ');
+    if (keyrate.status >= 200 && keyrate.status < 300) {
+      const text = htmlToText(keyrate.text);
       const matches = [...text.matchAll(/(\d{2}\.\d{2}\.\d{4})\s+([0-9]+(?:[.,][0-9]+)?)/g)];
       if (matches.length) {
-        const latest = matches.reduce((best, item) => item[1].split('.').reverse().join('-') > best[1].split('.').reverse().join('-') ? item : best, matches[0]);
+        const latest = matches.reduce((best, item) =>
+          item[1].split('.').reverse().join('-') > best[1].split('.').reverse().join('-') ? item : best,
+          matches[0]
+        );
         rateDate = latest[1].split('.').reverse().join('-');
         rate = Number(latest[2].replace(',', '.'));
       }
     }
 
     let nextMeeting = null;
-    if (home.ok) {
-      const text = home.text
-        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/&nbsp;/gi, ' ')
-        .replace(/\s+/g, ' ');
-      const m = text.match(/Следующее\s+заседание\s+Совета\s+директоров\s+по\s+ключевой\s+ставке\s+([0-9]{2}\.[0-9]{2}\.[0-9]{4})/i);
-      if (m) nextMeeting = m[1].split('.').reverse().join('-');
+    if (home.status >= 200 && home.status < 300) {
+      const text = htmlToText(home.text);
+      const patterns = [
+        /Следующее\s+заседание\s+Совета\s+директоров\s+по\s+ключевой\s+ставке\s+([0-9]{2}\.[0-9]{2}\.[0-9]{4})/i,
+        /ближайш(?:ее|ая)\s+заседани[ея][^0-9]{0,120}([0-9]{2}\.[0-9]{2}\.[0-9]{4})/i
+      ];
+      for (const re of patterns) {
+        const m = text.match(re);
+        if (m) {
+          nextMeeting = m[1].split('.').reverse().join('-');
+          break;
+        }
+      }
     }
-    if (!rate || !nextMeeting) return { ...fallback, rate, rateDate, nextMeeting: nextMeeting || fallback.nextMeeting, available: Boolean(rate) };
-    return { available: true, rate, rateDate, nextMeeting };
+
+    // The CBR key-rate page is the source of truth for the rate. The home page
+    // supplies the nearest board meeting. If the CBR changes its page wording,
+    // do not display a fake/stale value.
+    return {
+      available: Number.isFinite(rate) && rate > 0,
+      rate,
+      rateDate,
+      nextMeeting
+    };
   } catch (err) {
     return { ...fallback, error: errorInfo(err) };
   }
 }
-
 
 const HISTORY_CACHE = new Map();
 const HISTORY_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -684,7 +704,7 @@ function signedTradeCash(op) {
 async function buildPortfolioHistory(accountId, operations, firstInvestment, portfolioValue) {
   if (!firstInvestment?.date) return { available: false, points: [], reason: 'no_start_date' };
 
-  const cacheKey = `${String(accountId || 'default')}:3.8`;
+  const cacheKey = `${String(accountId || 'default')}:4.0`;
   const cached = HISTORY_CACHE.get(cacheKey);
   if (cached && Date.now() - cached.createdAt < HISTORY_CACHE_TTL_MS) return cached.data;
 
@@ -800,6 +820,14 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
   const first = raw[0];
   let index = 100;
   const points = [{ date: first.date, portfolio: 100 }];
+  const valuePoints = raw.map(x => ({ date: x.date, value: Number(x.value.toFixed(2)) }));
+  const investedRunning = [];
+  let investedTotal = 0;
+  for (const day of dates) {
+    const key = dateKey(day);
+    investedTotal += externalByDay.get(key) || 0;
+    investedRunning.push({ date: key, value: Number(Math.max(0, investedTotal).toFixed(2)) });
+  }
   for (let i = 1; i < raw.length; i++) {
     const prev = raw[i - 1];
     const cur = raw[i];
@@ -827,7 +855,9 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     startDate: points[0]?.date || null,
     endDate: points[points.length - 1]?.date || null,
     points,
-    method: 'daily_time_weighted_return_from_operations_and_historical_closes_v38',
+    valuePoints,
+    investedPoints: investedRunning,
+    method: 'daily_time_weighted_return_from_operations_and_historical_closes_v40',
     debug: {
       instruments: instrumentRows.map(r => ({figi:r.figi, instrumentId:r.instrumentId, instrumentType:r.instrumentType, candles:r.candles.length})),
       rawFirst: raw[0] || null,
@@ -1040,7 +1070,7 @@ app.get('/api/history-debug', async (req, res) => {
     const value = moneyValue(portfolio?.totalAmountPortfolio);
     const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.json({ok:true,version:'3.8-final-history-fix',positions,history});
+    res.json({ok:true,version:'4.0-dashboard-overhaul',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
   }
@@ -1118,7 +1148,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.8-final-history-fix' });
+  res.json({ ok: true, version: '4.0-dashboard-overhaul' });
 });
 
 

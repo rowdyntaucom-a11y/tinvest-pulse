@@ -1,18 +1,18 @@
-# tinvest-pulse v3.7 final
+# Кряхтящий фонд — v4.0
 
-Mobile single-screen T-Invest portfolio dashboard.
+Mobile-first T-Invest portfolio dashboard.
 
-## What's fixed
-- CBR key rate is parsed automatically from the official Bank of Russia pages; no hardcoded current rate.
-- Next CBR board meeting is parsed automatically from the official Bank of Russia homepage.
-- Portfolio history cache is versioned to prevent an older in-process history from being reused.
-- Dashboard and history API responses are explicitly no-cache.
-- Frontend `app.js` has a version query string to prevent an old browser bundle from being reused.
-- IMOEX history uses MOEX candles first with the official history endpoint as fallback.
+## v4.0
+- Five switchable visual styles: Neon, Emerald, Graphite, Cyber, Aurora.
+- PULSE screenshot button.
+- Accurate TWR portfolio history vs IMOEX.
+- New chart modes: Рост / Стоимость / Прибыль.
+- VS MOEX spread in percentage points on the latest common date.
+- Passive income shows month / day / year.
+- Historical value and invested series are returned by the dashboard.
+- CBR key rate and next meeting are fetched live.
+- Token remains server-side in Render environment variable `TINvest_API_TOKEN`.
 
-## Render
+## Deploy
 Build: `npm install`
 Start: `node server.js`
-Environment variable: `TINvest_API_TOKEN`
-
-Never commit a real API token to GitHub.
