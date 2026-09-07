@@ -513,13 +513,13 @@ async function getInstrumentMeta(figi, instrumentType) {
   }
 }
 
-async function getDailyCandles(figi, from, to) {
+async function getDailyCandles(instrumentId, from, to) {
   try {
     const data = await tbankRequest('tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles', {
       from: from.toISOString(),
       to: to.toISOString(),
       interval: 'CANDLE_INTERVAL_DAY',
-      instrumentId: figi,
+      instrumentId: instrumentId,
       candleSourceType: 'CANDLE_SOURCE_EXCHANGE',
       limit: 300
     });
@@ -618,20 +618,26 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
   for (const op of ops) {
     if (!op?.figi) continue;
     const delta = securityQuantityDelta(op);
-    if (!delta && !String(op?.type || '').toUpperCase().includes('BUY') && !String(op?.type || '').toUpperCase().includes('SELL')) continue;
-    if (!instruments.has(op.figi)) instruments.set(op.figi, String(op.instrumentType || ''));
+    const type = String(op?.type || '').toUpperCase();
+    if (!delta && !type.includes('BUY') && !type.includes('SELL')) continue;
+    if (!instruments.has(op.figi)) {
+      instruments.set(op.figi, {
+        instrumentType: String(op.instrumentType || ''),
+        instrumentId: op.instrumentUid || op.figi
+      });
+    }
   }
 
   const instrumentRows = [];
   const entries = [...instruments.entries()];
-  for (let i = 0; i < entries.length; i += 5) {
-    const batch = entries.slice(i, i + 5);
-    const results = await Promise.all(batch.map(async ([figi, instrumentType]) => {
+  for (let i = 0; i < entries.length; i += 3) {
+    const batch = entries.slice(i, i + 3);
+    const results = await Promise.all(batch.map(async ([figi, info]) => {
       const [meta, candles] = await Promise.all([
-        getInstrumentMeta(figi, instrumentType),
-        getDailyCandles(figi, from, to)
+        getInstrumentMeta(figi, info.instrumentType),
+        getDailyCandles(info.instrumentId, from, to)
       ]);
-      return { figi, instrumentType, meta, candles };
+      return { figi, instrumentType: info.instrumentType, instrumentId: info.instrumentId, meta, candles };
     }));
     instrumentRows.push(...results);
   }
@@ -743,7 +749,12 @@ async function buildPortfolioHistory(accountId, operations, firstInvestment, por
     startDate: points[0]?.date || null,
     endDate: points[points.length - 1]?.date || null,
     points,
-    method: 'daily_time_weighted_return_from_operations_and_historical_closes'
+    method: 'daily_time_weighted_return_from_operations_and_historical_closes_v35',
+    debug: {
+      instruments: instrumentRows.map(r => ({figi:r.figi, instrumentId:r.instrumentId, instrumentType:r.instrumentType, candles:r.candles.length})),
+      rawFirst: raw[0] || null,
+      rawLast: raw[raw.length - 1] || null
+    }
   };
   HISTORY_CACHE.set(cacheKey, { createdAt: Date.now(), data: result });
   return result;
@@ -937,6 +948,23 @@ async function buildDashboard() {
   };
 }
 
+// History diagnostics. Returns only derived portfolio-history diagnostics; no token is exposed.
+app.get('/api/history-debug', async (req, res) => {
+  try {
+    const accountsResponse = await getAccounts();
+    const account = selectAccount(accountsResponse);
+    if (!account?.id) return res.status(404).json({ok:false,error:'No open account'});
+    const [operations, portfolio] = await Promise.all([getOperations(account.id), getPortfolio(account.id)]);
+    const positions = Array.isArray(portfolio?.positions) ? portfolio.positions.length : 0;
+    const firstInvestment = operations.filter(isExternalCashOperation).map(op => ({date:safeDate(op.date), amount:operationCash(op)})).filter(x=>x.date && x.amount>0).sort((a,b)=>a.date-b.date)[0];
+    const value = moneyValue(portfolio?.totalAmountPortfolio);
+    const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
+    res.json({ok:true,version:'3.5-history-diagnostics',positions,history});
+  } catch (err) {
+    res.status(500).json({ok:false,error:err.message});
+  }
+});
+
 // Basic health check. Does not contact T-Bank.
 app.get('/api/health', (req, res) => {
   res.json({
@@ -1009,7 +1037,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.4-history-trade-cash-fixed' });
+  res.json({ ok: true, version: '3.5-history-diagnostics' });
 });
 
 
