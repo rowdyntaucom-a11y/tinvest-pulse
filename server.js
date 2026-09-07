@@ -522,8 +522,7 @@ async function getDailyCandles(instrumentId, from, to) {
       to: to.toISOString(),
       interval: 'CANDLE_INTERVAL_DAY',
       instrumentId: instrumentId,
-      candleSourceType: 'CANDLE_SOURCE_EXCHANGE',
-      limit: 300
+      candleSourceType: 'CANDLE_SOURCE_EXCHANGE'
     });
     const candles = Array.isArray(data?.candles) ? data.candles : [];
     candleDiagnostics.push({ instrumentId, ok: true, count: candles.length });
