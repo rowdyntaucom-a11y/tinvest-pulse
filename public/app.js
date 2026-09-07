@@ -102,6 +102,8 @@ function render(d){
   setText('vsMoex',vs==null?'—':`${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} п.п.`);
   setStyle('vsMoex','color',vs==null?'#fff':(vs>=0?'var(--accent)':'#ff6575'));
   setText('vsMoexCaption',vs==null?'ждём индекс':(vs>=0?'обгоняем индекс':'отстаём от индекса'));
+  const badge=vs==null?'НЕ СИДИМ':(vs>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');
+  setText('chartBadge',badge);
   setText('dates',`Начало: ${shortDate(p.startDate)} • Сегодня: ${shortDate(new Date())}`);
 
   const monthly=Number(dashboardData.passiveIncome?.averageMonthly ?? dashboardData.income?.monthly);
@@ -131,6 +133,6 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=4.5&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{const r=await fetch('/api/dashboard?v=4.6&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
 $('pulseBtn').addEventListener('click',async()=>{try{if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js?v=4.3';document.head.appendChild(s);await new Promise(r=>s.onload=r)}const canvas=await html2canvas($('pulse'),{backgroundColor:'#05070b',scale:2});const a=document.createElement('a');a.download='kryahtyashiy-fond-pulse.png';a.href=canvas.toDataURL('image/png');a.click();}catch(e){alert('Не удалось сделать Pulse: '+e.message)}});
 load();setInterval(load,60000);

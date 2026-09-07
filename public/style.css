@@ -24,3 +24,25 @@ body[data-theme=aurora] .chartTab.active{color:#12091c}
 @media(max-height:700px){.chartTabs{margin:3px 0 1px}.chartTab{padding:4px 2px;font-size:7px}.incomeMeta{padding-top:2px}.incomeMain b{font-size:15px}.incomeMeta b{font-size:8px!important}}
 
 .cagrLine{font-size:7px;color:var(--muted);margin-top:1px}.cagrLine strong{font-size:9px;color:#c9d2cf;margin-left:2px}@media(max-height:700px){.cagrLine{font-size:6px}.cagrLine strong{font-size:8px}}
+
+/* v4.6 visual polish — same data, stronger Pulse identity */
+.liveDot{font-size:6px;font-weight:950;letter-spacing:1px;color:var(--accent);display:inline-flex;align-items:center;gap:4px;margin-right:1px;opacity:.9}
+.liveDot:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:livePulse 1.8s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:.45;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+.topActions{filter:drop-shadow(0 7px 16px rgba(0,0,0,.22))}
+.styleBtn{transition:transform .18s ease,border-color .18s ease,background .18s ease}.styleBtn:active{transform:scale(.94)}
+.pulseBtn{position:relative;overflow:visible;transition:transform .18s ease,filter .18s ease}.pulseBtn:before{content:"";position:absolute;inset:-4px;border:1px solid color-mix(in srgb,var(--hot) 30%,transparent);border-radius:inherit;opacity:.45;animation:pulseRing 2.4s ease-out infinite;pointer-events:none}.pulseBtn:active{transform:scale(.95);filter:brightness(1.15)}
+@keyframes pulseRing{0%{transform:scale(.96);opacity:.55}70%,100%{transform:scale(1.14);opacity:0}}
+.card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.mini:after,.income:after,.leaders:after,.macro:after{content:"";position:absolute;left:12px;right:12px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.32}
+.mini{background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 94%,#fff 6%),var(--panel))}
+.hero{box-shadow:0 16px 34px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.035)}
+.heroArt{filter:drop-shadow(0 0 9px var(--glow));transform:translateZ(0)}
+.art{filter:drop-shadow(0 0 5px var(--glow))}
+.chartCard:before{content:"";position:absolute;inset:42px 0 0;background:repeating-linear-gradient(90deg,transparent 0,transparent 24%,rgba(255,255,255,.018) 25%,transparent 26%);pointer-events:none}
+.chartCard>*{position:relative;z-index:1}
+.chartBadge{box-shadow:0 0 12px var(--glow)}
+.legend i{box-shadow:0 0 7px var(--accent)}
+.coin{box-shadow:0 0 10px color-mix(in srgb,var(--accent) 25%,transparent)}
+footer{letter-spacing:.15px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
