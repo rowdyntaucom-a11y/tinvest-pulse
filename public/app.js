@@ -2,6 +2,8 @@ let chart;
 let chartMode='growth';
 let dashboardData=null;
 const $=id=>document.getElementById(id);
+const setText=(id,value)=>{const el=$(id);if(el)el.textContent=value;return el};
+const setStyle=(id,prop,value)=>{const el=$(id);if(el)el.style[prop]=value;return el};
 const rub=n=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Number(n))+' ₽':'—';
 const pct=n=>Number.isFinite(Number(n))?((Number(n)*100).toFixed(1).replace('.',',')+'%'):'—';
 const shortDate=d=>d?new Date(d).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
@@ -14,7 +16,7 @@ const themes=[
   ['aurora','AURORA','Рынок шумит. Фонд живёт.']
 ];
 let themeIndex=Math.max(0,themes.findIndex(x=>x[0]===localStorage.getItem('pulseTheme')));
-function applyTheme(){const t=themes[themeIndex];document.body.dataset.theme=t[0];$('styleBtn').textContent=t[1];$('slogan').textContent=t[2];localStorage.setItem('pulseTheme',t[0]);}
+function applyTheme(){const t=themes[themeIndex];document.body.dataset.theme=t[0];setText('styleBtn',t[1]);setText('slogan',t[2]);localStorage.setItem('pulseTheme',t[0]);}
 $('styleBtn').addEventListener('click',()=>{themeIndex=(themeIndex+1)%themes.length;applyTheme();});
 applyTheme();
 
@@ -74,36 +76,45 @@ function renderChart(history){
 }
 
 function render(d){
-  dashboardData=d;
-  const p=d.portfolio||{};
-  $('value').textContent=rub(p.value);
-  $('profit').textContent=rub(p.profit);
-  $('profitPct').textContent=p.profitPercent==null?'—':pct(p.profitPercent);
-  $('gain').textContent=p.profitPercent==null?'—':(p.profitPercent>=0?'+':'')+pct(p.profitPercent);
-  $('gain').style.color=p.profitPercent>=0?'var(--accent)':'#ff6575';
-  if ($('cagr')) $('cagr').textContent=p.cagr==null?'—':pct(p.cagr);
-  $('xirr').textContent=p.xirr==null?'—':pct(p.xirr);
-  const hp=Array.isArray(d.history?.points)?d.history.points:[];
+  dashboardData=d||{};
+  const p=dashboardData.portfolio||{};
+  setText('value',rub(p.value));
+  setText('profit',rub(p.profit));
+  setText('profitPct',p.profitPercent==null?'—':pct(p.profitPercent));
+  setText('gain',p.profitPercent==null?'—':(p.profitPercent>=0?'+':'')+pct(p.profitPercent));
+  const gainEl=setStyle('gain','color',p.profitPercent>=0?'var(--accent)':'#ff6575');
+  if(gainEl) gainEl.setAttribute('data-ready','1');
+  setText('cagr',p.cagr==null?'—':pct(p.cagr));
+  setText('xirr',p.xirr==null?'—':pct(p.xirr));
+
+  const hp=Array.isArray(dashboardData.history?.points)?dashboardData.history.points:[];
   const common=hp.filter(x=>Number.isFinite(Number(x.portfolio))&&Number.isFinite(Number(x.imoex))).slice(-1)[0];
   const vs=common?Number(common.portfolio)-Number(common.imoex):null;
-  $('vsMoex').textContent=vs==null?'—':`${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} п.п.`;
-  $('vsMoex').style.color=vs==null?'#fff':(vs>=0?'var(--accent)':'#ff6575');
-  $('vsMoexCaption').textContent=vs==null?'ждём индекс':(vs>=0?'обгоняем индекс':'отстаём от индекса');
-  $('dates').textContent=`Начало: ${shortDate(p.startDate)} • Сегодня: ${shortDate(new Date())}`;
-  const monthly=Number(d.passiveIncome?.averageMonthly ?? d.income?.monthly);
-  $('monthly').textContent=rub(monthly);
-  $('daily').textContent=Number.isFinite(monthly)?rub(monthly/30.4375):'—';
-  $('annual').textContent=Number.isFinite(monthly)?rub(monthly*12):'—';
-  const c=d.cbr||{};
-  $('keyRate').textContent=Number.isFinite(Number(c.rate))?`${Number(c.rate).toFixed(2).replace('.',',')}%`:'—';
-  $('keyRateDate').textContent=c.rateDate?`с ${shortDate(c.rateDate)}`:'Банк России';
-  $('nextMeeting').textContent=c.nextMeeting?shortDate(c.nextMeeting):'—';
-  const g=d.leaders?.gainers?.[0], l=d.leaders?.losers?.[0];
-  $('gainer').textContent=g?`${g.ticker||g.name} ${g.yieldRub>=0?'+':''}${rub(g.yieldRub)}`:'—';
-  $('loser').textContent=l?`${l.ticker||l.name} ${l.yieldRub>=0?'+':''}${rub(l.yieldRub)}`:'—';
-  $('status').textContent=`✓ Данные загружены • ${d.assets?.length||p.assets?.length||0} активов`;$('status').className='ok';
-  $('updated').textContent=new Date(d.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-  renderChart(d.history);
+  setText('vsMoex',vs==null?'—':`${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} п.п.`);
+  setStyle('vsMoex','color',vs==null?'#fff':(vs>=0?'var(--accent)':'#ff6575'));
+  setText('vsMoexCaption',vs==null?'ждём индекс':(vs>=0?'обгоняем индекс':'отстаём от индекса'));
+  setText('dates',`Начало: ${shortDate(p.startDate)} • Сегодня: ${shortDate(new Date())}`);
+
+  const monthly=Number(dashboardData.passiveIncome?.averageMonthly ?? dashboardData.income?.monthly);
+  setText('monthly',rub(monthly));
+  setText('daily',Number.isFinite(monthly)?rub(monthly/30.4375):'—');
+  setText('annual',Number.isFinite(monthly)?rub(monthly*12):'—');
+
+  const c=dashboardData.cbr||{};
+  setText('keyRate',Number.isFinite(Number(c.rate))&&Number(c.rate)>0?`${Number(c.rate).toFixed(2).replace('.',',')}%`:'—');
+  setText('keyRateDate',c.rateDate?`с ${shortDate(c.rateDate)}`:'Банк России');
+  setText('nextMeeting',c.nextMeeting?shortDate(c.nextMeeting):'—');
+
+  const g=dashboardData.leaders?.gainers?.[0], l=dashboardData.leaders?.losers?.[0];
+  setText('gainer',g?`${g.ticker||g.name} ${g.yieldRub>=0?'+':''}${rub(g.yieldRub)}`:'—');
+  setText('loser',l?`${l.ticker||l.name} ${l.yieldRub>=0?'+':''}${rub(l.yieldRub)}`:'—');
+  setText('status',`✓ Данные загружены • ${dashboardData.assets?.length||p.assets?.length||0} активов`);
+  const statusEl=$('status');if(statusEl)statusEl.className='ok';
+  setText('updated',new Date(dashboardData.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
+  try{renderChart(dashboardData.history||{});}catch(err){
+    console.error('Chart render error:',err);
+    const empty=$('chartEmpty');if(empty){empty.textContent='История временно недоступна';empty.style.display='flex';}
+  }
 }
 document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click',()=>{
   document.querySelectorAll('.chartTab').forEach(b=>b.classList.remove('active'));
@@ -111,6 +122,6 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard',{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){$('status').textContent='Ошибка: '+e.message;$('status').className='err';$('value').textContent='Нет данных';}}
-$('pulseBtn').addEventListener('click',async()=>{try{if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';document.head.appendChild(s);await new Promise(r=>s.onload=r)}const canvas=await html2canvas($('pulse'),{backgroundColor:'#05070b',scale:2});const a=document.createElement('a');a.download='kryahtyashiy-fond-pulse.png';a.href=canvas.toDataURL('image/png');a.click();}catch(e){alert('Не удалось сделать Pulse: '+e.message)}});
+async function load(){try{const r=await fetch('/api/dashboard?v=4.2&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+$('pulseBtn').addEventListener('click',async()=>{try{if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js?v=4.2';document.head.appendChild(s);await new Promise(r=>s.onload=r)}const canvas=await html2canvas($('pulse'),{backgroundColor:'#05070b',scale:2});const a=document.createElement('a');a.download='kryahtyashiy-fond-pulse.png';a.href=canvas.toDataURL('image/png');a.click();}catch(e){alert('Не удалось сделать Pulse: '+e.message)}});
 load();setInterval(load,60000);
