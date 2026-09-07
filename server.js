@@ -292,13 +292,12 @@ async function getOperations(accountId) {
   const operations = [];
   let cursor = '';
 
-  for (let page = 0; page < 10; page++) {
+  for (let page = 0; page < 20; page++) {
     const body = {
       accountId,
       from: new Date(Date.now() - 3650 * 24 * 60 * 60 * 1000).toISOString(),
       to: new Date().toISOString(),
       state: 'OPERATION_STATE_EXECUTED',
-      timeout: '30s',
       limit: 1000
     };
 
@@ -319,33 +318,20 @@ async function getOperations(accountId) {
   return operations;
 }
 
-async function getInstrument(figi) {
-  return tbankRequest(
-    'tinkoff.public.invest.api.contract.v1.InstrumentsService/GetInstrumentBy',
-    { idType: 'INSTRUMENT_ID_TYPE_FIGI', id: figi }
-  );
+function operationType(op) {
+  return String(op?.operationType || op?.type || '').toUpperCase();
 }
 
-function moneyValue(x) {
-  if (x == null) return 0;
-  if (typeof x === 'number') return x;
-  if (typeof x === 'string') return Number(x) || 0;
-  if (typeof x === 'object') {
-    const units = Number(x.units || 0);
-    const nano = Number(x.nano || 0);
-    return units + nano / 1e9;
-  }
-  return 0;
+function operationDate(op) {
+  return safeDate(op?.date || op?.operationDate || op?.timestamp);
 }
 
-function operationCash(op) {
-  if (!op) return 0;
-
+function operationPayment(op) {
   const candidates = [
-    op.payment,
-    op.amount,
-    op.operationAmount,
-    op.operationAmountRub
+    op?.payment,
+    op?.operationAmount,
+    op?.operationAmountRub,
+    op?.amount
   ];
 
   for (const value of candidates) {
@@ -356,29 +342,38 @@ function operationCash(op) {
   return 0;
 }
 
-function isExternalCashOperation(op) {
-  const type = String(op?.type || '').toUpperCase();
-  const name = String(op?.name || '').toLowerCase();
+function isInputOperation(op) {
+  return operationType(op) === 'OPERATION_TYPE_INPUT';
+}
 
-  return (
-    type.includes('BROKER_ACCOUNT') ||
-    type.includes('TRANSFER') ||
-    type.includes('CASH') ||
-    name.includes('пополн') ||
-    name.includes('вывод') ||
-    name.includes('перевод')
-  );
+function isOutputOperation(op) {
+  return operationType(op) === 'OPERATION_TYPE_OUTPUT';
 }
 
 function isIncomeOperation(op) {
-  const type = String(op?.type || '').toUpperCase();
-  const name = String(op?.name || '').toLowerCase();
-
+  const type = operationType(op);
   return (
-    type.includes('DIVIDEND') ||
-    type.includes('COUPON') ||
-    name.includes('дивид') ||
-    name.includes('купон')
+    type === 'OPERATION_TYPE_DIVIDEND' ||
+    type === 'OPERATION_TYPE_COUPON' ||
+    type === 'OPERATION_TYPE_DIV_EXT'
+  );
+}
+
+function isBuyOperation(op) {
+  const type = operationType(op);
+  return (
+    type === 'OPERATION_TYPE_BUY' ||
+    type === 'OPERATION_TYPE_BUY_CARD' ||
+    type === 'OPERATION_TYPE_BUY_MARGIN'
+  );
+}
+
+function isSellOperation(op) {
+  const type = operationType(op);
+  return (
+    type === 'OPERATION_TYPE_SELL' ||
+    type === 'OPERATION_TYPE_SELL_MARGIN' ||
+    type === 'OPERATION_TYPE_SELL_CARD'
   );
 }
 
@@ -432,31 +427,46 @@ function xirr(cashflows) {
   return (low + high) / 2;
 }
 
-async function getMoex() {
+async function getMoexHistory(fromDate, toDate) {
+  const from = (fromDate || new Date(Date.now() - 3650 * 24 * 60 * 60 * 1000))
+    .toISOString().slice(0, 10);
+  const till = (toDate || new Date()).toISOString().slice(0, 10);
+
   const url =
-    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
-    `?iss.meta=off&iss.only=history&history.columns=TRADEDATE,SECID,CLOSE` +
-    `&history.cursor=0`;
+    `${MOEX_BASE}history/engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
+    `?from=${from}&till=${till}&iss.meta=off&iss.only=history&history.columns=TRADEDATE,CLOSE`;
 
   const result = await safeFetch(url);
 
   if (!result.ok) {
-    return { available: false, error: result.error || `HTTP ${result.status}` };
+    return { available: false, error: result.error || `HTTP ${result.status}`, points: [] };
   }
 
   try {
     const data = JSON.parse(result.text);
     const rows = data?.history?.data || [];
-    const last = rows[rows.length - 1];
+    const points = rows
+      .map(row => ({ date: row?.[0], value: Number(row?.[1]) }))
+      .filter(x => x.date && Number.isFinite(x.value));
+
+    const last = points[points.length - 1];
 
     return {
-      available: true,
-      date: last?.[0] || null,
-      value: Number(last?.[2]) || null
+      available: points.length > 0,
+      date: last?.date || null,
+      value: last?.value || null,
+      points
     };
   } catch (err) {
-    return { available: false, error: errorInfo(err) };
+    return { available: false, error: errorInfo(err), points: [] };
   }
+}
+
+async function getMoex() {
+  return getMoexHistory(
+    new Date(Date.now() - 3650 * 24 * 60 * 60 * 1000),
+    new Date()
+  );
 }
 
 async function buildDashboard() {
@@ -511,20 +521,36 @@ async function buildDashboard() {
 
   const executed = Array.isArray(operations) ? operations : [];
 
-  const externalFlows = executed
-    .filter(isExternalCashOperation)
+  const inputFlows = executed
+    .filter(isInputOperation)
     .map(op => ({
-      date: safeDate(op.date),
-      amount: operationCash(op)
+      date: operationDate(op),
+      amount: Math.abs(operationPayment(op)),
+      type: 'INPUT'
+    }))
+    .filter(x => x.date && x.amount > 0);
+
+  const outputFlows = executed
+    .filter(isOutputOperation)
+    .map(op => ({
+      date: operationDate(op),
+      amount: -Math.abs(operationPayment(op)),
+      type: 'OUTPUT'
     }))
     .filter(x => x.date && x.amount !== 0);
+
+  const externalFlows = [...inputFlows, ...outputFlows]
+    .sort((a, b) => a.date - b.date);
 
   const totalExternal =
     externalFlows.reduce((sum, x) => sum + x.amount, 0);
 
+  const totalInputs = inputFlows.reduce((sum, x) => sum + x.amount, 0);
+  const totalOutputs = outputFlows.reduce((sum, x) => sum + Math.abs(x.amount), 0);
+
   const incomeOperations = executed.filter(isIncomeOperation);
   const passiveIncome =
-    incomeOperations.reduce((sum, op) => sum + Math.abs(operationCash(op)), 0);
+    incomeOperations.reduce((sum, op) => sum + Math.abs(operationPayment(op)), 0);
 
   const firstInvestment = externalFlows
     .filter(x => x.amount > 0)
@@ -574,6 +600,15 @@ async function buildDashboard() {
     .sort((a, b) => a.expectedYield - b.expectedYield)
     .slice(0, 3);
 
+  const operationsSummary = {
+    total: executed.length,
+    inputs: inputFlows.length,
+    outputs: outputFlows.length,
+    dividendsAndCoupons: incomeOperations.length,
+    buys: executed.filter(isBuyOperation).length,
+    sells: executed.filter(isSellOperation).length
+  };
+
   return {
     updatedAt: new Date().toISOString(),
     account: {
@@ -583,6 +618,8 @@ async function buildDashboard() {
     portfolio: {
       value: portfolioValue,
       externalFlows: totalExternal,
+      totalInputs,
+      totalOutputs,
       growth: portfolioValue - totalExternal,
       growthPercent,
       cagr,
@@ -595,10 +632,11 @@ async function buildDashboard() {
       averageMonthly: avgMonthlyPassiveIncome,
       operationCount: incomeOperations.length
     },
+    operationsSummary,
     leaders,
     laggards,
     moex,
-    note: 'CAGR is a simple estimate from the first external investment. XIRR is the preferred return metric when there are multiple cash flows.'
+    note: 'External inputs/outputs are taken from OPERATION_TYPE_INPUT/OUTPUT. XIRR uses those cash flows and current portfolio value. CAGR remains a simple estimate from the first input; XIRR is preferred when there are multiple cash flows.'
   };
 }
 
@@ -670,6 +708,56 @@ app.get('/api/accounts', async (req, res) => {
       error: `T-Bank connection/API failed: ${err.message}`,
       ...errorInfo(err)
     });
+  }
+});
+
+app.get('/api/operations-summary', async (req, res) => {
+  try {
+    const accountsResponse = await getAccounts();
+    const account = selectAccount(accountsResponse);
+
+    if (!account?.id) {
+      return res.status(404).json({ error: 'No open account' });
+    }
+
+    const operations = await getOperations(account.id);
+
+    const rows = operations
+      .map(op => ({
+        date: operationDate(op)?.toISOString() || null,
+        type: operationType(op),
+        name: op?.name || null,
+        payment: operationPayment(op),
+        quantity: moneyValue(op?.quantity),
+        figi: op?.figi || op?.instrumentUid || null
+      }))
+      .filter(x => x.date);
+
+    res.json({
+      accountId: account.id,
+      count: rows.length,
+      operations: rows
+    });
+  } catch (err) {
+    res.status(502).json({
+      error: `T-Bank operations failed: ${err.message}`,
+      ...errorInfo(err)
+    });
+  }
+});
+
+app.get('/api/moex-history', async (req, res) => {
+  try {
+    const from = req.query.from ? new Date(req.query.from) : new Date(Date.now() - 3650 * 24 * 60 * 60 * 1000);
+    const till = req.query.to ? new Date(req.query.to) : new Date();
+
+    if (Number.isNaN(from.getTime()) || Number.isNaN(till.getTime())) {
+      return res.status(400).json({ error: 'Invalid from/to date' });
+    }
+
+    res.json(await getMoexHistory(from, till));
+  } catch (err) {
+    res.status(502).json({ error: `MOEX history failed: ${err.message}`, ...errorInfo(err) });
   }
 });
 
