@@ -3,270 +3,1216 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const TBANK = 'https://invest-public-api.tbank.ru/rest/';
+const TBANK_URL = 'https://invest-public-api.tbank.ru/rest/';
 const TOKEN = process.env.TINvest_API_TOKEN;
 
-const M = {
-  accounts: 'tinkoff.public.invest.api.contract.v1.UsersService/GetAccounts',
-  portfolio: 'tinkoff.public.invest.api.contract.v1.OperationsService/GetPortfolio',
-  operations: 'tinkoff.public.invest.api.contract.v1.OperationsService/GetOperationsByCursor',
-  instrument: 'tinkoff.public.invest.api.contract.v1.InstrumentsService/GetInstrumentBy'
+const METHODS = {
+  accounts:
+    'tinkoff.public.invest.api.contract.v1.UsersService/GetAccounts',
+
+  portfolio:
+    'tinkoff.public.invest.api.contract.v1.OperationsService/GetPortfolio',
+
+  operations:
+    'tinkoff.public.invest.api.contract.v1.OperationsService/GetOperationsByCursor',
+
+  instrument:
+    'tinkoff.public.invest.api.contract.v1.InstrumentsService/GetInstrumentBy'
 };
 
-function num(x) {
-  if (x == null) return 0;
-  if (typeof x === 'number') return x;
-  if (typeof x === 'string') return Number(x.replace(',', '.')) || 0;
-  if (typeof x === 'object') {
-    const units = Number(x.units ?? 0);
-    const nano = Number(x.nano ?? 0);
-    return units + nano / 1e9;
+function num(value) {
+  if (value == null) return 0;
+
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
   }
+
+  if (typeof value === 'string') {
+    return Number(value.replace(',', '.')) || 0;
+  }
+
+  if (typeof value === 'object') {
+    return (
+      Number(value.units || 0) +
+      Number(value.nano || 0) / 1000000000
+    );
+  }
+
   return 0;
 }
 
-function money(x) { return num(x); }
-function quote(x) { return num(x); }
-function dateOf(x) { return x ? new Date(x) : null; }
-
-function errorJson(e) {
-  return { error: e.message || 'API error', details: e.details || undefined };
+function money(value) {
+  return num(value);
 }
 
-async function tbank(method, body = {}) {
+function quotation(value) {
+  return num(value);
+}
+
+function jsonError(error) {
+  return {
+    error: error?.message || 'Unknown error',
+    name: error?.name || null,
+    code: error?.code || error?.cause?.code || null,
+    cause: error?.cause
+      ? String(error.cause)
+      : null,
+    status: error?.status || null,
+    details: error?.details || null
+  };
+}
+
+async function tbankRequest(method, body = {}) {
   if (!TOKEN) {
-    const e = new Error('TINvest_API_TOKEN is not configured on Render');
-    e.status = 500;
-    throw e;
+    const error = new Error(
+      'TINvest_API_TOKEN is not configured'
+    );
+
+    error.status = 500;
+
+    throw error;
   }
-  const r = await fetch(TBANK + method, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-  const text = await r.text();
+
+  let response;
+
+  try {
+    response = await fetch(
+      TBANK_URL + method,
+      {
+        method: 'POST',
+
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+
+        body: JSON.stringify(body)
+      }
+    );
+  } catch (error) {
+    const networkError = new Error(
+      `T-Bank connection failed: ${error.message}`
+    );
+
+    networkError.name = error.name;
+    networkError.code = error.code;
+    networkError.cause = error;
+
+    throw networkError;
+  }
+
+  const text = await response.text();
+
   let data;
-  try { data = JSON.parse(text); } catch { data = { raw: text }; }
-  if (!r.ok) {
-    const e = new Error(data?.message || `T-Bank API ${r.status}`);
-    e.status = r.status;
-    e.details = data;
-    throw e;
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = {
+      raw: text
+    };
   }
+
+  if (!response.ok) {
+    const error = new Error(
+      data?.message ||
+      data?.error ||
+      `T-Bank API returned HTTP ${response.status}`
+    );
+
+    error.status = response.status;
+    error.details = data;
+
+    throw error;
+  }
+
   return data;
 }
 
+
+/* =========================
+   ACCOUNTS
+========================= */
+
+async function getAccounts() {
+  return await tbankRequest(
+    METHODS.accounts,
+    {
+      status: 'ACCOUNT_STATUS_OPEN'
+    }
+  );
+}
+
+
 async function getOpenAccount() {
-  const data = await tbank(M.accounts, { status: 'ACCOUNT_STATUS_OPEN' });
-  const accounts = data.accounts || [];
+  const data = await getAccounts();
+
+  const accounts =
+    data.accounts ||
+    [];
+
   if (!accounts.length) {
-    const e = new Error('No open T-Invest account found');
-    e.status = 404;
-    throw e;
+    const error = new Error(
+      'T-Invest did not return any open accounts'
+    );
+
+    error.status = 404;
+    error.details = data;
+
+    throw error;
   }
-  const preferred = accounts.find(a => String(a.type || '').includes('TINKOFF') && String(a.accessLevel || '').includes('FULL'));
-  return preferred || accounts[0];
+
+  const fullAccess =
+    accounts.find(account =>
+      String(
+        account.accessLevel || ''
+      ).includes('FULL')
+    );
+
+  return fullAccess ||
+    accounts[0];
 }
 
-async function getOperations(accountId, from) {
-  const bodyBase = {
-    accountId,
-    state: 'OPERATION_STATE_EXECUTED',
-    limit: 1000
-  };
-  if (from) bodyBase.from = new Date(from).toISOString();
-  bodyBase.to = new Date().toISOString();
-  const all = [];
-  let cursor;
-  for (let i = 0; i < 50; i++) {
-    const body = { ...bodyBase };
-    if (cursor) body.cursor = cursor;
-    const page = await tbank(M.operations, body);
-    const items = page.items || page.operations || [];
-    all.push(...items);
-    const next = page.nextCursor;
-    if (!next || !items.length) break;
-    cursor = next;
+
+/* =========================
+   PORTFOLIO
+========================= */
+
+async function getPortfolio(accountId) {
+  return await tbankRequest(
+    METHODS.portfolio,
+    {
+      accountId,
+      currency: 'RUB'
+    }
+  );
+}
+
+
+/* =========================
+   OPERATIONS
+========================= */
+
+async function getOperations(
+  accountId,
+  fromDate = null
+) {
+  const allOperations = [];
+
+  let cursor = '';
+
+  for (
+    let pageNumber = 0;
+    pageNumber < 50;
+    pageNumber++
+  ) {
+    const request = {
+      accountId,
+
+      status:
+        'OPERATION_STATE_EXECUTED',
+
+      limit: 1000,
+
+      to:
+        new Date().toISOString()
+    };
+
+    if (fromDate) {
+      request.from =
+        new Date(fromDate).toISOString();
+    }
+
+    if (cursor) {
+      request.cursor = cursor;
+    }
+
+    const page =
+      await tbankRequest(
+        METHODS.operations,
+        request
+      );
+
+    const operations =
+      page.items ||
+      page.operations ||
+      [];
+
+    allOperations.push(
+      ...operations
+    );
+
+    const nextCursor =
+      page.nextCursor;
+
+    if (
+      !nextCursor ||
+      !operations.length
+    ) {
+      break;
+    }
+
+    cursor = nextCursor;
   }
-  return all;
+
+  return allOperations;
 }
 
-function operationType(o) {
-  return String(o.operationType || o.type || '').toUpperCase();
+
+/* =========================
+   INSTRUMENTS
+========================= */
+
+async function getInstrument(figi) {
+  if (!figi) {
+    return null;
+  }
+
+  try {
+    const data =
+      await tbankRequest(
+        METHODS.instrument,
+        {
+          idType:
+            'INSTRUMENT_ID_TYPE_FIGI',
+
+          id: figi
+        }
+      );
+
+    return (
+      data.instrument ||
+      data ||
+      null
+    );
+  } catch {
+    return null;
+  }
 }
 
-function opDate(o) {
-  return o.date || o.operationDate || o.timestamp || o.createdAt;
+
+async function enrichPositions(
+  positions
+) {
+  const result = [];
+
+  for (
+    const position of
+    (positions || []).slice(0, 20)
+  ) {
+    const instrument =
+      await getInstrument(
+        position.figi
+      );
+
+    const quantity =
+      quotation(
+        position.quantity
+      );
+
+    const currentPrice =
+      money(
+        position.currentPrice
+      );
+
+    const value =
+      quantity *
+      currentPrice;
+
+    const yieldRub =
+      quotation(
+        position.expectedYield
+      );
+
+    const yieldPercent =
+      quotation(
+        position.expectedYieldRelative
+      );
+
+    result.push({
+      figi:
+        position.figi || null,
+
+      instrumentUid:
+        position.instrumentUid ||
+        null,
+
+      ticker:
+        instrument?.ticker ||
+        position.ticker ||
+        position.figi ||
+        '—',
+
+      name:
+        instrument?.name ||
+        position.name ||
+        instrument?.ticker ||
+        position.figi ||
+        'Без названия',
+
+      quantity,
+
+      currentPrice,
+
+      value,
+
+      yieldRub,
+
+      yieldPercent
+    });
+  }
+
+  return result;
 }
 
-function isPassive(o) {
-  const t = operationType(o);
-  return t.includes('DIVIDEND') || t.includes('COUPON') || t.includes('BOND_REPAYMENT') || t.includes('REPAYMENT');
+
+/* =========================
+   OPERATION HELPERS
+========================= */
+
+function operationType(operation) {
+  return String(
+    operation.operationType ||
+    operation.type ||
+    ''
+  ).toUpperCase();
 }
 
-function isExternalIn(o) {
-  const t = operationType(o);
-  return t.includes('INPUT') && !t.includes('SECURITIES');
-}
-function isExternalOut(o) {
-  const t = operationType(o);
-  return (t.includes('OUTPUT') || t.includes('WITHDRAW')) && !t.includes('SECURITIES');
+
+function operationDate(operation) {
+  return (
+    operation.date ||
+    operation.operationDate ||
+    operation.timestamp ||
+    operation.createdAt ||
+    null
+  );
 }
 
-function cash(o) {
-  // payment is the amount actually charged/credited by the operation.
-  if (o.payment != null) return money(o.payment);
-  if (o.amount != null) return money(o.amount);
-  if (o.operationAmount != null) return money(o.operationAmount);
+
+function operationCash(operation) {
+  if (
+    operation.payment != null
+  ) {
+    return money(
+      operation.payment
+    );
+  }
+
+  if (
+    operation.amount != null
+  ) {
+    return money(
+      operation.amount
+    );
+  }
+
+  if (
+    operation.operationAmount != null
+  ) {
+    return money(
+      operation.operationAmount
+    );
+  }
+
   return 0;
 }
 
-function xnpv(rate, flows) {
-  if (rate <= -0.999999) return Infinity;
-  const t0 = flows[0].date.getTime();
-  return flows.reduce((s, f) => {
-    const years = (f.date.getTime() - t0) / 31557600000;
-    return s + f.amount / Math.pow(1 + rate, years);
-  }, 0);
+
+function isPassiveIncome(
+  operation
+) {
+  const type =
+    operationType(operation);
+
+  return (
+    type.includes('DIVIDEND') ||
+    type.includes('COUPON')
+  );
 }
 
-function xirr(flows) {
-  if (flows.length < 2) return null;
-  let lo = -0.9999, hi = 10;
-  let flo = xnpv(lo, flows), fhi = xnpv(hi, flows);
-  let tries = 0;
-  while (flo * fhi > 0 && tries++ < 8) {
-    hi *= 2;
-    fhi = xnpv(hi, flows);
+
+function isMoneyInput(
+  operation
+) {
+  const type =
+    operationType(operation);
+
+  return (
+    type.includes('INPUT') &&
+    !type.includes('SECURITIES')
+  );
+}
+
+
+function isMoneyOutput(
+  operation
+) {
+  const type =
+    operationType(operation);
+
+  return (
+    (
+      type.includes('OUTPUT') ||
+      type.includes('WITHDRAW')
+    ) &&
+    !type.includes('SECURITIES')
+  );
+}
+
+
+/* =========================
+   XIRR
+========================= */
+
+function xnpv(
+  rate,
+  cashFlows
+) {
+  if (
+    rate <= -0.999999
+  ) {
+    return Infinity;
   }
-  if (!Number.isFinite(flo) || !Number.isFinite(fhi) || flo * fhi > 0) return null;
-  for (let i = 0; i < 100; i++) {
-    const mid = (lo + hi) / 2;
-    const fm = xnpv(mid, flows);
-    if (Math.abs(fm) < 0.01) return mid;
-    if (flo * fm <= 0) { hi = mid; fhi = fm; } else { lo = mid; flo = fm; }
+
+  const firstDate =
+    cashFlows[0].date.getTime();
+
+  let result = 0;
+
+  for (
+    const cashFlow of cashFlows
+  ) {
+    const years =
+      (
+        cashFlow.date.getTime() -
+        firstDate
+      ) / 31557600000;
+
+    result +=
+      cashFlow.amount /
+      Math.pow(
+        1 + rate,
+        years
+      );
   }
-  return (lo + hi) / 2;
+
+  return result;
 }
 
-function compactName(i) {
-  return i?.ticker || i?.name || i?.figi || 'Актив';
-}
 
-async function enrichPositions(positions) {
-  return Promise.all((positions || []).slice(0, 12).map(async p => {
-    let meta = {};
-    if (p.figi) {
-      try {
-        const r = await tbank(M.instrument, { idType: 'INSTRUMENT_ID_TYPE_FIGI', id: p.figi });
-        meta = r.instrument || r || {};
-      } catch (_) {}
+function xirr(
+  cashFlows
+) {
+  if (
+    !cashFlows ||
+    cashFlows.length < 2
+  ) {
+    return null;
+  }
+
+  let low = -0.9999;
+  let high = 10;
+
+  let lowValue =
+    xnpv(
+      low,
+      cashFlows
+    );
+
+  let highValue =
+    xnpv(
+      high,
+      cashFlows
+    );
+
+  for (
+    let attempt = 0;
+    attempt < 10 &&
+    lowValue * highValue > 0;
+    attempt++
+  ) {
+    high *= 2;
+
+    highValue =
+      xnpv(
+        high,
+        cashFlows
+      );
+  }
+
+  if (
+    !Number.isFinite(
+      lowValue
+    ) ||
+    !Number.isFinite(
+      highValue
+    ) ||
+    lowValue * highValue > 0
+  ) {
+    return null;
+  }
+
+  for (
+    let i = 0;
+    i < 100;
+    i++
+  ) {
+    const middle =
+      (low + high) / 2;
+
+    const middleValue =
+      xnpv(
+        middle,
+        cashFlows
+      );
+
+    if (
+      Math.abs(
+        middleValue
+      ) < 0.01
+    ) {
+      return middle;
     }
-    return {
-      figi: p.figi,
-      uid: p.instrumentUid || p.instrumentId,
-      ticker: meta.ticker || p.ticker || p.figi,
-      name: meta.name || p.name || meta.ticker || p.figi,
-      quantity: quote(p.quantity),
-      currentPrice: money(p.currentPrice),
-      value: money(p.quantity) * money(p.currentPrice),
-      yieldRub: quote(p.expectedYield),
-      yieldPct: quote(p.expectedYieldRelative ?? p.expectedYieldPercent)
-    };
-  }));
+
+    if (
+      lowValue *
+      middleValue <= 0
+    ) {
+      high = middle;
+      highValue =
+        middleValue;
+    } else {
+      low = middle;
+      lowValue =
+        middleValue;
+    }
+  }
+
+  return (
+    low + high
+  ) / 2;
 }
+
+
+/* =========================
+   MOEX
+========================= */
 
 async function getMoex() {
   try {
-    const url = 'https://iss.moex.com/iss/history/engines/stock/markets/index/boards/SNDX/securities/IMOEX.json?iss.meta=off&history.columns=TRADEDATE,CLOSE&history.limit=1&sort_order=desc';
-    const r = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!r.ok) return null;
-    const d = await r.json();
-    const rows = d?.history?.data || [];
-    if (!rows.length) return null;
-    return { date: rows[0][0], value: Number(rows[0][1]) || null };
-  } catch (_) { return null; }
-}
+    const url =
+      'https://iss.moex.com/iss/history/' +
+      'engines/stock/markets/index/' +
+      'boards/SNDX/securities/IMOEX.json' +
+      '?iss.meta=off' +
+      '&history.columns=TRADEDATE,CLOSE' +
+      '&history.limit=1' +
+      '&sort_order=desc';
 
-app.get('/api/health', (req,res) => res.json({ ok: true, tokenConfigured: !!TOKEN }));
+    const response =
+      await fetch(
+        url,
+        {
+          headers: {
+            Accept:
+              'application/json'
+          }
+        }
+      );
 
-app.get('/api/dashboard', async (req,res) => {
-  try {
-    const account = await getOpenAccount();
-    const accountId = account.id;
-    const [portfolio, operations] = await Promise.all([
-      tbank(M.portfolio, { accountId, currency: 'RUB' }),
-      getOperations(accountId)
-    ]);
-
-    const positions = portfolio.positions || [];
-    const enriched = await enrichPositions(positions);
-    const total = money(portfolio.totalAmountPortfolio);
-    const profit = money(portfolio.expectedYield);
-    const profitPct = quote(portfolio.expectedYield);
-
-    const sorted = [...enriched].sort((a,b) => b.yieldRub - a.yieldRub);
-    const startDates = operations.map(opDate).filter(Boolean).map(d => new Date(d)).filter(d => !isNaN(d.getTime()));
-    const accountOpened = dateOf(account.openedDate);
-    const startDate = startDates.length ? new Date(Math.min(...startDates.map(d => d.getTime()))) : accountOpened;
-
-    const passive = operations.filter(isPassive).map(o => ({ date: new Date(opDate(o)), amount: Math.abs(cash(o)), type: operationType(o) })).filter(x => !isNaN(x.date.getTime()) && x.amount > 0);
-    const passiveTotal = passive.reduce((s,x)=>s+x.amount,0);
-    const months = startDate ? Math.max(1, (Date.now() - startDate.getTime()) / (365.25/12*86400000)) : 1;
-    const monthlyPassive = passiveTotal / months;
-    const annualPassive = monthlyPassive * 12;
-
-    const flows = operations
-      .filter(o => isExternalIn(o) || isExternalOut(o))
-      .map(o => ({ date: new Date(opDate(o)), amount: isExternalIn(o) ? -Math.abs(cash(o)) : Math.abs(cash(o)) }))
-      .filter(x => !isNaN(x.date.getTime()) && x.amount !== 0)
-      .sort((a,b)=>a.date-b.date);
-    flows.push({ date: new Date(), amount: total });
-    const irr = xirr(flows);
-
-    let cagr = null;
-    const firstInvestment = flows.find(f => f.amount < 0);
-    if (firstInvestment && firstInvestment.amount !== 0 && total > 0) {
-      const years = Math.max(1/365, (Date.now()-firstInvestment.date.getTime())/31557600000);
-      const invested = Math.abs(firstInvestment.amount);
-      if (invested > 0) cagr = Math.pow(total/invested, 1/years)-1;
+    if (!response.ok) {
+      return null;
     }
 
-    const moex = await getMoex();
-    const payload = {
-      account: { id: accountId, name: account.name || account.type || 'T-Invest' },
-      portfolio: {
-        value: total,
-        profit,
-        profitPercent: profitPct,
-        startDate: startDate ? startDate.toISOString() : null,
-        cagr,
-        xirr: irr
-      },
-      assets: enriched,
-      leaders: { gainers: sorted.slice(0,3), losers: sorted.slice(-3).reverse() },
-      income: { total: passiveTotal, monthly: monthlyPassive, annual: annualPassive },
-      imoex: moex,
-      updatedAt: new Date().toISOString(),
-      operationCount: operations.length
+    const data =
+      await response.json();
+
+    const rows =
+      data?.history?.data ||
+      [];
+
+    if (!rows.length) {
+      return null;
+    }
+
+    return {
+      date:
+        rows[0][0],
+
+      value:
+        Number(
+          rows[0][1]
+        ) || null
     };
-    res.json(payload);
-  } catch (e) {
-    res.status(e.status || 500).json(errorJson(e));
+
+  } catch {
+    return null;
   }
-});
+}
 
-// Kept for troubleshooting.
-app.get('/api/accounts', async (req,res)=>{ try { res.json(await tbank(M.accounts,{status:'ACCOUNT_STATUS_OPEN'})); } catch(e){ res.status(e.status||500).json(errorJson(e)); }});
 
-app.get('*', (req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
+/* =========================
+   HEALTH
+========================= */
 
-const port = process.env.PORT || 10000;
-app.listen(port, '0.0.0.0', () => console.log(`T-Invest Pulse listening on ${port}`));
+app.get(
+  '/api/health',
+  (req, res) => {
+    res.json({
+      ok: true,
+      tokenConfigured:
+        Boolean(TOKEN),
+
+      serverTime:
+        new Date().toISOString()
+    });
+  }
+);
+
+
+/* =========================
+   ACCOUNTS DEBUG
+========================= */
+
+app.get(
+  '/api/accounts',
+  async (req, res) => {
+    try {
+      const data =
+        await getAccounts();
+
+      res.json(data);
+
+    } catch (error) {
+      console.error(
+        'GET /api/accounts ERROR:',
+        error
+      );
+
+      res
+        .status(
+          error.status || 500
+        )
+        .json(
+          jsonError(error)
+        );
+    }
+  }
+);
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+app.get(
+  '/api/dashboard',
+  async (req, res) => {
+    try {
+      console.log(
+        'Loading T-Invest dashboard...'
+      );
+
+      const account =
+        await getOpenAccount();
+
+      console.log(
+        'Account found:',
+        account.id
+      );
+
+      const accountId =
+        account.id;
+
+      const portfolio =
+        await getPortfolio(
+          accountId
+        );
+
+      const operations =
+        await getOperations(
+          accountId
+        );
+
+      const assets =
+        await enrichPositions(
+          portfolio.positions
+        );
+
+      const portfolioValue =
+        money(
+          portfolio.totalAmountPortfolio
+        );
+
+      /*
+       * T-Bank's expectedYield is a
+       * relative percentage.
+       *
+       * Therefore it is used as
+       * percentage, NOT as ruble profit.
+       */
+
+      const returnPercent =
+        quotation(
+          portfolio.expectedYield
+        );
+
+      /*
+       * Absolute profit:
+       * use current portfolio value
+       * minus net external deposits.
+       */
+
+      const externalFlows =
+        operations
+          .filter(
+            operation =>
+              isMoneyInput(
+                operation
+              ) ||
+              isMoneyOutput(
+                operation
+              )
+          )
+          .map(
+            operation => ({
+              date:
+                new Date(
+                  operationDate(
+                    operation
+                  )
+                ),
+
+              amount:
+                isMoneyInput(
+                  operation
+                )
+                  ? Math.abs(
+                      operationCash(
+                        operation
+                      )
+                    )
+                  : -Math.abs(
+                      operationCash(
+                        operation
+                      )
+                    )
+            })
+          )
+          .filter(
+            flow =>
+              !isNaN(
+                flow.date.getTime()
+              ) &&
+              Number.isFinite(
+                flow.amount
+              )
+          );
+
+      const netInvested =
+        externalFlows.reduce(
+          (
+            sum,
+            flow
+          ) =>
+            sum +
+            flow.amount,
+          0
+        );
+
+      const absoluteProfit =
+        portfolioValue -
+        netInvested;
+
+
+      /* =====================
+         START DATE
+      ===================== */
+
+      const operationDates =
+        operations
+          .map(
+            operation =>
+              operationDate(
+                operation
+              )
+          )
+          .filter(Boolean)
+          .map(
+            date =>
+              new Date(date)
+          )
+          .filter(
+            date =>
+              !isNaN(
+                date.getTime()
+              )
+          );
+
+      let startDate = null;
+
+      if (
+        operationDates.length
+      ) {
+        startDate =
+          new Date(
+            Math.min(
+              ...operationDates.map(
+                date =>
+                  date.getTime()
+              )
+            )
+          );
+      } else if (
+        account.openedDate
+      ) {
+        startDate =
+          new Date(
+            account.openedDate
+          );
+      }
+
+
+      /* =====================
+         PASSIVE INCOME
+      ===================== */
+
+      const passiveOperations =
+        operations
+          .filter(
+            isPassiveIncome
+          )
+          .map(
+            operation => ({
+              date:
+                new Date(
+                  operationDate(
+                    operation
+                  )
+                ),
+
+              amount:
+                Math.abs(
+                  operationCash(
+                    operation
+                  )
+                ),
+
+              type:
+                operationType(
+                  operation
+                )
+            })
+          )
+          .filter(
+            item =>
+              !isNaN(
+                item.date.getTime()
+              ) &&
+              item.amount > 0
+          );
+
+      const passiveTotal =
+        passiveOperations.reduce(
+          (
+            sum,
+            item
+          ) =>
+            sum +
+            item.amount,
+          0
+        );
+
+      let months = 1;
+
+      if (startDate) {
+        months =
+          Math.max(
+            1,
+
+            (
+              Date.now() -
+              startDate.getTime()
+            ) /
+              (
+                30.4375 *
+                86400000
+              )
+          );
+      }
+
+      const passiveMonthly =
+        passiveTotal /
+        months;
+
+      const passiveAnnual =
+        passiveMonthly *
+        12;
+
+
+      /* =====================
+         XIRR
+      ===================== */
+
+      const xirrFlows =
+        externalFlows
+          .map(
+            flow => ({
+              date:
+                flow.date,
+
+              amount:
+                -flow.amount
+            })
+          )
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              a.date -
+              b.date
+          );
+
+      xirrFlows.push({
+        date:
+          new Date(),
+
+        amount:
+          portfolioValue
+      });
+
+      const xirrValue =
+        xirr(
+          xirrFlows
+        );
+
+
+      /* =====================
+         CAGR
+      ===================== */
+
+      let cagr = null;
+
+      const firstInvestment =
+        externalFlows
+          .filter(
+            flow =>
+              flow.amount > 0
+          )
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              a.date -
+              b.date
+          )[0];
+
+      if (
+        firstInvestment &&
+        portfolioValue > 0
+      ) {
+        const years =
+          Math.max(
+            1 / 365,
+
+            (
+              Date.now() -
+              firstInvestment.date.getTime()
+            ) /
+              31557600000
+          );
+
+        const initial =
+          firstInvestment.amount;
+
+        if (
+          initial > 0
+        ) {
+          cagr =
+            Math.pow(
+              portfolioValue /
+                initial,
+
+              1 / years
+            ) - 1;
+        }
+      }
+
+
+      /* =====================
+         LEADERS
+      ===================== */
+
+      const sortedAssets =
+        [...assets].sort(
+          (
+            a,
+            b
+          ) =>
+            b.yieldRub -
+            a.yieldRub
+        );
+
+      const gainers =
+        sortedAssets
+          .filter(
+            asset =>
+              asset.yieldRub >= 0
+          )
+          .slice(
+            0,
+            3
+          );
+
+      const losers =
+        [...sortedAssets]
+          .filter(
+            asset =>
+              asset.yieldRub < 0
+          )
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              a.yieldRub -
+              b.yieldRub
+          )
+          .slice(
+            0,
+            3
+          );
+
+
+      /* =====================
+         IMOEX
+      ===================== */
+
+      const imoex =
+        await getMoex();
+
+
+      /* =====================
+         RESPONSE
+      ===================== */
+
+      res.json({
+        account: {
+          id:
+            accountId,
+
+          name:
+            account.name ||
+            'T-Invest'
+        },
+
+        portfolio: {
+          value:
+            portfolioValue,
+
+          profit:
+            absoluteProfit,
+
+          profitPercent:
+            returnPercent,
+
+          startDate:
+            startDate
+              ? startDate.toISOString()
+              : null,
+
+          cagr,
+
+          xirr:
+            xirrValue
+        },
+
+        assets,
+
+        leaders: {
+          gainers,
+
+          losers
+        },
+
+        income: {
+          total:
+            passiveTotal,
+
+          monthly:
+            passiveMonthly,
+
+          annual:
+            passiveAnnual
+        },
+
+        imoex,
+
+        operationCount:
+          operations.length,
+
+        updatedAt:
+          new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error(
+        'GET /api/dashboard ERROR:',
+        error
+      );
+
+      res
+        .status(
+          error.status || 500
+        )
+        .json(
+          jsonError(error)
+        );
+    }
+  }
+);
+
+
+/* =========================
+   SPA FALLBACK
+========================= */
+
+app.get(
+  '*',
+  (req, res) => {
+    res.sendFile(
+      path.join(
+        __dirname,
+        'public',
+        'index.html'
+      )
+    );
+  }
+);
+
+
+/* =========================
+   SERVER
+========================= */
+
+const PORT =
+  process.env.PORT ||
+  10000;
+
+app.listen(
+  PORT,
+  '0.0.0.0',
+  () => {
+    console.log(
+      `T-Invest Pulse running on port ${PORT}`
+    );
+  }
+);
