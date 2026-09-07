@@ -193,7 +193,7 @@ function httpsJsonRequest(url, options = {}) {
       path: `${target.pathname}${target.search}`,
       method: options.method || 'GET',
       headers: options.headers || {},
-      ca: RUSSIAN_TRUSTED_CA,
+      ca: [RUSSIAN_TRUSTED_CA_ROOT, RUSSIAN_TRUSTED_CA_SUB],
       timeout: options.timeout || 20000
     }, response => {
       let data = '';
@@ -547,24 +547,19 @@ async function buildDashboard() {
     growthPercent = ((portfolioValue - totalExternal) / totalExternal) * 100;
   }
 
-  let cagr = null;
-  if (firstInvestment && portfolioValue > 0) {
-    const years = (today - firstInvestment.date) / (365.25 * 24 * 60 * 60 * 1000);
-    if (years > 0.01 && firstInvestment.amount > 0) {
-      cagr = (Math.pow(portfolioValue / firstInvestment.amount, 1 / years) - 1) * 100;
-    }
-  }
+  // With repeated deposits/withdrawals, CAGR from the first deposit is not
+  // mathematically meaningful. XIRR is the correct annualized money-weighted
+  // return for this portfolio, so leave CAGR empty until a true single-lump
+  // start value is available.
+  const cagr = null;
 
-  const months =
-    firstInvestment
-      ? Math.max(
-          1,
-          (today.getFullYear() - firstInvestment.date.getFullYear()) * 12 +
-          (today.getMonth() - firstInvestment.date.getMonth()) + 1
-        )
-      : 1;
-
-  const avgMonthlyPassiveIncome = passiveIncome / months;
+  const elapsedDays = firstInvestment
+    ? Math.max(1, (today - firstInvestment.date) / (24 * 60 * 60 * 1000))
+    : 1;
+  const elapsedYears = elapsedDays / 365.25;
+  const elapsedMonths = elapsedDays / 30.4375;
+  const avgMonthlyPassiveIncome = passiveIncome / Math.max(1, elapsedMonths);
+  const avgAnnualPassiveIncome = passiveIncome / Math.max(1, elapsedYears);
 
   const sorted = [...positions].sort(
     (a, b) => b.expectedYield - a.expectedYield
@@ -586,20 +581,36 @@ async function buildDashboard() {
       externalFlows: totalExternal,
       growth: portfolioValue - totalExternal,
       growthPercent,
+      // Frontend-compatible aliases. Percent fields below are DECIMAL ratios
+      // (0.0125 = 1.25%) because the UI formats them as percentages.
+      profit: portfolioValue - totalExternal,
+      profitPercent: totalExternal > 0 ? (portfolioValue - totalExternal) / totalExternal : null,
       cagr,
-      xirr: irr == null ? null : irr * 100,
+      xirr: irr,
       createdAt: firstInvestment?.date?.toISOString() || null,
-      positions
+      startDate: firstInvestment?.date?.toISOString() || null,
+      positions,
+      assets: positions
     },
     passiveIncome: {
       total: passiveIncome,
       averageMonthly: avgMonthlyPassiveIncome,
+      averageAnnual: avgAnnualPassiveIncome,
       operationCount: incomeOperations.length
     },
-    leaders,
+    income: {
+      monthly: avgMonthlyPassiveIncome,
+      annual: avgAnnualPassiveIncome,
+      total: passiveIncome
+    },
+    leaders: {
+      gainers: leaders.map(p => ({ ...p, yieldRub: p.expectedYield })),
+      losers: laggards.map(p => ({ ...p, yieldRub: p.expectedYield }))
+    },
     laggards,
     moex,
-    note: 'CAGR is a simple estimate from the first external investment. XIRR is the preferred return metric when there are multiple cash flows.'
+    assets: positions,
+    note: 'CAGR is intentionally not calculated for a portfolio with multiple external cash flows. XIRR is the annualized money-weighted return.'
   };
 }
 
@@ -675,7 +686,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '2.9-external-cash-fixed' });
+  res.json({ ok: true, version: '3.0-metrics-schema-fixed' });
 });
 
 
@@ -745,7 +756,7 @@ async function start() {
     console.error('T-Bank requests will report the certificate bootstrap error.');
   }
 
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`TInvest Pulse listening on port ${PORT}`);
   });
 }
