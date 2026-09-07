@@ -1070,7 +1070,7 @@ app.get('/api/history-debug', async (req, res) => {
     const value = moneyValue(portfolio?.totalAmountPortfolio);
     const history = await buildPortfolioHistory(account.id, operations, firstInvestment, value);
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.json({ok:true,version:'4.0-dashboard-overhaul',positions,history});
+    res.json({ok:true,version:'4.1-final-null-fix',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
   }
@@ -1148,7 +1148,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '4.0-dashboard-overhaul' });
+  res.json({ ok: true, version: '4.1-final-null-fix' });
 });
 
 
