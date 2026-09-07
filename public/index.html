@@ -3,41 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#070b12">
-  <title>T-Invest Pulse</title>
+  <meta name="theme-color" content="#07100e">
+  <title>Кряхтящий фонд — Pulse</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body data-theme="neon">
   <main class="phone" id="pulse">
+    <div class="noise"></div>
     <header class="top">
-      <div><div class="brand">TInvest <span>Pulse</span></div><div class="sub">Инвестиционный портфель</div></div>
-      <button id="pulseBtn" class="pulseBtn">PULSE</button>
+      <div class="brandBlock">
+        <div class="brand">Кряхтящий <span>фонд</span></div>
+        <div class="sub" id="slogan">Кряхти, но расти.</div>
+      </div>
+      <div class="topActions">
+        <button id="styleBtn" class="styleBtn" aria-label="Сменить стиль">STYLE</button>
+        <button id="pulseBtn" class="pulseBtn">PULSE</button>
+      </div>
     </header>
 
     <section class="hero card">
+      <div class="heroArt" aria-hidden="true">
+        <svg class="art art-neon" viewBox="0 0 180 120"><path d="M22 88h92M36 76l20-25 18 14 25-34 22 12"/><circle cx="56" cy="51" r="4"/><circle cx="99" cy="31" r="4"/><path d="M126 68l15-17 14 9-12 17z"/></svg>
+        <svg class="art art-emerald" viewBox="0 0 180 120"><path d="M35 80c5-34 39-49 67-31 21 14 28 39 13 49-17 11-56 10-80-3z"/><path d="M73 50l10-12 10 12M62 72h48M73 87h28"/></svg>
+        <svg class="art art-graphite" viewBox="0 0 180 120"><rect x="34" y="29" width="80" height="61" rx="9"/><path d="M53 70l15-20 13 10 18-23 14 16M50 45h10M49 98h83"/></svg>
+        <svg class="art art-cyber" viewBox="0 0 180 120"><path d="M32 88l18-50h67l29 50z"/><path d="M61 68h52M69 54h36M79 40h18"/><circle cx="47" cy="88" r="8"/><circle cx="139" cy="88" r="8"/></svg>
+        <svg class="art art-aurora" viewBox="0 0 180 120"><path d="M28 80c14-37 43-53 71-39 23 11 42 2 52-14M28 91c28-14 54-4 76-15 22-11 37-31 51-18"/><circle cx="61" cy="52" r="6"/><circle cx="123" cy="47" r="4"/></svg>
+      </div>
       <div class="eyebrow">СТОИМОСТЬ ПОРТФЕЛЯ</div>
       <div class="value" id="value">Загрузка…</div>
       <div class="gain" id="gain">—</div>
       <div class="dates" id="dates">История загружается…</div>
+      <div class="stamp">НЕ БАНК. НЕ ФОНД. ПРОСТО КРЯХТИТ.</div>
     </section>
 
     <section class="grid2">
-      <div class="mini card"><span>ПРИБЫЛЬ</span><b id="profit">—</b></div>
-      <div class="mini card"><span>ДОХОДНОСТЬ</span><b id="profitPct">—</b></div>
-      <div class="mini card"><span>CAGR</span><b id="cagr">—</b></div>
-      <div class="mini card"><span>XIRR</span><b id="xirr">—</b></div>
+      <div class="mini card"><span>ПРИБЫЛЬ</span><b id="profit">—</b><i>деньги работают</i></div>
+      <div class="mini card"><span>ДОХОДНОСТЬ</span><b id="profitPct">—</b><i>без магии</i></div>
+      <div class="mini card"><span>CAGR</span><b id="cagr">—</b><i>не врём себе</i></div>
+      <div class="mini card"><span>XIRR</span><b id="xirr">—</b><i>с учётом пополнений</i></div>
     </section>
 
     <section class="chartCard card">
-      <div class="chartTitle">РОСТ ПОРТФЕЛЯ <small>vs IMOEX</small></div>
+      <div class="chartHeader"><div><div class="chartTitle">РОСТ КРЯХТЯЩЕГО ФОНДА</div><small>портфель vs IMOEX • старт = 100</small></div><span class="chartBadge">НЕ СИДИМ</span></div>
       <div class="chartWrap"><canvas id="chart"></canvas><div class="chartEmpty" id="chartEmpty">Загружаю историю…</div></div>
-      <div class="legend"><i></i> Портфель <em></em> IMOEX</div>
+      <div class="legend"><i></i> Портфель <em></em> IMOEX <span>100 = старт</span></div>
     </section>
 
     <section class="bottomGrid">
-      <div class="income card"><div class="eyebrow">ПАССИВНЫЙ ДОХОД</div><small>без пополнений</small><div><b id="monthly">—</b><span> / месяц</span></div><div><b id="annual">—</b><span> / год</span></div></div>
-      <div class="leaders card"><div class="eyebrow">ЛИДЕРЫ</div><div class="lead"><span>🟢</span><div><small>GAINER</small><b id="gainer">—</b></div></div><div class="lead"><span>🔴</span><div><small>LOSER</small><b id="loser">—</b></div></div></div>
+      <div class="income card">
+        <div class="eyebrow">ПАССИВНЫЙ ДОХОД</div><small>дивиденды + купоны • без пополнений</small>
+        <div><b id="monthly">—</b><span> / месяц</span></div>
+        <div><b id="annual">—</b><span> / год</span></div>
+      </div>
+      <div class="leaders card">
+        <div class="eyebrow">КТО ТАЩИТ / КТО НОЕТ</div>
+        <div class="lead"><span class="coin good">↗</span><div><small>ТАЩИТ</small><b id="gainer">—</b></div></div>
+        <div class="lead"><span class="coin bad">↘</span><div><small>НОЕТ</small><b id="loser">—</b></div></div>
+      </div>
     </section>
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
