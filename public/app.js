@@ -81,7 +81,7 @@ function render(d){
   $('profitPct').textContent=p.profitPercent==null?'—':pct(p.profitPercent);
   $('gain').textContent=p.profitPercent==null?'—':(p.profitPercent>=0?'+':'')+pct(p.profitPercent);
   $('gain').style.color=p.profitPercent>=0?'var(--accent)':'#ff6575';
-  $('cagr').textContent=p.cagr==null?'—':pct(p.cagr);
+  if ($('cagr')) $('cagr').textContent=p.cagr==null?'—':pct(p.cagr);
   $('xirr').textContent=p.xirr==null?'—':pct(p.xirr);
   const hp=Array.isArray(d.history?.points)?d.history.points:[];
   const common=hp.filter(x=>Number.isFinite(Number(x.portfolio))&&Number.isFinite(Number(x.imoex))).slice(-1)[0];

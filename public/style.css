@@ -22,3 +22,5 @@ body[data-theme=graphite] .chartTabs{border-radius:6px}body[data-theme=graphite]
 body[data-theme=cyber] .chartTabs{border-radius:5px;clip-path:polygon(0 2px,2px 0,100% 0,100% calc(100% - 2px),calc(100% - 2px) 100%,0 100%)}body[data-theme=cyber] .chartTab.active{color:#060816}
 body[data-theme=aurora] .chartTab.active{color:#12091c}
 @media(max-height:700px){.chartTabs{margin:3px 0 1px}.chartTab{padding:4px 2px;font-size:7px}.incomeMeta{padding-top:2px}.incomeMain b{font-size:15px}.incomeMeta b{font-size:8px!important}}
+
+.cagrLine{font-size:7px;color:var(--muted);margin-top:1px}.cagrLine strong{font-size:9px;color:#c9d2cf;margin-left:2px}@media(max-height:700px){.cagrLine{font-size:6px}.cagrLine strong{font-size:8px}}
