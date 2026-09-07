@@ -434,6 +434,246 @@ function xirr(cashflows) {
   return (low + high) / 2;
 }
 
+
+function operationQuantity(op) {
+  const q = Number(op?.quantity || op?.quantityExecuted || 0);
+  return Number.isFinite(q) ? q : 0;
+}
+
+function securityQuantityDelta(op) {
+  const type = String(op?.type || '').toUpperCase();
+  const q = operationQuantity(op);
+  if (!q || !op?.figi) return 0;
+
+  if (type.includes('BUY') || type === 'OPERATION_TYPE_INPUT_SECURITIES' || type === 'OPERATION_TYPE_DELIVERY_BUY' || type === 'OPERATION_TYPE_PRIMARY_ORDER') {
+    return Math.abs(q);
+  }
+  if (type.includes('SELL') || type === 'OPERATION_TYPE_OUTPUT_SECURITIES' || type === 'OPERATION_TYPE_DELIVERY_SELL') {
+    return -Math.abs(q);
+  }
+  if (type === 'OPERATION_TYPE_BOND_REPAYMENT' || type === 'OPERATION_TYPE_BOND_REPAYMENT_FULL') {
+    return -Math.abs(q);
+  }
+  return 0;
+}
+
+async function getInstrumentMeta(figi, instrumentType) {
+  const id = { idType: 'INSTRUMENT_ID_TYPE_FIGI', id: figi };
+  const type = String(instrumentType || '').toUpperCase();
+  try {
+    let data;
+    if (type.includes('BOND')) {
+      data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/BondBy', id);
+    } else if (type.includes('SHARE')) {
+      data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/ShareBy', id);
+    } else if (type.includes('ETF')) {
+      data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/EtfBy', id);
+    } else if (type.includes('CURRENCY')) {
+      data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/CurrencyBy', id);
+    } else {
+      data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/GetInstrumentBy', id);
+    }
+    return data?.instrument || data?.instrument_short || data || {};
+  } catch (err) {
+    console.warn(`Instrument metadata failed for ${figi}: ${err.message}`);
+    return {};
+  }
+}
+
+async function getDailyCandles(figi, from, to) {
+  try {
+    const data = await tbankRequest('tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles', {
+      from: from.toISOString(),
+      to: to.toISOString(),
+      interval: 'CANDLE_INTERVAL_DAY',
+      instrumentId: figi,
+      candleSourceType: 'CANDLE_SOURCE_EXCHANGE',
+      limit: 300
+    });
+    return Array.isArray(data?.candles) ? data.candles : [];
+  } catch (err) {
+    console.warn(`Candles failed for ${figi}: ${err.message}`);
+    return [];
+  }
+}
+
+function quotationValue(x) {
+  if (x == null) return 0;
+  if (typeof x === 'number') return x;
+  if (typeof x === 'string') return Number(x) || 0;
+  if (typeof x === 'object') return Number(x.units || 0) + Number(x.nano || 0) / 1e9;
+  return 0;
+}
+
+function dateKey(value) {
+  const d = value instanceof Date ? value : safeDate(value);
+  return d ? d.toISOString().slice(0, 10) : null;
+}
+
+function businessDates(from, to) {
+  const out = [];
+  const d = new Date(from);
+  d.setUTCHours(0, 0, 0, 0);
+  const end = new Date(to);
+  end.setUTCHours(0, 0, 0, 0);
+  while (d <= end) {
+    const day = d.getUTCDay();
+    if (day !== 0 && day !== 6) out.push(new Date(d));
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+  return out;
+}
+
+async function getMoexHistory(from, to) {
+  const url =
+    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
+    `?iss.meta=off&iss.only=history&history.columns=TRADEDATE,CLOSE` +
+    `&from=${encodeURIComponent(dateKey(from))}&till=${encodeURIComponent(dateKey(to))}`;
+  const result = await safeFetch(url);
+  if (!result.ok) return [];
+  try {
+    const data = JSON.parse(result.text);
+    const rows = data?.history?.data || [];
+    return rows.map(r => ({ date: String(r?.[0] || ''), value: Number(r?.[1]) })).filter(x => x.date && Number.isFinite(x.value));
+  } catch {
+    return [];
+  }
+}
+
+const HISTORY_CACHE = new Map();
+const HISTORY_CACHE_TTL_MS = 5 * 60 * 1000;
+
+async function buildPortfolioHistory(accountId, operations, firstInvestment, portfolioValue) {
+  if (!firstInvestment?.date) return { available: false, points: [], reason: 'no_start_date' };
+
+  const cacheKey = String(accountId || 'default');
+  const cached = HISTORY_CACHE.get(cacheKey);
+  if (cached && Date.now() - cached.createdAt < HISTORY_CACHE_TTL_MS) return cached.data;
+
+  const from = new Date(firstInvestment.date);
+  const to = new Date();
+  const ops = Array.isArray(operations) ? operations : [];
+
+  const instruments = new Map();
+  for (const op of ops) {
+    if (!op?.figi) continue;
+    const delta = securityQuantityDelta(op);
+    if (!delta && !String(op?.type || '').toUpperCase().includes('BUY') && !String(op?.type || '').toUpperCase().includes('SELL')) continue;
+    if (!instruments.has(op.figi)) instruments.set(op.figi, String(op.instrumentType || ''));
+  }
+
+  const instrumentRows = [];
+  const entries = [...instruments.entries()];
+  for (let i = 0; i < entries.length; i += 5) {
+    const batch = entries.slice(i, i + 5);
+    const results = await Promise.all(batch.map(async ([figi, instrumentType]) => {
+      const [meta, candles] = await Promise.all([
+        getInstrumentMeta(figi, instrumentType),
+        getDailyCandles(figi, from, to)
+      ]);
+      return { figi, instrumentType, meta, candles };
+    }));
+    instrumentRows.push(...results);
+  }
+
+  const candleMaps = new Map();
+  for (const row of instrumentRows) {
+    const type = String(row.instrumentType || '').toUpperCase();
+    const nominal = quotationValue(row.meta?.nominal || row.meta?.initialNominal || row.meta?.bond?.nominal || row.meta?.assetBond?.nominal);
+    const map = new Map();
+    for (const candle of row.candles) {
+      const key = dateKey(candle.time);
+      const close = quotationValue(candle.close);
+      if (!key || !Number.isFinite(close) || close <= 0) continue;
+      let price = close;
+      if (type.includes('BOND') && nominal > 0) price = close / 100 * nominal;
+      map.set(key, price);
+    }
+    candleMaps.set(row.figi, { map, type });
+  }
+
+  const dates = businessDates(from, to);
+  if (!dates.length) return { available: false, points: [], reason: 'no_dates' };
+
+  // Rebuild cash and security quantities at the end of each trading day.
+  const sortedOps = [...ops].map(op => ({ ...op, _date: safeDate(op.date) })).filter(op => op._date).sort((a, b) => a._date - b._date);
+  const qty = new Map();
+  let cash = 0;
+  let opIndex = 0;
+  const raw = [];
+
+  for (const day of dates) {
+    const end = new Date(day);
+    end.setUTCHours(23, 59, 59, 999);
+    while (opIndex < sortedOps.length && sortedOps[opIndex]._date <= end) {
+      const op = sortedOps[opIndex++];
+      cash += operationCash(op);
+      const delta = securityQuantityDelta(op);
+      if (delta) qty.set(op.figi, (qty.get(op.figi) || 0) + delta);
+    }
+
+    let securities = 0;
+    for (const [figi, quantity] of qty.entries()) {
+      if (!quantity) continue;
+      const info = candleMaps.get(figi);
+      if (!info) continue;
+      let price = info.map.get(dateKey(day));
+      if (price == null) {
+        // Carry the latest available close for holidays/missing candles.
+        const prior = [...info.map.entries()].filter(([k]) => k <= dateKey(day)).sort((a,b) => a[0].localeCompare(b[0])).pop();
+        price = prior?.[1] ?? null;
+      }
+      if (price != null && Number.isFinite(price)) securities += quantity * price;
+    }
+
+    const value = cash + securities;
+    if (Number.isFinite(value) && value > 0) raw.push({ date: dateKey(day), value });
+  }
+
+  // Add today's live portfolio value as the last point.
+  const todayKey = dateKey(to);
+  if (!raw.length || raw[raw.length - 1].date !== todayKey) raw.push({ date: todayKey, value: portfolioValue });
+  else raw[raw.length - 1].value = portfolioValue;
+
+  const externalByDay = new Map();
+  for (const op of sortedOps) {
+    if (!isExternalCashOperation(op)) continue;
+    const key = dateKey(op._date);
+    externalByDay.set(key, (externalByDay.get(key) || 0) + operationCash(op));
+  }
+
+  // Time-weighted return: remove the effect of deposits/withdrawals from the curve.
+  const first = raw[0];
+  let index = 100;
+  const points = [{ date: first.date, portfolio: index }];
+  for (let i = 1; i < raw.length; i++) {
+    const prev = raw[i - 1];
+    const cur = raw[i];
+    const flow = externalByDay.get(cur.date) || 0;
+    const base = prev.value + flow;
+    if (base > 0) index *= cur.value / base;
+    points.push({ date: cur.date, portfolio: Number(index.toFixed(4)) });
+  }
+
+  const moex = await getMoexHistory(from, to);
+  const moexMap = new Map(moex.map(x => [x.date, x.value]));
+  const firstMoex = moex.find(x => x.value > 0)?.value || null;
+  for (const p of points) {
+    const m = moexMap.get(p.date);
+    p.imoex = firstMoex && m ? Number((m / firstMoex * 100).toFixed(4)) : null;
+  }
+
+  const result = {
+    available: points.length >= 2,
+    startDate: points[0]?.date || null,
+    endDate: points[points.length - 1]?.date || null,
+    points,
+    method: 'daily_time_weighted_return_from_operations_and_historical_closes'
+  };
+  HISTORY_CACHE.set(cacheKey, { createdAt: Date.now(), data: result });
+  return result;
+}
+
 async function getMoex() {
   const url =
     `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
@@ -561,6 +801,13 @@ async function buildDashboard() {
   const avgMonthlyPassiveIncome = passiveIncome / Math.max(1, elapsedMonths);
   const avgAnnualPassiveIncome = passiveIncome / Math.max(1, elapsedYears);
 
+  let history = { available: false, points: [], reason: 'not_built' };
+  try {
+    history = await buildPortfolioHistory(account.id, executed, firstInvestment, portfolioValue);
+  } catch (err) {
+    console.warn('Portfolio history build failed:', err.message);
+  }
+
   const sorted = [...positions].sort(
     (a, b) => b.expectedYield - a.expectedYield
   );
@@ -609,6 +856,7 @@ async function buildDashboard() {
     },
     laggards,
     moex,
+    history,
     assets: positions,
     note: 'CAGR is intentionally not calculated for a portfolio with multiple external cash flows. XIRR is the annualized money-weighted return.'
   };
@@ -686,7 +934,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ ok: true, version: '3.0-metrics-schema-fixed' });
+  res.json({ ok: true, version: '3.1-history-chart-fixed' });
 });
 
 
