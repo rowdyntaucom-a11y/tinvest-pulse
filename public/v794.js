@@ -1,0 +1,20 @@
+(()=>{
+ const $=id=>document.getElementById(id),rub=n=>Number.isFinite(+n)?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(+n)+' ₽':'—';
+ function ensure(){
+  const cal=$('cashCalendarMonths')?.closest('.cashCalendar'),flow=document.querySelector('.flowPanel');
+  if(cal&&!$('payout794')){const x=document.createElement('div');x.id='payout794';x.className='p794';x.innerHTML='<div class="p794title"><span>12 МЕС · ДЕНЕЖНЫЙ ПОТОК</span><b>С НАЛОГОМ И БЕЗ</b></div><div class="p794grid"><div><small>НАЧИСЛЯТ</small><b id="p794gross">—</b><em>100%</em></div><div><small>НДФЛ · ОЦЕНКА</small><b id="p794tax">—</b><em id="p794taxPct">13%</em></div><div class="net"><small>НА РУКИ</small><b id="p794net">—</b><em id="p794keep">87%</em></div></div><p>Месяцы выше — сумма до налога, как в расписании выплат. «На руки» — оценка после НДФЛ.</p>';cal.appendChild(x)}
+  if(flow&&!$('flow794')){const x=document.createElement('div');x.id='flow794';x.className='flow794';x.innerHTML='<span>12 МЕС: <b id="f794gross">—</b> начислят</span><span>НДФЛ: <b id="f794tax">—</b></span><span>НА РУКИ: <b id="f794net">—</b></span>';flow.appendChild(x)}
+  if(!$('v794css')){const s=document.createElement('style');s.id='v794css';s.textContent='.p794{margin-top:6px;padding:7px;border-top:1px solid rgba(90,255,210,.12);background:rgba(84,246,197,.018)}.p794title{display:flex;justify-content:space-between;font-size:5px;letter-spacing:.8px;color:#71847f}.p794title b{color:var(--accent)}.p794grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}.p794grid>div{padding:6px;border:1px solid rgba(255,255,255,.08);border-radius:8px}.p794grid small,.p794grid em{display:block;font-size:5px;color:#70817c;font-style:normal}.p794grid b{display:block;font-size:8px;color:#dbe8e5;margin:2px 0}.p794grid .net{border-color:rgba(84,246,197,.28)}.p794grid .net b,.p794grid .net em{color:var(--accent)}.p794 p{font-size:5px;color:#71827d;margin:5px 0 0;line-height:1.35}.flow794{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:5px}.flow794 span{font-size:4.8px;color:#70817c;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:4px}.flow794 b{display:block;color:var(--accent);font-size:6px;margin-top:1px}';document.head.appendChild(s)}
+ }
+ function paint(d){ensure();const g=+d?.forecast?.gross,t=+d?.forecast?.tax,n=+d?.forecast?.net;if(!Number.isFinite(g)||!Number.isFinite(n))return;const rate=g?Math.abs(t)/g*100:0,keep=g?n/g*100:0;
+  [['p794gross',rub(g)],['p794tax','−'+rub(Math.abs(t))],['p794net',rub(n)],['p794taxPct',rate.toFixed(0)+'%'],['p794keep',keep.toFixed(0)+'%'],['f794gross',rub(g)],['f794tax','−'+rub(Math.abs(t))],['f794net',rub(n)]].forEach(([id,v])=>{if($(id))$(id).textContent=v});
+  const monthly=n/12,annual=n,total=+window.dashboardData?.portfolio?.value||+window.dashboardData?.value||0;
+  if($('flowMonthly'))$('flowMonthly').textContent=rub(monthly);
+  if($('flowAnnual'))$('flowAnnual').textContent=rub(annual);
+  if($('flowDaily'))$('flowDaily').textContent=rub(annual/365);
+  if($('flowYield'))$('flowYield').textContent=total?(annual/total*100).toFixed(1).replace('.',',')+'%':'—';
+  const lab=document.querySelector('.flowValue span');if(lab)lab.textContent='/ МЕС · НА РУКИ';const yl=document.querySelector('.flowYield span');if(yl)yl.textContent='прогноз 12 мес / капитал';
+ }
+ async function load(){if(!document.body.classList.contains('pulse-active'))return;try{const r=await fetch('/api/payouts?v=7.9.4&t='+Date.now(),{cache:'no-store'}),d=await r.json();if(r.ok)paint(d)}catch(e){}}
+ new MutationObserver(()=>{if(document.body.classList.contains('pulse-active'))setTimeout(load,500)}).observe(document.body,{attributes:true,attributeFilter:['class']});document.addEventListener('click',e=>{if(e.target.closest('#pulseBtn,#scoreRing'))setTimeout(load,900)});setTimeout(load,1200);
+})();
