@@ -183,6 +183,7 @@ function render(d){
     const empty=$('chartEmpty');if(empty){empty.textContent='История временно недоступна';empty.style.display='flex';}
   }
   pulseDataCards();
+  if(proMode)proRender(d);
 }
 document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click',()=>{
   document.querySelectorAll('.chartTab').forEach(b=>b.classList.remove('active'));
@@ -191,6 +192,71 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   if(dashboardData){renderChart(dashboardData.history);requestAnimationFrame(positionChartNode);}
 }));
 async function load(){try{const r=await fetch('/api/dashboard?v=6.2&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);setText('hudPulseState','ERR');const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+
+
+// v6.3 — PRO CAPITAL TERMINAL. This is an alternate presentation of the same live data;
+// the original Terminal and Pulse Röntgen views are preserved unchanged.
+let proMode=false;
+function proPath(values){
+  const a=values.map(Number).filter(v=>Number.isFinite(v)&&v>0);
+  if(a.length<2)return {path:'',area:''};
+  const min=Math.min(...a),max=Math.max(...a),span=Math.max(0.0001,max-min);
+  const pts=a.map((v,i)=>{const x=i/(a.length-1)*600;const y=12+(1-(v-min)/span)*126;return [x,y]});
+  const path=pts.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  return {path,area:path+' L600 148 L0 148 Z',last:pts[pts.length-1]};
+}
+function proRenderChart(d){
+  const pts=Array.isArray(d?.history?.points)?d.history.points:[];
+  const p=pts.map(x=>Number(x?.portfolio)).filter(v=>Number.isFinite(v)&&v>0);
+  const m=pts.map(x=>Number(x?.imoex)).filter(v=>Number.isFinite(v)&&v>0);
+  const pp=proPath(p), mm=proPath(m);
+  setAttr('proPortfolioPath','d',pp.path);setAttr('proPortfolioArea','d',pp.area);setAttr('proMoexPath','d',mm.path);
+  if(pp.last){setAttr('proChartDot','cx',pp.last[0]);setAttr('proChartDot','cy',pp.last[1]);}
+  setText('proChartEnd',p.length?`СЕЙЧАС ${p[p.length-1].toFixed(1).replace('.',',')}`:'СЕЙЧАС —');
+}
+function setAttr(id,name,value){const el=$(id);if(el)el.setAttribute(name,String(value));return el}
+function proRender(d){
+  const p=d?.portfolio||{}, pts=Array.isArray(d?.history?.points)?d.history.points:[];
+  const ps=pts.map(x=>Number(x?.portfolio)).filter(v=>Number.isFinite(v)&&v>0);
+  const ms=pts.map(x=>Number(x?.imoex)).filter(v=>Number.isFinite(v)&&v>0);
+  const p0=ps[0]||100,p1=ps[ps.length-1]||p0,m0=ms[0]||100,m1=ms[ms.length-1]||m0;
+  const pr=(p1/p0-1)*100,mr=(m1/m0-1)*100,vs=pr-mr;
+  const monthly=Number(d?.passiveIncome?.averageMonthly), total=Number(p.value)||0;
+  const assets=Array.isArray(d?.assets)?d.assets:(Array.isArray(p.assets)?p.assets:[]);
+  const sorted=[...assets].sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0));
+  const top=sorted.slice(0,4), maxVal=Math.max(...top.map(x=>Number(x.currentValue)||0),1);
+  const age=p.startDate?Math.max(0,Math.round((Date.now()-new Date(p.startDate).getTime())/86400000)):null;
+  const peak=ps.reduce((mx,v)=>Math.max(mx,v),p0); let dd=0; for(const v of ps) if(peak>0) dd=Math.max(dd,(peak-v)/peak*100);
+  const incomeYield=Number.isFinite(monthly)&&total>0?monthly*12/total*100:0;
+  const flowBar=clamp(Math.round(Math.min(100,incomeYield*14)),10,100);
+  const risk=Math.round(clamp(dd*7+(sorted[0]&&total>0?(Number(sorted[0].currentValue)||0)/total*100:0)*.7,5,100));
+  setText('proValue',rub(p.value));
+  setText('proGain',p.profitPercent==null?'—':`${p.profitPercent>=0?'+':''}${pct(p.profitPercent)}`);
+  setStyle('proGain','color',Number(p.profitPercent)>=0?'var(--accent)':'#ff6575');
+  setText('proHeroText',pr>=0?'Капитал держит курс и продолжает работать.':'Капитал проходит коррекцию. Система продолжает работать.');
+  setText('proProfit',rub(p.profit));setText('proProfitPct',p.profitPercent==null?'—':pct(p.profitPercent));setText('proXirr',p.xirr==null?'—':pct(p.xirr));
+  setText('proVsMoex',`${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} п.п.`);setStyle('proVsMoex','color',vs>=0?'var(--accent)':'#ff6575');setText('proVsText',vs>=0?'обгоняем индекс':'отстаём от индекса');
+  setText('proAssetCount',`${assets.length} АКТИВОВ`);setText('proAge',age==null?'—':`${age} ДН.`);setText('proUpdated',`SYNC ${new Date(d?.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`);
+  setText('proChartBadge',vs>=0?'INDEX BEAT':'INDEX CHASE');proRenderChart(d);
+  const hold=$('proHoldings');
+  if(hold){hold.innerHTML=top.map((a,i)=>{const v=Number(a.currentValue)||0,w=total>0?v/total*100:0,bw=v/maxVal*100;return `<div class="holdingRow"><span>${i===0?'◆':i===1?'◇':i===2?'◈':'○'} ${a.ticker||a.name||'—'}</span><i><em style="width:${bw.toFixed(1)}%"></em></i><b>${w.toFixed(1).replace('.',',')}%</b></div>`}).join('');}
+  setText('proHoldingsScore',sorted[0]&&total>0?`${((Number(sorted[0].currentValue)||0)/total*100).toFixed(1).replace('.',',')}% TOP`:'—');
+  setText('proMonthly',Number.isFinite(monthly)?rub(monthly):'—');setText('proDaily',Number.isFinite(monthly)?rub(monthly/30.4375):'—');setText('proAnnual',Number.isFinite(monthly)?rub(monthly*12):'—');setText('proFlowState',incomeYield>=5?'STRONG':'ACTIVE');setStyle('proFlowBar','width',flowBar+'%');setText('proFlowSignal',incomeYield>=5?'ПАССИВНЫЙ ДВИГАТЕЛЬ РАБОТАЕТ':'ПОТОК СТАБИЛЬНО ПОДАЁТСЯ');
+  const pBar=clamp(p1/(p1+m1)*100,18,82);setStyle('proBattlePortfolio','width',pBar+'%');setStyle('proBattleMoex','width',(100-pBar)+'%');setText('proBattleTitle',vs>=0?'ПОРТФЕЛЬ ВПЕРЕДИ':'ДОГОНЯЕМ IMOEX');setText('proBattleP',`${pr>=0?'+':''}${pr.toFixed(1).replace('.',',')}%`);setText('proBattleM',`${mr>=0?'+':''}${mr.toFixed(1).replace('.',',')}%`);
+  const c=d?.cbr||{};setText('proRate',Number.isFinite(Number(c.rate))?`${Number(c.rate).toFixed(2).replace('.',',')}%`:'—');setText('proRateDate',c.rateDate?`с ${shortDate(c.rateDate)}`:'Банк России');setText('proMeeting',c.nextMeeting?shortDate(c.nextMeeting):'—');
+  setText('proFooterText',incomeYield>=5?'ДЕНЕЖНЫЙ ПОТОК СИЛЬНЫЙ':dd>=8?'ПЕРЕЖИЛИ ПРОСАДКУ':'ДЕНЬГИ РАБОТАЮТ');
+  document.body.dataset.proRisk=risk>=70?'high':risk>=40?'mid':'low';
+}
+function enterPro(){
+  if(pulseMode)exitPulse();
+  proMode=true;document.body.classList.add('pro-active');$('proView')?.setAttribute('aria-hidden','false');$('proBtn')?.classList.add('active');
+  setText('proBtn','TERMINAL');
+  if(dashboardData)proRender(dashboardData);
+}
+function exitPro(){proMode=false;document.body.classList.remove('pro-active');$('proView')?.setAttribute('aria-hidden','true');$('proBtn')?.classList.remove('active');setText('proBtn','PRO');}
+function togglePro(){proMode?exitPro():enterPro();}
+$('proBtn')?.addEventListener('click',togglePro);$('proBack')?.addEventListener('click',exitPro);
+
 let pulseMode=false;
 let pulseLongTimer=null;
 let pulseScanToken=0;
@@ -350,3 +416,53 @@ $('pulseBtn').addEventListener('pointerdown',()=>{pulseLongTimer=setTimeout(()=>
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('pulseBtn').addEventListener(ev,()=>{if(pulseLongTimer){clearTimeout(pulseLongTimer);pulseLongTimer=null;}}));
 
 load();setInterval(load,60000);
+
+// v6.4 — FUND INTEL UI
+let intelData=null;
+let intelLoading=false;
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function intelAgo(iso){const ms=Date.now()-new Date(iso).getTime();if(!Number.isFinite(ms)||ms<0)return 'сейчас';const h=Math.floor(ms/3600000);if(h<1)return 'меньше часа назад';if(h<24)return `${h} ч назад`;return `${Math.floor(h/24)} дн назад`;}
+function intelOpen(){const modal=$('intelModal');if(!modal)return;modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(intelData)renderIntel(intelData);else loadIntel();}
+function intelClose(){const modal=$('intelModal');if(!modal)return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
+function renderIntel(data){
+  intelData=data||{};
+  const list=$('intelList'), summary=$('intelSummary');
+  if(summary)summary.textContent=data?.summary||'Новости по портфелю пока недоступны.';
+  if($('intelUpdated'))setText('intelUpdated',data?.generatedAt?`ОБНОВЛЕНО ${new Date(data.generatedAt).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`:'LIVE');
+  if(!list)return;
+  const items=Array.isArray(data?.items)?data.items:[];
+  if(!items.length){list.innerHTML='<div class="intelEmpty">За последние 72 часа заметных событий по основным позициям не найдено.<br>Это тоже сигнал: поводов срочно дёргать портфель сейчас нет.</div>';return;}
+  list.innerHTML=items.map(item=>{
+    const cls=['pos','neg','neu'].includes(item.sentimentClass)?item.sentimentClass:'neu';
+    const label=escapeHtml(item.sentiment||'НЕЙТРАЛЬНО');
+    const title=escapeHtml(item.title||'Без заголовка');
+    const ticker=escapeHtml(item.ticker||item.name||'—');
+    const source=escapeHtml(item.source||'Источник');
+    const why=escapeHtml(item.why||'');
+    const advice=escapeHtml(item.advice||'Наблюдать.');
+    const link=escapeHtml(item.link||'#');
+    return `<article class="intelItem"><div class="intelItemTop"><span class="intelTicker">${ticker}</span><span class="intelTag ${cls}">${label}</span></div><div class="intelTitle">${title}</div><div class="intelWhy">${why} · ${escapeHtml(intelAgo(item.publishedAt))} · важность ${Number(item.importance)||0}/100</div><div class="intelAction"><b>Что делать:</b> ${advice}</div><a class="intelSource" href="${link}" target="_blank" rel="noopener noreferrer">↗ ${source} · открыть источник</a></article>`;
+  }).join('');
+}
+async function loadIntel(force=false){
+  if(intelLoading)return;
+  if(intelData&&!force){renderIntel(intelData);return;}
+  intelLoading=true;
+  const list=$('intelList');if(list)list.innerHTML='<div class="intelLoading">✦ СКАНИРУЮ НОВОСТИ ПО ТВОИМ ПОЗИЦИЯМ…</div>';
+  if($('intelSummary'))setText('intelSummary','Смотрю сначала на самые крупные позиции и события за последние 72 часа.');
+  try{
+    const r=await fetch('/api/intel?v=6.4&t='+Date.now(),{cache:'no-store'});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+    renderIntel(d);
+  }catch(e){
+    console.error('Intel error:',e);
+    if($('intelSummary'))setText('intelSummary','Не удалось получить ленту новостей. Можно повторить обновление.');
+    if(list)list.innerHTML='<div class="intelEmpty">Новости временно недоступны.<br>Нажми «ОБНОВИТЬ» и попробуем ещё раз.</div>';
+  }finally{intelLoading=false;}
+}
+$('intelBtn')?.addEventListener('click',intelOpen);
+$('intelClose')?.addEventListener('click',intelClose);
+$('intelBackdrop')?.addEventListener('click',intelClose);
+$('intelRefresh')?.addEventListener('click',()=>loadIntel(true));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')intelClose();});

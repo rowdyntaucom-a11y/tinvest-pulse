@@ -160,8 +160,9 @@ function errorInfo(err) {
 
 async function safeFetch(url, options = {}) {
   try {
+    const { maxTextLength = 2000, ...fetchOptions } = options;
     const response = await fetch(url, {
-      ...options,
+      ...fetchOptions,
       signal: AbortSignal.timeout(15000)
     });
 
@@ -170,7 +171,7 @@ async function safeFetch(url, options = {}) {
       ok: response.ok,
       status: response.status,
       statusText: response.statusText,
-      text: text.slice(0, 2000)
+      text: text.slice(0, maxTextLength)
     };
   } catch (err) {
     return {
@@ -926,6 +927,186 @@ async function getMoex() {
     return { available: false, error: errorInfo(err) };
   }
 }
+
+
+// v6.4 — FUND INTEL. Lightweight news intelligence for the actual portfolio.
+// Uses public RSS search, caches results, and never exposes the T-Invest token.
+const INTEL_CACHE = new Map();
+const INTEL_CACHE_TTL_MS = 10 * 60 * 1000;
+
+function xmlDecode(value) {
+  return String(value || '')
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, '$1')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
+}
+
+function stripMarkup(value) {
+  return xmlDecode(value).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function rssTag(block, tag) {
+  const re = new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, 'i');
+  return stripMarkup(block.match(re)?.[1] || '');
+}
+
+function parseGoogleNewsRss(xml) {
+  const items = [];
+  const blocks = String(xml || '').match(/<item>[\s\S]*?<\/item>/gi) || [];
+  for (const block of blocks) {
+    const title = rssTag(block, 'title');
+    const link = rssTag(block, 'link');
+    const source = rssTag(block, 'source');
+    const description = rssTag(block, 'description');
+    const pubDate = rssTag(block, 'pubDate');
+    const date = pubDate ? new Date(pubDate) : null;
+    if (!title || !link || !date || !Number.isFinite(date.getTime())) continue;
+    items.push({ title, link, source: source || 'Новости', description, publishedAt: date.toISOString() });
+  }
+  return items;
+}
+
+function intelSentiment(item) {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  const positive = [
+    'рост прибыли','рост выручки','рекордн','увеличил прибыль','увеличила прибыль','повысил прогноз',
+    'повысила прогноз','дивиденд','buyback','выкуп акций','новый контракт','крупный контракт',
+    'одобрил','одобрена','запуск','рост добычи','рост производства','снижение долга','погашение долга'
+  ];
+  const negative = [
+    'санкци','ограничени','запрет','снизил прогноз','снизила прогноз','снижение прибыли','падение прибыли',
+    'убыток','авари','пожар','иск','штраф','налог','дефолт','долг вырос','сократил дивиденд',
+    'сокращение дивиденд','снижение добычи','снижение производства','экспорт запрещ','понизил рейтинг'
+  ];
+  const p = positive.filter(x => text.includes(x)).length;
+  const n = negative.filter(x => text.includes(x)).length;
+  if (n > p && n > 0) return { label:'НЕГАТИВ', cls:'neg', score:-n };
+  if (p > n && p > 0) return { label:'ПОЗИТИВ', cls:'pos', score:p };
+  return { label:'НЕЙТРАЛЬНО', cls:'neu', score:0 };
+}
+
+function intelImportance(item, weight) {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  const critical = ['дивиденд','санкци','отчет','финансов','прогноз','налог','суд','авари','запрет','buyback','ставк','экспорт','золото','нефть'];
+  const hits = critical.filter(x => text.includes(x)).length;
+  const ageH = Math.max(0, (Date.now() - new Date(item.publishedAt).getTime()) / 3600000);
+  let score = hits * 18 + Math.min(30, Math.max(0, 30 - ageH));
+  if (weight >= 20) score += 22;
+  else if (weight >= 10) score += 12;
+  return Math.round(Math.min(100, score));
+}
+
+function intelAdvice(item, asset, sentiment) {
+  const weight = Number(asset.weight) || 0;
+  const name = asset.ticker || asset.name || 'бумага';
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  if (sentiment.cls === 'neg') {
+    if (weight >= 15) return `Внимание: ${name} занимает ${weight.toFixed(1).replace('.', ',')}% портфеля. Наблюдать, но не принимать решение на эмоциях.`;
+    return 'Негативный фактор. Пока разумнее держать и следить за подтверждением новости в первоисточнике.';
+  }
+  if (sentiment.cls === 'pos') {
+    if (text.includes('дивиденд') || text.includes('buyback') || text.includes('выкуп')) return 'Позитив для держателя. Проверить условия и дату события, затем держать по плану.';
+    return 'Позитивный фактор. Сам по себе не повод догонять цену, лучше проверить первоисточник и подтверждение.';
+  }
+  return 'Существенного сигнала для смены позиции не видно. Наблюдать в контексте остальных факторов.';
+}
+
+async function getAssetNews(asset) {
+  const ticker = String(asset?.ticker || '').trim();
+  const name = String(asset?.name || '').trim();
+  const query = [ticker, name].filter(Boolean).join(' ');
+  if (!query) return [];
+  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ru&gl=RU&ceid=RU:ru`;
+  const result = await safeFetch(url, { maxTextLength: 50000, headers: { 'User-Agent': 'tinvest-pulse/6.4' } });
+  if (!result.ok) return [];
+  return parseGoogleNewsRss(result.text);
+}
+
+async function buildIntel() {
+  const accountsResponse = await getAccounts();
+  const account = selectAccount(accountsResponse);
+  if (!account?.id) return { available:false, items:[], summary:'Не найден открытый счёт.' };
+  const portfolio = await getPortfolio(account.id);
+  const positions = (portfolio?.positions || []).map(p => ({
+    figi: p.figi,
+    ticker: p.ticker || p.instrumentUid || p.figi,
+    name: p.name || p.ticker || p.figi,
+    currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice)
+  }));
+  const total = moneyValue(portfolio?.totalAmountPortfolio) || positions.reduce((s,p)=>s+p.currentValue,0);
+  const assets = positions
+    .filter(p => p.currentValue > 0)
+    .map(p => ({ ...p, weight: total > 0 ? p.currentValue / total * 100 : 0 }))
+    .sort((a,b)=>b.currentValue-a.currentValue)
+    .slice(0, 8);
+
+  const all = [];
+  for (let i=0;i<assets.length;i+=4) {
+    const batch = assets.slice(i,i+4);
+    const rows = await Promise.all(batch.map(async asset => ({ asset, news: await getAssetNews(asset) })));
+    all.push(...rows);
+  }
+
+  const cutoff = Date.now() - 72 * 3600000;
+  const items = [];
+  for (const row of all) {
+    for (const item of row.news) {
+      const ts = new Date(item.publishedAt).getTime();
+      if (!Number.isFinite(ts) || ts < cutoff) continue;
+      const sentiment = intelSentiment(item);
+      const importance = intelImportance(item, row.asset.weight);
+      items.push({
+        ...item,
+        ticker: row.asset.ticker,
+        name: row.asset.name,
+        weight: row.asset.weight,
+        sentiment: sentiment.label,
+        sentimentClass: sentiment.cls,
+        importance,
+        advice: intelAdvice(item, row.asset, sentiment),
+        why: `${row.asset.ticker || row.asset.name} = ${row.asset.weight.toFixed(1).replace('.', ',')}% портфеля`
+      });
+    }
+  }
+
+  const unique = [];
+  const seen = new Set();
+  for (const item of items.sort((a,b)=>b.importance-a.importance || new Date(b.publishedAt)-new Date(a.publishedAt))) {
+    const key = item.title.toLowerCase().replace(/\W+/g,'').slice(0,120);
+    if (seen.has(key)) continue;
+    seen.add(key); unique.push(item);
+    if (unique.length >= 5) break;
+  }
+
+  const negative = unique.filter(x=>x.sentimentClass==='neg').length;
+  const positive = unique.filter(x=>x.sentimentClass==='pos').length;
+  const summary = unique.length
+    ? `Найдено ${unique.length} заметных событий: ${negative} негативных, ${positive} позитивных. Сначала смотрим на бумаги с большим весом.`
+    : 'За последние 72 часа заметных событий по основным позициям не найдено.';
+  return { available:true, generatedAt:new Date().toISOString(), items:unique, summary };
+}
+
+app.get('/api/intel', async (req, res) => {
+  try {
+    const key = 'portfolio';
+    const cached = INTEL_CACHE.get(key);
+    if (cached && Date.now() - cached.createdAt < INTEL_CACHE_TTL_MS) {
+      res.setHeader('Cache-Control','no-store');
+      return res.json(cached.data);
+    }
+    const data = await buildIntel();
+    INTEL_CACHE.set(key, {createdAt:Date.now(), data});
+    res.setHeader('Cache-Control','no-store');
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({available:false,items:[],summary:'Не удалось обновить новости.',error:err.message});
+  }
+});
 
 async function buildDashboard() {
   const accountsResponse = await getAccounts();
