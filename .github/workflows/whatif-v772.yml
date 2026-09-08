@@ -1,0 +1,39 @@
+name: WHAT IF v7.7.2
+on:
+  push:
+    paths:
+      - '.github/workflows/whatif-v772.yml'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch WHAT IF numbers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('public/v77.js')
+          s=p.read_text()
+          s=s.replace("SERVER_WHAT_IF · v7.7.1", "SERVER_WHAT_IF · v7.7.2")
+          s=s.replace("SCENARIO ENGINE · v7.7.1", "SCENARIO ENGINE · v7.7.2")
+          old='''<div class="w77break"><div><small>РЫНОК</small><b class="${marketRub>=0?'good':'bad'}">${srub(marketRub)}</b></div><div><small>СТАВКА</small><b class="${rateRub>=0?'good':'bad'}">${srub(rateRub)}</b></div><div><small>ПОПОЛНЕНИЕ</small><b>${srub(contribution)}</b></div></div>'''
+          new='''<div class="w77break"><div><small>РЫНОК</small><b class="${marketRub>=0?'good':'bad'}">${srub(marketRub)}</b><span>${marketRub>=0?'поддержка':'давление'} акций</span></div><div><small>СТАВКА</small><b class="${rateRub>=0?'good':'bad'}">${srub(rateRub)}</b><span>${rateRub>=0?'поддержка':'давление'} облигаций</span></div><div><small>ПОПОЛНЕНИЕ</small><b>${srub(contribution)}</b><span>внесённые деньги</span></div></div><div class="w77net"><small>ЧИСТЫЙ ЭФФЕКТ СЦЕНАРИЯ</small><b class="${pnl>=0?'good':'bad'}">${srub(pnl)}</b><strong class="${pnl>=0?'good':'bad'}">${pnl>=0?'+':''}${f2(impactPct)}%</strong></div>'''
+          if old not in s:
+              raise SystemExit('target block not found')
+          s=s.replace(old,new)
+          s=s.replace(".w77break b{display:block;font-size:10px}", ".w77break b{display:block;font-size:12px;margin-top:2px}.w77break span{display:block;font-size:5px;color:#71827d;margin-top:2px}.w77net{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-top:7px;padding:10px 11px;border:1px solid rgba(84,246,197,.16);border-radius:11px;background:rgba(255,255,255,.018)}.w77net small{font-size:5px;color:#71827d;letter-spacing:.6px}.w77net b{font-size:13px}.w77net strong{font-size:11px}")
+          p.write_text(s)
+          idx=Path('public/index.html')
+          t=idx.read_text()
+          t=t.replace('/v77.js?v=7.7.1','/v77.js?v=7.7.2')
+          idx.write_text(t)
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/v77.js public/index.html
+          git commit -m 'v7.7.2 show WHAT IF impact numbers' || exit 0
+          git push
