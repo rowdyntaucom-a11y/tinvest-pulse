@@ -1006,14 +1006,71 @@ function intelAdvice(item, asset, sentiment) {
   const name = asset.ticker || asset.name || 'бумага';
   const text = `${item.title} ${item.description}`.toLowerCase();
   if (sentiment.cls === 'neg') {
-    if (weight >= 15) return `Внимание: ${name} занимает ${weight.toFixed(1).replace('.', ',')}% портфеля. Наблюдать, но не принимать решение на эмоциях.`;
-    return 'Негативный фактор. Пока разумнее держать и следить за подтверждением новости в первоисточнике.';
+    if (weight >= 20) return `ДЕРЖАТЬ / НАБЛЮДАТЬ. ${name} занимает ${weight.toFixed(1).replace('.', ',')}% портфеля, поэтому событие важно, но одной новости недостаточно для резкого решения.`;
+    if (weight >= 10) return `НАБЛЮДАТЬ. Фактор заметный, но лучше дождаться подтверждения в первоисточнике и следующих данных компании.`;
+    return 'НАБЛЮДАТЬ. Негативный фактор пока не выглядит достаточным основанием менять долгосрочную позицию.';
   }
   if (sentiment.cls === 'pos') {
-    if (text.includes('дивиденд') || text.includes('buyback') || text.includes('выкуп')) return 'Позитив для держателя. Проверить условия и дату события, затем держать по плану.';
-    return 'Позитивный фактор. Сам по себе не повод догонять цену, лучше проверить первоисточник и подтверждение.';
+    if (text.includes('дивиденд') || text.includes('buyback') || text.includes('выкуп')) return 'ДЕРЖАТЬ / ПРОВЕРИТЬ. Позитивно для держателя, но условия и даты события важнее самого заголовка.';
+    return 'ДЕРЖАТЬ / НАБЛЮДАТЬ. Позитивный фактор есть, но догонять цену только из-за новости не стоит.';
   }
-  return 'Существенного сигнала для смены позиции не видно. Наблюдать в контексте остальных факторов.';
+  return 'ДЕРЖАТЬ / НАБЛЮДАТЬ. Существенного сигнала для смены позиции пока не видно.';
+}
+
+function intelHorizon(item) {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  if (/дивиденд|buyback|выкуп|отчет|финансов|прибыл|выручк/.test(text)) return '3–12 мес.';
+  if (/авари|пожар|атак|нпз|санкци|запрет|экспорт/.test(text)) return 'дни–квартал';
+  return 'долгосрок';
+}
+
+function intelScenarios(item, asset, sentiment) {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  const name = asset.ticker || asset.name || 'компания';
+  if (/нпз|атака|авари|пожар/.test(text)) return {
+    base:`${name} постепенно возвращается к нормальной работе, а влияние события на результаты ограничивается несколькими периодами.`,
+    bull:`Восстановление проходит быстрее ожиданий и операционные показатели нормализуются.`,
+    bear:`Восстановление затягивается или повторяются сбои, что усиливает давление на результаты и оценку компании.`
+  };
+  if (/дивиденд|buyback|выкуп/.test(text)) return {
+    base:`Решение реализуется по объявленным условиям и уже в основном отражено в ожиданиях рынка.`,
+    bull:`Условия оказываются лучше ожиданий или появляются дополнительные выплаты/выкуп.`,
+    bear:`Условия ухудшаются, сроки сдвигаются или рынок закладывает меньший денежный поток.`
+  };
+  if (/санкци|запрет|ограничени|налог|экспорт/.test(text)) return {
+    base:`Компания адаптируется, а прямой эффект остаётся управляемым.`,
+    bull:`Ограничение оказывается мягче ожиданий или компания быстро находит замену.`,
+    bear:`Ограничения усиливаются и начинают заметно давить на продажи, маржу или дивиденды.`
+  };
+  if (/прибыл|выручк|отчет|финансов|прогноз/.test(text)) return {
+    base:`Фактические результаты близки к ожиданиям, тезис по компании не меняется.`,
+    bull:`Результаты или прогноз оказываются лучше ожиданий и поддерживают переоценку.`,
+    bear:`Результаты слабее ожиданий, а прогноз снижается или становится осторожнее.`
+  };
+  if (sentiment.cls==='pos') return {
+    base:`Новость остаётся позитивным фоном, но без подтверждения в цифрах эффект может быстро ослабнуть.`,
+    bull:`Фактор подтверждается новыми данными и улучшает ожидания по компании.`,
+    bear:`Рынок игнорирует новость или появляются встречные негативные факторы.`
+  };
+  if (sentiment.cls==='neg') return {
+    base:`Негативный фактор постепенно нормализуется без серьёзного ущерба для долгосрочного тезиса.`,
+    bull:`Проблема решается быстрее ожиданий и давление на компанию снижается.`,
+    bear:`Проблема затягивается и начинает отражаться на результатах или дивидендах.`
+  };
+  return {
+    base:`Ситуация остаётся близкой к текущей, без достаточного основания менять позицию.`,
+    bull:`Появляются подтверждающие данные, которые улучшают ожидания по ${name}.`,
+    bear:`Появляется новый негативный фактор, меняющий экономику события.`
+  };
+}
+
+function intelConfidence(item, importance, sentiment) {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  let score = 54 + Math.min(18, Number(importance)||0)/5;
+  if (/официаль|компани|алекс|цб|минфин|бирж/.test(text)) score += 8;
+  if (sentiment.cls !== 'neu') score += 5;
+  if (item.source && !/google|yandex/i.test(item.source)) score += 5;
+  return Math.round(Math.max(35, Math.min(88, score)));
 }
 
 async function getAssetNews(asset) {
@@ -1033,62 +1090,72 @@ async function buildIntel() {
   if (!account?.id) return { available:false, items:[], summary:'Не найден открытый счёт.' };
   const portfolio = await getPortfolio(account.id);
   const positions = (portfolio?.positions || []).map(p => ({
-    figi: p.figi,
-    ticker: p.ticker || p.instrumentUid || p.figi,
-    name: p.name || p.ticker || p.figi,
-    currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice)
+    figi:p.figi,
+    ticker:p.ticker || p.instrumentUid || p.figi,
+    name:p.name || p.ticker || p.figi,
+    currentValue:moneyValue(p.quantity) * moneyValue(p.currentPrice)
   }));
   const total = moneyValue(portfolio?.totalAmountPortfolio) || positions.reduce((s,p)=>s+p.currentValue,0);
-  const assets = positions
-    .filter(p => p.currentValue > 0)
-    .map(p => ({ ...p, weight: total > 0 ? p.currentValue / total * 100 : 0 }))
-    .sort((a,b)=>b.currentValue-a.currentValue)
-    .slice(0, 8);
+  const assets = positions.filter(p=>p.currentValue>0).map(p=>({...p,weight:total>0?p.currentValue/total*100:0}))
+    .sort((a,b)=>b.currentValue-a.currentValue).slice(0,8);
 
-  const all = [];
-  for (let i=0;i<assets.length;i+=4) {
-    const batch = assets.slice(i,i+4);
-    const rows = await Promise.all(batch.map(async asset => ({ asset, news: await getAssetNews(asset) })));
+  const all=[];
+  for(let i=0;i<assets.length;i+=4){
+    const rows=await Promise.all(assets.slice(i,i+4).map(async asset=>({asset,news:await getAssetNews(asset)})));
     all.push(...rows);
   }
-
-  const cutoff = Date.now() - 72 * 3600000;
-  const items = [];
-  for (const row of all) {
-    for (const item of row.news) {
-      const ts = new Date(item.publishedAt).getTime();
-      if (!Number.isFinite(ts) || ts < cutoff) continue;
-      const sentiment = intelSentiment(item);
-      const importance = intelImportance(item, row.asset.weight);
-      items.push({
-        ...item,
-        ticker: row.asset.ticker,
-        name: row.asset.name,
-        weight: row.asset.weight,
-        sentiment: sentiment.label,
-        sentimentClass: sentiment.cls,
-        importance,
-        advice: intelAdvice(item, row.asset, sentiment),
-        why: `${row.asset.ticker || row.asset.name} = ${row.asset.weight.toFixed(1).replace('.', ',')}% портфеля`
-      });
-    }
+  const cutoff=Date.now()-72*3600000;
+  const grouped=[];
+  for(const row of all){
+    const fresh=row.news.filter(n=>{const t=new Date(n.publishedAt).getTime();return Number.isFinite(t)&&t>=cutoff;});
+    if(!fresh.length) continue;
+    const enriched=fresh.map(item=>{
+      const sentiment=intelSentiment(item), importance=intelImportance(item,row.asset.weight);
+      return {...item,sentiment,importance,confidence:intelConfidence(item,importance,sentiment)};
+    }).sort((a,b)=>b.importance-a.importance || new Date(b.publishedAt)-new Date(a.publishedAt));
+    const lead=enriched[0];
+    const pos=enriched.filter(x=>x.sentiment.cls==='pos').length, neg=enriched.filter(x=>x.sentiment.cls==='neg').length;
+    const direction=neg>pos?'neg':pos>neg?'pos':lead.sentiment.cls;
+    const sentiment=direction==='neg'?{label:'РИСК-ФАКТОР',cls:'neg'}:direction==='pos'?{label:'ПОДДЕРЖКА',cls:'pos'}:{label:'БЕЗ СДВИГА',cls:'neu'};
+    const importance=Math.min(100,Math.round(lead.importance + Math.min(12,(enriched.length-1)*3)));
+    const confidence=Math.max(42,Math.min(91,Math.round(enriched.slice(0,4).reduce((a,x)=>a+x.confidence,0)/Math.min(4,enriched.length) + Math.min(6,(enriched.length-1)*2))));
+    const weight=row.asset.weight;
+    const ticker=row.asset.ticker||row.asset.name;
+    const scenarios=intelScenarios(lead,row.asset,sentiment);
+    const status=importance>=70?'ТРЕБУЕТ ВНИМАНИЯ':importance>=45?'НАБЛЮДАТЬ':'ФОН';
+    const whatChanged=enriched.length>1
+      ? `За 72 часа найдено ${enriched.length} связанных публикаций. Главная тема: ${lead.title}`
+      : `Зафиксировано новое событие: ${lead.title}`;
+    const meaning=weight>=20
+      ? `${ticker} — одна из крупнейших позиций (${weight.toFixed(1).replace('.',',')}%). Даже умеренное изменение факторов компании заметно для всего портфеля.`
+      : weight>=10
+      ? `Вес ${ticker} — ${weight.toFixed(1).replace('.',',')}%. Событие способно заметно повлиять на результат, но не определяет портфель целиком.`
+      : `Вес ${ticker} — ${weight.toFixed(1).replace('.',',')}%. Влияние на весь портфель ограничено, пока событие не перерастает в системный фактор.`;
+    const txt=`${lead.title} ${lead.description}`.toLowerCase();
+    let breaker='Появление подтверждённых данных, которые заметно меняют прибыль, денежный поток или долговую нагрузку компании.';
+    if(/дивиденд|buyback|выкуп/.test(txt)) breaker='Изменение размера, условий или сроков выплаты/выкупа относительно объявленных параметров.';
+    else if(/санкци|запрет|ограничени|экспорт/.test(txt)) breaker='Расширение ограничений до уровня, который устойчиво ухудшает продажи, маржу или денежный поток.';
+    else if(/авари|пожар|нпз|атак/.test(txt)) breaker='Затяжной простой, повторные повреждения или подтверждённое существенное снижение производства.';
+    else if(/отчет|прибыл|выручк|прогноз/.test(txt)) breaker='Следующий отчёт или прогноз, который подтвердит устойчивое отклонение ключевых показателей от текущего сценария.';
+    grouped.push({
+      title:lead.title,link:lead.link,source:lead.source,publishedAt:lead.publishedAt,
+      ticker,name:row.asset.name,weight,stories:enriched.length,
+      sentiment:sentiment.label,sentimentClass:sentiment.cls,importance,
+      impactLabel:importance>=70?'ВЫСОКОЕ':importance>=45?'СРЕДНЕЕ':'НИЗКОЕ',confidence,
+      horizon:intelHorizon(lead),scenarios,status,whatChanged,meaning,thesisBreaker:breaker,
+      sources:enriched.slice(0,3).map(x=>({title:x.title,source:x.source,link:x.link,publishedAt:x.publishedAt}))
+    });
   }
-
-  const unique = [];
-  const seen = new Set();
-  for (const item of items.sort((a,b)=>b.importance-a.importance || new Date(b.publishedAt)-new Date(a.publishedAt))) {
-    const key = item.title.toLowerCase().replace(/\W+/g,'').slice(0,120);
-    if (seen.has(key)) continue;
-    seen.add(key); unique.push(item);
-    if (unique.length >= 5) break;
-  }
-
-  const negative = unique.filter(x=>x.sentimentClass==='neg').length;
-  const positive = unique.filter(x=>x.sentimentClass==='pos').length;
-  const summary = unique.length
-    ? `Найдено ${unique.length} заметных событий: ${negative} негативных, ${positive} позитивных. Сначала смотрим на бумаги с большим весом.`
+  grouped.sort((a,b)=>b.importance-a.importance || b.weight-a.weight);
+  const items=grouped.slice(0,5);
+  const critical=items.filter(x=>x.importance>=80 && x.sentimentClass==='neg').length;
+  const attention=items.filter(x=>x.importance>=60).length;
+  const neutral=items.filter(x=>x.sentimentClass==='neu').length;
+  const main=items.slice().sort((a,b)=>b.weight-a.weight)[0];
+  const diagnosis=items.length
+    ? `${critical?'Есть критичные факторы — проверь первоисточники.':attention?'Есть факторы, которые стоит держать в поле зрения.':'Срочных изменений по новостному фону не видно.'}${main?` Главный вес среди событий: ${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%.`:''}`
     : 'За последние 72 часа заметных событий по основным позициям не найдено.';
-  return { available:true, generatedAt:new Date().toISOString(), items:unique, summary };
+  return {available:true,generatedAt:new Date().toISOString(),items,summary:diagnosis,diagnosis:{events:items.length,critical,attention,neutral,mainFactor:main?`${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%`:null}};
 }
 
 app.get('/api/intel', async (req, res) => {

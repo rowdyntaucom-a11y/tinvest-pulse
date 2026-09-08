@@ -435,45 +435,24 @@ function renderIntel(data){
   const list=$('intelList'), summary=$('intelSummary'), stats=$('intelStats');
   if(summary)summary.textContent=data?.summary||'Новости по портфелю пока недоступны.';
   if($('intelUpdated'))setText('intelUpdated',data?.generatedAt?`ОБНОВЛЕНО ${new Date(data.generatedAt).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`:'LIVE');
-  if(stats){
-    const items=Array.isArray(data?.items)?data.items:[];
-    const neg=items.filter(x=>x.sentimentClass==='neg').length;
-    const pos=items.filter(x=>x.sentimentClass==='pos').length;
-    const high=items.filter(x=>(Number(x.importance)||0)>=70).length;
-    stats.innerHTML=`<span><b>${items.length}</b> СИГНАЛОВ</span><span class="${neg?'hot':''}"><b>${neg}</b> РИСК</span><span class="${pos?'good':''}"><b>${pos}</b> ВОЗМОЖНОСТЕЙ</span><span><b>${high}</b> ВАЖНЫХ</span>`;
-  }
+  const items=Array.isArray(data?.items)?data.items:[]; const d=data?.diagnosis||{};
+  if(stats)stats.innerHTML=`<span><b>${d.events??items.length}</b> СОБЫТИЙ</span><span class="${d.critical?'hot':''}"><b>${d.critical??0}</b> КРИТИЧНЫХ</span><span class="${d.attention?'hot':''}"><b>${d.attention??0}</b> ВНИМАНИЕ</span><span><b>${escapeHtml(d.mainFactor||'—')}</b> ФАКТОР</span>`;
   if(!list)return;
-  const items=Array.isArray(data?.items)?data.items:[];
-  if(!items.length){list.innerHTML='<div class="intelEmpty">За последние 72 часа заметных событий по основным позициям не найдено.<br>Поводов срочно дёргать портфель сейчас нет.</div>';return;}
+  if(!items.length){list.innerHTML='<div class="intelEmpty">За последние 72 часа заметных событий по основным позициям не найдено.<br>Новостной фон не требует срочного внимания.</div>';return;}
   list.innerHTML=items.map((item,idx)=>{
     const cls=['pos','neg','neu'].includes(item.sentimentClass)?item.sentimentClass:'neu';
-    const label=escapeHtml(item.sentiment||'НЕЙТРАЛЬНО');
-    const title=escapeHtml(item.title||'Без заголовка');
-    const ticker=escapeHtml(item.ticker||item.name||'—');
-    const source=escapeHtml(item.source||'Источник');
-    const why=escapeHtml(item.why||'');
-    const advice=escapeHtml(item.advice||'Наблюдать.');
-    const link=escapeHtml(item.link||'#');
-    const impact=escapeHtml(item.impactLabel||intelImpactLabel(item));
-    const confidence=Math.max(0,Math.min(100,Number(item.confidence)||0));
-    const horizon=escapeHtml(item.horizon||'долгосрок');
-    const scenarios=item.scenarios||{};
-    const base=escapeHtml(scenarios.base||'Текущий сценарий сохраняется, если новых факторов не появится.');
-    const bull=escapeHtml(scenarios.bull||'Позитивный сценарий: фактор быстро нормализуется.');
-    const bear=escapeHtml(scenarios.bear||'Риск-сценарий: негативный фактор затягивается.');
-    const featured=idx===0?' featured':'';
-    return `<article class="intelItem${featured}">
-      <div class="intelItemTop"><div class="intelTickerWrap"><span class="intelTicker">${ticker}</span><span class="intelImpact ${cls}">ВЛИЯНИЕ ${impact}</span></div><span class="intelTag ${cls}">${label}</span></div>
-      <div class="intelTitle">${title}</div>
-      <div class="intelMeta"><span>${why}</span><span>${escapeHtml(intelAgo(item.publishedAt))}</span><span>горизонт: ${horizon}</span></div>
-      <div class="intelWhyBlock"><b>ПОЧЕМУ ЭТО ВАЖНО</b><span>${why}. Вес позиции учитывается в оценке влияния.</span></div>
-      <div class="intelScenarios">
-        <div class="intelScenario base"><i>●</i><div><b>БАЗОВЫЙ</b><span>${base}</span></div></div>
-        <div class="intelScenario bull"><i>▲</i><div><b>ПОЗИТИВНЫЙ</b><span>${bull}</span></div></div>
-        <div class="intelScenario bear"><i>▼</i><div><b>РИСК</b><span>${bear}</span></div></div>
-      </div>
-      <div class="intelVerdict"><div><small>ВЫВОД АНАЛИТИКА</small><b>${advice}</b></div><div class="intelConfidence"><small>УВЕРЕННОСТЬ</small><strong>${confidence}%</strong><i><em style="width:${confidence}%"></em></i></div></div>
-      <a class="intelSource" href="${link}" target="_blank" rel="noopener noreferrer"><span>↗ ${source}</span><b>ОТКРЫТЬ ПЕРВОИСТОЧНИК</b></a>
+    const confidence=Math.max(1,Math.min(100,Number(item.confidence)||50)); const sc=item.scenarios||{};
+    const sources=Array.isArray(item.sources)?item.sources:[];
+    return `<article class="intelItem${idx===0?' featured':''}">
+      <div class="intelItemTop"><div class="intelTickerWrap"><span class="intelTicker">${escapeHtml(item.ticker||item.name||'—')}</span><span class="intelImpact ${cls}">${escapeHtml(item.status||'НАБЛЮДАТЬ')}</span></div><span class="intelTag ${cls}">${escapeHtml(item.sentiment||'БЕЗ СДВИГА')}</span></div>
+      <div class="intelTitle">${escapeHtml(item.title||'Без заголовка')}</div>
+      <div class="intelMeta"><span>${Number(item.weight||0).toFixed(1).replace('.',',')}% портфеля · ${item.stories||1} ист.</span><span>${escapeHtml(intelAgo(item.publishedAt))}</span><span>${escapeHtml(item.horizon||'долгосрок')}</span></div>
+      <div class="intelWhyBlock"><b>ЧТО ИЗМЕНИЛОСЬ</b><span>${escapeHtml(item.whatChanged||item.title||'')}</span></div>
+      <div class="intelWhyBlock meaning"><b>ЧТО ЭТО ЗНАЧИТ</b><span>${escapeHtml(item.meaning||'')}</span></div>
+      <div class="intelScenarios"><div class="intelScenario base"><i>●</i><div><b>БАЗОВЫЙ</b><span>${escapeHtml(sc.base||'Текущий сценарий сохраняется.')}</span></div></div><div class="intelScenario bull"><i>▲</i><div><b>ПОЗИТИВНЫЙ</b><span>${escapeHtml(sc.bull||'Фактор развивается лучше базового сценария.')}</span></div></div><div class="intelScenario bear"><i>▼</i><div><b>РИСК</b><span>${escapeHtml(sc.bear||'Фактор развивается хуже базового сценария.')}</span></div></div></div>
+      <div class="intelBreaker"><b>ЧТО ИЗМЕНИТ СЦЕНАРИЙ</b><span>${escapeHtml(item.thesisBreaker||'Новые подтверждённые данные компании.')}</span></div>
+      <div class="intelVerdict"><div><small>СТАТУС НАБЛЮДЕНИЯ</small><b>${escapeHtml(item.status||'НАБЛЮДАТЬ')}</b></div><div class="intelConfidence"><small>НАДЁЖНОСТЬ ОЦЕНКИ</small><strong>${confidence}%</strong><i><em style="width:${confidence}%"></em></i></div></div>
+      <a class="intelSource" href="${escapeHtml(item.link||'#')}" target="_blank" rel="noopener noreferrer"><span>↗ ${escapeHtml(item.source||'Источник')}${sources.length>1?` + ещё ${sources.length-1}`:''}</span><b>ПЕРВОИСТОЧНИК</b></a>
     </article>`;
   }).join('');
 }
@@ -484,7 +463,7 @@ async function loadIntel(force=false){
   const list=$('intelList');if(list)list.innerHTML='<div class="intelLoading">✦ СКАНИРУЮ НОВОСТИ ПО ТВОИМ ПОЗИЦИЯМ…</div>';
   if($('intelSummary'))setText('intelSummary','Смотрю сначала на самые крупные позиции и события за последние 72 часа.');
   try{
-    const r=await fetch('/api/intel?v=6.5&t='+Date.now(),{cache:'no-store'});
+    const r=await fetch('/api/intel?v=6.6&t='+Date.now(),{cache:'no-store'});
     const d=await r.json();
     if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
     renderIntel(d);
