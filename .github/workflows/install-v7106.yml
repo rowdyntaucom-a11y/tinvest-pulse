@@ -1,0 +1,33 @@
+name: Install v7.10.6 growth chart guard
+on:
+  push:
+    paths: ['.github/workflows/install-v7106.yml']
+permissions:
+  contents: write
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load chart guard before app
+        run: |
+          python3 - <<'PY'
+          p='public/index.html'
+          s=open(p,encoding='utf-8').read()
+          old='<script src="/app.js?v=7.0"></script>'
+          new='<script src="/v7106.js?v=7.10.6"></script><script src="/app.js?v=7.0"></script>'
+          if new not in s:
+              if old not in s: raise SystemExit('app script marker missing')
+              s=s.replace(old,new,1)
+              open(p,'w',encoding='utf-8').write(s)
+          PY
+      - name: Syntax check
+        run: node --check public/v7106.js
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "v7.10.6 stabilize growth chart"
+          git push
