@@ -249,3 +249,33 @@ footer #status{position:relative}
 @keyframes badgeBlink{0%,100%{opacity:.8}50%{opacity:1;box-shadow:0 0 17px color-mix(in srgb,var(--accent) 18%,transparent)}}
 @keyframes liveDot{0%,100%{transform:scale(.75);opacity:.55}50%{transform:scale(1.25);opacity:1}}
 @media(prefers-reduced-motion:reduce){.phone:after,.top:before,.brand:after,.pulseBtn:before,.pulseBtn:after,.heroArt,.value:after,.gain,.mini:after,.income:after,.leaders:after,.macro:after,.chartWrap:before,.chartWrap:after,.chartBadge,#status.ok:before{animation:none}}
+
+/* v5.9 LIVE HUD — subtle motion for the CYBER dashboard */
+body:not(.pulse-active) .phone::after{content:"";position:absolute;left:0;right:0;top:-14%;height:2px;background:linear-gradient(90deg,transparent 0%,color-mix(in srgb,var(--accent) 0%,transparent) 15%,var(--accent) 50%,transparent 85%);box-shadow:0 0 18px var(--accent),0 0 42px var(--glow);opacity:.34;z-index:8;pointer-events:none;animation:hudScan 7.5s ease-in-out infinite}
+body:not(.pulse-active) .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 28%,rgba(255,255,255,.06) 43%,rgba(84,246,197,.11) 49%,transparent 58%);transform:translateX(-125%);pointer-events:none;animation:heroSweep 6.8s ease-in-out infinite;mix-blend-mode:screen}
+body:not(.pulse-active) .card{animation:cardBreath 5.5s ease-in-out infinite}
+body:not(.pulse-active) .mini:nth-child(2){animation-delay:.8s}body:not(.pulse-active) .mini:nth-child(3){animation-delay:1.6s}body:not(.pulse-active) .mini:nth-child(4){animation-delay:2.4s}
+body:not(.pulse-active) .chartWrap::after{content:"";position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--accent),transparent);box-shadow:0 0 12px var(--accent);opacity:.16;pointer-events:none;animation:chartScanner 8s linear infinite}
+body:not(.pulse-active) .chartCard{position:relative}
+body:not(.pulse-active) .chartCard::after{content:"";position:absolute;left:10%;right:10%;bottom:5px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.13;animation:signalLine 3.8s ease-in-out infinite}
+body:not(.pulse-active) .pulseBtn{position:relative;overflow:hidden;animation:buttonPulse 3.2s ease-in-out infinite}
+body:not(.pulse-active) .pulseBtn::after{content:"";position:absolute;inset:-40%;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.34) 50%,transparent 62%);transform:translateX(-90%) rotate(8deg);animation:buttonSweep 4.8s ease-in-out infinite}
+body:not(.pulse-active) .brand span{animation:accentFlicker 4.5s ease-in-out infinite}
+body:not(.pulse-active) footer #status.ok::before{content:"";display:inline-block;width:5px;height:5px;margin-right:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 9px var(--accent);vertical-align:1px;animation:statusBlink 1.8s ease-in-out infinite}
+.value.value-tick{animation:valueTick .42s ease-out}
+.card.data-flash{animation:dataFlash .55s ease-out!important}
+.hud-ripple{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent);pointer-events:none;transform:translate(-50%,-50%) scale(1);animation:rippleOut .65s ease-out forwards;z-index:20}
+
+@keyframes hudScan{0%,14%{transform:translateY(0);opacity:0}20%{opacity:.34}82%{opacity:.34}100%{transform:translateY(116vh);opacity:0}}
+@keyframes heroSweep{0%,28%{transform:translateX(-125%)}58%,100%{transform:translateX(125%)}}
+@keyframes chartScanner{0%{left:2%;opacity:0}12%{opacity:.18}88%{opacity:.18}100%{left:98%;opacity:0}}
+@keyframes signalLine{0%,100%{transform:scaleX(.25);opacity:.05}50%{transform:scaleX(1);opacity:.2}}
+@keyframes buttonPulse{0%,100%{box-shadow:0 9px 24px color-mix(in srgb,var(--hot) 28%,transparent),0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}50%{box-shadow:0 9px 28px color-mix(in srgb,var(--hot) 38%,transparent),0 0 0 5px color-mix(in srgb,var(--accent) 7%,transparent)}}
+@keyframes buttonSweep{0%,30%{transform:translateX(-90%) rotate(8deg)}64%,100%{transform:translateX(90%) rotate(8deg)}}
+@keyframes accentFlicker{0%,92%,100%{filter:drop-shadow(0 0 0 transparent)}95%{filter:drop-shadow(0 0 10px var(--accent))}}
+@keyframes statusBlink{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+@keyframes cardBreath{0%,100%{box-shadow:0 12px 28px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.025)}50%{box-shadow:0 13px 30px rgba(0,0,0,.37),0 0 16px color-mix(in srgb,var(--accent) 4%,transparent),inset 0 1px rgba(255,255,255,.035)}}
+@keyframes valueTick{0%{transform:translateY(3px);filter:blur(2px);opacity:.45}100%{transform:none;filter:none;opacity:1}}
+@keyframes dataFlash{0%{filter:brightness(1)}35%{filter:brightness(1.28)}100%{filter:brightness(1)}}
+@keyframes rippleOut{to{transform:translate(-50%,-50%) scale(28);opacity:0}}
+@media(prefers-reduced-motion:reduce){body:not(.pulse-active) .phone::after,body:not(.pulse-active) .hero::after,body:not(.pulse-active) .card,body:not(.pulse-active) .chartWrap::after,body:not(.pulse-active) .chartCard::after,body:not(.pulse-active) .pulseBtn,body:not(.pulse-active) .pulseBtn::after,body:not(.pulse-active) .brand span,body:not(.pulse-active) footer #status.ok::before{animation:none!important}.hud-ripple{display:none}}
