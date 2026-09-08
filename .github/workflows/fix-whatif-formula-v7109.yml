@@ -1,0 +1,48 @@
+name: v7.10.9 WHAT IF formula isolation
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-whatif-formula-v7109.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch WHAT IF formula CSS and cache
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/v77.js')
+          s=p.read_text()
+          old='.w77formula b{display:block!important;width:auto!important;height:auto!important;min-width:0!important;background:none!important;box-shadow:none!important;border:0!important;font-size:13px!important;line-height:1.25!important;margin-top:3px;white-space:nowrap;overflow:visible;color:inherit}'
+          new='.w77formula b{all:unset!important;display:block!important;box-sizing:border-box!important;font:700 13px/1.25 system-ui,-apple-system,sans-serif!important;margin-top:3px!important;white-space:nowrap!important;color:inherit!important}.w77formula b.good{color:var(--accent)!important}.w77formula b.bad{color:#ff6677!important}'
+          assert old in s, 'formula b CSS target not found'
+          s=s.replace(old,new,1)
+          old2='.w77formula strong{display:block!important;width:auto!important;height:auto!important;background:none!important;box-shadow:none!important;border:0!important;font-size:14px!important;line-height:1.25!important;text-align:right;white-space:nowrap;overflow:visible}'
+          new2='.w77formula strong{all:unset!important;display:block!important;box-sizing:border-box!important;font:800 14px/1.25 system-ui,-apple-system,sans-serif!important;text-align:right!important;white-space:nowrap!important}.w77formula strong.good{color:var(--accent)!important}.w77formula strong.bad{color:#ff6677!important}'
+          assert old2 in s, 'formula strong CSS target not found'
+          s=s.replace(old2,new2,1)
+          s=s.replace('SERVER_WHAT_IF · v7.10.8','SERVER_WHAT_IF · v7.10.9')
+          s=s.replace('SCENARIO ENGINE · v7.10.8','SCENARIO ENGINE · v7.10.9')
+          p.write_text(s)
+
+          p=Path('public/index.html')
+          s=p.read_text()
+          import re
+          matches=list(re.finditer(r'/v77\.js\?v=[^"\']+',s))
+          assert matches, 'v77 cache reference not found'
+          m=matches[-1]
+          s=s[:m.start()]+'/v77.js?v=7.10.9'+s[m.end():]
+          p.write_text(s)
+          PY
+          node --check public/v77.js
+          git diff --check
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/v77.js public/index.html
+          git commit -m 'v7.10.9 fix WHAT IF formula text rendering'
+          git push
