@@ -1,0 +1,46 @@
+name: v7.11.7 hard cash-flow source lock
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-cashflow-lock-v7117.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch source lock
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('public/app.js')
+          s=p.read_text()
+          old="""  const monthly=Number(dashboardData.passiveIncome?.averageMonthly ?? dashboardData.income?.monthly);\n  animateTextNumber('monthly',rub(monthly),420);\n  animateTextNumber('daily',Number.isFinite(monthly)?rub(monthly/30.4375):'—',420);\n  animateTextNumber('annual',Number.isFinite(monthly)?rub(monthly*12):'—',420);"""
+          new="""  // TRUE PAYOUT owns the visible passive-income card. Historical average is fallback only before that module claims it.\n  const incomeCard=$('monthly')?.closest('.income,.mini');\n  if(incomeCard?.dataset?.truePayout!=='1'){\n    const monthly=Number(dashboardData.passiveIncome?.averageMonthly ?? dashboardData.income?.monthly);\n    animateTextNumber('monthly',rub(monthly),420);\n    animateTextNumber('daily',Number.isFinite(monthly)?rub(monthly/30.4375):'—',420);\n    animateTextNumber('annual',Number.isFinite(monthly)?rub(monthly*12):'—',420);\n  }"""
+          if old not in s: raise SystemExit('app cashflow block not found')
+          p.write_text(s.replace(old,new,1))
+
+          p=Path('public/v7105.js')
+          s=p.read_text()
+          s=s.replace("let last=null,loading=false; const STORE='tinvest:lastPayoutForecast';", "let last=null,loading=false; const STORE='tinvest:lastPayoutForecast';\n function claim(){const main=$('monthly')?.closest('.income,.mini');if(main){main.dataset.truePayout='1';const title=main.querySelector('.eyebrow,span');if(title)title.textContent='ПАССИВНЫЙ ДОХОД · ПРОГНОЗ';}}")
+          s=s.replace("async function load(){if(loading)return;loading=true;try{const r=await fetch('/api/payouts?v=7.11.6&t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(+d?.forecast?.count>0&&paint(d)){save(d)}}catch(_){const cached=last||restore();if(cached)paint(cached,true)}finally{loading=false}}", "async function load(){if(loading)return;loading=true;const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),4500);try{const r=await fetch('/api/payouts?v=7.11.7&t='+Date.now(),{cache:'no-store',signal:ac.signal});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(+d?.forecast?.count>0&&paint(d)){save(d)}}catch(_){const cached=last||restore();if(cached)paint(cached,true)}finally{clearTimeout(tm);loading=false}}")
+          s=s.replace("const cached=restore();if(cached)paint(cached,true);", "claim();const cached=restore();if(cached)paint(cached,true);else{set('monthly','—');set('daily','—');set('annual','—');}")
+          p.write_text(s)
+
+          p=Path('public/index.html')
+          s=p.read_text()
+          s=s.replace('/app.js?v=7.0','/app.js?v=7.11.7',1)
+          s=s.replace('/v7105.js?v=7.11.6','/v7105.js?v=7.11.7',1)
+          p.write_text(s)
+          PY
+          node --check public/app.js
+          node --check public/v7105.js
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/app.js public/v7105.js public/index.html
+          git commit -m 'v7.11.7 lock overview cash flow to TRUE PAYOUT'
+          git push
