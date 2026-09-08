@@ -1,0 +1,31 @@
+name: v7.10.8 WHAT IF readable values
+on:
+  push:
+    paths: ['.github/workflows/whatif-readable-values-v7108.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch mobile rendering
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/v77.js'); s=p.read_text()
+          s=s.replace('SERVER_WHAT_IF · v7.10.7','SERVER_WHAT_IF · v7.10.8').replace('SCENARIO ENGINE · v7.10.7','SCENARIO ENGINE · v7.10.8')
+          old='.w77formula{display:flex;align-items:center;justify-content:space-between;gap:5px}.w77formula span{font-size:6px;color:#7e8e89}.w77formula b{display:block;font-size:11px;margin-top:2px}.w77formula i{font-style:normal;color:#53635f;font-size:9px}.w77formula strong{font-size:13px}.w77net>em{display:block;font-style:normal;text-align:right;font-size:6px;margin-top:5px}'
+          new='.w77formula{display:grid;grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr) 12px minmax(0,1.15fr);align-items:end;gap:4px}.w77formula span{display:block;min-width:0;font-size:7px;color:#7e8e89;white-space:normal}.w77formula b{display:block!important;width:auto!important;height:auto!important;min-width:0!important;background:none!important;box-shadow:none!important;border:0!important;font-size:13px!important;line-height:1.25!important;margin-top:3px;white-space:nowrap;overflow:visible;color:inherit}.w77formula i{display:block;font-style:normal;color:#71827d;font-size:11px;text-align:center;padding-bottom:2px}.w77formula strong{display:block!important;width:auto!important;height:auto!important;background:none!important;box-shadow:none!important;border:0!important;font-size:14px!important;line-height:1.25!important;text-align:right;white-space:nowrap;overflow:visible}.w77net>em{display:block!important;width:auto!important;height:auto!important;background:none!important;font-style:normal;text-align:right;font-size:7px!important;line-height:1.3;margin-top:7px;white-space:nowrap}'
+          if old not in s: raise SystemExit('css target missing')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          node --check public/v77.js
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/v77.js
+          git commit -m 'v7.10.8 fix WHAT IF mobile values' || exit 0
+          git push
