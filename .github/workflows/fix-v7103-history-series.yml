@@ -1,0 +1,56 @@
+name: Fix v7.10.3 history series
+'on':
+  push:
+    paths:
+      - '.github/workflows/fix-v7103-history-series.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stabilize history and benchmark
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('public/app.js'); s=p.read_text()
+          old="""  const pSeries=hp.map(x=>Number(x?.portfolio)).filter(Number.isFinite).filter(v=>v>0);
+  const mSeries=hp.map(x=>Number(x?.imoex)).filter(Number.isFinite).filter(v=>v>0);"""
+          new="""  const stableSeries=vals=>{const out=[];for(const v0 of vals){const v=Number(v0);if(!Number.isFinite(v)||v<=0)continue;if(!out.length||Math.abs(v/out[out.length-1]-1)<=0.35)out.push(v)}return out;};
+  const pSeries=stableSeries(hp.map(x=>x?.portfolio));
+  const mSeries=stableSeries(hp.map(x=>x?.imoex));"""
+          if old not in s: raise SystemExit('VS series block not found')
+          s=s.replace(old,new,1)
+          old2="""function cleanSeries(points,key){
+  const arr=[];
+  for(const p of points){const v=Number(p?.[key]);if(Number.isFinite(v)&&v>0)arr.push({date:p.date,value:v});}
+  return arr.length>=2?arr:[];
+}"""
+          new2="""function cleanSeries(points,key){
+  const arr=[];
+  for(const p of points){
+    const v=Number(p?.[key]);if(!Number.isFinite(v)||v<=0)continue;
+    const prev=arr.length?arr[arr.length-1].value:null;
+    if(prev&&Math.abs(v/prev-1)>.35)continue;
+    arr.push({date:p.date,value:v});
+  }
+  return arr.length>=2?arr:[];
+}"""
+          if old2 not in s: raise SystemExit('cleanSeries block not found')
+          s=s.replace(old2,new2,1)
+          p.write_text(s)
+
+          p=Path('public/index.html'); s=p.read_text()
+          s=re.sub(r'<script src="/v7102\.js\?v=7\.10\.2"></script>','',s,count=1)
+          s=re.sub(r'/app\.js\?v=[^"\']+', '/app.js?v=7.10.3', s, count=1)
+          p.write_text(s)
+          PY
+          node --check public/app.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/app.js public/index.html
+          git commit -m 'v7.10.3 reject corrupted history jumps and align VS MOEX' || exit 0
+          git push
