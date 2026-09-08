@@ -1,0 +1,34 @@
+name: Payout Audit v7.9.1
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add payout audit and clearer UI
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('payouts-core.js'); s=p.read_text()
+          s=s.replace("const gross=round2(events.reduce((s,x)=>s+x.gross,0)),tax=round2(events.reduce((s,x)=>s+x.tax,0)),net=round2(events.reduce((s,x)=>s+x.net,0)),months=buildMonths(now,events),next=events[0]||null;", "const gross=round2(events.reduce((s,x)=>s+x.gross,0)),tax=round2(events.reduce((s,x)=>s+x.tax,0)),net=round2(events.reduce((s,x)=>s+x.net,0)),months=buildMonths(now,events),next=events[0]||null;\n    const byAsset=eligible.map(a=>{const ticker=a?.ticker||a?.name||a?.figi||'—',figi=a?.figi||null,qty=quantityValue(a?.quantity),rows=events.filter(e=>(figi&&e.figi===figi)||(!figi&&e.ticker===ticker));return{ticker,name:a?.name||ticker,kind:classifyAsset(a),quantity:qty,gross:round2(rows.reduce((z,e)=>z+(+e.gross||0),0)),count:rows.length,first:rows[0]?.date||null,last:rows[rows.length-1]?.date||null}});\n    const couponGross=round2(events.filter(e=>e.kind==='COUPON').reduce((z,e)=>z+e.gross,0)),dividendGross=round2(events.filter(e=>e.kind==='DIVIDEND').reduce((z,e)=>z+e.gross,0));")
+          s=s.replace("return{version:'7.9',generatedAt", "return{version:'7.9.1',generatedAt")
+          s=s.replace("forecast:{gross,tax,net,count:events.length},next:", "forecast:{gross,tax,net,count:events.length,coupons:couponGross,dividends:dividendGross},audit:{byAsset,unresolved:byAsset.filter(x=>x.count===0),errors},next:")
+          s=s.replace("version:'7.9',available:false", "version:'7.9.1',available:false")
+          p.write_text(s)
+          q=Path('public/v72.js'); t=q.read_text()
+          t=t.replace("id=\"payoutTax\"></p>", "id=\"payoutTax\"></p><p id=\"payoutAudit\"></p>")
+          t=t.replace("#payoutTax{opacity:.8}", "#payoutTax{opacity:.8}#payoutAudit{opacity:.9;color:#9eb0aa}")
+          t=t.replace("if(d?.next){", "if($('payoutAudit')){const u=d?.audit?.unresolved||[],c=d?.forecast?.coupons||0,v=d?.forecast?.dividends||0;$('payoutAudit').textContent=`Купоны ${rub(c)} · дивиденды ${rub(v)} · охвачено ${(d?.coverage?.eligibleAssets||0)-u.length}/${d?.coverage?.eligibleAssets||0} бумаг${u.length?' · без расписания: '+u.map(x=>x.ticker).join(', '):''}`;}if(d?.next){")
+          t=t.replace("/api/payouts?v=7.9&t=", "/api/payouts?v=7.9.1&t=")
+          q.write_text(t)
+          i=Path('public/index.html'); h=i.read_text(); h=h.replace('/v72.js?v=7.2.1','/v72.js?v=7.9.1'); i.write_text(h)
+          PY
+          node --check payouts-core.js
+          node --check public/v72.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add payouts-core.js public/v72.js public/index.html
+          git commit -m 'v7.9.1 audit full T-Bank payout coverage' || exit 0
+          git push
