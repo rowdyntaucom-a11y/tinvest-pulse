@@ -25,20 +25,15 @@ jobs:
           new="""async function load(){try{const r=await fetch('/api/dashboard?v=7.11.5&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);try{localStorage.setItem('tinvest:lastDashboard',JSON.stringify({at:Date.now(),data:d}));}catch(_){}}catch(e){console.error(e);let saved=null;try{saved=JSON.parse(localStorage.getItem('tinvest:lastDashboard')||'null');}catch(_){}if(saved?.data){render(saved.data);const age=Math.max(0,Math.round((Date.now()-Number(saved.at||Date.now()))/60000));setText('status',`⚠ Связь потеряна • последний снимок${age?` ${age} мин назад`:''}`);setText('hudPulseState','STALE');const statusEl=$('status');if(statusEl)statusEl.className='err';}else{setText('status','Ошибка связи • повторяем…');setText('hudPulseState','ERR');const statusEl=$('status');if(statusEl)statusEl.className='err';}setTimeout(load,5000);}}"""
           if old not in s: raise SystemExit('load target not found')
           p.write_text(s.replace(old,new,1))
-
           p=Path('public/v7113.js')
           s=p.read_text()
           s=s.replace("const run=()=>{fix();setTimeout(fix,250);setTimeout(fix,900);setTimeout(fix,1800)};", "const run=()=>{fix();setTimeout(fix,250);setTimeout(fix,900);setTimeout(fix,1800);setInterval(fix,1500)};")
           p.write_text(s)
-
           p=Path('public/index.html')
           s=p.read_text()
-          if '/v7113.js?v=7.11.4' in s:
-              s=s.replace('/v7113.js?v=7.11.4','/v7113.js?v=7.11.5',1)
-          elif '/v7113.js?v=7.11.3' in s:
-              s=s.replace('/v7113.js?v=7.11.3','/v7113.js?v=7.11.5',1)
-          else:
-              raise SystemExit('legend cache target not found')
+          if '/v7113.js?v=7.11.4' in s: s=s.replace('/v7113.js?v=7.11.4','/v7113.js?v=7.11.5',1)
+          elif '/v7113.js?v=7.11.3' in s: s=s.replace('/v7113.js?v=7.11.3','/v7113.js?v=7.11.5',1)
+          else: raise SystemExit('legend cache target not found')
           p.write_text(s)
           PY
           node --check public/app.js
@@ -50,3 +45,4 @@ jobs:
           git add public/app.js public/v7113.js public/index.html
           git commit -m 'v7.11.5 keep last dashboard on fetch failure and stabilize legend'
           git push
+# trigger 2
