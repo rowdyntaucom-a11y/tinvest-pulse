@@ -1,0 +1,50 @@
+name: v7.11.0 Cash Flow source lock
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-cashflow-source-v7110.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lock visible cash flow to payout forecast
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/v794.js')
+          s=p.read_text()
+          old="const flowMain=$('flowNetMonthly')||$('flowMonthly');if(flowMain)flowMain.textContent=rub(monthly);\n  if($('flowAnnual'))$('flowAnnual').textContent=rub(annual);\n  if($('flowDaily'))$('flowDaily').textContent=rub(annual/365);"
+          new="const writeFlow=()=>{const flowMain=$('flowNetMonthly')||$('flowMonthly');if(flowMain)flowMain.textContent=rub(monthly);if($('flowAnnual'))$('flowAnnual').textContent=rub(annual);if($('flowDaily'))$('flowDaily').textContent=rub(annual/365);};writeFlow();[250,700,1500,3000].forEach(ms=>setTimeout(writeFlow,ms));"
+          assert old in s, 'cash-flow write target not found'
+          s=s.replace(old,new,1)
+          old2="async function load(){if(!document.body.classList.contains('pulse-active'))return;try{const r=await fetch('/api/payouts?v=7.9.5&t='+Date.now(),{cache:'no-store'}),d=await r.json();if(r.ok)paint(d)}catch(e){}}"
+          new2="let lastPayout=null;async function load(){try{const r=await fetch('/api/payouts?v=7.11.0&t='+Date.now(),{cache:'no-store'}),d=await r.json();if(r.ok&&+d?.forecast?.count>0){lastPayout=d;paint(d)}}catch(e){}}"
+          assert old2 in s, 'load target not found'
+          s=s.replace(old2,new2,1)
+          old3="new MutationObserver(()=>{if(document.body.classList.contains('pulse-active'))setTimeout(load,500)}).observe(document.body,{attributes:true,attributeFilter:['class']});document.addEventListener('click',e=>{if(e.target.closest('#pulseBtn,#scoreRing'))setTimeout(load,900)});setTimeout(load,1200);"
+          new3="new MutationObserver(()=>{if(lastPayout)setTimeout(()=>paint(lastPayout),80);if(document.body.classList.contains('pulse-active'))setTimeout(load,500)}).observe(document.body,{attributes:true,attributeFilter:['class']});document.addEventListener('click',e=>{if(lastPayout)setTimeout(()=>paint(lastPayout),80);if(e.target.closest('#pulseBtn,#scoreRing'))setTimeout(load,900)});setTimeout(load,300);setInterval(()=>{if(lastPayout)paint(lastPayout)},5000);"
+          assert old3 in s, 'observer target not found'
+          s=s.replace(old3,new3,1)
+          p.write_text(s)
+
+          p=Path('public/index.html')
+          s=p.read_text()
+          import re
+          matches=list(re.finditer(r'/v794\.js\?v=[^"\']+',s))
+          assert matches, 'v794 cache ref not found'
+          m=matches[-1]
+          s=s[:m.start()]+'/v794.js?v=7.11.0'+s[m.end():]
+          p.write_text(s)
+          PY
+          node --check public/v794.js
+          git diff --check
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/v794.js public/index.html
+          git commit -m 'v7.11.0 lock cash flow to payout forecast'
+          git push
