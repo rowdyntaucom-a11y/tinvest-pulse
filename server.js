@@ -1114,6 +1114,37 @@ function intelQuality(item, asset, importance) {
   return {score,level,relevance,sourceQuality};
 }
 
+// v6.9 — EVENT UNDERSTANDING. Require an actual business fact, not merely a market-price headline.
+function intelUnderstanding(item, asset) {
+  const title=String(item.title||'').trim(), description=String(item.description||'').trim();
+  const text=`${title} ${description}`.replace(/\s+/g,' ').trim();
+  const low=text.toLowerCase();
+  const numbers=(text.match(/(?:\d+[\s.,]?\d*\s?(?:%|₽|руб|млн|млрд|трлн|тонн|баррел|г\/т|год|квартал))/gi)||[]).slice(0,4);
+  const business=/прибыл|выручк|ebitda|денежн.*поток|долг|капзатрат|дивиденд|buyback|выкуп|производ|добыч|продаж|экспорт|санкци|налог|лиценз|контракт|авари|пожар|нпз|прогноз|отч[её]т|себестоим|запас|месторожд|ставк|пошлин/.test(low);
+  const priceOnly=/акци[ия].*(?:подешев|дешев|дорожа|раст[её]т|пада|снижа|вырос|упал)|котировк.*(?:рост|паден|снижен)|на мосбирже/.test(low) && !business;
+  const causal=/из-за|потому|после того|на фоне|в связи|причин|обуслов|сообщил|объявил|утвердил|опубликовал|представил/.test(low);
+  const factual=business || numbers.length>=2 || causal;
+  let score=0;
+  if(business) score+=42;
+  if(causal) score+=18;
+  score+=Math.min(24,numbers.length*8);
+  if(description.length>=120) score+=10;
+  if(priceOnly) score-=38;
+  score=Math.max(0,Math.min(100,score));
+  const sufficient=factual && score>=34 && !priceOnly;
+  let fact='';
+  if(description && description.length>35) fact=description.replace(/\s+/g,' ').trim();
+  if(!fact || /<a |href=|google news/i.test(fact)) fact=title;
+  if(fact.length>240) fact=fact.slice(0,237).replace(/\s+\S*$/,'')+'…';
+  const reason=priceOnly?'В публикации зафиксировано движение цены, но не найден подтверждённый бизнес-фактор.':!factual?'В материале недостаточно конкретных фактов, цифр или причинно-следственной связи.':score<34?'Фактическая плотность материала слишком низкая для отдельного события.':'Есть конкретный фактор, который можно связать с бизнесом компании.';
+  return {score,sufficient,priceOnly,numbers,fact,reason};
+}
+
+function intelMeaning(eventType, ticker, weight, understanding) {
+  const w=weight.toFixed(1).replace('.',',');
+  const base=eventType==='ФИНАНСОВЫЙ'?'Фактор может изменить ожидания по прибыли, денежному потоку и оценке компании.':eventType==='ОПЕРАЦИОННЫЙ'?'Фактор способен повлиять на объём производства, себестоимость и будущий денежный поток.':eventType==='РЕГУЛЯТОРНЫЙ'?'Фактор может изменить условия продаж, издержки или доступ компании к рынкам.':eventType==='КАПИТАЛ'?'Фактор напрямую связан с возвратом капитала акционерам и денежным потоком держателя.':'Пока это преимущественно информационный фон без доказанного изменения экономики бизнеса.';
+  return `${base} Вес ${ticker} в портфеле — ${w}%, поэтому влияние оценивается с учётом этой доли.`;
+}
 async function buildIntel() {
   const accountsResponse = await getAccounts();
   const account = selectAccount(accountsResponse);
@@ -1127,8 +1158,8 @@ async function buildIntel() {
   const cutoff=Date.now()-72*3600000, grouped=[], quiet=[];
   for(const row of all){
     const fresh=row.news.filter(n=>{const t=new Date(n.publishedAt).getTime();return Number.isFinite(t)&&t>=cutoff;});
-    const enriched=fresh.map(item=>{const sentiment=intelSentiment(item),importance=intelImportance(item,row.asset.weight),quality=intelQuality(item,row.asset,importance);return {...item,sentiment,importance,quality,confidence:Math.round(Math.max(35,Math.min(92,quality.score*.72+intelConfidence(item,importance,sentiment)*.28)))};}).sort((a,b)=>b.quality.score-a.quality.score||b.importance-a.importance);
-    const usable=enriched.filter(x=>x.quality.level!=='ШУМ' && x.quality.relevance>=34);
+    const enriched=fresh.map(item=>{const sentiment=intelSentiment(item),importance=intelImportance(item,row.asset.weight),quality=intelQuality(item,row.asset,importance),understanding=intelUnderstanding(item,row.asset);const adjustedScore=Math.max(0,Math.min(100,Math.round(quality.score*.72+understanding.score*.28)));const adjustedLevel=adjustedScore>=76?'ФАКТ':adjustedScore>=62?'СИГНАЛ':adjustedScore>=48?'ФОН':'ШУМ';return {...item,sentiment,importance,understanding,quality:{...quality,score:adjustedScore,level:adjustedLevel},confidence:Math.round(Math.max(30,Math.min(92,adjustedScore*.72+intelConfidence(item,importance,sentiment)*.28)))};}).sort((a,b)=>b.quality.score-a.quality.score||b.understanding.score-a.understanding.score||b.importance-a.importance);
+    const usable=enriched.filter(x=>x.quality.level!=='ШУМ' && x.quality.relevance>=34 && x.understanding.sufficient);
     if(!usable.length){quiet.push({ticker:row.asset.ticker||row.asset.name,name:row.asset.name,weight:row.asset.weight,status:'ТИХО',rejected:enriched.length});continue;}
     const lead=usable[0];
     const corroborating=usable.filter(x=>x.quality.score>=48).slice(0,5);
@@ -1139,20 +1170,21 @@ async function buildIntel() {
     const confidence=Math.round(Math.max(40,Math.min(92,corroborating.reduce((a,x)=>a+x.confidence,0)/corroborating.length+Math.min(5,(corroborating.length-1)*1.5))));
     const weight=row.asset.weight,ticker=row.asset.ticker||row.asset.name,scenarios=intelScenarios(lead,row.asset,sentiment);
     const status=importance>=72&&lead.quality.score>=62?'ТРЕБУЕТ ВНИМАНИЯ':importance>=48?'НАБЛЮДАТЬ':'ФОН';
-    const whatChanged=corroborating.length>1?`Найдено ${corroborating.length} релевантных публикаций. Главный подтверждённый сюжет: ${lead.title}`:`Найдено релевантное событие: ${lead.title}`;
-    const meaning=weight>=20?`${ticker} — одна из крупнейших позиций (${weight.toFixed(1).replace('.',',')}%). Поэтому даже умеренный подтверждённый фактор заметен для всего портфеля.`:weight>=10?`Вес ${ticker} — ${weight.toFixed(1).replace('.',',')}%. Подтверждённое событие может заметно повлиять на результат, но не определяет портфель целиком.`:`Вес ${ticker} — ${weight.toFixed(1).replace('.',',')}%. Влияние на портфель ограничено, пока фактор не становится системным.`;
+    const whatChanged=lead.understanding.fact;
+    let meaning='';
     const txt=`${lead.title} ${lead.description}`.toLowerCase();
     let breaker='Новые подтверждённые данные, заметно меняющие прибыль, денежный поток или долговую нагрузку компании.';
     if(/дивиденд|buyback|выкуп/.test(txt)) breaker='Изменение размера, условий или сроков выплаты/выкупа относительно объявленных параметров.'; else if(/санкци|запрет|ограничени|экспорт/.test(txt)) breaker='Расширение ограничений до уровня, который устойчиво ухудшает продажи, маржу или денежный поток.'; else if(/авари|пожар|нпз|атак/.test(txt)) breaker='Затяжной простой, повторные повреждения или подтверждённое существенное снижение производства.'; else if(/отчет|прибыл|выручк|прогноз/.test(txt)) breaker='Следующий отчёт или прогноз, подтверждающий устойчивое отклонение ключевых показателей от текущего сценария.';
     const eventType=/нпз|авари|пожар|атак|производ|добыч/.test(txt)?'ОПЕРАЦИОННЫЙ':/дивиденд|buyback|выкуп/.test(txt)?'КАПИТАЛ':/санкци|запрет|ограничени|экспорт|налог|фас/.test(txt)?'РЕГУЛЯТОРНЫЙ':/отчет|прибыл|выручк|финансов|прогноз/.test(txt)?'ФИНАНСОВЫЙ':'НОВОСТНОЙ ФОН';
+    meaning=intelMeaning(eventType,ticker,weight,lead.understanding);
     const strength=Math.max(1,Math.min(10,Math.round((importance*.055+lead.quality.score*.025+Math.min(2.8,weight/9))*10)/10));
-    grouped.push({title:lead.title,link:lead.link,source:lead.source,publishedAt:lead.publishedAt,ticker,name:row.asset.name,weight,stories:corroborating.length,sentiment:sentiment.label,sentimentClass:sentiment.cls,importance,eventType,strength,chain:`${eventType.toLowerCase()} фактор → бизнес ${ticker} → финансовые показатели → вес ${weight.toFixed(1).replace('.',',')}% → портфель`,impactLabel:importance>=70?'ВЫСОКОЕ':importance>=45?'СРЕДНЕЕ':'НИЗКОЕ',confidence,qualityLevel:lead.quality.level,qualityScore:lead.quality.score,relevance:lead.quality.relevance,horizon:intelHorizon(lead),scenarios,status,whatChanged,meaning,thesisBreaker:breaker,sources:corroborating.slice(0,3).map(x=>({title:x.title,source:x.source,link:x.link,publishedAt:x.publishedAt,qualityLevel:x.quality.level}))});
+    grouped.push({title:lead.title,link:lead.link,source:lead.source,publishedAt:lead.publishedAt,ticker,name:row.asset.name,weight,stories:corroborating.length,sentiment:sentiment.label,sentimentClass:sentiment.cls,importance,eventType,strength,chain:`${eventType.toLowerCase()} фактор → бизнес ${ticker} → финансовые показатели → вес ${weight.toFixed(1).replace('.',',')}% → портфель`,impactLabel:importance>=70?'ВЫСОКОЕ':importance>=45?'СРЕДНЕЕ':'НИЗКОЕ',confidence,qualityLevel:lead.quality.level,qualityScore:lead.quality.score,relevance:lead.quality.relevance,understandingScore:lead.understanding.score,understandingReason:lead.understanding.reason,keyFacts:lead.understanding.numbers,horizon:intelHorizon(lead),scenarios,status,whatChanged,meaning,thesisBreaker:breaker,sources:corroborating.slice(0,3).map(x=>({title:x.title,source:x.source,link:x.link,publishedAt:x.publishedAt,qualityLevel:x.quality.level}))});
   }
   grouped.sort((a,b)=>b.importance-a.importance||b.qualityScore-a.qualityScore||b.weight-a.weight);
   quiet.sort((a,b)=>b.weight-a.weight);
-  const items=grouped.slice(0,5),critical=items.filter(x=>x.importance>=80&&x.sentimentClass==='neg'&&x.qualityLevel!=='ФОН').length,attention=items.filter(x=>x.status==='ТРЕБУЕТ ВНИМАНИЯ').length,neutral=items.filter(x=>x.sentimentClass==='neu').length,main=items.slice().sort((a,b)=>b.weight-a.weight)[0]||quiet[0];
-  const diagnosis=items.length?`${critical?'Есть подтверждённые критичные факторы — проверь источники.':attention?'Есть подтверждённые факторы, которые стоит держать в поле зрения.':'Срочных изменений по качественному новостному фону не видно.'}${quiet.length?` ${quiet.length} поз. без значимых событий.`:''}${main?` Главный вес: ${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%.`:''}`:`Значимых подтверждённых событий за 72 часа не найдено. ${quiet.length} основных позиций в режиме «ТИХО».`;
-  return {available:true,generatedAt:new Date().toISOString(),items,quiet:quiet.slice(0,8),summary:diagnosis,diagnosis:{events:items.length,critical,attention,neutral,quiet:quiet.length,mainFactor:main?`${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%`:null}};
+  const items=grouped.slice(0,5),shownTickers=new Set(items.map(x=>String(x.ticker))),quietVisible=assets.filter(a=>!shownTickers.has(String(a.ticker||a.name))).map(a=>quiet.find(q=>String(q.ticker)===String(a.ticker||a.name))||{ticker:a.ticker||a.name,name:a.name,weight:a.weight,status:'ТИХО'}).sort((a,b)=>b.weight-a.weight),critical=items.filter(x=>x.importance>=80&&x.sentimentClass==='neg'&&x.qualityLevel!=='ФОН').length,attention=items.filter(x=>x.status==='ТРЕБУЕТ ВНИМАНИЯ').length,neutral=items.filter(x=>x.sentimentClass==='neu').length,main=items.slice().sort((a,b)=>b.weight-a.weight)[0]||quietVisible[0];
+  const diagnosis=items.length?`${critical?'Есть подтверждённые критичные факторы — проверь источники.':attention?'Есть подтверждённые факторы, которые стоит держать в поле зрения.':'Срочных изменений по качественному новостному фону не видно.'}${quietVisible.length?` ${quietVisible.length} поз. без значимых событий.`:''}${main?` Главный вес: ${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%.`:''}`:`Значимых подтверждённых событий за 72 часа не найдено. ${quietVisible.length} основных позиций в режиме «ТИХО».`;
+  return {available:true,generatedAt:new Date().toISOString(),items,quiet:quietVisible.slice(0,8),summary:diagnosis,diagnosis:{events:items.length,critical,attention,neutral,quiet:quietVisible.length,mainFactor:main?`${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%`:null}};
 }
 
 app.get('/api/intel', async (req, res) => {
