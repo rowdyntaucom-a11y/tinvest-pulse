@@ -14,3 +14,8 @@ PULSE RÖNTGEN now derives its character and diagnosis from the live dashboard d
 PULSE v5.7 SCAN HUD: radar sweep, targets, live readouts and fill animation.
 
 UI update: v5.8 — live HUD/scan effects added to the first dashboard screen; PULSE scanner retained.
+
+
+## v6.3 PRO Capital Terminal
+
+The existing Terminal and Pulse Röntgen views are preserved. Use the **PRO** button to switch to the alternative widget-based Capital Terminal; use **TERMINAL** to return. The PRO view uses the same live `/api/dashboard` data and does not require a second API key.
