@@ -1137,10 +1137,13 @@ async function buildIntel() {
     else if(/санкци|запрет|ограничени|экспорт/.test(txt)) breaker='Расширение ограничений до уровня, который устойчиво ухудшает продажи, маржу или денежный поток.';
     else if(/авари|пожар|нпз|атак/.test(txt)) breaker='Затяжной простой, повторные повреждения или подтверждённое существенное снижение производства.';
     else if(/отчет|прибыл|выручк|прогноз/.test(txt)) breaker='Следующий отчёт или прогноз, который подтвердит устойчивое отклонение ключевых показателей от текущего сценария.';
+    const eventType=/нпз|авари|пожар|атак|производ|добыч/.test(txt)?'ОПЕРАЦИОННЫЙ':/дивиденд|buyback|выкуп/.test(txt)?'КАПИТАЛ':/санкци|запрет|ограничени|экспорт|налог/.test(txt)?'РЕГУЛЯТОРНЫЙ':/отчет|прибыл|выручк|финансов|прогноз/.test(txt)?'ФИНАНСОВЫЙ':'НОВОСТНОЙ ФОН';
+    const strength=Math.max(1,Math.min(10,Math.round((importance*.065 + Math.min(3.5,weight/8))*10)/10));
+    const chain=`${eventType.toLowerCase()} фактор → бизнес ${ticker} → финансовые показатели → вес ${weight.toFixed(1).replace('.',',')}% → портфель`;
     grouped.push({
       title:lead.title,link:lead.link,source:lead.source,publishedAt:lead.publishedAt,
       ticker,name:row.asset.name,weight,stories:enriched.length,
-      sentiment:sentiment.label,sentimentClass:sentiment.cls,importance,
+      sentiment:sentiment.label,sentimentClass:sentiment.cls,importance,eventType,strength,chain,
       impactLabel:importance>=70?'ВЫСОКОЕ':importance>=45?'СРЕДНЕЕ':'НИЗКОЕ',confidence,
       horizon:intelHorizon(lead),scenarios,status,whatChanged,meaning,thesisBreaker:breaker,
       sources:enriched.slice(0,3).map(x=>({title:x.title,source:x.source,link:x.link,publishedAt:x.publishedAt}))
