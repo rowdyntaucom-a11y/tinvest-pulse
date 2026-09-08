@@ -6,66 +6,91 @@
   <meta name="theme-color" content="#07100e">
   <title>Кряхтящий фонд — Pulse</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/style.css?v=6.1">
+  <link rel="stylesheet" href="/style.css?v=6.2">
 </head>
 <body data-theme="neon">
   <main class="phone" id="pulse">
     <section class="pulseShot" id="pulseShot" aria-hidden="true">
-      <div class="pulseScan" id="pulseScan" aria-hidden="true">
-        <div class="pulseScanCore">
-          <div class="pulseScanMark"><i></i><b>PULSE</b><span>RÖNTGEN</span></div>
-          <div class="scanRadar" aria-hidden="true">
-            <div class="scanRadarGrid"></div>
-            <i class="scanSweep"></i>
-            <span class="scanCross h"></span><span class="scanCross v"></span>
-            <b class="scanCoreDot"></b>
-            <span class="scanTarget t1"></span><span class="scanTarget t2"></span><span class="scanTarget t3"></span>
-            <em class="scanRadarPct" id="scanPct">0%</em>
+      <div class="pulseGlow"></div>
+      <div class="pulseTopline">
+        <div><span class="pulseKicker">PULSE <b>RÖNTGEN</b></span><small>ВНУТРИ ПОРТФЕЛЯ</small></div>
+        <div class="pulseMode"><i></i> DEEP SCAN</div>
+      </div>
+
+      <div class="reactorHero">
+        <div class="reactorCore">
+          <div class="reactorRing" id="scoreRing" role="button" tabindex="0" aria-label="Повторить сканирование">
+            <div class="reactorInner"><b id="pulseScore">—</b><span>REACTOR<br>INDEX</span></div>
+            <i class="reactorOrbit r1"></i><i class="reactorOrbit r2"></i><i class="reactorOrbit r3"></i>
           </div>
-          <div class="pulseScanTitle">СКАНИРОВАНИЕ ПОРТФЕЛЯ</div>
+          <div class="reactorLabels"><span>CORE STATUS</span><b id="pulseCoreStatus">ONLINE</b></div>
+        </div>
+        <div class="reactorReadout">
+          <small>СОСТОЯНИЕ СИСТЕМЫ</small>
+          <strong id="pulseDiagnosisTitle">—</strong>
+          <p id="pulseDiagnosisText">—</p>
+          <div class="microReadouts"><span>RISK <b id="pulseRiskScore">—</b></span><span>FLOW <b id="pulseFlowScore">—</b></span></div>
+        </div>
+      </div>
+
+      <div class="pulseMatrix">
+        <div class="scanPanel riskPanel">
+          <div class="panelHead"><span>☢ RISK RADAR</span><b id="riskLabel">—</b></div>
+          <div class="radarBody">
+            <div class="riskDial"><div><b id="riskScore">—</b><span>RISK</span></div></div>
+            <div class="riskStats">
+              <div><span>ПРОСАДКА</span><b id="riskDrawdown">—</b></div>
+              <div><span>КОНЦЕНТРАЦИЯ</span><b id="riskConcentration">—</b></div>
+              <div><span>КИТ</span><b id="riskWhale">—</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scanPanel flowPanel">
+          <div class="panelHead"><span>⚡ MONEY FLOW</span><b id="flowState">—</b></div>
+          <div class="flowValue"><b id="flowMonthly">—</b><span>/ МЕС</span></div>
+          <div class="flowYield"><span>доходность потока</span><b id="flowYield">—</b></div>
+          <div class="flowBar"><i id="flowBar"></i></div>
+          <div class="flowFoot"><span>в день <b id="flowDaily">—</b></span><span>в год <b id="flowAnnual">—</b></span></div>
+        </div>
+      </div>
+
+      <div class="pulseAssetField scanPanel">
+        <div class="panelHead"><span>🛰 ASSET HEAT FIELD</span><b id="fieldCount">—</b></div>
+        <div class="assetField" id="assetField"></div>
+        <div class="fieldLegend"><span><i class="legendDot hot"></i>вес</span><span><i class="legendDot cool"></i>прочие активы</span><b id="fieldMessage">СИГНАЛЫ СТАБИЛЬНЫ</b></div>
+      </div>
+
+      <div class="signalMatrix">
+        <div class="signalNode"><small>⚡ ИМПУЛЬС</small><b id="signalMomentum2">—</b><i><em id="signalMomentumBar2"></em></i><span id="signalMomentumText2">рынок</span></div>
+        <div class="signalNode"><small>↻ ВОССТАНОВЛЕНИЕ</small><b id="signalRecovery2">—</b><i><em id="signalRecoveryBar2"></em></i><span>от локального дна</span></div>
+        <div class="signalNode"><small>◉ ДИВЕРСИФИКАЦИЯ</small><b id="signalDivers2">—</b><i><em id="signalDiversBar2"></em></i><span id="signalDiversText2">ширина корзины</span></div>
+        <div class="signalNode"><small>✦ КАЧЕСТВО ПОТОКА</small><b id="signalFlow2">—</b><i><em id="signalFlowBar2"></em></i><span>пассивный двигатель</span></div>
+      </div>
+
+      <div class="pulseDNA2 scanPanel">
+        <div class="panelHead"><span>🧬 DNA PROFILE</span><b id="dnaVerdict">—</b></div>
+        <div class="dnaRows2">
+          <div><span>ДИВИДЕНДЫ</span><i><em id="dnaIncome2"></em></i><b id="dnaIncomeVal2">—</b></div>
+          <div><span>СТАБИЛЬНОСТЬ</span><i><em id="dnaStability2"></em></i><b id="dnaStabilityVal2">—</b></div>
+          <div><span>РОСТ</span><i><em id="dnaGrowth2"></em></i><b id="dnaGrowthVal2">—</b></div>
+          <div><span>ДИВЕРСИФ.</span><i><em id="dnaDivers2"></em></i><b id="dnaDiversVal2">—</b></div>
+        </div>
+      </div>
+
+      <div class="pulseFooterBar"><span><b>LIVE</b> · RÖNTGEN LOCKED</span><span id="pulseCommandText">TAP CORE ↻ RESCAN</span><time id="pulseTime">—</time></div>
+
+      <div class="pulseScan">
+        <div class="pulseScanCore">
+          <div class="scanRadar"><div class="scanSweep"></div><span class="scanCross h"></span><span class="scanCross v"></span><b class="scanCoreDot"></b><span class="scanTarget t1"></span><span class="scanTarget t2"></span><span class="scanTarget t3"></span><em class="scanRadarPct" id="scanPct">0%</em></div>
+          <div class="pulseScanMark"><i></i><b>REACTOR</b><span>DEEP SCAN</span></div>
+          <div class="pulseScanTitle">СКАНИРОВАНИЕ ВНУТРЕННЕЙ СТРУКТУРЫ</div>
           <div class="pulseScanSub" id="pulseScanSub">Считываем состояние активов…</div>
           <div class="scanReadouts"><span>СИГНАЛ <b id="scanSignal">WAIT</b></span><span>ПОТОК <b id="scanFlux">—</b></span><span>РИСК <b id="scanRisk">—</b></span></div>
           <div class="pulseScanTrack"><i id="pulseScanProgress"></i></div>
-          <div class="pulseScanRows">
-            <span id="scanRow1">◌ СОСТОЯНИЕ АКТИВОВ</span>
-            <span id="scanRow2">◌ ДИНАМИКА И IMOEX</span>
-            <span id="scanRow3">◌ ДЕНЕЖНЫЙ ПОТОК</span>
-          </div>
+          <div class="pulseScanRows"><span id="scanRow1">◌ КОНЦЕНТРАЦИЯ И РИСК</span><span id="scanRow2">◌ ДЕНЕЖНЫЙ ПОТОК</span><span id="scanRow3">◌ ДНК И СИГНАЛЫ</span></div>
         </div>
       </div>
-      <div class="pulseGlow"></div>
-      <div class="pulseHeader"><div><span class="pulseKicker">PULSE <b>RÖNTGEN</b></span><small>ВНУТРИ ПОРТФЕЛЯ</small></div><button class="pulseBack" id="pulseBack" type="button">↩ PULSE</button></div>
-      <div class="pulseTelemetry"><span><i></i> LIVE</span><span id="pulseAssets">15 АКТИВОВ</span><span id="pulseAgeTop">43 ДН.</span><span id="pulseUpdated">ОБНОВЛЕНО —</span></div>
-      <div class="pulseHero">
-        <div class="pulseHeroCopy"><div class="pulseShotLabel">СЕГОДНЯШНИЙ ПУЛЬС</div><div class="pulseShotValue" id="pulseValue">—</div><div class="pulseShotGain" id="pulseGain">—</div></div>
-        <button class="scoreRing" id="scoreRing" type="button" aria-label="Повторить сканирование"><div><b id="pulseScore">—</b><span>PULSE<br>SCORE</span></div><i class="scoreOrbit o1"></i><i class="scoreOrbit o2"></i><i class="scoreOrbit o3"></i></button>
-      </div>
-      <div class="heartbeat"><div class="heartbeatHead"><span>♥ БИЕНИЕ ПОРТФЕЛЯ</span><b id="pulseHeartbeat">ЖИВОЙ</b></div><svg viewBox="0 0 600 105" preserveAspectRatio="none"><path id="heartbeatGrid" d="M0 26H600M0 52H600M0 78H600"/><path id="pulseArea" class="pulseArea" d=""/><path id="pulseLine" class="pulseLine" d=""/><path id="pulseMoex" class="pulseMoex" d=""/></svg><div class="heartbeatMeta"><span>СТАРТ 100</span><span id="pulseTrendEnd">СЕЙЧАС —</span></div></div>
-      <div class="pulseBattle"><div class="battleTitle"><span>⚔ БИТВА С IMOEX</span><b id="pulseBattleText">—</b></div><div class="battleNumbers"><strong id="pulsePortfolioReturn">—</strong><span>vs</span><strong id="pulseMoexReturn">—</strong></div><div class="battleBar"><i id="battlePortfolio"></i><em id="battleMoex"></em><span>ТЫ</span><span>IMOEX</span></div></div>
-      <div class="pulseGrid">
-        <div class="pulseTile"><small>🐋 КИТ ПОРТФЕЛЯ</small><b id="pulseWhale">—</b><span id="pulseWhaleWeight">—</span></div>
-        <div class="pulseTile"><small>📉 БОЛЬ</small><b id="pulsePain">—</b><span id="pulsePainText">—</span></div>
-        <div class="pulseTile"><small>💰 СКОРОСТЬ</small><b id="pulseSpeed">—</b><span>в день</span></div>
-        <div class="pulseTile"><small>🧱 ВОЗРАСТ</small><b id="pulseAge">—</b><span>портфеля</span></div>
-      </div>
-      <div class="pulseCharacter"><div><small>ХАРАКТЕР ПОРТФЕЛЯ</small><b id="pulseCharacterName">—</b></div><span id="pulseCharacterText">—</span></div>
-      <div class="pulseLabGrid"><div class="pulseDNA">
-        <div class="pulseSectionHead"><span>🧬 ДНК ПОРТФЕЛЯ</span><b id="pulseScoreWhy">РАЗБОР SCORE</b></div>
-        <div class="dnaGrid">
-          <div class="dnaItem"><span>ДИВИДЕНДЫ</span><i><em id="dnaIncome"></em></i><b id="dnaIncomeVal">—</b></div>
-          <div class="dnaItem"><span>СТАБИЛЬНОСТЬ</span><i><em id="dnaStability"></em></i><b id="dnaStabilityVal">—</b></div>
-          <div class="dnaItem"><span>РОСТ</span><i><em id="dnaGrowth"></em></i><b id="dnaGrowthVal">—</b></div>
-          <div class="dnaItem"><span>ДИВЕРСИФ.</span><i><em id="dnaDivers"></em></i><b id="dnaDiversVal">—</b></div>
-        </div>
-      </div><div class="pulseLabSide"><div class="pulseTelemetryBox"><small>ТЕМП ПОРТФЕЛЯ</small><b id="pulseTempo">—</b><span id="pulseTempoText">—</span></div><div class="pulseTicker" id="pulseTicker">ПУЛЬС СТАБИЛЬНЫЙ</div></div></div>
-      <div class="pulseDiagnosis"><div><small>🩺 ДИАГНОЗ</small><b id="pulseDiagnosisTitle">—</b></div><span id="pulseDiagnosisText">—</span></div>
-      <div class="pulseSignalDeck">
-        <div class="signalCard"><small>⚡ ИМПУЛЬС</small><b id="signalMomentum">—</b><i><em id="signalMomentumBar"></em></i><span id="signalMomentumText">рынок</span></div>
-        <div class="signalCard"><small>↻ ВОССТАНОВЛЕНИЕ</small><b id="signalRecovery">—</b><i><em id="signalRecoveryBar"></em></i><span>от дна</span></div>
-        <div class="signalCard"><small>◉ ДЕНЕЖНЫЙ ПОТОК</small><b id="signalFlow">—</b><i><em id="signalFlowBar"></em></i><span>в месяц</span></div>
-      </div>
-      <div class="pulseCommand"><span><b>LIVE</b> · SIGNALS LOCKED</span><span id="pulseCommandText">TAP SCORE ↻ RESCAN</span></div>
-      <div class="pulseShotFooter"><span>НЕ БАНК · НЕ ФОНД · ПРОСТО КРЯХТИТ</span><time id="pulseTime">—</time></div>
     </section>
     <div class="noise"></div>
     <div class="hudOverlay" id="hudOverlay" aria-hidden="true"><div class="hudScanline"></div><div class="hudVignette"></div><div class="hudCorner c1"></div><div class="hudCorner c2"></div><div class="hudCorner c3"></div><div class="hudCorner c4"></div><div class="hudParticles" id="hudParticles"></div><div class="hudReadout">SYS <b id="hudPulseState">LIVE</b></div></div>
@@ -134,6 +159,6 @@
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=6.1.0"></script>
+  <script src="/app.js?v=6.2.0"></script>
 </body>
 </html>

@@ -1,3 +1,7 @@
+## v6.2 — PULSE RÖNTGEN internal mode
+
+Page 2 is now a distinct internal-analysis screen: Reactor Index, Risk Radar, Money Flow, Asset Heat Field, signal matrix, and DNA profile. No duplicate dashboard widgets. PULSE toggles back and forth.
+
 
 ## v6.1 Reactor HUD — deployment fix
 
