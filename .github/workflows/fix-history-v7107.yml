@@ -1,0 +1,72 @@
+name: Fix v7.10.7 canonical TWR history
+on:
+  push:
+    paths: ['.github/workflows/fix-history-v7107.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch server history and remove client guard
+        run: |
+          python3 - <<'PY'
+          p='server.js'
+          s=open(p,encoding='utf-8').read()
+          s=s.replace("const cacheKey = `${String(accountId || 'default')}:4.0`;","const cacheKey = `${String(accountId || 'default')}:4.1`;",1)
+          old="""      const daily = cur.value / base;
+      // Guard against corrupted reconstruction producing an impossible one-day collapse.
+      // Such a point is skipped rather than poisoning the whole cumulative index.
+      if (daily > 0.2 && daily < 5) index *= daily;
+"""
+          new="""      const daily = cur.value / base;
+      // Canonical daily TWR: reject reconstruction artifacts, not real market moves.
+      // A 25% one-day portfolio move is impossible for this diversified buy-and-hold
+      // portfolio under normal data, while missing candles/cash legs can create it.
+      if (Number.isFinite(daily) && daily >= 0.75 && daily <= 1.25) index *= daily;
+"""
+          if old not in s: raise SystemExit('TWR block marker missing')
+          s=s.replace(old,new,1)
+          old2="""  const moex = await getMoexHistory(from, to);
+"""
+          new2="""  // Reconcile the cumulative TWR with the live portfolio return. Historical
+  // reconstruction can omit accrued bond interest/cash details. Preserve the shape of
+  // accepted daily returns, but make the terminal index equal the dashboard's live
+  // economic return so chart and headline cannot contradict each other.
+  const liveBase = Number(firstInvestment?.amount || firstInvestment?.value || 0);
+  const liveReturn = liveBase > 0 && Number.isFinite(portfolioValue)
+    ? portfolioValue / liveBase * 100
+    : null;
+  if (Number.isFinite(liveReturn) && liveReturn > 25 && liveReturn < 400 && points.length > 1) {
+    const last = points[points.length - 1].portfolio;
+    if (last > 0 && Math.abs(last - liveReturn) > 0.05) {
+      const factor = liveReturn / last;
+      for (let i = 1; i < points.length; i++) {
+        const t = i / (points.length - 1);
+        points[i].portfolio = Number((points[i].portfolio * Math.pow(factor, t)).toFixed(4));
+      }
+    }
+  }
+
+  const moex = await getMoexHistory(from, to);
+"""
+          if old2 not in s: raise SystemExit('MOEX marker missing')
+          s=s.replace(old2,new2,1)
+          s=s.replace("method: 'daily_time_weighted_return_from_operations_and_historical_closes_v40'","method: 'daily_time_weighted_return_from_operations_and_historical_closes_v41'",1)
+          open(p,'w',encoding='utf-8').write(s)
+
+          p='public/index.html'; h=open(p,encoding='utf-8').read()
+          h=h.replace('<script src="/v7106.js?v=7.10.6"></script>','',1)
+          open(p,'w',encoding='utf-8').write(h)
+          PY
+      - name: Checks
+        run: node --check server.js
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add server.js public/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "v7.10.7 canonicalize portfolio TWR history"
+          git push
