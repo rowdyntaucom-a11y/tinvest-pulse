@@ -408,6 +408,7 @@ function exitPulse(){
 }
 function togglePulse(e){if(e){e.preventDefault();e.stopPropagation();}pulseMode?exitPulse():enterPulse();}
 $('pulseBtn').addEventListener('click',togglePulse);
+$('pulseExitBtn')?.addEventListener('click',togglePulse);
 $('pulseBack')?.addEventListener('click',togglePulse);
 
 // Long press on PULSE opens the same Röntgen view with a subtle "deep" state for power users.

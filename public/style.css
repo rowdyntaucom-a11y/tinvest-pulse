@@ -353,3 +353,13 @@ footer #status{position:relative}
 @media(max-width:380px){.proBtn{min-width:45px;padding:8px 8px}.proKicker{font-size:12px}.proValue{font-size:25px}.proHero{grid-template-columns:1.15fr .85fr}.proWidgetGrid{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){.proBtn:before,.proView,.proHero:after,.capitalIsland,.islandAura,.goldParticle,.capitalBeam,.proChartDot,.proStatus i{animation:none!important}}
 @media(max-width:380px){.topActions{gap:4px}.styleBtn{padding:8px 7px;font-size:8px;border-radius:11px}.proBtn{min-width:40px;padding:8px 7px;font-size:8px}.pulseBtn{padding:9px 10px;font-size:11px;border-radius:14px}.brand{font-size:19px;letter-spacing:-.9px}.sub{font-size:8px}}
+
+
+/* v6.3.1 — PULSE standalone capture polish */
+.pulse-capture>.top{display:none!important;visibility:hidden!important}
+.pulse-capture>.pulseShot{padding-top:max(14px,env(safe-area-inset-top));padding-bottom:max(9px,env(safe-area-inset-bottom))}
+.pulse-capture .pulseTopline{gap:8px}
+.pulseTopActions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.pulseExitBtn{border:1px solid color-mix(in srgb,var(--accent) 42%,transparent);background:rgba(3,9,8,.64);color:var(--accent);border-radius:999px;padding:6px 9px;font:900 7px/1 Inter,system-ui,sans-serif;letter-spacing:.7px;white-space:nowrap;box-shadow:0 0 18px color-mix(in srgb,var(--accent) 10%,transparent);cursor:pointer}
+.pulseExitBtn:active{transform:scale(.96)}
+@media(max-height:760px){.pulse-capture>.pulseShot{padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(6px,env(safe-area-inset-bottom))}.pulseExitBtn{padding:5px 8px;font-size:6.5px}}
