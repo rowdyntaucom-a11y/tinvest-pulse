@@ -1,0 +1,67 @@
+name: v7.10.6 server-side WHAT IF duration
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-whatif-server-duration-v7106.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch WHAT IF duration source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('whatif-engine.js')
+          s=p.read_text()
+          s=s.replace("const { buildDashboard } = deps;", "const { buildDashboard, getBondDuration } = deps;")
+          old="const duration=clamp(Number(req.query.duration)||0,0,30);"
+          new="let duration=clamp(Number(req.query.duration)||0,0,30),durationSource=duration>0?'CLIENT_BOND_ANALYTICS':'UNAVAILABLE';\n      if(!(duration>0)&&typeof getBondDuration==='function'){try{const serverDuration=Number(await getBondDuration());if(Number.isFinite(serverDuration)&&serverDuration>0){duration=clamp(serverDuration,0,30);durationSource='SERVER_BOND_ANALYTICS'}}catch(_){}}"
+          if old not in s: raise SystemExit('duration target not found')
+          s=s.replace(old,new,1)
+          s=s.replace("version:'7.7',source:'SERVER_WHAT_IF',inputs:{", "version:'7.10.6',source:'SERVER_WHAT_IF',durationSource,inputs:{",1)
+          s=s.replace("res.status(500).json({version:'7.7'", "res.status(500).json({version:'7.10.6'",1)
+          p.write_text(s)
+
+          p=Path('bond-analytics.js')
+          s=p.read_text()
+          old="app.get('/api/shield/bonds',async(req,res)=>{"
+          new="async function getBondDuration(){if(cache&&Date.now()-cache.createdAt<CACHE_MS){const v=Number(cache.data?.summary?.weightedModifiedDuration);if(Number.isFinite(v)&&v>0)return v}let data=await build();if(!isGood(data)){await new Promise(r=>setTimeout(r,350));data=await build()}if(isGood(data)){cache={createdAt:Date.now(),data};lastGood=data;return Number(data.summary.weightedModifiedDuration)}const fallback=Number(lastGood?.summary?.weightedModifiedDuration);return Number.isFinite(fallback)&&fallback>0?fallback:null}\n  if(deps&&typeof deps==='object')deps.getBondDuration=getBondDuration;\n  app.get('/api/shield/bonds',async(req,res)=>{"
+          if old not in s: raise SystemExit('bond endpoint target not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          p=Path('payouts.js')
+          s=p.read_text()
+          old="registerBondAnalytics(app, { tbankRequest: deps?.tbankRequest, buildDashboard: deps?.buildDashboard });\n  registerWhatIfEngine(app, { buildDashboard: deps?.buildDashboard });"
+          new="const bondDeps={ tbankRequest: deps?.tbankRequest, buildDashboard: deps?.buildDashboard };\n  registerBondAnalytics(app, bondDeps);\n  registerWhatIfEngine(app, { buildDashboard: deps?.buildDashboard, getBondDuration: (...args)=>bondDeps.getBondDuration?.(...args) });"
+          if old not in s: raise SystemExit('module wiring target not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          p=Path('public/v77.js')
+          s=p.read_text()
+          s=s.replace("SERVER_WHAT_IF · v7.10.5 · DURATION", "SERVER_WHAT_IF · v7.10.6 · DURATION",1).replace("SCENARIO ENGINE · v7.10.5", "SCENARIO ENGINE · v7.10.6",1)
+          old="const a=d.after||{},e=d.effects||{},b=d.before||{},pnl=n(a.scenarioPnl)||0"
+          new="const serverDuration=n(d?.inputs?.duration);if(Number.isFinite(serverDuration)&&serverDuration>0){duration=serverDuration;localStorage.setItem('pulseBondDuration',String(serverDuration))}const a=d.after||{},e=d.effects||{},b=d.before||{},pnl=n(a.scenarioPnl)||0"
+          if old not in s: raise SystemExit('client server-duration target not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          node --check whatif-engine.js
+          node --check bond-analytics.js
+          node --check payouts.js
+          node --check public/v77.js
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add whatif-engine.js bond-analytics.js payouts.js public/v77.js
+          git commit -m 'v7.10.6 use server bond duration in WHAT IF' || exit 0
+          git push
