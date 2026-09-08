@@ -1,0 +1,38 @@
+name: v7.10.7 readable WHAT IF effect
+on:
+  push:
+    paths:
+      - '.github/workflows/whatif-readable-net-v7107.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Patch WHAT IF effect breakdown
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/v77.js'); s=p.read_text()
+          old='<div class="w77net"><small>ЧИСТЫЙ ЭФФЕКТ СЦЕНАРИЯ</small><b class="${pnl>=0?\'good\':\'bad\'}">${srub(pnl)}</b><strong class="${pnl>=0?\'good\':\'bad\'}">${pnl>=0?\'+\':\'\'}${f2(impactPct)}%</strong></div>'
+          new='<div class="w77net"><small>ЧИСТЫЙ ЭФФЕКТ СЦЕНАРИЯ</small><div class="w77formula"><span>Рынок <b class="${marketRub>=0?\'good\':\'bad\'}">${srub(marketRub)}</b></span><i>+</i><span>Ставка <b class="${rateRub>=0?\'good\':\'bad\'}">${srub(rateRub)}</b></span><i>=</i><strong class="${pnl>=0?\'good\':\'bad\'}">${srub(pnl)}</strong></div><em class="${pnl>=0?\'good\':\'bad\'}">${pnl>=0?\'+\':\'\'}${f2(impactPct)}% капитала</em></div>'
+          if old not in s: raise SystemExit('net target not found')
+          s=s.replace(old,new,1)
+          s=s.replace("SERVER_WHAT_IF · v7.10.6", "SERVER_WHAT_IF · v7.10.7",1).replace("SCENARIO ENGINE · v7.10.6", "SCENARIO ENGINE · v7.10.7",1)
+          oldcss='.w77net{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-top:7px;padding:10px 11px;border:1px solid rgba(84,246,197,.16);border-radius:11px;background:rgba(255,255,255,.018)}.w77net small{font-size:5px;color:#71827d;letter-spacing:.6px}.w77net b{font-size:13px}.w77net strong{font-size:11px}'
+          newcss='.w77net{margin-top:7px;padding:10px 11px;border:1px solid rgba(84,246,197,.16);border-radius:11px;background:rgba(255,255,255,.018)}.w77net small{display:block;font-size:5px;color:#71827d;letter-spacing:.6px;margin-bottom:7px}.w77formula{display:flex;align-items:center;justify-content:space-between;gap:5px}.w77formula span{font-size:6px;color:#7e8e89}.w77formula b{display:block;font-size:11px;margin-top:2px}.w77formula i{font-style:normal;color:#53635f;font-size:9px}.w77formula strong{font-size:13px}.w77net>em{display:block;font-style:normal;text-align:right;font-size:6px;margin-top:5px}'
+          if oldcss not in s: raise SystemExit('net css target not found')
+          s=s.replace(oldcss,newcss,1)
+          p.write_text(s)
+          PY
+          node --check public/v77.js
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/v77.js
+          git commit -m 'v7.10.7 make WHAT IF net effect readable' || exit 0
+          git push
