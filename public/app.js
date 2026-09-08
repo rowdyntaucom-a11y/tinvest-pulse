@@ -273,87 +273,20 @@ function classifyPulseAsset(a){
   return 'stocks';
 }
 function pulseStats(d){
-  const p=d?.portfolio||{};
-  const pts=Array.isArray(d?.history?.points)?d.history.points:[];
-  const ps=pts.map(x=>Number(x?.portfolio)).filter(v=>Number.isFinite(v)&&v>0);
-  const ms=pts.map(x=>Number(x?.imoex)).filter(v=>Number.isFinite(v)&&v>0);
-  const p0=ps[0]||100, p1=ps[ps.length-1]||p0, m0=ms[0]||100, m1=ms[ms.length-1]||m0;
-  const pReturn=(p1/p0-1)*100, mReturn=(m1/m0-1)*100, activeReturn=pReturn-mReturn;
-  let peak=p0,maxDD=0;
-  for(const v of ps){peak=Math.max(peak,v);if(peak>0)maxDD=Math.max(maxDD,(peak-v)/peak*100);}
-  const trough=ps.length?Math.min(...ps):p1;
-  const recovery=(p1>trough && peak>trough)?clamp((p1-trough)/(peak-trough)*100,0,100):100;
-  const daily=[];
-  for(let i=1;i<ps.length;i++){if(ps[i-1]>0)daily.push((ps[i]/ps[i-1]-1)*100);}
-  const avg=daily.length?daily.reduce((a,b)=>a+b,0)/daily.length:0;
-  const vol=daily.length>1?Math.sqrt(daily.reduce((a,b)=>a+(b-avg)**2,0)/(daily.length-1)):0;
-  const assets=Array.isArray(d?.assets)?d.assets:((Array.isArray(p.assets)?p.assets:[]));
-  const total=Number(p.value)||assets.reduce((sum,a)=>sum+Math.max(0,Number(a?.currentValue)||0),0);
+  const s=window.__shieldDNA||{};
+  const assets=Array.isArray(d?.assets)?d.assets:(Array.isArray(d?.portfolio?.assets)?d.portfolio.assets:[]);
+  const total=Number(d?.portfolio?.value)||assets.reduce((z,a)=>z+Math.max(0,Number(a?.currentValue)||0),0)||1;
   const byValue=[...assets].filter(a=>(Number(a?.currentValue)||0)>0).sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0));
-  const weights=byValue.map(a=>total>0?Math.max(0,Number(a.currentValue)||0)/total*100:0);
-  const whale=byValue[0], whaleWeight=weights[0]||0;
-  const top3Weight=weights.slice(0,3).reduce((a,b)=>a+b,0);
-  const squaredShare=weights.reduce((sum,w)=>sum+Math.pow(w/100,2),0);
-  const effectiveN=squaredShare>0?1/squaredShare:0;
-  const concentrationRisk=clamp(Math.round(Math.max(0,whaleWeight-15)*3.1 + Math.max(0,top3Weight-55)*1.45),0,100);
-  const concentrationScore=clamp(Math.round(100-concentrationRisk),0,100);
-  const diversificationScore=clamp(Math.round((Math.min(effectiveN,8)/8)*82 + Math.min(byValue.length,10)*1.8),18,100);
-
-  const alloc={stocks:0,bonds:0,reserve:0};
-  for(const a of byValue){alloc[classifyPulseAsset(a)]+=Math.max(0,Number(a.currentValue)||0);}
-  const represented=alloc.stocks+alloc.bonds+alloc.reserve;
-  if(total>represented) alloc.reserve+=total-represented;
-  const allocationBase=alloc.stocks+alloc.bonds+alloc.reserve;
-  const stocksPct=allocationBase>0?alloc.stocks/allocationBase*100:0;
-  const bondsPct=allocationBase>0?alloc.bonds/allocationBase*100:0;
-  const reservePct=allocationBase>0?alloc.reserve/allocationBase*100:0;
-  const defensivePct=bondsPct+reservePct;
-  const balanceGap=Math.abs(stocksPct-defensivePct);
-  const balanceScore=clamp(Math.round(100-balanceGap*1.65),0,100);
-
+  const weights=byValue.map(a=>Math.max(0,Number(a.currentValue)||0)/total*100);
   const assetResult=a=>Number.isFinite(Number(a?.yieldRub))?Number(a.yieldRub):Number(a?.expectedYield)||0;
   const byResult=[...byValue].sort((a,b)=>assetResult(b)-assetResult(a));
-  const strength=byResult[0], painAsset=byResult[byResult.length-1];
-  const monthly=Number(d?.passiveIncome?.averageMonthly);
-  const incomeYield=Number.isFinite(monthly)&&total>0?(monthly*12/total*100):0;
-  const ageDays=p.startDate?Math.max(0,Math.round((Date.now()-new Date(p.startDate).getTime())/86400000)):null;
-  const flowScore=clamp(Math.round(30+incomeYield*10+(monthly>0?14:0)),0,100);
-  const stabilityScore=clamp(Math.round(68 + bondsPct*.28 + reservePct*.18 - maxDD*3.7 - vol*3.2),12,100);
-  const growthScore=clamp(Math.round(50+pReturn*2.8+activeReturn*3.4),0,100);
-  const dnaIncome=flowScore;
-  const dnaStability=stabilityScore;
-  const dnaGrowth=growthScore;
-  const dnaDivers=diversificationScore;
-  const dnaBalance=balanceScore;
-  const dnaConcentration=concentrationScore;
-  const dnaBase=dnaBalance*.25+dnaConcentration*.20+dnaStability*.20+dnaIncome*.15+dnaGrowth*.10+dnaDivers*.10;
-  const score=clamp(Math.round(dnaBase),0,100);
-  const riskScore=clamp(Math.round(concentrationRisk*.42 + Math.min(100,maxDD*5)*.28 + Math.min(100,balanceGap*2.4)*.20 + Math.min(100,vol*12)*.10),0,100);
-  const riskLabel=riskScore>=65?'ВЫСОКИЙ':(riskScore>=35?'УМЕРЕННЫЙ':'НИЗКИЙ');
-  const flowBar=clamp(flowScore,6,100);
-  const strengthTicker=strength?(strength.ticker||strength.name||'—'):'—';
-  const painTicker=painAsset?(painAsset.ticker||painAsset.name||'—'):'—';
-  const strengthYield=assetResult(strength), painYield=assetResult(painAsset);
-  const momentum=clamp(50+activeReturn*7,0,100);
-  const diversified=byValue.length;
-  const pulseBeat=score>=70?'СОБРАН':score>=55?'РАБОТАЕТ':'ТРЕБУЕТ НАСТРОЙКИ';
-  const allocationState=balanceScore>=85?'ПОЧТИ 50 / 50':balanceScore>=65?'СДВИГ УМЕРЕННЫЙ':'БАЛАНС СМЕЩЁН';
-  const dnaVerdict=score>=80?'СИЛЬНЫЙ DNA':score>=65?'СБАЛАНСИРОВАН':score>=50?'РАБОЧИЙ ПРОФИЛЬ':'ТРЕБУЕТ НАСТРОЙКИ';
-
-  const concentrationNode=whaleWeight>=30?{level:'HIGH',text:`${(whale?.ticker||whale?.name||'ядро')} ${whaleWeight.toFixed(1).replace('.',',')}%`}:whaleWeight>=22?{level:'WATCH',text:`крупнейшая ${whaleWeight.toFixed(1).replace('.',',')}%`}:{level:'OK',text:`крупнейшая ${whaleWeight.toFixed(1).replace('.',',')}%`};
-  const balanceNode=balanceGap>=30?{level:'HIGH',text:`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`} : balanceGap>=16?{level:'WATCH',text:`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`}:{level:'OK',text:`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`};
-  const drawdownNode=maxDD>=15?{level:'HIGH',text:`−${maxDD.toFixed(1).replace('.',',')}%`}:maxDD>=8?{level:'WATCH',text:`−${maxDD.toFixed(1).replace('.',',')}%`}:{level:'OK',text:`−${maxDD.toFixed(1).replace('.',',')}%`};
-
-  let diagnosisTitle='DNA СБАЛАНСИРОВАН';
-  let diagnosisText=`Акции ${stocksPct.toFixed(0)}%, защитная часть ${defensivePct.toFixed(0)}%. Крупнейшая позиция — ${whale?.ticker||whale?.name||'—'} ${whaleWeight.toFixed(1).replace('.',',')}%.`;
-  if(concentrationRisk>=55){diagnosisTitle='ЯДРО ПЕРЕГРУЖЕНО';diagnosisText=`${whale?.ticker||whale?.name||'Крупнейшая позиция'} занимает ${whaleWeight.toFixed(1).replace('.',',')}%. Это главный структурный риск портфеля.`;}
-  else if(balanceScore<60){diagnosisTitle='БАЛАНС СМЕЩЁН';diagnosisText=`Структура сейчас ${stocksPct.toFixed(0)}% акции / ${defensivePct.toFixed(0)}% защитная часть. Цель 50/50 заметно отклонена.`;}
-  else if(flowScore>=70){diagnosisTitle='ДЕНЕЖНЫЙ ДВИГАТЕЛЬ';diagnosisText=`Пассивный поток ${rub(monthly)}/мес. уже заметно поддерживает DNA портфеля.`;}
-  else if(activeReturn>=2){diagnosisTitle='DNA НАБИРАЕТ ХОД';diagnosisText=`Портфель опережает IMOEX примерно на ${activeReturn.toFixed(1).replace('.',',')} п.п., не ломая базовую структуру.`;}
-  else if(activeReturn<=-4){diagnosisTitle='РЕЖИМ ДОГОНА';diagnosisText=`IMOEX впереди примерно на ${Math.abs(activeReturn).toFixed(1).replace('.',',')} п.п. Зона давления — ${painTicker}.`;}
-  else if(recovery>75 && maxDD>0){diagnosisTitle='ВОССТАНОВЛЕНИЕ';diagnosisText=`Портфель восстановил ${Math.round(recovery)}% пути от локального дна к пику.`;}
-
-  return {pts,p1,m1,total,pReturn,mReturn,activeReturn,maxDD,peak,trough,recovery,momentum,flowBar,whale,whaleWeight,strength,painAsset,strengthTicker,painTicker,strengthYield,painYield,riskLabel,riskScore,monthly,incomeYield,flowScore,score,dnaBase,ageDays,pulseBeat,dnaIncome,dnaStability,dnaGrowth,dnaDivers,dnaBalance,dnaConcentration,diagnosisTitle,diagnosisText,vol,diversified,dnaVerdict,weights,byValue,stocksPct,bondsPct,reservePct,defensivePct,balanceScore,balanceGap,concentrationRisk,concentrationScore,allocationState,effectiveN,concentrationNode,balanceNode,drawdownNode,assetResult};
+  const strength=byResult[0]||null,painAsset=byResult[byResult.length-1]||null;
+  const alloc=s.allocation||{},scores=s.scores||{},risk=s.risk||{},flow=s.flow||{};
+  const stocksPct=Number(alloc.stocks)||0,bondsPct=Number(alloc.bonds)||0,reservePct=Number(alloc.reserve)||0,defensivePct=bondsPct+reservePct;
+  const whale=byValue[0]||null,whaleWeight=Number(risk.largestWeight)||weights[0]||0;
+  const maxDD=Number(risk.drawdown)||0,riskScore=Number(scores.risk)||0,balanceScore=Number(scores.balance)||0,flowScore=Number(scores.flow)||0;
+  const node=(level,text)=>({level,text});
+  return {pts:[],p1:100,m1:100,total,pReturn:0,mReturn:0,activeReturn:0,maxDD,peak:100,trough:100,recovery:100,momentum:50,flowBar:flowScore,whale,whaleWeight,strength,painAsset,strengthTicker:strength?(strength.ticker||strength.name||'—'):'—',painTicker:painAsset?(painAsset.ticker||painAsset.name||'—'):'—',strengthYield:assetResult(strength),painYield:assetResult(painAsset),riskLabel:risk.label||'—',riskScore,monthly:Number(flow.monthly)||0,incomeYield:Number(flow.yieldPct)||0,flowScore,score:Number(s.score)||0,dnaBase:Number(s.score)||0,ageDays:null,pulseBeat:s.coreStatus||'SERVER',dnaIncome:flowScore,dnaStability:Number(scores.stability)||0,dnaGrowth:Number(scores.growth)||0,dnaDivers:Number(scores.diversification)||0,dnaBalance:balanceScore,dnaConcentration:Number(scores.concentration)||0,diagnosisTitle:s.diagnosis?.title||'SERVER DNA',diagnosisText:s.diagnosis?.text||'Защищённый расчёт загружается с сервера.',vol:0,diversified:Number(s.portfolio?.assets)||byValue.length,dnaVerdict:s.verdict||'SERVER DNA',weights,byValue,stocksPct,bondsPct,reservePct,defensivePct,balanceScore,balanceGap:Math.abs(stocksPct-defensivePct),concentrationRisk:Math.max(0,100-(Number(scores.concentration)||0)),concentrationScore:Number(scores.concentration)||0,allocationState:Math.abs(stocksPct-defensivePct)<8?'ПОЧТИ 50 / 50':'БАЛАНС СМЕЩЁН',effectiveN:Number(s.portfolio?.effectivePositions)||0,concentrationNode:node(whaleWeight>=30?'HIGH':whaleWeight>=22?'WATCH':'OK',`${whaleWeight.toFixed(1).replace('.',',')}%`),balanceNode:node(Math.abs(stocksPct-defensivePct)>=30?'HIGH':Math.abs(stocksPct-defensivePct)>=16?'WATCH':'OK',`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`),drawdownNode:node(maxDD>=15?'HIGH':maxDD>=8?'WATCH':'OK',`−${maxDD.toFixed(1).replace('.',',')}%`),assetResult};
 }
 function drawPulsePath(key,pts){
   const a=pts.map(x=>Number(x?.[key])).filter(v=>Number.isFinite(v)&&v>0);

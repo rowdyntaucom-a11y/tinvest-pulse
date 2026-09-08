@@ -28,7 +28,7 @@
  let busy=false,last=null;
  function set(id,v){const e=$(id);if(e)e.textContent=v}
  function bar(id,v){const e=$(id);if(e)e.style.width=Math.max(0,Math.min(100,num(v)||0))+'%'}
- function paint(x){
+ function paint(x){window.__shieldDNA=x;
   if(!x||x.source!=='SERVER_SHIELD')return;last=x;
   set('pulseScore',String(x.score??'—'));set('pulseCoreStatus',x.coreStatus||'SERVER');set('pulseDiagnosisTitle',x.diagnosis?.title||'—');set('pulseDiagnosisText',x.diagnosis?.text||'—');
   set('pulseBalanceScore',String(x.scores?.balance??'—'));set('pulseRiskScore',String(x.scores?.risk??'—'));set('pulseFlowScore',String(x.scores?.flow??'—'));
