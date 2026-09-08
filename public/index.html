@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07100e">
   <title>Кряхтящий фонд — Pulse</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/style.css?v=5.9">
+  <link rel="stylesheet" href="/style.css?v=6.1">
 </head>
 <body data-theme="neon">
   <main class="phone" id="pulse">
@@ -38,7 +38,7 @@
       <div class="pulseTelemetry"><span><i></i> LIVE</span><span id="pulseAssets">15 АКТИВОВ</span><span id="pulseAgeTop">43 ДН.</span><span id="pulseUpdated">ОБНОВЛЕНО —</span></div>
       <div class="pulseHero">
         <div class="pulseHeroCopy"><div class="pulseShotLabel">СЕГОДНЯШНИЙ ПУЛЬС</div><div class="pulseShotValue" id="pulseValue">—</div><div class="pulseShotGain" id="pulseGain">—</div></div>
-        <div class="scoreRing" id="scoreRing"><div><b id="pulseScore">—</b><span>PULSE<br>SCORE</span></div></div>
+        <button class="scoreRing" id="scoreRing" type="button" aria-label="Повторить сканирование"><div><b id="pulseScore">—</b><span>PULSE<br>SCORE</span></div><i class="scoreOrbit o1"></i><i class="scoreOrbit o2"></i><i class="scoreOrbit o3"></i></button>
       </div>
       <div class="heartbeat"><div class="heartbeatHead"><span>♥ БИЕНИЕ ПОРТФЕЛЯ</span><b id="pulseHeartbeat">ЖИВОЙ</b></div><svg viewBox="0 0 600 105" preserveAspectRatio="none"><path id="heartbeatGrid" d="M0 26H600M0 52H600M0 78H600"/><path id="pulseArea" class="pulseArea" d=""/><path id="pulseLine" class="pulseLine" d=""/><path id="pulseMoex" class="pulseMoex" d=""/></svg><div class="heartbeatMeta"><span>СТАРТ 100</span><span id="pulseTrendEnd">СЕЙЧАС —</span></div></div>
       <div class="pulseBattle"><div class="battleTitle"><span>⚔ БИТВА С IMOEX</span><b id="pulseBattleText">—</b></div><div class="battleNumbers"><strong id="pulsePortfolioReturn">—</strong><span>vs</span><strong id="pulseMoexReturn">—</strong></div><div class="battleBar"><i id="battlePortfolio"></i><em id="battleMoex"></em><span>ТЫ</span><span>IMOEX</span></div></div>
@@ -59,9 +59,16 @@
         </div>
       </div><div class="pulseLabSide"><div class="pulseTelemetryBox"><small>ТЕМП ПОРТФЕЛЯ</small><b id="pulseTempo">—</b><span id="pulseTempoText">—</span></div><div class="pulseTicker" id="pulseTicker">ПУЛЬС СТАБИЛЬНЫЙ</div></div></div>
       <div class="pulseDiagnosis"><div><small>🩺 ДИАГНОЗ</small><b id="pulseDiagnosisTitle">—</b></div><span id="pulseDiagnosisText">—</span></div>
+      <div class="pulseSignalDeck">
+        <div class="signalCard"><small>⚡ ИМПУЛЬС</small><b id="signalMomentum">—</b><i><em id="signalMomentumBar"></em></i><span id="signalMomentumText">рынок</span></div>
+        <div class="signalCard"><small>↻ ВОССТАНОВЛЕНИЕ</small><b id="signalRecovery">—</b><i><em id="signalRecoveryBar"></em></i><span>от дна</span></div>
+        <div class="signalCard"><small>◉ ДЕНЕЖНЫЙ ПОТОК</small><b id="signalFlow">—</b><i><em id="signalFlowBar"></em></i><span>в месяц</span></div>
+      </div>
+      <div class="pulseCommand"><span><b>LIVE</b> · SIGNALS LOCKED</span><span id="pulseCommandText">TAP SCORE ↻ RESCAN</span></div>
       <div class="pulseShotFooter"><span>НЕ БАНК · НЕ ФОНД · ПРОСТО КРЯХТИТ</span><time id="pulseTime">—</time></div>
     </section>
     <div class="noise"></div>
+    <div class="hudOverlay" id="hudOverlay" aria-hidden="true"><div class="hudScanline"></div><div class="hudVignette"></div><div class="hudCorner c1"></div><div class="hudCorner c2"></div><div class="hudCorner c3"></div><div class="hudCorner c4"></div><div class="hudParticles" id="hudParticles"></div><div class="hudReadout">SYS <b id="hudPulseState">LIVE</b></div></div>
     <header class="top">
       <div class="brandBlock">
         <div class="brand">Кряхтящий <span>фонд</span></div>
@@ -74,7 +81,6 @@
     </header>
 
     <section class="hero card">
-      <div class="heroScanBeam" aria-hidden="true"></div><div class="heroSparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="heroArt" aria-hidden="true">
         <svg class="art art-neon" viewBox="0 0 180 120"><path d="M22 88h92M36 76l20-25 18 14 25-34 22 12"/><circle cx="56" cy="51" r="4"/><circle cx="99" cy="31" r="4"/><path d="M126 68l15-17 14 9-12 17z"/></svg>
         <svg class="art art-emerald" viewBox="0 0 180 120"><path d="M35 80c5-34 39-49 67-31 21 14 28 39 13 49-17 11-56 10-80-3z"/><path d="M73 50l10-12 10 12M62 72h48M73 87h28"/></svg>
@@ -103,7 +109,7 @@
         <button class="chartTab" data-mode="value">СТОИМОСТЬ</button>
         <button class="chartTab" data-mode="profit">ПРИБЫЛЬ</button>
       </div>
-      <div class="chartWrap"><canvas id="chart"></canvas><div class="chartScanLine" id="chartScanLine" aria-hidden="true"></div><div class="chartScanDot" id="chartScanDot" aria-hidden="true"></div><div class="chartEmpty" id="chartEmpty">Загружаю историю…</div></div>
+      <div class="chartWrap"><canvas id="chart"></canvas><div class="chartLiveNode" id="chartLiveNode" aria-hidden="true"><i></i><b></b></div><div class="chartEmpty" id="chartEmpty">Загружаю историю…</div></div>
       <div class="legend" id="chartLegend"><i></i> Портфель <em></em> IMOEX <span>100 = старт</span></div>
     </section>
 
@@ -126,8 +132,8 @@
       </div>
     </section>
 
-    <footer><span id="status">Подключение…</span><span class="syncFlow" id="syncFlow">SYNC • PORTFOLIO • MOEX • DIVIDENDS • READY</span><span id="updated">—</span></footer>
+    <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=5.9.0"></script>
+  <script src="/app.js?v=6.1.0"></script>
 </body>
 </html>
