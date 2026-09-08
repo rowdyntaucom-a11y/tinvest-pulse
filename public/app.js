@@ -162,10 +162,14 @@ function render(d){
   setText('chartBadge',badge);
   setText('dates',`Начало: ${shortDate(p.startDate)} • Сегодня: ${shortDate(new Date())}`);
 
-  const monthly=Number(dashboardData.passiveIncome?.averageMonthly ?? dashboardData.income?.monthly);
-  animateTextNumber('monthly',rub(monthly),420);
-  animateTextNumber('daily',Number.isFinite(monthly)?rub(monthly/30.4375):'—',420);
-  animateTextNumber('annual',Number.isFinite(monthly)?rub(monthly*12):'—',420);
+  // TRUE PAYOUT owns the visible passive-income card. Historical average is fallback only before that module claims it.
+  const incomeCard=$('monthly')?.closest('.income,.mini');
+  if(incomeCard?.dataset?.truePayout!=='1'){
+    const monthly=Number(dashboardData.passiveIncome?.averageMonthly ?? dashboardData.income?.monthly);
+    animateTextNumber('monthly',rub(monthly),420);
+    animateTextNumber('daily',Number.isFinite(monthly)?rub(monthly/30.4375):'—',420);
+    animateTextNumber('annual',Number.isFinite(monthly)?rub(monthly*12):'—',420);
+  }
 
   const c=dashboardData.cbr||{};
   const keyRateText=Number.isFinite(Number(c.rate))&&Number(c.rate)>0?`${Number(c.rate).toFixed(2).replace('.',',')}%`:'—'; setText('keyRate',keyRateText);
