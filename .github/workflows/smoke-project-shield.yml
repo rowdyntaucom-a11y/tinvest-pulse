@@ -1,0 +1,33 @@
+name: Smoke Project Shield
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/smoke-project-shield.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify hardened production
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://tinvest-pulse.onrender.com'
+          ok=0
+          for i in $(seq 1 18); do
+            echo "Attempt $i"
+            curl -L -sS -D /tmp/headers --max-time 30 -o /tmp/home "$BASE/" || true
+            code=$(awk 'toupper($1) ~ /^HTTP\// {c=$2} END{print c}' /tmp/headers)
+            if [ "$code" = '200' ] && grep -q '/v74.js?v=7.4.0' /tmp/home && ! grep -q 'raw.githubusercontent.com' /tmp/home; then
+              grep -qi '^x-content-type-options: nosniff' /tmp/headers
+              grep -qi '^x-frame-options: DENY' /tmp/headers
+              grep -qi '^x-robots-tag: noindex, nofollow, noarchive' /tmp/headers
+              echo 'PROJECT_SHIELD_OK'
+              ok=1
+              break
+            fi
+            sleep 10
+          done
+          [ "$ok" = '1' ]
