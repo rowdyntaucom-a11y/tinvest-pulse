@@ -249,3 +249,24 @@ footer #status{position:relative}
 @keyframes badgeBlink{0%,100%{opacity:.8}50%{opacity:1;box-shadow:0 0 17px color-mix(in srgb,var(--accent) 18%,transparent)}}
 @keyframes liveDot{0%,100%{transform:scale(.75);opacity:.55}50%{transform:scale(1.25);opacity:1}}
 @media(prefers-reduced-motion:reduce){.phone:after,.top:before,.brand:after,.pulseBtn:before,.pulseBtn:after,.heroArt,.value:after,.gain,.mini:after,.income:after,.leaders:after,.macro:after,.chartWrap:before,.chartWrap:after,.chartBadge,#status.ok:before{animation:none}}
+
+/* v5.9 // PORTFOLIO LIFE HUD */
+.phone:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(180deg,transparent 0%,rgba(84,246,197,.025) 48%,transparent 52%);opacity:.55;animation:screenScan 8s linear infinite}
+.top,.hero,.grid2,.chartCard,.bottomGrid,footer{position:relative;z-index:2}
+.hudParticles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.hudParticle{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);opacity:0;animation:particleRise var(--pd,4s) ease-out forwards}
+.hero.valueFlash{animation:valueFlash .65s ease-out}
+.hero.valueFlash .value{animation:valueFlashText .65s ease-out}
+.dataPulse{animation:dataPulse .55s ease-out}
+.chartCard.chartPulse{animation:chartPulse .7s ease-out}
+.hudCorner{position:absolute;width:18px;height:18px;border-color:color-mix(in srgb,var(--accent) 30%,transparent);pointer-events:none;opacity:.45}
+.hudCorner.a{top:8px;left:8px;border-top:1px solid;border-left:1px solid}.hudCorner.b{top:8px;right:8px;border-top:1px solid;border-right:1px solid}.hudCorner.c{bottom:8px;left:8px;border-bottom:1px solid;border-left:1px solid}.hudCorner.d{bottom:8px;right:8px;border-bottom:1px solid;border-right:1px solid}
+.hudPulseDot{position:absolute;right:13px;bottom:12px;width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);animation:hudDot 1.8s ease-in-out infinite}
+@keyframes screenScan{0%{transform:translateY(-110%)}100%{transform:translateY(110%)}}
+@keyframes particleRise{0%{transform:translate3d(0,8px,0) scale(.4);opacity:0}15%{opacity:.75}100%{transform:translate3d(var(--px,0px),-42px,0) scale(0);opacity:0}}
+@keyframes valueFlash{0%{box-shadow:0 12px 28px rgba(0,0,0,.34),0 0 30px color-mix(in srgb,var(--accent) 7%,transparent)}35%{box-shadow:0 12px 28px rgba(0,0,0,.34),0 0 46px color-mix(in srgb,var(--accent) 27%,transparent)}100%{box-shadow:0 12px 28px rgba(0,0,0,.34),0 0 30px color-mix(in srgb,var(--accent) 7%,transparent)}}
+@keyframes valueFlashText{0%{transform:translateY(0);filter:none}35%{transform:translateY(-2px);filter:drop-shadow(0 0 12px var(--accent))}100%{transform:translateY(0);filter:none}}
+@keyframes dataPulse{0%{transform:scale(1)}45%{transform:scale(1.012);text-shadow:0 0 16px color-mix(in srgb,var(--accent) 35%,transparent)}100%{transform:scale(1);text-shadow:none}}
+@keyframes chartPulse{0%{filter:none}35%{filter:drop-shadow(0 0 8px color-mix(in srgb,var(--accent) 22%,transparent))}100%{filter:none}}
+@keyframes hudDot{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.5)}}
+@media(prefers-reduced-motion:reduce){.phone:before,.hero.valueFlash,.hero.valueFlash .value,.dataPulse,.chartCard.chartPulse,.hudParticle,.hudPulseDot{animation:none}}
