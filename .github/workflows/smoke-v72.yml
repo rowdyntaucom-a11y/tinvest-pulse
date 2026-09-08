@@ -20,15 +20,19 @@ jobs:
             echo "Attempt $i"
             home_code=$(curl -L -sS --max-time 30 -o /tmp/home.html -w '%{http_code}' "$BASE/" || true)
             api_code=$(curl -L -sS --max-time 60 -o /tmp/payouts.json -w '%{http_code}' "$BASE/api/payouts?v=7.2&t=$(date +%s)" || true)
-            echo "home=$home_code payouts=$api_code"
-            if [ "$home_code" = '200' ] && [ "$api_code" = '200' ]; then
-              if grep -q 'v72.js' /tmp/home.html && node - <<'NODE'
+            js72_code=$(curl -L -sS --max-time 30 -o /tmp/v72.js -w '%{http_code}' "$BASE/v72.js?v=7.2.1" || true)
+            js71_code=$(curl -L -sS --max-time 30 -o /tmp/v71-data.js -w '%{http_code}' "$BASE/v71-data.js?v=7.2.1" || true)
+            echo "home=$home_code payouts=$api_code v72=$js72_code v71data=$js71_code"
+            if [ "$home_code" = '200' ] && [ "$api_code" = '200' ] && [ "$js72_code" = '200' ] && [ "$js71_code" = '200' ]; then
+              node --check /tmp/v72.js
+              node --check /tmp/v71-data.js
+              if grep -q 'v72.js?v=7.2.1' /tmp/home.html && grep -q "truePayout='1'" /tmp/v72.js && node - <<'NODE'
           const fs=require('fs');
           const d=JSON.parse(fs.readFileSync('/tmp/payouts.json','utf8'));
           if(d.version!=='7.2') throw new Error('wrong version '+d.version);
           if(!Array.isArray(d.months)||d.months.length!==12) throw new Error('months != 12');
           if(!d.forecast||!d.actual||!d.coverage) throw new Error('missing payout sections');
-          console.log(JSON.stringify({version:d.version,events:d.forecast.count,net:d.forecast.net,actual:d.actual.totalNet,eligible:d.coverage.eligibleAssets,errors:d.coverage.errors?.length||0}));
+          console.log(JSON.stringify({version:d.version,events:d.forecast.count,gross:d.forecast.gross,tax:d.forecast.tax,net:d.forecast.net,actual:d.actual.totalNet,next:d.next?{ticker:d.next.ticker,kind:d.next.kind,date:d.next.date,net:d.next.net,days:d.next.days}:null,eligible:d.coverage.eligibleAssets,errors:d.coverage.errors?.length||0}));
           NODE
               then
                 ok=1
@@ -39,9 +43,9 @@ jobs:
           done
           if [ "$ok" != '1' ]; then
             echo 'HOME:'
-            head -c 1000 /tmp/home.html 2>/dev/null || true
+            head -c 1200 /tmp/home.html 2>/dev/null || true
             echo
             echo 'PAYOUTS:'
-            head -c 4000 /tmp/payouts.json 2>/dev/null || true
+            head -c 5000 /tmp/payouts.json 2>/dev/null || true
             exit 1
           fi
