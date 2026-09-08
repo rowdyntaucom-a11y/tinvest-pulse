@@ -10,7 +10,9 @@
   function install(){
     const host=$('cashCalendarMonths');
     const panel=host?.closest('.cashCalendar');
-    if(!host||!panel||$('payoutTrueMeta'))return false;
+    if(!host||!panel)return false;
+    host.dataset.truePayout='1';
+    if($('payoutTrueMeta'))return true;
 
     const head=panel.querySelector('.panelHead');
     if(head){
@@ -41,15 +43,6 @@
     return true;
   }
 
-  function lockLegacyCalendar(){
-    const host=$('cashCalendarMonths');
-    if(!host)return;
-    const grossText=$('flowGrossMonthly')?.textContent||$('monthly')?.textContent||'';
-    const num=Number(String(grossText).replace(/\u00a0/g,' ').replace(/[^0-9,.-]/g,'').replace(',','.'));
-    const now=new Date();
-    if(Number.isFinite(num))host.dataset.key=`${num.toFixed(4)}|${now.getFullYear()}-${now.getMonth()}`;
-  }
-
   function renderDetail(month){
     const p=$('payoutDetail');if(!p)return;
     if(!month||!month.items?.length){p.textContent='В этом месяце подтверждённых выплат по текущим позициям нет — ТИХО.';return;}
@@ -58,7 +51,6 @@
 
   function render(d){
     if(!install())return;
-    lockLegacyCalendar();
     const host=$('cashCalendarMonths');
     const months=Array.isArray(d?.months)?d.months:[];
     host.innerHTML='';
