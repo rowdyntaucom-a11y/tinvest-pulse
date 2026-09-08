@@ -8,8 +8,18 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const TINVEST_TOKEN = process.env.TINvest_API_TOKEN;
 
+app.disable('x-powered-by');
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use((req,res,next)=>{
+  res.setHeader('X-Content-Type-Options','nosniff');
+  res.setHeader('X-Frame-Options','DENY');
+  res.setHeader('Referrer-Policy','no-referrer');
+  res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
+  res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
+  if(req.path==='/' || req.path.endsWith('.html')) res.setHeader('Cache-Control','no-store, no-cache, must-revalidate');
+  next();
+});
+app.use(express.static(path.join(__dirname, 'public'), {etag:true, maxAge:'1h'}));
 
 const TBANK_BASE = 'https://invest-public-api.tbank.ru/rest/';
 const MOEX_BASE = 'https://iss.moex.com/iss/';
