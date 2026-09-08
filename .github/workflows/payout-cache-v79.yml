@@ -1,0 +1,26 @@
+name: Payout v7.9 cache bust
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump payout client cache key
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html')
+          s=p.read_text()
+          import re
+          s2=re.sub(r'/v72\.js\?v=[^"\']+', '/v72.js?v=7.9', s)
+          if s2==s:
+              raise SystemExit('v72 script tag not found or already v7.9')
+          p.write_text(s2)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m 'v7.9 bust payout client cache'
+          git push
