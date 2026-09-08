@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07100e">
   <title>Кряхтящий фонд — Pulse</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/style.css?v=6.3">
+  <link rel="stylesheet" href="/style.css?v=6.4">
 </head>
 <body data-theme="neon">
   <main class="phone" id="pulse">
@@ -101,6 +101,7 @@
       </div>
       <div class="topActions">
         <button id="styleBtn" class="styleBtn" aria-label="Сменить стиль">STYLE</button>
+        <button id="intelBtn" class="intelBtn" type="button" aria-label="Новости и аналитика">✦</button>
         <button id="proBtn" class="proBtn" type="button">PRO</button>
         <button id="pulseBtn" class="pulseBtn">PULSE</button>
       </div>
@@ -164,6 +165,19 @@
 
       <div class="proFooter"><span><b>PRO MODE</b> · CAPITAL SYSTEM ONLINE</span><span id="proFooterText">ДЕНЬГИ РАБОТАЮТ</span></div>
     </section>
+
+    <section class="intelModal" id="intelModal" aria-hidden="true">
+      <div class="intelBackdrop" id="intelBackdrop"></div>
+      <div class="intelPanel">
+        <div class="intelHead">
+          <div><span>✦ FUND <b>INTEL</b></span><small>ВАЖНОЕ ИЗ ТВОЕГО ПОРТФЕЛЯ</small></div>
+          <button id="intelClose" type="button">×</button>
+        </div>
+        <div class="intelSummary" id="intelSummary">Сканируем бумаги и ищем события…</div>
+        <div class="intelList" id="intelList"></div>
+        <div class="intelFoot"><span id="intelUpdated">—</span><button id="intelRefresh" type="button">↻ ОБНОВИТЬ</button></div>
+      </div>
+    </section>
     <section class="hero card">
       <div class="heroArt" aria-hidden="true">
         <svg class="art art-neon" viewBox="0 0 180 120"><path d="M22 88h92M36 76l20-25 18 14 25-34 22 12"/><circle cx="56" cy="51" r="4"/><circle cx="99" cy="31" r="4"/><path d="M126 68l15-17 14 9-12 17z"/></svg>
@@ -218,6 +232,6 @@
 
     <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
   </main>
-  <script src="/app.js?v=6.3.0"></script>
+  <script src="/app.js?v=6.4.0"></script>
 </body>
 </html>

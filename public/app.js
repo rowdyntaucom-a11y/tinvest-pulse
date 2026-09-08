@@ -416,3 +416,53 @@ $('pulseBtn').addEventListener('pointerdown',()=>{pulseLongTimer=setTimeout(()=>
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('pulseBtn').addEventListener(ev,()=>{if(pulseLongTimer){clearTimeout(pulseLongTimer);pulseLongTimer=null;}}));
 
 load();setInterval(load,60000);
+
+// v6.4 — FUND INTEL UI
+let intelData=null;
+let intelLoading=false;
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function intelAgo(iso){const ms=Date.now()-new Date(iso).getTime();if(!Number.isFinite(ms)||ms<0)return 'сейчас';const h=Math.floor(ms/3600000);if(h<1)return 'меньше часа назад';if(h<24)return `${h} ч назад`;return `${Math.floor(h/24)} дн назад`;}
+function intelOpen(){const modal=$('intelModal');if(!modal)return;modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(intelData)renderIntel(intelData);else loadIntel();}
+function intelClose(){const modal=$('intelModal');if(!modal)return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
+function renderIntel(data){
+  intelData=data||{};
+  const list=$('intelList'), summary=$('intelSummary');
+  if(summary)summary.textContent=data?.summary||'Новости по портфелю пока недоступны.';
+  if($('intelUpdated'))setText('intelUpdated',data?.generatedAt?`ОБНОВЛЕНО ${new Date(data.generatedAt).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`:'LIVE');
+  if(!list)return;
+  const items=Array.isArray(data?.items)?data.items:[];
+  if(!items.length){list.innerHTML='<div class="intelEmpty">За последние 72 часа заметных событий по основным позициям не найдено.<br>Это тоже сигнал: поводов срочно дёргать портфель сейчас нет.</div>';return;}
+  list.innerHTML=items.map(item=>{
+    const cls=['pos','neg','neu'].includes(item.sentimentClass)?item.sentimentClass:'neu';
+    const label=escapeHtml(item.sentiment||'НЕЙТРАЛЬНО');
+    const title=escapeHtml(item.title||'Без заголовка');
+    const ticker=escapeHtml(item.ticker||item.name||'—');
+    const source=escapeHtml(item.source||'Источник');
+    const why=escapeHtml(item.why||'');
+    const advice=escapeHtml(item.advice||'Наблюдать.');
+    const link=escapeHtml(item.link||'#');
+    return `<article class="intelItem"><div class="intelItemTop"><span class="intelTicker">${ticker}</span><span class="intelTag ${cls}">${label}</span></div><div class="intelTitle">${title}</div><div class="intelWhy">${why} · ${escapeHtml(intelAgo(item.publishedAt))} · важность ${Number(item.importance)||0}/100</div><div class="intelAction"><b>Что делать:</b> ${advice}</div><a class="intelSource" href="${link}" target="_blank" rel="noopener noreferrer">↗ ${source} · открыть источник</a></article>`;
+  }).join('');
+}
+async function loadIntel(force=false){
+  if(intelLoading)return;
+  if(intelData&&!force){renderIntel(intelData);return;}
+  intelLoading=true;
+  const list=$('intelList');if(list)list.innerHTML='<div class="intelLoading">✦ СКАНИРУЮ НОВОСТИ ПО ТВОИМ ПОЗИЦИЯМ…</div>';
+  if($('intelSummary'))setText('intelSummary','Смотрю сначала на самые крупные позиции и события за последние 72 часа.');
+  try{
+    const r=await fetch('/api/intel?v=6.4&t='+Date.now(),{cache:'no-store'});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+    renderIntel(d);
+  }catch(e){
+    console.error('Intel error:',e);
+    if($('intelSummary'))setText('intelSummary','Не удалось получить ленту новостей. Можно повторить обновление.');
+    if(list)list.innerHTML='<div class="intelEmpty">Новости временно недоступны.<br>Нажми «ОБНОВИТЬ» и попробуем ещё раз.</div>';
+  }finally{intelLoading=false;}
+}
+$('intelBtn')?.addEventListener('click',intelOpen);
+$('intelClose')?.addEventListener('click',intelClose);
+$('intelBackdrop')?.addEventListener('click',intelClose);
+$('intelRefresh')?.addEventListener('click',()=>loadIntel(true));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')intelClose();});
