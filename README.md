@@ -1,3 +1,7 @@
+
+## v6.1 Reactor HUD — deployment fix
+
+Frontend files are placed in `public/`, matching `server.js`. The same PULSE button toggles Page 1 ↔ PULSE Röntgen Page 2.
 # Кряхтящий фонд — PULSE v5.5 МОЗГ
 
 PULSE RÖNTGEN now derives its character and diagnosis from the live dashboard data: strongest asset, weakest asset, passive income, portfolio-vs-IMOEX spread, drawdown and concentration risk. The scan animation remains replayable on every PULSE entry.
