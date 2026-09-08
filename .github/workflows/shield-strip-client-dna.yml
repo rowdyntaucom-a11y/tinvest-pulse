@@ -1,0 +1,80 @@
+name: Strip Client DNA Formula
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/shield-strip-client-dna.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  strip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace client DNA engine with server adapter
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          app = Path('public/app.js')
+          text = app.read_text(encoding='utf-8')
+          stub = r'''function pulseStats(d){
+  const s=window.__shieldDNA||{};
+  const assets=Array.isArray(d?.assets)?d.assets:(Array.isArray(d?.portfolio?.assets)?d.portfolio.assets:[]);
+  const total=Number(d?.portfolio?.value)||assets.reduce((z,a)=>z+Math.max(0,Number(a?.currentValue)||0),0)||1;
+  const byValue=[...assets].filter(a=>(Number(a?.currentValue)||0)>0).sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0));
+  const weights=byValue.map(a=>Math.max(0,Number(a.currentValue)||0)/total*100);
+  const assetResult=a=>Number.isFinite(Number(a?.yieldRub))?Number(a.yieldRub):Number(a?.expectedYield)||0;
+  const byResult=[...byValue].sort((a,b)=>assetResult(b)-assetResult(a));
+  const strength=byResult[0]||null,painAsset=byResult[byResult.length-1]||null;
+  const alloc=s.allocation||{},scores=s.scores||{},risk=s.risk||{},flow=s.flow||{};
+  const stocksPct=Number(alloc.stocks)||0,bondsPct=Number(alloc.bonds)||0,reservePct=Number(alloc.reserve)||0,defensivePct=bondsPct+reservePct;
+  const whale=byValue[0]||null,whaleWeight=Number(risk.largestWeight)||weights[0]||0;
+  const maxDD=Number(risk.drawdown)||0,riskScore=Number(scores.risk)||0,balanceScore=Number(scores.balance)||0,flowScore=Number(scores.flow)||0;
+  const node=(level,text)=>({level,text});
+  return {
+    pts:[],p1:100,m1:100,total,pReturn:0,mReturn:0,activeReturn:0,maxDD,peak:100,trough:100,recovery:100,momentum:50,
+    flowBar:flowScore,whale,whaleWeight,strength,painAsset,strengthTicker:strength?(strength.ticker||strength.name||'—'):'—',painTicker:painAsset?(painAsset.ticker||painAsset.name||'—'):'—',strengthYield:assetResult(strength),painYield:assetResult(painAsset),
+    riskLabel:risk.label||'—',riskScore,monthly:Number(flow.monthly)||0,incomeYield:Number(flow.yieldPct)||0,flowScore,score:Number(s.score)||0,dnaBase:Number(s.score)||0,ageDays:null,pulseBeat:s.coreStatus||'SERVER',
+    dnaIncome:flowScore,dnaStability:Number(scores.stability)||0,dnaGrowth:Number(scores.growth)||0,dnaDivers:Number(scores.diversification)||0,dnaBalance:balanceScore,dnaConcentration:Number(scores.concentration)||0,
+    diagnosisTitle:s.diagnosis?.title||'SERVER DNA',diagnosisText:s.diagnosis?.text||'Защищённый расчёт загружается с сервера.',vol:0,diversified:Number(s.portfolio?.assets)||byValue.length,dnaVerdict:s.verdict||'SERVER DNA',
+    weights,byValue,stocksPct,bondsPct,reservePct,defensivePct,balanceScore,balanceGap:Math.abs(stocksPct-defensivePct),concentrationRisk:Math.max(0,100-(Number(scores.concentration)||0)),concentrationScore:Number(scores.concentration)||0,
+    allocationState:Math.abs(stocksPct-defensivePct)<8?'ПОЧТИ 50 / 50':'БАЛАНС СМЕЩЁН',effectiveN:Number(s.portfolio?.effectivePositions)||0,
+    concentrationNode:node(whaleWeight>=30?'HIGH':whaleWeight>=22?'WATCH':'OK',`${whaleWeight.toFixed(1).replace('.',',')}%`),
+    balanceNode:node(Math.abs(stocksPct-defensivePct)>=30?'HIGH':Math.abs(stocksPct-defensivePct)>=16?'WATCH':'OK',`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`),
+    drawdownNode:node(maxDD>=15?'HIGH':maxDD>=8?'WATCH':'OK',`−${maxDD.toFixed(1).replace('.',',')}%`),assetResult
+  };
+}
+function drawPulsePath'''
+          new, n = re.subn(r'function pulseStats\(d\)\{[\s\S]*?\n\}\nfunction drawPulsePath', stub, text, count=1)
+          if n != 1:
+              raise SystemExit('pulseStats block not found or ambiguous')
+          app.write_text(new, encoding='utf-8')
+
+          v74 = Path('public/v74.js')
+          t = v74.read_text(encoding='utf-8')
+          if 'window.__shieldDNA=x;' not in t:
+              t, n = re.subn(r'function paint\(x\)\{', 'function paint(x){window.__shieldDNA=x;', t, count=1)
+              if n != 1:
+                  raise SystemExit('v74 paint hook not found')
+              v74.write_text(t, encoding='utf-8')
+          PY
+          node --check public/app.js
+          node --check public/v74.js
+      - name: Commit sanitized client
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'No changes needed'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/app.js public/v74.js
+          git commit -m 'Shield: remove proprietary DNA formula from browser'
+          git push
