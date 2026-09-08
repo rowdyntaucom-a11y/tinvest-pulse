@@ -1,0 +1,30 @@
+name: Install v7.9.7 pp explainer
+'on':
+  push:
+    paths:
+      - '.github/workflows/install-v797.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install explainer safely
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html'); s=p.read_text()
+          tag='<script src="/v797.js?v=7.9.7"></script>'
+          if tag not in s:
+              pos=s.lower().rfind('</body>')
+              if pos<0: raise SystemExit('body close not found')
+              s=s[:pos]+tag+s[pos:]
+              p.write_text(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html public/v797.js
+          git commit -m 'v7.9.7 explain percentage points in plain language' || exit 0
+          git push
