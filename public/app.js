@@ -191,7 +191,7 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData){renderChart(dashboardData.history);requestAnimationFrame(positionChartNode);}
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=6.2&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);setText('hudPulseState','ERR');const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{const r=await fetch('/api/dashboard?v=7.11.5&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);try{localStorage.setItem('tinvest:lastDashboard',JSON.stringify({at:Date.now(),data:d}));}catch(_){}}catch(e){console.error(e);let saved=null;try{saved=JSON.parse(localStorage.getItem('tinvest:lastDashboard')||'null');}catch(_){}if(saved?.data){render(saved.data);const age=Math.max(0,Math.round((Date.now()-Number(saved.at||Date.now()))/60000));setText('status',`⚠ Связь потеряна • последний снимок${age?` ${age} мин назад`:''}`);setText('hudPulseState','STALE');const statusEl=$('status');if(statusEl)statusEl.className='err';}else{setText('status','Ошибка связи • повторяем…');setText('hudPulseState','ERR');const statusEl=$('status');if(statusEl)statusEl.className='err';}setTimeout(load,5000);}}
 
 
 // v6.3 — PRO CAPITAL TERMINAL. This is an alternate presentation of the same live data;

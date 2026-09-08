@@ -10,6 +10,6 @@
   if(m)m.style.cssText='display:block!important;width:24px!important;height:3px!important;flex:0 0 24px!important;background:#8290a7!important';
   if(s)s.style.cssText='margin-left:auto!important;flex:0 0 auto!important;font-size:10px!important;color:#5d6b67!important';
  };
- const run=()=>{fix();setTimeout(fix,250);setTimeout(fix,900);setTimeout(fix,1800)};
+ const run=()=>{fix();setTimeout(fix,250);setTimeout(fix,900);setTimeout(fix,1800);setInterval(fix,1500)};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
 })();
