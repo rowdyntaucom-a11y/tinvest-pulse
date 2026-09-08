@@ -7,6 +7,8 @@ on:
       - 'public/**'
       - 'server.js'
       - 'payouts.js'
+      - 'payouts-core.js'
+      - 'shield-engine.js'
       - '.github/workflows/smoke-project-shield.yml'
 
 jobs:
@@ -19,20 +21,26 @@ jobs:
           set -euo pipefail
           BASE='https://tinvest-pulse.onrender.com'
           ok=0
-          for i in $(seq 1 18); do
+          for i in $(seq 1 24); do
             echo "Attempt $i"
             curl -L -sS -D /tmp/headers --max-time 30 -o /tmp/home "$BASE/" || true
             code=$(awk 'toupper($1) ~ /^HTTP\// {c=$2} END{print c}' /tmp/headers)
             curl -L -sS --max-time 20 -o /tmp/server_public "$BASE/server.js" || true
             curl -L -sS --max-time 20 -o /tmp/payouts_public "$BASE/payouts.js" || true
+            curl -L -sS --max-time 30 -o /tmp/analytics "$BASE/api/shield/analytics" || true
+            curl -L -sS --max-time 30 -o /tmp/strategy "$BASE/api/shield/strategy?target=50&contribution=20000" || true
             source_safe=1
             grep -q "const express = require('express')" /tmp/server_public && source_safe=0 || true
             grep -q "registerPayoutCalendar" /tmp/payouts_public && source_safe=0 || true
-            if [ "$code" = '200' ] && [ "$source_safe" = '1' ] && grep -q '/v74.js?v=7.4.0' /tmp/home && ! grep -q 'raw.githubusercontent.com' /tmp/home; then
+            analytics_ok=0
+            strategy_ok=0
+            grep -q '"version":"7.4.1"' /tmp/analytics && grep -q '"sharpe"' /tmp/analytics && analytics_ok=1 || true
+            grep -q '"version":"7.4.1"' /tmp/strategy && grep -q '"buyStocks"' /tmp/strategy && strategy_ok=1 || true
+            if [ "$code" = '200' ] && [ "$source_safe" = '1' ] && [ "$analytics_ok" = '1' ] && [ "$strategy_ok" = '1' ] && ! grep -q 'raw.githubusercontent.com' /tmp/home; then
               grep -qi '^x-content-type-options: nosniff' /tmp/headers
               grep -qi '^x-frame-options: DENY' /tmp/headers
               grep -qi '^x-robots-tag: noindex, nofollow, noarchive' /tmp/headers
-              echo 'PROJECT_SHIELD_OK'
+              echo 'PROJECT_SHIELD_SERVER_OK'
               ok=1
               break
             fi
