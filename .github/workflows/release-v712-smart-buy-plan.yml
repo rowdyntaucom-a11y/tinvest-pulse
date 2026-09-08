@@ -1,0 +1,91 @@
+name: Release v7.12 Smart Buy Plan
+on:
+  push:
+    paths:
+      - '.github/workflows/release-v712-smart-buy-plan.yml'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch server and strategy UI
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('shield-engine.js')
+          s=p.read_text()
+          old="""advice:Math.abs(gap)<1?'Портфель почти в цели. Новое пополнение распределяем так, чтобы удержать стратегию.':gap>0?'Акций выше цели. Следующее пополнение смещаем в облигации — без продаж.':'Облигаций выше цели. Следующее пополнение смещаем в акции — без продаж.'
+    };"""
+          new="""advice:Math.abs(gap)<1?'Портфель почти в цели. Новое пополнение распределяем так, чтобы удержать стратегию.':gap>0?'Акций выше цели. Следующее пополнение смещаем в облигации — без продаж.':'Облигаций выше цели. Следующее пополнение смещаем в акции — без продаж.',
+      buyPlan: buildBuyPlan(d,buyStocks,buyBonds)
+    };"""
+          assert old in s
+          s=s.replace(old,new,1)
+          marker='  function strategyResult(d,targetStocks,contribution){'
+          helper="""  function buildBuyPlan(d,buyStocks,buyBonds){
+    const assets=assetsOf(d).filter(a=>(Number(a?.currentValue??a?.value??a?.marketValue)||0)>0);
+    const value=a=>Math.max(0,Number(a?.currentValue??a?.value??a?.marketValue)||0);
+    const ticker=a=>String(a?.ticker||a?.name||'АКТИВ').toUpperCase();
+    function side(kind,budget){
+      budget=Math.max(0,Number(budget)||0); if(budget<1)return [];
+      const list=assets.filter(a=>classify(a)===kind).sort((a,b)=>value(a)-value(b));
+      if(!list.length)return [];
+      const take=list.slice(0,Math.min(3,list.length));
+      const weights=take.map((_,i)=>take.length-i),sum=weights.reduce((a,b)=>a+b,0);
+      let used=0;
+      return take.map((a,i)=>{
+        const amount=i===take.length-1?budget-used:Math.round(budget*weights[i]/sum/10)*10;used+=amount;
+        return {ticker:ticker(a),amount:round(amount,2),priority:i+1,currentValue:round(value(a),2),reason:i===0?'минимальный вес в своей части портфеля':'добор диверсификации'};
+      }).filter(x=>x.amount>0);
+    }
+    return [...side('stock',buyStocks),...side('bond',buyBonds)];
+  }
+
+"""
+          assert marker in s
+          s=s.replace(marker,helper+marker,1)
+          s=s.replace("version:'7.4.2', targetStocks", "version:'7.12', targetStocks",1)
+          p.write_text(s)
+
+          p=Path('public/v73.js'); s=p.read_text()
+          s=s.replace("$('stAfter').textContent=num(x.afterStocks).toFixed(1).replace('.',',')+' / '+num(x.afterBonds).toFixed(1).replace('.',',');$('stAdvice').textContent=x.advice||'—';", "$('stAfter').textContent=num(x.afterStocks).toFixed(1).replace('.',',')+' / '+num(x.afterBonds).toFixed(1).replace('.',',');$('stAdvice').textContent=x.advice||'—';renderPlan(x.buyPlan||[]);")
+          anchor=' async function load(){'
+          fn=""" function renderPlan(plan){
+  const box=$('stPlan');if(!box)return;
+  if(!plan.length){box.innerHTML='<small>SMART BUY PLAN</small><p>При текущем пополнении дополнительных покупок не требуется.</p>';return}
+  box.innerHTML='<div class="stPlanHead"><b>SMART BUY PLAN</b><span>ПРИОРИТЕТ ПО НЕДОВЕСУ</span></div>'+plan.map((x,i)=>'<div class="stPlanRow"><em>'+String(i+1).padStart(2,'0')+'</em><strong>'+x.ticker+'</strong><span>'+x.reason+'</span><b>'+rub(x.amount)+'</b></div>').join('');
+ }
+"""
+          assert anchor in s;s=s.replace(anchor,fn+anchor,1)
+          s=s.replace('SERVER-SIDE SMART BUY · v7.4.1','SERVER-SIDE SMART BUY · v7.12',1)
+          s=s.replace('<div class="stAfter"><span>ПОСЛЕ ПОПОЛНЕНИЯ</span><b id="stAfter">—</b></div><p id="stAdvice">', '<div class="stAfter"><span>ПОСЛЕ ПОПОЛНЕНИЯ</span><b id="stAfter">—</b></div><div id="stPlan" class="stPlan"><small>SMART BUY PLAN</small></div><p id="stAdvice">',1)
+          css=""".stPlan{margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07)}.stPlanHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}.stPlanHead b{font-size:8px;color:var(--accent);letter-spacing:1px}.stPlanHead span{font-size:5px;color:#657570}.stPlanRow{display:grid;grid-template-columns:20px 58px 1fr auto;gap:6px;align-items:center;padding:6px 0;border-top:1px solid rgba(255,255,255,.045)}.stPlanRow em{font-style:normal;font-size:6px;color:#60716c}.stPlanRow strong{font-size:9px;color:#fff}.stPlanRow span{font-size:5.5px;color:#758681}.stPlanRow b{font-size:9px;color:var(--accent)}"""
+          s=s.replace('@media(max-width:560px)',css+'@media(max-width:560px)',1)
+          p.write_text(s)
+
+          p=Path('public/index.html'); s=p.read_text()
+          old='/v73.js?v=7.4.1'; new='/v73.js?v=7.12'
+          if old in s:s=s.replace(old,new,1)
+          elif '/v73.js' in s:
+            import re
+            s=re.sub(r'/v73\.js(?:\?v=[^\"\']+)?','/v73.js?v=7.12',s,count=1)
+          else: raise SystemExit('v73 script not found')
+          p.write_text(s)
+          PY
+      - name: Syntax checks
+        run: |
+          node --check shield-engine.js
+          node --check public/v73.js
+      - name: Commit release
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add shield-engine.js public/v73.js public/index.html
+          git commit -m 'v7.12 smart buy plan' || exit 0
+          git push
