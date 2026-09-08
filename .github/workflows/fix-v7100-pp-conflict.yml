@@ -1,0 +1,40 @@
+name: Fix v7.10.0 percentage hint conflict
+'on':
+  push:
+    paths:
+      - '.github/workflows/fix-v7100-pp-conflict.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove legacy enhancer and bump caches
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/v77.js'); s=p.read_text()
+          marker='/* v7.9.6 — novice-friendly percentage-point labels across the whole UI.'
+          if marker in s:
+              s=s[:s.index(marker)].rstrip()+"\n"
+          s=s.replace("+' п.п. ('+(rateShift>0?'+':'')+f(rateShift)+'%)'", "+' п.п.'")
+          s=s.replace("+' п.п. (${n(a.gapPp)>0?'+':''}${f(a.gapPp)}%)", "+' п.п.") if False else s
+          old="${n(a.gapPp)>0?'+':''}${f(a.gapPp)} п.п. (${n(a.gapPp)>0?'+':''}${f(a.gapPp)}%)"
+          new="${n(a.gapPp)>0?'+':''}${f(a.gapPp)} п.п."
+          s=s.replace(old,new)
+          p.write_text(s)
+          p=Path('public/index.html'); s=p.read_text()
+          import re
+          s=re.sub(r'/v77\.js\?v=[^\"\']+', '/v77.js?v=7.10.0', s, count=1)
+          s=re.sub(r'/v797\.js\?v=[^\"\']+', '/v797.js?v=7.10.0', s, count=1)
+          p.write_text(s)
+          PY
+          node --check public/v77.js
+          node --check public/v797.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/v77.js public/index.html
+          git commit -m 'v7.10.0 remove legacy pp enhancer conflict' || exit 0
+          git push
