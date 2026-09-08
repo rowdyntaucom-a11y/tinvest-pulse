@@ -29,18 +29,21 @@ jobs:
             curl -L -sS --max-time 20 -o /tmp/payouts_public "$BASE/payouts.js" || true
             curl -L -sS --max-time 30 -o /tmp/analytics "$BASE/api/shield/analytics" || true
             curl -L -sS --max-time 30 -o /tmp/strategy "$BASE/api/shield/strategy?target=50&contribution=20000" || true
+            curl -L -sS --max-time 30 -o /tmp/dna "$BASE/api/shield/dna" || true
             source_safe=1
             grep -q "const express = require('express')" /tmp/server_public && source_safe=0 || true
             grep -q "registerPayoutCalendar" /tmp/payouts_public && source_safe=0 || true
             analytics_ok=0
             strategy_ok=0
-            grep -q '"version":"7.4.1"' /tmp/analytics && grep -q '"sharpe"' /tmp/analytics && analytics_ok=1 || true
-            grep -q '"version":"7.4.1"' /tmp/strategy && grep -q '"buyStocks"' /tmp/strategy && strategy_ok=1 || true
-            if [ "$code" = '200' ] && [ "$source_safe" = '1' ] && [ "$analytics_ok" = '1' ] && [ "$strategy_ok" = '1' ] && ! grep -q 'raw.githubusercontent.com' /tmp/home; then
+            dna_ok=0
+            grep -q '"version":"7.4.2"' /tmp/analytics && grep -q '"sharpe"' /tmp/analytics && analytics_ok=1 || true
+            grep -q '"version":"7.4.2"' /tmp/strategy && grep -q '"buyStocks"' /tmp/strategy && strategy_ok=1 || true
+            grep -q '"version":"7.4.2"' /tmp/dna && grep -q '"source":"SERVER_SHIELD"' /tmp/dna && grep -q '"score"' /tmp/dna && dna_ok=1 || true
+            if [ "$code" = '200' ] && [ "$source_safe" = '1' ] && [ "$analytics_ok" = '1' ] && [ "$strategy_ok" = '1' ] && [ "$dna_ok" = '1' ] && ! grep -q 'raw.githubusercontent.com' /tmp/home; then
               grep -qi '^x-content-type-options: nosniff' /tmp/headers
               grep -qi '^x-frame-options: DENY' /tmp/headers
               grep -qi '^x-robots-tag: noindex, nofollow, noarchive' /tmp/headers
-              echo 'PROJECT_SHIELD_SERVER_OK'
+              echo 'PROJECT_SHIELD_DNA_OK'
               ok=1
               break
             fi
