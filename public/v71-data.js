@@ -13,16 +13,18 @@
     return Number.isFinite(n)?n:NaN;
   };
 
-  // v7.1.1: PRO lives inside .phone, so hide the normal dashboard with descendant selectors.
+  // v7.1.1: PRO lives inside .phone. Give it its own full remaining grid row
+  // and hide every normal-dashboard row while PRO is active.
   const style=document.createElement('style');
   style.id='v711HotfixStyle';
   style.textContent=`
+    body.pro-active .phone{grid-template-rows:auto minmax(0,1fr)!important;gap:0!important}
     body.pro-active .phone>.hero,
     body.pro-active .phone>.grid2,
     body.pro-active .phone>.chartCard,
     body.pro-active .phone>.bottomGrid,
     body.pro-active .phone>footer{display:none!important}
-    body.pro-active .phone>.proView{display:block!important}
+    body.pro-active .phone>.proView{display:block!important;min-height:0!important;height:100%!important;overflow:hidden!important}
   `;
   if(!document.getElementById(style.id))document.head.appendChild(style);
 
@@ -45,11 +47,11 @@
 
     const host=$('cashCalendarMonths');
     if(host){
-      const key=`${monthly.toFixed(4)}|${new Date().getFullYear()}-${new Date().getMonth()}`;
+      const now=new Date();
+      const key=`${monthly.toFixed(4)}|${now.getFullYear()}-${now.getMonth()}`;
       if(host.dataset.key!==key){
         host.innerHTML='';
         let sum=0;
-        const now=new Date();
         for(let i=0;i<12;i++){
           const dt=new Date(now.getFullYear(),now.getMonth()+i,1);
           const net=tax(monthly).net;
@@ -73,7 +75,8 @@
   }
 
   function syncFromVisibleDashboard(){
-    // Robust fallback: the main dashboard already renders the same live API values.
+    // The main dashboard already contains the live values, so this works even
+    // before the dedicated v7.1.1 API refresh completes.
     const monthly=parseRub($('monthly')?.textContent);
     const total=parseRub($('value')?.textContent);
     return renderNet(monthly,total);
@@ -101,7 +104,6 @@
     if(!document.body.classList.contains('pulse-active'))return;
     if(lastData&&syncFromData(lastData))return;
     if(syncFromVisibleDashboard()){
-      // Still refresh from the API so the estimate uses exact values rather than rounded UI text.
       fetchDashboard(false);
       return;
     }
