@@ -46,7 +46,7 @@
     if($('flowNetYield'))$('flowNetYield').textContent=total?(annual.net/total*100).toFixed(1).replace('.',',')+'%':'—';
 
     const host=$('cashCalendarMonths');
-    if(host){
+    if(host && host.dataset.truePayout!=='1'){
       const now=new Date();
       const key=`${monthly.toFixed(4)}|${now.getFullYear()}-${now.getMonth()}`;
       if(host.dataset.key!==key){
