@@ -13,8 +13,6 @@
     return Number.isFinite(n)?n:NaN;
   };
 
-  // v7.1.1: PRO lives inside .phone. Give it its own full remaining grid row
-  // and hide every normal-dashboard row while PRO is active.
   const style=document.createElement('style');
   style.id='v711HotfixStyle';
   style.textContent=`
@@ -33,6 +31,12 @@
   let lastFetchAt=0;
 
   function renderNet(monthly,total){
+    // v7.9.4: once TRUE PAYOUT CALENDAR is installed, /api/payouts is the
+    // authoritative source for Cash Flow too. Never let the legacy dashboard
+    // average overwrite its 12-month gross/tax/net forecast.
+    const truePayoutHost=$('cashCalendarMonths');
+    if(truePayoutHost?.dataset.truePayout==='1')return true;
+
     monthly=Number(monthly);total=Number(total)||0;
     if(!Number.isFinite(monthly)||monthly<0||!$('flowNetMonthly'))return false;
 
@@ -75,8 +79,6 @@
   }
 
   function syncFromVisibleDashboard(){
-    // The main dashboard already contains the live values, so this works even
-    // before the dedicated v7.1.1 API refresh completes.
     const monthly=parseRub($('monthly')?.textContent);
     const total=parseRub($('value')?.textContent);
     return renderNet(monthly,total);
