@@ -1,0 +1,45 @@
+name: v7.10.5 WHAT IF duration bridge
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-whatif-duration-v7105.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch duration bridge
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('public/v77.js')
+          s=p.read_text()
+          old="try{const br=await fetch('/api/shield/bonds?t='+Date.now(),{cache:'no-store'}),b=await br.json();duration=n(b?.summary?.weightedModifiedDuration)||0}catch(_){duration=0}"
+          new="try{const br=await fetch('/api/shield/bonds?v=7.10.5&t='+Date.now(),{cache:'no-store'}),b=await br.json(),fresh=n(b?.summary?.weightedModifiedDuration);if(br.ok&&Number.isFinite(fresh)&&fresh>0){duration=fresh;localStorage.setItem('pulseBondDuration',String(fresh))}else{duration=n(localStorage.getItem('pulseBondDuration'))||0}}catch(_){duration=n(localStorage.getItem('pulseBondDuration'))||0}"
+          if old not in s: raise SystemExit('v77 duration target not found')
+          s=s.replace(old,new,1).replace("SERVER_WHAT_IF · v7.7.2 · DURATION", "SERVER_WHAT_IF · v7.10.5 · DURATION",1).replace("SCENARIO ENGINE · v7.7.2", "SCENARIO ENGINE · v7.10.5",1)
+          p.write_text(s)
+
+          p=Path('bond-analytics.js')
+          s=p.read_text()
+          old="const data=await build();if(!isGood(data)){if(lastGood)return res.json({...lastGood,stale:true,warning:'Temporary incomplete T-Bank bond response; serving last valid analytics.'});throw new Error('Incomplete bond analytics response')}"
+          new="let data=await build();if(!isGood(data)){await new Promise(r=>setTimeout(r,350));data=await build()}if(!isGood(data)){if(lastGood)return res.json({...lastGood,stale:true,warning:'Temporary incomplete T-Bank bond response; serving last valid analytics.'});throw new Error('Incomplete bond analytics response after retry')}"
+          if old not in s: raise SystemExit('bond retry target not found')
+          s=s.replace(old,new,1).replace("version:'7.10.1'", "version:'7.10.5'")
+          p.write_text(s)
+          PY
+          node --check public/v77.js
+          node --check bond-analytics.js
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/v77.js bond-analytics.js
+          git commit -m 'v7.10.5 stabilize WHAT IF duration' || exit 0
+          git push
