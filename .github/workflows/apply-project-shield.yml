@@ -1,0 +1,38 @@
+name: Apply Project Shield
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/apply-project-shield.js'
+      - '.github/workflows/apply-project-shield.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  shield:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply Shield
+        run: node scripts/apply-project-shield.js
+      - name: Validate JS
+        run: |
+          node --check server.js
+          node --check public/server.js
+          node --check public/v74.js
+          node --check public/v731.js
+      - name: Commit hardened runtime
+        run: |
+          if git diff --quiet; then
+            echo 'No changes'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add server.js public/server.js public/index.html public/robots.txt
+          git commit -m 'Apply Project Shield runtime hardening'
+          git push
