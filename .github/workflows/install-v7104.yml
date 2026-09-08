@@ -1,0 +1,29 @@
+name: Install v7.10.4 XIRR explanation
+'on':
+  push:
+    paths:
+      - '.github/workflows/install-v7104.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XIRR explanation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html');s=p.read_text();tag='<script src="/v7104.js?v=7.10.4"></script>'
+          if tag not in s:
+            pos=s.lower().rfind('</body>')
+            if pos<0: raise SystemExit('body close not found')
+            p.write_text(s[:pos]+tag+s[pos:])
+          PY
+          node --check public/v7104.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html public/v7104.js
+          git commit -m 'v7.10.4 explain annualized XIRR for short history' || exit 0
+          git push
