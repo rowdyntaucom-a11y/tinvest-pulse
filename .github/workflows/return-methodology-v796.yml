@@ -1,0 +1,77 @@
+name: v7.9.6 return methodology audit
+on:
+  push:
+    paths:
+      - '.github/workflows/return-methodology-v796.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch return methodology
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('server.js')
+          s=p.read_text()
+          old="""  const externalFlows = executed
+    .filter(isExternalCashOperation)
+    .map(op => ({
+      date: safeDate(op.date),
+      amount: operationCash(op)
+    }))
+    .filter(x => x.date && x.amount !== 0);"""
+          new="""  const externalFlows = executed
+    .filter(isExternalCashOperation)
+    .map(op => ({
+      date: safeDate(op.date),
+      // Normalize direction explicitly: deposits are +, withdrawals are -.
+      // Do not trust the raw payment sign across operation variants.
+      amount: signedHistoricalCash(op)
+    }))
+    .filter(x => x.date && Number.isFinite(x.amount) && x.amount !== 0);"""
+          if old not in s: raise SystemExit('externalFlows target not found')
+          s=s.replace(old,new,1)
+          s=s.replace("const cacheKey = `${String(accountId || 'default')}:4.0`;","const cacheKey = `${String(accountId || 'default')}:4.1`;",1)
+          s=s.replace("method: 'daily_time_weighted_return_from_operations_and_historical_closes_v40',","method: 'daily_time_weighted_return_from_operations_and_historical_closes_v41',",1)
+          p.write_text(s)
+
+          p=Path('app.js')
+          s=p.read_text()
+          old="""  const pSeries=hp.map(x=>Number(x?.portfolio)).filter(Number.isFinite).filter(v=>v>0);
+  const mSeries=hp.map(x=>Number(x?.imoex)).filter(Number.isFinite).filter(v=>v>0);
+  let vs=null;
+  if(pSeries.length>=2 && mSeries.length>=2){
+    const pReturn=pSeries[pSeries.length-1]/pSeries[0]-1;
+    const mReturn=mSeries[mSeries.length-1]/mSeries[0]-1;
+    vs=(pReturn-mReturn)*100;
+  }"""
+          new="""  // Benchmark only on dates where BOTH series exist. This prevents a stale or
+  // shorter IMOEX series from being compared with a different portfolio endpoint.
+  const common=hp.map(x=>({p:Number(x?.portfolio),m:Number(x?.imoex)}))
+    .filter(x=>Number.isFinite(x.p)&&x.p>0&&Number.isFinite(x.m)&&x.m>0);
+  let vs=null;
+  if(common.length>=2){
+    const first=common[0], last=common[common.length-1];
+    const pReturn=last.p/first.p-1;
+    const mReturn=last.m/first.m-1;
+    vs=(pReturn-mReturn)*100;
+  }"""
+          if old not in s: raise SystemExit('benchmark target not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          node --check server.js
+          node --check app.js
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add server.js app.js
+          git commit -m 'v7.9.6 normalize cash flows and align IMOEX comparison' || exit 0
+          git push
