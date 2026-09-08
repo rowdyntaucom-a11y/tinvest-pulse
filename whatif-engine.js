@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function registerWhatIfEngine(app, deps = {}) {
-  const { buildDashboard } = deps;
+  const { buildDashboard, getBondDuration } = deps;
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const round=(v,d=2)=>Number.isFinite(Number(v))?Number(Number(v).toFixed(d)):null;
   function classify(a){
@@ -23,7 +23,8 @@ module.exports = function registerWhatIfEngine(app, deps = {}) {
       const marketShock=clamp(Number(req.query.marketShock)||0,-80,80);
       const rateShift=clamp(Number(req.query.rateShift)||0,-10,10);
       const targetStocks=clamp(Number(req.query.target)||50,10,90);
-      const duration=clamp(Number(req.query.duration)||0,0,30);
+      let duration=clamp(Number(req.query.duration)||0,0,30),durationSource=duration>0?'CLIENT_BOND_ANALYTICS':'UNAVAILABLE';
+      if(!(duration>0)&&typeof getBondDuration==='function'){try{const serverDuration=Number(await getBondDuration());if(Number.isFinite(serverDuration)&&serverDuration>0){duration=clamp(serverDuration,0,30);durationSource='SERVER_BOND_ANALYTICS'}}catch(_){}}
       const investable=stocks+bonds;
       const target=targetStocks/100;
       const desiredStocks=(investable+contribution)*target;
@@ -41,7 +42,7 @@ module.exports = function registerWhatIfEngine(app, deps = {}) {
       const scenarioPnl=total-(start+contribution);
       res.setHeader('Cache-Control','no-store');
       res.json({
-        version:'7.7',source:'SERVER_WHAT_IF',inputs:{contribution:round(contribution),marketShock:round(marketShock),rateShift:round(rateShift),targetStocks:round(targetStocks),duration:round(duration)},
+        version:'7.10.6',source:'SERVER_WHAT_IF',durationSource,inputs:{contribution:round(contribution),marketShock:round(marketShock),rateShift:round(rateShift),targetStocks:round(targetStocks),duration:round(duration)},
         before:{capital:round(start),stocks:round(stocks),bonds:round(bonds),reserve:round(reserve),stocksPct:round(investable?stocks/investable*100:0,1),bondsPct:round(investable?bonds/investable*100:0,1)},
         buys:{stocks:round(buyStocks),bonds:round(buyBonds)},
         effects:{stocksRub:round(stockEffect),bondsRub:round(bondEffect),bondPricePct:round(bondPricePct)},
@@ -49,6 +50,6 @@ module.exports = function registerWhatIfEngine(app, deps = {}) {
         verdict:Math.abs(gap)<=1?'ЦЕЛЬ УДЕРЖАНА':gap>0?'ПОСЛЕ СЦЕНАРИЯ АКЦИЙ ВЫШЕ ЦЕЛИ':'ПОСЛЕ СЦЕНАРИЯ ОБЛИГАЦИЙ ВЫШЕ ЦЕЛИ',
         note:duration>0?'Ставочный сценарий использует модифицированную дюрацию из Bond Analytics. Это приближение, не прогноз.':'Ставочный эффект не применён: дюрация недоступна.'
       });
-    }catch(err){res.status(500).json({version:'7.7',available:false,error:err?.message||'What If unavailable'});}
+    }catch(err){res.status(500).json({version:'7.10.6',available:false,error:err?.message||'What If unavailable'});}
   });
 };
