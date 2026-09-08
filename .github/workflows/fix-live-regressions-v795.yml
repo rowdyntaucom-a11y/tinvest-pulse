@@ -1,0 +1,79 @@
+name: Fix live regressions v7.9.5
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-live-regressions-v795.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch payout resilience, cash flow sync and drawdown outliers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          # 1) Never replace a valid payout calendar with a suspicious empty T-Bank response.
+          p=Path('payouts-core.js')
+          s=p.read_text()
+          s=s.replace("  let cache = null;", "  let cache = null;\n  let lastGood = null;")
+          old="""  app.get('/api/payouts',async(req,res)=>{try{if(cache&&Date.now()-cache.createdAt<CACHE_MS){res.setHeader('Cache-Control','no-store');return res.json(cache.data)}const data=await buildPayouts();cache={createdAt:Date.now(),data};res.setHeader('Cache-Control','no-store, no-cache, must-revalidate');res.json(data)}catch(err){res.status(500).json({version:'7.9',available:false,error:err?.message||'Payout calendar unavailable'})}});"""
+          new="""  app.get('/api/payouts',async(req,res)=>{try{
+    if(cache&&Date.now()-cache.createdAt<CACHE_MS){res.setHeader('Cache-Control','no-store');return res.json(cache.data)}
+    const data=await buildPayouts();
+    const eligible=Number(data?.coverage?.eligibleAssets)||0,count=Number(data?.forecast?.count)||0;
+    if(eligible>0&&count===0){
+      if(lastGood){res.setHeader('Cache-Control','no-store');return res.json({...lastGood,stale:true,warning:'T-Bank temporarily returned an empty payout schedule; showing last confirmed schedule.'})}
+      throw new Error('T-Bank returned an empty payout schedule for a non-empty eligible portfolio');
+    }
+    cache={createdAt:Date.now(),data};lastGood=data;
+    res.setHeader('Cache-Control','no-store, no-cache, must-revalidate');res.json(data)
+  }catch(err){
+    if(lastGood){res.setHeader('Cache-Control','no-store');return res.json({...lastGood,stale:true,warning:err?.message||'Temporary payout API error'})}
+    res.status(500).json({version:'7.9.5',available:false,error:err?.message||'Payout calendar unavailable'})
+  }});"""
+          if old not in s: raise SystemExit('payout route signature not found')
+          s=s.replace(old,new)
+          p.write_text(s)
+
+          # 2) Ignore impossible one-step history glitches for drawdown instead of poisoning DNA.
+          p=Path('shield-engine.js'); s=p.read_text()
+          old="  function maxDD(vals){let peak=-Infinity,dd=0;for(const v of vals){if(v>peak)peak=v;if(peak>0)dd=Math.min(dd,v/peak-1);}return dd;}"
+          new="""  function maxDD(vals){
+    const a=(Array.isArray(vals)?vals:[]).map(Number).filter(v=>Number.isFinite(v)&&v>0);
+    if(!a.length)return 0;
+    let synthetic=100,peak=100,dd=0;
+    for(let i=1;i<a.length;i++){
+      const r=a[i]/a[i-1]-1;
+      if(!Number.isFinite(r)||Math.abs(r)>.35)continue;
+      synthetic*=1+r;peak=Math.max(peak,synthetic);dd=Math.min(dd,synthetic/peak-1);
+    }
+    return dd;
+  }"""
+          if old not in s: raise SystemExit('maxDD signature not found')
+          s=s.replace(old,new)
+          old="    let peak=p0,maxDrawdown=0;for(const v of ps){peak=Math.max(peak,v);maxDrawdown=Math.max(maxDrawdown,peak>0?(peak-v)/peak*100:0);}"
+          new="    const maxDrawdown=Math.abs(maxDD(ps))*100;"
+          if old not in s: raise SystemExit('DNA drawdown signature not found')
+          s=s.replace(old,new)
+          p.write_text(s)
+
+          # 3) v7.9.4 was writing to legacy flowMonthly, while v7.1 UI uses flowNetMonthly.
+          p=Path('public/v794.js'); s=p.read_text()
+          s=s.replace("  if($('flowMonthly'))$('flowMonthly').textContent=rub(monthly);", "  const flowMain=$('flowNetMonthly')||$('flowMonthly');if(flowMain)flowMain.textContent=rub(monthly);")
+          s=s.replace("async function load(){if(!document.body.classList.contains('pulse-active'))return;try{const r=await fetch('/api/payouts?v=7.9.4&t='+Date.now(),{cache:'no-store'}),d=await r.json();if(r.ok)paint(d)}catch(e){}}", "async function load(){if(!document.body.classList.contains('pulse-active'))return;try{const r=await fetch('/api/payouts?v=7.9.5&t='+Date.now(),{cache:'no-store'}),d=await r.json();if(r.ok&&Number(d?.forecast?.count)>0)paint(d)}catch(e){}}")
+          p.write_text(s)
+
+          # Cache bust only the overlay module; do not touch layout.
+          p=Path('public/index.html'); s=p.read_text();s=s.replace('/v794.js?v=7.9.4','/v794.js?v=7.9.5');p.write_text(s)
+          PY
+          node --check payouts-core.js
+          node --check shield-engine.js
+          node --check public/v794.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add payouts-core.js shield-engine.js public/v794.js public/index.html
+          git commit -m 'v7.9.5 stabilize payouts and DNA drawdown' || exit 0
+          git push
