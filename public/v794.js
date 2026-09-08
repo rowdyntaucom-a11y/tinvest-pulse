@@ -9,12 +9,12 @@
  function paint(d){ensure();const g=+d?.forecast?.gross,t=+d?.forecast?.tax,n=+d?.forecast?.net;if(!Number.isFinite(g)||!Number.isFinite(n))return;const rate=g?Math.abs(t)/g*100:0,keep=g?n/g*100:0;
   [['p794gross',rub(g)],['p794tax','−'+rub(Math.abs(t))],['p794net',rub(n)],['p794taxPct',rate.toFixed(0)+'%'],['p794keep',keep.toFixed(0)+'%'],['f794gross',rub(g)],['f794tax','−'+rub(Math.abs(t))],['f794net',rub(n)]].forEach(([id,v])=>{if($(id))$(id).textContent=v});
   const monthly=n/12,annual=n,total=+window.dashboardData?.portfolio?.value||+window.dashboardData?.value||0;
-  if($('flowMonthly'))$('flowMonthly').textContent=rub(monthly);
+  const flowMain=$('flowNetMonthly')||$('flowMonthly');if(flowMain)flowMain.textContent=rub(monthly);
   if($('flowAnnual'))$('flowAnnual').textContent=rub(annual);
   if($('flowDaily'))$('flowDaily').textContent=rub(annual/365);
   if($('flowYield'))$('flowYield').textContent=total?(annual/total*100).toFixed(1).replace('.',',')+'%':'—';
   const lab=document.querySelector('.flowValue span');if(lab)lab.textContent='/ МЕС · НА РУКИ';const yl=document.querySelector('.flowYield span');if(yl)yl.textContent='прогноз 12 мес / капитал';
  }
- async function load(){if(!document.body.classList.contains('pulse-active'))return;try{const r=await fetch('/api/payouts?v=7.9.4&t='+Date.now(),{cache:'no-store'}),d=await r.json();if(r.ok)paint(d)}catch(e){}}
+ async function load(){if(!document.body.classList.contains('pulse-active'))return;try{const r=await fetch('/api/payouts?v=7.9.5&t='+Date.now(),{cache:'no-store'}),d=await r.json();if(r.ok)paint(d)}catch(e){}}
  new MutationObserver(()=>{if(document.body.classList.contains('pulse-active'))setTimeout(load,500)}).observe(document.body,{attributes:true,attributeFilter:['class']});document.addEventListener('click',e=>{if(e.target.closest('#pulseBtn,#scoreRing'))setTimeout(load,900)});setTimeout(load,1200);
 })();

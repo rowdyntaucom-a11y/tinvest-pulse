@@ -67,7 +67,17 @@ module.exports = function registerShieldEngine(app, deps = {}) {
     return {p,m,pts};
   }
   function downside(a){const neg=a.map(x=>Math.min(0,x));return Math.sqrt(mean(neg.map(x=>x*x)));}
-  function maxDD(vals){let peak=-Infinity,dd=0;for(const v of vals){if(v>peak)peak=v;if(peak>0)dd=Math.min(dd,v/peak-1);}return dd;}
+  function maxDD(vals){
+  const a=(Array.isArray(vals)?vals:[]).map(Number).filter(v=>Number.isFinite(v)&&v>0);
+  if(!a.length)return 0;
+  let synthetic=100,peak=100,dd=0;
+  for(let i=1;i<a.length;i++){
+    const r=a[i]/a[i-1]-1;
+    if(!Number.isFinite(r)||Math.abs(r)>.35)continue;
+    synthetic*=1+r;peak=Math.max(peak,synthetic);dd=Math.min(dd,synthetic/peak-1);
+  }
+  return dd;
+}
   function beta(p,m){const n=Math.min(p.length,m.length);if(n<3)return NaN;const pp=p.slice(-n),mm=m.slice(-n),mp=mean(pp),mi=mean(mm),cov=pp.reduce((s,x,i)=>s+(x-mp)*(mm[i]-mi),0)/(n-1),v=mm.reduce((s,x)=>s+(x-mi)**2,0)/(n-1);return v?cov/v:NaN;}
   function corr(p,m){const n=Math.min(p.length,m.length);if(n<3)return NaN;const pp=p.slice(-n),mm=m.slice(-n),mp=mean(pp),mi=mean(mm),sp=sd(pp),sm=sd(mm);if(!sp||!sm)return NaN;return pp.reduce((s,x,i)=>s+(x-mp)*(mm[i]-mi),0)/((n-1)*sp*sm);}
   function explain(k,v){
@@ -101,7 +111,7 @@ module.exports = function registerShieldEngine(app, deps = {}) {
     const pts=Array.isArray(d?.history?.points)?d.history.points:[], ps=pts.map(x=>Number(x?.portfolio)).filter(v=>v>0), ms=pts.map(x=>Number(x?.imoex)).filter(v=>v>0);
     const p0=ps[0]||100,p1=ps[ps.length-1]||p0,m0=ms[0]||100,m1=ms[ms.length-1]||m0;
     const pReturn=(p1/p0-1)*100,mReturn=(m1/m0-1)*100,activeReturn=pReturn-mReturn;
-    let peak=p0,maxDrawdown=0;for(const v of ps){peak=Math.max(peak,v);maxDrawdown=Math.max(maxDrawdown,peak>0?(peak-v)/peak*100:0);}
+    const maxDrawdown=Math.abs(maxDD(ps))*100;
     const daily=[];for(let i=1;i<ps.length;i++)if(ps[i-1]>0)daily.push((ps[i]/ps[i-1]-1)*100);
     const dm=mean(daily),vol=daily.length>1?Math.sqrt(daily.reduce((s,x)=>s+(x-dm)**2,0)/(daily.length-1)):0;
     const monthly=Number(d?.passiveIncome?.averageMonthly)||0, incomeYield=total>0?monthly*12/total*100:0;

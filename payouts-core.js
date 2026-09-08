@@ -5,6 +5,7 @@ module.exports = function registerPayoutCalendar(app, deps) {
   const INSTRUMENTS = 'tinkoff.public.invest.api.contract.v1.InstrumentsService/';
   const CACHE_MS = 60 * 1000;
   let cache = null;
+  let lastGood = null;
 
   function moneyValue(v) {
     if (v == null) return 0;
@@ -51,5 +52,18 @@ module.exports = function registerPayoutCalendar(app, deps) {
     const gross=round2(events.reduce((s,x)=>s+x.gross,0)),tax=round2(events.reduce((s,x)=>s+x.tax,0)),net=round2(events.reduce((s,x)=>s+x.net,0)),months=buildMonths(now,events),next=events[0]||null;
     return{version:'7.9',generatedAt:now.toISOString(),period:{from:now.toISOString(),to:to.toISOString()},basis:'CURRENT_HOLDINGS_FULL_12M',displayBasis:'GROSS_SCHEDULED_PAYOUTS',actual,forecast:{gross,tax,net,count:events.length},next:next?{...next,days:Math.max(0,Math.ceil((new Date(next.date)-now)/86400000))}:null,months,events,coverage:{eligibleAssets:eligible.length,scheduledEvents:events.length,resolvedAssets:eligible.length-errors.filter(x=>x.ticker!=='FACT').length,errors},note:'Будущие выплаты показываются начисленными (gross), как календарь выплат. НДФЛ показывается отдельно как оценка; net не используется как сумма будущих выплат.'};
   }
-  app.get('/api/payouts',async(req,res)=>{try{if(cache&&Date.now()-cache.createdAt<CACHE_MS){res.setHeader('Cache-Control','no-store');return res.json(cache.data)}const data=await buildPayouts();cache={createdAt:Date.now(),data};res.setHeader('Cache-Control','no-store, no-cache, must-revalidate');res.json(data)}catch(err){res.status(500).json({version:'7.9',available:false,error:err?.message||'Payout calendar unavailable'})}});
+  app.get('/api/payouts',async(req,res)=>{try{
+  if(cache&&Date.now()-cache.createdAt<CACHE_MS){res.setHeader('Cache-Control','no-store');return res.json(cache.data)}
+  const data=await buildPayouts();
+  const eligible=Number(data?.coverage?.eligibleAssets)||0,count=Number(data?.forecast?.count)||0;
+  if(eligible>0&&count===0){
+    if(lastGood){res.setHeader('Cache-Control','no-store');return res.json({...lastGood,stale:true,warning:'Temporary empty payout schedule; showing last confirmed schedule.'})}
+    throw new Error('Empty payout schedule for eligible portfolio');
+  }
+  cache={createdAt:Date.now(),data};lastGood=data;
+  res.setHeader('Cache-Control','no-store, no-cache, must-revalidate');res.json(data)
+}catch(err){
+  if(lastGood){res.setHeader('Cache-Control','no-store');return res.json({...lastGood,stale:true,warning:err?.message||'Temporary payout API error'})}
+  res.status(500).json({version:'7.9.5',available:false,error:err?.message||'Payout calendar unavailable'})
+}});
 };
