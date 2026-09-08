@@ -1160,7 +1160,11 @@ async function buildIntel() {
     const fresh=row.news.filter(n=>{const t=new Date(n.publishedAt).getTime();return Number.isFinite(t)&&t>=cutoff;});
     const enriched=fresh.map(item=>{const sentiment=intelSentiment(item),importance=intelImportance(item,row.asset.weight),quality=intelQuality(item,row.asset,importance),understanding=intelUnderstanding(item,row.asset);const adjustedScore=Math.max(0,Math.min(100,Math.round(quality.score*.72+understanding.score*.28)));const adjustedLevel=adjustedScore>=76?'ФАКТ':adjustedScore>=62?'СИГНАЛ':adjustedScore>=48?'ФОН':'ШУМ';return {...item,sentiment,importance,understanding,quality:{...quality,score:adjustedScore,level:adjustedLevel},confidence:Math.round(Math.max(30,Math.min(92,adjustedScore*.72+intelConfidence(item,importance,sentiment)*.28)))};}).sort((a,b)=>b.quality.score-a.quality.score||b.understanding.score-a.understanding.score||b.importance-a.importance);
     const usable=enriched.filter(x=>x.quality.level!=='ШУМ' && x.quality.relevance>=34 && x.understanding.sufficient);
-    if(!usable.length){quiet.push({ticker:row.asset.ticker||row.asset.name,name:row.asset.name,weight:row.asset.weight,status:'ТИХО',rejected:enriched.length});continue;}
+    if(!usable.length){
+      const watch=enriched.find(x=>x.quality.level!=='ШУМ' && x.quality.relevance>=42 && x.understanding.score>=20 && !x.understanding.priceOnly);
+      quiet.push({ticker:row.asset.ticker||row.asset.name,name:row.asset.name,weight:row.asset.weight,status:watch?'НАБЛЮДАЕМ':'ТИХО',rejected:enriched.length,watchScore:watch?.understanding?.score||0,watchReason:watch?.understanding?.reason||null});
+      continue;
+    }
     const lead=usable[0];
     const corroborating=usable.filter(x=>x.quality.score>=48).slice(0,5);
     const pos=corroborating.filter(x=>x.sentiment.cls==='pos').length,neg=corroborating.filter(x=>x.sentiment.cls==='neg').length;
@@ -1182,9 +1186,10 @@ async function buildIntel() {
   }
   grouped.sort((a,b)=>b.importance-a.importance||b.qualityScore-a.qualityScore||b.weight-a.weight);
   quiet.sort((a,b)=>b.weight-a.weight);
-  const items=grouped.slice(0,5),shownTickers=new Set(items.map(x=>String(x.ticker))),quietVisible=assets.filter(a=>!shownTickers.has(String(a.ticker||a.name))).map(a=>quiet.find(q=>String(q.ticker)===String(a.ticker||a.name))||{ticker:a.ticker||a.name,name:a.name,weight:a.weight,status:'ТИХО'}).sort((a,b)=>b.weight-a.weight),critical=items.filter(x=>x.importance>=80&&x.sentimentClass==='neg'&&x.qualityLevel!=='ФОН').length,attention=items.filter(x=>x.status==='ТРЕБУЕТ ВНИМАНИЯ').length,neutral=items.filter(x=>x.sentimentClass==='neu').length,main=items.slice().sort((a,b)=>b.weight-a.weight)[0]||quietVisible[0];
-  const diagnosis=items.length?`${critical?'Есть подтверждённые критичные факторы — проверь источники.':attention?'Есть подтверждённые факторы, которые стоит держать в поле зрения.':'Срочных изменений по качественному новостному фону не видно.'}${quietVisible.length?` ${quietVisible.length} поз. без значимых событий.`:''}${main?` Главный вес: ${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%.`:''}`:`Значимых подтверждённых событий за 72 часа не найдено. ${quietVisible.length} основных позиций в режиме «ТИХО».`;
-  return {available:true,generatedAt:new Date().toISOString(),items,quiet:quietVisible.slice(0,8),summary:diagnosis,diagnosis:{events:items.length,critical,attention,neutral,quiet:quietVisible.length,mainFactor:main?`${main.ticker} ${main.weight.toFixed(1).replace('.',',')}%`:null}};
+  const items=grouped.slice(0,5),eventTickers=new Set(grouped.map(x=>String(x.ticker))),quietVisible=assets.filter(a=>!eventTickers.has(String(a.ticker||a.name))).map(a=>quiet.find(q=>String(q.ticker)===String(a.ticker||a.name))||{ticker:a.ticker||a.name,name:a.name,weight:a.weight,status:'ТИХО'}).sort((a,b)=>b.weight-a.weight),critical=items.filter(x=>x.importance>=80&&x.sentimentClass==='neg'&&x.qualityLevel!=='ФОН').length,attention=items.filter(x=>x.status==='ТРЕБУЕТ ВНИМАНИЯ').length,neutral=items.filter(x=>x.sentimentClass==='neu').length,watchCount=quietVisible.filter(x=>x.status==='НАБЛЮДАЕМ').length,quietCount=quietVisible.filter(x=>x.status!=='НАБЛЮДАЕМ').length,largest=assets[0]||null;
+  const largestText=largest?`${largest.ticker||largest.name} ${largest.weight.toFixed(1).replace('.',',')}%`:null;
+  const diagnosis=items.length?`${critical?'Есть подтверждённые критичные факторы — проверь источники.':attention?'Есть подтверждённые факторы, которые стоит держать в поле зрения.':'Срочных изменений по качественному новостному фону не видно.'}${watchCount?` ${watchCount} поз. в режиме «НАБЛЮДАЕМ».`:''}${quietCount?` ${quietCount} поз. в режиме «ТИХО».`:''}${largestText?` Крупнейшая позиция: ${largestText}.`:''}`:`Подтверждённых событий за 72 часа нет.${watchCount?` ${watchCount} поз. в режиме «НАБЛЮДАЕМ».`:''}${quietCount?` ${quietCount} поз. в режиме «ТИХО».`:''}${largestText?` Крупнейшая позиция: ${largestText}.`:''}`;
+  return {available:true,generatedAt:new Date().toISOString(),items,quiet:quietVisible.slice(0,8),summary:diagnosis,diagnosis:{events:items.length,critical,attention,neutral,watch:watchCount,quiet:quietCount,largestPosition:largestText,mainFactor:largestText}};
 }
 
 app.get('/api/intel', async (req, res) => {
@@ -1226,6 +1231,7 @@ async function buildDashboard() {
     figi: p.figi,
     ticker: p.ticker || p.instrumentUid || p.figi,
     name: p.name || p.ticker || p.figi,
+    instrumentType: p.instrumentType || '',
     quantity: moneyValue(p.quantity),
     averagePrice: moneyValue(p.averagePositionPrice),
     currentPrice: moneyValue(p.currentPrice),
@@ -1245,6 +1251,7 @@ async function buildDashboard() {
         position.ticker =
           instrument?.instrument?.ticker ||
           position.ticker;
+        position.instrumentType = position.instrumentType || instrument?.instrument?.instrumentType || instrument?.instrument?.type || '';
       } catch {
         // Keep the portfolio response usable if one instrument lookup fails.
       }

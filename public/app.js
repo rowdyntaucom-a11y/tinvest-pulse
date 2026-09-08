@@ -262,66 +262,98 @@ let pulseLongTimer=null;
 let pulseScanToken=0;
 
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function classifyPulseAsset(a){
+  const type=String(a?.instrumentType||a?.type||'').toLowerCase();
+  const ticker=String(a?.ticker||'').toUpperCase();
+  const name=String(a?.name||'').toLowerCase();
+  if(type.includes('bond') || /^SU\d/.test(ticker) || /^RU000A/.test(ticker) || /офз|облигац/.test(name)) return 'bonds';
+  if(type.includes('etf') || type.includes('fund') || /tmon|ликвидн|денежн.*рын/.test(`${ticker} ${name}`.toLowerCase())) return 'reserve';
+  if(type.includes('currency') || type.includes('cash')) return 'reserve';
+  if(type.includes('share') || type.includes('stock')) return 'stocks';
+  return 'stocks';
+}
 function pulseStats(d){
   const p=d?.portfolio||{};
   const pts=Array.isArray(d?.history?.points)?d.history.points:[];
   const ps=pts.map(x=>Number(x?.portfolio)).filter(v=>Number.isFinite(v)&&v>0);
   const ms=pts.map(x=>Number(x?.imoex)).filter(v=>Number.isFinite(v)&&v>0);
   const p0=ps[0]||100, p1=ps[ps.length-1]||p0, m0=ms[0]||100, m1=ms[ms.length-1]||m0;
-  const pReturn=(p1/p0-1)*100, mReturn=(m1/m0-1)*100;
+  const pReturn=(p1/p0-1)*100, mReturn=(m1/m0-1)*100, activeReturn=pReturn-mReturn;
   let peak=p0,maxDD=0;
   for(const v of ps){peak=Math.max(peak,v);if(peak>0)maxDD=Math.max(maxDD,(peak-v)/peak*100);}
+  const trough=ps.length?Math.min(...ps):p1;
+  const recovery=(p1>trough && peak>trough)?clamp((p1-trough)/(peak-trough)*100,0,100):100;
   const daily=[];
   for(let i=1;i<ps.length;i++){if(ps[i-1]>0)daily.push((ps[i]/ps[i-1]-1)*100);}
   const avg=daily.length?daily.reduce((a,b)=>a+b,0)/daily.length:0;
   const vol=daily.length>1?Math.sqrt(daily.reduce((a,b)=>a+(b-avg)**2,0)/(daily.length-1)):0;
   const assets=Array.isArray(d?.assets)?d.assets:((Array.isArray(p.assets)?p.assets:[]));
-  const total=Number(p.value)||0;
-  const byValue=[...assets].sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0));
-  const whale=byValue[0];
+  const total=Number(p.value)||assets.reduce((sum,a)=>sum+Math.max(0,Number(a?.currentValue)||0),0);
+  const byValue=[...assets].filter(a=>(Number(a?.currentValue)||0)>0).sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0));
   const weights=byValue.map(a=>total>0?Math.max(0,Number(a.currentValue)||0)/total*100:0);
-  const whaleWeight=weights[0]||0;
-  const hhi=weights.reduce((sum,w)=>sum+w*w,0);
-  const concentration=clamp(Math.round(hhi),0,100);
-  const breadth=assets.length?clamp(Math.round(100-(Math.max(0,whaleWeight-10)*1.7)),18,100):0;
+  const whale=byValue[0], whaleWeight=weights[0]||0;
+  const top3Weight=weights.slice(0,3).reduce((a,b)=>a+b,0);
+  const squaredShare=weights.reduce((sum,w)=>sum+Math.pow(w/100,2),0);
+  const effectiveN=squaredShare>0?1/squaredShare:0;
+  const concentrationRisk=clamp(Math.round(Math.max(0,whaleWeight-15)*3.1 + Math.max(0,top3Weight-55)*1.45),0,100);
+  const concentrationScore=clamp(Math.round(100-concentrationRisk),0,100);
+  const diversificationScore=clamp(Math.round((Math.min(effectiveN,8)/8)*82 + Math.min(byValue.length,10)*1.8),18,100);
+
+  const alloc={stocks:0,bonds:0,reserve:0};
+  for(const a of byValue){alloc[classifyPulseAsset(a)]+=Math.max(0,Number(a.currentValue)||0);}
+  const represented=alloc.stocks+alloc.bonds+alloc.reserve;
+  if(total>represented) alloc.reserve+=total-represented;
+  const allocationBase=alloc.stocks+alloc.bonds+alloc.reserve;
+  const stocksPct=allocationBase>0?alloc.stocks/allocationBase*100:0;
+  const bondsPct=allocationBase>0?alloc.bonds/allocationBase*100:0;
+  const reservePct=allocationBase>0?alloc.reserve/allocationBase*100:0;
+  const defensivePct=bondsPct+reservePct;
+  const balanceGap=Math.abs(stocksPct-defensivePct);
+  const balanceScore=clamp(Math.round(100-balanceGap*1.65),0,100);
+
   const assetResult=a=>Number.isFinite(Number(a?.yieldRub))?Number(a.yieldRub):Number(a?.expectedYield)||0;
-  const byResult=[...assets].sort((a,b)=>assetResult(b)-assetResult(a));
-  const strength=byResult[0];
-  const painAsset=byResult[byResult.length-1];
+  const byResult=[...byValue].sort((a,b)=>assetResult(b)-assetResult(a));
+  const strength=byResult[0], painAsset=byResult[byResult.length-1];
   const monthly=Number(d?.passiveIncome?.averageMonthly);
   const incomeYield=Number.isFinite(monthly)&&total>0?(monthly*12/total*100):0;
   const ageDays=p.startDate?Math.max(0,Math.round((Date.now()-new Date(p.startDate).getTime())/86400000)):null;
-  const pulseBeat=pReturn>=0?'ЖИВОЙ':'КРЯХТИТ';
-  const totalBase=p1+m1;
-  const pBar=totalBase>0?clamp(p1/totalBase*100,18,82):50;
-  const dnaIncome=clamp(Math.round(35 + incomeYield*7.5),0,100);
-  const dnaStability=clamp(Math.round(88 - maxDD*5.2 - vol*4),18,100);
-  const dnaGrowth=clamp(Math.round(48 + pReturn*4 + (pReturn-mReturn)*2),0,100);
-  const dnaDivers=clamp(Math.round(38 + Math.min(15,Math.max(0,assets.length-1))*3.2),0,100);
-  const dnaBase=(dnaIncome*.30)+(dnaStability*.25)+(dnaGrowth*.30)+(dnaDivers*.15);
-  const marketAdj=clamp((pReturn-mReturn)*1.2,-8,8);
-  const score=clamp(Math.round(dnaBase+marketAdj),0,100);
-  const riskScore=clamp(Math.round(maxDD*4.8 + Math.max(0,whaleWeight-12)*1.6 + vol*6),0,100);
+  const flowScore=clamp(Math.round(30+incomeYield*10+(monthly>0?14:0)),0,100);
+  const stabilityScore=clamp(Math.round(68 + bondsPct*.28 + reservePct*.18 - maxDD*3.7 - vol*3.2),12,100);
+  const growthScore=clamp(Math.round(50+pReturn*2.8+activeReturn*3.4),0,100);
+  const dnaIncome=flowScore;
+  const dnaStability=stabilityScore;
+  const dnaGrowth=growthScore;
+  const dnaDivers=diversificationScore;
+  const dnaBalance=balanceScore;
+  const dnaConcentration=concentrationScore;
+  const dnaBase=dnaBalance*.25+dnaConcentration*.20+dnaStability*.20+dnaIncome*.15+dnaGrowth*.10+dnaDivers*.10;
+  const score=clamp(Math.round(dnaBase),0,100);
+  const riskScore=clamp(Math.round(concentrationRisk*.42 + Math.min(100,maxDD*5)*.28 + Math.min(100,balanceGap*2.4)*.20 + Math.min(100,vol*12)*.10),0,100);
   const riskLabel=riskScore>=65?'ВЫСОКИЙ':(riskScore>=35?'УМЕРЕННЫЙ':'НИЗКИЙ');
-  const flowScore=clamp(Math.round(35+incomeYield*11+(monthly>0?15:0)),0,100);
+  const flowBar=clamp(flowScore,6,100);
   const strengthTicker=strength?(strength.ticker||strength.name||'—'):'—';
   const painTicker=painAsset?(painAsset.ticker||painAsset.name||'—'):'—';
-  const strengthYield=Number(strength?.expectedYield)||0;
-  const painYield=Number(painAsset?.expectedYield)||0;
-  let diagnosisTitle='ПУЛЬС СТАБИЛЬНЫЙ';
-  let diagnosisText=`Структура собрана. Поток ${rub(monthly)}/мес. Риск: ${riskLabel.toLowerCase()}.`;
-  if(riskScore>=65){diagnosisTitle='КОНТУР НАПРЯЖЁН';diagnosisText=`Главная уязвимость — концентрация ${whaleWeight.toFixed(1).replace('.',',')}% в ${whale?.ticker||whale?.name||'крупнейшей позиции'}.`}
-  else if(incomeYield>=5){diagnosisTitle='ДЕНЕЖНЫЙ ДВИГАТЕЛЬ';diagnosisText=`Пассивный поток ${rub(monthly)}/мес. уже заметен в структуре портфеля.`}
-  else if(pReturn-mReturn>=2){diagnosisTitle='ИМПУЛЬС ПОЙМАН';diagnosisText=`Портфель набирает ход относительно рынка. Сигнал роста активен.`}
-  else if(pReturn-mReturn<=-4){diagnosisTitle='РЕЖИМ ДОГОНА';diagnosisText=`Индекс впереди. Внутри портфеля есть зона давления — ${painTicker}.`}
-  else if(recovery>75){diagnosisTitle='ВОССТАНОВЛЕНИЕ';diagnosisText=`Портфель возвращается от локального дна. Система держит нагрузку.`}
-  const trough=ps.length?Math.min(...ps):p1;
-  const recovery=(p1>trough && peak>trough)?clamp((p1-trough)/(peak-trough)*100,0,100):100;
-  const momentum=clamp(50+(pReturn-mReturn)*8,0,100);
-  const flowBar=clamp(flowScore,8,100);
-  const diversified=assets.filter(a=>(Number(a.currentValue)||0)>0).length;
-  const dnaVerdict=dnaBase>=75?'СИЛЬНЫЙ ПРОФИЛЬ':(dnaBase>=55?'СБАЛАНСИРОВАН':'ТОЧКА РОСТА');
-  return {pts,p1,m1,total,pReturn,mReturn,maxDD,peak,trough,recovery,momentum,flowBar,whale,whaleWeight,strength,painAsset,strengthTicker,painTicker,strengthYield,painYield,riskLabel,riskScore,monthly,incomeYield,flowScore,score,dnaBase,marketAdj,ageDays,pulseBeat,pBar,mBar:100-pBar,dnaIncome,dnaStability,dnaGrowth,dnaDivers,diagnosisTitle,diagnosisText,vol,concentration,breadth,diversified,dnaVerdict,weights,byValue};
+  const strengthYield=assetResult(strength), painYield=assetResult(painAsset);
+  const momentum=clamp(50+activeReturn*7,0,100);
+  const diversified=byValue.length;
+  const pulseBeat=score>=70?'СОБРАН':score>=55?'РАБОТАЕТ':'ТРЕБУЕТ НАСТРОЙКИ';
+  const allocationState=balanceScore>=85?'ПОЧТИ 50 / 50':balanceScore>=65?'СДВИГ УМЕРЕННЫЙ':'БАЛАНС СМЕЩЁН';
+  const dnaVerdict=score>=80?'СИЛЬНЫЙ DNA':score>=65?'СБАЛАНСИРОВАН':score>=50?'РАБОЧИЙ ПРОФИЛЬ':'ТРЕБУЕТ НАСТРОЙКИ';
+
+  const concentrationNode=whaleWeight>=30?{level:'HIGH',text:`${(whale?.ticker||whale?.name||'ядро')} ${whaleWeight.toFixed(1).replace('.',',')}%`}:whaleWeight>=22?{level:'WATCH',text:`крупнейшая ${whaleWeight.toFixed(1).replace('.',',')}%`}:{level:'OK',text:`крупнейшая ${whaleWeight.toFixed(1).replace('.',',')}%`};
+  const balanceNode=balanceGap>=30?{level:'HIGH',text:`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`} : balanceGap>=16?{level:'WATCH',text:`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`}:{level:'OK',text:`${stocksPct.toFixed(0)} / ${defensivePct.toFixed(0)}`};
+  const drawdownNode=maxDD>=15?{level:'HIGH',text:`−${maxDD.toFixed(1).replace('.',',')}%`}:maxDD>=8?{level:'WATCH',text:`−${maxDD.toFixed(1).replace('.',',')}%`}:{level:'OK',text:`−${maxDD.toFixed(1).replace('.',',')}%`};
+
+  let diagnosisTitle='DNA СБАЛАНСИРОВАН';
+  let diagnosisText=`Акции ${stocksPct.toFixed(0)}%, защитная часть ${defensivePct.toFixed(0)}%. Крупнейшая позиция — ${whale?.ticker||whale?.name||'—'} ${whaleWeight.toFixed(1).replace('.',',')}%.`;
+  if(concentrationRisk>=55){diagnosisTitle='ЯДРО ПЕРЕГРУЖЕНО';diagnosisText=`${whale?.ticker||whale?.name||'Крупнейшая позиция'} занимает ${whaleWeight.toFixed(1).replace('.',',')}%. Это главный структурный риск портфеля.`;}
+  else if(balanceScore<60){diagnosisTitle='БАЛАНС СМЕЩЁН';diagnosisText=`Структура сейчас ${stocksPct.toFixed(0)}% акции / ${defensivePct.toFixed(0)}% защитная часть. Цель 50/50 заметно отклонена.`;}
+  else if(flowScore>=70){diagnosisTitle='ДЕНЕЖНЫЙ ДВИГАТЕЛЬ';diagnosisText=`Пассивный поток ${rub(monthly)}/мес. уже заметно поддерживает DNA портфеля.`;}
+  else if(activeReturn>=2){diagnosisTitle='DNA НАБИРАЕТ ХОД';diagnosisText=`Портфель опережает IMOEX примерно на ${activeReturn.toFixed(1).replace('.',',')} п.п., не ломая базовую структуру.`;}
+  else if(activeReturn<=-4){diagnosisTitle='РЕЖИМ ДОГОНА';diagnosisText=`IMOEX впереди примерно на ${Math.abs(activeReturn).toFixed(1).replace('.',',')} п.п. Зона давления — ${painTicker}.`;}
+  else if(recovery>75 && maxDD>0){diagnosisTitle='ВОССТАНОВЛЕНИЕ';diagnosisText=`Портфель восстановил ${Math.round(recovery)}% пути от локального дна к пику.`;}
+
+  return {pts,p1,m1,total,pReturn,mReturn,activeReturn,maxDD,peak,trough,recovery,momentum,flowBar,whale,whaleWeight,strength,painAsset,strengthTicker,painTicker,strengthYield,painYield,riskLabel,riskScore,monthly,incomeYield,flowScore,score,dnaBase,ageDays,pulseBeat,dnaIncome,dnaStability,dnaGrowth,dnaDivers,dnaBalance,dnaConcentration,diagnosisTitle,diagnosisText,vol,diversified,dnaVerdict,weights,byValue,stocksPct,bondsPct,reservePct,defensivePct,balanceScore,balanceGap,concentrationRisk,concentrationScore,allocationState,effectiveN,concentrationNode,balanceNode,drawdownNode,assetResult};
 }
 function drawPulsePath(key,pts){
   const a=pts.map(x=>Number(x?.[key])).filter(v=>Number.isFinite(v)&&v>0);
@@ -333,25 +365,34 @@ function enterPulse(){
   const root=$('pulse'),shot=$('pulseShot'),d=dashboardData||{};
   root.classList.remove('is-scanning');
   ['scanRow1','scanRow2','scanRow3'].forEach(id=>$(id)?.classList.remove('done'));
-  setStyle('pulseScanProgress','width','0%'); setText('scanPct','0%'); setText('scanSignal','WAIT'); setText('scanFlux','—'); setText('scanRisk','—'); setText('pulseScanSub','Считываем внутреннюю структуру…');
+  setStyle('pulseScanProgress','width','0%'); setText('scanPct','0%'); setText('scanSignal','WAIT'); setText('scanFlux','—'); setText('scanRisk','—'); setText('pulseScanSub','Считываем распределение и риски…');
   const st=pulseStats(d);
   setText('pulseScore',String(st.score));
-  setText('pulseCoreStatus',st.score>=70?'OPTIMAL':(st.score>=50?'ONLINE':'WATCH'));
-  setText('pulseRiskScore',String(st.riskScore)); setText('pulseFlowScore',String(st.flowScore));
+  setText('pulseCoreStatus',st.score>=80?'STRONG':(st.score>=65?'BALANCED':(st.score>=50?'ONLINE':'WATCH')));
+  setText('pulseBalanceScore',String(st.balanceScore)); setText('pulseRiskScore',String(st.riskScore)); setText('pulseFlowScore',String(st.flowScore));
   setText('riskScore',String(st.riskScore)); setText('riskLabel',st.riskLabel); setText('riskDrawdown',`−${st.maxDD.toFixed(1).replace('.',',')}%`); setText('riskConcentration',`${st.whaleWeight.toFixed(1).replace('.',',')}%`); setText('riskWhale',st.whale?(st.whale.ticker||st.whale.name||'—'):'—');
+  setStyle('riskScore','color',st.riskScore>=65?'#ff7180':'');
+  const dial=document.querySelector('.riskDial'); if(dial)dial.style.background=`conic-gradient(${st.riskScore>=65?'#ff7180':'var(--accent)'} ${st.riskScore*3.6}deg,rgba(255,255,255,.05) 0deg)`;
   setText('flowState',st.flowScore>=70?'ACTIVE':(st.flowScore>=45?'STABLE':'LOW')); setText('flowMonthly',Number.isFinite(st.monthly)?rub(st.monthly):'—'); setText('flowYield',`${st.incomeYield.toFixed(1).replace('.',',')}%`); setStyle('flowBar','width',`${st.flowBar}%`);
-  const daily=Number.isFinite(st.monthly)?st.monthly/30.4375:NaN; const annual=Number.isFinite(st.monthly)?st.monthly*12:NaN; setText('flowDaily',Number.isFinite(daily)?rub(daily):'—'); setText('flowAnnual',Number.isFinite(annual)?rub(annual):'—');
-  setText('fieldCount',`${st.diversified} АКТИВОВ`); setText('fieldMessage',st.whaleWeight>=30?'КОНЦЕНТРАЦИЯ ВЫСОКАЯ':(st.diversified>=10?'СИГНАЛЫ СТАБИЛЬНЫ':'КОРЗИНА УЗКАЯ'));
-  const field=$('assetField'); if(field){field.innerHTML=''; const maxW=Math.max(...st.weights,1); st.byValue.slice(0,6).forEach((a,i)=>{const w=Number(a.currentValue)||0;const weight=st.total?0:0; const pctW=st.weights[i]||0; const el=document.createElement('div');el.className='assetBar';el.innerHTML=`<span>${i+1}</span><b>${a.ticker||a.name||'—'}</b><i><em style="width:${clamp(pctW/maxW*100,3,100)}%"></em></i><strong>${pctW.toFixed(1).replace('.',',')}%</strong>`;field.appendChild(el);}); }
-  setText('signalMomentum2',`${Math.round(st.momentum)}`); setStyle('signalMomentumBar2','width',`${st.momentum}%`); setText('signalMomentumText2',st.momentum>=65?'импульс вверх':(st.momentum>=45?'нейтрально':'давление'));
-  setText('signalRecovery2',`${Math.round(st.recovery)}`); setStyle('signalRecoveryBar2','width',`${st.recovery}%`);
-  setText('signalDivers2',`${Math.round(st.breadth)}`); setStyle('signalDiversBar2','width',`${st.breadth}%`); setText('signalDiversText2',`${st.diversified} позиций в корзине`);
-  setText('signalFlow2',`${Math.round(st.flowScore)}`); setStyle('signalFlowBar2','width',`${st.flowScore}%`);
+  const daily=Number.isFinite(st.monthly)?st.monthly/30.4375:NaN, annual=Number.isFinite(st.monthly)?st.monthly*12:NaN; setText('flowDaily',Number.isFinite(daily)?rub(daily):'—'); setText('flowAnnual',Number.isFinite(annual)?rub(annual):'—');
+
+  setText('allocationState',st.allocationState); setText('allocStocks',`${st.stocksPct.toFixed(1).replace('.',',')}%`); setText('allocBonds',`${st.bondsPct.toFixed(1).replace('.',',')}%`); setText('allocReserve',`${st.reservePct.toFixed(1).replace('.',',')}%`);
+  setStyle('allocStocksBar','width',`${st.stocksPct}%`); setStyle('allocBondsBar','width',`${st.bondsPct}%`); setStyle('allocReserveBar','width',`${st.reservePct}%`);
+  setText('fieldCount',`${st.diversified} АКТИВОВ`); setText('fieldMessage',st.concentrationRisk>=55?'ЯДРО ПЕРЕГРУЖЕНО':(st.balanceScore>=80?'СТРУКТУРА РОВНАЯ':'СЛЕДИМ ЗА БАЛАНСОМ'));
+  const field=$('assetField');
+  if(field){
+    field.innerHTML=''; const maxW=Math.max(...st.weights,1);
+    st.byValue.slice(0,6).forEach((a,i)=>{const pctW=st.weights[i]||0,pnl=st.assetResult(a);const el=document.createElement('div');el.className='assetBar';const pnlText=Number.isFinite(pnl)?`${pnl>=0?'+':''}${new Intl.NumberFormat('ru-RU',{notation:'compact',maximumFractionDigits:1}).format(pnl)}₽`:'—';el.innerHTML=`<span>${i+1}</span><b>${escapeHtml(a.ticker||a.name||'—')}</b><i><em style="width:${clamp(pctW/maxW*100,3,100)}%"></em></i><strong>${pctW.toFixed(1).replace('.',',')}%</strong><small class="${pnl<0?'neg':pnl>0?'pos':''}">${pnlText}</small>`;field.appendChild(el);});
+  }
+
+  const nodes=[['nodeConcentration','nodeConcentrationText',st.concentrationNode],['nodeBalance','nodeBalanceText',st.balanceNode],['nodeDrawdown','nodeDrawdownText',st.drawdownNode]];
+  for(const [id,textId,node] of nodes){const b=$(id),box=b?.closest('.riskNode');setText(id,node.level);setText(textId,node.text);if(box)box.dataset.level=node.level.toLowerCase();}
+
   setText('dnaVerdict',st.dnaVerdict);
-  const dna=[['dnaIncome2','dnaIncomeVal2',st.dnaIncome],['dnaStability2','dnaStabilityVal2',st.dnaStability],['dnaGrowth2','dnaGrowthVal2',st.dnaGrowth],['dnaDivers2','dnaDiversVal2',st.dnaDivers]];
+  const dna=[['dnaBalance2','dnaBalanceVal2',st.dnaBalance],['dnaConcentration2','dnaConcentrationVal2',st.dnaConcentration],['dnaStability2','dnaStabilityVal2',st.dnaStability],['dnaIncome2','dnaIncomeVal2',st.dnaIncome],['dnaGrowth2','dnaGrowthVal2',st.dnaGrowth],['dnaDivers2','dnaDiversVal2',st.dnaDivers]];
   for(const [bar,val,n] of dna){setStyle(bar,'width',`${n}%`);setText(val,`${n}`);}
   setText('pulseDiagnosisTitle',st.diagnosisTitle); setText('pulseDiagnosisText',st.diagnosisText); root.dataset.pulseRisk=(st.riskLabel||'').toLowerCase();
-  setStyle('scoreRing','background',`conic-gradient(var(--accent) 0deg,rgba(255,255,255,.07) 0deg)`); requestAnimationFrame(()=>setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`));
+  setStyle('scoreRing','background','conic-gradient(var(--accent) 0deg,rgba(255,255,255,.07) 0deg)'); requestAnimationFrame(()=>setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`));
   setText('pulseCommandText','TAP CORE ↻ RESCAN'); setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
   root.classList.add('pulse-capture');shot.setAttribute('aria-hidden','false');pulseMode=true;setText('pulseBtn','✕ PULSE');document.body.classList.add('pulse-active');runPulseScan(st);
 }
@@ -361,10 +402,10 @@ function runPulseScan(st){
   if(!root||!progress)return;
   root.classList.add('is-scanning');
   const steps=[
-    [180,18,'Проверяем состав и вес активов…','scanRow1'],
-    [470,46,'Сверяем динамику портфеля с IMOEX…','scanRow2'],
-    [760,76,'Оцениваем денежный поток и просадку…','scanRow3'],
-    [1080,100,'Формируем персональный диагноз…',null]
+    [180,18,'Разделяем акции, облигации и резерв…','scanRow1'],
+    [470,46,'Проверяем концентрацию, просадку и поток…','scanRow2'],
+    [760,76,'Собираем шесть генов Portfolio DNA…','scanRow3'],
+    [1080,100,'Формируем структурный диагноз…',null]
   ];
   steps.forEach(([delay,pct,msg,id])=>setTimeout(()=>{
     if(!pulseMode || token!==pulseScanToken)return;
@@ -436,10 +477,12 @@ function renderIntel(data){
   if(summary)summary.textContent=data?.summary||'Новости по портфелю пока недоступны.';
   if($('intelUpdated'))setText('intelUpdated',data?.generatedAt?`ОБНОВЛЕНО ${new Date(data.generatedAt).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`:'LIVE');
   const items=Array.isArray(data?.items)?data.items:[],quiet=Array.isArray(data?.quiet)?data.quiet:[],d=data?.diagnosis||{},changes=intelMemory(items);
-  if(stats)stats.innerHTML=`<span><b>${d.events??items.length}</b> СОБЫТИЙ</span><span class="${d.critical?'hot':''}"><b>${d.critical??0}</b> КРИТИЧНЫХ</span><span class="${d.attention?'hot':''}"><b>${d.attention??0}</b> ВНИМАНИЕ</span><span><b>${d.quiet??quiet.length}</b> ТИХО</span><span><b>${escapeHtml(d.mainFactor||'—')}</b> ФАКТОР</span>`;
-  if(!list)return;if(!items.length){const q=quiet.map(x=>`<span class="quiet"><b>${escapeHtml(x.ticker||x.name||'—')}</b><i>ТИХО · ${Number(x.weight||0).toFixed(1).replace('.',',')}%</i></span>`).join('');list.innerHTML='<div class="intelEmpty">Значимых подтверждённых событий за последние 72 часа не найдено.<br>Это нормальный результат: система не заполняет экран шумом.</div>'+(q?`<section class="intelAttention"><div><b>ТИХИЕ ПОЗИЦИИ</b><small>Нет достаточно качественного события</small></div><div class="intelAttentionGrid">${q}</div></section>`:'');return;}
+  const panel=$('intelPanel');if(panel)panel.classList.toggle('quietMode',!items.length);
+  const watchCount=d.watch??quiet.filter(x=>x.status==='НАБЛЮДАЕМ').length,quietCount=d.quiet??quiet.filter(x=>x.status!=='НАБЛЮДАЕМ').length;
+  if(stats)stats.innerHTML=`<span><b>${d.events??items.length}</b> СОБЫТИЙ</span><span class="${d.critical?'hot':''}"><b>${d.critical??0}</b> КРИТИЧНЫХ</span><span class="${watchCount?'good':''}"><b>${watchCount}</b> НАБЛЮДАЕМ</span><span><b>${quietCount}</b> ТИХО</span><span class="major"><b>${escapeHtml(d.largestPosition||d.mainFactor||'—')}</b> КРУПНЕЙШАЯ</span>`;
+  if(!list)return;if(!items.length){const q=quiet.map(x=>{const watch=x.status==='НАБЛЮДАЕМ';return `<span class="${watch?'watch':'quiet'}"><b>${escapeHtml(x.ticker||x.name||'—')}</b><i>${watch?'НАБЛЮДАЕМ':'ТИХО'} · ${Number(x.weight||0).toFixed(1).replace('.',',')}%</i></span>`}).join('');list.innerHTML='<div class="intelEmpty"><b>НОВОСТНОЙ ФОН ЧИСТЫЙ</b><span>Подтверждённых событий за 72 часа нет. Шум в основной INTEL не попал.</span></div>'+(q?`<section class="intelAttention"><div><b>КАРТА СОСТОЯНИЙ</b><small>НАБЛЮДАЕМ = материал есть, но факта пока недостаточно</small></div><div class="intelAttentionGrid">${q}</div></section>`:'');return;}
   const cards=items.map((item,idx)=>{const cls=['pos','neg','neu'].includes(item.sentimentClass)?item.sentimentClass:'neu',confidence=Math.max(1,Math.min(100,Number(item.confidence)||50)),sc=item.scenarios||{},sources=Array.isArray(item.sources)?item.sources:[],ticker=String(item.ticker||item.name||'—').toUpperCase(),memory=changes[ticker];return `<article class="intelItem${idx===0?' featured':''}"><div class="intelItemTop"><div class="intelTickerWrap"><span class="intelTicker">${escapeHtml(ticker)}</span><span class="intelImpact ${cls}">${escapeHtml(item.status||'НАБЛЮДАТЬ')}</span></div><span class="intelTag ${cls}">${escapeHtml(item.sentiment||'БЕЗ СДВИГА')}</span></div><div class="intelEventLine"><span>${escapeHtml(item.eventType||'СОБЫТИЕ')} · ${escapeHtml(item.qualityLevel||'СИГНАЛ')} ${Number(item.qualityScore||0)}% · ФАКТ ${Number(item.understandingScore||0)}%</span><b>СИЛА ДЛЯ ПОРТФЕЛЯ ${Number(item.strength||0).toFixed(1).replace('.',',')} / 10</b></div>${memory?`<div class="intelMemory">СЛЕД СОБЫТИЯ · ${escapeHtml(memory)}</div>`:''}<div class="intelTitle">${escapeHtml(item.title||'Без заголовка')}</div><div class="intelMeta"><span>${Number(item.weight||0).toFixed(1).replace('.',',')}% портфеля · ${item.stories||1} ист.</span><span>${escapeHtml(intelAgo(item.publishedAt))}</span><span>${escapeHtml(item.horizon||'долгосрок')}</span></div><div class="intelWhyBlock"><b>ЧТО ПРОИЗОШЛО</b><span>${escapeHtml(item.whatChanged||item.title||'')}</span></div><div class="intelWhyBlock meaning"><b>ПОЧЕМУ ЭТО ВАЖНО</b><span>${escapeHtml(item.meaning||'')}</span></div><div class="intelChain"><b>ЦЕПОЧКА ВЛИЯНИЯ</b><span>${escapeHtml(item.chain||'Событие → компания → портфель')}</span></div><div class="intelScenarios"><div class="intelScenario base"><i>●</i><div><b>БАЗОВЫЙ</b><span>${escapeHtml(sc.base||'Текущий сценарий сохраняется.')}</span></div></div><div class="intelScenario bull"><i>▲</i><div><b>УСИЛЕНИЕ</b><span>${escapeHtml(sc.bull||'Фактор развивается лучше базового сценария.')}</span></div></div><div class="intelScenario bear"><i>▼</i><div><b>РИСК</b><span>${escapeHtml(sc.bear||'Фактор развивается хуже базового сценария.')}</span></div></div></div><div class="intelBreaker"><b>ЧТО ИЗМЕНИТ ОЦЕНКУ</b><span>${escapeHtml(item.thesisBreaker||'Новые подтверждённые данные компании.')}</span></div><div class="intelVerdict"><div><small>СТАТУС НАБЛЮДЕНИЯ</small><b>${escapeHtml(item.status||'НАБЛЮДАТЬ')}</b></div><div class="intelConfidence"><small>НАДЁЖНОСТЬ ДАННЫХ</small><strong>${confidence}%</strong><i><em style="width:${confidence}%"></em></i></div></div><a class="intelSource" href="${escapeHtml(item.link||'#')}" target="_blank" rel="noopener noreferrer"><span>↗ ${escapeHtml(item.source||'Источник')}${sources.length>1?` + ещё ${sources.length-1}`:''}</span><b>ОТКРЫТЬ ИСТОЧНИК</b></a></article>`}).join('');
-  const map=items.map(x=>{const c=['pos','neg','neu'].includes(x.sentimentClass)?x.sentimentClass:'neu';return `<span class="${c}"><b>${escapeHtml(x.ticker||x.name||'—')}</b><i>${escapeHtml(x.status||'ФОН')}</i></span>`}).join('')+quiet.map(x=>`<span class="quiet"><b>${escapeHtml(x.ticker||x.name||'—')}</b><i>ТИХО</i></span>`).join('');
+  const map=items.map(x=>{const c=['pos','neg','neu'].includes(x.sentimentClass)?x.sentimentClass:'neu';return `<span class="${c}"><b>${escapeHtml(x.ticker||x.name||'—')}</b><i>${escapeHtml(x.status||'ФОН')}</i></span>`}).join('')+quiet.map(x=>{const watch=x.status==='НАБЛЮДАЕМ';return `<span class="${watch?'watch':'quiet'}"><b>${escapeHtml(x.ticker||x.name||'—')}</b><i>${watch?'НАБЛЮДАЕМ':'ТИХО'}</i></span>`}).join('');
   list.innerHTML=cards+`<section class="intelAttention"><div><b>КАРТА ВНИМАНИЯ</b><small>Срез факторов по портфелю сейчас</small></div><div class="intelAttentionGrid">${map}</div></section>`;
 }
 async function loadIntel(force=false){
@@ -449,7 +492,7 @@ async function loadIntel(force=false){
   const list=$('intelList');if(list)list.innerHTML='<div class="intelLoading">✦ СКАНИРУЮ НОВОСТИ ПО ТВОИМ ПОЗИЦИЯМ…</div>';
   if($('intelSummary'))setText('intelSummary','Смотрю сначала на самые крупные позиции и события за последние 72 часа.');
   try{
-    const r=await fetch('/api/intel?v=6.9&t='+Date.now(),{cache:'no-store'});
+    const r=await fetch('/api/intel?v=7.0&t='+Date.now(),{cache:'no-store'});
     const d=await r.json();
     if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
     renderIntel(d);
