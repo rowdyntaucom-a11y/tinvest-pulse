@@ -190,7 +190,7 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData){renderChart(dashboardData.history);requestAnimationFrame(positionChartNode);}
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=6.0&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);setText('hudPulseState','ERR');const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{const r=await fetch('/api/dashboard?v=6.2&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);setText('hudPulseState','ERR');const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
 let pulseMode=false;
 let pulseLongTimer=null;
 let pulseScanToken=0;
@@ -205,74 +205,57 @@ function pulseStats(d){
   const pReturn=(p1/p0-1)*100, mReturn=(m1/m0-1)*100;
   let peak=p0,maxDD=0;
   for(const v of ps){peak=Math.max(peak,v);if(peak>0)maxDD=Math.max(maxDD,(peak-v)/peak*100);}
+  const daily=[];
+  for(let i=1;i<ps.length;i++){if(ps[i-1]>0)daily.push((ps[i]/ps[i-1]-1)*100);}
+  const avg=daily.length?daily.reduce((a,b)=>a+b,0)/daily.length:0;
+  const vol=daily.length>1?Math.sqrt(daily.reduce((a,b)=>a+(b-avg)**2,0)/(daily.length-1)):0;
   const assets=Array.isArray(d?.assets)?d.assets:((Array.isArray(p.assets)?p.assets:[]));
   const total=Number(p.value)||0;
   const byValue=[...assets].sort((a,b)=>(Number(b.currentValue)||0)-(Number(a.currentValue)||0));
   const whale=byValue[0];
-  const whaleWeight=whale&&total>0?((Number(whale.currentValue)||0)/total*100):null;
+  const weights=byValue.map(a=>total>0?Math.max(0,Number(a.currentValue)||0)/total*100:0);
+  const whaleWeight=weights[0]||0;
+  const hhi=weights.reduce((sum,w)=>sum+w*w,0);
+  const concentration=clamp(Math.round(hhi),0,100);
+  const breadth=assets.length?clamp(Math.round(100-(Math.max(0,whaleWeight-10)*1.7)),18,100):0;
   const assetResult=a=>Number.isFinite(Number(a?.yieldRub))?Number(a.yieldRub):Number(a?.expectedYield)||0;
   const byResult=[...assets].sort((a,b)=>assetResult(b)-assetResult(a));
   const strength=byResult[0];
   const painAsset=byResult[byResult.length-1];
   const monthly=Number(d?.passiveIncome?.averageMonthly);
-  const xirr=Number(p.xirr)*100;
   const incomeYield=Number.isFinite(monthly)&&total>0?(monthly*12/total*100):0;
   const ageDays=p.startDate?Math.max(0,Math.round((Date.now()-new Date(p.startDate).getTime())/86400000)):null;
   const pulseBeat=pReturn>=0?'ЖИВОЙ':'КРЯХТИТ';
   const totalBase=p1+m1;
   const pBar=totalBase>0?clamp(p1/totalBase*100,18,82):50;
-  // Score is intentionally explainable: the four DNA components form the base,
-  // then the relative result vs IMOEX nudges it up/down. This makes the 0–100
-  // score visibly traceable to the same values shown below.
   const dnaIncome=clamp(Math.round(35 + incomeYield*7.5),0,100);
-  const dnaStability=clamp(Math.round(88 - maxDD*5.2),18,100);
+  const dnaStability=clamp(Math.round(88 - maxDD*5.2 - vol*4),18,100);
   const dnaGrowth=clamp(Math.round(48 + pReturn*4 + (pReturn-mReturn)*2),0,100);
   const dnaDivers=clamp(Math.round(38 + Math.min(15,Math.max(0,assets.length-1))*3.2),0,100);
   const dnaBase=(dnaIncome*.30)+(dnaStability*.25)+(dnaGrowth*.30)+(dnaDivers*.15);
   const marketAdj=clamp((pReturn-mReturn)*1.2,-8,8);
   const score=clamp(Math.round(dnaBase+marketAdj),0,100);
+  const riskScore=clamp(Math.round(maxDD*4.8 + Math.max(0,whaleWeight-12)*1.6 + vol*6),0,100);
+  const riskLabel=riskScore>=65?'ВЫСОКИЙ':(riskScore>=35?'УМЕРЕННЫЙ':'НИЗКИЙ');
+  const flowScore=clamp(Math.round(35+incomeYield*11+(monthly>0?15:0)),0,100);
   const strengthTicker=strength?(strength.ticker||strength.name||'—'):'—';
   const painTicker=painAsset?(painAsset.ticker||painAsset.name||'—'):'—';
   const strengthYield=Number(strength?.expectedYield)||0;
   const painYield=Number(painAsset?.expectedYield)||0;
-  const riskLabel=maxDD>=10?'ВЫСОКИЙ':(maxDD>=6||((whaleWeight||0)>=30)?'УМЕРЕННЫЙ':'НИЗКИЙ');
-
-  // The Pulse diagnosis is derived from the live portfolio state rather than fixed copy.
   let diagnosisTitle='ПУЛЬС СТАБИЛЬНЫЙ';
-  let diagnosisText=`Сила: ${strengthTicker}. Боль: ${painTicker}. Риск: ${riskLabel.toLowerCase()}.`;
-  let character='УПРЯМЫЙ';
-  let text='Портфель держит удар и продолжает работать.';
-  if(pReturn-mReturn>=2){
-    character='ОХОТНИК ЗА РОСТОМ';
-    text=`${strengthTicker} ведёт атаку. Фонд обгоняет индекс.`;
-    diagnosisTitle='ПОШЁЛ В РАЗНОС';
-    diagnosisText=`Сила: ${strengthTicker} +${strengthYield>=0?'+':''}${rub(strengthYield)}. IMOEX позади. Не мешать.`;
-  } else if(incomeYield>=5){
-    character='ДИВИДЕНДНЫЙ ОХОТНИК';
-    text=`${rub(monthly)} в месяц — поток уже работает сам.`;
-    diagnosisTitle='ДЕНЬГИ РАБОТАЮТ';
-    diagnosisText=`Сила: денежный поток. ${rub(monthly)}/мес. Боль: ${painTicker}.`;
-  } else if(pReturn-mReturn<=-4){
-    character='УПРЯМЫЙ ДОГОНЯЛА';
-    text=`${painTicker} тянет вниз. Фонд держит курс и догоняет индекс.`;
-    diagnosisTitle='НУЖНО ДОГОНЯТЬ';
-    diagnosisText=`Боль: ${painTicker} ${painYield>=0?'+':''}${rub(painYield)}. IMOEX впереди на ${Math.abs(pReturn-mReturn).toFixed(1).replace('.',',')} п.п.`;
-  } else if(maxDD>=10 || riskLabel==='ВЫСОКИЙ'){
-    character='ЖЕЛЕЗНЫЙ';
-    text=`Пережил ${maxDD.toFixed(1).replace('.',',')}% просадки. Не дрогнул.`;
-    diagnosisTitle='РЕЖИМ ОБОРОНЫ';
-    diagnosisText=`Риск: высокий. Кит ${strengthTicker==='—'?'портфеля':(whale?.ticker||whale?.name||'—')} — ${whaleWeight?.toFixed(1).replace('.',',')||'—'}% веса.`;
-  } else if(pReturn>=0){
-    character='КРЕПКИЙ';
-    text=`${strengthTicker} даёт импульс. Деньги работают без суеты.`;
-    diagnosisTitle='ДЕНЬГИ РАБОТАЮТ';
-    diagnosisText=`Сила: ${strengthTicker}. Боль: ${painTicker}. Риск: ${riskLabel.toLowerCase()}.`;
-  }
+  let diagnosisText=`Структура собрана. Поток ${rub(monthly)}/мес. Риск: ${riskLabel.toLowerCase()}.`;
+  if(riskScore>=65){diagnosisTitle='КОНТУР НАПРЯЖЁН';diagnosisText=`Главная уязвимость — концентрация ${whaleWeight.toFixed(1).replace('.',',')}% в ${whale?.ticker||whale?.name||'крупнейшей позиции'}.`}
+  else if(incomeYield>=5){diagnosisTitle='ДЕНЕЖНЫЙ ДВИГАТЕЛЬ';diagnosisText=`Пассивный поток ${rub(monthly)}/мес. уже заметен в структуре портфеля.`}
+  else if(pReturn-mReturn>=2){diagnosisTitle='ИМПУЛЬС ПОЙМАН';diagnosisText=`Портфель набирает ход относительно рынка. Сигнал роста активен.`}
+  else if(pReturn-mReturn<=-4){diagnosisTitle='РЕЖИМ ДОГОНА';diagnosisText=`Индекс впереди. Внутри портфеля есть зона давления — ${painTicker}.`}
+  else if(recovery>75){diagnosisTitle='ВОССТАНОВЛЕНИЕ';diagnosisText=`Портфель возвращается от локального дна. Система держит нагрузку.`}
   const trough=ps.length?Math.min(...ps):p1;
   const recovery=(p1>trough && peak>trough)?clamp((p1-trough)/(peak-trough)*100,0,100):100;
   const momentum=clamp(50+(pReturn-mReturn)*8,0,100);
-  const flowBar=clamp((Number.isFinite(monthly)?monthly:0)/1000*100,8,100);
-  return {pts,p1,m1,pReturn,mReturn,maxDD,peak,trough,recovery,momentum,flowBar,whale,whaleWeight,strength,painAsset,strengthTicker,painTicker,strengthYield,painYield,riskLabel,monthly,incomeYield,score,dnaBase,marketAdj,ageDays,character,text,pulseBeat,pBar, mBar:100-pBar,dnaIncome,dnaStability,dnaGrowth,dnaDivers,diagnosisTitle,diagnosisText};
+  const flowBar=clamp(flowScore,8,100);
+  const diversified=assets.filter(a=>(Number(a.currentValue)||0)>0).length;
+  const dnaVerdict=dnaBase>=75?'СИЛЬНЫЙ ПРОФИЛЬ':(dnaBase>=55?'СБАЛАНСИРОВАН':'ТОЧКА РОСТА');
+  return {pts,p1,m1,total,pReturn,mReturn,maxDD,peak,trough,recovery,momentum,flowBar,whale,whaleWeight,strength,painAsset,strengthTicker,painTicker,strengthYield,painYield,riskLabel,riskScore,monthly,incomeYield,flowScore,score,dnaBase,marketAdj,ageDays,pulseBeat,pBar,mBar:100-pBar,dnaIncome,dnaStability,dnaGrowth,dnaDivers,diagnosisTitle,diagnosisText,vol,concentration,breadth,diversified,dnaVerdict,weights,byValue};
 }
 function drawPulsePath(key,pts){
   const a=pts.map(x=>Number(x?.[key])).filter(v=>Number.isFinite(v)&&v>0);
@@ -282,55 +265,29 @@ function drawPulsePath(key,pts){
 }
 function enterPulse(){
   const root=$('pulse'),shot=$('pulseShot'),d=dashboardData||{};
-  // Reset the scanner every time PULSE is opened so each capture feels fresh.
   root.classList.remove('is-scanning');
   ['scanRow1','scanRow2','scanRow3'].forEach(id=>$(id)?.classList.remove('done'));
-  setStyle('pulseScanProgress','width','0%');
-  setText('scanPct','0%'); setText('scanSignal','WAIT'); setText('scanFlux','—'); setText('scanRisk','—');
-  setText('pulseScanSub','Считываем состояние активов…');
-  const p=d.portfolio||{}, st=pulseStats(d);
-  setText('pulseValue',rub(p.value));
-  setText('pulseGain',p.profitPercent==null?'—':`${p.profitPercent>=0?'+':''}${pct(p.profitPercent)}`);
+  setStyle('pulseScanProgress','width','0%'); setText('scanPct','0%'); setText('scanSignal','WAIT'); setText('scanFlux','—'); setText('scanRisk','—'); setText('pulseScanSub','Считываем внутреннюю структуру…');
+  const st=pulseStats(d);
   setText('pulseScore',String(st.score));
-  setText('pulseHeartbeat',st.pulseBeat);
-  setText('pulseVs',st.pReturn-st.mReturn>=0?`+${(st.pReturn-st.mReturn).toFixed(2).replace('.',',')} п.п.`:`${(st.pReturn-st.mReturn).toFixed(2).replace('.',',')} п.п.`);
-  setText('pulseXirr',p.xirr==null?'—':pct(p.xirr));
-  setText('pulseIncome',Number.isFinite(st.monthly)?rub(st.monthly):'—');
-  const pl=$('pulseLine'),pa=$('pulseArea'),pm=$('pulseMoex');
-  const pp=drawPulsePath('portfolio',st.pts),mm=drawPulsePath('imoex',st.pts);
-  if(pl)pl.setAttribute('d',pp); if(pa)pa.setAttribute('d',pp?pp+' L600 105 L0 105 Z':''); if(pm)pm.setAttribute('d',mm);
-  setText('pulseTrendEnd',`СЕЙЧАС ${st.p1.toFixed(1).replace('.',',')}`);
-  const whale=st.whale;
-  setText('pulseWhale',whale?(whale.ticker||whale.name||'—'):'—');
-  setText('pulseWhaleWeight',st.whaleWeight==null?'—':`${st.whaleWeight.toFixed(1).replace('.',',')}% веса`);
-  setText('pulsePain',st.painTicker||'—');
-  setText('pulsePainText',st.maxDD>0?`просадка −${st.maxDD.toFixed(1).replace('.',',')}%`:'без просадки');
-  setText('pulseSpeed',Number.isFinite(st.monthly)?rub(st.monthly/30.4375):'—');
-  setText('pulseAge',st.ageDays==null?'—':`${st.ageDays} дн.`);const assetCount=Array.isArray(d?.assets)?d.assets.length:(Array.isArray(p.assets)?p.assets.length:0);setText('pulseAssets',`${assetCount} АКТИВОВ`);setText('pulseAgeTop',st.ageDays==null?'—':`${st.ageDays} ДН.`);setText('pulseUpdated',`ОБНОВЛЕНО ${new Date(d.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`);
-  setText('pulseCharacterName',st.character);setText('pulseCharacterText',st.text);
-  const dna=[['dnaIncome','dnaIncomeVal',st.dnaIncome],['dnaStability','dnaStabilityVal',st.dnaStability],['dnaGrowth','dnaGrowthVal',st.dnaGrowth],['dnaDivers','dnaDiversVal',st.dnaDivers]];
+  setText('pulseCoreStatus',st.score>=70?'OPTIMAL':(st.score>=50?'ONLINE':'WATCH'));
+  setText('pulseRiskScore',String(st.riskScore)); setText('pulseFlowScore',String(st.flowScore));
+  setText('riskScore',String(st.riskScore)); setText('riskLabel',st.riskLabel); setText('riskDrawdown',`−${st.maxDD.toFixed(1).replace('.',',')}%`); setText('riskConcentration',`${st.whaleWeight.toFixed(1).replace('.',',')}%`); setText('riskWhale',st.whale?(st.whale.ticker||st.whale.name||'—'):'—');
+  setText('flowState',st.flowScore>=70?'ACTIVE':(st.flowScore>=45?'STABLE':'LOW')); setText('flowMonthly',Number.isFinite(st.monthly)?rub(st.monthly):'—'); setText('flowYield',`${st.incomeYield.toFixed(1).replace('.',',')}%`); setStyle('flowBar','width',`${st.flowBar}%`);
+  const daily=Number.isFinite(st.monthly)?st.monthly/30.4375:NaN; const annual=Number.isFinite(st.monthly)?st.monthly*12:NaN; setText('flowDaily',Number.isFinite(daily)?rub(daily):'—'); setText('flowAnnual',Number.isFinite(annual)?rub(annual):'—');
+  setText('fieldCount',`${st.diversified} АКТИВОВ`); setText('fieldMessage',st.whaleWeight>=30?'КОНЦЕНТРАЦИЯ ВЫСОКАЯ':(st.diversified>=10?'СИГНАЛЫ СТАБИЛЬНЫ':'КОРЗИНА УЗКАЯ'));
+  const field=$('assetField'); if(field){field.innerHTML=''; const maxW=Math.max(...st.weights,1); st.byValue.slice(0,6).forEach((a,i)=>{const w=Number(a.currentValue)||0;const weight=st.total?0:0; const pctW=st.weights[i]||0; const el=document.createElement('div');el.className='assetBar';el.innerHTML=`<span>${i+1}</span><b>${a.ticker||a.name||'—'}</b><i><em style="width:${clamp(pctW/maxW*100,3,100)}%"></em></i><strong>${pctW.toFixed(1).replace('.',',')}%</strong>`;field.appendChild(el);}); }
+  setText('signalMomentum2',`${Math.round(st.momentum)}`); setStyle('signalMomentumBar2','width',`${st.momentum}%`); setText('signalMomentumText2',st.momentum>=65?'импульс вверх':(st.momentum>=45?'нейтрально':'давление'));
+  setText('signalRecovery2',`${Math.round(st.recovery)}`); setStyle('signalRecoveryBar2','width',`${st.recovery}%`);
+  setText('signalDivers2',`${Math.round(st.breadth)}`); setStyle('signalDiversBar2','width',`${st.breadth}%`); setText('signalDiversText2',`${st.diversified} позиций в корзине`);
+  setText('signalFlow2',`${Math.round(st.flowScore)}`); setStyle('signalFlowBar2','width',`${st.flowScore}%`);
+  setText('dnaVerdict',st.dnaVerdict);
+  const dna=[['dnaIncome2','dnaIncomeVal2',st.dnaIncome],['dnaStability2','dnaStabilityVal2',st.dnaStability],['dnaGrowth2','dnaGrowthVal2',st.dnaGrowth],['dnaDivers2','dnaDiversVal2',st.dnaDivers]];
   for(const [bar,val,n] of dna){setStyle(bar,'width',`${n}%`);setText(val,`${n}`);}
-  const scoreWhy = `ДНК ${Math.round(st.dnaBase)} • рынок ${st.marketAdj>=0?'+':''}${st.marketAdj.toFixed(1).replace('.',',')}`;
-  setText('pulseScoreWhy',scoreWhy);
-  setText('pulseDiagnosisTitle',st.diagnosisTitle);setText('pulseDiagnosisText',st.diagnosisText);root.dataset.pulseRisk=(st.riskLabel||'').toLowerCase();root.dataset.pulseDiagnosis=st.diagnosisTitle;
+  setText('pulseDiagnosisTitle',st.diagnosisTitle); setText('pulseDiagnosisText',st.diagnosisText); root.dataset.pulseRisk=(st.riskLabel||'').toLowerCase();
   setStyle('scoreRing','background',`conic-gradient(var(--accent) 0deg,rgba(255,255,255,.07) 0deg)`); requestAnimationFrame(()=>setStyle('scoreRing','background',`conic-gradient(var(--accent) ${st.score*3.6}deg,rgba(255,255,255,.07) 0deg)`));
-  setStyle('battlePortfolio','width',`${st.pBar}%`);setStyle('battleMoex','width',`${st.mBar}%`);
-  setText('pulseBattleText',st.pReturn-st.mReturn>=0?'ОБГОНЯЕМ':'ДОГОНЯЕМ');setText('pulsePortfolioReturn',`${st.pReturn>=0?'+':''}${st.pReturn.toFixed(1).replace('.',',')}%`);setText('pulseMoexReturn',`${st.mReturn>=0?'+':''}${st.mReturn.toFixed(1).replace('.',',')}%`);
-  const tempo=Number.isFinite(st.pReturn)?Math.abs(st.pReturn):0;setText('pulseTempo',`${tempo.toFixed(1).replace('.',',')}%`);setText('pulseTempoText',st.pReturn>=0?'темп роста':'темп просадки');
-  const ticker=st.pReturn-st.mReturn>=2?'ФОНД НАБИРАЕТ ХОД':st.pReturn-st.mReturn<=-2?'Индекс ВПЕРЕДИ — ДОГОНЯЕМ':st.incomeYield>=5?'ДИВИДЕНДЫ ДЕРЖАТ ПУЛЬС':'ПУЛЬС СТАБИЛЬНЫЙ';setText('pulseTicker',ticker);
-  const momentumText=st.pReturn-st.mReturn>=1?'обгоняем рынок':st.pReturn-st.mReturn<=-1?'догоняем рынок':'идём рядом';
-  setText('signalMomentum',`${st.pReturn>=0?'+':''}${st.pReturn.toFixed(1).replace('.',',')}%`);
-  setText('signalMomentumText',momentumText);
-  setStyle('signalMomentumBar','width',`${st.momentum}%`);
-  setText('signalRecovery',`${Math.round(st.recovery)}%`);
-  setStyle('signalRecoveryBar','width',`${st.recovery}%`);
-  setText('signalFlow',Number.isFinite(st.monthly)?rub(st.monthly):'—');
-  setStyle('signalFlowBar','width',`${st.flowBar}%`);
-  setText('pulseCommandText',`TAP SCORE ↻ RESCAN · ${st.riskLabel}`);
-  setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
-  root.classList.add('pulse-capture');shot.setAttribute('aria-hidden','false');pulseMode=true;
-  setText('pulseBtn','✕ PULSE');document.body.classList.add('pulse-active');
-  runPulseScan(st);
+  setText('pulseCommandText','TAP CORE ↻ RESCAN'); setText('pulseTime',new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
+  root.classList.add('pulse-capture');shot.setAttribute('aria-hidden','false');pulseMode=true;setText('pulseBtn','✕ PULSE');document.body.classList.add('pulse-active');runPulseScan(st);
 }
 function runPulseScan(st){
   const token=++pulseScanToken;
@@ -375,10 +332,9 @@ function animatePulseScore(target){
 }
 $('scoreRing')?.addEventListener('click',()=>{
   if(!pulseMode || !dashboardData) return;
-  const root=$('pulse');
-  root.classList.remove('deep-pulse');
   runPulseScan(pulseStats(dashboardData));
 });
+$('scoreRing')?.addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('scoreRing').click();}});
 
 function exitPulse(){
   const root=$('pulse'),shot=$('pulseShot');pulseScanToken++;root.classList.remove('pulse-capture','is-scanning');shot.setAttribute('aria-hidden','true');pulseMode=false;
