@@ -1,0 +1,33 @@
+name: Plain Language v7.8
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add beginner friendly overlay
+        run: |
+          cat > public/v78.js <<'EOF'
+          (()=>{
+          const pct=v=>Number.isFinite(+v)?((+v>0?'+':'')+(+v).toFixed(1).replace('.',',')+'%'):'—';
+          function humanizeWhatIf(){const root=document.getElementById('whatIfView');if(!root)return;const intro=root.querySelector('.w77intro');if(intro){intro.querySelector('small').textContent='ПРОВЕРКА ПОРТФЕЛЯ';intro.querySelector('b').textContent='Как портфель поведёт себя при изменении рынка?';intro.querySelector('span').textContent='Это не прогноз. Вы задаёте условия сами, а приложение показывает возможный результат в процентах и рублях.'}const labels=root.querySelectorAll('.w77controls label>span');if(labels[1])labels[1].childNodes[0].textContent='АКЦИИ ИЗМЕНЯТСЯ ';if(labels[2])labels[2].childNodes[0].textContent='ДОХОДНОСТИ ОБЛИГАЦИЙ ИЗМЕНЯТСЯ ';root.querySelectorAll('.w77presets button').forEach((b,i)=>b.textContent=['ПЛОХОЙ СЦЕНАРИЙ','СНИЖЕНИЕ СТАВКИ','БЕЗ ИЗМЕНЕНИЙ'][i]);}
+          function explainTechnical(){document.querySelectorAll('.analyticsView').forEach(root=>{root.querySelectorAll('*').forEach(el=>{if(el.children.length)return;const t=(el.textContent||'').trim();const map={'VOLATILITY':'КОЛЕБАНИЯ ПОРТФЕЛЯ','DOWNSIDE RISK':'РИСК ПАДЕНИЯ','BETA VS IMOEX':'ЗАВИСИМОСТЬ ОТ РЫНКА','CORRELATION':'СВЯЗЬ С IMOEX','MAX DRAWDOWN':'МАКС. ПРОСАДКА','TRACKING ERROR':'ОТЛИЧИЕ ОТ РЫНКА','INFORMATION RATIO':'ЭФФЕКТИВНОСТЬ ОТНОСИТЕЛЬНО РЫНКА','PERFORMANCE ATTRIBUTION':'КТО СОЗДАЁТ РЕЗУЛЬТАТ','DIVERSIFICATION MAP':'ДИВЕРСИФИКАЦИЯ','EFFECTIVE N':'РЕАЛЬНОЕ ЧИСЛО ПОЗИЦИЙ','TOP-3 WEIGHT':'ДОЛЯ 3 КРУПНЕЙШИХ','CAPITAL SPLIT':'СТРУКТУРА КАПИТАЛА','WEIGHTED YTM':'ДОХОДНОСТЬ ОБЛИГАЦИЙ','MOD. DURATION':'ЧУВСТВИТЕЛЬНОСТЬ К СТАВКЕ','AVG MATURITY':'СРЕДНИЙ СРОК ПОГАШЕНИЯ','COUPON LADDER':'КОГДА ПРИДУТ КУПОНЫ','MATURITY LADDER':'КОГДА ПОГАСЯТСЯ ОБЛИГАЦИИ','MATURITY STRUCTURE':'СТРУКТУРА ПО СРОКАМ','RATE SCENARIOS':'ЕСЛИ ИЗМЕНИТСЯ СТАВКА'};if(map[t]){el.dataset.proTerm=t;el.textContent=map[t]}})});}
+          function addHelp(){if(document.getElementById('simpleHelp'))return;const b=document.createElement('button');b.id='simpleHelp';b.textContent='?';b.title='Как читать показатели';b.onclick=()=>{const old=document.getElementById('simpleHelpCard');if(old)return old.remove();const d=document.createElement('div');d.id='simpleHelpCard';d.innerHTML='<b>КАК ЧИТАТЬ TINVEST PULSE</b><span><strong>% — главное.</strong> Показывает масштаб результата относительно портфеля.</span><span><strong>₽ — дополнение.</strong> Показывает ту же величину в деньгах.</span><span><strong>Зелёный</strong> — поддерживает портфель. <strong>Красный</strong> — давит на него.</span><span>Сценарии WHAT IF — <strong>не прогноз</strong>, а проверка «что будет, если».</span><button>ПОНЯТНО</button>';d.querySelector('button').onclick=()=>d.remove();document.body.appendChild(d)};document.body.appendChild(b);const s=document.createElement('style');s.textContent='#simpleHelp{position:fixed;right:14px;bottom:18px;z-index:10020;width:34px;height:34px;border-radius:50%;border:1px solid rgba(84,246,197,.45);background:#071613;color:#54f6c5;font-weight:900}#simpleHelpCard{position:fixed;z-index:10021;left:18px;right:18px;bottom:62px;max-width:520px;margin:auto;padding:16px;border:1px solid rgba(84,246,197,.35);border-radius:18px;background:#071310;color:#dce9e6;box-shadow:0 20px 60px #000}#simpleHelpCard>b{display:block;color:#54f6c5;margin-bottom:10px}#simpleHelpCard span{display:block;font-size:11px;line-height:1.55;margin:7px 0;color:#9eb0aa}#simpleHelpCard strong{color:#e9fff8}#simpleHelpCard button{margin-top:9px;width:100%;padding:10px;border-radius:10px;border:1px solid rgba(84,246,197,.3);background:rgba(84,246,197,.08);color:#54f6c5}';document.head.appendChild(s)}
+          function nav(){document.querySelectorAll('.navHubGrid button').forEach(b=>{const k=b.dataset.go;if(k==='overview'){b.querySelector('small').textContent='Сколько денег и во что вложено'}if(k==='pro'){b.querySelector('small').textContent='Подробные данные портфеля'}if(k==='strategy'){b.querySelector('small').textContent='Как держать выбранные пропорции'}if(k==='analytics'){b.querySelector('small').textContent='Доходность, риск и диверсификация'}if(k==='whatif'){b.querySelector('small').textContent='Проверить портфель при разных условиях'}})}
+          function run(){humanizeWhatIf();explainTechnical();nav();addHelp()}setTimeout(run,700);setInterval(()=>{humanizeWhatIf();explainTechnical();nav()},2500);
+          })();
+          EOF
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html'); s=p.read_text()
+          tag='<script src="/v78.js?v=7.8"></script>'
+          if tag not in s: s=s.replace('</body>',tag+'</body>')
+          p.write_text(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/v78.js public/index.html
+          git commit -m 'v7.8 plain language beginner UX' || exit 0
+          git push
