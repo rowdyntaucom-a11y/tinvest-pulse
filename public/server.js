@@ -1509,6 +1509,17 @@ app.get('/api/operations-summary', async (req, res) => {
   }
 });
 
+// v7.2 — TRUE PAYOUT CALENDAR
+require('./payouts')(app, {
+  tbankRequest,
+  buildDashboard,
+  getAccounts,
+  selectAccount,
+  getOperations,
+  isIncomeOperation,
+  operationCash
+});
+
 app.get('/api/dashboard', async (req, res) => {
   try {
     const data = await buildDashboard();
