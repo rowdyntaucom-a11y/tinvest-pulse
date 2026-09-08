@@ -75,38 +75,10 @@ function renderChart(history){
   chart=new Chart($('chart'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${new Intl.NumberFormat('ru-RU').format(Number(c.parsed.y))}${mode==='growth'?'':' ₽'}`}}},scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'#7e8b86',maxTicksLimit:4,callback:v=>mode==='growth'?Number(v).toFixed(0):new Intl.NumberFormat('ru-RU',{notation:'compact',maximumFractionDigits:1}).format(v)}}}}});
 }
 
-let lastPortfolioValue=null;
-function animatePortfolioValue(next){
-  const el=$('value');
-  if(!el || !Number.isFinite(next)){ if(el)el.textContent=rub(next); return; }
-  if(lastPortfolioValue===null || !Number.isFinite(lastPortfolioValue) || Math.abs(next-lastPortfolioValue)<0.01){
-    setText('value',rub(next)); lastPortfolioValue=next; return;
-  }
-  const from=lastPortfolioValue, to=next, start=performance.now(), duration=700;
-  el.classList.remove('value-tick'); void el.offsetWidth; el.classList.add('value-tick');
-  const tick=(now)=>{
-    const k=clamp((now-start)/duration,0,1), e=1-Math.pow(1-k,3);
-    setText('value',rub(from+(to-from)*e));
-    if(k<1)requestAnimationFrame(tick); else lastPortfolioValue=to;
-  };
-  requestAnimationFrame(tick);
-}
-function flashDataCards(){
-  document.querySelectorAll('.mini.card,.hero.card,.bottomGrid .card').forEach((el,i)=>{
-    setTimeout(()=>{el.classList.remove('data-flash');void el.offsetWidth;el.classList.add('data-flash');},i*55);
-  });
-}
-function addHudRipple(e){
-  const btn=e.currentTarget;if(!btn)return;
-  const r=document.createElement('span');r.className='hud-ripple';
-  const rect=btn.getBoundingClientRect();r.style.left=(e.clientX-rect.left)+'px';r.style.top=(e.clientY-rect.top)+'px';
-  btn.appendChild(r);setTimeout(()=>r.remove(),700);
-}
-
 function render(d){
   dashboardData=d||{};
   const p=dashboardData.portfolio||{};
-  animatePortfolioValue(Number(p.value));
+  setText('value',rub(p.value));
   setText('profit',rub(p.profit));
   setText('profitPct',p.profitPercent==null?'—':pct(p.profitPercent));
   setText('gain',p.profitPercent==null?'—':(p.profitPercent>=0?'+':'')+pct(p.profitPercent));
@@ -150,7 +122,6 @@ function render(d){
   setText('status',`✓ Данные загружены • ${dashboardData.assets?.length||p.assets?.length||0} активов`);
   const statusEl=$('status');if(statusEl)statusEl.className='ok';
   setText('updated',new Date(dashboardData.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
-  flashDataCards();
   try{renderChart(dashboardData.history||{});}catch(err){
     console.error('Chart render error:',err);
     const empty=$('chartEmpty');if(empty){empty.textContent='История временно недоступна';empty.style.display='flex';}
@@ -336,7 +307,6 @@ function exitPulse(){
 }
 function togglePulse(){pulseMode?exitPulse():enterPulse();}
 $('pulseBtn').addEventListener('click',togglePulse);
-$('pulseBtn').addEventListener('pointerdown',addHudRipple);
 $('pulseBack')?.addEventListener('click',togglePulse);
 
 // Long press on PULSE opens the same Röntgen view with a subtle "deep" state for power users.
