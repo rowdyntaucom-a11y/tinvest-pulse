@@ -1,0 +1,25 @@
+name: v7.11.4 legend cache bust
+on: push
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          p='public/index.html'
+          s=open(p,encoding='utf-8').read()
+          old='/v7113.js?v=7.11.3'
+          new='/v7113.js?v=7.11.4'
+          if old not in s:
+              raise SystemExit('expected v7.11.3 script tag not found')
+          s=s.replace(old,new,1)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m 'v7.11.4 activate rebuilt chart legend'
+          git push
