@@ -75,34 +75,27 @@ function renderChart(history){
   chart=new Chart($('chart'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${new Intl.NumberFormat('ru-RU').format(Number(c.parsed.y))}${mode==='growth'?'':' ₽'}`}}},scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'#7e8b86',maxTicksLimit:4,callback:v=>mode==='growth'?Number(v).toFixed(0):new Intl.NumberFormat('ru-RU',{notation:'compact',maximumFractionDigits:1}).format(v)}}}}});
 }
 
-function spawnHudParticles(count=7){
-  const box=$('hudParticles'); if(!box)return;
-  for(let i=0;i<count;i++){
-    const el=document.createElement('i'); el.className='hudParticle';
-    el.style.left=(8+Math.random()*84)+'%'; el.style.top=(24+Math.random()*64)+'%';
-    el.style.setProperty('--pd',(2.6+Math.random()*2.4).toFixed(2)+'s');
-    el.style.setProperty('--px',((Math.random()-.5)*34).toFixed(0)+'px');
-    box.appendChild(el); setTimeout(()=>el.remove(),5200);
+function triggerLiveFX(){
+  const hero=$('value')?.closest('.hero');
+  const value=$('value'), gain=$('gain'), chartCard=document.querySelector('.chartCard');
+  hero?.classList.remove('live-flash'); value?.classList.remove('live-pulse'); gain?.classList.remove('live-pulse'); chartCard?.classList.remove('chart-live');
+  void hero?.offsetWidth; void value?.offsetWidth;
+  hero?.classList.add('live-flash'); value?.classList.add('live-pulse'); gain?.classList.add('live-pulse'); chartCard?.classList.add('chart-live');
+  setTimeout(()=>{hero?.classList.remove('live-flash');value?.classList.remove('live-pulse');gain?.classList.remove('live-pulse');chartCard?.classList.remove('chart-live');},2400);
+}
+function setSync(mode){
+  const el=$('syncFlow'); if(!el)return;
+  if(mode==='sync'){
+    el.textContent='SYNC → PORTFOLIO → MOEX → DIVIDENDS → READY'; el.classList.add('syncing');
+  }else{
+    el.textContent='PORTFOLIO • MOEX • DIVIDENDS • READY'; el.classList.remove('syncing');
   }
 }
-function flashData(){
-  const hero=$('heroCard'), value=$('value'), chartCard=$('chartCard');
-  hero?.classList.remove('valueFlash'); value?.classList.remove('dataPulse'); chartCard?.classList.remove('chartPulse');
-  void hero?.offsetWidth; void value?.offsetWidth; void chartCard?.offsetWidth;
-  hero?.classList.add('valueFlash'); value?.classList.add('dataPulse'); chartCard?.classList.add('chartPulse');
-  spawnHudParticles(9);
-  setTimeout(()=>{hero?.classList.remove('valueFlash');value?.classList.remove('dataPulse');chartCard?.classList.remove('chartPulse');},800);
-}
-
 function render(d){
-  const previousValue=lastPortfolioValue;
   dashboardData=d||{};
   const p=dashboardData.portfolio||{};
   setText('value',rub(p.value));
   setText('profit',rub(p.profit));
-  const numericValue=Number(p.value);
-  if(Number.isFinite(numericValue) && previousValue!==null && Number.isFinite(previousValue) && Math.abs(numericValue-previousValue)>0.01) flashData();
-  if(Number.isFinite(numericValue)) lastPortfolioValue=numericValue;
   setText('profitPct',p.profitPercent==null?'—':pct(p.profitPercent));
   setText('gain',p.profitPercent==null?'—':(p.profitPercent>=0?'+':'')+pct(p.profitPercent));
   const gainEl=setStyle('gain','color',p.profitPercent>=0?'var(--accent)':'#ff6575');
@@ -145,6 +138,9 @@ function render(d){
   setText('status',`✓ Данные загружены • ${dashboardData.assets?.length||p.assets?.length||0} активов`);
   const statusEl=$('status');if(statusEl)statusEl.className='ok';
   setText('updated',new Date(dashboardData.updatedAt||Date.now()).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
+  triggerLiveFX();
+  const statusEl2=$('status'); statusEl2?.classList.remove('status-flash'); void statusEl2?.offsetWidth; statusEl2?.classList.add('status-flash'); setTimeout(()=>statusEl2?.classList.remove('status-flash'),900);
+  setSync('ready');
   try{renderChart(dashboardData.history||{});}catch(err){
     console.error('Chart render error:',err);
     const empty=$('chartEmpty');if(empty){empty.textContent='История временно недоступна';empty.style.display='flex';}
@@ -156,11 +152,9 @@ document.querySelectorAll('.chartTab').forEach(btn=>btn.addEventListener('click'
   chartMode=btn.dataset.mode||'growth';
   if(dashboardData)renderChart(dashboardData.history);
 }));
-async function load(){try{const r=await fetch('/api/dashboard?v=5.6&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
+async function load(){try{setSync('sync');const r=await fetch('/api/dashboard?v=5.6&t='+Date.now(),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);render(d);}catch(e){console.error(e);setText('status','Ошибка: '+e.message);setSync('ready');const statusEl=$('status');if(statusEl)statusEl.className='err';setText('value','Нет данных');}}
 let pulseMode=false;
 let pulseLongTimer=null;
-let lastPortfolioValue=null;
-let particleTimer=null;
 
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 function pulseStats(d){
@@ -339,4 +333,3 @@ $('pulseBtn').addEventListener('pointerdown',()=>{pulseLongTimer=setTimeout(()=>
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('pulseBtn').addEventListener(ev,()=>{if(pulseLongTimer){clearTimeout(pulseLongTimer);pulseLongTimer=null;}}));
 
 load();setInterval(load,60000);
-particleTimer=setInterval(()=>{ if(!document.hidden && !pulseMode) spawnHudParticles(2); },4200);

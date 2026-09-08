@@ -61,7 +61,7 @@
       <div class="pulseDiagnosis"><div><small>🩺 ДИАГНОЗ</small><b id="pulseDiagnosisTitle">—</b></div><span id="pulseDiagnosisText">—</span></div>
       <div class="pulseShotFooter"><span>НЕ БАНК · НЕ ФОНД · ПРОСТО КРЯХТИТ</span><time id="pulseTime">—</time></div>
     </section>
-    <div class="noise"></div><div class="hudParticles" id="hudParticles" aria-hidden="true"></div>
+    <div class="noise"></div>
     <header class="top">
       <div class="brandBlock">
         <div class="brand">Кряхтящий <span>фонд</span></div>
@@ -73,7 +73,8 @@
       </div>
     </header>
 
-    <section class="hero card" id="heroCard"><span class="hudCorner a"></span><span class="hudCorner b"></span><span class="hudCorner c"></span><span class="hudCorner d"></span><span class="hudPulseDot"></span>
+    <section class="hero card">
+      <div class="heroScanBeam" aria-hidden="true"></div><div class="heroSparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="heroArt" aria-hidden="true">
         <svg class="art art-neon" viewBox="0 0 180 120"><path d="M22 88h92M36 76l20-25 18 14 25-34 22 12"/><circle cx="56" cy="51" r="4"/><circle cx="99" cy="31" r="4"/><path d="M126 68l15-17 14 9-12 17z"/></svg>
         <svg class="art art-emerald" viewBox="0 0 180 120"><path d="M35 80c5-34 39-49 67-31 21 14 28 39 13 49-17 11-56 10-80-3z"/><path d="M73 50l10-12 10 12M62 72h48M73 87h28"/></svg>
@@ -95,14 +96,14 @@
       <div class="mini card"><span>XIRR / CAGR</span><b id="xirr">—</b><div class="cagrLine">CAGR <strong id="cagr">—</strong></div><i>с учётом пополнений</i></div>
     </section>
 
-    <section class="chartCard card" id="chartCard"><span class="hudCorner a"></span><span class="hudCorner b"></span><span class="hudCorner c"></span><span class="hudCorner d"></span>
+    <section class="chartCard card">
       <div class="chartHeader"><div><div class="chartTitle" id="chartTitle">РОСТ КРЯХТЯЩЕГО ФОНДА</div><small id="chartSubtitle">портфель vs IMOEX • старт = 100</small></div><span class="chartBadge" id="chartBadge">НЕ СИДИМ</span></div>
       <div class="chartTabs" role="tablist" aria-label="Режим графика">
         <button class="chartTab active" data-mode="growth">РОСТ</button>
         <button class="chartTab" data-mode="value">СТОИМОСТЬ</button>
         <button class="chartTab" data-mode="profit">ПРИБЫЛЬ</button>
       </div>
-      <div class="chartWrap"><canvas id="chart"></canvas><div class="chartEmpty" id="chartEmpty">Загружаю историю…</div></div>
+      <div class="chartWrap"><canvas id="chart"></canvas><div class="chartScanLine" id="chartScanLine" aria-hidden="true"></div><div class="chartScanDot" id="chartScanDot" aria-hidden="true"></div><div class="chartEmpty" id="chartEmpty">Загружаю историю…</div></div>
       <div class="legend" id="chartLegend"><i></i> Портфель <em></em> IMOEX <span>100 = старт</span></div>
     </section>
 
@@ -125,7 +126,7 @@
       </div>
     </section>
 
-    <footer><span id="status">Подключение…</span><span id="updated">—</span></footer>
+    <footer><span id="status">Подключение…</span><span class="syncFlow" id="syncFlow">SYNC • PORTFOLIO • MOEX • DIVIDENDS • READY</span><span id="updated">—</span></footer>
   </main>
   <script src="/app.js?v=5.9.0"></script>
 </body>
