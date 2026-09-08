@@ -1,0 +1,31 @@
+name: v7.11.3 chart legend hotfix
+on:
+  push:
+    paths:
+      - '.github/workflows/hotfix-chart-legend-v7113.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject legend hotfix
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html')
+          s=p.read_text()
+          old='<script src="/v797.js?v=7.10.0"></script><script src="/v7102.js?v=7.10.2"></script><script src="/v7104.js?v=7.10.4"></script><script src="/v7105.js?v=7.11.2"></script></body></html>'
+          new='<script src="/v797.js?v=7.10.0"></script><script src="/v7102.js?v=7.10.2"></script><script src="/v7104.js?v=7.10.4"></script><script src="/v7105.js?v=7.11.2"></script><script src="/v7113.js?v=7.11.3"></script></body></html>'
+          if old not in s: raise SystemExit('target script chain not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+          node --check public/v7113.js
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/index.html
+          git commit -m "v7.11.3 restore compact chart legend"
+          git push
