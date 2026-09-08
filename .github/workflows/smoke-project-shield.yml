@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
     paths:
+      - 'public/**'
+      - 'server.js'
+      - 'payouts.js'
       - '.github/workflows/smoke-project-shield.yml'
 
 jobs:
@@ -20,7 +23,12 @@ jobs:
             echo "Attempt $i"
             curl -L -sS -D /tmp/headers --max-time 30 -o /tmp/home "$BASE/" || true
             code=$(awk 'toupper($1) ~ /^HTTP\// {c=$2} END{print c}' /tmp/headers)
-            if [ "$code" = '200' ] && grep -q '/v74.js?v=7.4.0' /tmp/home && ! grep -q 'raw.githubusercontent.com' /tmp/home; then
+            curl -L -sS --max-time 20 -o /tmp/server_public "$BASE/server.js" || true
+            curl -L -sS --max-time 20 -o /tmp/payouts_public "$BASE/payouts.js" || true
+            source_safe=1
+            grep -q "const express = require('express')" /tmp/server_public && source_safe=0 || true
+            grep -q "registerPayoutCalendar" /tmp/payouts_public && source_safe=0 || true
+            if [ "$code" = '200' ] && [ "$source_safe" = '1' ] && grep -q '/v74.js?v=7.4.0' /tmp/home && ! grep -q 'raw.githubusercontent.com' /tmp/home; then
               grep -qi '^x-content-type-options: nosniff' /tmp/headers
               grep -qi '^x-frame-options: DENY' /tmp/headers
               grep -qi '^x-robots-tag: noindex, nofollow, noarchive' /tmp/headers
