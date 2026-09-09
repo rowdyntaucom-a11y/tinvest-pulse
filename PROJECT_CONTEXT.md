@@ -54,27 +54,23 @@ Capital controls **world development**, while real local time controls **world s
 - transitions should be gradual rather than hard reload/switches.
 Implemented as v11.3 REAL-TIME WORLD using the browser/device local time, without external weather API.
 
-### MARKET WEATHER / PORTFOLIO MOOD — approved next environment layer
-Portfolio drawdown should affect weather/atmosphere, not punish the investor or stop production. The world must communicate resilience consistent with a 10+ year buy-and-hold philosophy.
-- small drawdown: subtle cloud/wind change;
-- moderate drawdown: rain/fog, warmer importance of local lamps;
-- deep drawdown: harsher weather/atmosphere while mine, cart and construction keep operating;
-- recovery: weather gradually clears;
-- new portfolio high: rare short celebratory world event rather than trading-style reward spam;
-- future dividends/coupons may appear as positive resources/events grounded in actual portfolio data.
-System meaning: capital = development; local time = day/night; drawdown = weather/mood; recovery = clearing weather; passive income = resources/events; new high = rare celebration.
+### MARKET WEATHER / PORTFOLIO MOOD — approved permanent mechanic
+Portfolio drawdown affects weather/atmosphere, not production or investor punishment. Capital = development; local time = day/night; drawdown = weather/mood; recovery = clearing weather; passive income = resources/events; new high = rare celebration. Small drawdown uses subtle cloud/wind; moderate drawdown rain/fog and stronger local lamps; deep drawdown harsher atmosphere while work continues.
+
+### Art enrichment line
+v11.6 added game-art detail, v11.7 environment props/vegetation/tools, and v11.8 LIGHTS & LIFE adds stronger warm local lantern/window glow, moon wash and animated fireflies. These are atmosphere/art layers over the single v11.3 renderer and must not create competing world render loops. The internal DNA badge must always be owned by the latest art layer rather than showing an older WEATHER ALIVE version.
 
 Technical direction: do not migrate the whole application. Keep Node/Express, T-Bank integration, Render and existing financial screens. Replace/evolve only the DNA WORLD renderer. First quality gate remains reference-quality Level 1 `ФУНДАМЕНТ` before scaling to Levels 2–11.
 
 ## 8. Current production state — 2026-09-09
-DNA development line reached v11.3.0 REAL-TIME WORLD after v11.2 CINEMATIC COMPOSITION, v11.1 LIGHTING & DEPTH and v11.0 GAME WORLD. Historical renderer conflicts were caused by independent intervals and competing `#iwScene` rewrites. Preserve the single-renderer invariant and inspect current `main` before every DNA change. The healthy financial/main dashboard must remain frozen while DNA art evolves.
+DNA development line reached **v11.8.0 LIGHTS & LIFE** on top of v11.3 REAL-TIME WORLD, MARKET WEATHER, WEATHER ALIVE, art detail and environment detail. Historical renderer conflicts were caused by independent intervals and competing `#iwScene` rewrites. Preserve the single-renderer invariant and inspect current `main` before every DNA change. The healthy financial/main dashboard must remain frozen while DNA art evolves.
 
 ## 9. DNA level model
 Thresholds: `0, 100k, 250k, 500k, 1m, 2.5m, 5m, 10m, 25m, 50m, 100m RUB`, mapping to 11 levels. Historical names: 1 ФУНДАМЕНТ, 2 ДОМ, 3 МАСТЕРСКАЯ, 4 УСАДЬБА, 5 КАПИТАЛЬНЫЙ ДОМ, 6 БАШНЯ, 7 КРЕПОСТЬ, 8 ЦИТАДЕЛЬ, 9 ГОРОД, 10 ИМПЕРИЯ, 11 ЛЕГЕНДА. Names/art can evolve if a stronger coherent progression is designed.
 
 ## 10. Implemented vs remaining
-Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; game-world composition; lighting/depth; cinematic composition; real-time local day/night system.
-Remaining priorities: reference-quality Level 1 art; MARKET WEATHER / PORTFOLIO MOOD; high-quality original characters/environment; believable production refinements; progressive construction; distinct evolution across 11 levels; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
+Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; game-world composition; lighting/depth; cinematic composition; real-time local day/night; market-weather mood; weather-alive atmosphere; environment props; LIGHTS & LIFE.
+Remaining priorities: reference-quality Level 1 art; high-quality original characters/environment; believable production refinements; progressive construction; distinct evolution across 11 levels; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
 
 ## 11. Development/deployment architecture
 Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. Important files: `server.js`, `server-core.js`, `public/index.html`, historical `public/v*.js`, current DNA renderer, `production-bootstrap.js`, `render.yaml`, `package.json`, `PROJECT_CONTEXT.md`. Do not confuse root historical `index.html` with served `public/index.html`.
@@ -90,4 +86,4 @@ New chat: read `PROJECT_CONTEXT.md`; inspect current `main` and recent commits; 
 Never commit T-Bank API token/credentials. Keep secrets in Render/environment variables. Avoid exposing account identifiers/secrets.
 
 ## 15. Immediate next milestone
-Validate **v11.3 REAL-TIME WORLD** on the user's phone at the current local time. Confirm sky state, local clock label, sun/moon, automatic mine/workshop lights, stars/fireflies and unchanged live portfolio values. If stable, implement **MARKET WEATHER / PORTFOLIO MOOD** from actual portfolio drawdown while keeping production active.
+Validate **v11.8 LIGHTS & LIFE** on the user's Samsung/Android phone at night: latest inner badge, warm mine/workshop/window light, moon wash, fireflies, preserved market-weather label and unchanged live portfolio values. If stable, continue toward benchmark-quality Level 1 with richer structures/materials and more expressive original worker sprites without touching the healthy financial dashboard.
