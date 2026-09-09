@@ -12,10 +12,10 @@ let html = fs.readFileSync(htmlPath, 'utf8');
 // v800 is kept because it creates the Investor DNA shell/button/profile UI.
 // v841 is kept because it syncs live portfolio values and open/close wiring.
 // Every historical scene renderer is removed from the production HTML.
-const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
+const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html = html.replace(legacy, '');
-html = html.replace('</body>', '<script src="/dna-game-l1.js?build=1050-living-production"></script></body>');
+html = html.replace('</body>', '<script src="/dna-game-l1.js?build=1050-living-production"></script><script src="/dna-world-polish-v106.js?build=1060-character-world-polish"></script></body>');
 fs.writeFileSync(htmlPath, html);
-process.env.TINVEST_BUILD = '10.5.0';
+process.env.TINVEST_BUILD = '10.6.0';
 
 require('./server-core.js');
