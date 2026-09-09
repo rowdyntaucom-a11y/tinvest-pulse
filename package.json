@@ -1,10 +1,10 @@
 {
   "name":"tinvest-pulse",
-  "version":"2.2.0",
+  "version":"10.2.1",
   "private":true,
   "description":"Mobile single-screen T-Invest portfolio dashboard",
-  "main":"server.js",
-  "scripts":{"start":"node server.js"},
+  "main":"production-bootstrap.js",
+  "scripts":{"start":"node production-bootstrap.js"},
   "engines":{"node":">=20 <25"},
   "dependencies":{"dotenv":"^16.4.7","express":"^4.21.2"}
 }
