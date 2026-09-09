@@ -1,0 +1,33 @@
+name: Activate v7.16.5 payout owner
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/activate-v7165.yml'
+permissions:
+  contents: write
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch exact payout script version
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html')
+          s=p.read_text()
+          old='<script src="/v7105.js?v=7.16.0"></script>'
+          new='<script src="/v7105.js?v=7.16.5"></script>'
+          if old not in s:
+              raise SystemExit('expected v7105 script tag not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Commit activation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/index.html
+          git commit -m "activate v7.16.5 payout owner" || exit 0
+          git push
