@@ -1,0 +1,35 @@
+name: v7.16.9 Bond browser last-good
+on: push
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('public/v76.js')
+          s=p.read_text()
+          needle=" const $=id=>document.getElementById(id),n=v=>Number(v),rub=v=>Number.isFinite(n(v))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0,signDisplay:'exceptZero'}).format(n(v))+' ₽':'—',f=v=>Number.isFinite(n(v))?n(v).toFixed(1).replace('.',','):'—',f2=v=>Number.isFinite(n(v))?n(v).toFixed(2).replace('.',','):'—';"
+          add=needle+"\n const BOND_LAST_GOOD='tinvest.bond.lastgood.v1',BOND_LAST_GOOD_TTL=7*24*60*60*1000;\n function readLastGood(){try{const x=JSON.parse(localStorage.getItem(BOND_LAST_GOOD)||'null'),t=Number(x?.savedAt)||0,d=x?.data;if(!d||!t||Date.now()-t>BOND_LAST_GOOD_TTL)return null;return{...d,stale:true,available:true,__clientLastGood:true,staleAgeMinutes:Math.max(0,Math.round((Date.now()-t)/60000)),warning:'T-Bank временно недоступен · показан последний подтверждённый снимок'}}catch(_){return null}}\n function saveLastGood(d){try{if(d&&!d.stale&&Number(d?.summary?.bondCapital)>0&&Number(d?.summary?.issues)>0)localStorage.setItem(BOND_LAST_GOOD,JSON.stringify({savedAt:Date.now(),data:d}))}catch(_){}}"
+          if 'tinvest.bond.lastgood.v1' not in s:
+              if needle not in s: raise SystemExit('v76 anchor 1 missing')
+              s=s.replace(needle,add,1)
+          old="let b={};try{b=await br.json()}catch(_){throw new Error('Bond API returned non-JSON · HTTP '+br.status)}if(!br.ok||b.available===false)throw new Error((b.error||'Bond API unavailable')+' · HTTP '+br.status);const pr="
+          new="let b={};try{b=await br.json()}catch(_){b={}}if(!br.ok||b.available===false){const saved=readLastGood();if(saved)b=saved;else throw new Error((b.error||'Bond API unavailable')+' · HTTP '+br.status)}else saveLastGood(b);const pr="
+          if old in s:s=s.replace(old,new,1)
+          elif 'readLastGood();if(saved)b=saved' not in s: raise SystemExit('v76 anchor 2 missing')
+          s=s.replace("const pr=await fetch('/api/payouts?t='+Date.now(),{cache:'no-store'}),p=await pr.json()","const pr=await fetch('/api/payouts?t='+Date.now(),{cache:'no-store'}),p=pr.ok?await pr.json():{events:[],months:[]}",1)
+          s=s.replace("b.stale?`<div class=\"b76stale\">LAST GOOD · ${Number.isFinite(n(b.staleAgeMinutes))?Math.max(0,n(b.staleAgeMinutes))+' мин назад · ':''}T-Bank временно недоступен</div>`:''","b.stale?`<div class=\"b76stale\">LAST GOOD · ${Number.isFinite(n(b.staleAgeMinutes))?Math.max(0,n(b.staleAgeMinutes))+' мин назад · ':''}T-Bank временно недоступен · данные сохранены</div>`:''",1)
+          s=s.replace('BOND API ERROR · v7.16.8','BOND API ERROR · v7.16.9').replace('FIXED INCOME CORE · v7.16.8','FIXED INCOME CORE · v7.16.9')
+          p.write_text(s)
+          p=Path('public/v75.js');s=p.read_text();s=s.replace("/v76.js?v=7.6.2","/v76.js?v=7.16.9");p.write_text(s)
+          PY
+          node --check public/v76.js
+          node --check public/v75.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/v76.js public/v75.js
+          if ! git diff --cached --quiet; then git commit -m 'v7.16.9 activate persistent Bond last-good'; git push; fi
