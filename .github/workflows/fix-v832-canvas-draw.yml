@@ -1,0 +1,45 @@
+name: v8.3.2 Fix Canvas Draw
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-v832-canvas-draw.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch v830 robust image decode
+        run: |
+          python3 - <<'PY'
+          p='public/v830.js'
+          s=open(p,encoding='utf-8').read()
+          s=s.replace("const V='8.3.1'","const V='8.3.2'",1)
+          old="img=new Image();const start=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)};img.onload=start;img.src=IMG;if(img.complete&&img.naturalWidth)start();"
+          new="img=new Image();const start=()=>{if(!img.naturalWidth)return;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)};img.onload=start;img.onerror=()=>{scene.style.backgroundImage=`url(${IMG})`;scene.style.backgroundSize='cover';scene.style.backgroundPosition='center'};img.src=IMG;if(img.decode){img.decode().then(start).catch(()=>{if(img.complete&&img.naturalWidth)start();else img.onerror()})}else if(img.complete&&img.naturalWidth)start();"
+          if old not in s:
+              raise SystemExit('expected image bootstrap not found')
+          s=s.replace(old,new,1)
+          open(p,'w',encoding='utf-8').write(s)
+          p='public/index.html'
+          h=open(p,encoding='utf-8').read()
+          if 'v830.js?v=8.3.1' in h:
+              h=h.replace('v830.js?v=8.3.1','v830.js?v=8.3.2')
+          elif 'v830.js?v=8.3.0' in h:
+              h=h.replace('v830.js?v=8.3.0','v830.js?v=8.3.2')
+          else:
+              raise SystemExit('v830 script tag not found')
+          open(p,'w',encoding='utf-8').write(h)
+          PY
+          node --check public/v830.js
+      - name: Commit fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/v830.js public/index.html
+          git commit -m 'v8.3.2 robust 2D canvas image decode'
+          git push
