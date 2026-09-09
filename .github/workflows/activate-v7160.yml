@@ -1,0 +1,29 @@
+name: activate v7.16 overview stability
+on:
+  push:
+    paths: ['.github/workflows/activate-v7160.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          node --check public/v7105.js
+          python3 - <<'PY'
+          p='public/index.html'
+          s=open(p,encoding='utf-8').read()
+          changed=False
+          for old in ['/v7105.js?v=7.15.9','/v7105.js?v=7.15.8','/v7105.js?v=7.15.4']:
+              if old in s:
+                  s=s.replace(old,'/v7105.js?v=7.16.0',1);changed=True;break
+          if not changed:
+              raise SystemExit('v7105 script reference not found')
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m 'v7.16 cache bust overview stability'
+          git push
