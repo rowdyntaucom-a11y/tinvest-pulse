@@ -1,0 +1,28 @@
+name: activate v7.15.8 payout hard lock
+on:
+  push:
+    paths: ['.github/workflows/activate-v7158.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          node --check public/v7105.js
+          node --check public/v7106.js
+          python3 - <<'PY'
+          import re
+          p='public/index.html'
+          s=open(p,encoding='utf-8').read()
+          s,n1=re.subn(r'/v7105\.js\?v=[^"\']+', '/v7105.js?v=7.15.8', s, count=1)
+          s,n2=re.subn(r'/v7106\.js\?v=[^"\']+', '/v7106.js?v=7.15.8', s, count=1)
+          assert n1==1 and n2==1, (n1,n2)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m 'v7.15.8 activate payout hard lock'
+          git push
