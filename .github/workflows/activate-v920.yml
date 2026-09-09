@@ -1,0 +1,33 @@
+name: Activate DNA World v9.2
+on:
+  push:
+    paths:
+      - 'public/v920.js'
+      - '.github/workflows/activate-v920.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Activate v9.2
+        run: |
+          node --check public/v920.js
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html')
+          s=p.read_text()
+          tag='<script src="/v920.js?v=9.2.0"></script>'
+          if tag not in s:
+              old='<script src="/v910.js?v=9.1.0"></script>'
+              if old not in s: raise SystemExit('v9.1 anchor not found')
+              s=s.replace(old,old+tag,1)
+              p.write_text(s)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/index.html
+          git diff --cached --quiet || git commit -m 'activate DNA world v9.2'
+          git push
