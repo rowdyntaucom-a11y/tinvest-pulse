@@ -1,0 +1,44 @@
+name: v8.3.1 Fix 2D scene image load
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-v831-2d-image-load.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch cinematic image load race
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('public/v830.js')
+          s=p.read_text()
+          old="img=new Image();img.src=IMG;img.onload=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)};"
+          new="img=new Image();const start2D=()=>{if(!img.naturalWidth)return;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)};img.onload=start2D;img.onerror=()=>{scene.classList.add('iw2dLoadError');console.error('2D WORLD image decode failed')};img.src=IMG;if(img.complete&&img.naturalWidth)start2D();"
+          if old not in s:
+              raise SystemExit('needle not found')
+          s=s.replace(old,new,1)
+          s=s.replace("const V='8.3.0'","const V='8.3.1'",1)
+          p.write_text(s)
+          idx=Path('public/index.html')
+          h=idx.read_text()
+          if '/v830.js?v=8.3.0' in h:
+              h=h.replace('/v830.js?v=8.3.0','/v830.js?v=8.3.1',1)
+          elif '/v830.js?v=8.3.1' not in h:
+              h=h.replace('</body>','<script src="/v830.js?v=8.3.1"></script></body>',1)
+          idx.write_text(h)
+          PY
+      - name: Verify syntax
+        run: node --check public/v830.js
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/v830.js public/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'v8.3.1 fix cinematic 2D image loading'
+          git push
