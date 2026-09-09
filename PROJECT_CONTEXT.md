@@ -46,26 +46,35 @@ Core concept: capital becomes a living world. World language: mine/extraction, c
 - ONE WORLD → ONE RENDERER → ONE UPDATE LOOP.
 
 ### Living real-time environment — approved permanent mechanic
-The world should later synchronize its ambience with the user's real local time. Capital controls **world development**, while real local time controls **world state/lighting**.
+Capital controls **world development**, while real local time controls **world state/lighting**.
 - dawn: cool sunrise, lamps gradually switch off;
 - day: sun, brighter sky/environment and readable active production;
 - sunset: warm golden light and long shadows, windows/lamps begin switching on;
 - night: moon, stars, warm mine/workshop/window lights, fireflies and stronger local lighting;
-- transitions should be gradual rather than hard reload/switches;
-- after the day/night system is stable, weather and seasons may be added as a later layer; do not require external weather API for the initial day/night implementation.
-This is a permanent DNA WORLD system, not a one-off effect.
+- transitions should be gradual rather than hard reload/switches.
+Implemented as v11.3 REAL-TIME WORLD using the browser/device local time, without external weather API.
+
+### MARKET WEATHER / PORTFOLIO MOOD — approved next environment layer
+Portfolio drawdown should affect weather/atmosphere, not punish the investor or stop production. The world must communicate resilience consistent with a 10+ year buy-and-hold philosophy.
+- small drawdown: subtle cloud/wind change;
+- moderate drawdown: rain/fog, warmer importance of local lamps;
+- deep drawdown: harsher weather/atmosphere while mine, cart and construction keep operating;
+- recovery: weather gradually clears;
+- new portfolio high: rare short celebratory world event rather than trading-style reward spam;
+- future dividends/coupons may appear as positive resources/events grounded in actual portfolio data.
+System meaning: capital = development; local time = day/night; drawdown = weather/mood; recovery = clearing weather; passive income = resources/events; new high = rare celebration.
 
 Technical direction: do not migrate the whole application. Keep Node/Express, T-Bank integration, Render and existing financial screens. Replace/evolve only the DNA WORLD renderer. First quality gate remains reference-quality Level 1 `ФУНДАМЕНТ` before scaling to Levels 2–11.
 
 ## 8. Current production state — 2026-09-09
-Current DNA development line reached v11.2.0 CINEMATIC COMPOSITION after v11.0 GAME WORLD and v11.1 LIGHTING & DEPTH. Historical renderer conflicts were caused by independent intervals and competing `#iwScene` rewrites. Preserve the single-renderer invariant and inspect current `main` before every DNA change. The healthy financial/main dashboard must remain frozen while DNA art evolves.
+DNA development line reached v11.3.0 REAL-TIME WORLD after v11.2 CINEMATIC COMPOSITION, v11.1 LIGHTING & DEPTH and v11.0 GAME WORLD. Historical renderer conflicts were caused by independent intervals and competing `#iwScene` rewrites. Preserve the single-renderer invariant and inspect current `main` before every DNA change. The healthy financial/main dashboard must remain frozen while DNA art evolves.
 
 ## 9. DNA level model
 Thresholds: `0, 100k, 250k, 500k, 1m, 2.5m, 5m, 10m, 25m, 50m, 100m RUB`, mapping to 11 levels. Historical names: 1 ФУНДАМЕНТ, 2 ДОМ, 3 МАСТЕРСКАЯ, 4 УСАДЬБА, 5 КАПИТАЛЬНЫЙ ДОМ, 6 БАШНЯ, 7 КРЕПОСТЬ, 8 ЦИТАДЕЛЬ, 9 ГОРОД, 10 ИМПЕРИЯ, 11 ЛЕГЕНДА. Names/art can evolve if a stronger coherent progression is designed.
 
 ## 10. Implemented vs remaining
-Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; game-world composition; lighting/depth pass.
-Remaining priorities: reference-quality Level 1 art; high-quality original characters/environment; cinematic composition validation; real-time day/night system; believable production refinements; progressive construction; distinct evolution across 11 levels; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
+Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; game-world composition; lighting/depth; cinematic composition; real-time local day/night system.
+Remaining priorities: reference-quality Level 1 art; MARKET WEATHER / PORTFOLIO MOOD; high-quality original characters/environment; believable production refinements; progressive construction; distinct evolution across 11 levels; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
 
 ## 11. Development/deployment architecture
 Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. Important files: `server.js`, `server-core.js`, `public/index.html`, historical `public/v*.js`, current DNA renderer, `production-bootstrap.js`, `render.yaml`, `package.json`, `PROJECT_CONTEXT.md`. Do not confuse root historical `index.html` with served `public/index.html`.
@@ -81,4 +90,4 @@ New chat: read `PROJECT_CONTEXT.md`; inspect current `main` and recent commits; 
 Never commit T-Bank API token/credentials. Keep secrets in Render/environment variables. Avoid exposing account identifiers/secrets.
 
 ## 15. Immediate next milestone
-Validate **v11.2 CINEMATIC COMPOSITION** on the user's phone. Then implement the approved **real-time DAY/NIGHT SYSTEM**: local-time-driven dawn/day/sunset/night with gradual sky/light transitions, sun/moon, automatic lamps/windows, stars and fireflies, while preserving financial mechanics and the single-renderer architecture.
+Validate **v11.3 REAL-TIME WORLD** on the user's phone at the current local time. Confirm sky state, local clock label, sun/moon, automatic mine/workshop lights, stars/fireflies and unchanged live portfolio values. If stable, implement **MARKET WEATHER / PORTFOLIO MOOD** from actual portfolio drawdown while keeping production active.
