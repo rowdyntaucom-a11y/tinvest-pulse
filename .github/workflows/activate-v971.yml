@@ -1,4 +1,4 @@
-name: Activate DNA v9.7.2
+name: Activate DNA v9.8.0
 on:
   push:
     paths: ['.github/workflows/activate-v971.yml']
@@ -13,14 +13,14 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           p=Path('public/index.html'); s=p.read_text()
-          old='/v960.js?v=9.7.1'
-          new='/v960.js?v=9.7.2'
-          if old not in s: raise SystemExit('v9.7.1 script tag not found')
+          old='/v960.js?v=9.7.2'
+          new='/v960.js?v=9.8.0'
+          if old not in s: raise SystemExit('v9.7.2 script tag not found')
           p.write_text(s.replace(old,new,1))
           PY
           node --check public/v960.js
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add public/index.html
-          git commit -m 'activate DNA world v9.7.2'
+          git commit -m 'activate DNA world v9.8.0'
           git push
