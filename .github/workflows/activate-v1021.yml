@@ -1,0 +1,27 @@
+name: Activate DNA v10.2.1
+on:
+  push:
+    paths: ['.github/workflows/activate-v1021.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html'); s=p.read_text()
+          anchor='<script src="/v960.js?v=10.2.0"></script>'
+          tag='<script src="/v1021.js?v=10.2.1"></script>'
+          if tag in s: raise SystemExit('v10.2.1 already active')
+          if anchor not in s: raise SystemExit('v10.2.0 anchor not found')
+          p.write_text(s.replace(anchor,anchor+tag,1))
+          PY
+          node --check public/v1021.js
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/index.html
+          git commit -m 'activate DNA world v10.2.1 persistent build'
+          git push
