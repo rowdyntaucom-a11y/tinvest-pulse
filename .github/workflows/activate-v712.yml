@@ -1,0 +1,31 @@
+name: activate v7.12 smart buy plan
+on:
+  push:
+    paths:
+      - '.github/workflows/activate-v712.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          p='public/index.html'
+          s=open(p,encoding='utf-8').read()
+          needle='<script src="/v77.js?v=7.11.1"></script>'
+          add=needle+'<script src="/v712.js?v=7.12.0"></script>'
+          if '/v712.js?v=7.12.0' not in s:
+              assert needle in s
+              s=s.replace(needle,add,1)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          node --check public/v712.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'v7.12 activate smart buy plan'
+            git push
+          fi
