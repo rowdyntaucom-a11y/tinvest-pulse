@@ -1,0 +1,47 @@
+name: activate v7.15.7 payout single-owner
+on:
+  push:
+    paths: ['.github/workflows/activate-v7157.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/v714.js')
+          s=p.read_text(encoding='utf-8')
+          prefix="(()=>{if(!document.getElementById('payout-loader-v7153')){const q=document.createElement('script');q.id='payout-loader-v7153';q.src='/v7153.js?v=7.15.3';document.head.appendChild(q)}"
+          assert s.startswith(prefix), 'unexpected v714 prefix'
+          s='(()=>{'+s[len(prefix):]
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('public/index.html')
+          s=p.read_text(encoding='utf-8')
+          repl={
+            '/v7106.js?v=7.10.8':'/v7106.js?v=7.15.7',
+            '/v7106.js?v=7.15.6':'/v7106.js?v=7.15.7',
+            '/app.js?v=7.11.7':'/app.js?v=7.15.7',
+            '/v7105.js?v=7.15.2':'/v7105.js?v=7.15.7',
+            '/v714.js?v=7.14.1':'/v714.js?v=7.15.7'
+          }
+          for old,new in repl.items():
+            if old in s:s=s.replace(old,new,1)
+          assert '/app.js?v=7.15.7' in s
+          assert '/v7105.js?v=7.15.7' in s
+          assert '/v7106.js?v=7.15.7' in s
+          assert '/v714.js?v=7.15.7' in s
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check public/v714.js
+          node --check public/v7105.js
+          node --check public/v7106.js
+          node --check public/app.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/v714.js public/index.html
+          git commit -m 'v7.15.7 enforce single payout owner'
+          git push
