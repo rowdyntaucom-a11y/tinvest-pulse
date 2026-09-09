@@ -1,4 +1,6 @@
 (()=>{
+ const incomeCard=document.getElementById('monthly')?.closest('.income,.mini');
+ if(incomeCard){incomeCard.dataset.truePayout='1';incomeCard.dataset.payoutOwner='preclaim-v7156';}
  const sane=v=>Number.isFinite(+v)&&+v>0;
  function normalize(points,liveReturn){
   if(!Array.isArray(points)||points.length<2)return points||[];
@@ -8,14 +10,9 @@
   for(let i=1;i<src.length;i++){
    const raw=sane(src[i].portfolio)?+src[i].portfolio:prevRaw;
    const r=prevRaw>0?raw/prevRaw:1;
-   // A diversified 50/50 portfolio cannot realistically move 8% in one day here.
-   // Larger jumps are reconstruction/cash-flow artifacts and must not enter P&L.
    if(Number.isFinite(r)&&r>=0.92&&r<=1.08)idx*=r;
    src[i].portfolio=+idx.toFixed(4);prevRaw=raw;
   }
-  // profitPercent in /api/dashboard is decimal (e.g. 0.025 = +2.5%).
-  // Read it from the SAME response being rendered; app.js keeps dashboardData lexical,
-  // so window.dashboardData was never a valid source and caused the previous bad anchor.
   const live=Number(liveReturn);
   if(Number.isFinite(live)&&live>-0.95&&live<5&&src.length>1){
    const target=100*(1+live),last=+src[src.length-1].portfolio;
