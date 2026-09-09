@@ -1,0 +1,8 @@
+(()=>{
+ const $=id=>document.getElementById(id),rub=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Number(n)||0)+' ₽',STORE='tinvest:lastPayoutForecast';
+ function payoutPaint(d){const g=+d?.forecast?.gross,n=+d?.forecast?.net,c=+d?.forecast?.count;if(!(g>0&&n>=0&&c>0))return false;const m=n/12,day=n/365;for(const [id,v] of [['monthly',rub(m)],['daily',rub(day)],['annual',rub(n)]]){const e=$(id);if(e)e.textContent=v}const card=$('monthly')?.closest('.income,.mini');if(card){card.dataset.truePayout='1';const t=card.querySelector('.eyebrow,span');if(t)t.textContent='ПАССИВНЫЙ ДОХОД · ПРОГНОЗ';const s=card.querySelector('small,i');if(s)s.textContent=`на руки · ${c} выплат · начислят ${rub(g)}/год`}return true}
+ function cached(){try{return JSON.parse(localStorage.getItem(STORE)||'null')?.data||null}catch(_){return null}}
+ function guardPayout(){const c=cached();if(c)payoutPaint(c)}
+ function saneAnalytics(){const root=$('analyticsView'),box=$('an20');if(!root||!box)return;const vals=[...root.querySelectorAll('.anGrid .anVal,.anGrid strong')].map(x=>parseFloat(String(x.textContent).replace(',','.'))).filter(Number.isFinite);const suspicious=vals.some(v=>Math.abs(v)>80);if(suspicious){const b=$('an20Body');if(b)b.innerHTML='<div class="an20Score"><strong>—</strong><div><b>ДАННЫЕ ПРОВЕРЯЮТСЯ</b><p>Короткая история дала аномальную годовую метрику. Оценка 0–100 скрыта, чтобы не выдавать ложный диагноз.</p></div></div><div class="an20Warn">DATA INTEGRITY · экстремальные annualized-метрики не участвуют в вердикте.</div>'}}
+ guardPayout();setInterval(guardPayout,700);setTimeout(saneAnalytics,900);setInterval(saneAnalytics,2500);
+})();
