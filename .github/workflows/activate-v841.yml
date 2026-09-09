@@ -1,0 +1,33 @@
+name: Activate v8.4.1 DNA Interaction
+on:
+  push:
+    paths: ['.github/workflows/activate-v841.yml']
+permissions:
+  contents: write
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index
+        run: |
+          node --check public/v841.js
+          python3 - <<'PY'
+          p='public/index.html'
+          s=open(p,encoding='utf-8').read()
+          s=s.replace('<script src="/v820.js?v=8.2.0"></script>','')
+          s=s.replace('<script src="/v830.js?v=8.3.1"></script>','')
+          tag='<script src="/v841.js?v=8.4.1"></script>'
+          if tag not in s:
+              needle='<script src="/v840.js?v=8.4.0"></script>'
+              if needle not in s: raise SystemExit('v840 tag not found')
+              s=s.replace(needle,needle+tag)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m "v8.4.1 fix DNA button and remove obsolete world layers"
+          git push
