@@ -20,11 +20,11 @@ TInvest Pulse is a mobile-first personal investment dashboard for a long-term T-
 - Strong visual identity, complete shells/themes, illustrations and effects rather than recoloring.
 - `Пульс` presentation exists for shareable screenshots.
 - Effects must never break live data/calculations/interaction.
-- DNA WORLD target quality is now explicitly a **detailed 2D game scene**, inspired by the density/readability of polished pixel-art management/adventure games (references supplied by user included Terraria-like constructed worlds and Yes, Your Grace-like character/environment detail). Do not copy their protected characters/assets/layouts; create an original TInvest Pulse world at comparable detail quality.
-- Stop treating schematic SVG stick-figures/basic geometry as the final visual target. SVG may remain a prototype/fallback, but the target is game-quality art, characters and animation.
+- DNA WORLD target quality is a detailed original 2D game scene with layered depth, high readability and game-quality character/environment art.
+- Stop treating schematic SVG stick-figures/basic geometry as the final visual target.
 
 ## 4. Core portfolio analytics
-Important/historical requirements: total value; dates; holdings/weights; gainers/losers; real passive income excluding deposits; monthly passive income; historical chart; IMOEX comparison; CAGR/XIRR from actual history/cash flows; concentration; risk/health diagnostics; WHAT IF with non-forecast labeling. T-Bank accounts/portfolio/operations integration works. Preserve the Russian TLS/certificate-chain solution in `server.js`.
+Important/historical requirements: total value; dates; holdings/weights; gainers/losers; real passive income excluding deposits; monthly passive income; historical chart; IMOEX comparison; CAGR/XIRR from actual history/cash flows; concentration; risk/health diagnostics; WHAT IF with non-forecast labeling. T-Bank accounts/portfolio/operations integration works. Preserve the Russian TLS/certificate-chain solution in the application server.
 
 ## 5. Passive income / payout engine
 Direction by v7.9 included real T-Bank payout schedules for current holdings: 12-month schedules, deduplication, gross/tax/net, real monthly calendar. Historical validation target 4,935.78 ₽ must never be hardcoded.
@@ -33,44 +33,46 @@ Direction by v7.9 included real T-Bank payout schedules for current holdings: 12
 v6.7 Event Engine introduced portfolio-event intelligence. v6.8 Quality Engine added `ФАКТ / СИГНАЛ / ФОН / ШУМ`, source quality, company relevance, multi-ticker penalties, noise filtering and `ТИХО`. v6.9 Event Understanding strengthened real-event vs price-headline detection, facts/numbers/causal checks and event/quiet counts. Significance must come from meaningful events related to holdings.
 
 ## 7. Investor DNA / Living Portfolio / DNA WORLD
-Core concept: capital becomes a living world. The user should feel long-term compounding/progress visually rather than stare only at tables.
+Core concept: capital becomes a living world. World language: mine/extraction, crystals/resources, workers, tools, carts/logistics, construction, workshops/warehouses, environment evolution and investor levels. Work cycle: `ДОБЫЧА → ДОСТАВКА → СТРОЙКА`.
 
-World language: mine/extraction, crystals/resources, workers, tools, carts/logistics, construction, workshops/warehouses, environment evolution and investor levels. Work cycle: `ДОБЫЧА → ДОСТАВКА → СТРОЙКА`.
-
-### New visual target — GAME WORLD
-DNA WORLD should feel like a small real 2D game embedded inside the investment app:
+### GAME WORLD target
 - layered background/midground/foreground and atmospheric depth;
-- original detailed worker sprites/models rather than symbolic people;
-- animation states such as idle, walk, mine, carry, load/unload, build and rest;
-- mine interior/entrance, rails, carts, cranes/scaffolding, workshops, storage, lights, smoke/steam, particles and crystals;
-- warm local light against a darker night environment; readable silhouettes on phone;
-- continuous believable activity: miner extracts resource → resource is loaded → cart delivers → builder receives material → construction visibly advances;
-- capital movement inside a level should change construction progress continuously; threshold crossing unlocks a meaningful world upgrade;
-- dividends/coupons and portfolio events may later become meaningful world events/resources, but must remain grounded in real portfolio data;
-- financial UI remains TInvest Pulse, not a game HUD that hides the actual portfolio.
+- original detailed worker sprites/models;
+- idle, walk, mine, carry, load/unload, build and rest states;
+- mine, rails, carts, cranes/scaffolding, workshops, storage, lights, smoke/steam, particles and crystals;
+- continuous believable activity: miner extracts → resource loaded → cart delivers → builder receives → construction advances;
+- capital movement inside a level changes construction progress continuously; threshold crossing unlocks meaningful world upgrade;
+- financial UI remains TInvest Pulse, not a game HUD hiding real portfolio data;
+- ONE WORLD → ONE RENDERER → ONE UPDATE LOOP.
 
-Technical direction: **do not migrate the whole application**. Keep Node/Express, T-Bank integration, Render and existing financial screens. Replace/evolve only the DNA WORLD visual renderer. A dedicated 2D renderer/sprite pipeline is acceptable if it improves art/animation quality and remains performant on Samsung/Android.
+### Living real-time environment — approved permanent mechanic
+The world should later synchronize its ambience with the user's real local time. Capital controls **world development**, while real local time controls **world state/lighting**.
+- dawn: cool sunrise, lamps gradually switch off;
+- day: sun, brighter sky/environment and readable active production;
+- sunset: warm golden light and long shadows, windows/lamps begin switching on;
+- night: moon, stars, warm mine/workshop/window lights, fireflies and stronger local lighting;
+- transitions should be gradual rather than hard reload/switches;
+- after the day/night system is stable, weather and seasons may be added as a later layer; do not require external weather API for the initial day/night implementation.
+This is a permanent DNA WORLD system, not a one-off effect.
 
-First milestone: build one **reference-quality Level 1 `ФУНДАМЕНТ`** before scaling the art system to all 11 levels. This is the visual quality gate: only after Level 1 looks like a convincing game scene should the same system be expanded.
+Technical direction: do not migrate the whole application. Keep Node/Express, T-Bank integration, Render and existing financial screens. Replace/evolve only the DNA WORLD renderer. First quality gate remains reference-quality Level 1 `ФУНДАМЕНТ` before scaling to Levels 2–11.
 
 ## 8. Current production state — 2026-09-09
-Intended visible version: v10.2.1. A production bug caused historical renderer scripts to fight over `#iwScene`, switching among v10.2.0, v10.2.1 and old `2D SPRITE WORLD · v8.6`. Root causes: independent intervals, old `innerHTML` rewrites, competing ownership, stale cached assets, and inconsistent Render startup. Production now uses `production-bootstrap.js` and single-renderer normalization. Current invariant: **ONE WORLD → ONE RENDERER → ONE UPDATE LOOP.** Always inspect current `main`/commits rather than trusting a stale SHA.
+Current DNA development line reached v11.2.0 CINEMATIC COMPOSITION after v11.0 GAME WORLD and v11.1 LIGHTING & DEPTH. Historical renderer conflicts were caused by independent intervals and competing `#iwScene` rewrites. Preserve the single-renderer invariant and inspect current `main` before every DNA change. The healthy financial/main dashboard must remain frozen while DNA art evolves.
 
 ## 9. DNA level model
-Thresholds currently used: `0, 100k, 250k, 500k, 1m, 2.5m, 5m, 10m, 25m, 50m, 100m RUB`, mapping to 11 levels. Historical names: 1 ФУНДАМЕНТ, 2 ДОМ, 3 МАСТЕРСКАЯ, 4 УСАДЬБА, 5 КАПИТАЛЬНЫЙ ДОМ, 6 БАШНЯ, 7 КРЕПОСТЬ, 8 ЦИТАДЕЛЬ, 9 ГОРОД, 10 ИМПЕРИЯ, 11 ЛЕГЕНДА. Names/art can evolve if a stronger coherent world progression is designed.
+Thresholds: `0, 100k, 250k, 500k, 1m, 2.5m, 5m, 10m, 25m, 50m, 100m RUB`, mapping to 11 levels. Historical names: 1 ФУНДАМЕНТ, 2 ДОМ, 3 МАСТЕРСКАЯ, 4 УСАДЬБА, 5 КАПИТАЛЬНЫЙ ДОМ, 6 БАШНЯ, 7 КРЕПОСТЬ, 8 ЦИТАДЕЛЬ, 9 ГОРОД, 10 ИМПЕРИЯ, 11 ЛЕГЕНДА. Names/art can evolve if a stronger coherent progression is designed.
 
 ## 10. Implemented vs remaining
-Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1 prototype; 11-level capital model; single-renderer architecture.
-
-Remaining priorities: reference-quality Level 1 game scene; high-quality original characters and environment; believable animation cycle; progressive construction inside a level; distinct evolution across 11 levels; deeper Portfolio DNA diagnostics; continued INTEL validation; CAGR/XIRR/history/IMOEX/passive-income validation; clean mobile performance; retire obsolete runtime renderer patches once safe.
+Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; game-world composition; lighting/depth pass.
+Remaining priorities: reference-quality Level 1 art; high-quality original characters/environment; cinematic composition validation; real-time day/night system; believable production refinements; progressive construction; distinct evolution across 11 levels; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
 
 ## 11. Development/deployment architecture
-Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. Important files: `server.js`, `public/index.html`, historical `public/v*.js`, `production-bootstrap.js`, `render.yaml`, `package.json`, `PROJECT_CONTEXT.md`. Do not confuse root historical `index.html` with served `public/index.html`.
+Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. Important files: `server.js`, `server-core.js`, `public/index.html`, historical `public/v*.js`, current DNA renderer, `production-bootstrap.js`, `render.yaml`, `package.json`, `PROJECT_CONTEXT.md`. Do not confuse root historical `index.html` with served `public/index.html`.
 
 ## 12. Working agreement
 Normal feature rhythm: assistant analyzes/proposes next step → user says `Ок`/correction → assistant implements, tests, commits and pushes to `main` without asking again → user sends production screenshot → if good, discuss next step and await next `Ок`.
-
-Bug rhythm: if screenshot shows a clear bug/regression/wrong data/version conflict, do not ask approval. Diagnose, fix, test, commit/push, then tell user what to check. Do not require repeated `Ок`. Do not say `исправляю` and then wait; complete work in the same tool sequence whenever possible.
+Bug rhythm: if screenshot shows a clear bug/regression/wrong data/version conflict, do not ask approval. Diagnose, fix, test, commit/push, then tell user what to check. Do not require repeated `Ок`.
 
 ## 13. Source-of-truth hierarchy
 New chat: read `PROJECT_CONTEXT.md`; inspect current `main` and recent commits; inspect relevant files; use memory/prior-chat context for product intent. If docs/code disagree on implementation, current `main` wins; this file records intent unless user changed it. Update this file after meaningful decisions/milestones.
@@ -79,4 +81,4 @@ New chat: read `PROJECT_CONTEXT.md`; inspect current `main` and recent commits; 
 Never commit T-Bank API token/credentials. Keep secrets in Render/environment variables. Avoid exposing account identifiers/secrets.
 
 ## 15. Immediate next milestone
-**DNA WORLD — GAME QUALITY LEVEL 1 / ФУНДАМЕНТ.** Create an original, detailed, layered Level 1 world and a reusable character/animation architecture. Preserve the stable single-renderer rule and all financial mechanics. Validate the result on the user's phone via screenshot before expanding to Levels 2–11.
+Validate **v11.2 CINEMATIC COMPOSITION** on the user's phone. Then implement the approved **real-time DAY/NIGHT SYSTEM**: local-time-driven dawn/day/sunset/night with gradual sky/light transitions, sun/moon, automatic lamps/windows, stars and fireflies, while preserving financial mechanics and the single-renderer architecture.
