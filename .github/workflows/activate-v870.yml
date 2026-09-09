@@ -1,7 +1,9 @@
 name: Activate Investor DNA v8.7
 on:
   push:
-    paths: ['public/v870.js']
+    paths:
+      - 'public/v870.js'
+      - '.github/workflows/activate-v870.yml'
   workflow_dispatch:
 jobs:
   activate:
@@ -23,6 +25,7 @@ jobs:
             if s.count(anchor)!=1: raise SystemExit('SAFE ABORT: v860 anchor')
             s=s.replace(anchor,anchor+'\n'+tag,1); p.write_text(s)
           if p.read_text().count(tag)!=1: raise SystemExit('SAFE ABORT: v870 verify')
+          print('v8.7 production tag verified')
           PY
       - run: |
           git config user.name github-actions[bot]
