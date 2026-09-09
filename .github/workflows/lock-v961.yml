@@ -1,0 +1,32 @@
+name: Lock DNA renderer v9.6.1
+on:
+  push:
+    paths:
+      - '.github/workflows/lock-v961.yml'
+permissions:
+  contents: write
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keep only v9.6.1 DNA renderer
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html')
+          s=p.read_text()
+          old='<script src="/v940.js?v=9.4.1"></script><script src="/v950.js?v=9.5.0"></script><script src="/v960.js?v=9.6.0"></script><script src="/v841.js?v=8.4.1"></script>'
+          new='<script src="/v960.js?v=9.6.1"></script><script src="/v841.js?v=8.4.1"></script>'
+          if old not in s:
+              raise SystemExit('expected DNA renderer tail not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+          node --check public/v960.js
+      - name: Commit lock
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/index.html
+          git commit -m "lock DNA renderer to v9.6.1"
+          git push
