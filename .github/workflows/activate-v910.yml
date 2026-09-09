@@ -1,0 +1,34 @@
+name: Activate Investor DNA v9.1
+on:
+  push:
+    paths:
+      - 'public/v910.js'
+      - '.github/workflows/activate-v910.yml'
+  workflow_dispatch:
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - run: node --check public/v910.js
+      - name: Safe exact activation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html'); s=p.read_text()
+          tag='<script src="/v910.js?v=9.1.0"></script>'
+          anchor='<script src="/v870.js?v=9.0.0"></script>'
+          if tag not in s:
+            if s.count(anchor)!=1: raise SystemExit('SAFE ABORT: v9.0 anchor')
+            s=s.replace(anchor,anchor+'\n'+tag,1); p.write_text(s)
+          if p.read_text().count(tag)!=1: raise SystemExit('SAFE ABORT: v9.1 verify')
+          print('v9.1 verified exactly once')
+          PY
+      - run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/index.html
+          git diff --cached --quiet || (git commit -m 'activate Investor DNA v9.1' && git push)
