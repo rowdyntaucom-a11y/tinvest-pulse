@@ -1,0 +1,25 @@
+name: Activate DNA v10.2
+on:
+  push:
+    paths: ['.github/workflows/activate-v1020.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html'); s=p.read_text()
+          old='/v960.js?v=10.1.0'; new='/v960.js?v=10.2.0'
+          if old not in s: raise SystemExit('v10.1.0 script tag not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+          node --check public/v960.js
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/index.html
+          git commit -m 'activate DNA world v10.2.0'
+          git push
