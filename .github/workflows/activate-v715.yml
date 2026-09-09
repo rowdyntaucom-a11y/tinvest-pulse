@@ -1,0 +1,24 @@
+name: activate v7.15
+on:
+  push:
+    paths: ['.github/workflows/activate-v715.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          node --check public/v715.js
+          node --check public/v715hub.js
+          python3 - <<'PY'
+          p='public/index.html';s=open(p,encoding='utf-8').read();needle='<script src="/v714.js?v=7.14.1"></script>';add=needle+'<script src="/v715.js?v=7.15.0"></script><script src="/v715hub.js?v=7.15.0"></script>';assert needle in s
+          if '/v715.js?v=7.15.0' not in s:s=s.replace(needle,add,1)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m 'v7.15 activate portfolio rules'
+          git push
