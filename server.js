@@ -14,8 +14,8 @@ let html = fs.readFileSync(htmlPath, 'utf8');
 // Every historical scene renderer is removed from the production HTML.
 const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html = html.replace(legacy, '');
-html = html.replace('</body>', '<script src="/dna-game-l1.js?build=1030-server-entry-r8"></script></body>');
+html = html.replace('</body>', '<script src="/dna-game-l1.js?build=1040-game-quality-l1"></script></body>');
 fs.writeFileSync(htmlPath, html);
-process.env.TINVEST_BUILD = '10.3.0-r8';
+process.env.TINVEST_BUILD = '10.4.0';
 
 require('./server-core.js');
