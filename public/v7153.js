@@ -1,0 +1,1 @@
+(()=>{const id='payout-integrity-v7153';if(document.getElementById(id))return;const old=document.querySelector('script[data-payout-7152]');if(old)old.remove();const s=document.createElement('script');s.id=id;s.src='/v7105.js?v=7.15.3';s.async=false;document.head.appendChild(s)})();
