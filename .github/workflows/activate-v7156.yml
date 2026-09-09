@@ -1,0 +1,21 @@
+name: activate v7.15.6 preclaim
+on:
+  push:
+    paths: ['.github/workflows/activate-v7156.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          node --check public/v7106.js
+          python3 - <<'PY'
+          p='public/index.html';s=open(p,encoding='utf-8').read();old='/v7106.js?v=7.10.8';new='/v7106.js?v=7.15.6';assert old in s;s=s.replace(old,new,1);open(p,'w',encoding='utf-8').write(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m 'v7.15.6 activate passive income preclaim'
+          git push
