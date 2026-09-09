@@ -1,6 +1,6 @@
 {
   "name":"tinvest-pulse",
-  "version":"10.3.0",
+  "version":"10.2.1",
   "private":true,
   "description":"Mobile single-screen T-Invest portfolio dashboard",
   "main":"production-bootstrap.js",
