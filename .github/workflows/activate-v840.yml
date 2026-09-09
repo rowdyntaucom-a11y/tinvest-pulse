@@ -1,0 +1,32 @@
+name: Activate v8.4 2D World
+on:
+  push:
+    paths: ['.github/workflows/activate-v840.yml']
+permissions:
+  contents: write
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Activate v8.4 safely
+        run: |
+          node --check public/v840.js
+          python3 - <<'PY'
+          p='public/index.html'
+          s=open(p,encoding='utf-8').read()
+          tag='<script src="/v840.js?v=8.4.0"></script>'
+          if tag not in s:
+              pos=s.lower().rfind('</body>')
+              if pos < 0: raise SystemExit('body close not found')
+              s=s[:pos]+tag+s[pos:]
+              open(p,'w',encoding='utf-8').write(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "activate v8.4 2D world"
+          git push
