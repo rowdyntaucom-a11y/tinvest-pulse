@@ -1,0 +1,39 @@
+name: Activate Investor DNA v8.5
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'public/v850.js'
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Syntax check
+        run: node --check public/v850.js
+      - name: Activate module
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/index.html')
+          s=p.read_text()
+          tag='<script src="/v850.js?v=8.5.0"></script>'
+          if tag not in s:
+              anchor='<script src="/v840.js?v=8.4.0"></script>'
+              if anchor not in s: raise SystemExit('v840 anchor not found')
+              s=s.replace(anchor,anchor+'\n'+tag)
+          p.write_text(s)
+          PY
+      - name: Commit activation
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add public/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "activate v8.5 living world"
+          git push
