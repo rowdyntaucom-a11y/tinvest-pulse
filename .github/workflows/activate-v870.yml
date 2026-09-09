@@ -1,4 +1,4 @@
-name: Activate Investor DNA v8.7
+name: Activate Investor DNA v8.8
 on:
   push:
     paths:
@@ -14,21 +14,21 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '20'}
       - run: node --check public/v870.js
-      - name: Exact activation
+      - name: Exact cache-bust activation
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('public/index.html'); s=p.read_text()
-          tag='<script src="/v870.js?v=8.7.0"></script>'
-          anchor='<script src="/v860.js?v=8.6.0"></script>'
-          if tag not in s:
-            if s.count(anchor)!=1: raise SystemExit('SAFE ABORT: v860 anchor')
-            s=s.replace(anchor,anchor+'\n'+tag,1); p.write_text(s)
-          if p.read_text().count(tag)!=1: raise SystemExit('SAFE ABORT: v870 verify')
-          print('v8.7 production tag verified')
+          old='<script src="/v870.js?v=8.7.0"></script>'
+          new='<script src="/v870.js?v=8.8.0"></script>'
+          if new not in s:
+            if s.count(old)!=1: raise SystemExit('SAFE ABORT: v870 old tag')
+            s=s.replace(old,new,1); p.write_text(s)
+          if p.read_text().count(new)!=1: raise SystemExit('SAFE ABORT: v8.8 verify')
+          print('v8.8 cache-bust verified')
           PY
       - run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add public/index.html
-          git diff --cached --quiet || (git commit -m 'activate v8.7 local asset world' && git push)
+          git diff --cached --quiet || (git commit -m 'activate v8.8 living world' && git push)
