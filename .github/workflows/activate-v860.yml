@@ -1,7 +1,9 @@
 name: Activate Investor DNA v8.6
 on:
   push:
-    paths: ['public/v860.js']
+    paths:
+      - 'public/v860.js'
+      - '.github/workflows/activate-v860.yml'
   workflow_dispatch:
 jobs:
   activate:
