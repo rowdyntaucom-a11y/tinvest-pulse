@@ -1,0 +1,24 @@
+name: activate v7.14
+on:
+  push:
+    paths: ['.github/workflows/activate-v714.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          node --check whatif-engine.js
+          node --check public/v714.js
+          python3 - <<'PY'
+          p='public/index.html';s=open(p,encoding='utf-8').read();needle='<script src="/v7132.js?v=7.13.2"></script>';add=needle+'<script src="/v714.js?v=7.14.0"></script>';assert needle in s
+          if '/v714.js?v=7.14.0' not in s:s=s.replace(needle,add,1)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add public/index.html
+          git commit -m 'v7.14 activate resilience layer'
+          git push
