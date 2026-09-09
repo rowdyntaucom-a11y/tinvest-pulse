@@ -1,4 +1,4 @@
-name: Activate Investor DNA v8.8
+name: Activate Investor DNA v8.9
 on:
   push:
     paths:
@@ -19,16 +19,16 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           p=Path('public/index.html'); s=p.read_text()
-          old='<script src="/v870.js?v=8.7.0"></script>'
-          new='<script src="/v870.js?v=8.8.0"></script>'
+          old='<script src="/v870.js?v=8.8.0"></script>'
+          new='<script src="/v870.js?v=8.9.0"></script>'
           if new not in s:
-            if s.count(old)!=1: raise SystemExit('SAFE ABORT: v870 old tag')
+            if s.count(old)!=1: raise SystemExit('SAFE ABORT: v8.8 tag')
             s=s.replace(old,new,1); p.write_text(s)
-          if p.read_text().count(new)!=1: raise SystemExit('SAFE ABORT: v8.8 verify')
-          print('v8.8 cache-bust verified')
+          if p.read_text().count(new)!=1: raise SystemExit('SAFE ABORT: v8.9 verify')
+          print('v8.9 verified')
           PY
       - run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add public/index.html
-          git diff --cached --quiet || (git commit -m 'activate v8.8 living world' && git push)
+          git diff --cached --quiet || (git commit -m 'activate v8.9 living world' && git push)
