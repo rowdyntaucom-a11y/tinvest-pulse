@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.10.0';let raf=0;
+const V='14.11.0';let raf=0;
 function boot(){
  const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
  if(getComputedStyle(h).position==='static')h.style.position='relative';
@@ -10,7 +10,7 @@ function boot(){
  Object.assign(art.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:39,pointerEvents:'none',opacity:'0',transition:'opacity .25s ease'});
  art.onload=()=>{artReady=true;art.style.opacity='1';window.dispatchEvent(new CustomEvent('dna-art-ready',{detail:{version:V,width:art.naturalWidth,height:art.naturalHeight,source:'dom-image'}}));};
  art.onerror=()=>{artReady=false;art.style.opacity='0';console.warn('DNA art v'+V+' failed to load from same-origin source');};
- art.src='/dna-art-v148.webp?rev=14100';h.appendChild(art);
+ art.src='/dna-art-v148.webp?rev=14110';h.appendChild(art);
  const c=document.createElement('canvas');c.id='dnaWorld148';c.width=1200;c.height=680;
  Object.assign(c.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:40,pointerEvents:'none',imageRendering:'auto'});h.appendChild(c);
  const g=c.getContext('2d');g.imageSmoothingEnabled=true;const A=()=>window.DNA_GAME_ASSETS||null;
@@ -34,6 +34,7 @@ function boot(){
   R(20,286,560,4,'#6a4730');for(let x=22;x<580;x+=18)L(x,282,x+8,294,'#765039',2);
   [26,43,60,499,516,533,550].forEach(x=>crystal(x,286,.85));
  }
+ function infrastructure(){const a=A();if(!a)return;a.draw('mineExterior',22,108,112,92,{alpha:.34});a.draw('mineInterior',20,220,560,90,{alpha:.24});a.draw('supports',20,222,560,82,{alpha:.38});a.draw('railSurface',18,194,564,20,{alpha:.92});a.draw('railUnderground',18,284,564,20,{alpha:.9})}
  function resources(t){const a=A();if(a&&a.draw('orePile',58,171,37,20,{alpha:.93}))glow(77,184,19,.06,'39,226,218');crystal(49,191,.78,false);crystal(159,191,.72,true);crystal(202,286,.72,false);crystal(309,286,.8,true);crystal(507,286,.7,false)}
  function ambient(t){
   const pulse=(Math.sin(t*2.9)+1)/2;
@@ -55,9 +56,9 @@ function boot(){
   if(p>.54&&p<.78){const a=1-Math.abs(((p-.54)/.24)-.5)*2;for(let i=0;i<7;i++){const sx=281+i*4,sy=191-(i%3)*3;R(sx,sy,1.5,1.5,'#ffd15f',Math.max(0,a))}}
   const lift=80+Math.sin(t*.62)*10;L(524,92,524,lift+58,'rgba(218,180,117,.55)',.8);R(517,lift+55,15,9,'rgba(129,92,60,.82)');
  }
- function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else resources(t);ambient(t);activity(t);raf=requestAnimationFrame(frame)}
+ function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{infrastructure();resources(t)}ambient(t);activity(t);raf=requestAnimationFrame(frame)}
  cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
- setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> RESOURCES · v'+V+' · 3/11')},120)
+ setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> MINEWORKS · v'+V+' · 4/11')},120)
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 window.addEventListener('dna-game-remount',()=>setTimeout(boot,100));
