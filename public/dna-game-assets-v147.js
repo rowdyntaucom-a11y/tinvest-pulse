@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const VERSION='14.8.4';
+const VERSION='14.8.5';
 const slots={background:['sceneBase','sky','mountainsFar','mountainsNear','forest','settlement'],mine:['mineExterior','mineInterior','supports','railSurface','railUnderground'],buildings:['foundation','workshop','warehouse','crane','scaffold'],workers:['minerIdle','minerMine','haulerWalk','builderWork','operatorIdle'],logistics:['cartEmpty','cartLoaded','crate','timberStack','stoneStack'],resources:['crystalSmall','crystalLarge','orePile'],fx:['lampGlow','dust','spark','smoke','mist']};
 const art=window.DNA_ART_PACK||{};
 const manifest={version:VERSION,level:1,name:'FOUNDATION',base:'/assets/dna-world/l1/',assets:{sceneBase:art.sceneBase||'',minerIdle:'miner.svg',minerMine:'miner.svg',haulerWalk:'miner.svg',builderWork:'miner.svg',operatorIdle:'miner.svg',cartEmpty:'cart-loaded.svg',cartLoaded:'cart-loaded.svg',mineExterior:'mine-exterior.svg',mineInterior:'mine-exterior.svg',foundation:'construction.svg',scaffold:'construction.svg',workshop:'workshop.svg',warehouse:'warehouse.svg'}};
