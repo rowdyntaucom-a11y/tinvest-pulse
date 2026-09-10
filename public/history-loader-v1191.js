@@ -1,8 +1,9 @@
-// v14.1.2 — single independent history owner.
-// The history request deliberately uses XMLHttpRequest so legacy window.fetch
-// wrappers cannot intercept, clone or suppress Portfolio + IMOEX history.
+// v14.1.3 — single independent history owner.
+// Fetch history once, then apply it only after the live dashboard model exists.
 (function(){
   let started=false;
+  let pendingHistory=null;
+  let applyTimer=null;
   const MAX_ATTEMPTS=3;
   const RETRY_DELAYS=[0,8000,20000];
 
@@ -21,7 +22,7 @@
       x.onreadystatechange=function(){
         if(x.readyState!==4)return;
         let payload=null;
-        try{payload=JSON.parse(x.responseText||'null')}catch(_){ }
+        try{payload=JSON.parse(x.responseText||'null')}catch(_){}
         if(x.status>=200&&x.status<300) resolve({status:x.status,payload});
         else reject(new Error((payload&&payload.error)||`HTTP ${x.status||0}`));
       };
@@ -34,7 +35,7 @@
   async function requestHistory(attempt){
     if(RETRY_DELAYS[attempt]) await sleep(RETRY_DELAYS[attempt]);
     setHistoryMessage(attempt===0?'История загружается…':`История: повтор ${attempt}/${MAX_ATTEMPTS-1}…`);
-    const result=await xhrJSON('/api/history-debug?v=14.1.2&a='+attempt+'&t='+Date.now());
+    const result=await xhrJSON('/api/history-debug?v=14.1.3&a='+attempt+'&t='+Date.now());
     const payload=result.payload;
     if(!payload||!payload.ok||!payload.history||!payload.history.available){
       throw new Error((payload&&payload.error)||'history unavailable');
@@ -42,21 +43,40 @@
     return payload.history;
   }
 
-  function applyHistory(history){
-    // One history object owns both the chart and VS IMOEX. Merge it into the
-    // live dashboard model first, then use the application's normal renderer.
+  function tryApplyHistory(){
+    if(!pendingHistory)return false;
     let applied=false;
     try{
-      if(typeof dashboardData!=='undefined'&&dashboardData){
-        dashboardData.history=history;
-        if(typeof render==='function'){render(dashboardData);applied=true;}
+      if(typeof dashboardData!=='undefined'&&dashboardData&&typeof render==='function'){
+        dashboardData.history=pendingHistory;
+        render(dashboardData);
+        applied=true;
       }
     }catch(err){console.warn('History merge failed:',err&&err.message||err)}
     if(!applied){
-      try{if(typeof renderChart==='function'){renderChart(history);applied=true;}}catch(_){}
+      try{
+        if(typeof renderChart==='function'){
+          renderChart(pendingHistory);
+          applied=true;
+        }
+      }catch(_){}
     }
-    window.__TIN_HISTORY=history;
-    window.dispatchEvent(new CustomEvent('tinvest:history-ready',{detail:{points:(history.points||[]).length,applied}}));
+    if(applied){
+      const history=pendingHistory;
+      pendingHistory=null;
+      if(applyTimer){clearInterval(applyTimer);applyTimer=null;}
+      window.__TIN_HISTORY=history;
+      window.dispatchEvent(new CustomEvent('tinvest:history-ready',{detail:{points:(history.points||[]).length,applied:true}}));
+      return true;
+    }
+    return false;
+  }
+
+  function queueApply(history){
+    pendingHistory=history;
+    if(tryApplyHistory())return;
+    setHistoryMessage('История готова, подключаем график…');
+    if(!applyTimer) applyTimer=setInterval(tryApplyHistory,500);
   }
 
   async function loadHistory(){
@@ -66,7 +86,7 @@
     for(let attempt=0;attempt<MAX_ATTEMPTS;attempt++){
       try{
         const history=await requestHistory(attempt);
-        applyHistory(history);
+        queueApply(history);
         return;
       }catch(err){
         lastError=err;
@@ -77,6 +97,7 @@
     window.dispatchEvent(new CustomEvent('tinvest:history-error',{detail:{message:String(lastError&&lastError.message||lastError||'unknown')}}));
   }
 
+  window.addEventListener('tinvest:dashboard-live',tryApplyHistory);
   function start(){setTimeout(loadHistory,1200)}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
