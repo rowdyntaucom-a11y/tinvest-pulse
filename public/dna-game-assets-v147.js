@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const VERSION='14.7.1';
+const VERSION='14.7.2';
 const slots={
   background:['sky','mountainsFar','mountainsNear','forest','settlement'],
   mine:['mineExterior','mineInterior','supports','railSurface','railUnderground'],
@@ -9,7 +9,7 @@ const slots={
   resources:['crystalSmall','crystalLarge','orePile'],
   fx:['lampGlow','dust','spark','smoke','mist']
 };
-const manifest={version:VERSION,level:1,name:'FOUNDATION',base:'/assets/dna-world/l1/',assets:{minerIdle:'miner.svg',minerMine:'miner.svg',builderWork:'miner.svg',operatorIdle:'miner.svg',cartLoaded:'cart-loaded.svg'}};
+const manifest={version:VERSION,level:1,name:'FOUNDATION',base:'/assets/dna-world/l1/',assets:{minerIdle:'miner.svg',minerMine:'miner.svg',builderWork:'miner.svg',operatorIdle:'miner.svg',cartLoaded:'cart-loaded.svg',mineExterior:'mine-exterior.svg',foundation:'construction.svg',workshop:'workshop.svg',warehouse:'warehouse.svg'}};
 const cache=new Map();
 function urlFor(key){const rel=manifest.assets[key];return rel?manifest.base+rel:null}
 function register(next){if(!next||typeof next!=='object')return manifest;Object.assign(manifest.assets,next);return manifest}
@@ -18,6 +18,6 @@ function get(key){return cache.get(key)||null}
 function draw(ctx,key,x,y,w,h,opts={}){const img=get(key);if(!img)return false;ctx.save();ctx.globalAlpha=opts.alpha==null?1:opts.alpha;if(opts.flipX){ctx.translate(x+w,y);ctx.scale(-1,1);ctx.drawImage(img,0,0,w,h)}else ctx.drawImage(img,x,y,w,h);ctx.restore();return true}
 function status(){const keys=Object.values(slots).flat();return{version:VERSION,registered:Object.keys(manifest.assets).length,loaded:cache.size,totalSlots:keys.length,missing:keys.filter(k=>!manifest.assets[k])}}
 window.DNA_GAME_ASSETS={VERSION,slots,manifest,register,preload,get,draw,status};
-window.DNA_GAME_ASSETS.preload(['minerIdle','minerMine','builderWork','operatorIdle','cartLoaded']);
+window.DNA_GAME_ASSETS.preload(['minerIdle','minerMine','builderWork','operatorIdle','cartLoaded','mineExterior','foundation','workshop','warehouse']);
 window.dispatchEvent(new CustomEvent('dna-assets-ready',{detail:status()}));
 })();
