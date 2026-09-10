@@ -9,21 +9,17 @@ const htmlPath = path.join(__dirname, 'public', 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
 // ONE WORLD -> ONE RENDERER -> ONE UPDATE LOOP.
-const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106|dna-game-art-v107|dna-pixel-v108|dna-pixel-v109|dna-game-world-v110|dna-lighting-v111|dna-cinematic-v112|dna-daynight-v113|dna-market-weather-v114|dna-weather-alive-v115|dna-art-detail-v116|dna-environment-v117|dna-lights-life-v118|dna-foundation-v119|dna-game-art-v1110)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
+const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106|dna-game-art-v107|dna-pixel-v108|dna-pixel-v109|dna-game-world-v110|dna-lighting-v111|dna-cinematic-v112|dna-daynight-v113|dna-market-weather-v114|dna-weather-alive-v115|dna-art-detail-v116|dna-environment-v117|dna-lights-life-v118|dna-foundation-v119)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html = html.replace(legacy, '');
-const dnaBuild = '11111-safe-version-owner';
-const VERSION = 'v11.11.1';
-
-// Version ownership is CSS-only. Do not observe/rewrite the whole DOM: that can
-// starve the main dashboard render loop on mobile browsers.
-const versionCss = `<style id="dnaVersionOwner">#investorWorld{visibility:hidden!important}#investorWorld .iwTop small{font-size:0!important}#investorWorld .iwTop small::after{content:'INVESTOR DNA · ${VERSION}'!important;font-size:12px!important;letter-spacing:2px!important;color:#76978f!important}#investorWorld .dnBadge{font-size:0!important}#investorWorld .dnBadge::after{content:'FOUNDATION WORKS · ${VERSION} · 1/11'!important;font-size:9px!important;letter-spacing:.7px!important;color:#b8e8dc!important}</style>`;
-html = html.replace('</head>', versionCss + '</head>');
-const dna = '<script src="/dna-daynight-v113.js?rev='+dnaBuild+'"></script><script src="/dna-market-weather-v114.js?rev='+dnaBuild+'"></script><script src="/dna-weather-alive-v115.js?rev='+dnaBuild+'"></script><script src="/dna-art-detail-v116.js?rev='+dnaBuild+'"></script><script src="/dna-environment-v117.js?rev='+dnaBuild+'"></script><script src="/dna-lights-life-v118.js?rev='+dnaBuild+'"></script><script src="/dna-foundation-v119.js?rev='+dnaBuild+'"></script><script src="/dna-game-art-v1110.js?rev='+dnaBuild+'"></script>';
-const historyLoader = '<script src="/history-loader-v1191.js?rev='+dnaBuild+'"></script>';
-const revealWorld = `<script>(function(){function reveal(){const root=document.getElementById('investorWorld');if(!root)return false;const owner=document.getElementById('dnaVersionOwner');if(owner)owner.textContent=owner.textContent.replace('#investorWorld{visibility:hidden!important}','');root.style.visibility='visible';return true;}if(!reveal()){let n=0;const t=setInterval(function(){if(reveal()||++n>40)clearInterval(t);},50);}setTimeout(reveal,250);})();</script>`;
-html = html.replace('</body>', dna + historyLoader + revealWorld + '</body>');
+const dnaBuild = '1191-independent-history';
+const dna = '<script src="/dna-daynight-v113.js?rev='+dnaBuild+'"></script><script src="/dna-market-weather-v114.js?rev='+dnaBuild+'"></script><script src="/dna-weather-alive-v115.js?rev='+dnaBuild+'"></script><script src="/dna-art-detail-v116.js?rev='+dnaBuild+'"></script><script src="/dna-environment-v117.js?rev='+dnaBuild+'"></script><script src="/dna-lights-life-v118.js?rev='+dnaBuild+'"></script><script src="/dna-foundation-v119.js?rev='+dnaBuild+'"></script>';
+const historyLoader = '<script src="/history-loader-v1191.js?rev=1191-independent-history"></script>';
+// Final owner for the two visible DNA version labels. This intentionally runs
+// after all DNA layers, so legacy decorators cannot repaint an older version.
+const versionLock = `<script>(function(){const V='v11.9.1';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length) return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|LIGHTS & DETAIL|LIGHTS & LIFE)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}lock();setTimeout(lock,250);setTimeout(lock,1000);window.addEventListener('tinvest:dashboard-live',lock);window.addEventListener('tinvest:history-ready',lock);})();</script>`;
+html = html.replace('</body>', dna + historyLoader + versionLock + '</body>');
 fs.writeFileSync(htmlPath, html);
-process.env.TINVEST_BUILD = '11.11.1';
+process.env.TINVEST_BUILD = '11.9.1';
 
 // Stable live-dashboard behaviour: live portfolio data never waits for
 // per-instrument metadata or historical candle reconstruction.
