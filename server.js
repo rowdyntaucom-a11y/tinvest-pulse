@@ -11,13 +11,16 @@ let html = fs.readFileSync(htmlPath, 'utf8');
 // ONE WORLD -> ONE RENDERER -> ONE UPDATE LOOP.
 const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106|dna-game-art-v107|dna-pixel-v108|dna-pixel-v109|dna-game-world-v110|dna-lighting-v111|dna-cinematic-v112|dna-daynight-v113|dna-market-weather-v114|dna-weather-alive-v115|dna-art-detail-v116|dna-environment-v117|dna-lights-life-v118|dna-foundation-v119|dna-game-art-v1110)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html = html.replace(legacy, '');
-const dnaBuild = '11100-game-art';
+const dnaBuild = '11101-no-flash';
+// Hide only DNA while the final renderer stack mounts. This prevents cached/legacy
+// markup from being painted for a frame during startup.
+html = html.replace('</head>', '<style id="dnaBootGuard">#investorWorld{visibility:hidden!important}</style></head>');
 const dna = '<script src="/dna-daynight-v113.js?rev='+dnaBuild+'"></script><script src="/dna-market-weather-v114.js?rev='+dnaBuild+'"></script><script src="/dna-weather-alive-v115.js?rev='+dnaBuild+'"></script><script src="/dna-art-detail-v116.js?rev='+dnaBuild+'"></script><script src="/dna-environment-v117.js?rev='+dnaBuild+'"></script><script src="/dna-lights-life-v118.js?rev='+dnaBuild+'"></script><script src="/dna-foundation-v119.js?rev='+dnaBuild+'"></script><script src="/dna-game-art-v1110.js?rev='+dnaBuild+'"></script>';
-const historyLoader = '<script src="/history-loader-v1191.js?rev=11100-game-art"></script>';
-const versionLock = `<script>(function(){const V='v11.10.0';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length) return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|GAME ART|LIGHTS & DETAIL|LIGHTS & LIFE)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}lock();setTimeout(lock,250);setTimeout(lock,1000);window.addEventListener('tinvest:dashboard-live',lock);window.addEventListener('tinvest:history-ready',lock);})();</script>`;
+const historyLoader = '<script src="/history-loader-v1191.js?rev=11101-no-flash"></script>';
+const versionLock = `<script>(function(){const V='v11.10.1';function lock(){const root=document.getElementById('investorWorld')||document;root.querySelectorAll('*').forEach(function(el){if(el.children.length) return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|GAME ART|LIGHTS & DETAIL|LIGHTS & LIFE)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}function reveal(){lock();const guard=document.getElementById('dnaBootGuard');if(guard)guard.remove();const root=document.getElementById('investorWorld');if(root)root.style.visibility='visible';}lock();setTimeout(reveal,80);setTimeout(lock,250);setTimeout(lock,700);setInterval(lock,1500);window.addEventListener('tinvest:dashboard-live',lock);window.addEventListener('tinvest:history-ready',lock);})();</script>`;
 html = html.replace('</body>', dna + historyLoader + versionLock + '</body>');
 fs.writeFileSync(htmlPath, html);
-process.env.TINVEST_BUILD = '11.10.0';
+process.env.TINVEST_BUILD = '11.10.1';
 
 // Stable live-dashboard behaviour: live portfolio data never waits for
 // per-instrument metadata or historical candle reconstruction.
