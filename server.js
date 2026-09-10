@@ -10,11 +10,11 @@ const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|
 html = html.replace(legacy, '');
 const dnaBuild = '1400-cinematic';
 const dna = '<script src="/dna-world-engine-v140.js?rev='+dnaBuild+'"></script>';
-const historyLoader = '<script src="/history-loader-v1191.js?rev=1192-resilient-history"></script>';
-const versionLock = `<script>(function(){const V='v14.0.0';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length)return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|LIGHTS & DETAIL|LIGHTS & LIFE|LIVING MARKET)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}lock();setTimeout(lock,250);setTimeout(lock,1000);window.addEventListener('tinvest:dashboard-live',lock);window.addEventListener('tinvest:history-ready',lock);})();</script>`;
+const historyLoader = '<script src="/history-loader-v1191.js?rev=1401-live-event"></script>';
+const versionLock = `<script>(function(){const V='v14.0.1';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length)return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|LIGHTS & DETAIL|LIGHTS & LIFE|LIVING MARKET)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}lock();setTimeout(lock,250);setTimeout(lock,1000);window.addEventListener('tinvest:dashboard-live',lock);window.addEventListener('tinvest:history-ready',lock);})();</script>`;
 html = html.replace('</body>', dna + historyLoader + versionLock + '</body>');
 fs.writeFileSync(htmlPath, html);
-process.env.TINVEST_BUILD = '14.0.0';
+process.env.TINVEST_BUILD = '14.0.1';
 
 const corePath = path.join(__dirname, 'server-core.js');
 let core = fs.readFileSync(corePath, 'utf8');
