@@ -1,4 +1,4 @@
-// v14.2.0 — ONE HISTORY OWNER. No dependency on legacy app events or fetch wrappers.
+// v14.2.1 — single history owner: clean overlay + trading-day aligned IMOEX.
 (function(){
   'use strict';
   if(window.__TIN_HISTORY_V142)return;
@@ -7,26 +7,32 @@
   const state={history:null,chart:null,mode:'growth'};
   const shortDate=d=>d?new Date(d).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'}):'';
   function message(t){const e=$('chartEmpty');if(e){e.textContent=t;e.style.display='flex';}}
+  function clearMessage(){const e=$('chartEmpty');if(e){e.textContent='';e.style.display='none';e.hidden=true;}}
   function series(points,key){return (points||[]).map(p=>({date:p.date,value:Number(p&&p[key])})).filter(x=>Number.isFinite(x.value)&&x.value>0)}
+  function alignedMoex(points){
+    const raw=series(points,'imoex'); if(!raw.length)return [];
+    const byDate=new Map(raw.map(x=>[x.date,x.value])); let last=null;
+    return (points||[]).map(p=>{if(byDate.has(p.date))last=byDate.get(p.date);return {date:p.date,value:last};}).filter(x=>Number.isFinite(x.value)&&x.value>0);
+  }
   function vsMoex(h){
-    const p=series(h.points,'portfolio'),m=series(h.points,'imoex'); let vs=null;
-    if(p.length>1&&m.length>1)vs=((p[p.length-1].value/p[0].value-1)-(m[m.length-1].value/m[0].value-1))*100;
+    const p=series(h.points,'portfolio'),m=alignedMoex(h.points); let vs=null;
+    if(p.length>1&&m.length>1){const startDate=m[0].date;const pp=p.filter(x=>x.date>=startDate);if(pp.length>1)vs=((pp[pp.length-1].value/pp[0].value-1)-(m[m.length-1].value/m[0].value-1))*100;}
     const e=$('vsMoex'),c=$('vsMoexCaption');
     if(e)e.textContent=vs==null?'—':(vs>=0?'+':'')+vs.toFixed(2).replace('.',',')+' п.п.';
     if(c)c.textContent=vs==null?'ждём индекс':vs>=0?'обгоняем индекс':'отстаём от индекса';
   }
   function draw(h){
     state.history=h; vsMoex(h);
-    const p=series(h.points,'portfolio'),m=series(h.points,'imoex');
+    const p=series(h.points,'portfolio'),m=alignedMoex(h.points);
     if(p.length<2){message('История временно недоступна');return;}
-    const empty=$('chartEmpty');if(empty)empty.style.display='none';
+    clearMessage();
     if(state.chart){state.chart.destroy();state.chart=null;}
     if(typeof Chart==='undefined'||!$('chart')){message('График временно недоступен');return;}
     const labels=p.map(x=>shortDate(x.date)); const mm=new Map(m.map(x=>[x.date,x.value]));
     let datasets=[];
     if(state.mode==='growth')datasets=[
       {label:'Портфель',data:p.map(x=>x.value),borderColor:'#54f6c5',backgroundColor:'rgba(84,246,197,.07)',borderWidth:2.7,pointRadius:0,tension:.25,fill:true},
-      {label:'IMOEX',data:p.map(x=>mm.has(x.date)?mm.get(x.date):null),borderColor:'#8290a7',borderWidth:1.7,pointRadius:0,tension:.2,spanGaps:true,fill:false}
+      {label:'IMOEX',data:p.map(x=>mm.has(x.date)?mm.get(x.date):null),borderColor:'#8290a7',borderWidth:1.9,pointRadius:0,tension:.2,spanGaps:true,fill:false}
     ];
     else {
       const vals=new Map((h.valuePoints||[]).map(x=>[x.date,Number(x.value)]));
@@ -35,11 +41,11 @@
       else datasets=[{label:'Прибыль',data:p.map(x=>vals.has(x.date)&&inv.has(x.date)?vals.get(x.date)-inv.get(x.date):null),borderColor:'#54f6c5',backgroundColor:'rgba(84,246,197,.08)',borderWidth:2.6,pointRadius:0,tension:.2,spanGaps:true,fill:true}];
     }
     state.chart=new Chart($('chart'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'#7e8b86',maxTicksLimit:4}}}}});
+    clearMessage();
   }
   function load(){
     message('История загружается…');
-    const x=new XMLHttpRequest();
-    x.open('GET','/api/history-debug?owner=v142&t='+Date.now(),true);x.timeout=90000;
+    const x=new XMLHttpRequest();x.open('GET','/api/history-debug?owner=v1421&t='+Date.now(),true);x.timeout=90000;
     x.onload=function(){try{const p=JSON.parse(x.responseText||'null');if(x.status>=200&&x.status<300&&p&&p.ok&&p.history&&p.history.available){draw(p.history);return}}catch(_){}message('История временно недоступна')};
     x.onerror=x.ontimeout=function(){message('История временно недоступна')};x.send(null);
   }
