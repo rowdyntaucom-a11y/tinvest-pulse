@@ -52,7 +52,9 @@ Capital controls **world development**, while real local time controls **world s
 Technical direction: do not migrate the whole application. Keep Node/Express, T-Bank integration, Render and existing financial screens. Replace/evolve only the DNA WORLD renderer. First quality gate remains reference-quality Level 1 `ФУНДАМЕНТ` before scaling to Levels 2–11.
 
 ## 8. Current production state — 2026-09-10
-Financial dashboard remains healthy. Current production is **v14.7.3**. `public/dna-world-engine-v141.js` remains the single production renderer. `public/dna-game-assets-v147.js` is the external asset registry/pipeline and currently contains temporary SVG mappings plus role aliases for workers/carts/buildings. v14.7.3 proves the technical animation/state pipeline (`ДОБЫЧА → ДОСТАВКА → СТРОЙКА`, moving cart, workers, crane, sparks) but the temporary SVG visual layer is intentionally considered below target quality.
+Financial dashboard remains healthy. Current production checkpoint is **v14.8.1 ATMOSPHERIC DNA ART**. `public/dna-world-engine-v141.js` remains the single production renderer and `public/dna-game-assets-v147.js` remains the single asset registry. The approved atmospheric scene is now packaged in `public/dna-art-scene-v148.js` as a WebP data asset and is injected **before** the registry, so `sceneBase` is available during preload. The server wrapper was bumped to v14.8.1 and all DNA asset/renderer URLs use `rev=1481` for cache busting.
+
+Important bug fixed during this checkpoint: v14.8.0 files had been committed and Render deployed them, but `server.js` still injected only the old v14.7.3 script set and version lock. That meant the new scene art could exist in GitHub without actually entering the production dependency chain. v14.8.1 fixes the production order explicitly: `history → dna-art-scene-v148 → dna-game-assets-v147 → dna-world-engine-v141 → version lock`.
 
 The user approved a new high-quality art direction generated during GAME ASSET PASS. Two cohesive asset-sheet images were created/approved: (1) environment/world assets with mountains, forest, distant illuminated city/castle, mine entrance, construction, workshop, warehouse, crane, rail/tunnel/materials; (2) character/prop assets with detailed miner roles, carts, cyan crystals, masonry, logs, crates, barrels, lamps, smoke, glow/particles and crane/rail props. This art direction is now the preferred visual basis; do not revert to simplistic geometric SVG as the intended final look.
 
@@ -64,12 +66,12 @@ Figma subscription now reports tier **`student`** for `Роман's team` (`team
 Thresholds: `0, 100k, 250k, 500k, 1m, 2.5m, 5m, 10m, 25m, 50m, 100m RUB`, mapping to 11 levels. Historical names: 1 ФУНДАМЕНТ, 2 ДОМ, 3 МАСТЕРСКАЯ, 4 УСАДЬБА, 5 КАПИТАЛЬНЫЙ ДОМ, 6 БАШНЯ, 7 КРЕПОСТЬ, 8 ЦИТАДЕЛЬ, 9 ГОРОД, 10 ИМПЕРИЯ, 11 ЛЕГЕНДА. Names/art can evolve if a stronger coherent progression is designed.
 
 ## 10. Implemented vs remaining
-Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; independent history/IMOEX loading architecture; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; real-time day/night; market-weather; environment/lights/detail layers; stable production-owned version labels; mine→cart→delivery animation loop; external game-asset registry/pipeline; role-aware worker/logistics animation state machine; approved reference-quality art direction and first coherent environment/character asset sheets.
+Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; independent history/IMOEX loading architecture; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; real-time day/night; market-weather; environment/lights/detail layers; stable production-owned version labels; mine→cart→delivery animation loop; external game-asset registry/pipeline; role-aware worker/logistics animation state machine; approved reference-quality art direction; first coherent environment/character asset sheets; atmospheric sceneBase packaged and wired into production; cache-safe v14.8.1 release ordering.
 
-Remaining priorities: convert the approved high-quality art sheets into production-ready transparent PNG/WebP sprites/layers; create DNA Art JS chunks or equivalent efficient asset modules; map them into `dna-game-assets-v147.js`; replace temporary SVG primitives asset-by-asset while preserving fallback safety; progressive construction tied continuously to capital; distinct evolution across 11 levels; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
+Remaining priorities: validate v14.8.1 visually on the user's Samsung/Android device; then split the approved art into more independent production-ready transparent PNG/WebP sprites/layers instead of relying mainly on one baked sceneBase; replace temporary SVG worker/cart fallbacks with real detailed animated sprites; tie visible construction progress continuously to capital; build distinct evolution across Levels 2–11; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
 
 ## 11. Development/deployment architecture
-Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. Important files: `server.js`, `server-core.js`, `public/index.html`, historical `public/v*.js`, `public/dna-world-engine-v141.js` (single production world renderer), `public/dna-game-assets-v147.js` (asset registry/pipeline), `production-bootstrap.js`, `render.yaml`, `package.json`, `PROJECT_CONTEXT.md`. Do not confuse root historical `index.html` with served `public/index.html`.
+Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. Important files: `server.js`, `server-core.js`, `public/index.html`, historical `public/v*.js`, `public/dna-world-engine-v141.js` (single production world renderer), `public/dna-game-assets-v147.js` (asset registry/pipeline), `public/dna-art-scene-v148.js` (approved atmospheric sceneBase), `production-bootstrap.js`, `render.yaml`, `package.json`, `PROJECT_CONTEXT.md`. Do not confuse root historical `index.html` with served `public/index.html`.
 
 ## 12. Working agreement
 Normal feature rhythm: assistant analyzes/proposes next step → user says `Ок`/correction → assistant implements, tests, commits and pushes to `main` without asking again → user sends production screenshot → if good, discuss next step and await next `Ок`.
@@ -82,18 +84,10 @@ New chat: read `PROJECT_CONTEXT.md`; inspect current `main` and recent commits; 
 ## 14. Safety / secrets
 Never commit T-Bank API token/credentials. Keep secrets in Render/environment variables. Avoid exposing account identifiers/secrets.
 
-## 15. Immediate next milestone — resume point after interrupted work
-The last attempted implementation was interrupted after the approved high-quality art sheets were created. Work had reached: **compressed game assets / prepared Base64 image chunks → start of `DNA Art` JavaScript chunk creation**. The intended pipeline was not finished and was not integrated into production.
+## 15. Immediate next milestone
+**Validate v14.8.1 on production first.** Render shows the release commit live and the service starts successfully with the Russian Trusted CA and the existing history warmup. The next human checkpoint is the user's Samsung screenshot of DNA WORLD. Confirm that the header/badge both show v14.8.1, the new atmospheric world is actually visible, live capital/profit/level cards remain correct, and the page remains responsive.
 
-Resume exactly here:
-1. preserve v14.7.3 finance/history and single-renderer behavior;
-2. prepare efficient production assets from the approved art sheets (transparent PNG/WebP or chunked image modules; avoid huge unbounded Base64 payloads if file assets are cleaner);
-3. create/register DNA Art asset modules;
-4. update `public/dna-game-assets-v147.js` manifest to point to the new real art;
-5. make `public/dna-world-engine-v141.js` draw the approved art while keeping Canvas/SVG fallback until validated;
-6. test mobile sizing/performance and visual composition;
-7. commit/push to `main`, let Render deploy, then validate with the user's Samsung screenshot;
-8. only after Level 1 passes the visual quality gate, expand to the remaining animation states and Levels 2–11.
+If that passes, continue the GAME ASSET PASS by decomposing the baked art into independent layers/sprites: background depth, mine, workshop/warehouse, construction/foundation, crane, workers, carts, crystals/resources, light/FX. Preserve Canvas fallbacks until each replacement group is visually validated. Do not expand Levels 2–11 until Level 1 reaches the visual quality gate.
 
 ## 16. Continuity / project memory policy
 The user explicitly asks that **requirements, wishes, plans, ideas, approved/rejected visual directions, architecture constraints, bug lessons, workflow decisions and current resume point** be preserved so a new chat can continue without re-explaining the project.
