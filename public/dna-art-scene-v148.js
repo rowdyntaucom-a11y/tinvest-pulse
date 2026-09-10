@@ -1,1 +1,1 @@
-(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='https://cdn.openart.ai/watermarked_images/hKZ2IytfR0LUReIZ7bbF/thumbnail_a9b438ee_1789042825922.webp';window.DNA_ART_PACK.version='14.8.3';})();
+(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='/dna-art-v148.webp?rev=1484';window.DNA_ART_PACK.version='14.8.4';})();
