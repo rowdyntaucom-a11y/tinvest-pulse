@@ -5,16 +5,16 @@ const Module = require('module');
 const htmlPath = path.join(__dirname, 'public', 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
-// DNA WORLD v14.1: richer cinematic Level 1 environment; one production renderer only.
+// DNA WORLD v14.1.1: keep Level 1 renderer stable while history ownership is fixed.
 const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106|dna-game-art-v107|dna-pixel-v108|dna-pixel-v109|dna-game-world-v110|dna-lighting-v111|dna-cinematic-v112|dna-daynight-v113|dna-market-weather-v114|dna-weather-alive-v115|dna-art-detail-v116|dna-environment-v117|dna-lights-life-v118|dna-foundation-v119|dna-game-quality-v120|dna-characters-depth-v121|dna-character-art-v122|dna-game-art-v123|dna-art-direction-v124|dna-game-art-v125|dna-scene-composition-v126|dna-depth-underground-v127|dna-game-art-v128|dna-character-material-v129|dna-art-reset-v130|dna-scene-composition-v131|dna-material-architecture-v132|dna-art-clarity-v133|dna-character-world-art-v134|dna-scene-hierarchy-v135|dna-visual-story-v136|dna-clean-scene-v137|dna-world-engine-v138|dna-world-engine-v139|dna-world-engine-v140|dna-world-engine-v141)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html = html.replace(legacy, '');
-const dnaBuild = '1410-environment';
+const dnaBuild = '1411-history-stable';
 const dna = '<script src="/dna-world-engine-v141.js?rev='+dnaBuild+'"></script>';
-const historyLoader = '<script src="/history-loader-v1191.js?rev=1401-live-event"></script>';
-const versionLock = `<script>(function(){const V='v14.1.0';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length)return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|LIGHTS & DETAIL|LIGHTS & LIFE|LIVING MARKET)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}lock();setTimeout(lock,250);setTimeout(lock,1000);window.addEventListener('tinvest:dashboard-live',lock);window.addEventListener('tinvest:history-ready',lock);})();</script>`;
+const historyLoader = '<script src="/history-loader-v1191.js?rev=1411-independent-start"></script>';
+const versionLock = `<script>(function(){const V='v14.1.1';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length)return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|LIGHTS & DETAIL|LIGHTS & LIFE|LIVING MARKET)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}lock();setTimeout(lock,250);setTimeout(lock,1000);window.addEventListener('tinvest:dashboard-live',lock);window.addEventListener('tinvest:history-ready',lock);})();</script>`;
 html = html.replace('</body>', dna + historyLoader + versionLock + '</body>');
 fs.writeFileSync(htmlPath, html);
-process.env.TINVEST_BUILD = '14.1.0';
+process.env.TINVEST_BUILD = '14.1.1';
 
 const corePath = path.join(__dirname, 'server-core.js');
 let core = fs.readFileSync(corePath, 'utf8');
