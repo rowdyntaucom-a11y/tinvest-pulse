@@ -11,20 +11,19 @@ let html = fs.readFileSync(htmlPath, 'utf8');
 // ONE WORLD -> ONE RENDERER -> ONE UPDATE LOOP.
 const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106|dna-game-art-v107|dna-pixel-v108|dna-pixel-v109|dna-game-world-v110|dna-lighting-v111|dna-cinematic-v112|dna-daynight-v113|dna-market-weather-v114|dna-weather-alive-v115|dna-art-detail-v116|dna-environment-v117|dna-lights-life-v118|dna-foundation-v119|dna-game-art-v1110)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html = html.replace(legacy, '');
-const dnaBuild = '11110-living-logistics-version-owner';
-const VERSION = 'v11.11.0';
+const dnaBuild = '11111-safe-version-owner';
+const VERSION = 'v11.11.1';
 
-// Production is the only owner of visible DNA version labels.
-// Hide the world until the authoritative version has been painted, preventing
-// old renderer labels from flashing during late mounts.
+// Version ownership is CSS-only. Do not observe/rewrite the whole DOM: that can
+// starve the main dashboard render loop on mobile browsers.
 const versionCss = `<style id="dnaVersionOwner">#investorWorld{visibility:hidden!important}#investorWorld .iwTop small{font-size:0!important}#investorWorld .iwTop small::after{content:'INVESTOR DNA · ${VERSION}'!important;font-size:12px!important;letter-spacing:2px!important;color:#76978f!important}#investorWorld .dnBadge{font-size:0!important}#investorWorld .dnBadge::after{content:'FOUNDATION WORKS · ${VERSION} · 1/11'!important;font-size:9px!important;letter-spacing:.7px!important;color:#b8e8dc!important}</style>`;
 html = html.replace('</head>', versionCss + '</head>');
 const dna = '<script src="/dna-daynight-v113.js?rev='+dnaBuild+'"></script><script src="/dna-market-weather-v114.js?rev='+dnaBuild+'"></script><script src="/dna-weather-alive-v115.js?rev='+dnaBuild+'"></script><script src="/dna-art-detail-v116.js?rev='+dnaBuild+'"></script><script src="/dna-environment-v117.js?rev='+dnaBuild+'"></script><script src="/dna-lights-life-v118.js?rev='+dnaBuild+'"></script><script src="/dna-foundation-v119.js?rev='+dnaBuild+'"></script><script src="/dna-game-art-v1110.js?rev='+dnaBuild+'"></script>';
 const historyLoader = '<script src="/history-loader-v1191.js?rev='+dnaBuild+'"></script>';
-const versionLock = `<script>(function(){const V='${VERSION}',re=/v\\d+\\.\\d+\\.\\d+/gi;let revealed=false;function normalize(){const root=document.getElementById('investorWorld');if(!root)return false;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){const t=n.nodeValue||'';re.lastIndex=0;if(re.test(t)){re.lastIndex=0;n.nodeValue=t.replace(re,V);}re.lastIndex=0;}if(!revealed){const owner=document.getElementById('dnaVersionOwner');if(owner)owner.textContent=owner.textContent.replace('#investorWorld{visibility:hidden!important}','');root.style.visibility='visible';revealed=true;}return true;}const obs=new MutationObserver(normalize);obs.observe(document.documentElement,{subtree:true,childList:true,characterData:true});let tries=0;const boot=setInterval(function(){normalize();if(++tries>40)clearInterval(boot);},50);requestAnimationFrame(function(){requestAnimationFrame(normalize);});setTimeout(normalize,250);setTimeout(normalize,1000);window.addEventListener('tinvest:dashboard-live',normalize);window.addEventListener('tinvest:history-ready',normalize);})();</script>`;
-html = html.replace('</body>', dna + historyLoader + versionLock + '</body>');
+const revealWorld = `<script>(function(){function reveal(){const root=document.getElementById('investorWorld');if(!root)return false;const owner=document.getElementById('dnaVersionOwner');if(owner)owner.textContent=owner.textContent.replace('#investorWorld{visibility:hidden!important}','');root.style.visibility='visible';return true;}if(!reveal()){let n=0;const t=setInterval(function(){if(reveal()||++n>40)clearInterval(t);},50);}setTimeout(reveal,250);})();</script>`;
+html = html.replace('</body>', dna + historyLoader + revealWorld + '</body>');
 fs.writeFileSync(htmlPath, html);
-process.env.TINVEST_BUILD = '11.11.0';
+process.env.TINVEST_BUILD = '11.11.1';
 
 // Stable live-dashboard behaviour: live portfolio data never waits for
 // per-instrument metadata or historical candle reconstruction.
