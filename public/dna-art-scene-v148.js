@@ -1,1 +1,1 @@
-(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='/dna-art-v148.webp?rev=1485';window.DNA_ART_PACK.version='14.8.5';})();
+(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='/dna-art-v148.webp?rev=1486';window.DNA_ART_PACK.version='14.8.6';})();
