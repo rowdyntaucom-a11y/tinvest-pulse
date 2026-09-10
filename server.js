@@ -1,20 +1,33 @@
 const fs = require('fs');
 const path = require('path');
+const Module = require('module');
 
-// Render service currently starts `node server.js` directly.
-// Keep the original application server byte-for-byte in server-core.js and
-// use this tiny entrypoint only to prepare the DNA WORLD HTML before Express
-// serves public/index.html.
+// Render starts `node server.js`. Keep server-core.js as the canonical app and
+// apply only narrow production guards here so the stable dashboard path is not
+// blocked by history/metadata enrichment.
 const htmlPath = path.join(__dirname, 'public', 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
 // ONE WORLD -> ONE RENDERER -> ONE UPDATE LOOP.
-// Stable financial core stays untouched; DNA evolution happens inside the existing renderer/layers.
 const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106|dna-game-art-v107|dna-pixel-v108|dna-pixel-v109|dna-game-world-v110|dna-lighting-v111|dna-cinematic-v112|dna-daynight-v113|dna-market-weather-v114|dna-weather-alive-v115|dna-art-detail-v116|dna-environment-v117|dna-lights-life-v118|dna-foundation-v119)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html = html.replace(legacy, '');
-const dnaBuild = '1190-label-clean-c20aed5';
-html = html.replace('</body>', '<script src="/dna-daynight-v113.js?rev='+dnaBuild+'"></script><script src="/dna-market-weather-v114.js?rev='+dnaBuild+'"></script><script src="/dna-weather-alive-v115.js?rev='+dnaBuild+'"></script><script src="/dna-art-detail-v116.js?rev='+dnaBuild+'"></script><script src="/dna-environment-v117.js?rev='+dnaBuild+'"></script><script src="/dna-lights-life-v118.js?rev='+dnaBuild+'"></script><script src="/dna-foundation-v119.js?rev='+dnaBuild+'"></script></body>');
+const dnaBuild = '1190-stable-data-version-lock-131f01a';
+const dna = '<script src="/dna-daynight-v113.js?rev='+dnaBuild+'"></script><script src="/dna-market-weather-v114.js?rev='+dnaBuild+'"></script><script src="/dna-weather-alive-v115.js?rev='+dnaBuild+'"></script><script src="/dna-art-detail-v116.js?rev='+dnaBuild+'"></script><script src="/dna-environment-v117.js?rev='+dnaBuild+'"></script><script src="/dna-lights-life-v118.js?rev='+dnaBuild+'"></script><script src="/dna-foundation-v119.js?rev='+dnaBuild+'"></script>';
+// Final owner for the two visible DNA version labels. This intentionally runs
+// after all DNA layers, so legacy decorators cannot repaint v11.6/v11.7.
+const versionLock = `<script>(function(){const V='v11.9.0';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length) return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);if(/(?:FOUNDATION WORKS|LIGHTS & DETAIL|LIGHTS & LIFE)\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});}lock();setTimeout(lock,250);setTimeout(lock,1000);window.addEventListener('tinvest:dashboard-live',lock);})();</script>`;
+html = html.replace('</body>', dna + versionLock + '</body>');
 fs.writeFileSync(htmlPath, html);
 process.env.TINVEST_BUILD = '11.9.0';
 
-require('./server-core.js');
+// Restore the proven stable live-dashboard behaviour: live portfolio data must
+// never wait for per-instrument metadata or historical candle reconstruction.
+const corePath = path.join(__dirname, 'server-core.js');
+let core = fs.readFileSync(corePath, 'utf8');
+core = core.replace(/\n  \/\/ Enrich a small number of positions with instrument names\.[\s\S]*?\n  const portfolioValue =/, '\n  // Production: portfolio payload already contains everything needed for the live dashboard.\n  // Instrument-name enrichment is deliberately skipped here to avoid T-Bank 429 bursts.\n  const portfolioValue =');
+core = core.replace(/\n  let history = \{ available: false, points: \[\], reason: 'not_built' \};\n  try \{\n    history = await buildPortfolioHistory\(account\.id, executed, firstInvestment, portfolioValue\);\n  \} catch \(err\) \{\n    console\.warn\('Portfolio history build failed:', err\.message\);\n  \}/, "\n  // History is intentionally detached from the live dashboard response.\n  // The existing client can keep its last good chart while live values remain responsive.\n  const history = { available: false, points: [], reason: 'deferred' };");
+
+const mod = new Module(corePath, module);
+mod.filename = corePath;
+mod.paths = Module._nodeModulePaths(path.dirname(corePath));
+mod._compile(core, corePath);
