@@ -1,1 +1,43 @@
-(()=>{'use strict';const V='14.7.3';let raf=0;function boot(){const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);h.querySelectorAll('canvas,svg').forEach(e=>e.style.display='none');const c=document.createElement('canvas');c.id='dnaWorld147';c.width=600;c.height=340;Object.assign(c.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:40,pointerEvents:'none',imageRendering:'pixelated'});h.appendChild(c);const g=c.getContext('2d');g.imageSmoothingEnabled=false;const A=()=>window.DNA_GAME_ASSETS||null,R=(x,y,w,z,k,a=1)=>{g.globalAlpha=a;g.fillStyle=k;g.fillRect(x|0,y|0,w|0,z|0);g.globalAlpha=1},P=(p,k,a=1)=>{g.globalAlpha=a;g.fillStyle=k;g.beginPath();g.moveTo(...p[0]);p.slice(1).forEach(q=>g.lineTo(...q));g.closePath();g.fill();g.globalAlpha=1},L=(x,y,a,b,k,w=1)=>{g.strokeStyle=k;g.lineWidth=w;g.beginPath();g.moveTo(x,y);g.lineTo(a,b);g.stroke()};function glow(x,y,r=28,a=.4){let q=g.createRadialGradient(x,y,1,x,y,r);q.addColorStop(0,`rgba(255,183,75,${a})`);q.addColorStop(.35,`rgba(255,153,54,${a*.35})`);q.addColorStop(1,'rgba(255,130,20,0)');g.fillStyle=q;g.fillRect(x-r,y-r,r*2,r*2)}function lamp(x,y,t=0){glow(x,y,29,.31+.06*Math.sin(t*7+x));R(x-3,y-6,7,8,'#a7662d');R(x-2,y-5,5,6,'#ffd15f');R(x-1,y-4,3,3,'#fff7b2');R(x,y+2,2,10,'#4d3224')}function crystal(x,y,s=1){P([[x,y],[x+3*s,y-12*s],[x+8*s,y-19*s],[x+11*s,y]],'#58eadf');P([[x+8*s,y],[x+13*s,y-12*s],[x+17*s,y-17*s],[x+20*s,y]],'#18aaa8')}function timber(x,y,w,z){R(x,y,w,z,'#422a20');R(x+1,y+1,w-2,2,'#a16a3e')}function worker(x,y,t,role='minerIdle',flip=false){let a=A();if(a&&a.draw(role,x-12,y-48,27,49,{flipX:flip}))return;R(x-6,y-28,12,9,'#c88b63');R(x-8,y-19,16,19,'#248d88')}function cart(x,y,load){let a=A(),key=load?'cartLoaded':'cartEmpty';if(a&&a.draw(key,x-3,y-31,50,29))return;R(x,y-19,42,18,'#593725');for(let q of[x+9,x+33]){g.fillStyle='#0b1110';g.beginPath();g.arc(q,y+3,6,0,7);g.fill()}}function sky(){let q=g.createLinearGradient(0,0,0,205);q.addColorStop(0,'#02091a');q.addColorStop(.52,'#0d2d46');q.addColorStop(1,'#28524b');g.fillStyle=q;g.fillRect(0,0,600,205);g.fillStyle='#f2dda0';g.beginPath();g.arc(493,31,18,0,7);g.fill();for(let i=0;i<7;i++)P([[i*112-100,157],[i*112+25,39+(i%3)*17],[i*112+145,157]],i%2?'#0b2138':'#071a31');for(let i=0;i<9;i++)P([[i*82-70,177],[i*82+17,87+(i%3)*12],[i*82+105,177]],i%2?'#11333c':'#0d2a34')}function sceneAsset(key,x,y,w,h,fallback){let a=A();if(a&&a.draw(key,x,y,w,h))return true;fallback&&fallback();return false}function mine(t){sceneAsset('mineExterior',0,30,174,166,()=>{P([[0,196],[7,91],[48,45],[98,53],[150,107],[146,196]],'#30231f');R(25,109,100,87,'#060d0d')});lamp(36,136,t)}function building(t){sceneAsset('foundation',218,52,190,145,()=>{for(let x=235;x<=393;x+=24)timber(x,74,5,123)});lamp(256,138,t)}function shop(t){sceneAsset('workshop',392,69,105,127,()=>R(400,120,86,76,'#142f2b'));sceneAsset('warehouse',486,119,91,77,()=>R(490,148,82,48,'#10231f'));lamp(475,142,t)}function crane(t,phase){timber(391,51,8,145);timber(391,51,130,8);let active=phase>.48&&phase<.78,lift=active?72+Math.sin((phase-.48)/.30*Math.PI)*58:91;L(498,59,498,lift,'#b59a72',1);R(488,lift,21,13,'#785038')}function underground(t){R(0,194,600,10,'#67432e');R(0,211,600,129,'#020c0c');for(let x=31;x<574;x+=69){timber(x,221,6,74);timber(x-13,219,87,6);L(x+3,226,x+54,292,'#34271f',2)}L(17,289,575,289,'#65452f',3);L(17,302,575,302,'#65452f',3);for(let x=18;x<100;x+=22)crystal(x,286,.8);for(let x=500;x<585;x+=22)crystal(x,286,.8);lamp(153,235,t);lamp(390,235,t)}function frame(ms){if(!document.body.contains(c))return;let t=ms/1000,p=(t%20)/20;g.clearRect(0,0,600,340);sky();mine(t);building(t);shop(t);crane(t,p);underground(t);let wx=112,cx=165,loaded=false,role='minerMine';if(p<.18){wx=108+Math.sin(t*3)*4;role='minerMine'}else if(p<.28){wx=112+(p-.18)/.10*52;role='haulerWalk'}else if(p<.36){wx=164;role='haulerWalk';loaded=p>.31}else if(p<.58){wx=164;cx=165+(p-.36)/.22*130;loaded=true}else if(p<.72){wx=295;cx=295;loaded=true;role='builderWork'}else{cx=295-(p-.72)/.28*130;role='minerIdle'}worker(wx,183,t,role,p>.2&&p<.6);cart(cx,183,loaded);worker(215,183,t+.6,'haulerWalk',true);worker(371,183,t+1.4,'builderWork',false);worker(438,183,t+2.1,'operatorIdle',true);worker(507,183,t+2.8,'operatorIdle',false);cart(170+Math.sin(t*.35)*20,284,true);worker(414,284,t+1.1,'minerMine',true);if(p>.56&&p<.76){let a=(p-.56)/.20;for(let i=0;i<5;i++){let sx=330+i*7,sy=156-i*3;R(sx,sy,2,2,'#ffd15f',1-a)}}raf=requestAnimationFrame(frame)}cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> GAME ASSETS · v'+V+' · 1/11')},100)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();window.addEventListener('dna-game-remount',()=>setTimeout(boot,100))})();
+(()=>{'use strict';
+const V='14.8.0';let raf=0;
+function boot(){
+ const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
+ h.querySelectorAll('canvas,svg').forEach(e=>e.style.display='none');
+ const old=document.getElementById('dnaWorld148');if(old)old.remove();
+ const c=document.createElement('canvas');c.id='dnaWorld148';c.width=1200;c.height=680;
+ Object.assign(c.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:40,pointerEvents:'none',imageRendering:'auto'});h.appendChild(c);
+ const g=c.getContext('2d');g.imageSmoothingEnabled=true;const A=()=>window.DNA_GAME_ASSETS||null;
+ const R=(x,y,w,z,k,a=1)=>{g.globalAlpha=a;g.fillStyle=k;g.fillRect(x,y,w,z);g.globalAlpha=1};
+ const L=(x,y,a,b,k,w=1)=>{g.strokeStyle=k;g.lineWidth=w;g.beginPath();g.moveTo(x,y);g.lineTo(a,b);g.stroke()};
+ function glow(x,y,r=26,a=.18,col='255,177,68'){g.save();g.globalCompositeOperation='screen';let q=g.createRadialGradient(x,y,1,x,y,r);q.addColorStop(0,`rgba(${col},${a})`);q.addColorStop(.35,`rgba(${col},${a*.45})`);q.addColorStop(1,`rgba(${col},0)`);g.fillStyle=q;g.fillRect(x-r,y-r,r*2,r*2);g.restore()}
+ function worker(x,y,t,role='minerIdle',flip=false){const a=A();if(a&&a.draw(role,x-10,y-37,21,38,{flipX:flip,alpha:.98}))return;R(x-5,y-23,10,8,'#c88b63');R(x-7,y-15,14,15,'#248d88')}
+ function cart(x,y,load){const a=A(),key=load?'cartLoaded':'cartEmpty';if(a&&a.draw(key,x-2,y-22,37,22,{alpha:.98}))return;R(x,y-14,32,12,'#593725')}
+ function fallback(){let q=g.createLinearGradient(0,0,0,340);q.addColorStop(0,'#02091a');q.addColorStop(.55,'#103044');q.addColorStop(1,'#061516');g.fillStyle=q;g.fillRect(0,0,600,340);R(0,198,600,142,'#04100f')}
+ function base(){const a=A();return !!(a&&a.draw('sceneBase',0,0,600,340,{alpha:1}))}
+ function ambient(t){
+  const pulse=(Math.sin(t*2.9)+1)/2;
+  [[49,190,19],[164,171,14],[347,185,16],[504,195,16],[162,270,13],[307,270,13]].forEach((p,i)=>glow(p[0],p[1],p[2],.11+.055*Math.sin(t*4+i)));
+  glow(152,173,28,.08+.04*pulse,'39,226,218');glow(205,267,24,.06+.03*pulse,'39,226,218');
+  g.save();g.globalAlpha=.16;g.fillStyle='#b7dbe2';for(let i=0;i<5;i++){const x=(70+i*127+(t*3*(i+1)))%670-40,y=116+(i%3)*26;g.beginPath();g.ellipse(x,y,38,8,0,0,Math.PI*2);g.fill()}g.restore();
+ }
+ function activity(t){
+  const p=(t%22)/22;let wx=82,cx=118,loaded=false,role='minerMine',flip=false;
+  if(p<.16){wx=80+Math.sin(t*3)*2;role='minerMine'}
+  else if(p<.26){wx=82+(p-.16)/.10*45;role='haulerWalk';flip=false}
+  else if(p<.34){wx=127;role='haulerWalk';loaded=p>.29}
+  else if(p<.58){wx=127;cx=118+(p-.34)/.24*118;loaded=true}
+  else if(p<.72){wx=238;cx=236;loaded=true;role='builderWork'}
+  else{cx=236-(p-.72)/.28*118;role='minerIdle';flip=true}
+  worker(wx,205,t,role,flip);cart(cx,207,loaded);
+  worker(204,208,t+.7,'haulerWalk',true);worker(276,207,t+1.4,'builderWork',false);worker(385,208,t+2.1,'operatorIdle',true);worker(500,211,t+2.8,'operatorIdle',false);
+  const undergroundX=142+Math.sin(t*.35)*32;cart(undergroundX,301,true);worker(346,302,t+1.1,'minerMine',true);
+  if(p>.54&&p<.78){const a=1-Math.abs(((p-.54)/.24)-.5)*2;for(let i=0;i<7;i++){const sx=281+i*4,sy=191-(i%3)*3;R(sx,sy,1.5,1.5,'#ffd15f',Math.max(0,a))}}
+  const lift=80+Math.sin(t*.62)*10;L(524,92,524,lift+58,'rgba(218,180,117,.55)',.8);R(517,lift+55,15,9,'rgba(129,92,60,.82)');
+ }
+ function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!base())fallback();ambient(t);activity(t);raf=requestAnimationFrame(frame)}
+ cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
+ setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> DNA ART · v'+V+' · 1/11')},120)
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+window.addEventListener('dna-game-remount',()=>setTimeout(boot,100));
+})();
