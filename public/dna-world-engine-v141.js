@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.8.0';let raf=0;
+const V='14.8.1';let raf=0;
 function boot(){
  const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
  h.querySelectorAll('canvas,svg').forEach(e=>e.style.display='none');
