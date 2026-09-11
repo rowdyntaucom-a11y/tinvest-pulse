@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
 import type { AnalyticsHistoryPoint, PortfolioAnalytics } from './metrics'
 import { calculateRelativePerformance } from './relativePerformance'
+import { calculateTailRisk } from './tailRisk'
 import './relativePerformance.css'
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
-type Mode = 'portfolio' | 'benchmark'
+type Mode = 'portfolio' | 'benchmark' | 'tail'
 
 type Props = {
   analytics: PortfolioAnalytics
@@ -30,6 +31,13 @@ function plainRatio(value: number | null) {
 export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMature, historyLabel }: Props) {
   const [mode, setMode] = useState<Mode>('portfolio')
   const relative = useMemo(() => calculateRelativePerformance(history), [history])
+  const tail = useMemo(() => calculateTailRisk(history), [history])
+
+  const modeStatus = mode === 'portfolio'
+    ? historyLabel
+    : mode === 'benchmark'
+      ? `${relative.overlapPoints} общих точек`
+      : `${tail.returns} дневных доходностей`
 
   return (
     <div className="analytics-risk-view">
@@ -37,10 +45,11 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
         <span>РЕЖИМ</span>
         <button className={mode === 'portfolio' ? 'is-active' : ''} onClick={() => setMode('portfolio')}>ПОРТФЕЛЬ</button>
         <button className={mode === 'benchmark' ? 'is-active' : ''} onClick={() => setMode('benchmark')}>VS IMOEX</button>
-        <small>{mode === 'portfolio' ? historyLabel : `${relative.overlapPoints} общих точек`}</small>
+        <button className={mode === 'tail' ? 'is-active' : ''} onClick={() => setMode('tail')}>TAIL</button>
+        <small>{modeStatus}</small>
       </div>
 
-      {mode === 'portfolio' ? (
+      {mode === 'portfolio' && (
         <>
           <section className="risk-grid">
             <article className="risk-card"><span>MAX DRAWDOWN</span><strong>{signedRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
@@ -56,7 +65,9 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
             <p>Сейчас доступно {historyLabel}. Годовая волатильность, Sharpe и Sortino математически считаются, но до накопления 12 месяцев показываются как предварительные, а не как зрелая характеристика риска.</p>
           </section>
         </>
-      ) : (
+      )}
+
+      {mode === 'benchmark' && (
         <>
           <section className="risk-grid relative-risk-grid">
             <article className="risk-card"><span>ПОРТФЕЛЬ · OVERLAP</span><strong>{signedRatio(relative.portfolioReturn)}</strong><small>{relative.periodDays ? `${relative.periodDays} дней общей выборки` : 'общая выборка не готова'}</small></article>
@@ -70,6 +81,24 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
             <span className="eyebrow">BENCHMARK QUALITY</span>
             <h2>{relative.status === 'mature' ? 'ЗРЕЛАЯ СРАВНИМАЯ ВЫБОРКА' : relative.status === 'preview' ? 'ПРЕДВАРИТЕЛЬНО' : 'КОРОТКАЯ ИСТОРИЯ'}</h2>
             <p>{relative.note} Периодная доходность показывается уже при двух общих точках; Tracking Error, Information Ratio, Beta и корреляция не рассчитываются на слишком короткой истории.</p>
+          </section>
+        </>
+      )}
+
+      {mode === 'tail' && (
+        <>
+          <section className="risk-grid relative-risk-grid">
+            <article className="risk-card"><span>HISTORICAL VaR 95% · 1D</span><strong>{plainRatio(tail.var95Loss)}</strong><small>порог потери худших 5% дней</small></article>
+            <article className="risk-card"><span>CVaR / EXPECTED SHORTFALL</span><strong>{plainRatio(tail.cvar95Loss)}</strong><small>средняя потеря внутри худшего 5%-хвоста</small></article>
+            <article className="risk-card"><span>ХУДШИЙ ДЕНЬ</span><strong>{signedRatio(tail.worstDay)}</strong><small>фактическая дневная TWR-доходность</small></article>
+            <article className="risk-card"><span>ДОЛЯ ОТРИЦАТЕЛЬНЫХ ДНЕЙ</span><strong>{plainRatio(tail.downsideFrequency)}</strong><small>частота дней TWR &lt; 0</small></article>
+            <article className="risk-card"><span>TAIL OBSERVATIONS</span><strong>{tail.available ? tail.tailObservations : '—'}</strong><small>наблюдений в 5%-хвосте</small></article>
+            <article className="risk-card"><span>МЕТОД</span><strong>HIST</strong><small>без нормального распределения и параметрической подгонки</small></article>
+          </section>
+          <section className="panel analytics-note relative-note">
+            <span className="eyebrow">TAIL RISK · v1</span>
+            <h2>{tail.status === 'mature' ? 'ЗРЕЛАЯ ОЦЕНКА' : tail.status === 'preview' ? 'ПРЕДВАРИТЕЛЬНО' : 'НЕДОСТАТОЧНО ИСТОРИИ'}</h2>
+            <p>{tail.note} VaR/CVaR здесь — историческая однодневная оценка риска по TWR портфеля, а не прогноз максимального будущего убытка.</p>
           </section>
         </>
       )}
