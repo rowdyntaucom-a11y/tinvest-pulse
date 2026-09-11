@@ -5,6 +5,7 @@ import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
 import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analytics/drift'
 import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
+import { RiskWorkspace } from './features/analytics/RiskWorkspace'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
 
@@ -135,21 +136,13 @@ export default function App() {
             )}
 
             {analyticsView === 'risk' && (
-              <div className="analytics-risk-view">
-                <section className="risk-grid">
-                  <article className="risk-card"><span>MAX DRAWDOWN</span><strong>{signedRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
-                  <article className="risk-card"><span>ВОЛАТИЛЬНОСТЬ</span><strong>{plainRatio(analytics.volatility)}</strong><small>σ дневных доходностей × √252</small></article>
-                  <article className="risk-card"><span>SHARPE</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{snapshot.riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Rf ${number.format(snapshot.riskFreeRate)}%`}</small></article>
-                  <article className="risk-card"><span>SORTINO</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Downside deviation относительно MAR (Rf)</small></article>
-                  <article className="risk-card"><span>HHI</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
-                  <article className="risk-card"><span>ЭКВ. ПОЗИЦИЙ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
-                </section>
-                <section className="panel analytics-note">
-                  <span className="eyebrow">КАЧЕСТВО ВЫБОРКИ</span>
-                  <h2>{analyticsMature ? 'ИСТОРИЯ ДОСТАТОЧНА' : 'МЕТРИКИ ПРЕДВАРИТЕЛЬНЫЕ'}</h2>
-                  <p>Сейчас доступно {historyLabel}. Годовая волатильность, Sharpe и Sortino математически считаются, но до накопления 12 месяцев показываются как предварительные, а не как зрелая характеристика риска.</p>
-                </section>
-              </div>
+              <RiskWorkspace
+                analytics={analytics}
+                history={snapshot.history}
+                riskFreeRate={snapshot.riskFreeRate}
+                analyticsMature={analyticsMature}
+                historyLabel={historyLabel}
+              />
             )}
 
             {analyticsView === 'health' && (
