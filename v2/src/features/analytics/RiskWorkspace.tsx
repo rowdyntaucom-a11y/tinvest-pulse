@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { AnalyticsHistoryPoint, PortfolioAnalytics } from './metrics'
 import { calculateRelativePerformance } from './relativePerformance'
+import { calculateRollingRisk } from './rollingRisk'
 import { calculateTailRisk } from './tailRisk'
 import './relativePerformance.css'
 
@@ -8,7 +9,7 @@ const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, sig
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
-type Mode = 'portfolio' | 'benchmark' | 'tail'
+type Mode = 'portfolio' | 'benchmark' | 'rolling' | 'tail'
 
 type Props = {
   analytics: PortfolioAnalytics
@@ -31,13 +32,17 @@ function plainRatio(value: number | null) {
 export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMature, historyLabel }: Props) {
   const [mode, setMode] = useState<Mode>('portfolio')
   const relative = useMemo(() => calculateRelativePerformance(history), [history])
+  const rolling = useMemo(() => calculateRollingRisk(history), [history])
   const tail = useMemo(() => calculateTailRisk(history), [history])
+  const roll = rolling.activeWindow
 
   const modeStatus = mode === 'portfolio'
     ? historyLabel
     : mode === 'benchmark'
       ? `${relative.overlapPoints} общих точек`
-      : `${tail.returns} дневных доходностей`
+      : mode === 'rolling'
+        ? roll ? `${roll.tradingDays}D active` : `${rolling.availableReturns} доходностей`
+        : `${tail.returns} дневных доходностей`
 
   return (
     <div className="analytics-risk-view">
@@ -45,6 +50,7 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
         <span>РЕЖИМ</span>
         <button className={mode === 'portfolio' ? 'is-active' : ''} onClick={() => setMode('portfolio')}>ПОРТФЕЛЬ</button>
         <button className={mode === 'benchmark' ? 'is-active' : ''} onClick={() => setMode('benchmark')}>VS IMOEX</button>
+        <button className={mode === 'rolling' ? 'is-active' : ''} onClick={() => setMode('rolling')}>ROLLING</button>
         <button className={mode === 'tail' ? 'is-active' : ''} onClick={() => setMode('tail')}>TAIL</button>
         <small>{modeStatus}</small>
       </div>
@@ -81,6 +87,24 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
             <span className="eyebrow">BENCHMARK QUALITY</span>
             <h2>{relative.status === 'mature' ? 'ЗРЕЛАЯ СРАВНИМАЯ ВЫБОРКА' : relative.status === 'preview' ? 'ПРЕДВАРИТЕЛЬНО' : 'КОРОТКАЯ ИСТОРИЯ'}</h2>
             <p>{relative.note} Периодная доходность показывается уже при двух общих точках; Tracking Error, Information Ratio, Beta и корреляция не рассчитываются на слишком короткой истории.</p>
+          </section>
+        </>
+      )}
+
+      {mode === 'rolling' && (
+        <>
+          <section className="risk-grid relative-risk-grid">
+            <article className="risk-card"><span>ROLLING RETURN</span><strong>{signedRatio(roll?.portfolioReturn ?? null)}</strong><small>{roll ? `${roll.tradingDays} торговых дней` : 'нужно минимум 20 дневных доходностей'}</small></article>
+            <article className="risk-card"><span>ROLLING VOL</span><strong>{plainRatio(roll?.volatility ?? null)}</strong><small>σ окна × √252</small></article>
+            <article className="risk-card"><span>ROLLING MAXDD</span><strong>{roll?.maxDrawdown == null ? '—' : signedRatio(-roll.maxDrawdown)}</strong><small>просадка внутри выбранного окна</small></article>
+            <article className="risk-card"><span>WORST DAY</span><strong>{signedRatio(roll?.worstDay ?? null)}</strong><small>худшая дневная TWR-доходность окна</small></article>
+            <article className="risk-card"><span>IMOEX · WINDOW</span><strong>{signedRatio(roll?.benchmarkReturn ?? null)}</strong><small>{roll?.pairedBenchmarkReturns ? `${roll.pairedBenchmarkReturns} парных доходностей` : 'бенчмарк не покрывает всё окно'}</small></article>
+            <article className="risk-card"><span>EXCESS · WINDOW</span><strong>{signedRatio(roll?.excessReturn ?? null)}</strong><small>портфель минус IMOEX на том же окне</small></article>
+          </section>
+          <section className="panel analytics-note relative-note">
+            <span className="eyebrow">ROLLING WINDOWS · v1</span>
+            <h2>{roll ? `${roll.tradingDays}D · ТЕКУЩЕЕ ОКНО` : 'НЕДОСТАТОЧНО ИСТОРИИ'}</h2>
+            <p>{rolling.note} Стандартные горизонты: 20 / 60 / 120 / 252 торговых дня. QVANIX автоматически использует самый длинный полностью доступный горизонт и не растягивает короткую историю до года.</p>
           </section>
         </>
       )}
