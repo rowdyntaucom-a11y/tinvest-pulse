@@ -50,7 +50,7 @@ core=core.replace(benchmarkMarker,benchmarkCode);
 // ticker. Enrich current bond positions only from T-Bank instrument metadata;
 // the v2 UI then exposes coverage and leaves missing fields unknown.
 const bondMetaBridge=`
-const bondMetaMarker="  // Enrich a small number of positions with instrument names.";
+const bondMetaMarker="  // Live dashboard stays lightweight; history owns its own refresh.";
 if(!core.includes(bondMetaMarker))throw new Error('QVANIX v2: bond metadata marker changed');
 const bondMetaCode=[
  "  // QVANIX v2 bond metadata: verified instrument fields only.",
