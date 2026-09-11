@@ -1,0 +1,55 @@
+name: DNA motion hotfix v14.17.0
+on:
+  push:
+    branches: [dna-motion-pass-v14180]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-motion-pass-v14180
+      - name: Restore visible DNA world motion without primitive worker overlays
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('public/dna-world-engine-v141.js')
+          s=p.read_text()
+          old="function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{}ambient(t);raf=requestAnimationFrame(frame)}"
+          new="""function motion(t){
+  // Motion-only overlay: keep the Figma master clean and animate atmosphere/infrastructure.
+  const q=(Math.sin(t*1.6)+1)/2;
+  // Crane cable + suspended load.
+  const lift=118+Math.sin(t*.72)*24;
+  L(480,70,480,lift,'rgba(218,180,117,.78)',1.4);R(468,lift,24,14,'rgba(126,82,48,.95)');
+  glow(480,lift+7,22,.055,'255,183,82');
+  // Moving light traces along both rails create an obvious but non-cartoonish logistics pulse.
+  const sx=70+((t*42)%620), ux=95+((t*30)%590);
+  g.save();g.globalCompositeOperation='screen';
+  let gr=g.createLinearGradient(sx-55,0,sx+20,0);gr.addColorStop(0,'rgba(65,238,221,0)');gr.addColorStop(.7,'rgba(65,238,221,.34)');gr.addColorStop(1,'rgba(195,255,247,.7)');g.strokeStyle=gr;g.lineWidth=3;g.beginPath();g.moveTo(sx-55,281);g.lineTo(sx+20,281);g.stroke();
+  gr=g.createLinearGradient(ux-45,0,ux+18,0);gr.addColorStop(0,'rgba(255,177,73,0)');gr.addColorStop(.72,'rgba(255,177,73,.28)');gr.addColorStop(1,'rgba(255,225,168,.64)');g.strokeStyle=gr;g.lineWidth=2.5;g.beginPath();g.moveTo(ux-45,556);g.lineTo(ux+18,556);g.stroke();
+  g.restore();
+  // Lamp breathing and mineral shimmer.
+  [[370,191],[182,501],[338,501],[491,501]].forEach((p,i)=>glow(p[0],p[1],26,.08+.055*Math.sin(t*2.4+i),'255,187,82'));
+  [[125,531],[150,540],[385,530],[410,538]].forEach((p,i)=>glow(p[0],p[1],17,.05+.035*Math.sin(t*3.1+i),'49,234,224'));
+  // Fine drifting dust/fog.
+  g.save();g.fillStyle='rgba(196,235,232,.16)';for(let i=0;i<13;i++){const x=(i*79+t*(8+i%3)*3)%850-15;const y=120+(i*43)%410+Math.sin(t*.7+i)*6;g.globalAlpha=.05+(i%4)*.018;g.beginPath();g.arc(x,y,1.1+(i%3)*.45,0,Math.PI*2);g.fill()}g.restore();
+  // Subtle scene pulse so the world never reads as a frozen illustration.
+  g.save();g.globalAlpha=.025+.018*q;g.fillStyle='#68e9da';g.fillRect(0,266,820,2);g.restore();
+ }
+ function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(1200/820,0,0,1,0,0);if(!artReady)fallback();ambient(t);motion(t);raf=requestAnimationFrame(frame)}"""
+          if old not in s:
+              raise SystemExit('target frame function not found')
+          p.write_text(s.replace(old,new))
+          PY
+      - name: Commit hotfix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/dna-world-engine-v141.js
+          git diff --cached --quiet && exit 0
+          git commit -m "restore DNA world motion without primitive overlays"
+          git push origin HEAD:dna-motion-pass-v14180
