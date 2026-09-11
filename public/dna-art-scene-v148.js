@@ -1,1 +1,1 @@
-(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='/assets/dna-world/l1/figma-master-v14140.svg?rev=14140';window.DNA_ART_PACK.version='14.15.0';window.DNA_ART_PACK.source='figma-master';})();
+(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='/assets/dna-world/l1/figma-art-rebuild-v14160.svg?rev=14160';window.DNA_ART_PACK.version='14.16.0';window.DNA_ART_PACK.source='figma-art-rebuild';})();
