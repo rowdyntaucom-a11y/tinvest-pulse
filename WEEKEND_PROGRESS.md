@@ -135,11 +135,23 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Deploy status could not be queried because the Render connector requires a user-confirmed workspace and autonomous mode must not choose one implicitly.
 - Legal publication remains blocked; no RU/EN offer, privacy or consent wording was published.
 
+### 01:57 MSK autonomous pass — compact bond risk UI integration
+- Integrated the existing verified country-of-risk and sector concentration primitives into the existing `BondAnalytics` split block through PR #72; no additional full-size widget was introduced.
+- Each dimension shows metadata coverage separately from the leading category's share of the covered subset, plus the effective category count (`Nₑ = 1 / HHI`). This prevents partial T-Bank metadata from looking like complete portfolio coverage.
+- Issuer concentration remains explicitly gated because the current snapshot has no verified issuer identifier; sector/country are not relabelled as issuer risk.
+- YTM, duration, expected-return assumptions and personalized trade outputs remain absent.
+- Quant methodology pass: verified that concentration percentages are labelled as shares of covered metadata and that coverage is visible alongside them.
+- Code-quality pass: PR #72 changed only `BondAnalytics.tsx` and `bondAnalytics.css`; GitHub `v2 build` workflow run #96 completed successfully (`tsc -b`, Vite build and existing syntax checks).
+- Mobile-UX pass: the new diagnostics reuse the existing two-column compact block, with 5.2px mobile labels and ellipsis rather than adding vertical cards or another scrolling section.
+- Release pass: PR #72 was squash-merged to `main` as `b3da84473ef50321a93d693ada5868307a7c3705`; no backend route, broker call, credential, legal/payment text or deployment configuration changed.
+- Render auto-deploy was not manually triggered. Status could not be queried because the Render connector requires a user-confirmed workspace and autonomous mode must not choose one implicitly.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; deepen it only with validated live sample coverage and mobile density.
 - Expand historical stress only with versioned sourced return data; do not convert OFZ yield-bp moves into price shocks until duration semantics are verified.
-- Bond analytics may next surface country/sector coverage compactly; issuer concentration stays gated until a verified issuer identifier is added to the broker metadata boundary. YTM/duration remain gated.
+- Bond country/sector concentration is now compactly surfaced; issuer concentration stays gated until a verified issuer identifier is added to the broker metadata boundary. YTM/duration remain gated.
 - Portfolio data context is now compactly surfaced in the existing Portfolio shell; account type remains gated until the backend exposes a verified account-type field.
 - Broker P/L attribution remains clearly labelled current unrealized contribution; historical/TWR attribution stays gated on trustworthy per-position history.
 - Recovery diagnostics are deterministic but should remain out of the UI until the live sample gate is met.
