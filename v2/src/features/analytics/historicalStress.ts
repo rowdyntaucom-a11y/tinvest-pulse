@@ -1,7 +1,7 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 import type { StressExposure, StressScenario } from './stress'
 
-export type HistoricalStressClass = 'equity_ru' | 'ofz' | 'unassigned'
+export type HistoricalStressClass = 'equity_mcftr_proxy' | 'ofz' | 'unassigned'
 
 export type HistoricalStressScenario = StressScenario & {
   version: '1.0'
@@ -14,7 +14,7 @@ export type HistoricalStressScenario = StressScenario & {
   sourceUrl: string
   verifiedAt: string
   benchmarks: Array<{
-    classKey: 'equity_ru' | 'ofz'
+    classKey: 'equity_mcftr_proxy' | 'ofz'
     symbol: 'MCFTR' | 'RGBITR'
     label: string
   }>
@@ -30,15 +30,15 @@ export const HISTORICAL_STRESS_SCENARIOS: HistoricalStressScenario[] = [
     source: 'Банк России · рыночные индикаторы НПФ',
     sourceDate: '2020-03-31',
     period: { from: '2020-01-01', to: '2020-03-31', label: 'I квартал 2020' },
-    methodology: 'Фактическая доходность индексов полной доходности MCFTR и RGBITR за один календарный период. Шоки линейно применяются только к текущим акциям РФ и ОФЗ.',
+    methodology: 'Фактическая доходность индексов полной доходности MCFTR и RGBITR за один календарный период. MCFTR используется как прозрачный proxy для текущих позиций типа share/stock; RGBITR применяется только к явно распознанным ОФЗ. Остальные классы не шокируются.',
     sourceUrl: 'https://www.cbr.ru/analytics/RSCI/activity_npf/dokhodnost-npf-1-20/',
     verifiedAt: '2026-09-11',
     benchmarks: [
-      { classKey: 'equity_ru', symbol: 'MCFTR', label: 'Акции РФ · total return' },
+      { classKey: 'equity_mcftr_proxy', symbol: 'MCFTR', label: 'Позиции share/stock · MCFTR proxy' },
       { classKey: 'ofz', symbol: 'RGBITR', label: 'ОФЗ · total return' },
     ],
     shocks: {
-      equity_ru: -0.174,
+      equity_mcftr_proxy: -0.174,
       ofz: -0.007,
     },
   },
@@ -49,15 +49,15 @@ export const HISTORICAL_STRESS_SCENARIOS: HistoricalStressScenario[] = [
     source: 'Банк России · рыночные индикаторы НПФ',
     sourceDate: '2022-09-30',
     period: { from: '2022-01-01', to: '2022-09-30', label: '9 месяцев 2022' },
-    methodology: 'Фактическая доходность индексов полной доходности MCFTR и RGBITR за один календарный период. Шоки линейно применяются только к текущим акциям РФ и ОФЗ.',
+    methodology: 'Фактическая доходность индексов полной доходности MCFTR и RGBITR за один календарный период. MCFTR используется как прозрачный proxy для текущих позиций типа share/stock; RGBITR применяется только к явно распознанным ОФЗ. Остальные классы не шокируются.',
     sourceUrl: 'https://www.cbr.ru/analytics/RSCI/activity_npf/dokhodnost-npf-3-22/',
     verifiedAt: '2026-09-11',
     benchmarks: [
-      { classKey: 'equity_ru', symbol: 'MCFTR', label: 'Акции РФ · total return' },
+      { classKey: 'equity_mcftr_proxy', symbol: 'MCFTR', label: 'Позиции share/stock · MCFTR proxy' },
       { classKey: 'ofz', symbol: 'RGBITR', label: 'ОФЗ · total return' },
     ],
     shocks: {
-      equity_ru: -0.471,
+      equity_mcftr_proxy: -0.471,
       ofz: -0.018,
     },
   },
@@ -69,7 +69,7 @@ export function classifyHistoricalStress(position: PositionSnapshot): Historical
   const name = String(position.name || '').trim().toLowerCase()
 
   if (/^SU\d/.test(ticker) || /офз/.test(name)) return 'ofz'
-  if (type.includes('share') || type.includes('stock') || type === 'equity') return 'equity_ru'
+  if (type.includes('share') || type.includes('stock') || type === 'equity') return 'equity_mcftr_proxy'
   return 'unassigned'
 }
 
