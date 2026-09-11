@@ -68,7 +68,7 @@ export function classifyHistoricalStress(position: PositionSnapshot): Historical
   const ticker = String(position.ticker || '').trim().toUpperCase()
   const name = String(position.name || '').trim().toLowerCase()
 
-  if (/^SU\d/.test(ticker) || /\bофз\b/.test(name)) return 'ofz'
+  if (/^SU\d/.test(ticker) || /офз/.test(name)) return 'ofz'
   if (type.includes('share') || type.includes('stock') || type === 'equity') return 'equity_ru'
   return 'unassigned'
 }
