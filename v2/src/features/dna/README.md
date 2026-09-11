@@ -13,9 +13,21 @@
 
 ## Current v0.1 boundary
 
-`xpEngine.ts` provides two independent primitives:
+The deterministic DNA core is intentionally split into four responsibilities:
 
-1. `buildQualitySnapshot(...)` — normalized current signals and availability/coverage only. It does not award persistent XP.
-2. `buildXpLedger(events)` — validates, de-duplicates and accumulates already-awarded versioned XP events. It never reads capital value.
+1. `buildQualitySnapshot(...)` in `xpEngine.ts` — normalized current signals and availability/coverage only. It does not award persistent XP.
+2. `xpRules.ts` — stable, versioned event factories for reviewed award rules. Contribution-habit inputs contain no deposit amount.
+3. `xpPersistence.ts` — fail-closed persisted-document parser plus idempotent event merge. Existing event ids win, invalid payloads are ignored/countable, timestamps are normalized and event ordering is deterministic. It has no browser-storage, account-id or RUB-capital dependency, so a future encrypted backend/database adapter can persist the same document without changing progression math.
+4. `worldState.ts` — compact resolved state boundary for the renderer; it consumes progression/quality/time/weather/events and must not recalculate financial metrics inside PixiJS.
 
-The next implementation step is a deterministic rule layer that emits XP events from monthly contribution habit, mature Health/performance periods, validated passive-income growth and plan-adherence events. That rule layer must include anti-gaming limits before it is connected to world levels.
+## Persistence rules
+
+- Persistence stores versioned XP events, not a mutable `level = capital` snapshot.
+- Replaying the same event id must never increase XP twice.
+- Invalid/corrupt persisted payloads fail closed to an empty v0.1 document rather than manufacturing XP.
+- A retry cannot rewrite an existing event with a new award; changing an XP rule requires a new rule version and therefore a new stable event id.
+- Storage technology is deliberately not selected in this layer. Real multi-user persistence belongs on the backend with authenticated account scoping; do not place broker credentials or sensitive account data in frontend storage.
+
+## Still gated
+
+Final XP award weights, long-term level thresholds/economy and production persistence schema remain gated on validation. The current short portfolio history is not enough to tune a durable progression economy, and no subjective DNA art-direction changes should be inferred from this groundwork.

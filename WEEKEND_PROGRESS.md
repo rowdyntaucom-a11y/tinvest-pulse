@@ -24,10 +24,27 @@ This log is maintained by autonomous development runs. Production changes must r
 - Initial bond production deploy failed at runtime because the bridge looked for a marker removed earlier by `server-base.js`. The bridge marker was changed to the actual post-transform dashboard marker; hotfix `b07d93886ccaf4ffbfd1734e0ae7b1b4a544cb54` restored both preview and primary to `live`.
 - Tail-risk v1 prepared on repaired main: historical one-day VaR 95% / CVaR (Expected Shortfall), worst day and negative-day frequency use daily TWR returns only. VaR/CVaR are unavailable below 126 returns and mature at 252.
 - Correlation-matrix primitives use paired daily returns with a 60-return gate. Stress-test primitives accept only explicit sourced class shocks and report coverage; no historical shock numbers are invented.
+- Rolling-risk mode added for return / volatility / drawdown with short-history gating; mobile controls were tightened to preserve one-screen density.
+- `QVANIX_TERMINAL_DECISIONS.md` and `LEGAL_REVIEW_2026-09-11.md` are now in the current main lineage. The legal review remains a publication blocker checklist, not final publishable wording.
+
+### 20:00 MSK autonomous pass — XP persistence boundary
+- Added `xpPersistence.ts` on branch `qvanix-xp-persistence-v1` as a storage-agnostic deterministic boundary for XP event persistence.
+- Persisted documents fail closed when schema/version is invalid; corrupt payloads cannot manufacture XP.
+- Event normalization validates known event kinds, non-negative finite XP, stable IDs, rule versions and ISO timestamps.
+- Merge is idempotent: existing event IDs always win, retries cannot double-count or rewrite earlier awards, and event ordering is deterministic.
+- The persistence layer has no browser-storage, account-id, broker-token or RUB-capital dependency; production storage remains a future authenticated backend concern.
+- DNA README updated with persistence, retry/idempotency and backend-storage rules. Final XP weights/level economy remain gated on validation and are not invented in this pass.
+
+### Validation / release notes
+- Quant methodology pass: no new financial calculation or wealth-based XP logic introduced; persistence only stores already-awarded versioned events.
+- Code-quality pass: TypeScript 5.8.3 strict `--noEmit` compile passed against the existing XP schema shape; runtime assertions passed for duplicate retry, invalid event rejection, fail-closed version mismatch and prevention of XP rewrite.
+- Mobile-UX pass: no UI/layout changes in this batch.
+- Release pass: runtime diff is isolated to DNA groundwork plus documentation; no broker/backend route changes, no secrets, no legal text publication.
 
 ### Current focus
-- Validate and deploy tail-risk v1 after branch review.
+- Promote XP persistence only if PR diff remains isolated and production build/deploy is healthy.
 - Wire per-asset historical series before exposing a portfolio correlation matrix.
 - Source and version historical stress-scenario shock tables before exposing stress results.
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
-- Keep legal publication blocked until P0 review issues and real operator/provider placeholders are resolved.
+- Deepen passive-income history / concentration / goal framework without fabricating payout growth.
+- Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
