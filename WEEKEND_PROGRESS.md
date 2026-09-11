@@ -93,10 +93,23 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render `tinvest-pulse` deploy `dep-dai503rtqb8s73bl3300`: `live`.
 - No rollback required; both auto-deploys accepted the same production commit.
 
+### 23:00 MSK autonomous pass — Portfolio data context boundary
+- Added `v2/src/features/portfolio/portfolioDataContext.ts` through PR #61 and squash-merged as `ecb32f4aa4c5c3e5f35cb25f0ab58e770dded455`.
+- The boundary exposes account label, actual data source, reported timestamp/age, history date coverage and count of positions with observable price/cost-basis fields.
+- No arbitrary freshness SLA is invented: age is numeric and timestamp state is only `REPORTED / MISSING / INVALID`.
+- Quant/code review caught and removed a misleading planned `expectedYield` coverage counter before merge because `portfolioApi` normalizes a missing broker value to numeric zero, making source-field presence unknowable at this layer.
+- Strict TypeScript 5.8.3 `--noEmit` validation passed against the current `PortfolioSnapshot` shape; runtime assertions passed for reported/missing/invalid timestamp handling and coverage counts.
+- Mobile-UX pass: no UI/layout change in this batch; this is a compact data boundary for a later Portfolio context row rather than a new full widget.
+- Release pass: one side-effect-free module only; no API route, broker call, credential, legal text, renderer or deployment configuration changed.
+- Render `tinvest-pulse-v2-preview` deploy `dep-dai5sse1egvs73a2ekl0`: `live`.
+- Render `tinvest-pulse` deploy `dep-dai5sse1egvs73a2ekng`: `live`.
+- No rollback required.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; next deepen it only after validating live sample coverage and UX density.
 - Expand historical stress only with versioned sourced return data; do not convert OFZ yield-bp moves into price shocks until duration semantics are verified.
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
+- Surface Portfolio data context compactly without adding a duplicate full widget; account type remains gated until the backend exposes a verified account-type field.
 - Integrate broker P/L attribution only as clearly labelled current unrealized contribution; historical/TWR attribution remains gated on trustworthy per-position history.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
