@@ -7,6 +7,11 @@
 .income-integrity-status.is-verified b{color:var(--mint)}
 .income-integrity-status.is-stale b,.income-integrity-status.is-partial b{color:var(--amber)}
 .income-integrity-status.is-unavailable b{color:#d98f87}
+.income-profile-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:9px}
+.income-profile-grid article{min-width:0;padding:9px 10px;border:1px solid rgba(89,240,209,.09);border-radius:12px;background:rgba(5,18,15,.55);display:flex;flex-direction:column;gap:4px}
+.income-profile-grid span{color:#718d86;font-size:7px;font-weight:850;letter-spacing:.06em}
+.income-profile-grid strong{overflow:hidden;color:#dff4ee;font-size:14px;text-overflow:ellipsis;white-space:nowrap}
+.income-profile-grid small{overflow:hidden;color:#68837c;font-size:7px;text-overflow:ellipsis;white-space:nowrap}
 
 @media(max-width:620px){
   .income-workspace{height:100%;grid-template-rows:auto minmax(0,1fr);gap:5px;overflow:hidden}
@@ -47,15 +52,20 @@
   .income-method-note{margin-top:5px;padding-top:5px;font-size:6px;line-height:1.3}
   .income-warning{margin-top:4px;font-size:6px}
 
-  .income-source-table{flex:1 1 auto;min-height:0;margin-top:5px;overflow:hidden}
-  .income-source-row{min-height:0;height:calc((100% - 24px)/6);grid-template-columns:minmax(0,1fr) 58px 76px;gap:5px;padding:3px 1px}
-  .income-source-row--head{height:24px;min-height:24px;font-size:6.2px}
+  .income-profile-grid{flex:0 0 auto;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;margin-top:4px}
+  .income-profile-grid article{padding:5px 5px;border-radius:8px;gap:2px}
+  .income-profile-grid span{font-size:4.9px;letter-spacing:0}
+  .income-profile-grid strong{font-size:7.5px}
+  .income-profile-grid small{font-size:4.8px}
+  .income-source-table{flex:1 1 auto;min-height:0;margin-top:4px;overflow:hidden}
+  .income-source-row{min-height:0;height:calc((100% - 20px)/6);grid-template-columns:minmax(0,1fr) 58px 76px;gap:5px;padding:2px 1px}
+  .income-source-row--head{height:20px;min-height:20px;font-size:6.2px}
   .income-source-row strong{font-size:8px}
   .income-source-row small,.income-source-row>b,.income-source-forecast>b{font-size:6.4px}
   .income-source-forecast small{font-size:5.8px}
-  .income-integrity{margin-top:5px;gap:6px;font-size:6px}
+  .income-integrity{margin-top:4px;gap:6px;font-size:6px}
   .income-integrity i{height:4px}
   .income-integrity strong{font-size:6.5px}
-  .income-integrity-status{margin-top:5px;padding:5px 6px;font-size:5.8px}
-  .income-integrity-status b{font-size:5.8px;white-space:nowrap}
+  .income-integrity-status{margin-top:4px;padding:4px 6px;font-size:5.5px}
+  .income-integrity-status b{font-size:5.5px;white-space:nowrap}
 }
