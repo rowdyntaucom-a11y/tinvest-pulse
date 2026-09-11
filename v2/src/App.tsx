@@ -4,6 +4,7 @@ import { HistoryChart } from './features/portfolio/HistoryChart'
 import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
 import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analytics/drift'
+import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
 
@@ -12,7 +13,7 @@ const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
 type Tab = 'portfolio' | 'analytics' | 'income' | 'dna'
-type AnalyticsView = 'overview' | 'risk' | 'health' | 'drift'
+type AnalyticsView = 'overview' | 'risk' | 'health' | 'drift' | 'montecarlo'
 
 function annualPct(value: number | null) {
   if (value == null || !Number.isFinite(value)) return null
@@ -107,6 +108,7 @@ export default function App() {
               <button onClick={() => setAnalyticsView('risk')} className={analyticsView === 'risk' ? 'subnav--active' : ''}>РИСК</button>
               <button onClick={() => setAnalyticsView('health')} className={analyticsView === 'health' ? 'subnav--active' : ''}>HEALTH</button>
               <button onClick={() => setAnalyticsView('drift')} className={analyticsView === 'drift' ? 'subnav--active' : ''}>DRIFT</button>
+              <button onClick={() => setAnalyticsView('montecarlo')} className={analyticsView === 'montecarlo' ? 'subnav--active' : ''}>MC</button>
               <span className={analyticsMature ? 'sample-badge sample-badge--mature' : 'sample-badge'}>{analyticsMature ? '12M' : `PREVIEW · ${historyLabel}`}</span>
             </nav>
 
@@ -207,6 +209,10 @@ export default function App() {
 
                 <p className="method-note">Drift v1 сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это диагностический триггер для проверки стратегии, а не команда купить или продать.</p>
               </section>
+            )}
+
+            {analyticsView === 'montecarlo' && (
+              <MonteCarloPanel history={snapshot.history} currentValue={snapshot.value} />
             )}
           </div>
         )}
