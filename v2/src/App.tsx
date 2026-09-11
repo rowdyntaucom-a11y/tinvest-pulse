@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { WorldStage } from './features/world/WorldStage'
 import { HistoryChart } from './features/portfolio/HistoryChart'
+import { IncomePanel } from './features/income/IncomePanel'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot, type PositionSnapshot } from './lib/portfolioApi'
 
@@ -261,19 +262,11 @@ export default function App() {
         )}
 
         {tab === 'income' && (
-          <div className="income-layout">
-            <section className="income-hero panel">
-              <div><span className="eyebrow">ПАССИВНЫЙ ДОХОД · ФАКТ</span><h2>ДИВИДЕНДЫ + КУПОНЫ</h2><p>Только реально полученный денежный поток от активов. Пополнения и продажи исключены.</p></div>
-              <strong>{snapshot.passiveIncome ? `${money.format(snapshot.passiveIncome)} ₽` : '—'}</strong>
-              <small>с начала учёта · {startDate}</small>
-            </section>
-            <section className="income-stats">
-              <article className="metric-card"><span className="metric-label">СРЕДНЕЕ / МЕС.</span><strong>{snapshot.averageMonthlyPassiveIncome ? `${money.format(snapshot.averageMonthlyPassiveIncome)} ₽` : '—'}</strong><small>По фактически доступному периоду</small></article>
-              <article className="metric-card"><span className="metric-label">ПЕРИОД УЧЁТА</span><strong>{analytics.historyDays ? analytics.historyDays : '—'}</strong><small>{analytics.historyDays ? 'дней истории' : 'история загружается'}</small></article>
-              <article className="context-card"><span>12М RUN-RATE</span><strong>—</strong><span>СЛЕДУЮЩЕЕ</span><strong>Календарь выплат</strong></article>
-            </section>
-            <section className="panel roadmap-panel"><span className="eyebrow">СЛЕДУЮЩИЙ МОДУЛЬ</span><h2>КАЛЕНДАРЬ ВЫПЛАТ</h2><p>Подключим подтверждённые ожидаемые купоны и дивиденды, затем YoC и рост дохода к собственной базе. Прогнозные суммы не показываем без надёжного источника.</p></section>
-          </div>
+          <IncomePanel
+            passiveIncome={snapshot.passiveIncome}
+            averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome}
+            startDate={startDate}
+          />
         )}
 
         {tab === 'dna' && (
