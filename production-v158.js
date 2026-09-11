@@ -46,6 +46,40 @@ const benchmarkCode=[
 core=core.replace(benchmarkMarker,benchmarkCode);
 `;
 
+// QVANIX bond metadata bridge. Do not infer maturity/coupon/currency from a
+// ticker. Enrich current bond positions only from T-Bank instrument metadata;
+// the v2 UI then exposes coverage and leaves missing fields unknown.
+const bondMetaBridge=`
+const bondMetaMarker="  // Enrich a small number of positions with instrument names.";
+if(!core.includes(bondMetaMarker))throw new Error('QVANIX v2: bond metadata marker changed');
+const bondMetaCode=[
+ "  // QVANIX v2 bond metadata: verified instrument fields only.",
+ "  for (const position of positions.slice(0, 30)) {",
+ "    if (!position.figi || !String(position.instrumentType || '').toUpperCase().includes('BOND')) continue;",
+ "    const bond = await getInstrumentMeta(position.figi, position.instrumentType);",
+ "    const nominal = bond?.nominal || bond?.initialNominal || null;",
+ "    const currency = String(nominal?.currency || bond?.currency || '').toUpperCase();",
+ "    position.bond = {",
+ "      maturityDate: bond?.maturityDate || null,",
+ "      nominal: quotationValue(nominal),",
+ "      currency: currency || null,",
+ "      couponQuantityPerYear: Number(bond?.couponQuantityPerYear || 0) || null,",
+ "      floatingCoupon: Boolean(bond?.floatingCouponFlag),",
+ "      perpetual: Boolean(bond?.perpetualFlag),",
+ "      amortizing: Boolean(bond?.amortizationFlag),",
+ "      issueKind: bond?.issueKind || null,",
+ "      countryOfRisk: bond?.countryOfRisk || null,",
+ "      countryOfRiskName: bond?.countryOfRiskName || null,",
+ "      sector: bond?.sector || null",
+ "    };",
+ "    position.name = bond?.name || position.name;",
+ "    position.ticker = bond?.ticker || position.ticker;",
+ "  }",
+ ""
+].join('\\n');
+core=core.replace(bondMetaMarker,bondMetaCode+bondMetaMarker);
+`;
+
 // v2 bridge: server-base compiles server-core at runtime, so inject the isolated
 // React/Pixi build before the legacy wildcard route without changing v1 pages.
 const v2Bridge=`core=core.replace("\\napp.get('*', (req, res) => {",\`\\nconst V2_DIST=path.join(__dirname,'v2','dist');
@@ -54,6 +88,6 @@ app.get(['/v2','/v2/*'],(req,res)=>res.sendFile(path.join(V2_DIST,'index.html'))
 \\napp.get('*', (req, res) => {\`);\n`;
 const coreCompile='const mod=new Module(corePath,module);';
 if(!src.includes(coreCompile))throw new Error('v15.8: core compile marker changed');
-src=src.replace(coreCompile,benchmarkBridge+v2Bridge+coreCompile);
+src=src.replace(coreCompile,benchmarkBridge+bondMetaBridge+v2Bridge+coreCompile);
 
 const mod=new Module(serverPath,module);mod.filename=serverPath;mod.paths=Module._nodeModulePaths(__dirname);mod._compile(src,serverPath);
