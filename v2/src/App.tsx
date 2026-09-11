@@ -107,8 +107,8 @@ export default function App() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand-block">
-          <div className="eyebrow">TINVEST PULSE 2.0 · LIVE CORE</div>
-          <h1>КРЯХТЯЩИЙ <span>ФОНД</span></h1>
+          <div className="eyebrow">QVANIX · PORTFOLIO INTELLIGENCE</div>
+          <h1>QVANIX</h1>
           <p>{snapshot.accountName} · финансовое ядро, аналитика и живой мир без лишнего дублирования.</p>
         </div>
         <nav className="topbar__nav" aria-label="Разделы">
@@ -228,7 +228,7 @@ export default function App() {
           <div className="dna-layout">
             <section className="world-panel world-panel--view">
               <div className="world-panel__head">
-                <div><span className="eyebrow">INVESTOR DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div>
+                <div><span className="eyebrow">QVANIX DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div>
                 <div className="dna-state"><span>УРОВЕНЬ</span><strong>XP</strong><small>рублёвые пороги отключены</small></div>
               </div>
               <div className="world-frame"><WorldStage level={1} /></div>
