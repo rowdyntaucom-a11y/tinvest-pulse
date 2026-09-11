@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { loadPayoutCalendar, type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { getIncomeIntegrity } from './incomeIntegrity'
+import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration } from './incomeHistory'
 import './income.css'
 import './incomeCompact.css'
 
@@ -164,6 +165,15 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
     }
   }, [data.actual.items, data.events])
 
+  const realizedHistory = useMemo(() => buildRealizedIncomeHistory(data.actual.items), [data.actual.items])
+  const realizedConcentration = useMemo(() => calculateIncomeSourceConcentration(data.actual.items), [data.actual.items])
+  const realizedTopSource = useMemo(
+    () => [...sourceRows].filter(row => row.fact > 0).sort((a, b) => b.fact - a.fact)[0] ?? null,
+    [sourceRows],
+  )
+  const realizedMonthCount = realizedHistory.months.length
+  const latestRealizedMonth = realizedHistory.months.at(-1) ?? null
+
   const monthRows = data.months.slice(0, 6)
   const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
   const coverage = integrity.coveragePct
@@ -260,10 +270,10 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className="income-panel-head"><div><span className="eyebrow">РАЗБИВКА ПО АКТИВАМ</span><h2>ИСТОЧНИКИ ДОХОДА</h2></div><small>факт ≠ прогноз</small></div>
 
           <div className="income-profile-grid">
-            <article><span>ФАКТ · КУПОНЫ</span><strong>{incomeProfile.actualCoupons ? `${money.format(incomeProfile.actualCoupons)} ₽` : '—'}</strong><small>{data.actual.year ?? 'текущий период'}</small></article>
-            <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{data.actual.year ?? 'текущий период'}</small></article>
-            <article><span>12М · TOP SOURCE</span><strong>{incomeProfile.topSource ?? '—'}</strong><small>{incomeProfile.topShare == null ? 'нет расписания' : `${pct1.format(incomeProfile.topShare * 100)}% подтверждённого gross`}</small></article>
-            <article><span>ЭКВ. ИСТОЧНИКОВ</span><strong>{incomeProfile.effectiveSources == null ? '—' : number2.format(incomeProfile.effectiveSources)}</strong><small>1 / HHI по 12М gross</small></article>
+            <article><span>ФАКТ · КУПОНЫ</span><strong>{incomeProfile.actualCoupons ? `${money.format(incomeProfile.actualCoupons)} ₽` : '—'}</strong><small>{data.actual.year ?? 'период'} · {realizedMonthCount ? `${realizedMonthCount} мес.` : 'нет истории'}</small></article>
+            <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{latestRealizedMonth ? `${latestRealizedMonth.key} · ${money.format(latestRealizedMonth.totalNet)} ₽ net` : 'нет FACT-событий'}</small></article>
+            <article><span>ФАКТ · TOP SOURCE</span><strong>{realizedTopSource?.ticker ?? '—'}</strong><small>{realizedConcentration.topSourceShare == null ? 'нет FACT-источников' : `${pct1.format(realizedConcentration.topSourceShare * 100)}% реализованного net`}</small></article>
+            <article><span>ФАКТ · ЭКВ. ИСТОЧНИКОВ</span><strong>{realizedConcentration.effectiveSources == null ? '—' : number2.format(realizedConcentration.effectiveSources)}</strong><small>{realizedConcentration.sourceCount ? `${realizedConcentration.sourceCount} источн. · 1 / HHI` : 'нет FACT-источников'}</small></article>
           </div>
 
           <div className="income-source-table">
@@ -287,9 +297,9 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className={`income-integrity-status is-${integrity.state}`}>
             <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
           </div>
-          <p className="income-method-note">12М концентрация использует только подтверждённый gross-график: купоны {money.format(incomeProfile.forecastCoupons)} ₽, дивиденды {money.format(incomeProfile.forecastDividends)} ₽. Эффективное число источников = 1/HHI; чем оно выше, тем меньше зависимость от одного источника.</p>
-          <p className="income-method-note">YoC 12M = подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции (средняя цена × количество). Это не текущая дивидендная доходность и не оценка неподтверждённых выплат.</p>
-          <p className="income-method-note">Темп роста выплат появится после двух сопоставимых годовых периодов. Короткую историю QVANIX не годифицирует и не выдаёт за устойчивый рост.</p>
+          <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. Депозиты и будущие выплаты сюда не попадают; эффективное число источников = 1/HHI.</p>
+          <p className="income-method-note">12М / YoC в таблице остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Это не текущая дивидендная доходность.</p>
+          <p className="income-method-note">Цель пассивного дохода не задаётся автоматически. Прогресс будет доступен только после явного annual net-target пользователя и полного реализованного 12-месячного календарного периода; короткая история не годифицируется.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
       )}
