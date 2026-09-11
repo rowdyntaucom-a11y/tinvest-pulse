@@ -79,10 +79,14 @@ export function CorrelationPanel() {
     return map
   }, [matrix])
 
-  const pairs = matrix.cells.filter(cell => cell.a !== cell.b && cell.available && cell.correlation != null)
-  const lowest = pairs.length ? pairs.reduce((best, cell) => (cell.correlation! < best.correlation! ? cell : best)) : null
-  const highest = pairs.length ? pairs.reduce((best, cell) => (cell.correlation! > best.correlation! ? cell : best)) : null
+  const pairs = matrix.cells.filter(cell => cell.a !== cell.b)
+  const readyPairs = pairs.filter(cell => cell.available && cell.correlation != null)
+  const maturePairs = readyPairs.filter(cell => cell.mature)
+  const lowest = readyPairs.length ? readyPairs.reduce((best, cell) => (cell.correlation! < best.correlation! ? cell : best)) : null
+  const highest = readyPairs.length ? readyPairs.reduce((best, cell) => (cell.correlation! > best.correlation! ? cell : best)) : null
   const labelByKey = new Map(series.map(item => [item.key, item.label]))
+  const requestedSeries = Math.max(series.length, Number(payload?.requested) || 0)
+  const availableSeries = Math.max(series.length, Number(payload?.availableSeries) || 0)
 
   if (loading) {
     return <section className="panel corr-panel"><div className="corr-loading">ЗАГРУЖАЕМ 365 ДНЕЙ ИСТОРИИ АКТИВОВ…</div></section>
@@ -91,7 +95,7 @@ export function CorrelationPanel() {
   if (series.length < 2) {
     return (
       <section className="panel corr-panel">
-        <div className="panel-head"><div><span className="eyebrow">CORRELATION MATRIX · v1</span><h2>ИСТОРИЯ ЕЩЁ НЕ ГОТОВА</h2></div><small>fail-closed</small></div>
+        <div className="panel-head"><div><span className="eyebrow">CORRELATION MATRIX · v1.1</span><h2>ИСТОРИЯ ЕЩЁ НЕ ГОТОВА</h2></div><small>fail-closed</small></div>
         <p className="corr-note">Нужно минимум два актива с рыночной историей. QVANIX не подставляет искусственные коэффициенты, если T‑Bank не вернул достаточный ряд.</p>
       </section>
     )
@@ -101,13 +105,16 @@ export function CorrelationPanel() {
     <section className="panel corr-panel">
       <div className="panel-head corr-headline">
         <div><span className="eyebrow">CORRELATION MATRIX · v{matrix.version}</span><h2>СВЯЗЬ АКТИВОВ</h2></div>
-        <small>{payload?.from && payload?.to ? `${payload.from} → ${payload.to}` : '365 дней'} · top {series.length}</small>
+        <small>
+          {payload?.from && payload?.to ? `${payload.from} → ${payload.to}` : '365 дней'}
+          {requestedSeries ? ` · серии ${availableSeries}/${requestedSeries}` : ` · top ${series.length}`}
+        </small>
       </div>
 
       <div className="corr-summary">
-        <article><span>МИНИМУМ ДАННЫХ</span><strong>{matrix.minimumPairedReturns}</strong><small>парных дневных доходностей</small></article>
-        <article><span>САМАЯ НИЗКАЯ ρ</span><strong>{lowest?.correlation == null ? '—' : number.format(lowest.correlation)}</strong><small>{lowest ? `${labelByKey.get(lowest.a)} ↔ ${labelByKey.get(lowest.b)}` : 'пока нет зрелой пары'}</small></article>
-        <article><span>САМАЯ ВЫСОКАЯ ρ</span><strong>{highest?.correlation == null ? '—' : number.format(highest.correlation)}</strong><small>{highest ? `${labelByKey.get(highest.a)} ↔ ${labelByKey.get(highest.b)}` : 'пока нет зрелой пары'}</small></article>
+        <article><span>ГОТОВЫЕ ПАРЫ</span><strong>{readyPairs.length}/{pairs.length}</strong><small>mature {maturePairs.length} · gate {matrix.minimumPairedReturns}/{matrix.maturePairedReturns}</small></article>
+        <article><span>САМАЯ НИЗКАЯ ρ</span><strong>{lowest?.correlation == null ? '—' : number.format(lowest.correlation)}</strong><small>{lowest ? `${labelByKey.get(lowest.a)} ↔ ${labelByKey.get(lowest.b)}` : 'пока нет готовой пары'}</small></article>
+        <article><span>САМАЯ ВЫСОКАЯ ρ</span><strong>{highest?.correlation == null ? '—' : number.format(highest.correlation)}</strong><small>{highest ? `${labelByKey.get(highest.a)} ↔ ${labelByKey.get(highest.b)}` : 'пока нет готовой пары'}</small></article>
       </div>
 
       <div className="corr-scroll">
@@ -118,11 +125,12 @@ export function CorrelationPanel() {
             const cellsForRow = series.map(column => {
               const cell = cells.get(`${row.key}|${column.key}`)
               const value = cell?.available && cell.correlation != null ? cell.correlation : null
+              const maturity = cell?.mature ? 'MATURE' : cell?.available ? 'PREVIEW' : 'INSUFFICIENT'
               return (
                 <span
                   className={`corr-cell ${cellTone(value)}`}
                   key={`${row.key}-${column.key}`}
-                  title={`${row.label} ↔ ${column.label}: ${value == null ? 'недостаточно данных' : number.format(value)}${cell ? ` · ${cell.pairedReturns} пар` : ''}`}
+                  title={`${row.label} ↔ ${column.label}: ${value == null ? 'недостаточно данных' : number.format(value)}${cell ? ` · ${cell.pairedReturns} пар · ${maturity}` : ''}`}
                 >
                   {value == null ? '—' : number.format(value)}
                 </span>
@@ -133,7 +141,7 @@ export function CorrelationPanel() {
         </div>
       </div>
 
-      <p className="corr-note">Pearson ρ считается по совпадающим дневным доходностям, а не по ценам. Пара скрывается до {matrix.minimumPairedReturns} общих доходностей. Это диагностика структуры портфеля, не торговый сигнал.</p>
+      <p className="corr-note">Pearson ρ считается по совпадающим дневным доходностям, а не по ценам. До {matrix.minimumPairedReturns} общих доходностей пара скрыта; {matrix.minimumPairedReturns}–{matrix.maturePairedReturns - 1} = preview, {matrix.maturePairedReturns}+ = mature. Это диагностика структуры портфеля, не торговый сигнал.</p>
     </section>
   )
 }
