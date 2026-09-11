@@ -17,6 +17,35 @@ if(!src.includes(oldBody))throw new Error('v15.8: base body injection changed');
 src=src.replace(oldBody,newBody);
 src=src.replace("version:'15.1.0',build:'15.1.0',source:'cinematic-world'","version:'15.8.0',build:'15.8.0',source:'single-runtime-performance'");
 
+// QVANIX v2 analytics bridge: server-base intentionally deferred MOEX during the
+// v1 performance pass. Restore the original MOEX fetcher for the isolated v2
+// history endpoint, then enrich the lightweight v1473 history with a normalized
+// IMOEX series and explicit integrity metadata.
+const benchmarkBridge=`
+const originalCoreForMoex=fs.readFileSync(corePath,'utf8');
+const originalMoexMatch=originalCoreForMoex.match(/async function getMoexHistory\\(from, to\\) \\{[\\s\\S]*?\\n\\}\\n\\nfunction cbrHttpsRequest/);
+if(!originalMoexMatch)throw new Error('QVANIX v2: original getMoexHistory not found');
+core=core.replace(/async function getMoexHistory\\(from,to\\)\\{ return \\[\\]; \\}\\n\\nfunction cbrHttpsRequest/,originalMoexMatch[0]);
+const benchmarkMarker="const result={available:true,startDate:points[0].date,endDate:points.at(-1).date,points,valuePoints,investedPoints,method:'portfolio_snapshot_v1473',benchmark:{symbol:'IMOEX',available:false,source:'deferred'}};";
+if(!core.includes(benchmarkMarker))throw new Error('QVANIX v2: history benchmark marker changed');
+const benchmarkCode=[
+ "let moex=[];",
+ "try{moex=await getMoexHistory(from,to)}catch(e){console.warn('IMOEX history failed:',e.message)}",
+ "const moexRows=(Array.isArray(moex)?moex:[]).filter(x=>x&&x.date&&Number.isFinite(Number(x.value))&&Number(x.value)>0).sort((a,b)=>String(a.date).localeCompare(String(b.date)));",
+ "const moexByDate=new Map(moexRows.map(x=>[String(x.date).slice(0,10),Number(x.value)]));",
+ "const firstPointDate=points[0]?.date||null;",
+ "const baselineRow=moexRows.find(x=>!firstPointDate||String(x.date).slice(0,10)>=firstPointDate)||moexRows[0]||null;",
+ "const baseline=baselineRow?Number(baselineRow.value):null;",
+ "let lastMoex=null;",
+ "for(const p of points){const exact=moexByDate.get(p.date);if(Number.isFinite(exact)&&exact>0)lastMoex=exact;p.imoex=baseline&&lastMoex?Number((lastMoex/baseline*100).toFixed(4)):null;}",
+ "const benchmarkPoints=points.filter(p=>Number.isFinite(p.imoex)).length;",
+ "const uniqueDates=new Set(points.map(p=>p.date)).size;",
+ "const integrity={version:'1.0',points:points.length,uniqueDates,portfolioFinite:points.filter(p=>Number.isFinite(p.portfolio)&&p.portfolio>0).length,benchmarkPoints,benchmarkCoverage:points.length?Number((benchmarkPoints/points.length).toFixed(4)):0,startDate:points[0]?.date||null,endDate:points.at(-1)?.date||null,monotonicDates:points.every((p,i)=>i===0||String(points[i-1].date)<String(p.date))};",
+ "const result={available:true,startDate:points[0].date,endDate:points.at(-1).date,points,valuePoints,investedPoints,method:'portfolio_snapshot_v1474_imoex',benchmark:{symbol:'IMOEX',available:benchmarkPoints>=2,source:'MOEX ISS',points:benchmarkPoints,coverage:integrity.benchmarkCoverage,baselineDate:baselineRow?String(baselineRow.date).slice(0,10):null},integrity};"
+].join('\\n');
+core=core.replace(benchmarkMarker,benchmarkCode);
+`;
+
 // v2 bridge: server-base compiles server-core at runtime, so inject the isolated
 // React/Pixi build before the legacy wildcard route without changing v1 pages.
 const v2Bridge=`core=core.replace("\\napp.get('*', (req, res) => {",\`\\nconst V2_DIST=path.join(__dirname,'v2','dist');
@@ -25,6 +54,6 @@ app.get(['/v2','/v2/*'],(req,res)=>res.sendFile(path.join(V2_DIST,'index.html'))
 \\napp.get('*', (req, res) => {\`);\n`;
 const coreCompile='const mod=new Module(corePath,module);';
 if(!src.includes(coreCompile))throw new Error('v15.8: core compile marker changed');
-src=src.replace(coreCompile,v2Bridge+coreCompile);
+src=src.replace(coreCompile,benchmarkBridge+v2Bridge+coreCompile);
 
 const mod=new Module(serverPath,module);mod.filename=serverPath;mod.paths=Module._nodeModulePaths(__dirname);mod._compile(src,serverPath);
