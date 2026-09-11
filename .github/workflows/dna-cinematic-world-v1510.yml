@@ -1,0 +1,41 @@
+name: DNA cinematic world v15.1.0
+on:
+  push:
+    branches: [dna-cinematic-world-v1510]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-cinematic-world-v1510
+      - name: Wire v15.1 cinematic world
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js'); s=p.read_text()
+          s=s.replace('// v15.0.0 — DNA WORLD MASTER: panoramic world architecture, true territorial progression and desktop/mobile proportional layout; finance/history unchanged.','// v15.1.0 — DNA CINEMATIC WORLD: larger landmark zones, denser cave system and stronger visual progression; finance/history unchanged.')
+          s=s.replace('dna-world-master-v150)\\.js','dna-world-master-v150|dna-world-cinematic-v151)\\.js')
+          s=s.replace("master='<script src=\"/dna-world-master-v150.js?rev=1500\"></script>',history=", "master='<script src=\"/dna-world-master-v150.js?rev=1510\"></script>',cinematic='<script src=\"/dna-world-cinematic-v151.js?rev=1510\"></script>',history=")
+          s=s.replace("history+art+assets+dna+runtime+preview+levelworld+master+versionLock+'</body>'", "history+art+assets+dna+runtime+preview+levelworld+master+cinematic+versionLock+'</body>'")
+          s=s.replace("const V='v15.0.0'", "const V='v15.1.0'")
+          s=s.replace("|WORLD MASTER/i", "|WORLD MASTER|CINEMATIC WORLD/i")
+          s=s.replace("b.innerHTML='<i></i> WORLD MASTER · '+V+' · 11/11'", "b.innerHTML='<i></i> CINEMATIC WORLD · '+V+' · 11/11'")
+          s=s.replace("process.env.TINVEST_BUILD='15.0.0'", "process.env.TINVEST_BUILD='15.1.0'")
+          s=s.replace("version:'15.0.0',build:'15.0.0',source:'world-master-panorama'", "version:'15.1.0',build:'15.1.0',source:'cinematic-world'")
+          p.write_text(s)
+          PY
+          node --check server.js
+          node --check public/dna-world-cinematic-v151.js
+      - name: Remove transient workflow and commit
+        run: |
+          git rm .github/workflows/dna-cinematic-world-v1510.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "wire DNA cinematic world v15.1.0"
+          git push origin HEAD:dna-cinematic-world-v1510
