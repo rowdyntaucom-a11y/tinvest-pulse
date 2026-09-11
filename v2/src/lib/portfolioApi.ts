@@ -11,6 +11,8 @@ export type PositionSnapshot = {
   name: string
   instrumentType: string
   quantity: number
+  averagePrice: number
+  costBasis: number
   currentPrice: number
   currentValue: number
   expectedYield: number
@@ -101,13 +103,17 @@ const normalisePositions = (rawPositions: unknown, portfolioValue: number): Posi
   const rows = rawPositions.map(item => {
     const row = (item ?? {}) as Record<string, unknown>
     const quantity = n(row.quantity)
+    const averagePrice = n(row.averagePrice ?? row.averagePositionPrice)
     const currentPrice = n(row.currentPrice)
     const currentValue = n(row.currentValue) || quantity * currentPrice
+    const costBasis = averagePrice > 0 && quantity > 0 ? averagePrice * quantity : 0
     return {
       ticker: String(row.ticker || row.figi || row.instrumentUid || '—'),
       name: String(row.name || row.ticker || row.figi || 'Актив'),
       instrumentType: String(row.instrumentType || row.type || ''),
       quantity,
+      averagePrice,
+      costBasis,
       currentPrice,
       currentValue,
       expectedYield: n(row.expectedYield),
