@@ -1,0 +1,125 @@
+import type { AnalyticsHistoryPoint } from './metrics'
+
+export type RelativePerformance = {
+  available: boolean
+  status: 'insufficient_history' | 'preview' | 'mature'
+  overlapPoints: number
+  pairedReturns: number
+  minimumReturns: number
+  matureReturns: number
+  periodDays: number
+  portfolioReturn: number | null
+  benchmarkReturn: number | null
+  excessReturn: number | null
+  trackingError: number | null
+  informationRatio: number | null
+  beta: number | null
+  correlation: number | null
+  note: string
+}
+
+const MIN_RELATIVE_RETURNS = 60
+const MATURE_RELATIVE_RETURNS = 252
+
+const mean = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length
+
+function sampleVariance(values: number[]) {
+  if (values.length < 2) return null
+  const avg = mean(values)
+  return values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / (values.length - 1)
+}
+
+function sampleCovariance(a: number[], b: number[]) {
+  if (a.length !== b.length || a.length < 2) return null
+  const avgA = mean(a)
+  const avgB = mean(b)
+  let sum = 0
+  for (let i = 0; i < a.length; i += 1) sum += (a[i] - avgA) * (b[i] - avgB)
+  return sum / (a.length - 1)
+}
+
+function overlap(history: AnalyticsHistoryPoint[]) {
+  return history
+    .filter(point => (
+      typeof point.portfolio === 'number' && Number.isFinite(point.portfolio) && point.portfolio > 0
+      && typeof point.imoex === 'number' && Number.isFinite(point.imoex) && point.imoex > 0
+    ))
+    .map(point => ({ date: point.date, portfolio: point.portfolio as number, imoex: point.imoex as number }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+}
+
+export function calculateRelativePerformance(history: AnalyticsHistoryPoint[]): RelativePerformance {
+  const points = overlap(history)
+  const portfolioReturns: number[] = []
+  const benchmarkReturns: number[] = []
+
+  for (let i = 1; i < points.length; i += 1) {
+    const previous = points[i - 1]
+    const current = points[i]
+    const portfolioReturn = current.portfolio / previous.portfolio - 1
+    const benchmarkReturn = current.imoex / previous.imoex - 1
+    if (!Number.isFinite(portfolioReturn) || !Number.isFinite(benchmarkReturn)) continue
+    portfolioReturns.push(portfolioReturn)
+    benchmarkReturns.push(benchmarkReturn)
+  }
+
+  const first = points[0]
+  const last = points.at(-1)
+  const portfolioReturn = first && last ? last.portfolio / first.portfolio - 1 : null
+  const benchmarkReturn = first && last ? last.imoex / first.imoex - 1 : null
+  const excessReturn = portfolioReturn != null && benchmarkReturn != null ? portfolioReturn - benchmarkReturn : null
+  const firstDate = first?.date ? new Date(first.date) : null
+  const lastDate = last?.date ? new Date(last.date) : null
+  const periodDays = firstDate && lastDate ? Math.max(0, Math.round((lastDate.getTime() - firstDate.getTime()) / 86_400_000)) : 0
+
+  const sufficient = portfolioReturns.length >= MIN_RELATIVE_RETURNS
+  let trackingError: number | null = null
+  let informationRatio: number | null = null
+  let beta: number | null = null
+  let correlation: number | null = null
+
+  if (sufficient) {
+    const active = portfolioReturns.map((value, index) => value - benchmarkReturns[index])
+    const activeVariance = sampleVariance(active)
+    const benchmarkVariance = sampleVariance(benchmarkReturns)
+    const portfolioVariance = sampleVariance(portfolioReturns)
+    const covariance = sampleCovariance(portfolioReturns, benchmarkReturns)
+    const activeStdev = activeVariance == null ? null : Math.sqrt(Math.max(0, activeVariance))
+
+    if (activeStdev != null && activeStdev > 0) {
+      trackingError = activeStdev * Math.sqrt(252)
+      informationRatio = (mean(active) / activeStdev) * Math.sqrt(252)
+    }
+    if (covariance != null && benchmarkVariance != null && benchmarkVariance > 0) beta = covariance / benchmarkVariance
+    if (covariance != null && benchmarkVariance != null && benchmarkVariance > 0 && portfolioVariance != null && portfolioVariance > 0) {
+      correlation = covariance / Math.sqrt(benchmarkVariance * portfolioVariance)
+    }
+  }
+
+  const mature = portfolioReturns.length >= MATURE_RELATIVE_RETURNS
+  const available = points.length >= 2
+
+  return {
+    available,
+    status: sufficient ? (mature ? 'mature' : 'preview') : 'insufficient_history',
+    overlapPoints: points.length,
+    pairedReturns: portfolioReturns.length,
+    minimumReturns: MIN_RELATIVE_RETURNS,
+    matureReturns: MATURE_RELATIVE_RETURNS,
+    periodDays,
+    portfolioReturn,
+    benchmarkReturn,
+    excessReturn,
+    trackingError,
+    informationRatio,
+    beta,
+    correlation,
+    note: !available
+      ? 'Для сравнения нужны совпадающие точки TWR портфеля и IMOEX.'
+      : sufficient
+        ? mature
+          ? `Относительные коэффициенты рассчитаны по ${portfolioReturns.length} парным дневным доходностям.`
+          : `Предварительная выборка: ${portfolioReturns.length} парных дневных доходностей. Для зрелой оценки QVANIX ждёт ${MATURE_RELATIVE_RETURNS}.`
+        : `Периодную доходность сравнивать можно, но Tracking Error / Information Ratio / Beta / корреляция скрыты до ${MIN_RELATIVE_RETURNS} парных дневных доходностей. Сейчас ${portfolioReturns.length}.`,
+  }
+}
