@@ -1,0 +1,46 @@
+name: Run v15.4 patch
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-performance-ceiling-v1540
+      - name: Build v15.4
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, json
+          src=Path('public/dna-world-v153.js').read_text()
+          src=src.replace("const V='15.3.0'","const V='15.4.0'")
+          new_motion="""function motionWorld(c,t,l){c.clearRect(0,0,LW,LH);const sw=Math.sin(t*4.8);worker(c,'minerMine',160,498,58,86,false,Math.abs(sw)*1.2,-.035+sw*.05);worker(c,'builderWork',1100,498,56,84,false,Math.abs(Math.sin(t*4))*1.0,Math.sin(t*4)*.025);if(l>=3)worker(c,'haulerWalk',360+((t*18)%360),498,52,78,false,Math.abs(Math.sin(t*5.5))*1.1,0);const sx=-70+((t*31)%(LW+150));cart(c,sx,512,true,.96,t*4.8);worker(c,'minerMine',185,706,49,74,true,Math.abs(Math.sin(t*4.2))*1.0,.025);const ux=LW+60-((t*20+60)%(LW+140));cart(c,ux,718,true,.8,t*4.2);if(!MOBILE&&l>=4){worker(c,'operatorIdle',650,498,53,80,true,Math.sin(t*2)*.3,0);if(l>=7)worker(c,'operatorIdle',835,498,51,76,false,0,0);for(let i=0;i<3;i++){const a=(t*.08+i*.31)%1;c.globalAlpha=(1-a)*.06;c.fillStyle='#bbc8c4';c.beginPath();c.ellipse(675+Math.sin(t+i)*6,335-a*70,11+a*16,5+a*8,0,0,Math.PI*2);c.fill()}c.globalAlpha=1}window.DNA_PERF_STATE={version:V,level:l,mobile:MOBILE,animatedBudget:MOBILE?6:9,motionCanvas:MOBILE?'480w':'960w',levelScaledMotion:false}}"""
+          src=re.sub(r"function motionWorld\(c,t,l\)\{.*?\}\nfunction sync",new_motion+"\nfunction sync",src,flags=re.S)
+          src=src.replace("renderer:'single-v153'","renderer:'single-v154-perf-ceiling'")
+          src=src.replace("PERFORMANCE LIFE · v'+V+' · ","PERF CEILING · v'+V+' · ")
+          old="const rw=MOBILE?720:1200,rh=rw*LH/LW;base.width=motion.width=rw;base.height=motion.height=rh;h.append(base,motion);b=base.getContext('2d',{alpha:false});g=motion.getContext('2d',{alpha:true});b.setTransform(rw/LW,0,0,rh/LH,0,0);g.setTransform(rw/LW,0,0,rh/LH,0,0);b.imageSmoothingEnabled=g.imageSmoothingEnabled"
+          new="const brw=MOBILE?720:1200,brh=brw*LH/LW,mrw=MOBILE?480:960,mrh=mrw*LH/LW;base.width=brw;base.height=brh;motion.width=mrw;motion.height=mrh;h.append(base,motion);b=base.getContext('2d',{alpha:false,desynchronized:true});g=motion.getContext('2d',{alpha:true,desynchronized:true});b.setTransform(brw/LW,0,0,brh/LH,0,0);g.setTransform(mrw/LW,0,0,mrh/LH,0,0);b.imageSmoothingEnabled=true;g.imageSmoothingEnabled=false"
+          if old not in src: raise SystemExit('mount sizing pattern not found')
+          Path('public/dna-world-v154.js').write_text(src.replace(old,new))
+          life=Path('public/dna-life-v153.js').read_text().replace("const V='15.3.0'","const V='15.4.0'")
+          life=life.replace("let root,last=-1,timer=0","let root,last=-1")
+          life=life.replace("clearInterval(timer);timer=setInterval(()=>draw(level()),700)","")
+          life=life.replace("sparse:true,loop:'css-compositor'","sparse:true,loop:'event-driven-css',maxResidents:5,maxChildren:2,maxAnimals:2,maxBirds:2")
+          Path('public/dna-life-v154.js').write_text(life)
+          prod=Path('production-v153.js').read_text().replace('v15.3','v15.4').replace('15.3.0','15.4.0').replace('1530','1540').replace('dna-world-v153','dna-world-v154').replace('dna-life-v153','dna-life-v154').replace('performance-life-single-renderer','performance-ceiling-single-renderer').replace('PERFORMANCE LIFE','PERF CEILING')
+          Path('production-v154.js').write_text(prod)
+          pkg=json.loads(Path('package.json').read_text());pkg['version']='15.4.0';pkg['main']='production-v154.js';pkg['scripts']['start']='node production-v154.js';Path('package.json').write_text(json.dumps(pkg,ensure_ascii=False,indent=2)+'\n')
+          PY
+          node --check public/dna-world-v154.js
+          node --check public/dna-life-v154.js
+          node --check production-v154.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/dna-world-v154.js public/dna-life-v154.js production-v154.js package.json
+          git commit -m "DNA performance ceiling v15.4.0"
+          git push origin HEAD:dna-performance-ceiling-v1540
