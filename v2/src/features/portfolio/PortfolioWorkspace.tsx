@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi'
 import { PortfolioValueChart } from './PortfolioValueChart'
 import { BondAnalytics } from './BondAnalytics'
+import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './portfolioAttribution'
 import './portfolio.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -98,6 +99,11 @@ export function PortfolioWorkspace({ snapshot }: Props) {
       .sort((a, b) => b.value - a.value)
   }, [snapshot.positionItems])
 
+  const pnlAttribution = useMemo(
+    () => calculatePortfolioPnlAttribution(snapshot.positionItems),
+    [snapshot.positionItems],
+  )
+
   const sortedPositions = useMemo(() => {
     const rows = [...snapshot.positionItems]
     if (positionSort === 'pnl') return rows.sort((a, b) => positionPnl(b).amount - positionPnl(a).amount)
@@ -115,6 +121,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   )
   const selectedPosition = visiblePositions.find(position => positionKey(position) === selectedPositionKey) ?? visiblePositions[0] ?? null
   const selectedPnl = selectedPosition ? positionPnl(selectedPosition) : null
+  const selectedAttribution = selectedPosition ? findPositionPnlAttribution(pnlAttribution, selectedPosition) : null
 
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
   const topPosition = snapshot.positionItems[0]
@@ -194,7 +201,10 @@ export function PortfolioWorkspace({ snapshot }: Props) {
             <div className="position-inspector">
               <div className="position-inspector__head">
                 <div><span>ВЫБРАНО</span><strong>{selectedPosition.ticker || selectedPosition.name}</strong></div>
-                <small>{assetTypeLabel(selectedPosition.instrumentType)} · вес {pctPlain.format(selectedPosition.weight * 100)}%</small>
+                <small>
+                  {assetTypeLabel(selectedPosition.instrumentType)} · вес {pctPlain.format(selectedPosition.weight * 100)}%
+                  {selectedAttribution?.grossPnlShare == null ? '' : ` · P/L вклад ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}
+                </small>
               </div>
               <div className="position-inspector__grid">
                 <div><span>КОЛ-ВО</span><strong>{quantityFmt.format(selectedPosition.quantity)}</strong></div>
@@ -204,7 +214,11 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                 <div><span>P/L · API</span><strong className={selectedPnl.amount > 0 ? 'is-positive' : selectedPnl.amount < 0 ? 'is-negative' : ''}>{signedMoney(selectedPnl.amount)}</strong></div>
                 <div><span>P/L %</span><strong className={(selectedPnl.pct ?? 0) > 0 ? 'is-positive' : (selectedPnl.pct ?? 0) < 0 ? 'is-negative' : ''}>{selectedPnl.pct == null ? '—' : `${pctSigned.format(selectedPnl.pct * 100)}%`}</strong></div>
               </div>
-              <p>Результат позиции берётся из broker `expectedYield`; процент рассчитан относительно подразумеваемой базы позиции. Это не TWR и не вклад позиции в доходность всего портфеля.</p>
+              <p>
+                Результат позиции берётся из broker `expectedYield`; P/L-вклад = |P/L позиции| / сумма |P/L| текущих позиций
+                {selectedAttribution?.grossPnlShare == null ? '' : ` = ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}.
+                Это текущая нереализованная broker P/L attribution, а не TWR, alpha или исторический вклад в доходность.
+              </p>
             </div>
           )}
         </section>
