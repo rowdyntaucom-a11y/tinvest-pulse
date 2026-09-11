@@ -23,6 +23,14 @@ const linePath = (values: Array<number | null>, min: number, max: number) => {
   }).filter(Boolean).join(' ')
 }
 
+const lastFinite = (values: Array<number | null>) => {
+  for (let i = values.length - 1; i >= 0; i -= 1) {
+    const value = values[i]
+    if (typeof value === 'number' && Number.isFinite(value)) return value
+  }
+  return null
+}
+
 export function HistoryChart({ points }: Props) {
   const chartPoints = points.filter(p => p.portfolio != null || p.imoex != null)
   if (chartPoints.length < 2) {
@@ -39,7 +47,12 @@ export function HistoryChart({ points }: Props) {
   const max = rawMax + padding
   const portfolioPath = linePath(portfolioValues, min, max)
   const imoexPath = linePath(imoexValues, min, max)
-  const hasImoex = imoexValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length >= 2
+  const portfolioCount = portfolioValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
+  const imoexCount = imoexValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
+  const hasImoex = imoexCount >= 2
+  const benchmarkCoverage = portfolioCount ? Math.round((imoexCount / portfolioCount) * 100) : 0
+  const latestPortfolio = lastFinite(portfolioValues)
+  const latestImoex = lastFinite(imoexValues)
   const first = chartPoints[0]?.date
   const last = chartPoints.at(-1)?.date
 
@@ -53,8 +66,10 @@ export function HistoryChart({ points }: Props) {
         {hasImoex && imoexPath && <path d={imoexPath} className="history-line history-line--imoex" />}
       </svg>
       <div className="history-legend">
-        <span><i className="legend-dot legend-dot--portfolio" />Портфель</span>
-        {hasImoex ? <span><i className="legend-dot legend-dot--imoex" />IMOEX</span> : <span>IMOEX: данные ещё не готовы</span>}
+        <span><i className="legend-dot legend-dot--portfolio" />Портфель{latestPortfolio == null ? '' : ` · ${latestPortfolio.toFixed(1)}`}</span>
+        {hasImoex
+          ? <span><i className="legend-dot legend-dot--imoex" />IMOEX{latestImoex == null ? '' : ` · ${latestImoex.toFixed(1)}`} · покрытие {benchmarkCoverage}%</span>
+          : <span>IMOEX: данные ещё не готовы</span>}
         <small>{first} → {last}</small>
       </div>
     </div>
