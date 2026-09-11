@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.24.0';let raf=0;
+const V='14.25.0';let raf=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function readLevel(){const root=document.getElementById('iwScene')?.parentElement||document.body;const m=(root.innerText||'').match(/(\d+)\s*\/\s*11/);return clamp(m?Number(m[1]):1,1,11)}
 function mount(){
@@ -15,10 +15,10 @@ function mount(){
  function infrastructure(t,level){const lift=225+Math.sin(t*(.7+level*.02))*31;g.strokeStyle='rgba(214,169,103,.92)';g.lineWidth=2;g.beginPath();g.moveTo(548,145);g.lineTo(548,lift);g.stroke();g.fillStyle='#83502e';g.strokeStyle='#d39a5b';g.lineWidth=2;g.fillRect(536,lift,24,16);g.strokeRect(536,lift,24,16);glow(548,lift+8,25,.09,'255,190,92');[[221,479],[514,479],[764,479]].forEach((p,i)=>glow(p[0],p[1],32,.09+.06*Math.sin(t*(2.2+level*.03)+i),'255,186,78'));[[96,572],[118,582],[493,570],[515,581],[688,575]].forEach((p,i)=>glow(p[0],p[1],19,.05+.035*Math.sin(t*3+i),'54,236,226'))}
  function spark(x,y,t,phase=0,col='255,202,93'){const hit=(Math.sin(t*5.4+phase)+1)/2;if(hit<.76)return;g.save();g.globalCompositeOperation='screen';for(let i=0;i<5;i++){const a=(hit-.76)/.24,ang=-1.3+i*.33,r=8+5*i*a;g.fillStyle=`rgba(${col},${.75*a})`;g.fillRect(x+Math.cos(ang)*r,y+Math.sin(ang)*r,2,2)}g.restore()}
  function people(t,level){
-   const mineBob=Math.sin(t*5.2)*1.6;worker('minerMine',318,365,78,112,false,1,mineBob,Math.sin(t*5.2)*.035);spark(292,328,t,0);
-   worker('builderWork',600,365,76,110,false,1,Math.sin(t*4.4+1)*1.3,-Math.sin(t*4.4+1)*.022);spark(626,321,t,1.2,'255,170,82');
-   const run=(t*(13+level*.9))%360,hx=170+run;worker('haulerWalk',hx,365,72,105,false,.98,Math.sin(t*7)*2.1,Math.sin(t*7)*.016);
-   if(level>=3)worker('operatorIdle',472,365,73,106,false,.99,Math.sin(t*2.5)*.8,Math.sin(t*2.5)*.008);
+   const mineBob=Math.sin(t*5.2)*1.6;worker('minerMine',286,365,78,112,false,1,mineBob,Math.sin(t*5.2)*.035);spark(260,328,t,0);
+   worker('builderWork',650,365,76,110,false,1,Math.sin(t*4.4+1)*1.3,-Math.sin(t*4.4+1)*.022);spark(676,321,t,1.2,'255,170,82');
+   const run=(t*(13+level*.9))%150,hx=390+run;worker('haulerWalk',hx,365,72,105,false,.98,Math.sin(t*7)*2.1,Math.sin(t*7)*.016);
+   if(level>=3)worker('operatorIdle',725,365,73,106,true,.99,Math.sin(t*2.5)*.8,Math.sin(t*2.5)*.008);
    worker('minerMine',166,636,70,103,true,.97,Math.sin(t*5+2)*1.6,-Math.sin(t*5+2)*.03);spark(193,598,t,2.1,'74,241,226');
    if(level>=4)worker('haulerWalk',425+Math.sin(t*.55)*110,636,68,100,true,.95,Math.sin(t*6.2)*1.8,Math.sin(t*6.2)*.014);
    if(level>=6)worker('operatorIdle',610,636,70,102,true,.96,Math.sin(t*2.2)*.8,0);

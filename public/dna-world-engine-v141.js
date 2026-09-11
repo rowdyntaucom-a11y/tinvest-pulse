@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.24.0';let raf=0;
+const V='14.25.0';let raf=0;
 function boot(){
  const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
  if(getComputedStyle(h).position==='static')h.style.position='relative';
@@ -13,7 +13,7 @@ function boot(){
  art.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.sceneBase)||'/assets/dna-world/l1/figma-mobile-v14170.svg?rev=14170';h.appendChild(art);
  const quality=document.createElement('img');quality.id='dnaQuality14200';quality.alt='';quality.decoding='async';quality.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.qualityOverlay)||'/assets/dna-world/l1/depth-material-v14210.svg?rev=14210';Object.assign(quality.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:41,pointerEvents:'none',opacity:'.48'});h.appendChild(quality);
  const env=document.createElement('img');env.id='dnaEnv14230';env.alt='';env.decoding='async';env.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.environmentOverlay)||'/assets/dna-world/l1/cinematic-environment-v14230.svg?rev=14230';Object.assign(env.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:42,pointerEvents:'none',opacity:'.72',transformOrigin:'50% 50%',willChange:'transform'});h.appendChild(env);
- const detail=document.createElement('img');detail.id='dnaDetail14240';detail.alt='';detail.decoding='async';detail.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.detailOverlay)||'/assets/dna-world/l1/detail-readability-v14240.svg?rev=14240';Object.assign(detail.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:42,pointerEvents:'none',opacity:'.86'});h.appendChild(detail);
+ const detail=document.createElement('img');detail.id='dnaDetail14240';detail.alt='';detail.decoding='async';detail.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.detailOverlay)||'/assets/dna-world/l1/clean-polish-v14250.svg?rev=14250';Object.assign(detail.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:42,pointerEvents:'none',opacity:'.72'});h.appendChild(detail);
  const c=document.createElement('canvas');c.id='dnaWorld148';c.width=1200;c.height=680;
  Object.assign(c.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:40,pointerEvents:'none',imageRendering:'auto'});h.appendChild(c);
  const g=c.getContext('2d');g.imageSmoothingEnabled=true;const A=()=>window.DNA_GAME_ASSETS||null;
@@ -61,7 +61,7 @@ function boot(){
  }
  function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{}ambient(t);raf=requestAnimationFrame(frame)}
  cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
- setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> DETAIL READABILITY · v'+V+' · 11/11')},120)
+ setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> CLEAN POLISH · v'+V+' · 11/11')},120)
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 window.addEventListener('dna-game-remount',()=>setTimeout(boot,100));
