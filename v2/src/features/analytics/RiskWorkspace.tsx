@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { AnalyticsHistoryPoint, PortfolioAnalytics } from './metrics'
+import { CorrelationPanel } from './CorrelationPanel'
 import { calculateRelativePerformance } from './relativePerformance'
 import { calculateRollingRisk } from './rollingRisk'
 import { calculateTailRisk } from './tailRisk'
@@ -9,7 +10,7 @@ const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, sig
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
-type Mode = 'portfolio' | 'benchmark' | 'rolling' | 'tail'
+type Mode = 'portfolio' | 'benchmark' | 'rolling' | 'tail' | 'corr'
 
 type Props = {
   analytics: PortfolioAnalytics
@@ -42,7 +43,9 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
       ? `${relative.overlapPoints} общих точек`
       : mode === 'rolling'
         ? roll ? `${roll.tradingDays}D active` : `${rolling.availableReturns} доходностей`
-        : `${tail.returns} дневных доходностей`
+        : mode === 'tail'
+          ? `${tail.returns} дневных доходностей`
+          : '365D · top 6 активов'
 
   return (
     <div className="analytics-risk-view">
@@ -52,6 +55,7 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
         <button className={mode === 'benchmark' ? 'is-active' : ''} onClick={() => setMode('benchmark')}>VS IMOEX</button>
         <button className={mode === 'rolling' ? 'is-active' : ''} onClick={() => setMode('rolling')}>ROLLING</button>
         <button className={mode === 'tail' ? 'is-active' : ''} onClick={() => setMode('tail')}>TAIL</button>
+        <button className={mode === 'corr' ? 'is-active' : ''} onClick={() => setMode('corr')}>CORR</button>
         <small>{modeStatus}</small>
       </div>
 
@@ -126,6 +130,8 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
           </section>
         </>
       )}
+
+      {mode === 'corr' && <CorrelationPanel />}
     </div>
   )
 }
