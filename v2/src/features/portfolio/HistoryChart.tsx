@@ -45,7 +45,7 @@ export function HistoryChart({ points }: Props) {
 
   return (
     <div className="history-chart">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Доходность портфеля и IMOEX на общей шкале">
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="Доходность портфеля и IMOEX на общей шкале">
         {[0.2, 0.4, 0.6, 0.8].map(k => (
           <line key={k} x1={PAD_X} x2={W - PAD_X} y1={H * k} y2={H * k} className="history-gridline" />
         ))}

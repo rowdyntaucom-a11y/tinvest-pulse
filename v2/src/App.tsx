@@ -210,7 +210,7 @@ export default function App() {
                     <small>{analyticsMature ? 'Расчёт на зрелой истории' : `Предварительно · история ${historyLabel}`}</small>
                   </article>
                   <article className="metric-card"><span className="metric-label">XIRR · ЛИЧНАЯ</span><strong>{xirr == null ? '—' : `${pctSigned.format(xirr)}%`}</strong><small>Учитывает даты денежных потоков</small></article>
-                  <article className="metric-card"><span className="metric-label">TWR · РЫНОК</span><strong>{signedRatio(analytics.twr)}</strong><small>Не зависит от размера довнесений</small></article>
+                  <article className="metric-card"><span className="metric-label">TWR · ПОРТФЕЛЬ</span><strong>{signedRatio(analytics.twr)}</strong><small>Доходность без влияния размера довнесений</small></article>
                 </section>
 
                 <section className="panel history-panel">
@@ -229,7 +229,7 @@ export default function App() {
                   <article className="risk-card"><span>MAX DRAWDOWN</span><strong>{signedRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
                   <article className="risk-card"><span>ВОЛАТИЛЬНОСТЬ</span><strong>{plainRatio(analytics.volatility)}</strong><small>σ дневных доходностей × √252</small></article>
                   <article className="risk-card"><span>SHARPE</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{snapshot.riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Rf ${number.format(snapshot.riskFreeRate)}%`}</small></article>
-                  <article className="risk-card"><span>SORTINO</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Downside deviation ниже Rf</small></article>
+                  <article className="risk-card"><span>SORTINO</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Downside deviation относительно MAR (Rf)</small></article>
                   <article className="risk-card"><span>HHI</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
                   <article className="risk-card"><span>ЭКВ. ПОЗИЦИЙ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
                 </section>
@@ -269,8 +269,8 @@ export default function App() {
             </section>
             <section className="income-stats">
               <article className="metric-card"><span className="metric-label">СРЕДНЕЕ / МЕС.</span><strong>{snapshot.averageMonthlyPassiveIncome ? `${money.format(snapshot.averageMonthlyPassiveIncome)} ₽` : '—'}</strong><small>По фактически доступному периоду</small></article>
-              <article className="metric-card"><span className="metric-label">12М RUN-RATE</span><strong>—</strong><small>Не показываем до достаточной истории</small></article>
-              <article className="context-card"><span>ИСТОРИЯ</span><strong>{historyLabel}</strong><span>СЛЕДУЮЩЕЕ</span><strong>Календарь выплат</strong></article>
+              <article className="metric-card"><span className="metric-label">ПЕРИОД УЧЁТА</span><strong>{analytics.historyDays ? analytics.historyDays : '—'}</strong><small>{analytics.historyDays ? 'дней истории' : 'история загружается'}</small></article>
+              <article className="context-card"><span>12М RUN-RATE</span><strong>—</strong><span>СЛЕДУЮЩЕЕ</span><strong>Календарь выплат</strong></article>
             </section>
             <section className="panel roadmap-panel"><span className="eyebrow">СЛЕДУЮЩИЙ МОДУЛЬ</span><h2>КАЛЕНДАРЬ ВЫПЛАТ</h2><p>Подключим подтверждённые ожидаемые купоны и дивиденды, затем YoC и рост дохода к собственной базе. Прогнозные суммы не показываем без надёжного источника.</p></section>
           </div>
