@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadPayoutCalendar, type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
+import { getIncomeIntegrity } from './incomeIntegrity'
 import './income.css'
+import './incomeCompact.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
@@ -79,6 +81,8 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const safePage = Math.min(page, pages - 1)
   const visibleUpcoming = upcoming.slice(safePage * pageSize, safePage * pageSize + pageSize)
 
+  const integrity = useMemo(() => getIncomeIntegrity(data, loading), [data, loading])
+
   const sourceRows = useMemo(() => {
     const positionMap = new Map<string, PositionSnapshot>()
     for (const position of positions) {
@@ -117,7 +121,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
   const monthRows = data.months.slice(0, 6)
   const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
-  const coverage = data.coverage.eligibleAssets > 0 ? data.coverage.coverageRatio : 0
+  const coverage = integrity.coveragePct
   const next = data.next
 
   return (
@@ -126,8 +130,8 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
         <button className={view === 'overview' ? 'is-active' : ''} onClick={() => setView('overview')}>ОБЗОР</button>
         <button className={view === 'calendar' ? 'is-active' : ''} onClick={() => setView('calendar')}>КАЛЕНДАРЬ</button>
         <button className={view === 'sources' ? 'is-active' : ''} onClick={() => setView('sources')}>ИСТОЧНИКИ</button>
-        <span className={`income-source-badge ${data.integrity.complete ? 'is-ok' : ''}`}>
-          {loading ? 'T-BANK · ЗАГРУЗКА' : data.integrity.complete ? 'T-BANK · VERIFIED' : 'T-BANK · PARTIAL'}
+        <span className={`income-source-badge is-${integrity.state}`} title={integrity.detail}>
+          {integrity.label}
         </span>
       </nav>
 
@@ -148,7 +152,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             <small>gross · только выплаты из расписания текущих позиций</small>
             <div className="forecast-meta">
               <span>{data.forecast.count || 0} выплат</span>
-              <span>покрытие {coverage ? `${pct.format(coverage * 100)}%` : '—'}</span>
+              <span>покрытие {coverage == null ? '—' : `${pct.format(coverage)}%`}</span>
             </div>
           </section>
 
@@ -202,6 +206,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             )) : <div className="income-empty">{loading ? 'Получаем расписание Т-Банка…' : 'Будущие выплаты не найдены.'}</div>}
           </div>
           <p className="income-method-note">Будущие суммы не смешиваются с фактом. Здесь показывается gross из официального расписания Т‑Банка для текущих позиций; дивиденды без подтверждённого события не прогнозируются.</p>
+          {data.stale && <p className="income-warning">Расписание временно не обновилось: используется последний полный снимок.</p>}
         </section>
       )}
 
@@ -222,9 +227,12 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             )) : <div className="income-empty">Нет данных для разбивки.</div>}
           </div>
           <div className="income-integrity">
-            <span>Покрытие расписания</span>
-            <i><b style={{ width: `${Math.min(100, coverage * 100)}%` }} /></i>
-            <strong>{coverage ? `${pct.format(coverage * 100)}%` : '—'}</strong>
+            <span>Покрытие расписания · {integrity.resolvedAssets}/{integrity.eligibleAssets || '—'}</span>
+            <i><b style={{ width: `${coverage == null ? 0 : Math.min(100, coverage)}%` }} /></i>
+            <strong>{coverage == null ? '—' : `${pct.format(coverage)}%`}</strong>
+          </div>
+          <div className={`income-integrity-status is-${integrity.state}`}>
+            <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
           </div>
           <p className="income-method-note">YoC 12M = подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции (средняя цена × количество). Это не текущая дивидендная доходность и не оценка неподтверждённых выплат.</p>
           <p className="income-method-note">Темп роста выплат появится после двух сопоставимых годовых периодов. Короткую историю QVANIX не годифицирует и не выдаёт за устойчивый рост.</p>
