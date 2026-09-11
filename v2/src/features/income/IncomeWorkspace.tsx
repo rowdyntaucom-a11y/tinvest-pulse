@@ -9,6 +9,7 @@ const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const pct1 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
+const number2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const monthFmt = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
 const dateFmt = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' })
 
@@ -119,6 +120,50 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
       .slice(0, 6)
   }, [data.actual.items, data.events, positions])
 
+  const incomeProfile = useMemo(() => {
+    let actualCoupons = 0
+    let actualDividends = 0
+    let forecastCoupons = 0
+    let forecastDividends = 0
+    const bySource = new Map<string, number>()
+
+    for (const event of data.actual.items) {
+      const amount = Math.max(0, eventAmount(event, true))
+      const kind = String(event.kind || '').toUpperCase()
+      if (kind === 'COUPON') actualCoupons += amount
+      if (kind === 'DIVIDEND') actualDividends += amount
+    }
+
+    for (const event of data.events) {
+      const amount = Math.max(0, eventAmount(event))
+      const kind = String(event.kind || '').toUpperCase()
+      if (kind === 'COUPON') forecastCoupons += amount
+      if (kind === 'DIVIDEND') forecastDividends += amount
+      if (amount <= 0) continue
+      const key = event.ticker || event.name || '—'
+      bySource.set(key, (bySource.get(key) || 0) + amount)
+    }
+
+    const forecastTotal = [...bySource.values()].reduce((sum, value) => sum + value, 0)
+    const rankedSources = [...bySource.entries()].sort((a, b) => b[1] - a[1])
+    const top = rankedSources[0] ?? null
+    const topShare = top && forecastTotal > 0 ? top[1] / forecastTotal : null
+    const hhi = forecastTotal > 0
+      ? rankedSources.reduce((sum, [, value]) => sum + (value / forecastTotal) ** 2, 0)
+      : null
+    const effectiveSources = hhi != null && hhi > 0 ? 1 / hhi : null
+
+    return {
+      actualCoupons,
+      actualDividends,
+      forecastCoupons,
+      forecastDividends,
+      topSource: top?.[0] ?? null,
+      topShare,
+      effectiveSources,
+    }
+  }, [data.actual.items, data.events])
+
   const monthRows = data.months.slice(0, 6)
   const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
   const coverage = integrity.coveragePct
@@ -213,6 +258,14 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
       {view === 'sources' && (
         <section className="panel income-sources-panel">
           <div className="income-panel-head"><div><span className="eyebrow">РАЗБИВКА ПО АКТИВАМ</span><h2>ИСТОЧНИКИ ДОХОДА</h2></div><small>факт ≠ прогноз</small></div>
+
+          <div className="income-profile-grid">
+            <article><span>ФАКТ · КУПОНЫ</span><strong>{incomeProfile.actualCoupons ? `${money.format(incomeProfile.actualCoupons)} ₽` : '—'}</strong><small>{data.actual.year ?? 'текущий период'}</small></article>
+            <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{data.actual.year ?? 'текущий период'}</small></article>
+            <article><span>12М · TOP SOURCE</span><strong>{incomeProfile.topSource ?? '—'}</strong><small>{incomeProfile.topShare == null ? 'нет расписания' : `${pct1.format(incomeProfile.topShare * 100)}% подтверждённого gross`}</small></article>
+            <article><span>ЭКВ. ИСТОЧНИКОВ</span><strong>{incomeProfile.effectiveSources == null ? '—' : number2.format(incomeProfile.effectiveSources)}</strong><small>1 / HHI по 12М gross</small></article>
+          </div>
+
           <div className="income-source-table">
             <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М / YoC</span></div>
             {sourceRows.length ? sourceRows.map(row => (
@@ -234,6 +287,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className={`income-integrity-status is-${integrity.state}`}>
             <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
           </div>
+          <p className="income-method-note">12М концентрация использует только подтверждённый gross-график: купоны {money.format(incomeProfile.forecastCoupons)} ₽, дивиденды {money.format(incomeProfile.forecastDividends)} ₽. Эффективное число источников = 1/HHI; чем оно выше, тем меньше зависимость от одного источника.</p>
           <p className="income-method-note">YoC 12M = подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции (средняя цена × количество). Это не текущая дивидендная доходность и не оценка неподтверждённых выплат.</p>
           <p className="income-method-note">Темп роста выплат появится после двух сопоставимых годовых периодов. Короткую историю QVANIX не годифицирует и не выдаёт за устойчивый рост.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
