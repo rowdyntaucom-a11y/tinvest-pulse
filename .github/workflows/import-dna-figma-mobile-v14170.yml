@@ -1,0 +1,59 @@
+name: Import DNA Figma Mobile v14.17.0
+on:
+  push:
+    branches: [dna-mobile-pass-v14170]
+permissions:
+  contents: write
+jobs:
+  import-mobile-master:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-mobile-pass-v14170
+      - name: Download Figma mobile master
+        run: |
+          mkdir -p public/assets/dna-world/l1
+          curl -fL --retry 3 --retry-delay 1 \
+            'https://www.figma.com/api/mcp/asset/910b723f-695b-461a-b411-45e5448d1b8d.svg' \
+            -o public/assets/dna-world/l1/figma-mobile-v14170.svg
+          test -s public/assets/dna-world/l1/figma-mobile-v14170.svg
+      - name: Wire v14.17.0 production
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          art = Path('public/dna-art-scene-v148.js')
+          art.write_text("(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='/assets/dna-world/l1/figma-mobile-v14170.svg?rev=14170';window.DNA_ART_PACK.version='14.17.0';window.DNA_ART_PACK.source='figma-mobile-master';})();\n", encoding='utf-8')
+
+          eng = Path('public/dna-world-engine-v141.js')
+          s = eng.read_text(encoding='utf-8')
+          s = s.replace("const V='14.16.0'", "const V='14.17.0'")
+          s = s.replace('figma-art-rebuild-v14160.svg?rev=14160', 'figma-mobile-v14170.svg?rev=14170')
+          s = s.replace("source:'figma-art-rebuild'", "source:'figma-mobile-master'")
+          s = s.replace('ART REBUILD · v'+"'"+'+V+'+"'"+' · 7/11', 'MOBILE MASTER · v'+"'"+'+V+'+"'"+' · 8/11')
+          eng.write_text(s, encoding='utf-8')
+
+          srv = Path('server.js')
+          s = srv.read_text(encoding='utf-8')
+          s = s.replace('v14.16.0 — FIGMA ART REBUILD', 'v14.17.0 — FIGMA MOBILE MASTER')
+          s = s.replace('?rev=14160', '?rev=14170')
+          s = s.replace("const V='v14.16.0'", "const V='v14.17.0'")
+          s = s.replace("ART REBUILD · '+V+' · 7/11", "MOBILE MASTER · '+V+' · 8/11")
+          s = s.replace("process.env.TINVEST_BUILD='14.16.0'", "process.env.TINVEST_BUILD='14.17.0'")
+          srv.write_text(s, encoding='utf-8')
+          PY
+      - name: Verify version and asset
+        run: |
+          grep -q '14.17.0' server.js
+          grep -q 'figma-mobile-v14170.svg' public/dna-art-scene-v148.js
+          grep -q '14.17.0' public/dna-world-engine-v141.js
+          test -s public/assets/dna-world/l1/figma-mobile-v14170.svg
+      - name: Commit imported mobile master
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/assets/dna-world/l1/figma-mobile-v14170.svg public/dna-art-scene-v148.js public/dna-world-engine-v141.js server.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'DNA FIGMA MOBILE MASTER · v14.17.0'
+            git push origin HEAD:dna-mobile-pass-v14170
+          fi
