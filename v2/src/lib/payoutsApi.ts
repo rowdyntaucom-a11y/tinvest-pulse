@@ -20,6 +20,15 @@ export type PayoutEvent = {
   days?: number
 }
 
+export type PayoutObservation = {
+  available: boolean
+  from: string | null
+  to: string | null
+  completeMonths: string[]
+  partialMonths: string[]
+  basis: string | null
+}
+
 export type PayoutMonth = {
   key: string
   year: number
@@ -43,6 +52,7 @@ export type PayoutCalendar = {
     items: PayoutEvent[]
     totalNet: number
     count: number
+    observation: PayoutObservation
   }
   forecast: {
     gross: number
@@ -69,13 +79,22 @@ export type PayoutCalendar = {
   note: string | null
 }
 
+const emptyObservation = (): PayoutObservation => ({
+  available: false,
+  from: null,
+  to: null,
+  completeMonths: [],
+  partialMonths: [],
+  basis: null,
+})
+
 const emptyCalendar = (): PayoutCalendar => ({
   available: false,
   generatedAt: null,
   period: { from: null, to: null },
   basis: null,
   displayBasis: null,
-  actual: { year: null, items: [], totalNet: 0, count: 0 },
+  actual: { year: null, items: [], totalNet: 0, count: 0, observation: emptyObservation() },
   forecast: { gross: 0, tax: 0, net: 0, count: 0 },
   next: null,
   months: [],
@@ -92,12 +111,18 @@ const n = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
+const monthKeys = (value: unknown) => {
+  if (!Array.isArray(value)) return []
+  return [...new Set(value.map(item => String(item || '').slice(0, 7)).filter(key => /^\d{4}-\d{2}$/.test(key)))].sort()
+}
+
 export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
   try {
     const response = await fetch('/api/payouts', { cache: 'no-store' })
     if (!response.ok) return emptyCalendar()
     const raw = await response.json() as Record<string, any>
     const actual = raw.actual ?? {}
+    const observation = actual.observation ?? {}
     const forecast = raw.forecast ?? {}
     const coverage = raw.coverage ?? {}
     const integrity = raw.integrity ?? {}
@@ -116,6 +141,14 @@ export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
         items: Array.isArray(actual.items) ? actual.items : [],
         totalNet: n(actual.totalNet),
         count: n(actual.count),
+        observation: {
+          available: Boolean(observation.available),
+          from: observation.from ? String(observation.from) : null,
+          to: observation.to ? String(observation.to) : null,
+          completeMonths: monthKeys(observation.completeMonths),
+          partialMonths: monthKeys(observation.partialMonths),
+          basis: observation.basis ? String(observation.basis) : null,
+        },
       },
       forecast: {
         gross: n(forecast.gross),
