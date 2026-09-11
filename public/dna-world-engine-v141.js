@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.13.0';let raf=0;
+const V='14.14.0';let raf=0;
 function boot(){
  const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
  if(getComputedStyle(h).position==='static')h.style.position='relative';
@@ -8,9 +8,9 @@ function boot(){
  let artReady=false;
  const art=document.createElement('img');art.id='dnaWorldArt148';art.alt='';art.decoding='async';art.loading='eager';
  Object.assign(art.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:39,pointerEvents:'none',opacity:'0',transition:'opacity .25s ease'});
- art.onload=()=>{artReady=true;art.style.opacity='1';window.dispatchEvent(new CustomEvent('dna-art-ready',{detail:{version:V,width:art.naturalWidth,height:art.naturalHeight,source:'local-original-depth'}}));};
+ art.onload=()=>{artReady=true;art.style.opacity='1';window.dispatchEvent(new CustomEvent('dna-art-ready',{detail:{version:V,width:art.naturalWidth,height:art.naturalHeight,source:'figma-master'}}));};
  art.onerror=()=>{artReady=false;art.style.opacity='0';console.warn('DNA local art v'+V+' failed to load');};
- art.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.sceneBase)||'/assets/dna-world/l1/scene-base-clean.svg?rev=14130';h.appendChild(art);
+ art.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.sceneBase)||'/assets/dna-world/l1/figma-master-v14140.svg?rev=14140';h.appendChild(art);
  const c=document.createElement('canvas');c.id='dnaWorld148';c.width=1200;c.height=680;
  Object.assign(c.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:40,pointerEvents:'none',imageRendering:'auto'});h.appendChild(c);
  const g=c.getContext('2d');g.imageSmoothingEnabled=true;const A=()=>window.DNA_GAME_ASSETS||null;
@@ -56,9 +56,9 @@ function boot(){
   if(p>.54&&p<.78){const a=1-Math.abs(((p-.54)/.24)-.5)*2;for(let i=0;i<8;i++){const sx=278+i*4,sy=188-(i%3)*4;R(sx,sy,2,2,'#ffd15f',Math.max(0,a))}}
   const lift=76+Math.sin(t*.62)*12;L(590,86,590,lift+58,'rgba(218,180,117,.68)',1);R(581,lift+55,18,11,'rgba(145,99,60,.9)');
  }
- function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{infrastructure();resources(t)}ambient(t);activity(t);raf=requestAnimationFrame(frame)}
+ function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{}ambient(t);activity(t);raf=requestAnimationFrame(frame)}
  cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
- setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> ART DEPTH · v'+V+' · 4/11')},120)
+ setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> FIGMA MASTER · v'+V+' · 5/11')},120)
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 window.addEventListener('dna-game-remount',()=>setTimeout(boot,100));
