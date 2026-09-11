@@ -5,19 +5,28 @@ import { calculatePortfolioAnalytics } from './features/analytics/metrics'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot, type PositionSnapshot } from './lib/portfolioApi'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
-const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
+const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
+const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
+const POSITION_PAGE_SIZE = 5
+
 type Tab = 'portfolio' | 'analytics' | 'income' | 'dna'
+type AnalyticsView = 'overview' | 'risk' | 'health'
 
 function annualPct(value: number | null) {
   if (value == null || !Number.isFinite(value)) return null
   return Math.abs(value) <= 5 ? value * 100 : value
 }
 
-function pctRatio(value: number | null) {
+function signedRatio(value: number | null) {
   if (value == null || !Number.isFinite(value)) return '—'
-  return `${pct.format(value * 100)}%`
+  return `${pctSigned.format(value * 100)}%`
+}
+
+function plainRatio(value: number | null) {
+  if (value == null || !Number.isFinite(value)) return '—'
+  return `${pctPlain.format(value * 100)}%`
 }
 
 function assetTypeLabel(type: string) {
@@ -41,19 +50,24 @@ function PositionList({ positions }: { positions: PositionSnapshot[] }) {
   if (!positions.length) return <div className="empty-state">Позиции загружаются…</div>
   return (
     <div className="positions-list">
-      {positions.slice(0, 12).map(position => (
-        <div className="position-row" key={`${position.ticker}-${position.name}`}>
-          <div className="position-main">
-            <strong>{position.ticker}</strong>
-            <span>{position.name}</span>
+      {positions.map(position => {
+        const ticker = position.ticker || position.name || '—'
+        const sameName = !position.name || position.name.trim().toUpperCase() === ticker.trim().toUpperCase()
+        const subtitle = sameName ? assetTypeLabel(position.instrumentType) : position.name
+        return (
+          <div className="position-row" key={`${ticker}-${position.currentValue}`}>
+            <div className="position-main">
+              <strong>{ticker}</strong>
+              <span>{subtitle}</span>
+            </div>
+            <div className="position-weight">
+              <span>{pctPlain.format(position.weight * 100)}%</span>
+              <i><b style={{ width: `${Math.min(100, position.weight * 100)}%` }} /></i>
+            </div>
+            <div className="position-value">{money.format(position.currentValue)} ₽</div>
           </div>
-          <div className="position-weight">
-            <span>{pct.format(position.weight * 100)}%</span>
-            <i><b style={{ width: `${Math.min(100, position.weight * 100)}%` }} /></i>
-          </div>
-          <div className="position-value">{money.format(position.currentValue)} ₽</div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -61,6 +75,8 @@ function PositionList({ positions }: { positions: PositionSnapshot[] }) {
 export default function App() {
   const [snapshot, setSnapshot] = useState<PortfolioSnapshot>(EMPTY)
   const [tab, setTab] = useState<Tab>('portfolio')
+  const [analyticsView, setAnalyticsView] = useState<AnalyticsView>('overview')
+  const [positionPage, setPositionPage] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -100,8 +116,17 @@ export default function App() {
       .sort((a, b) => b.value - a.value)
   }, [snapshot.positionItems])
 
+  const positionPages = Math.max(1, Math.ceil(snapshot.positionItems.length / POSITION_PAGE_SIZE))
+  const safePositionPage = Math.min(positionPage, positionPages - 1)
+  const visiblePositions = snapshot.positionItems.slice(
+    safePositionPage * POSITION_PAGE_SIZE,
+    safePositionPage * POSITION_PAGE_SIZE + POSITION_PAGE_SIZE,
+  )
+
   const xirr = annualPct(snapshot.xirr)
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
+  const analyticsMature = analytics.historyDays >= 365
+  const historyLabel = analytics.historyDays ? `${analytics.historyDays} дней` : 'нет истории'
 
   return (
     <main className="app-shell">
@@ -131,7 +156,7 @@ export default function App() {
               <article className="metric-card">
                 <span className="metric-label">ДЕНЕЖНЫЙ РЕЗУЛЬТАТ</span>
                 <strong>{snapshot.value ? `${snapshot.profit >= 0 ? '+' : ''}${money.format(snapshot.profit)} ₽` : '—'}</strong>
-                <small>{snapshot.value ? `${pct.format(snapshot.profitPct)}% к внешним потокам` : 'ожидаем данные'}</small>
+                <small>{snapshot.value ? `${pctSigned.format(snapshot.profitPct)}% к внешним потокам` : 'ожидаем данные'}</small>
               </article>
               <article className="context-card">
                 <span>СЧЁТ</span><strong>{snapshot.accountName}</strong>
@@ -141,20 +166,24 @@ export default function App() {
             </section>
 
             <section className="panel positions-panel">
-              <div className="panel-head">
-                <div><span className="eyebrow">СОСТАВ</span><h2>ТЕКУЩИЕ ПОЗИЦИИ</h2></div>
-                <small>{snapshot.positionItems.length ? `${snapshot.positionItems.length} активов` : 'загрузка'}</small>
+              <div className="panel-head panel-head--paged">
+                <div><span className="eyebrow">СОСТАВ</span><h2>ПОЗИЦИИ</h2></div>
+                <div className="pager" aria-label="Страницы позиций">
+                  <button disabled={safePositionPage === 0} onClick={() => setPositionPage(page => Math.max(0, page - 1))}>‹</button>
+                  <span>{snapshot.positionItems.length ? `${safePositionPage + 1}/${positionPages}` : '—'}</span>
+                  <button disabled={safePositionPage >= positionPages - 1} onClick={() => setPositionPage(page => Math.min(positionPages - 1, page + 1))}>›</button>
+                </div>
               </div>
-              <PositionList positions={snapshot.positionItems} />
+              <PositionList positions={visiblePositions} />
             </section>
 
             <section className="panel allocation-panel">
               <div className="panel-head"><div><span className="eyebrow">СТРУКТУРА</span><h2>КЛАССЫ АКТИВОВ</h2></div></div>
               <div className="allocation-list">
-                {allocation.length ? allocation.map(item => (
+                {allocation.length ? allocation.slice(0, 4).map(item => (
                   <div className="allocation-row" key={item.label}>
                     <div><strong>{item.label}</strong><span>{money.format(item.value)} ₽</span></div>
-                    <b>{pct.format(item.weight * 100)}%</b>
+                    <b>{pctPlain.format(item.weight * 100)}%</b>
                     <i><span style={{ width: `${item.weight * 100}%` }} /></i>
                   </div>
                 )) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
@@ -165,62 +194,85 @@ export default function App() {
 
         {tab === 'analytics' && (
           <div className="analytics-layout">
-            <section className="analytics-topline">
-              <article className="score-card">
-                <span className="metric-label">HEALTH SCORE · v{analytics.healthVersion}</span>
-                <strong>{analytics.healthScore == null ? '—' : Math.round(analytics.healthScore)}</strong>
-                <small>{analytics.healthScore == null ? 'Для полного скора нужны все компоненты' : 'Прозрачный композитный скор 0–100'}</small>
-              </article>
-              <article className="metric-card"><span className="metric-label">XIRR · ЛИЧНАЯ ДОХОДНОСТЬ</span><strong>{xirr == null ? '—' : `${pct.format(xirr)}%`}</strong><small>Money-weighted, учитывает даты пополнений</small></article>
-              <article className="metric-card"><span className="metric-label">TWR · СРАВНЕНИЕ С РЫНКОМ</span><strong>{pctRatio(analytics.twr)}</strong><small>Не зависит от размера и времени довнесений</small></article>
-            </section>
+            <nav className="subnav" aria-label="Разделы аналитики">
+              <button onClick={() => setAnalyticsView('overview')} className={analyticsView === 'overview' ? 'subnav--active' : ''}>ОБЗОР</button>
+              <button onClick={() => setAnalyticsView('risk')} className={analyticsView === 'risk' ? 'subnav--active' : ''}>РИСК</button>
+              <button onClick={() => setAnalyticsView('health')} className={analyticsView === 'health' ? 'subnav--active' : ''}>HEALTH</button>
+              <span className={analyticsMature ? 'sample-badge sample-badge--mature' : 'sample-badge'}>{analyticsMature ? '12M' : `PREVIEW · ${historyLabel}`}</span>
+            </nav>
 
-            <section className="panel history-panel">
-              <div className="panel-head">
-                <div><span className="eyebrow">ДОХОДНОСТЬ · TWR INDEX</span><h2>ПОРТФЕЛЬ VS IMOEX</h2></div>
-                <small>{analytics.historyPoints ? `${analytics.historyPoints} точек · ${analytics.historyDays} дней` : 'история загружается'}</small>
-              </div>
-              <HistoryChart points={snapshot.history} />
-            </section>
+            {analyticsView === 'overview' && (
+              <div className="analytics-overview">
+                <section className="analytics-topline">
+                  <article className="score-card">
+                    <span className="metric-label">HEALTH SCORE · v{analytics.healthVersion}</span>
+                    <strong>{analytics.healthScore == null ? '—' : Math.round(analytics.healthScore)}</strong>
+                    <small>{analyticsMature ? 'Расчёт на зрелой истории' : `Предварительно · история ${historyLabel}`}</small>
+                  </article>
+                  <article className="metric-card"><span className="metric-label">XIRR · ЛИЧНАЯ</span><strong>{xirr == null ? '—' : `${pctSigned.format(xirr)}%`}</strong><small>Учитывает даты денежных потоков</small></article>
+                  <article className="metric-card"><span className="metric-label">TWR · РЫНОК</span><strong>{signedRatio(analytics.twr)}</strong><small>Не зависит от размера довнесений</small></article>
+                </section>
 
-            <section className="risk-grid">
-              <article className="risk-card"><span>MAX DRAWDOWN</span><strong>{pctRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
-              <article className="risk-card"><span>ВОЛАТИЛЬНОСТЬ</span><strong>{pctRatio(analytics.volatility)}</strong><small>Годовая, σ дневных доходностей × √252</small></article>
-              <article className="risk-card"><span>SHARPE</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{snapshot.riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Rf ${number.format(snapshot.riskFreeRate)}%`}</small></article>
-              <article className="risk-card"><span>SORTINO</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Штрафует только доходность ниже Rf</small></article>
-              <article className="risk-card"><span>HHI</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
-              <article className="risk-card"><span>ЭКВ. ПОЗИЦИЙ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
-            </section>
-
-            <section className="panel health-panel">
-              <div className="panel-head"><div><span className="eyebrow">МЕТОДИКА v1.0</span><h2>ИЗ ЧЕГО СОБРАН HEALTH</h2></div><small>никакого чёрного ящика</small></div>
-              <div className="health-components">
-                {analytics.components.map(component => (
-                  <div className="health-row" key={component.key}>
-                    <div><strong>{component.label}</strong><span>{component.note}</span></div>
-                    <div className="health-weight">{Math.round(component.weight * 100)}%</div>
-                    <div className="health-points">{component.points == null ? '—' : `${number.format(component.points)} п.`}</div>
-                    <i><span style={{ width: `${(component.normalized ?? 0) * 100}%` }} /></i>
+                <section className="panel history-panel">
+                  <div className="panel-head">
+                    <div><span className="eyebrow">TWR INDEX</span><h2>ПОРТФЕЛЬ VS IMOEX</h2></div>
+                    <small>{analytics.historyPoints ? `${analytics.historyPoints} точек` : 'история загружается'}</small>
                   </div>
-                ))}
+                  <HistoryChart points={snapshot.history} />
+                </section>
               </div>
-              <p className="method-note">История короче 12 месяцев не маскируется под годовую выборку: сейчас расчёты используют фактически доступный период ({analytics.historyDays || 0} дней). По мере накопления истории окно будет доведено до принятой 12-месячной методики.</p>
-            </section>
+            )}
+
+            {analyticsView === 'risk' && (
+              <div className="analytics-risk-view">
+                <section className="risk-grid">
+                  <article className="risk-card"><span>MAX DRAWDOWN</span><strong>{signedRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
+                  <article className="risk-card"><span>ВОЛАТИЛЬНОСТЬ</span><strong>{plainRatio(analytics.volatility)}</strong><small>σ дневных доходностей × √252</small></article>
+                  <article className="risk-card"><span>SHARPE</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{snapshot.riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Rf ${number.format(snapshot.riskFreeRate)}%`}</small></article>
+                  <article className="risk-card"><span>SORTINO</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Downside deviation ниже Rf</small></article>
+                  <article className="risk-card"><span>HHI</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
+                  <article className="risk-card"><span>ЭКВ. ПОЗИЦИЙ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
+                </section>
+                <section className="panel analytics-note">
+                  <span className="eyebrow">КАЧЕСТВО ВЫБОРКИ</span>
+                  <h2>{analyticsMature ? 'ИСТОРИЯ ДОСТАТОЧНА' : 'МЕТРИКИ ПРЕДВАРИТЕЛЬНЫЕ'}</h2>
+                  <p>Сейчас доступно {historyLabel}. Годовая волатильность, Sharpe и Sortino математически считаются, но до накопления 12 месяцев показываются как предварительные, а не как зрелая характеристика риска.</p>
+                </section>
+              </div>
+            )}
+
+            {analyticsView === 'health' && (
+              <section className="panel health-panel">
+                <div className="panel-head"><div><span className="eyebrow">МЕТОДИКА v1.0</span><h2>HEALTH SCORE</h2></div><small>{analyticsMature ? 'полная выборка' : 'предварительно'}</small></div>
+                <div className="health-components">
+                  {analytics.components.map(component => (
+                    <div className="health-row" key={component.key}>
+                      <div><strong>{component.label}</strong><span>{component.note}</span></div>
+                      <div className="health-weight">{Math.round(component.weight * 100)}%</div>
+                      <div className="health-points">{component.points == null ? '—' : `${number.format(component.points)} п.`}</div>
+                      <i><span style={{ width: `${(component.normalized ?? 0) * 100}%` }} /></i>
+                    </div>
+                  ))}
+                </div>
+                <p className="method-note">Скор прозрачен и версионируется. На истории короче 12 месяцев компоненты риска остаются видимыми, но весь Health помечается как предварительный.</p>
+              </section>
+            )}
           </div>
         )}
 
         {tab === 'income' && (
           <div className="income-layout">
             <section className="income-hero panel">
-              <div><span className="eyebrow">ПАССИВНЫЙ ДОХОД</span><h2>ДИВИДЕНДЫ + КУПОНЫ</h2><p>Здесь только денежный поток от активов. Пополнения и продажи в этот модуль не входят.</p></div>
+              <div><span className="eyebrow">ПАССИВНЫЙ ДОХОД · ФАКТ</span><h2>ДИВИДЕНДЫ + КУПОНЫ</h2><p>Только реально полученный денежный поток от активов. Пополнения и продажи исключены.</p></div>
               <strong>{snapshot.passiveIncome ? `${money.format(snapshot.passiveIncome)} ₽` : '—'}</strong>
+              <small>с начала учёта · {startDate}</small>
             </section>
             <section className="income-stats">
-              <article className="metric-card"><span className="metric-label">СРЕДНЕЕ / МЕС.</span><strong>{snapshot.averageMonthlyPassiveIncome ? `${money.format(snapshot.averageMonthlyPassiveIncome)} ₽` : '—'}</strong><small>Фактический средний поток</small></article>
-              <article className="metric-card"><span className="metric-label">СРЕДНЕЕ / ГОД</span><strong>{snapshot.averageAnnualPassiveIncome ? `${money.format(snapshot.averageAnnualPassiveIncome)} ₽` : '—'}</strong><small>Без депозитов и внешних пополнений</small></article>
-              <article className="context-card"><span>СЛЕДУЮЩЕЕ</span><strong>Календарь выплат</strong><span>ПОТОМ</span><strong>YoC + рост выплат</strong></article>
+              <article className="metric-card"><span className="metric-label">СРЕДНЕЕ / МЕС.</span><strong>{snapshot.averageMonthlyPassiveIncome ? `${money.format(snapshot.averageMonthlyPassiveIncome)} ₽` : '—'}</strong><small>По фактически доступному периоду</small></article>
+              <article className="metric-card"><span className="metric-label">12М RUN-RATE</span><strong>—</strong><small>Не показываем до достаточной истории</small></article>
+              <article className="context-card"><span>ИСТОРИЯ</span><strong>{historyLabel}</strong><span>СЛЕДУЮЩЕЕ</span><strong>Календарь выплат</strong></article>
             </section>
-            <section className="panel roadmap-panel"><span className="eyebrow">СЛЕДУЮЩИЙ РАБОЧИЙ МОДУЛЬ</span><h2>КАЛЕНДАРЬ ВЫПЛАТ</h2><p>Подключим реальные ожидаемые купоны и дивиденды, затем YoC и рост пассивного дохода к собственной базе. Никаких прогнозных сумм пока источник данных не подтверждён.</p></section>
+            <section className="panel roadmap-panel"><span className="eyebrow">СЛЕДУЮЩИЙ МОДУЛЬ</span><h2>КАЛЕНДАРЬ ВЫПЛАТ</h2><p>Подключим подтверждённые ожидаемые купоны и дивиденды, затем YoC и рост дохода к собственной базе. Прогнозные суммы не показываем без надёжного источника.</p></section>
           </div>
         )}
 
