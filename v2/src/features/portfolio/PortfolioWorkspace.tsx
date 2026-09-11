@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi'
 import { PortfolioValueChart } from './PortfolioValueChart'
+import { BondAnalytics } from './BondAnalytics'
 import './portfolio.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -13,6 +14,7 @@ const POSITION_PAGE_SIZE = 5
 
 type View = 'overview' | 'positions' | 'structure'
 type PositionSort = 'weight' | 'pnl' | 'pnlPct'
+type StructureMode = 'classes' | 'bonds'
 
 type Props = { snapshot: PortfolioSnapshot }
 
@@ -82,6 +84,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const [positionPage, setPositionPage] = useState(0)
   const [positionSort, setPositionSort] = useState<PositionSort>('weight')
   const [selectedPositionKey, setSelectedPositionKey] = useState('')
+  const [structureMode, setStructureMode] = useState<StructureMode>('classes')
 
   const allocation = useMemo(() => {
     const groups = new Map<string, number>()
@@ -209,17 +212,30 @@ export function PortfolioWorkspace({ snapshot }: Props) {
 
       {view === 'structure' && (
         <section className="panel portfolio-fill-panel">
-          <div className="panel-head"><div><span className="eyebrow">СТРУКТУРА</span><h2>КЛАССЫ АКТИВОВ</h2></div><small>TOP 3 позиций · {pctPlain.format(top3 * 100)}%</small></div>
-          <div className="allocation-list portfolio-allocation-list">
-            {allocation.length ? allocation.map(item => (
-              <div className="allocation-row" key={item.label}>
-                <div><strong>{item.label}</strong><span>{money.format(item.value)} ₽</span></div>
-                <b>{pctPlain.format(item.weight * 100)}%</b>
-                <i><span style={{ width: `${item.weight * 100}%` }} /></i>
-              </div>
-            )) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
+          <div className="panel-head">
+            <div><span className="eyebrow">СТРУКТУРА</span><h2>{structureMode === 'classes' ? 'КЛАССЫ АКТИВОВ' : 'ОБЛИГАЦИИ'}</h2></div>
+            <div className="structure-switch" aria-label="Режим структуры">
+              <button className={structureMode === 'classes' ? 'is-active' : ''} onClick={() => setStructureMode('classes')}>КЛАССЫ</button>
+              <button className={structureMode === 'bonds' ? 'is-active' : ''} onClick={() => setStructureMode('bonds')}>BONDS</button>
+            </div>
           </div>
-          <p className="method-note">Здесь только состав портфеля. Оценка концентрации HHI и Health остаются в «Аналитике», чтобы не дублировать одни и те же показатели.</p>
+
+          {structureMode === 'classes' ? (
+            <>
+              <div className="allocation-list portfolio-allocation-list">
+                {allocation.length ? allocation.map(item => (
+                  <div className="allocation-row" key={item.label}>
+                    <div><strong>{item.label}</strong><span>{money.format(item.value)} ₽</span></div>
+                    <b>{pctPlain.format(item.weight * 100)}%</b>
+                    <i><span style={{ width: `${item.weight * 100}%` }} /></i>
+                  </div>
+                )) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
+              </div>
+              <p className="method-note">TOP 3 позиций · {pctPlain.format(top3 * 100)}%. Оценка концентрации HHI и Health остаются в «Аналитике», чтобы не дублировать одни и те же показатели.</p>
+            </>
+          ) : (
+            <BondAnalytics positions={snapshot.positionItems} />
+          )}
         </section>
       )}
     </div>
