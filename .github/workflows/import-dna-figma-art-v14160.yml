@@ -1,0 +1,69 @@
+name: Import DNA Figma Art v14.16.0
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-dna-figma-art-v14160.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import-art:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download Figma master art
+        run: |
+          set -euo pipefail
+          mkdir -p public/assets/dna-world/l1
+          curl -fL --retry 3 --retry-delay 2 \
+            'https://www.figma.com/api/mcp/asset/acd2a232-6961-49f5-b259-9470846a8682.svg' \
+            -o public/assets/dna-world/l1/figma-art-rebuild-v14160.svg
+          test -s public/assets/dna-world/l1/figma-art-rebuild-v14160.svg
+      - name: Wire v14.16.0 production art
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('public/dna-art-scene-v148.js')
+          p.write_text("(()=>{'use strict';window.DNA_ART_PACK=window.DNA_ART_PACK||{};window.DNA_ART_PACK.sceneBase='/assets/dna-world/l1/figma-art-rebuild-v14160.svg?rev=14160';window.DNA_ART_PACK.version='14.16.0';window.DNA_ART_PACK.source='figma-art-rebuild';})();\n")
+
+          p=Path('public/dna-game-assets-v147.js')
+          s=p.read_text()
+          s=s.replace("const VERSION='14.15.0'","const VERSION='14.16.0'")
+          p.write_text(s)
+
+          p=Path('public/dna-world-engine-v141.js')
+          s=p.read_text()
+          s=s.replace("const V='14.15.0'","const V='14.16.0'")
+          s=s.replace("source:'figma-master'","source:'figma-art-rebuild'")
+          s=s.replace("'/assets/dna-world/l1/figma-master-v14140.svg?rev=14140'","'/assets/dna-world/l1/figma-art-rebuild-v14160.svg?rev=14160'")
+          s=s.replace("ambient(t);activity(t);raf=requestAnimationFrame(frame)","ambient(t);raf=requestAnimationFrame(frame)")
+          s=s.replace("CHARACTERS · v'+V+' · 6/11","ART REBUILD · v'+V+' · 7/11")
+          p.write_text(s)
+
+          p=Path('server.js')
+          s=p.read_text()
+          s=s.replace('v14.15.0 — FIGMA CHARACTER PASS: richer local DNA world art and larger readable activity; finance/history unchanged.','v14.16.0 — FIGMA ART REBUILD: production master scene replaces primitive overlay art; finance/history unchanged.')
+          s=s.replace('14.15.0','14.16.0').replace('14150','14160')
+          s=s.replace('CHARACTERS','ART REBUILD').replace('6/11','7/11')
+          s=s.replace('figma-master','figma-art-rebuild')
+          p.write_text(s)
+          PY
+      - name: Validate files
+        run: |
+          node --check server.js
+          node --check public/dna-art-scene-v148.js
+          node --check public/dna-game-assets-v147.js
+          node --check public/dna-world-engine-v141.js
+          grep -q '14.16.0' server.js
+          grep -q 'figma-art-rebuild-v14160.svg' public/dna-art-scene-v148.js
+      - name: Commit production pass
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/assets/dna-world/l1/figma-art-rebuild-v14160.svg public/dna-art-scene-v148.js public/dna-game-assets-v147.js public/dna-world-engine-v141.js server.js
+          git commit -m 'DNA FIGMA ART REBUILD · v14.16.0'
+          git push
