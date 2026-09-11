@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { loadPayoutCalendar, type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { getIncomeIntegrity } from './incomeIntegrity'
-import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration } from './incomeHistory'
+import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration, calculateIncomeStability } from './incomeHistory'
 import './income.css'
 import './incomeCompact.css'
 
@@ -29,7 +29,13 @@ const empty: PayoutCalendar = {
   period: { from: null, to: null },
   basis: null,
   displayBasis: null,
-  actual: { year: null, items: [], totalNet: 0, count: 0 },
+  actual: {
+    year: null,
+    items: [],
+    totalNet: 0,
+    count: 0,
+    observation: { available: false, from: null, to: null, completeMonths: [], partialMonths: [], basis: null },
+  },
   forecast: { gross: 0, tax: 0, net: 0, count: 0 },
   next: null,
   months: [],
@@ -124,9 +130,6 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const incomeProfile = useMemo(() => {
     let actualCoupons = 0
     let actualDividends = 0
-    let forecastCoupons = 0
-    let forecastDividends = 0
-    const bySource = new Map<string, number>()
 
     for (const event of data.actual.items) {
       const amount = Math.max(0, eventAmount(event, true))
@@ -135,44 +138,33 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
       if (kind === 'DIVIDEND') actualDividends += amount
     }
 
-    for (const event of data.events) {
-      const amount = Math.max(0, eventAmount(event))
-      const kind = String(event.kind || '').toUpperCase()
-      if (kind === 'COUPON') forecastCoupons += amount
-      if (kind === 'DIVIDEND') forecastDividends += amount
-      if (amount <= 0) continue
-      const key = event.ticker || event.name || '—'
-      bySource.set(key, (bySource.get(key) || 0) + amount)
-    }
+    return { actualCoupons, actualDividends }
+  }, [data.actual.items])
 
-    const forecastTotal = [...bySource.values()].reduce((sum, value) => sum + value, 0)
-    const rankedSources = [...bySource.entries()].sort((a, b) => b[1] - a[1])
-    const top = rankedSources[0] ?? null
-    const topShare = top && forecastTotal > 0 ? top[1] / forecastTotal : null
-    const hhi = forecastTotal > 0
-      ? rankedSources.reduce((sum, [, value]) => sum + (value / forecastTotal) ** 2, 0)
-      : null
-    const effectiveSources = hhi != null && hhi > 0 ? 1 / hhi : null
-
-    return {
-      actualCoupons,
-      actualDividends,
-      forecastCoupons,
-      forecastDividends,
-      topSource: top?.[0] ?? null,
-      topShare,
-      effectiveSources,
-    }
-  }, [data.actual.items, data.events])
-
-  const realizedHistory = useMemo(() => buildRealizedIncomeHistory(data.actual.items), [data.actual.items])
+  const realizedHistory = useMemo(
+    () => buildRealizedIncomeHistory(data.actual.items, data.actual.observation),
+    [data.actual.items, data.actual.observation],
+  )
   const realizedConcentration = useMemo(() => calculateIncomeSourceConcentration(data.actual.items), [data.actual.items])
+  const realizedStability = useMemo(() => calculateIncomeStability(realizedHistory), [realizedHistory])
   const realizedTopSource = useMemo(
     () => [...sourceRows].filter(row => row.fact > 0).sort((a, b) => b.fact - a.fact)[0] ?? null,
     [sourceRows],
   )
-  const realizedMonthCount = realizedHistory.months.length
-  const latestRealizedMonth = realizedHistory.months.at(-1) ?? null
+  const latestPayoutMonth = useMemo(
+    () => [...realizedHistory.months].reverse().find(month => month.totalNet > 0) ?? null,
+    [realizedHistory.months],
+  )
+  const observation = realizedHistory.observation
+  const observationCompact = observation.available
+    ? `${observation.completeMonths} полн. · ${observation.partialMonths} част.`
+    : 'период не подтверждён'
+  const stabilityValue = realizedStability.available
+    ? realizedStability.status === 'mature' ? 'MATURE' : 'PREVIEW'
+    : `${realizedStability.observedMonths}/3 мес.`
+  const stabilityDetail = realizedStability.available
+    ? `${money.format(realizedStability.averageMonthlyNet ?? 0)} ₽/мес. · 0 ₽: ${realizedStability.zeroIncomeMonths} мес.`
+    : `полных месяцев · нужно ≥3`
 
   const monthRows = data.months.slice(0, 6)
   const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
@@ -267,13 +259,16 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
       {view === 'sources' && (
         <section className="panel income-sources-panel">
-          <div className="income-panel-head"><div><span className="eyebrow">РАЗБИВКА ПО АКТИВАМ</span><h2>ИСТОЧНИКИ ДОХОДА</h2></div><small>факт ≠ прогноз</small></div>
+          <div className="income-panel-head">
+            <div><span className="eyebrow">РАЗБИВКА ПО АКТИВАМ</span><h2>ИСТОЧНИКИ ДОХОДА</h2></div>
+            <small>{observation.available ? `OBS · ${observationCompact}` : 'факт ≠ прогноз'}</small>
+          </div>
 
           <div className="income-profile-grid">
-            <article><span>ФАКТ · КУПОНЫ</span><strong>{incomeProfile.actualCoupons ? `${money.format(incomeProfile.actualCoupons)} ₽` : '—'}</strong><small>{data.actual.year ?? 'период'} · {realizedMonthCount ? `${realizedMonthCount} мес.` : 'нет истории'}</small></article>
-            <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{latestRealizedMonth ? `${latestRealizedMonth.key} · ${money.format(latestRealizedMonth.totalNet)} ₽ net` : 'нет FACT-событий'}</small></article>
-            <article><span>ФАКТ · TOP SOURCE</span><strong>{realizedTopSource?.ticker ?? '—'}</strong><small>{realizedConcentration.topSourceShare == null ? 'нет FACT-источников' : `${pct1.format(realizedConcentration.topSourceShare * 100)}% реализованного net`}</small></article>
-            <article><span>ФАКТ · ЭКВ. ИСТОЧНИКОВ</span><strong>{realizedConcentration.effectiveSources == null ? '—' : number2.format(realizedConcentration.effectiveSources)}</strong><small>{realizedConcentration.sourceCount ? `${realizedConcentration.sourceCount} источн. · 1 / HHI` : 'нет FACT-источников'}</small></article>
+            <article><span>ФАКТ · КУПОНЫ</span><strong>{incomeProfile.actualCoupons ? `${money.format(incomeProfile.actualCoupons)} ₽` : '—'}</strong><small>{data.actual.year ?? 'период'} · {observationCompact}</small></article>
+            <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{latestPayoutMonth ? `${latestPayoutMonth.key} · ${money.format(latestPayoutMonth.totalNet)} ₽ net` : 'нет FACT-выплат'}</small></article>
+            <article><span>ФАКТ · TOP SOURCE</span><strong>{realizedTopSource?.ticker ?? '—'}</strong><small>{realizedConcentration.topSourceShare == null ? 'нет FACT-источников' : `${pct1.format(realizedConcentration.topSourceShare * 100)}% · ${realizedConcentration.sourceCount} ист. · Neff ${number2.format(realizedConcentration.effectiveSources ?? 0)}`}</small></article>
+            <article><span>ФАКТ · СТАБИЛЬНОСТЬ</span><strong>{stabilityValue}</strong><small>{stabilityDetail}</small></article>
           </div>
 
           <div className="income-source-table">
@@ -297,9 +292,9 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className={`income-integrity-status is-${integrity.state}`}>
             <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
           </div>
-          <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. Депозиты и будущие выплаты сюда не попадают; эффективное число источников = 1/HHI.</p>
-          <p className="income-method-note">12М / YoC в таблице остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Это не текущая дивидендная доходность.</p>
-          <p className="income-method-note">Цель пассивного дохода не задаётся автоматически. Прогресс будет доступен только после явного annual net-target пользователя и полного реализованного 12-месячного календарного периода; короткая история не годифицируется.</p>
+          <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. TOP SOURCE показывает долю лидера, число источников и эффективное число источников Neff = 1/HHI.</p>
+          <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Это не текущая дивидендная доходность.</p>
+          <p className="income-method-note">OBS считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Цель дохода по короткой истории не годифицируется.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
       )}
