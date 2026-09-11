@@ -3,6 +3,7 @@ import { WorldStage } from './features/world/WorldStage'
 import { HistoryChart } from './features/portfolio/HistoryChart'
 import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
+import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analytics/drift'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
 
@@ -11,7 +12,7 @@ const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
 type Tab = 'portfolio' | 'analytics' | 'income' | 'dna'
-type AnalyticsView = 'overview' | 'risk' | 'health'
+type AnalyticsView = 'overview' | 'risk' | 'health' | 'drift'
 
 function annualPct(value: number | null) {
   if (value == null || !Number.isFinite(value)) return null
@@ -26,6 +27,11 @@ function signedRatio(value: number | null) {
 function plainRatio(value: number | null) {
   if (value == null || !Number.isFinite(value)) return '—'
   return `${pctPlain.format(value * 100)}%`
+}
+
+function signedPoints(value: number | null) {
+  if (value == null || !Number.isFinite(value)) return '—'
+  return `${pctSigned.format(value * 100)} п.п.`
 }
 
 const EMPTY: PortfolioSnapshot = {
@@ -65,6 +71,10 @@ export default function App() {
     () => calculatePortfolioAnalytics(snapshot.history, snapshot.positionItems, snapshot.riskFreeRate),
     [snapshot.history, snapshot.positionItems, snapshot.riskFreeRate],
   )
+  const drift = useMemo(
+    () => calculateAllocationDrift(snapshot.positionItems, PERSONAL_STRATEGY_V1),
+    [snapshot.positionItems],
+  )
 
   const xirr = annualPct(snapshot.xirr)
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
@@ -92,10 +102,11 @@ export default function App() {
 
         {tab === 'analytics' && (
           <div className="analytics-layout">
-            <nav className="subnav" aria-label="Разделы аналитики">
+            <nav className="subnav analytics-subnav" aria-label="Разделы аналитики">
               <button onClick={() => setAnalyticsView('overview')} className={analyticsView === 'overview' ? 'subnav--active' : ''}>ОБЗОР</button>
               <button onClick={() => setAnalyticsView('risk')} className={analyticsView === 'risk' ? 'subnav--active' : ''}>РИСК</button>
               <button onClick={() => setAnalyticsView('health')} className={analyticsView === 'health' ? 'subnav--active' : ''}>HEALTH</button>
+              <button onClick={() => setAnalyticsView('drift')} className={analyticsView === 'drift' ? 'subnav--active' : ''}>DRIFT</button>
               <span className={analyticsMature ? 'sample-badge sample-badge--mature' : 'sample-badge'}>{analyticsMature ? '12M' : `PREVIEW · ${historyLabel}`}</span>
             </nav>
 
@@ -153,6 +164,48 @@ export default function App() {
                   ))}
                 </div>
                 <p className="method-note">Скор прозрачен и версионируется. На истории короче 12 месяцев компоненты риска остаются видимыми, но весь Health помечается как предварительный.</p>
+              </section>
+            )}
+
+            {analyticsView === 'drift' && (
+              <section className="panel drift-panel">
+                <div className="panel-head">
+                  <div><span className="eyebrow">СТРАТЕГИЯ v{drift.strategy.version}</span><h2>ЦЕЛЬ VS ФАКТ</h2></div>
+                  <small>{drift.strategy.name}</small>
+                </div>
+
+                <div className="drift-summary">
+                  <article>
+                    <span>СТАТУС</span>
+                    <strong className={drift.withinTolerance ? 'is-ok' : drift.available ? 'is-watch' : ''}>{drift.available ? drift.withinTolerance ? 'В ДОПУСКЕ' : 'ВНЕ ДОПУСКА' : 'НЕТ ДАННЫХ'}</strong>
+                    <small>контроль структуры, не торговый сигнал</small>
+                  </article>
+                  <article>
+                    <span>МАКС. ОТКЛОНЕНИЕ</span>
+                    <strong>{drift.maxAbsoluteDrift == null ? '—' : `${pctPlain.format(drift.maxAbsoluteDrift * 100)} п.п.`}</strong>
+                    <small>по целевым классам</small>
+                  </article>
+                  <article>
+                    <span>ВНЕ МОДЕЛИ</span>
+                    <strong>{pctPlain.format(drift.unassignedWeight * 100)}%</strong>
+                    <small>активы без целевого класса</small>
+                  </article>
+                </div>
+
+                <div className="drift-rows">
+                  {drift.rows.map(row => (
+                    <div className={`drift-row ${row.outsideTolerance ? 'is-outside' : ''}`} key={row.key}>
+                      <div className="drift-row__title"><strong>{row.label}</strong><span>цель {pctPlain.format(row.target * 100)}%</span></div>
+                      <div className="drift-row__numbers"><b>{pctPlain.format(row.actual * 100)}%</b><span>{signedPoints(row.delta)}</span></div>
+                      <div className="drift-track" aria-label={`${row.label}: факт ${pctPlain.format(row.actual * 100)}%, цель ${pctPlain.format(row.target * 100)}%`}>
+                        <i style={{ width: `${Math.min(100, Math.max(0, row.actual * 100))}%` }} />
+                        <b style={{ left: `${Math.min(100, Math.max(0, row.target * 100))}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="method-note">Drift v1 сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это диагностический триггер для проверки стратегии, а не команда купить или продать.</p>
               </section>
             )}
           </div>
