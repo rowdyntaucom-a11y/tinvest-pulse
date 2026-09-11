@@ -139,6 +139,7 @@ export default function App() {
               <RiskWorkspace
                 analytics={analytics}
                 history={snapshot.history}
+                positions={snapshot.positionItems}
                 riskFreeRate={snapshot.riskFreeRate}
                 analyticsMature={analyticsMature}
                 historyLabel={historyLabel}

@@ -57,10 +57,19 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render `tinvest-pulse` deploy `dep-dai3lj2d0e5s73beilng`: `live`; startup log confirms local Russian Trusted CA load and server listening on port 10000.
 - No rollback was required. The failed deploy and hotfix are retained here as release history.
 
+### 20:59 MSK autonomous pass — sourced historical stress v1
+- Added `STRESS` mode to Risk Workspace using the existing fail-closed stress engine; no new broker/backend route or secret-bearing boundary is required.
+- Historical scenario catalog v1 is source-versioned and stores period, methodology, source URL and verification date with every scenario.
+- Bank of Russia total-return observations used as explicit shocks: Q1 2020 MCFTR -17.4% / RGBITR -0.7%; 9M 2022 MCFTR -47.1% / RGBITR -1.8%.
+- MCFTR is labelled as an equity proxy for current share/stock positions, not an instrument-level replay. RGBITR applies only to explicitly recognized OFZ positions.
+- Corporate/unknown bonds and other unsupported classes remain unshocked and lower coverage; they never inherit an invented OFZ shock.
+- UI reports covered-value P&L, coverage ratio, class-level shock and source methodology. Stress results are explicitly diagnostic and do not claim to forecast future losses.
+- Existing repository `v2 build` workflow remains the single pre-merge TypeScript/Vite gate; a duplicate workflow drafted during the pass was removed before merge.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; next deepen it only after validating live sample coverage and UX density.
-- Source and version historical stress-scenario shock tables before exposing stress results.
+- Expand historical stress only with versioned sourced return data; do not convert OFZ yield-bp moves into price shocks until duration semantics are verified.
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
 - Deepen passive-income history / concentration / goal framework without fabricating payout growth.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.

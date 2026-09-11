@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
+import type { PositionSnapshot } from '../../lib/portfolioApi'
 import type { AnalyticsHistoryPoint, PortfolioAnalytics } from './metrics'
 import { CorrelationPanel } from './CorrelationPanel'
+import { StressPanel } from './StressPanel'
 import { calculateRelativePerformance } from './relativePerformance'
 import { calculateRollingRisk } from './rollingRisk'
 import { calculateTailRisk } from './tailRisk'
@@ -10,11 +12,12 @@ const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, sig
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
-type Mode = 'portfolio' | 'benchmark' | 'rolling' | 'tail' | 'corr'
+type Mode = 'portfolio' | 'benchmark' | 'rolling' | 'tail' | 'corr' | 'stress'
 
 type Props = {
   analytics: PortfolioAnalytics
   history: AnalyticsHistoryPoint[]
+  positions: PositionSnapshot[]
   riskFreeRate: number | null
   analyticsMature: boolean
   historyLabel: string
@@ -30,7 +33,7 @@ function plainRatio(value: number | null) {
   return `${pctPlain.format(value * 100)}%`
 }
 
-export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMature, historyLabel }: Props) {
+export function RiskWorkspace({ analytics, history, positions, riskFreeRate, analyticsMature, historyLabel }: Props) {
   const [mode, setMode] = useState<Mode>('portfolio')
   const relative = useMemo(() => calculateRelativePerformance(history), [history])
   const rolling = useMemo(() => calculateRollingRisk(history), [history])
@@ -45,7 +48,9 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
         ? roll ? `${roll.tradingDays}D active` : `${rolling.availableReturns} доходностей`
         : mode === 'tail'
           ? `${tail.returns} дневных доходностей`
-          : '365D · top 6 активов'
+          : mode === 'corr'
+            ? '365D · top 6 активов'
+            : 'исторические шоки · v1'
 
   return (
     <div className="analytics-risk-view">
@@ -56,6 +61,7 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
         <button className={mode === 'rolling' ? 'is-active' : ''} onClick={() => setMode('rolling')}>ROLLING</button>
         <button className={mode === 'tail' ? 'is-active' : ''} onClick={() => setMode('tail')}>TAIL</button>
         <button className={mode === 'corr' ? 'is-active' : ''} onClick={() => setMode('corr')}>CORR</button>
+        <button className={mode === 'stress' ? 'is-active' : ''} onClick={() => setMode('stress')}>STRESS</button>
         <small>{modeStatus}</small>
       </div>
 
@@ -132,6 +138,7 @@ export function RiskWorkspace({ analytics, history, riskFreeRate, analyticsMatur
       )}
 
       {mode === 'corr' && <CorrelationPanel />}
+      {mode === 'stress' && <StressPanel positions={positions} />}
     </div>
   )
 }
