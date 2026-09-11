@@ -13,6 +13,7 @@ export type PositionPnlAttribution = {
 export type AssetClassPnlAttribution = {
   assetClass: string
   pnl: number
+  grossAbsolutePnl: number
   direction: 'positive' | 'negative' | 'flat'
   grossPnlShare: number | null
 }
@@ -78,20 +79,24 @@ export function calculatePortfolioPnlAttribution(positions: PositionSnapshot[]):
     }))
     .sort((a, b) => Math.abs(b.pnl) - Math.abs(a.pnl))
 
-  const byClass = new Map<string, number>()
+  const byClass = new Map<string, { pnl: number; grossAbsolutePnl: number }>()
   for (const row of normalized) {
     const label = assetClass(row.instrumentType)
-    byClass.set(label, (byClass.get(label) || 0) + row.pnl)
+    const current = byClass.get(label) ?? { pnl: 0, grossAbsolutePnl: 0 }
+    current.pnl += row.pnl
+    current.grossAbsolutePnl += Math.abs(row.pnl)
+    byClass.set(label, current)
   }
 
   const assetClasses: AssetClassPnlAttribution[] = [...byClass.entries()]
-    .map(([label, pnl]) => ({
+    .map(([label, values]) => ({
       assetClass: label,
-      pnl,
-      direction: direction(pnl),
-      grossPnlShare: grossAbsolutePnl > 0 ? Math.abs(pnl) / grossAbsolutePnl : null,
+      pnl: values.pnl,
+      grossAbsolutePnl: values.grossAbsolutePnl,
+      direction: direction(values.pnl),
+      grossPnlShare: grossAbsolutePnl > 0 ? values.grossAbsolutePnl / grossAbsolutePnl : null,
     }))
-    .sort((a, b) => Math.abs(b.pnl) - Math.abs(a.pnl))
+    .sort((a, b) => b.grossAbsolutePnl - a.grossAbsolutePnl)
 
   return {
     netPnl,
