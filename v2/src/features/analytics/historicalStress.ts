@@ -20,7 +20,7 @@ export type HistoricalStressScenario = StressScenario & {
   }>
 }
 
-export const HISTORICAL_STRESS_CATALOG_VERSION = '1.0'
+export const HISTORICAL_STRESS_CATALOG_VERSION = '1.1'
 
 export const HISTORICAL_STRESS_SCENARIOS: HistoricalStressScenario[] = [
   {
@@ -40,6 +40,25 @@ export const HISTORICAL_STRESS_SCENARIOS: HistoricalStressScenario[] = [
     shocks: {
       equity_mcftr_proxy: -0.174,
       ofz: -0.007,
+    },
+  },
+  {
+    id: 'ru-2022-q1-synchronized-shock',
+    version: '1.0',
+    label: 'I кв. 2022 · SYNCHRONIZED SHOCK',
+    source: 'Банк России · рыночные индикаторы НПФ',
+    sourceDate: '2022-03-31',
+    period: { from: '2022-01-01', to: '2022-03-31', label: 'I квартал 2022' },
+    methodology: 'Фактическая доходность индексов полной доходности MCFTR и RGBITR за один календарный период. Сценарий фиксирует одновременный шок акций и ОФЗ: MCFTR используется как proxy для текущих share/stock, RGBITR — только для явно распознанных ОФЗ. Это исторический replay классов, а не прогноз будущего и не инструментальная переоценка отдельных бумаг.',
+    sourceUrl: 'https://www.cbr.ru/analytics/RSCI/activity_npf/dokhodnost-npf-1-22/',
+    verifiedAt: '2026-09-11',
+    benchmarks: [
+      { classKey: 'equity_mcftr_proxy', symbol: 'MCFTR', label: 'Позиции share/stock · MCFTR proxy' },
+      { classKey: 'ofz', symbol: 'RGBITR', label: 'ОФЗ · total return' },
+    ],
+    shocks: {
+      equity_mcftr_proxy: -0.282,
+      ofz: -0.119,
     },
   },
   {
