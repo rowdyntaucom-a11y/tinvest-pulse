@@ -1,0 +1,56 @@
+name: DNA depth material v14.21.0
+on:
+  push:
+    branches: [dna-depth-material-v14210]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-depth-material-v14210
+      - name: Wire depth material pass
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js'); s=p.read_text()
+          s=s.replace('// v14.20.0 — DNA QUALITY PASS: material depth + detailed sprites + modular world; finance/history unchanged.','// v14.21.0 — DNA DEPTH MATERIAL: cleaner layers + stronger material/readability pass; finance/history unchanged.')
+          s=s.replace('?rev=14200','?rev=14210')
+          s=s.replace("const V='v14.20.0'","const V='v14.21.0'")
+          s=s.replace("b.innerHTML='<i></i> QUALITY PASS · '+V+' · 11/11'","b.innerHTML='<i></i> DEPTH MATERIAL · '+V+' · 11/11'")
+          s=s.replace("process.env.TINVEST_BUILD='14.20.0'","process.env.TINVEST_BUILD='14.21.0'")
+          s=s.replace("version:'14.20.0',build:'14.20.0',source:'figma-quality-pass',path:'/assets/dna-world/l1/figma-pixel-v14190.svg',overlay:'/assets/dna-world/l1/quality-overlay-v14200.svg'","version:'14.21.0',build:'14.21.0',source:'figma-depth-material',path:'/assets/dna-world/l1/figma-pixel-v14190.svg',overlay:'/assets/dna-world/l1/depth-material-v14210.svg'")
+          p.write_text(s)
+
+          e=Path('public/dna-world-engine-v141.js'); x=e.read_text()
+          x=x.replace("const V='14.20.0'","const V='14.21.0'")
+          x=x.replace("'/assets/dna-world/l1/quality-overlay-v14200.svg?rev=14200'","'/assets/dna-world/l1/depth-material-v14210.svg?rev=14210'")
+          x=x.replace("opacity:'.92'","opacity:'.80'")
+          x=x.replace("QUALITY PASS · v'+V+' · 11/11","DEPTH MATERIAL · v'+V+' · 11/11")
+          e.write_text(x)
+
+          r=Path('public/dna-world-runtime-v14180.js'); x=r.read_text()
+          x=x.replace("const V='14.20.0'","const V='14.21.0'")
+          x=x.replace("g.globalAlpha=.28","g.globalAlpha=.36")
+          x=x.replace("worker('minerMine',326,365,68,99","worker('minerMine',326,365,72,104")
+          x=x.replace("worker('builderWork',602,365,67,98","worker('builderWork',602,365,71,103")
+          x=x.replace("worker('haulerWalk',hx,365,64,94","worker('haulerWalk',hx,365,68,99")
+          x=x.replace("worker('operatorIdle',476,365,64,94","worker('operatorIdle',476,365,68,99")
+          x=x.replace("worker('minerMine',158,636,64,94","worker('minerMine',158,636,67,99")
+          x=x.replace("worker('builderWork',676,636,64,94","worker('builderWork',676,636,67,99")
+          x=x.replace("const w=72*scale,h=50*scale","const w=76*scale,h=52*scale")
+          r.write_text(x)
+
+          a=Path('public/dna-game-assets-v147.js'); x=a.read_text().replace("const VERSION='14.20.0'","const VERSION='14.21.0'"); a.write_text(x)
+          PY
+      - name: Commit wiring
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js public/dna-world-engine-v141.js public/dna-world-runtime-v14180.js public/dna-game-assets-v147.js
+          git diff --cached --quiet && exit 0
+          git commit -m "wire DNA depth material v14.21.0"
+          git push origin HEAD:dna-depth-material-v14210
