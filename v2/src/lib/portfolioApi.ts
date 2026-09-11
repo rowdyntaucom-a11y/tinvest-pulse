@@ -6,6 +6,13 @@ export type HistoryPoint = {
   invested: number | null
 }
 
+export type PositionSummary = {
+  ticker: string
+  name: string
+  instrumentType: string
+  currentValue: number
+}
+
 export type PortfolioSnapshot = {
   accountName: string
   value: number
@@ -14,6 +21,9 @@ export type PortfolioSnapshot = {
   passiveIncome: number
   averageMonthlyPassiveIncome: number
   positions: number
+  positionDetails: PositionSummary[]
+  riskFreeRate: number | null
+  riskFreeRateDate: string | null
   xirr: number | null
   cagr: number | null
   startDate: string | null
@@ -46,6 +56,22 @@ const ratioToPercent = (value: unknown): number => {
   const parsed = nullableNumber(value)
   if (parsed == null) return 0
   return Math.abs(parsed) <= 10 ? parsed * 100 : parsed
+}
+
+const normalisePositions = (positionsRaw: unknown): PositionSummary[] => {
+  if (!Array.isArray(positionsRaw)) return []
+  return positionsRaw.map(rowRaw => {
+    const row = (rowRaw ?? {}) as Record<string, unknown>
+    const quantity = n(row.quantity)
+    const currentPrice = n(row.currentPrice)
+    const currentValue = n(row.currentValue ?? row.marketValue ?? row.positionValue ?? row.totalValue) || quantity * currentPrice
+    return {
+      ticker: String(row.ticker ?? row.figi ?? row.instrumentUid ?? '—'),
+      name: String(row.name ?? row.ticker ?? row.figi ?? 'Актив'),
+      instrumentType: String(row.instrumentType ?? row.type ?? ''),
+      currentValue: Number.isFinite(currentValue) ? Math.max(0, currentValue) : 0,
+    }
+  }).filter(position => position.currentValue > 0)
 }
 
 const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
@@ -89,6 +115,9 @@ const fallbackSnapshot = (): PortfolioSnapshot => ({
   passiveIncome: 0,
   averageMonthlyPassiveIncome: 0,
   positions: 0,
+  positionDetails: [],
+  riskFreeRate: null,
+  riskFreeRateDate: null,
   xirr: null,
   cagr: null,
   startDate: null,
@@ -104,8 +133,9 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
   const portfolio = (raw.portfolio ?? {}) as Record<string, unknown>
   const passive = (raw.passiveIncome ?? raw.income ?? {}) as Record<string, unknown>
   const account = (raw.account ?? {}) as Record<string, unknown>
+  const cbr = (raw.cbr ?? {}) as Record<string, unknown>
   const positionsRaw = portfolio.positions ?? portfolio.assets ?? raw.assets
-  const positions = Array.isArray(positionsRaw) ? positionsRaw.length : 0
+  const positionDetails = normalisePositions(positionsRaw)
 
   return {
     accountName: String(account.name || 'Кряхтящий фонд'),
@@ -114,7 +144,10 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
     profitPct: ratioToPercent(portfolio.profitPercent ?? portfolio.growthPercent ?? raw.profitPct),
     passiveIncome: n(passive.total ?? raw.passiveIncomeTotal),
     averageMonthlyPassiveIncome: n(passive.averageMonthly ?? (raw.income as Record<string, unknown> | undefined)?.monthly),
-    positions,
+    positions: positionDetails.length || (Array.isArray(positionsRaw) ? positionsRaw.length : 0),
+    positionDetails,
+    riskFreeRate: nullableNumber(cbr.rate),
+    riskFreeRateDate: cbr.rateDate ? String(cbr.rateDate) : null,
     xirr: nullableNumber(portfolio.xirr),
     cagr: nullableNumber(portfolio.cagr),
     startDate: portfolio.startDate ? String(portfolio.startDate) : portfolio.createdAt ? String(portfolio.createdAt) : null,
@@ -132,7 +165,7 @@ async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
   const value = n(raw.totalValue ?? raw.portfolioValue ?? portfolio.totalAmountPortfolio)
   const profit = n(raw.profit ?? raw.expectedYield ?? portfolio.expectedYield)
   const positionsRaw = raw.positions ?? portfolio.positions
-  const positions = Array.isArray(positionsRaw) ? positionsRaw.length : 0
+  const positionDetails = normalisePositions(positionsRaw)
   const invested = value - profit
   const profitPct = invested > 0 ? profit / invested * 100 : 0
 
@@ -142,7 +175,8 @@ async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
     profit,
     profitPct,
     passiveIncome: n(raw.passiveIncomeTotal ?? raw.passiveIncome),
-    positions,
+    positions: positionDetails.length || (Array.isArray(positionsRaw) ? positionsRaw.length : 0),
+    positionDetails,
     source: 'portfolio',
   }
 }
