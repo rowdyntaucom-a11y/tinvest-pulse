@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
 import './keyRateWidget.css'
 
 type CbrMacro = {
@@ -37,7 +36,6 @@ function resolveNextMeeting(reported: string | null) {
   const now = Date.now()
   const fromServer = validIsoDate(reported)
   if (fromServer && decisionTimestamp(fromServer) > now) return fromServer
-
   return OFFICIAL_2026_MEETINGS.find(date => decisionTimestamp(date) > now) ?? fromServer
 }
 
@@ -48,12 +46,7 @@ function shortDate(value: string | null, formatter: Intl.DateTimeFormat) {
 }
 
 export function KeyRateWidget() {
-  const [host, setHost] = useState<HTMLElement | null>(null)
   const [macro, setMacro] = useState<CbrMacro>({ rate: null, rateDate: null, nextMeeting: null })
-
-  useEffect(() => {
-    setHost(document.querySelector<HTMLElement>('.topbar'))
-  }, [])
 
   useEffect(() => {
     let active = true
@@ -84,9 +77,8 @@ export function KeyRateWidget() {
   }, [])
 
   const nextMeeting = useMemo(() => resolveNextMeeting(macro.nextMeeting), [macro.nextMeeting])
-  if (!host) return null
 
-  return createPortal(
+  return (
     <a
       className="key-rate-widget"
       href="https://www.cbr.ru/press/keypr/"
@@ -106,7 +98,6 @@ export function KeyRateWidget() {
         <b>13:30 МСК</b>
       </span>
       <span className="key-rate-widget__source">ЦБ РФ{macro.rateDate ? ` · ${shortDate(macro.rateDate, dateFmt)}` : ''}</span>
-    </a>,
-    host,
+    </a>
   )
 }
