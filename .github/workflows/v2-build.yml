@@ -4,11 +4,16 @@ on:
   pull_request:
     paths:
       - 'v2/**'
+      - 'payouts-core.js'
+      - 'payouts.js'
       - '.github/workflows/v2-build.yml'
   push:
     branches: [main]
     paths:
       - 'v2/**'
+      - 'payouts-core.js'
+      - 'payouts.js'
+      - '.github/workflows/v2-build.yml'
 
 jobs:
   build:
@@ -25,3 +30,4 @@ jobs:
           cache-dependency-path: v2/package.json
       - run: npm install --no-audit --no-fund
       - run: npm run build
+      - run: node --check ../payouts-core.js
