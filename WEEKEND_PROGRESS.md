@@ -66,10 +66,22 @@ This log is maintained by autonomous development runs. Production changes must r
 - UI reports covered-value P&L, coverage ratio, class-level shock and source methodology. Stress results are explicitly diagnostic and do not claim to forecast future losses.
 - Existing repository `v2 build` workflow remains the single pre-merge TypeScript/Vite gate; a duplicate workflow drafted during the pass was removed before merge.
 
+### 21:03 MSK autonomous pass — realized income history primitives
+- A parallel stress-framework PR was closed without merge after `main` independently received the sourced stress implementation; duplicate analytics code was intentionally avoided.
+- Added `v2/src/features/income/incomeHistory.ts` through PR #49 and squash-merged as `a81997befcec59a18c7424bdd4d301130ff56999`.
+- Realized history consumes only payout events explicitly marked `FACT` and positive finite net amounts; it aggregates month/year totals and coupon/dividend/other splits without mixing forecast events into history.
+- Income-source concentration is calculated from realized net payouts only using HHI, effective source count and top-source share.
+- Passive-income goal progress requires a user-supplied positive annual net target and a complete 12-month realized calendar year. Short history is not annualized, no goal date is invented and no reinvestment assumption is silently applied.
+- Quant methodology pass: fact/forecast separation preserved; no payout-growth extrapolation, no personalized recommendation and no invented return assumption.
+- Code-quality pass: standalone strict TypeScript 5.8.3 compile succeeded against the current payout-event shape.
+- Mobile-UX pass: no UI/layout changes; this is a runtime-isolated calculation primitive pending a later compact Income integration pass.
+- Release pass: one new imported-by-nobody module only; no routes, broker calls, secrets, payment/legal content or existing render paths changed.
+- Render status could not be queried in this run because the connector requires an explicitly selected workspace and autonomous mode cannot safely choose one. Auto-deploy was not manually triggered.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; next deepen it only after validating live sample coverage and UX density.
 - Expand historical stress only with versioned sourced return data; do not convert OFZ yield-bp moves into price shocks until duration semantics are verified.
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
-- Deepen passive-income history / concentration / goal framework without fabricating payout growth.
+- Wire realized income history / concentration / user-defined goal diagnostics into a compact Income subview without duplicating existing source widgets.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
