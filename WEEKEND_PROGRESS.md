@@ -18,11 +18,16 @@ This log is maintained by autonomous development runs. Production changes must r
 - Advanced investor depth audit added and made mandatory for autonomous passes so existing Portfolio / Analytics / Income / Bonds screens are deepened before unrelated navigation growth.
 - Portfolio depth v1: position sorting by weight / P&L RUB / P&L %, selectable position inspector, quantity, average/current price, current value, weight and broker-reported P&L. Build succeeded.
 - Benchmark-relative Analytics v1: Portfolio vs IMOEX mode with common-sample return, excess return, Tracking Error, Information Ratio, Beta and correlation. Complex relative-risk coefficients are gated until at least 60 paired daily returns; 252 paired returns marks mature history.
-- Income depth v2 prepared: realized coupon/dividend split, top confirmed 12M income source, source concentration HHI and effective number of income sources.
+- Income depth v2 is live on both Render services: realized coupon/dividend split, top confirmed 12M source, source concentration HHI and effective number of income sources.
 - Preview deployment for benchmark-relative Analytics built successfully but initially hit a transient Render port-scan timeout after build. A no-code redeploy of the same commit completed successfully and preview returned to `live`; primary was already `live`. No code rollback was required.
+- Bond analytics v1 added: current bond positions are enriched only from T-Bank instrument metadata; UI exposes maturity ladder, OFZ share, coupon type, nominal currency, nearest maturity and metadata coverage. YTM/duration remain intentionally gated until price/nominal semantics are verified.
+- Initial bond production deploy failed at runtime because the bridge looked for a marker removed earlier by `server-base.js`. The bridge marker was changed to the actual post-transform dashboard marker; hotfix `b07d93886ccaf4ffbfd1734e0ae7b1b4a544cb54` restored both preview and primary to `live`.
+- Tail-risk v1 prepared on repaired main: historical one-day VaR 95% / CVaR (Expected Shortfall), worst day and negative-day frequency use daily TWR returns only. VaR/CVaR are unavailable below 126 returns and mature at 252.
+- Correlation-matrix primitives use paired daily returns with a 60-return gate. Stress-test primitives accept only explicit sourced class shocks and report coverage; no historical shock numbers are invented.
 
 ### Current focus
-- Merge Income depth v2 after green preview recovery.
-- Add bond-specific metadata foundation and deterministic maturity/coupon/currency analytics only from verified instrument metadata.
-- Add CVaR / correlation / stress-test foundations with strict sample gates.
+- Validate and deploy tail-risk v1 after branch review.
+- Wire per-asset historical series before exposing a portfolio correlation matrix.
+- Source and version historical stress-scenario shock tables before exposing stress results.
+- Continue bond analytics only with verified source semantics; no guessed YTM/duration.
 - Keep legal publication blocked until P0 review issues and real operator/provider placeholders are resolved.
