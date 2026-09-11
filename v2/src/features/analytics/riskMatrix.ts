@@ -7,16 +7,19 @@ export type CorrelationCell = {
   correlation: number | null
   pairedReturns: number
   available: boolean
+  mature: boolean
 }
 
 export type CorrelationMatrixResult = {
-  version: '1.0'
+  version: '1.1'
   minimumPairedReturns: number
+  maturePairedReturns: number
   series: Array<{ key: string; label: string; returns: number }>
   cells: CorrelationCell[]
 }
 
 const MIN_PAIRED_RETURNS = 60
+const MATURE_PAIRED_RETURNS = 252
 
 function dailyReturnMap(points: PricePoint[]) {
   const sorted = points
@@ -64,19 +67,22 @@ export function calculateCorrelationMatrix(series: RiskSeries[]): CorrelationMat
       const valuesA = dates.map(date => mapA.get(date)!)
       const valuesB = dates.map(date => mapB.get(date)!)
       const available = a.key === b.key || dates.length >= MIN_PAIRED_RETURNS
+      const mature = dates.length >= MATURE_PAIRED_RETURNS
       cells.push({
         a: a.key,
         b: b.key,
         pairedReturns: dates.length,
         available,
+        mature,
         correlation: a.key === b.key ? 1 : available ? correlation(valuesA, valuesB) : null,
       })
     }
   }
 
   return {
-    version: '1.0',
+    version: '1.1',
     minimumPairedReturns: MIN_PAIRED_RETURNS,
+    maturePairedReturns: MATURE_PAIRED_RETURNS,
     series: series.map(item => ({ key: item.key, label: item.label, returns: maps.get(item.key)?.size || 0 })),
     cells,
   }
