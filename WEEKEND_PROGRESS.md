@@ -87,6 +87,11 @@ This log is maintained by autonomous development runs. Production changes must r
 - Code-quality pass: module is pure, side-effect free, has no API/network/storage dependency and uses finite-number guards on broker values.
 - Mobile-UX pass: no UI change in this batch; primitive is groundwork for a later compact drill-down, avoiding another full widget.
 - Release pass: isolated new module + documentation only; no existing rendering path, broker route, secret, legal text or deployment configuration changed.
+- Local strict TypeScript 5.8.3 compile passed for the attribution boundary against the current `PositionSnapshot` type; runtime assertions passed for totals, winner/loser cancellation, class-share additivity and zero-P/L gating.
+- PR #55 was squash-merged to `main` as `ea633c9c8098a67c1bab1d36465f7fc79e60462b`.
+- Render `tinvest-pulse-v2-preview` deploy `dep-dai503rtqb8s73bl32tg`: `live`.
+- Render `tinvest-pulse` deploy `dep-dai503rtqb8s73bl3300`: `live`.
+- No rollback required; both auto-deploys accepted the same production commit.
 
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
