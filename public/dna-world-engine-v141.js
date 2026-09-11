@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.26.0';let raf=0;
+const V='14.27.0';let raf=0;
 function boot(){
  const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
  if(getComputedStyle(h).position==='static')h.style.position='relative';
@@ -61,7 +61,7 @@ function boot(){
  }
  function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{}ambient(t);raf=requestAnimationFrame(frame)}
  cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
- setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> CHARACTER MATERIAL · v'+V+' · 11/11')},120)
+ setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> WORLD COHESION · v'+V+' · 11/11')},120)
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 window.addEventListener('dna-game-remount',()=>setTimeout(boot,100));
