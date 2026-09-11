@@ -78,10 +78,20 @@ This log is maintained by autonomous development runs. Production changes must r
 - Release pass: one new imported-by-nobody module only; no routes, broker calls, secrets, payment/legal content or existing render paths changed.
 - Render status could not be queried in this run because the connector requires an explicitly selected workspace and autonomous mode cannot safely choose one. Auto-deploy was not manually triggered.
 
+### 21:58 MSK autonomous pass — Portfolio P/L attribution groundwork
+- Added `v2/src/features/portfolio/portfolioAttribution.ts` on branch `qvanix-portfolio-attribution-v1` as a deterministic current-position attribution primitive.
+- Attribution consumes only broker-reported `expectedYield` from current positions; it does not reconstruct TWR or claim historical performance contribution without per-position return history.
+- Position contribution uses `abs(position P/L) / sum(abs(position P/L))` so offsetting winners and losers cannot create unstable or misleading shares when net P/L is near zero.
+- Positive P/L, negative P/L, net P/L and gross absolute P/L are exposed separately; asset-class grouping is deterministic and reuses the existing share/bond/fund/currency/future taxonomy.
+- Quant methodology pass: this is explicitly unrealized broker P/L attribution, not return attribution, alpha, TWR or Brinson attribution.
+- Code-quality pass: module is pure, side-effect free, has no API/network/storage dependency and uses finite-number guards on broker values.
+- Mobile-UX pass: no UI change in this batch; primitive is groundwork for a later compact drill-down, avoiding another full widget.
+- Release pass: isolated new module + documentation only; no existing rendering path, broker route, secret, legal text or deployment configuration changed.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; next deepen it only after validating live sample coverage and UX density.
 - Expand historical stress only with versioned sourced return data; do not convert OFZ yield-bp moves into price shocks until duration semantics are verified.
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
-- Wire realized income history / concentration / user-defined goal diagnostics into a compact Income subview without duplicating existing source widgets.
+- Integrate broker P/L attribution only as clearly labelled current unrealized contribution; historical/TWR attribution remains gated on trustworthy per-position history.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
