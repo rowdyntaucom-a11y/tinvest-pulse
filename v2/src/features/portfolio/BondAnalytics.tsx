@@ -4,6 +4,7 @@ import './bondAnalytics.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
+const yearsFmt = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const dateFmt = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })
 
 type Props = { positions: PositionSnapshot[] }
@@ -39,14 +40,20 @@ function hasVerifiedBondMeta(position: PositionSnapshot) {
   )
 }
 
-function maturityBucket(position: PositionSnapshot) {
+function futureMaturityYears(position: PositionSnapshot, now: number) {
+  const meta = position.bond
+  if (!meta || meta.perpetual || !meta.maturityDate) return null
+  const maturity = new Date(meta.maturityDate).getTime()
+  if (!Number.isFinite(maturity) || maturity < now) return null
+  return (maturity - now) / (365.25 * 24 * 60 * 60 * 1000)
+}
+
+function maturityBucket(position: PositionSnapshot, now: number) {
   const meta = position.bond
   if (!meta) return 'unknown'
   if (meta.perpetual) return 'perpetual'
-  if (!meta.maturityDate) return 'unknown'
-  const maturity = new Date(meta.maturityDate).getTime()
-  if (!Number.isFinite(maturity)) return 'unknown'
-  const years = (maturity - Date.now()) / (365.25 * 24 * 60 * 60 * 1000)
+  const years = futureMaturityYears(position, now)
+  if (years == null) return 'unknown'
   if (years <= 3) return '0-3'
   if (years <= 7) return '3-7'
   if (years <= 15) return '7-15'
@@ -59,6 +66,7 @@ function addBucket(map: Map<string, number>, key: string, value: number) {
 
 export function BondAnalytics({ positions }: Props) {
   const model = useMemo(() => {
+    const now = Date.now()
     const bonds = positions.filter(isBond)
     const total = bonds.reduce((sum, position) => sum + position.currentValue, 0)
     const metadataValue = bonds.filter(hasVerifiedBondMeta).reduce((sum, position) => sum + position.currentValue, 0)
@@ -67,9 +75,19 @@ export function BondAnalytics({ positions }: Props) {
     const maturity = new Map<string, number>()
     const coupon = new Map<string, number>()
     const currency = new Map<string, number>()
+    const datedMaturities: Array<{ position: PositionSnapshot; years: number; time: number }> = []
 
     for (const position of bonds) {
-      addBucket(maturity, maturityBucket(position), position.currentValue)
+      addBucket(maturity, maturityBucket(position, now), position.currentValue)
+
+      const years = futureMaturityYears(position, now)
+      if (years != null) {
+        datedMaturities.push({
+          position,
+          years,
+          time: new Date(position.bond!.maturityDate!).getTime(),
+        })
+      }
 
       const meta = position.bond
       if (meta?.floatingCoupon === true) addBucket(coupon, 'floating', position.currentValue)
@@ -92,11 +110,11 @@ export function BondAnalytics({ positions }: Props) {
       .map(key => ({ key, label: maturityLabels[key], value: maturity.get(key) || 0 }))
       .filter(row => row.value > 0)
 
-    const nearest = bonds
-      .filter(position => position.bond?.maturityDate && !position.bond?.perpetual)
-      .map(position => ({ position, time: new Date(position.bond!.maturityDate!).getTime() }))
-      .filter(row => Number.isFinite(row.time) && row.time >= Date.now())
-      .sort((a, b) => a.time - b.time)[0] || null
+    const datedMaturityValue = datedMaturities.reduce((sum, row) => sum + row.position.currentValue, 0)
+    const weightedYearsToMaturity = datedMaturityValue > 0
+      ? datedMaturities.reduce((sum, row) => sum + row.years * row.position.currentValue, 0) / datedMaturityValue
+      : null
+    const nearest = [...datedMaturities].sort((a, b) => a.time - b.time)[0] || null
 
     const couponRows: Bucket[] = [
       { key: 'floating', label: 'Плавающий', value: coupon.get('floating') || 0 },
@@ -113,6 +131,9 @@ export function BondAnalytics({ positions }: Props) {
       total,
       metadataValue,
       metadataCoverage: total > 0 ? metadataValue / total : 0,
+      datedMaturityValue,
+      maturityDateCoverage: total > 0 ? datedMaturityValue / total : 0,
+      weightedYearsToMaturity,
       ofzValue,
       ofzShare: total > 0 ? ofzValue / total : 0,
       maturityRows,
@@ -133,7 +154,7 @@ export function BondAnalytics({ positions }: Props) {
       <div className="bond-summary">
         <article><span>ОБЛИГАЦИИ</span><strong>{model.bonds.length}</strong><small>{money.format(model.total)} ₽</small></article>
         <article><span>ОФЗ В BOND-СЛИВЕ</span><strong>{pct.format(model.ofzShare * 100)}%</strong><small>{money.format(model.ofzValue)} ₽</small></article>
-        <article><span>МЕТАДАННЫЕ</span><strong>{pct.format(model.metadataCoverage * 100)}%</strong><small>по стоимости позиций</small></article>
+        <article><span>ДАТЫ ПОГАШЕНИЯ</span><strong>{pct.format(model.maturityDateCoverage * 100)}%</strong><small>{model.weightedYearsToMaturity == null ? 'средний срок —' : `ср. ${yearsFmt.format(model.weightedYearsToMaturity)} г.`} · meta {pct.format(model.metadataCoverage * 100)}%</small></article>
         <article><span>БЛИЖАЙШЕЕ ПОГАШЕНИЕ</span><strong>{model.nearest ? model.nearest.position.ticker : '—'}</strong><small>{model.nearest ? dateFmt.format(new Date(model.nearest.position.bond!.maturityDate!)) : 'нет подтверждённой даты'}</small></article>
       </div>
 
@@ -169,7 +190,7 @@ export function BondAnalytics({ positions }: Props) {
         </section>
       </div>
 
-      <p className="bond-method-note">Погашения, валюта и тип купона показываются только из инструментальных данных Т‑Банка. QVANIX не угадывает их по тикеру. Доходность к погашению и duration пока намеренно не показываются: сначала нужно зафиксировать и проверить семантику цен/номинала для всех выпусков.</p>
+      <p className="bond-method-note">Погашения, валюта и тип купона показываются только из инструментальных данных Т‑Банка. Средний срок — взвешенный текущей стоимостью календарный срок до подтверждённых будущих дат погашения; бессрочные и выпуски без валидной даты из среднего исключаются. Это не duration и не оценка чувствительности цены. Доходность к погашению пока намеренно не показывается: сначала нужно зафиксировать и проверить семантику цены и номинала для всех выпусков.</p>
     </div>
   )
 }
