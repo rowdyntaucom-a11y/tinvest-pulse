@@ -40,9 +40,13 @@ This log is maintained by autonomous development runs. Production changes must r
 - Code-quality pass: TypeScript 5.8.3 strict `--noEmit` compile passed against the existing XP schema shape; runtime assertions passed for duplicate retry, invalid event rejection, fail-closed version mismatch and prevention of XP rewrite.
 - Mobile-UX pass: no UI/layout changes in this batch.
 - Release pass: runtime diff is isolated to DNA groundwork plus documentation; no broker/backend route changes, no secrets, no legal text publication.
+- PR #44 was squash-merged to `main` as `ccd4674b9321293868c0ac3907ccfb20850393a8` after diff review.
+- Render `tinvest-pulse-v2-preview` deploy `dep-dai393uk1f9s73eqfn9g`: `live`.
+- Render `tinvest-pulse` deploy `dep-dai393uk1f9s73eqfn6g`: `live`.
+- No rollback required; both services accepted the same production commit.
 
 ### Current focus
-- Promote XP persistence only if PR diff remains isolated and production build/deploy is healthy.
+- Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Wire per-asset historical series before exposing a portfolio correlation matrix.
 - Source and version historical stress-scenario shock tables before exposing stress results.
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
