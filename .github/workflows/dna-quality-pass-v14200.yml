@@ -1,0 +1,56 @@
+name: DNA quality pass v14.20.0
+on:
+  push:
+    branches: [dna-quality-pass-v14200]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-quality-pass-v14200
+      - name: Wire quality pass
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js'); s=p.read_text()
+          s=s.replace('// v14.19.0 — DNA PIXEL PRESET: modular art + workers + level-driven world; finance/history unchanged.','// v14.20.0 — DNA QUALITY PASS: material depth + detailed sprites + modular world; finance/history unchanged.')
+          s=s.replace('?rev=14190','?rev=14200')
+          s=s.replace("const V='v14.19.0'","const V='v14.20.0'")
+          s=s.replace("b.innerHTML='<i></i> PIXEL PRESET · '+V+' · 10/11'","b.innerHTML='<i></i> QUALITY PASS · '+V+' · 11/11'")
+          s=s.replace("process.env.TINVEST_BUILD='14.19.0'","process.env.TINVEST_BUILD='14.20.0'")
+          s=s.replace("version:'14.19.0',build:'14.19.0',source:'figma-pixel-preset',path:'/assets/dna-world/l1/figma-pixel-v14190.svg'","version:'14.20.0',build:'14.20.0',source:'figma-quality-pass',path:'/assets/dna-world/l1/figma-pixel-v14190.svg',overlay:'/assets/dna-world/l1/quality-overlay-v14200.svg'")
+          p.write_text(s)
+
+          a=Path('public/dna-art-scene-v148.js'); x=a.read_text()
+          x=x.replace("window.DNA_ART_PACK.version='14.19.0'","window.DNA_ART_PACK.version='14.20.0'")
+          x=x.replace("window.DNA_ART_PACK.source='figma-pixel-preset'","window.DNA_ART_PACK.source='figma-quality-pass';window.DNA_ART_PACK.qualityOverlay='/assets/dna-world/l1/quality-overlay-v14200.svg?rev=14200'")
+          a.write_text(x)
+
+          e=Path('public/dna-world-engine-v141.js'); x=e.read_text().replace("const V='14.19.0'","const V='14.20.0'")
+          x=x.replace("['dnaWorld148','dnaWorldArt148'].forEach", "['dnaWorld148','dnaWorldArt148','dnaQuality14200'].forEach")
+          marker="art.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.sceneBase)||'/assets/dna-world/l1/figma-mobile-v14170.svg?rev=14170';h.appendChild(art);"
+          overlay="""art.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.sceneBase)||'/assets/dna-world/l1/figma-mobile-v14170.svg?rev=14170';h.appendChild(art);\n const quality=document.createElement('img');quality.id='dnaQuality14200';quality.alt='';quality.decoding='async';quality.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.qualityOverlay)||'/assets/dna-world/l1/quality-overlay-v14200.svg?rev=14200';Object.assign(quality.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:41,pointerEvents:'none',opacity:'.92'});h.appendChild(quality);"""
+          if marker not in x: raise SystemExit('engine marker not found')
+          x=x.replace(marker,overlay)
+          x=x.replace("b.innerHTML='<i></i> MOBILE MASTER · v'+V+' · 8/11'","b.innerHTML='<i></i> QUALITY PASS · v'+V+' · 11/11'")
+          e.write_text(x)
+
+          r=Path('public/dna-world-runtime-v14180.js'); x=r.read_text().replace("const V='14.19.0'","const V='14.20.0'")
+          old="function worker(key,x,feetY,w=66,h=96,flip=false,alpha=1,bob=0){asset(key,x-w/2,feetY-h+bob,w,h,{flipX:flip,alpha})}"
+          new="function worker(key,x,feetY,w=66,h=96,flip=false,alpha=1,bob=0){g.save();g.globalAlpha=.28;g.fillStyle='#000';g.beginPath();g.ellipse(x,feetY+2,w*.27,5,0,0,Math.PI*2);g.fill();g.restore();asset(key,x-w/2,feetY-h+bob,w,h,{flipX:flip,alpha})}"
+          if old not in x: raise SystemExit('runtime worker marker not found')
+          x=x.replace(old,new)
+          r.write_text(x)
+          PY
+      - name: Commit production wiring
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js public/dna-art-scene-v148.js public/dna-world-engine-v141.js public/dna-world-runtime-v14180.js
+          git diff --cached --quiet && exit 0
+          git commit -m "wire DNA quality pass v14.20.0"
+          git push origin HEAD:dna-quality-pass-v14200
