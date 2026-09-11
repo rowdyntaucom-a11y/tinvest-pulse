@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.30.0';
+const V='14.31.0';
 const NAMES=['ФУНДАМЕНТ','ДОМ','ПОСЕЛЕНИЕ','ГОРОД','КРЕПОСТЬ','КОРОЛЕВСТВО','СТОЛИЦА','ЦИТАДЕЛЬ','ИМПЕРИЯ','ЛЕГЕНДА','БЕСКОНЕЧНОСТЬ'];
 let level=Number(sessionStorage.getItem('dnaPreviewLevel'))||0;
 let hidden=sessionStorage.getItem('dnaPreviewHidden')==='1';
