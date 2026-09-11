@@ -105,6 +105,21 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render `tinvest-pulse` deploy `dep-dai5sse1egvs73a2ekng`: `live`.
 - No rollback required.
 
+### 00:00 MSK autonomous pass — drawdown recovery diagnostics
+- Added `v2/src/features/analytics/recoveryDiagnostics.ts` through PR #67 and squash-merged as `f74f7e440a0e4b972a6a234b7d9279852251c52d`.
+- Recovery diagnostics consume only the normalized portfolio TWR index. They do not use portfolio RUB value, benchmark prices or an LLM-derived number.
+- A recovery episode closes only when the index regains the previous peak. Peak-to-trough, trough-to-recovery and total calendar durations are reported separately; an active drawdown remains open and is never counted as recovered.
+- Fail-closed sample gate: fewer than 60 daily return observations returns `available=false`; 60–251 is `DEVELOPING`; 252+ is `MATURE`.
+- No future recovery date, expected return or personalized action is forecast.
+- Quant methodology pass: reviewed episode state transitions, depth formula `1 - trough / peak`, separation of active vs completed drawdowns and short-history behavior.
+- Code-quality pass: strict TypeScript 5.8.3 compile passed; runtime assertions passed for the 59/60 observation gate, completed-episode depth/dates and active-drawdown separation.
+- Mobile-UX pass: no UI/layout change; module is calculation groundwork only, so Samsung/Android density and widget duplication are unchanged.
+- Release pass: PR diff is one pure analytics module plus methodology README; no backend route, broker call, secret, payment/legal text, renderer or deployment configuration changed.
+- GitHub `v2 build` workflow run #90 completed successfully, including Vite build and `payouts-core.js` syntax check.
+- Render `tinvest-pulse-v2-preview` deploy `dep-dai6odnqj5pc73bll4ig`: `live`.
+- Render `tinvest-pulse` deploy `dep-dai6odnqj5pc73bll4g0`: `live`.
+- No rollback required; both services accepted the production commit. No manual deploy was triggered.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; next deepen it only after validating live sample coverage and UX density.
@@ -112,4 +127,5 @@ This log is maintained by autonomous development runs. Production changes must r
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
 - Surface Portfolio data context compactly without adding a duplicate full widget; account type remains gated until the backend exposes a verified account-type field.
 - Integrate broker P/L attribution only as clearly labelled current unrealized contribution; historical/TWR attribution remains gated on trustworthy per-position history.
+- Recovery diagnostics are now available as a deterministic primitive; UI integration should wait until the live sample gate is met so the screen does not show decorative unavailable metrics.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
