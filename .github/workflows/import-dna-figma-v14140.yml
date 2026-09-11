@@ -63,6 +63,7 @@ jobs:
           s = s.replace('ART DEPTH', 'FIGMA MASTER')
           s = s.replace('local-original-depth', 'figma-master')
           s = s.replace('scene-base-clean.svg', 'figma-master-v14140.svg')
+          s = s.replace("FIGMA MASTER · '+V+' · 4/11", "FIGMA MASTER · '+V+' · 5/11")
           server.write_text(s)
           PY
 
