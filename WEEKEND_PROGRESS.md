@@ -45,9 +45,21 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render `tinvest-pulse` deploy `dep-dai393uk1f9s73eqfn6g`: `live`.
 - No rollback required; both services accepted the same production commit.
 
+### 20:28 MSK autonomous pass — per-asset correlation history
+- Added an isolated `/api/asset-history` boundary backed by T-Bank `MarketDataService/GetCandles` with a fixed 365-day daily window, top-six current positions and a 15-minute server cache.
+- Endpoint output is intentionally narrow: instrument key/label plus price history only; broker token, quantity, current capital value and trading actions are not exposed.
+- Added mobile `CORR` mode to Risk Workspace. Pearson correlation is calculated from overlapping daily returns, not price levels, and remains unavailable below 60 paired returns.
+- Correlation matrix surfaces the lowest/highest mature pair and keeps incomplete pairs fail-closed instead of inventing coefficients.
+- PR #45 was squash-merged as `4be20d372844776bd737cf0efc6619ba2e0c0e26` after TypeScript checks and runtime assertions for +1/-1 correlation and the 60-vs-59 return boundary.
+- The first primary deploy of #45 built the Vite bundle successfully but failed during `node server.js`: nested template escaping in `production-v159.js` emitted an invalid token while dynamically compiling the v15.8 wrapper. Existing production remained live and was not cut over.
+- Hotfix PR #46 replaced the nested template delimiter with JSON-serialized injected source and was squash-merged as `fcffdbaaaecc34c5099caae8d314aaa11b709918`.
+- Render `tinvest-pulse-v2-preview` deploy `dep-dai3lj2d0e5s73beill0`: `live`.
+- Render `tinvest-pulse` deploy `dep-dai3lj2d0e5s73beilng`: `live`; startup log confirms local Russian Trusted CA load and server listening on port 10000.
+- No rollback was required. The failed deploy and hotfix are retained here as release history.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
-- Wire per-asset historical series before exposing a portfolio correlation matrix.
+- Correlation matrix now has real per-asset market history; next deepen it only after validating live sample coverage and UX density.
 - Source and version historical stress-scenario shock tables before exposing stress results.
 - Continue bond analytics only with verified source semantics; no guessed YTM/duration.
 - Deepen passive-income history / concentration / goal framework without fabricating payout growth.
