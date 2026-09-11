@@ -111,7 +111,7 @@ export function CorrelationPanel() {
       </div>
 
       <div className="corr-scroll">
-        <div className="corr-matrix" style={{ gridTemplateColumns: `66px repeat(${series.length}, minmax(38px, 1fr))` }}>
+        <div className="corr-matrix" style={{ gridTemplateColumns: `60px repeat(${series.length}, minmax(0, 1fr))` }}>
           <span className="corr-corner">ρ</span>
           {series.map(item => <span className="corr-axis corr-axis--top" key={`top-${item.key}`} title={item.label}>{compactLabel(item.label)}</span>)}
           {series.flatMap(row => {
