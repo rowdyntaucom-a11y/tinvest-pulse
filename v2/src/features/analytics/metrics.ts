@@ -165,12 +165,12 @@ export function calculatePortfolioAnalytics(
     },
   ]
 
-  const availableWeight = componentDefs.reduce((sum, component) => sum + (component.normalized == null ? 0 : component.weight), 0)
+  const complete = componentDefs.every(component => component.normalized != null)
   const weighted = componentDefs.reduce((sum, component) => sum + (component.normalized == null ? 0 : component.normalized * component.weight), 0)
-  const healthScore = availableWeight > 0 ? 100 * weighted / availableWeight : null
+  const healthScore = complete ? 100 * weighted : null
   const components = componentDefs.map(component => ({
     ...component,
-    points: component.normalized == null || availableWeight <= 0 ? null : (component.normalized * component.weight / availableWeight) * 100,
+    points: component.normalized == null ? null : component.normalized * component.weight * 100,
   }))
 
   return {
