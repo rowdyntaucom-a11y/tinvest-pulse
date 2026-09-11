@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.12.0';let raf=0;
+const V='14.13.0';let raf=0;
 function boot(){
  const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
  if(getComputedStyle(h).position==='static')h.style.position='relative';
@@ -8,18 +8,18 @@ function boot(){
  let artReady=false;
  const art=document.createElement('img');art.id='dnaWorldArt148';art.alt='';art.decoding='async';art.loading='eager';
  Object.assign(art.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:39,pointerEvents:'none',opacity:'0',transition:'opacity .25s ease'});
- art.onload=()=>{artReady=true;art.style.opacity='1';window.dispatchEvent(new CustomEvent('dna-art-ready',{detail:{version:V,width:art.naturalWidth,height:art.naturalHeight,source:'local-original'}}));};
+ art.onload=()=>{artReady=true;art.style.opacity='1';window.dispatchEvent(new CustomEvent('dna-art-ready',{detail:{version:V,width:art.naturalWidth,height:art.naturalHeight,source:'local-original-depth'}}));};
  art.onerror=()=>{artReady=false;art.style.opacity='0';console.warn('DNA local art v'+V+' failed to load');};
- art.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.sceneBase)||'/assets/dna-world/l1/scene-base-clean.svg?rev=14120';h.appendChild(art);
+ art.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.sceneBase)||'/assets/dna-world/l1/scene-base-clean.svg?rev=14130';h.appendChild(art);
  const c=document.createElement('canvas');c.id='dnaWorld148';c.width=1200;c.height=680;
  Object.assign(c.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:40,pointerEvents:'none',imageRendering:'auto'});h.appendChild(c);
  const g=c.getContext('2d');g.imageSmoothingEnabled=true;const A=()=>window.DNA_GAME_ASSETS||null;
  const R=(x,y,w,z,k,a=1)=>{g.globalAlpha=a;g.fillStyle=k;g.fillRect(x,y,w,z);g.globalAlpha=1};
  const L=(x,y,a,b,k,w=1)=>{g.strokeStyle=k;g.lineWidth=w;g.beginPath();g.moveTo(x,y);g.lineTo(a,b);g.stroke()};
  function glow(x,y,r=26,a=.18,col='255,177,68'){g.save();g.globalCompositeOperation='screen';let q=g.createRadialGradient(x,y,1,x,y,r);q.addColorStop(0,`rgba(${col},${a})`);q.addColorStop(.35,`rgba(${col},${a*.45})`);q.addColorStop(1,`rgba(${col},0)`);g.fillStyle=q;g.fillRect(x-r,y-r,r*2,r*2);g.restore()}
- function worker(x,y,t,role='minerIdle',flip=false){const a=A();if(a&&a.draw(role,x-10,y-37,21,38,{flipX:flip,alpha:.98}))return;R(x-5,y-23,10,8,'#c88b63');R(x-7,y-15,14,15,'#248d88')}
- function cart(x,y,load){const a=A(),key=load?'cartLoaded':'cartEmpty';if(a&&a.draw(key,x-2,y-22,37,22,{alpha:.98}))return;R(x,y-14,32,12,'#593725');R(x+4,y-2,6,6,'#07100e');R(x+23,y-2,6,6,'#07100e')}
- function crystal(x,y,s=1,large=false){const a=A(),key=large?'crystalLarge':'crystalSmall',w=(large?22:14)*s,h=(large?27:17)*s;if(a&&a.draw(key,x-w/2,y-h,w,h,{alpha:.97}))return;g.fillStyle='#39e5e4';g.beginPath();g.moveTo(x,y);g.lineTo(x+4*s,y-11*s);g.lineTo(x+8*s,y);g.fill();g.fillStyle='#9ffff8';g.beginPath();g.moveTo(x+5*s,y);g.lineTo(x+8*s,y-8*s);g.lineTo(x+11*s,y);g.fill()}
+ function worker(x,y,t,role='minerIdle',flip=false){const a=A();if(a&&a.draw(role,x-14,y-50,29,50,{flipX:flip,alpha:.99}))return;R(x-7,y-31,14,10,'#d79c70');R(x-10,y-21,20,21,'#248d88')}
+ function cart(x,y,load){const a=A(),key=load?'cartLoaded':'cartEmpty';if(a&&a.draw(key,x-3,y-27,45,27,{alpha:.99}))return;R(x,y-18,39,15,'#68422d');R(x+5,y-3,7,7,'#07100e');R(x+28,y-3,7,7,'#07100e')}
+ function crystal(x,y,s=1,large=false){const a=A(),key=large?'crystalLarge':'crystalSmall',w=(large?24:16)*s,h=(large?30:20)*s;if(a&&a.draw(key,x-w/2,y-h,w,h,{alpha:.98}))return;g.fillStyle='#39e5e4';g.beginPath();g.moveTo(x,y);g.lineTo(x+4*s,y-11*s);g.lineTo(x+8*s,y);g.fill();g.fillStyle='#9ffff8';g.beginPath();g.moveTo(x+5*s,y);g.lineTo(x+8*s,y-8*s);g.lineTo(x+11*s,y);g.fill()}
  function fallback(){
   let q=g.createLinearGradient(0,0,0,340);q.addColorStop(0,'#02091a');q.addColorStop(.48,'#0b2740');q.addColorStop(1,'#061516');g.fillStyle=q;g.fillRect(0,0,600,340);
   g.fillStyle='rgba(20,52,73,.9)';[[0,168,125,58],[92,156,155,70],[225,163,150,63],[365,151,160,75],[475,163,150,63]].forEach(p=>{g.beginPath();g.moveTo(p[0],p[1]+p[3]);g.lineTo(p[0]+p[2]*.48,p[1]);g.lineTo(p[0]+p[2],p[1]+p[3]);g.closePath();g.fill()});
@@ -34,13 +34,13 @@ function boot(){
   R(20,286,560,4,'#6a4730');for(let x=22;x<580;x+=18)L(x,282,x+8,294,'#765039',2);
   [26,43,60,499,516,533,550].forEach(x=>crystal(x,286,.85));
  }
- function infrastructure(){const a=A();if(!a)return;a.draw('mineExterior',22,108,112,92,{alpha:.5});a.draw('mineInterior',20,220,560,90,{alpha:.34});a.draw('supports',20,222,560,82,{alpha:.56});a.draw('railSurface',18,194,564,20,{alpha:.98});a.draw('railUnderground',18,284,564,20,{alpha:.96})}
- function resources(t){const a=A();if(a&&a.draw('orePile',58,171,37,20,{alpha:.93}))glow(77,184,19,.06,'39,226,218');crystal(49,191,.78,false);crystal(159,191,.72,true);crystal(202,286,.72,false);crystal(309,286,.8,true);crystal(507,286,.7,false)}
+ function infrastructure(){const a=A();if(!a)return;a.draw('mineExterior',9,92,138,112,{alpha:.58});a.draw('mineInterior',14,219,572,96,{alpha:.4});a.draw('supports',14,220,572,91,{alpha:.62});a.draw('railSurface',16,193,568,23,{alpha:.99});a.draw('railUnderground',16,283,568,23,{alpha:.98})}
+ function resources(t){const a=A();if(a&&a.draw('orePile',72,170,46,25,{alpha:.96}))glow(95,184,25,.08,'39,226,218');crystal(48,192,.96,false);crystal(145,190,.92,true);crystal(205,289,.88,false);crystal(309,289,.98,true);crystal(511,289,.9,false)}
  function ambient(t){
   const pulse=(Math.sin(t*2.9)+1)/2;
-  [[49,190,19],[164,171,14],[347,185,16],[504,195,16],[162,270,13],[307,270,13]].forEach((p,i)=>glow(p[0],p[1],p[2],.11+.055*Math.sin(t*4+i)));
-  glow(152,173,28,.08+.04*pulse,'39,226,218');glow(205,267,24,.06+.03*pulse,'39,226,218');
-  g.save();g.globalAlpha=.08;g.fillStyle='#b7dbe2';for(let i=0;i<5;i++){const x=(70+i*127+(t*3*(i+1)))%670-40,y=116+(i%3)*26;g.beginPath();g.ellipse(x,y,38,8,0,0,Math.PI*2);g.fill()}g.restore();
+  [[50,184,28],[145,180,20],[342,184,20],[509,180,22],[205,279,18],[309,279,18]].forEach((p,i)=>glow(p[0],p[1],p[2],.13+.06*Math.sin(t*4+i)));
+  glow(61,170,46,.12+.05*pulse,'39,226,218');glow(516,162,48,.08+.035*pulse,'255,188,92');glow(286,166,35,.05+.025*pulse,'255,178,80');
+  g.save();g.globalAlpha=.075;g.fillStyle='#b7dbe2';for(let i=0;i<6;i++){const x=(60+i*111+(t*2.6*(i+1)))%680-45,y=108+(i%3)*25;g.beginPath();g.ellipse(x,y,43,8,0,0,Math.PI*2);g.fill()}g.restore();
  }
  function activity(t){
   const p=(t%22)/22;let wx=82,cx=118,loaded=false,role='minerMine',flip=false;
@@ -50,15 +50,15 @@ function boot(){
   else if(p<.58){wx=127;cx=118+(p-.34)/.24*118;loaded=true}
   else if(p<.72){wx=238;cx=236;loaded=true;role='builderWork'}
   else{cx=236-(p-.72)/.28*118;role='minerIdle';flip=true}
-  worker(wx,205,t,role,flip);cart(cx,207,loaded);
-  worker(204,208,t+.7,'haulerWalk',true);worker(276,207,t+1.4,'builderWork',false);worker(385,208,t+2.1,'operatorIdle',true);worker(500,211,t+2.8,'operatorIdle',false);
-  const undergroundX=142+Math.sin(t*.35)*32;cart(undergroundX,301,true);worker(346,302,t+1.1,'minerMine',true);
-  if(p>.54&&p<.78){const a=1-Math.abs(((p-.54)/.24)-.5)*2;for(let i=0;i<7;i++){const sx=281+i*4,sy=191-(i%3)*3;R(sx,sy,1.5,1.5,'#ffd15f',Math.max(0,a))}}
-  const lift=80+Math.sin(t*.62)*10;L(524,92,524,lift+58,'rgba(218,180,117,.55)',.8);R(517,lift+55,15,9,'rgba(129,92,60,.82)');
+  worker(wx,207,t,role,flip);cart(cx,209,loaded);
+  worker(201,208,t+.7,'haulerWalk',true);worker(276,208,t+1.4,'builderWork',false);worker(390,208,t+2.1,'operatorIdle',true);worker(500,211,t+2.8,'operatorIdle',false);
+  const undergroundX=142+Math.sin(t*.35)*32;cart(undergroundX,303,true);worker(347,305,t+1.1,'minerMine',true);
+  if(p>.54&&p<.78){const a=1-Math.abs(((p-.54)/.24)-.5)*2;for(let i=0;i<8;i++){const sx=278+i*4,sy=188-(i%3)*4;R(sx,sy,2,2,'#ffd15f',Math.max(0,a))}}
+  const lift=76+Math.sin(t*.62)*12;L(590,86,590,lift+58,'rgba(218,180,117,.68)',1);R(581,lift+55,18,11,'rgba(145,99,60,.9)');
  }
  function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{infrastructure();resources(t)}ambient(t);activity(t);raf=requestAnimationFrame(frame)}
  cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
- setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> CLEAN ART · v'+V+' · 4/11')},120)
+ setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> ART DEPTH · v'+V+' · 4/11')},120)
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 window.addEventListener('dna-game-remount',()=>setTimeout(boot,100));
