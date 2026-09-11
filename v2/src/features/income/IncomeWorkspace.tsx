@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadPayoutCalendar, type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
+import type { PositionSnapshot } from '../../lib/portfolioApi'
 import './income.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
+const pct1 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const monthFmt = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
 const dateFmt = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' })
 
@@ -14,6 +16,7 @@ type Props = {
   passiveIncome: number
   averageMonthlyPassiveIncome: number
   startDate: string
+  positions: PositionSnapshot[]
 }
 
 const empty: PayoutCalendar = {
@@ -46,7 +49,11 @@ function eventKind(event: PayoutEvent) {
   return 'Доход'
 }
 
-export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate }: Props) {
+function keyOf(value: unknown) {
+  return String(value || '').trim().toUpperCase()
+}
+
+export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions }: Props) {
   const [data, setData] = useState<PayoutCalendar>(empty)
   const [view, setView] = useState<View>('overview')
   const [loading, setLoading] = useState(true)
@@ -73,6 +80,14 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const visibleUpcoming = upcoming.slice(safePage * pageSize, safePage * pageSize + pageSize)
 
   const sourceRows = useMemo(() => {
+    const positionMap = new Map<string, PositionSnapshot>()
+    for (const position of positions) {
+      const tickerKey = keyOf(position.ticker)
+      const nameKey = keyOf(position.name)
+      if (tickerKey) positionMap.set(tickerKey, position)
+      if (nameKey) positionMap.set(nameKey, position)
+    }
+
     const map = new Map<string, { ticker: string; name: string; fact: number; forecast: number; factCount: number; forecastCount: number }>()
     for (const event of data.actual.items) {
       const key = event.ticker || event.name || '—'
@@ -88,10 +103,17 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
       row.forecastCount += 1
       map.set(key, row)
     }
+
     return [...map.values()]
+      .map(row => {
+        const position = positionMap.get(keyOf(row.ticker)) ?? positionMap.get(keyOf(row.name))
+        const costBasis = position?.costBasis ?? 0
+        const yoc12m = costBasis > 0 && row.forecast > 0 ? row.forecast / costBasis : null
+        return { ...row, costBasis, yoc12m }
+      })
       .sort((a, b) => (b.fact + b.forecast) - (a.fact + a.forecast))
       .slice(0, 6)
-  }, [data.actual.items, data.events])
+  }, [data.actual.items, data.events, positions])
 
   const monthRows = data.months.slice(0, 6)
   const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
@@ -187,12 +209,15 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
         <section className="panel income-sources-panel">
           <div className="income-panel-head"><div><span className="eyebrow">РАЗБИВКА ПО АКТИВАМ</span><h2>ИСТОЧНИКИ ДОХОДА</h2></div><small>факт ≠ прогноз</small></div>
           <div className="income-source-table">
-            <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М график</span></div>
+            <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М / YoC</span></div>
             {sourceRows.length ? sourceRows.map(row => (
               <div className="income-source-row" key={row.ticker}>
                 <div><strong>{row.ticker}</strong><small>{row.name !== row.ticker ? row.name : `${row.factCount + row.forecastCount} событий`}</small></div>
                 <b>{row.fact ? `${money2.format(row.fact)} ₽` : '—'}</b>
-                <b>{row.forecast ? `${money2.format(row.forecast)} ₽` : '—'}</b>
+                <div className="income-source-forecast">
+                  <b>{row.forecast ? `${money2.format(row.forecast)} ₽` : '—'}</b>
+                  <small>{row.yoc12m == null ? 'YoC —' : `YoC ${pct1.format(row.yoc12m * 100)}%`}</small>
+                </div>
               </div>
             )) : <div className="income-empty">Нет данных для разбивки.</div>}
           </div>
@@ -201,6 +226,8 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             <i><b style={{ width: `${Math.min(100, coverage * 100)}%` }} /></i>
             <strong>{coverage ? `${pct.format(coverage * 100)}%` : '—'}</strong>
           </div>
+          <p className="income-method-note">YoC 12M = подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции (средняя цена × количество). Это не текущая дивидендная доходность и не оценка неподтверждённых выплат.</p>
+          <p className="income-method-note">Темп роста выплат появится после двух сопоставимых годовых периодов. Короткую историю QVANIX не годифицирует и не выдаёт за устойчивый рост.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
       )}
