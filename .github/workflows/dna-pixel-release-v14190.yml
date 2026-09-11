@@ -1,0 +1,37 @@
+name: DNA pixel preset v14.19.0
+on:
+  push:
+    branches: [dna-pixel-preset-v14190]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-pixel-preset-v14190
+      - name: Wire pixel preset and bump production build
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js');s=p.read_text()
+          s=s.replace('// v14.18.0 — DNA WORLD RUNTIME: live motion + level-driven world state; finance/history unchanged.','// v14.19.0 — DNA PIXEL PRESET: modular art + workers + level-driven world; finance/history unchanged.')
+          s=s.replace('?rev=14180','?rev=14190')
+          s=s.replace("const V='v14.18.0'","const V='v14.19.0'")
+          s=s.replace("b.innerHTML='<i></i> WORLD RUNTIME · '+V+' · 9/11'","b.innerHTML='<i></i> PIXEL PRESET · '+V+' · 10/11'")
+          s=s.replace("process.env.TINVEST_BUILD='14.18.0'","process.env.TINVEST_BUILD='14.19.0'")
+          s=s.replace("version:'14.16.0',build:'14.16.0',source:'figma-art-rebuild',path:'/assets/dna-world/l1/figma-art-rebuild-v14140.svg'","version:'14.19.0',build:'14.19.0',source:'figma-pixel-preset',path:'/assets/dna-world/l1/figma-pixel-v14190.svg'")
+          p.write_text(s)
+          e=Path('public/dna-world-engine-v141.js');x=e.read_text().replace("const V='14.18.0'","const V='14.19.0'")
+          e.write_text(x)
+          PY
+      - name: Commit production wiring
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js public/dna-world-engine-v141.js
+          git diff --cached --quiet && exit 0
+          git commit -m "wire DNA pixel preset v14.19.0"
+          git push origin HEAD:dna-pixel-preset-v14190
