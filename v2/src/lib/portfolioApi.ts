@@ -66,8 +66,8 @@ const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
   for (const row of indexPoints) {
     const point = ensure(row.date)
     if (!point) continue
-    point.portfolio = nullableNumber(row.portfolio)
-    point.imoex = nullableNumber(row.imoex)
+    point.portfolio = nullableNumber(row.portfolio ?? row.index ?? row.twr)
+    point.imoex = nullableNumber(row.imoex ?? row.benchmark)
   }
   for (const row of valuePoints) {
     const point = ensure(row.date)
@@ -144,6 +144,17 @@ async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
     passiveIncome: n(raw.passiveIncomeTotal ?? raw.passiveIncome),
     positions,
     source: 'portfolio',
+  }
+}
+
+export async function loadPortfolioHistory(): Promise<HistoryPoint[]> {
+  try {
+    const response = await fetch('/api/history-debug', { cache: 'no-store' })
+    if (!response.ok) return []
+    const raw = await response.json() as Record<string, unknown>
+    return normaliseHistory(raw.history)
+  } catch {
+    return []
   }
 }
 

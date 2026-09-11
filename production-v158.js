@@ -16,4 +16,15 @@ const newBody="html=html.replace('</body>',history+assets+preview+world+single+v
 if(!src.includes(oldBody))throw new Error('v15.8: base body injection changed');
 src=src.replace(oldBody,newBody);
 src=src.replace("version:'15.1.0',build:'15.1.0',source:'cinematic-world'","version:'15.8.0',build:'15.8.0',source:'single-runtime-performance'");
+
+// v2 bridge: server-base compiles server-core at runtime, so inject the isolated
+// React/Pixi build before the legacy wildcard route without changing v1 pages.
+const v2Bridge=`core=core.replace("\\napp.get('*', (req, res) => {",\`\\nconst V2_DIST=path.join(__dirname,'v2','dist');
+app.use('/v2',express.static(V2_DIST,{etag:true,maxAge:'10m'}));
+app.get(['/v2','/v2/*'],(req,res)=>res.sendFile(path.join(V2_DIST,'index.html')));
+\\napp.get('*', (req, res) => {\`);\n`;
+const coreCompile='const mod=new Module(corePath,module);';
+if(!src.includes(coreCompile))throw new Error('v15.8: core compile marker changed');
+src=src.replace(coreCompile,v2Bridge+coreCompile);
+
 const mod=new Module(serverPath,module);mod.filename=serverPath;mod.paths=Module._nodeModulePaths(__dirname);mod._compile(src,serverPath);
