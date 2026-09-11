@@ -1,0 +1,82 @@
+name: Import DNA Figma Master v14.14.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-dna-figma-v14140.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-figma-master:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Figma master asset
+        run: |
+          set -euo pipefail
+          mkdir -p public/assets/dna-world/l1
+          curl -L --fail --retry 3 --retry-delay 2 \
+            'https://www.figma.com/api/mcp/asset/1c76ce70-7a0b-49ed-90c2-cb4d54d48f7a.svg' \
+            -o public/assets/dna-world/l1/figma-master-v14140.svg
+          bytes="$(wc -c < public/assets/dna-world/l1/figma-master-v14140.svg)"
+          test "$bytes" -gt 20000
+          grep -q '<svg' public/assets/dna-world/l1/figma-master-v14140.svg
+          echo "Figma master downloaded: ${bytes} bytes"
+
+      - name: Wire Figma master into DNA World v14.14.0
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          art = Path('public/dna-art-scene-v148.js')
+          s = art.read_text()
+          s = s.replace("scene-base-clean.svg?rev=14130", "figma-master-v14140.svg?rev=14140")
+          s = s.replace("version='14.13.0'", "version='14.14.0'")
+          s = s.replace("source='local-original-depth'", "source='figma-master'")
+          art.write_text(s)
+
+          assets = Path('public/dna-game-assets-v147.js')
+          s = assets.read_text().replace("const VERSION='14.13.0'", "const VERSION='14.14.0'")
+          assets.write_text(s)
+
+          engine = Path('public/dna-world-engine-v141.js')
+          s = engine.read_text()
+          s = s.replace("const V='14.13.0'", "const V='14.14.0'")
+          s = s.replace("scene-base-clean.svg?rev=14130", "figma-master-v14140.svg?rev=14140")
+          s = s.replace("source:'local-original-depth'", "source:'figma-master'")
+          s = s.replace("else{infrastructure();resources(t)}ambient(t);activity(t);", "else{}ambient(t);activity(t);")
+          s = s.replace("ART DEPTH · v'+V+' · 4/11", "FIGMA MASTER · v'+V+' · 5/11")
+          engine.write_text(s)
+
+          server = Path('server.js')
+          s = server.read_text()
+          s = s.replace('v14.13.0 — ART DEPTH PASS', 'v14.14.0 — FIGMA MASTER PASS')
+          s = s.replace('14.13.0', '14.14.0')
+          s = s.replace('14130', '14140')
+          s = s.replace('ART DEPTH', 'FIGMA MASTER')
+          s = s.replace('local-original-depth', 'figma-master')
+          s = s.replace('scene-base-clean.svg', 'figma-master-v14140.svg')
+          server.write_text(s)
+          PY
+
+      - name: Commit imported master
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/assets/dna-world/l1/figma-master-v14140.svg \
+                  public/dna-art-scene-v148.js \
+                  public/dna-game-assets-v147.js \
+                  public/dna-world-engine-v141.js \
+                  server.js
+          git diff --cached --check
+          git diff --cached --quiet && exit 0
+          git commit -m 'DNA FIGMA MASTER · v14.14.0'
+          git push origin HEAD:main
