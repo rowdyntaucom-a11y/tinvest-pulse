@@ -15,16 +15,14 @@ This log is maintained by autonomous development runs. Production changes must r
 - Anti-gaming rule primitives added with stable event IDs. Contribution-habit rules intentionally have no deposit-amount input, and XP values must come from an explicit reviewed config rather than hidden defaults.
 - Compact `WorldState` boundary added for PixiJS: level/xp/quality coverage/time phase/weather/events are passed as resolved state; it does not derive levels from capital or silently derive weather from returns.
 - TypeScript/Vite build for the XP/world-state batch completed successfully on Render. Existing build output still reports two moderate npm vulnerabilities; review is pending and no blind `npm audit fix` has been applied.
-- Advanced investor audit added as `ADVANCED_INVESTOR_AUDIT.md`; autonomous work now treats old tabs as depth work, not finished decorative screens.
-- Portfolio depth v1 implemented and merged to `main`: position sorting by weight / broker P&L RUB / P&L %, selectable position drill-down, quantity / average price / current price / value / broker expectedYield result and compact mobile inspector. The production TypeScript/Vite build succeeded; Render rollout had not yet promoted at the time of this log update.
-- Benchmark-relative analytics v1 implemented and merged to `main`: Risk now has Portfolio / VS IMOEX modes. Relative mode includes same-window portfolio return, IMOEX return, excess return, Tracking Error, Information Ratio, Beta and correlation. Advanced ratios are explicitly gated until at least 60 paired daily returns and mature at 252.
-- Income depth v2 prepared on `qvanix-income-depth-v2`: realized coupon/dividend split, 12M top income source and effective number of income sources (1/HHI) based only on confirmed gross schedule. This package is intentionally not merged until the current Render rollout queue clears.
+- Advanced investor depth audit added and made mandatory for autonomous passes so existing Portfolio / Analytics / Income / Bonds screens are deepened before unrelated navigation growth.
+- Portfolio depth v1: position sorting by weight / P&L RUB / P&L %, selectable position inspector, quantity, average/current price, current value, weight and broker-reported P&L. Build succeeded.
+- Benchmark-relative Analytics v1: Portfolio vs IMOEX mode with common-sample return, excess return, Tracking Error, Information Ratio, Beta and correlation. Complex relative-risk coefficients are gated until at least 60 paired daily returns; 252 paired returns marks mature history.
+- Income depth v2 prepared: realized coupon/dividend split, top confirmed 12M income source, source concentration HHI and effective number of income sources.
+- Preview deployment for benchmark-relative Analytics built successfully but initially hit a transient Render port-scan timeout after build. A no-code redeploy of the same commit completed successfully and preview returned to `live`; primary was already `live`. No code rollback was required.
 
 ### Current focus
-- Wait for the current Render rollout to become healthy before merging Income depth v2.
-- Then add deterministic bond analytics only where trustworthy instrument metadata exists; do not invent maturity/issuer/coupon-type fields.
-- Continue rolling/benchmark-relative diagnostics as sample history grows.
-- Connect deterministic XP rule inputs only when the required monthly contribution/income-history data is available.
-- Define transaction/payout world events and persistence boundary without exposing capital.
-- Review dependency audit safely before changing package versions.
-- Keep subjective DNA art-direction changes blocked until user review.
+- Merge Income depth v2 after green preview recovery.
+- Add bond-specific metadata foundation and deterministic maturity/coupon/currency analytics only from verified instrument metadata.
+- Add CVaR / correlation / stress-test foundations with strict sample gates.
+- Keep legal publication blocked until P0 review issues and real operator/provider placeholders are resolved.
