@@ -4,7 +4,10 @@
   "private":true,
   "description":"Mobile and desktop T-Invest portfolio dashboard with living DNA world",
   "main":"server.js",
-  "scripts":{"start":"node server.js"},
+  "scripts":{
+    "start":"node server.js",
+    "postinstall":"cd v2 && npm install --no-audit --no-fund && npm run build"
+  },
   "engines":{"node":">=20 <25"},
   "dependencies":{"dotenv":"^16.4.7","express":"^4.21.2"}
 }
