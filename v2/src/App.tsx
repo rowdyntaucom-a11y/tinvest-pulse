@@ -163,6 +163,7 @@ export default function App() {
             passiveIncome={snapshot.passiveIncome}
             averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome}
             startDate={startDate}
+            positions={snapshot.positionItems}
           />
         )}
 
