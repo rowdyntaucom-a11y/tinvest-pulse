@@ -120,12 +120,27 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render `tinvest-pulse` deploy `dep-dai6odnqj5pc73bll4g0`: `live`.
 - No rollback required; both services accepted the production commit. No manual deploy was triggered.
 
+## 2026-09-12
+
+### 00:57 MSK autonomous pass — verified bond risk dimensions
+- Confirmed current `main` already contains the compact Portfolio data-context integration from PR #69, so no duplicate Portfolio widget/change was introduced.
+- Added `v2/src/features/portfolio/bondRiskDimensions.ts` on branch `qvanix-bond-risk-dimensions-v1` and merged PR #70 as `3cf9e4531a9f7642f639ff68ec7ed61b971b0de8`.
+- Country-of-risk and sector concentration primitives consume only existing verified T-Bank bond metadata. HHI, effective count and top share are computed only inside the covered subset, while metadata coverage is reported separately.
+- Issuer concentration remains explicitly unavailable because the current normalized snapshot contains no verified issuer identifier; sector/country are not relabelled as issuer concentration.
+- No YTM, duration, expected return, stress assumption, LLM-derived number or personalized buy/sell output was added.
+- Quant methodology pass: incomplete metadata cannot masquerade as full bond concentration because `coverageRatio` and `shareOfCovered` are separate quantities.
+- Code-quality pass: the module is pure and side-effect free; GitHub `v2 build` workflow run #94 passed, including `tsc -b`, Vite build and `payouts-core.js` syntax check.
+- Mobile-UX pass: no rendering/layout change in this batch; Samsung/Android density and no-duplication rules are unaffected.
+- Release pass: one new calculation primitive only; no broker/backend route, renderer, secrets, legal/payment text or deployment config changed.
+- Render auto-deploy was not manually triggered. Deploy status could not be queried because the Render connector requires a user-confirmed workspace and autonomous mode must not choose one implicitly.
+- Legal publication remains blocked; no RU/EN offer, privacy or consent wording was published.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
-- Correlation matrix now has real per-asset market history; next deepen it only after validating live sample coverage and UX density.
+- Correlation matrix now has real per-asset market history; deepen it only with validated live sample coverage and mobile density.
 - Expand historical stress only with versioned sourced return data; do not convert OFZ yield-bp moves into price shocks until duration semantics are verified.
-- Continue bond analytics only with verified source semantics; no guessed YTM/duration.
-- Surface Portfolio data context compactly without adding a duplicate full widget; account type remains gated until the backend exposes a verified account-type field.
-- Integrate broker P/L attribution only as clearly labelled current unrealized contribution; historical/TWR attribution remains gated on trustworthy per-position history.
-- Recovery diagnostics are now available as a deterministic primitive; UI integration should wait until the live sample gate is met so the screen does not show decorative unavailable metrics.
+- Bond analytics may next surface country/sector coverage compactly; issuer concentration stays gated until a verified issuer identifier is added to the broker metadata boundary. YTM/duration remain gated.
+- Portfolio data context is now compactly surfaced in the existing Portfolio shell; account type remains gated until the backend exposes a verified account-type field.
+- Broker P/L attribution remains clearly labelled current unrealized contribution; historical/TWR attribution stays gated on trustworthy per-position history.
+- Recovery diagnostics are deterministic but should remain out of the UI until the live sample gate is met.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
