@@ -5,7 +5,6 @@ import {
   buildHistoricalStressExposures,
   HISTORICAL_STRESS_CATALOG_VERSION,
   HISTORICAL_STRESS_SCENARIOS,
-  type HistoricalStressScenario,
 } from './historicalStress'
 import './stress.css'
 
@@ -26,7 +25,7 @@ type ClassSummary = {
 }
 
 const CLASS_LABELS: Record<string, string> = {
-  equity_ru: 'АКЦИИ РФ',
+  equity_mcftr_proxy: 'АКЦИИ · MCFTR PROXY',
   ofz: 'ОФЗ',
   unassigned: 'ВНЕ МОДЕЛИ',
 }
