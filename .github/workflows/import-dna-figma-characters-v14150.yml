@@ -1,0 +1,92 @@
+name: Import DNA Figma Characters v14.15.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-dna-figma-characters-v14150.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-character-pass:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Figma character assets
+        run: |
+          set -euo pipefail
+          base='public/assets/dna-world/l1'
+          mkdir -p "$base"
+          curl -L --fail --retry 3 'https://www.figma.com/api/mcp/asset/b070dde2-261e-46aa-acc9-03fab5a766b8.svg' -o "$base/miner-idle-v14150.svg"
+          curl -L --fail --retry 3 'https://www.figma.com/api/mcp/asset/51be3559-bf5b-4f9f-9ebe-23ed6d45fa28.svg' -o "$base/miner-mine-v14150.svg"
+          curl -L --fail --retry 3 'https://www.figma.com/api/mcp/asset/dd1312df-a59c-4db1-a250-6160c8f470f9.svg' -o "$base/hauler-walk-v14150.svg"
+          curl -L --fail --retry 3 'https://www.figma.com/api/mcp/asset/ef4de08c-63b6-44a1-8c8a-8b18242c9939.svg' -o "$base/builder-work-v14150.svg"
+          curl -L --fail --retry 3 'https://www.figma.com/api/mcp/asset/5b3e3763-f126-400f-b317-fcfa99b5727f.svg' -o "$base/operator-idle-v14150.svg"
+          curl -L --fail --retry 3 'https://www.figma.com/api/mcp/asset/7a8d6a55-f2a5-4f41-8b93-6897f02c8edb.svg' -o "$base/cart-empty-v14150.svg"
+          curl -L --fail --retry 3 'https://www.figma.com/api/mcp/asset/2c4efb02-cb29-4437-bdd6-b193e77417b0.svg' -o "$base/cart-loaded-v14150.svg"
+          for f in "$base"/*-v14150.svg; do
+            test "$(wc -c < "$f")" -gt 1000
+            grep -q '<svg' "$f"
+          done
+
+      - name: Wire Figma characters into DNA World v14.15.0
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          assets=Path('public/dna-game-assets-v147.js')
+          s=assets.read_text()
+          s=s.replace("const VERSION='14.14.0'", "const VERSION='14.15.0'")
+          repl={
+            "minerIdle:'miner-idle.svg'":"minerIdle:'miner-idle-v14150.svg'",
+            "minerMine:'miner-mine.svg'":"minerMine:'miner-mine-v14150.svg'",
+            "haulerWalk:'hauler-walk.svg'":"haulerWalk:'hauler-walk-v14150.svg'",
+            "builderWork:'builder-work.svg'":"builderWork:'builder-work-v14150.svg'",
+            "operatorIdle:'operator-idle.svg'":"operatorIdle:'operator-idle-v14150.svg'",
+            "cartEmpty:'cart-empty.svg'":"cartEmpty:'cart-empty-v14150.svg'",
+            "cartLoaded:'cart-loaded.svg'":"cartLoaded:'cart-loaded-v14150.svg'",
+          }
+          for a,b in repl.items(): s=s.replace(a,b)
+          assets.write_text(s)
+
+          art=Path('public/dna-art-scene-v148.js')
+          s=art.read_text().replace("version='14.14.0'", "version='14.15.0'")
+          art.write_text(s)
+
+          engine=Path('public/dna-world-engine-v141.js')
+          s=engine.read_text()
+          s=s.replace("const V='14.14.0'", "const V='14.15.0'")
+          s=s.replace("x-14,y-50,29,50", "x-17,y-56,34,56")
+          s=s.replace("x-3,y-27,45,27", "x-5,y-38,55,38")
+          s=s.replace("FIGMA MASTER · v'+V+' · 5/11", "CHARACTERS · v'+V+' · 6/11")
+          engine.write_text(s)
+
+          server=Path('server.js')
+          s=server.read_text()
+          s=s.replace('v14.14.0 — FIGMA MASTER PASS', 'v14.15.0 — FIGMA CHARACTER PASS')
+          s=s.replace('14.14.0', '14.15.0')
+          s=s.replace('14140', '14150')
+          s=s.replace('FIGMA MASTER', 'CHARACTERS')
+          server.write_text(s)
+          PY
+
+      - name: Commit Figma character pass
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/assets/dna-world/l1/*-v14150.svg \
+                  public/dna-art-scene-v148.js \
+                  public/dna-game-assets-v147.js \
+                  public/dna-world-engine-v141.js \
+                  server.js
+          git diff --cached --check
+          git diff --cached --quiet && exit 0
+          git commit -m 'DNA FIGMA CHARACTER PASS · v14.15.0'
+          git push origin HEAD:main
