@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Application, Container, Graphics } from 'pixi.js'
+import type { Application as PixiApplication } from 'pixi.js'
 
 type Props = {
   level: number
@@ -19,9 +19,14 @@ export function WorldStage({ level }: Props) {
     if (!host) return
 
     let disposed = false
-    let app: Application | null = null
+    let app: PixiApplication | null = null
 
     const boot = async () => {
+      // Pixi/WebGL is deliberately loaded only when DNA is actually mounted.
+      // Portfolio/Analytics/Income should never pay the runtime cost on first load.
+      const { Application, Container, Graphics } = await import('pixi.js')
+      if (disposed) return
+
       const resolution = clamp(window.devicePixelRatio || 1, 1, window.innerWidth < 900 ? 1.35 : 1.75)
       const next = new Application()
       await next.init({
@@ -105,7 +110,7 @@ export function WorldStage({ level }: Props) {
       fit()
       const ro = new ResizeObserver(fit)
       ro.observe(host)
-      ;(next as Application & { __pulseResizeObserver?: ResizeObserver }).__pulseResizeObserver = ro
+      ;(next as PixiApplication & { __pulseResizeObserver?: ResizeObserver }).__pulseResizeObserver = ro
 
       const onVisibility = () => {
         if (!app) return
@@ -113,7 +118,7 @@ export function WorldStage({ level }: Props) {
         else app.start()
       }
       document.addEventListener('visibilitychange', onVisibility)
-      ;(next as Application & { __pulseVisibility?: () => void }).__pulseVisibility = onVisibility
+      ;(next as PixiApplication & { __pulseVisibility?: () => void }).__pulseVisibility = onVisibility
     }
 
     void boot()
@@ -121,7 +126,7 @@ export function WorldStage({ level }: Props) {
     return () => {
       disposed = true
       if (app) {
-        const typed = app as Application & { __pulseResizeObserver?: ResizeObserver, __pulseVisibility?: () => void }
+        const typed = app as PixiApplication & { __pulseResizeObserver?: ResizeObserver, __pulseVisibility?: () => void }
         typed.__pulseResizeObserver?.disconnect()
         if (typed.__pulseVisibility) document.removeEventListener('visibilitychange', typed.__pulseVisibility)
         app.destroy(true, { children: true })
