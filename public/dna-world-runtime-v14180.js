@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.23.0';let raf=0;
+const V='14.24.0';let raf=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function readLevel(){const root=document.getElementById('iwScene')?.parentElement||document.body;const m=(root.innerText||'').match(/(\d+)\s*\/\s*11/);return clamp(m?Number(m[1]):1,1,11)}
 function mount(){
