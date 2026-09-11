@@ -237,15 +237,26 @@ export function PortfolioWorkspace({ snapshot }: Props) {
           {structureMode === 'classes' ? (
             <>
               <div className="allocation-list portfolio-allocation-list">
-                {allocation.length ? allocation.map(item => (
-                  <div className="allocation-row" key={item.label}>
-                    <div><strong>{item.label}</strong><span>{money.format(item.value)} ₽</span></div>
-                    <b>{pctPlain.format(item.weight * 100)}%</b>
-                    <i><span style={{ width: `${item.weight * 100}%` }} /></i>
-                  </div>
-                )) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
+                {allocation.length ? allocation.map(item => {
+                  const classAttribution = pnlAttribution.assetClasses.find(row => row.assetClass === item.label)
+                  const pnlShare = classAttribution?.grossPnlShare
+                  return (
+                    <div className="allocation-row" key={item.label}>
+                      <div>
+                        <strong>{item.label}</strong>
+                        <span>
+                          {money.format(item.value)} ₽
+                          {classAttribution ? ` · P/L ${signedMoney(classAttribution.pnl)}` : ''}
+                          {pnlShare == null ? '' : ` · ${pctPlain.format(pnlShare * 100)}% |P/L|`}
+                        </span>
+                      </div>
+                      <b>{pctPlain.format(item.weight * 100)}%</b>
+                      <i><span style={{ width: `${item.weight * 100}%` }} /></i>
+                    </div>
+                  )
+                }) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
               </div>
-              <p className="method-note">TOP 3 позиций · {pctPlain.format(top3 * 100)}%. Оценка концентрации HHI и Health остаются в «Аналитике», чтобы не дублировать одни и те же показатели.</p>
+              <p className="method-note">TOP 3 позиций · {pctPlain.format(top3 * 100)}%. P/L по классам — текущий broker `expectedYield`; доля |P/L| = gross absolute P/L класса / сумма |P/L| всех текущих позиций. Это не TWR и не историческая return attribution. HHI и Health остаются в «Аналитике».</p>
             </>
           ) : (
             <BondAnalytics positions={snapshot.positionItems} />
