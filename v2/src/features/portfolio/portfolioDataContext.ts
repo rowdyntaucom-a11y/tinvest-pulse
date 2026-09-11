@@ -18,7 +18,6 @@ export type PortfolioDataContext = {
     total: number
     priced: number
     withCostBasis: number
-    withBrokerPnl: number
   }
 }
 
@@ -60,12 +59,10 @@ export function buildPortfolioDataContext(snapshot: PortfolioSnapshot, now: Date
 
   let priced = 0
   let withCostBasis = 0
-  let withBrokerPnl = 0
 
   for (const position of snapshot.positionItems) {
     if (Number.isFinite(position.currentPrice) && position.currentPrice > 0) priced += 1
     if (Number.isFinite(position.costBasis) && position.costBasis > 0) withCostBasis += 1
-    if (Number.isFinite(position.expectedYield)) withBrokerPnl += 1
   }
 
   return {
@@ -81,7 +78,6 @@ export function buildPortfolioDataContext(snapshot: PortfolioSnapshot, now: Date
       total: snapshot.positionItems.length,
       priced,
       withCostBasis,
-      withBrokerPnl,
     },
   }
 }
