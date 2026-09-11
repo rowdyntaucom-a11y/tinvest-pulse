@@ -1,0 +1,32 @@
+name: QVANIX v2 CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'v2/**'
+      - '.github/workflows/qvanix-v2-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: v2/package.json
+      - name: Install v2 dependencies
+        working-directory: v2
+        run: npm install --no-audit --no-fund
+      - name: TypeScript and Vite build
+        working-directory: v2
+        run: npm run build
