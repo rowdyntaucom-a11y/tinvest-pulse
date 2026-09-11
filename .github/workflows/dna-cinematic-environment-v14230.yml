@@ -1,0 +1,63 @@
+name: DNA cinematic environment v14.23.0
+on:
+  push:
+    branches: [dna-cinematic-environment-v14230]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-cinematic-environment-v14230
+      - name: Wire cinematic environment pass
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('server.js'); s=p.read_text()
+          s=s.replace('// v14.22.0 — DNA CHARACTER LIFE: detailed Figma sprites + visible work cycles + livelier mine; finance/history unchanged.','// v14.23.0 — DNA CINEMATIC ENVIRONMENT: depth, local light, foreground and parallax; finance/history unchanged.')
+          s=s.replace('?rev=14220','?rev=14230')
+          s=s.replace("const V='v14.22.0'","const V='v14.23.0'")
+          s=s.replace("CHARACTER LIFE · '+V+' · 11/11","CINEMATIC ENV · '+V+' · 11/11")
+          s=s.replace("process.env.TINVEST_BUILD='14.22.0'","process.env.TINVEST_BUILD='14.23.0'")
+          s=s.replace("version:'14.22.0',build:'14.22.0',source:'figma-character-life'","version:'14.23.0',build:'14.23.0',source:'figma-cinematic-environment'")
+          p.write_text(s)
+
+          a=Path('public/dna-art-scene-v148.js'); x=a.read_text()
+          x=x.replace("window.DNA_ART_PACK.version='14.22.0'","window.DNA_ART_PACK.version='14.23.0'")
+          x=x.replace("window.DNA_ART_PACK.source='figma-character-life'","window.DNA_ART_PACK.source='figma-cinematic-environment'")
+          if 'environmentOverlay' not in x:
+              x=x.replace("window.DNA_ART_PACK.qualityOverlay='/assets/dna-world/l1/depth-material-v14210.svg?rev=14210';","window.DNA_ART_PACK.qualityOverlay='/assets/dna-world/l1/depth-material-v14210.svg?rev=14210';window.DNA_ART_PACK.environmentOverlay='/assets/dna-world/l1/cinematic-environment-v14230.svg?rev=14230';")
+          a.write_text(x)
+
+          g=Path('public/dna-game-assets-v147.js'); x=g.read_text().replace("const VERSION='14.22.0'","const VERSION='14.23.0'"); g.write_text(x)
+
+          e=Path('public/dna-world-engine-v141.js'); x=e.read_text()
+          x=x.replace("const V='14.22.0'","const V='14.23.0'")
+          x=x.replace("['dnaWorld148','dnaWorldArt148','dnaQuality14200']","['dnaWorld148','dnaWorldArt148','dnaQuality14200','dnaEnv14230']")
+          x=x.replace("zIndex:41,pointerEvents:'none',opacity:'.80'","zIndex:41,pointerEvents:'none',opacity:'.64'")
+          marker="h.appendChild(quality);\n const c=document.createElement('canvas');"
+          insert="h.appendChild(quality);\n const env=document.createElement('img');env.id='dnaEnv14230';env.alt='';env.decoding='async';env.src=(window.DNA_ART_PACK&&window.DNA_ART_PACK.environmentOverlay)||'/assets/dna-world/l1/cinematic-environment-v14230.svg?rev=14230';Object.assign(env.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:42,pointerEvents:'none',opacity:'.90',transformOrigin:'50% 50%',willChange:'transform'});h.appendChild(env);\n const c=document.createElement('canvas');"
+          x=x.replace(marker,insert)
+          x=x.replace("CHARACTER LIFE · v'+V+' · 11/11","CINEMATIC ENV · v'+V+' · 11/11")
+          e.write_text(x)
+
+          r=Path('public/dna-world-runtime-v14180.js'); x=r.read_text()
+          x=x.replace("const V='14.22.0'","const V='14.23.0'")
+          x=x.replace("zIndex:42,pointerEvents:'none'","zIndex:43,pointerEvents:'none'")
+          old="g.clearRect(0,0,820,680);growth(level);atmosphere(t,level);ambientLife(t,level);infrastructure(t,level);people(t,level);logistics(t,level);raf=requestAnimationFrame(frame)"
+          new="const env=document.getElementById('dnaEnv14230');if(env){const px=Math.sin(t*.12)*1.6,py=Math.cos(t*.09)*1.1;env.style.transform=`scale(1.012) translate(${px}px,${py}px)`;}g.clearRect(0,0,820,680);growth(level);atmosphere(t,level);ambientLife(t,level);infrastructure(t,level);people(t,level);logistics(t,level);raf=requestAnimationFrame(frame)"
+          x=x.replace(old,new)
+          r.write_text(x)
+          PY
+      - name: Commit wiring
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js public/dna-art-scene-v148.js public/dna-game-assets-v147.js public/dna-world-engine-v141.js public/dna-world-runtime-v14180.js
+          git diff --cached --quiet && exit 0
+          git commit -m "wire DNA cinematic environment v14.23.0"
+          git push origin HEAD:dna-cinematic-environment-v14230
