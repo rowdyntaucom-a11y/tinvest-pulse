@@ -6,6 +6,20 @@ export type HistoryPoint = {
   invested: number | null
 }
 
+export type BondMetadata = {
+  maturityDate: string | null
+  nominal: number | null
+  currency: string | null
+  couponQuantityPerYear: number | null
+  floatingCoupon: boolean | null
+  perpetual: boolean | null
+  amortizing: boolean | null
+  issueKind: string | null
+  countryOfRisk: string | null
+  countryOfRiskName: string | null
+  sector: string | null
+}
+
 export type PositionSnapshot = {
   ticker: string
   name: string
@@ -17,6 +31,7 @@ export type PositionSnapshot = {
   currentValue: number
   expectedYield: number
   weight: number
+  bond: BondMetadata | null
 }
 
 export type PortfolioSnapshot = {
@@ -59,6 +74,11 @@ const nullableNumber = (value: unknown): number | null => {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+const nullableBoolean = (value: unknown): boolean | null => {
+  if (typeof value === 'boolean') return value
+  return null
+}
+
 const ratioToPercent = (value: unknown): number => {
   const parsed = nullableNumber(value)
   if (parsed == null) return 0
@@ -98,6 +118,25 @@ const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
   return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date))
 }
 
+const normaliseBond = (value: unknown): BondMetadata | null => {
+  if (!value || typeof value !== 'object') return null
+  const row = value as Record<string, unknown>
+  const maturityRaw = row.maturityDate == null ? '' : String(row.maturityDate)
+  return {
+    maturityDate: maturityRaw ? maturityRaw.slice(0, 10) : null,
+    nominal: nullableNumber(row.nominal),
+    currency: row.currency ? String(row.currency).toUpperCase() : null,
+    couponQuantityPerYear: nullableNumber(row.couponQuantityPerYear),
+    floatingCoupon: nullableBoolean(row.floatingCoupon),
+    perpetual: nullableBoolean(row.perpetual),
+    amortizing: nullableBoolean(row.amortizing),
+    issueKind: row.issueKind ? String(row.issueKind) : null,
+    countryOfRisk: row.countryOfRisk ? String(row.countryOfRisk) : null,
+    countryOfRiskName: row.countryOfRiskName ? String(row.countryOfRiskName) : null,
+    sector: row.sector ? String(row.sector) : null,
+  }
+}
+
 const normalisePositions = (rawPositions: unknown, portfolioValue: number): PositionSnapshot[] => {
   if (!Array.isArray(rawPositions)) return []
   const rows = rawPositions.map(item => {
@@ -118,6 +157,7 @@ const normalisePositions = (rawPositions: unknown, portfolioValue: number): Posi
       currentValue,
       expectedYield: n(row.expectedYield),
       weight: 0,
+      bond: normaliseBond(row.bond),
     }
   }).filter(row => Number.isFinite(row.currentValue) && row.currentValue > 0)
 
