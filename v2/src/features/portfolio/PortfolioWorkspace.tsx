@@ -3,6 +3,7 @@ import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi
 import { PortfolioValueChart } from './PortfolioValueChart'
 import { BondAnalytics } from './BondAnalytics'
 import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './portfolioAttribution'
+import { buildPortfolioDataContext } from './portfolioDataContext'
 import './portfolio.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -43,6 +44,19 @@ function positionPnl(position: PositionSnapshot) {
 function signedMoney(value: number) {
   const sign = value > 0 ? '+' : value < 0 ? '−' : ''
   return `${sign}${money.format(Math.abs(value))} ₽`
+}
+
+function compactAge(ageMinutes: number | null) {
+  if (ageMinutes == null || !Number.isFinite(ageMinutes)) return null
+  if (ageMinutes < 60) return `${Math.floor(ageMinutes)} мин`
+  if (ageMinutes < 24 * 60) return `${(ageMinutes / 60).toFixed(ageMinutes < 600 ? 1 : 0)} ч`
+  return `${Math.floor(ageMinutes / (24 * 60))} д`
+}
+
+function compactDate(value: string | null) {
+  if (!value) return null
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  return match ? `${match[3]}.${match[2]}` : value
 }
 
 function PositionList({ positions, selectedKey, onSelect }: {
@@ -103,6 +117,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
     () => calculatePortfolioPnlAttribution(snapshot.positionItems),
     [snapshot.positionItems],
   )
+  const dataContext = useMemo(() => buildPortfolioDataContext(snapshot), [snapshot])
 
   const sortedPositions = useMemo(() => {
     const rows = [...snapshot.positionItems]
@@ -124,8 +139,21 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const selectedAttribution = selectedPosition ? findPositionPnlAttribution(pnlAttribution, selectedPosition) : null
 
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
-  const topPosition = snapshot.positionItems[0]
   const top3 = snapshot.positionItems.slice(0, 3).reduce((sum, item) => sum + item.weight, 0)
+  const snapshotAge = compactAge(dataContext.ageMinutes)
+  const snapshotLabel = dataContext.timestampState === 'REPORTED'
+    ? snapshotAge ?? '0 мин'
+    : dataContext.timestampState === 'INVALID' ? 'INVALID' : 'НЕТ ВРЕМЕНИ'
+  const historyFrom = compactDate(dataContext.history.firstDate)
+  const historyTo = compactDate(dataContext.history.lastDate)
+  const historyLabel = dataContext.history.points
+    ? `${dataContext.history.points} т. · ${historyFrom ?? '—'}→${historyTo ?? '—'}`
+    : 'история загружается'
+  const sourceTitle = [
+    `Источник: ${dataContext.source}`,
+    `timestamp: ${dataContext.timestampState}`,
+    dataContext.reportedAt ? `reportedAt: ${new Date(dataContext.reportedAt).toLocaleString('ru-RU')}` : null,
+  ].filter(Boolean).join(' · ')
 
   const chooseSort = (sort: PositionSort) => {
     setPositionSort(sort)
@@ -144,7 +172,12 @@ export function PortfolioWorkspace({ snapshot }: Props) {
         <button onClick={() => setView('overview')} className={view === 'overview' ? 'subnav--active' : ''}>ОБЗОР</button>
         <button onClick={() => setView('positions')} className={view === 'positions' ? 'subnav--active' : ''}>ПОЗИЦИИ</button>
         <button onClick={() => setView('structure')} className={view === 'structure' ? 'subnav--active' : ''}>СТРУКТУРА</button>
-        <span className={`sample-badge ${snapshot.source !== 'fallback' ? 'sample-badge--mature' : ''}`}>{snapshot.source !== 'fallback' ? 'LIVE' : 'API WAIT'}</span>
+        <span
+          className={`sample-badge ${dataContext.source !== 'FALLBACK' ? 'sample-badge--mature' : ''}`}
+          title={sourceTitle}
+        >
+          {dataContext.source !== 'FALLBACK' ? 'API' : 'API WAIT'}
+        </span>
       </nav>
 
       {view === 'overview' && (
@@ -153,24 +186,24 @@ export function PortfolioWorkspace({ snapshot }: Props) {
             <article className="metric-card metric-card--hero">
               <span className="metric-label">КАПИТАЛ</span>
               <strong>{snapshot.value ? `${money.format(snapshot.value)} ₽` : '—'}</strong>
-              <small>текущая стоимость портфеля</small>
+              <small>{startDate === '—' ? 'текущая стоимость портфеля' : `с ${startDate} · текущая стоимость`}</small>
             </article>
             <article className="metric-card">
               <span className="metric-label">ДЕНЕЖНЫЙ РЕЗУЛЬТАТ</span>
               <strong>{snapshot.value ? `${snapshot.profit >= 0 ? '+' : ''}${money.format(snapshot.profit)} ₽` : '—'}</strong>
               <small>{snapshot.value ? `${pctSigned.format(snapshot.profitPct)}% к внешним потокам` : 'ожидаем данные'}</small>
             </article>
-            <article className="context-card">
-              <span>СТАРТ</span><strong>{startDate}</strong>
-              <span>ПОЗИЦИЙ</span><strong>{snapshot.positions || '—'}</strong>
-              <span>TOP 1</span><strong>{topPosition ? `${pctPlain.format(topPosition.weight * 100)}%` : '—'}</strong>
+            <article className="context-card" title={sourceTitle}>
+              <span>ИСТОЧНИК</span><strong>{dataContext.source}</strong>
+              <span>СНИМОК</span><strong>{snapshotLabel}</strong>
+              <span>ЦЕНЫ / БАЗА</span><strong>{dataContext.positions.priced}/{dataContext.positions.total} · {dataContext.positions.withCostBasis}/{dataContext.positions.total}</strong>
             </article>
           </section>
 
           <section className="panel portfolio-chart-panel">
             <div className="panel-head">
               <div><span className="eyebrow">ИСТОРИЯ</span><h2>ПОРТФЕЛЬ</h2></div>
-              <small>{snapshot.history.length ? `${snapshot.history.length} точек` : 'история загружается'}</small>
+              <small>{historyLabel}</small>
             </div>
             <PortfolioValueChart points={snapshot.history} />
           </section>
