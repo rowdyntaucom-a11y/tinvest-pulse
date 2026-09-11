@@ -52,7 +52,7 @@ export type PayoutCalendar = {
     items: PayoutEvent[]
     totalNet: number
     count: number
-    observation: PayoutObservation
+    observation?: PayoutObservation
   }
   forecast: {
     gross: number
