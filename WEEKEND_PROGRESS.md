@@ -116,7 +116,9 @@ This log is maintained by autonomous development runs. Production changes must r
 - Mobile-UX pass: no UI/layout change; module is calculation groundwork only, so Samsung/Android density and widget duplication are unchanged.
 - Release pass: PR diff is one pure analytics module plus methodology README; no backend route, broker call, secret, payment/legal text, renderer or deployment configuration changed.
 - GitHub `v2 build` workflow run #90 completed successfully, including Vite build and `payouts-core.js` syntax check.
-- Render auto-deploys for production commit `f74f7e440a0e4b972a6a234b7d9279852251c52d` were started automatically; final status is recorded below once confirmed. No manual deploy was triggered.
+- Render `tinvest-pulse-v2-preview` deploy `dep-dai6odnqj5pc73bll4ig`: `live`.
+- Render `tinvest-pulse` deploy `dep-dai6odnqj5pc73bll4g0`: `live`.
+- No rollback required; both services accepted the production commit. No manual deploy was triggered.
 
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
