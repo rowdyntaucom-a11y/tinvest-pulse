@@ -1,0 +1,32 @@
+<svg width="96" height="140" viewBox="0 0 96 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="96" height="140" fill="#E5E5E5"/>
+<g id="DNA WORLD &#194;&#183; CHARACTER PASS &#194;&#183; v14.15.0">
+<rect width="820" height="250" transform="translate(-545 -45)" fill="#04090A"/>
+<g id="SPRITE &#194;&#183; operatorIdle" clip-path="url(#clip0_0_1)">
+<g id="Frame">
+<path id="Vector" opacity="0.55" d="M48 136C62.3594 136 74 133.314 74 130C74 126.686 62.3594 124 48 124C33.6406 124 22 126.686 22 130C22 133.314 33.6406 136 48 136Z" fill="#001311"/>
+<path id="Vector_2" d="M33 126L40 93H60L66 126H55L50 101L46 126H33Z" fill="#202D31"/>
+<path id="Vector_3" d="M29 62H67L71 97H25L29 62Z" fill="#116F72" stroke="#61D7D1" stroke-width="3"/>
+<path id="Vector_4" d="M48 64C57.9411 64 66 55.9411 66 46C66 36.0589 57.9411 28 48 28C38.0589 28 30 36.0589 30 46C30 55.9411 38.0589 64 48 64Z" fill="#C98A5F"/>
+<path id="Vector_5" d="M27 45C28 27 38 16 48 16C58 16 68 27 69 45H27Z" fill="#C9D3D0"/>
+<path id="Vector_6" d="M69 40H26C24.3431 40 23 41.3431 23 43V44C23 45.6569 24.3431 47 26 47H69C70.6569 47 72 45.6569 72 44V43C72 41.3431 70.6569 40 69 40Z" fill="#E6EFED"/>
+<g id="Vector_7">
+<path d="M31 73L18 94L31 73Z" fill="black"/>
+<path d="M31 73L18 94" stroke="#C98A5F" stroke-width="8" stroke-linecap="round"/>
+</g>
+<g id="Vector_8">
+<path d="M65 73L78 94L65 73Z" fill="black"/>
+<path d="M65 73L78 94" stroke="#C98A5F" stroke-width="8" stroke-linecap="round"/>
+</g>
+<path id="Vector_9" d="M63 78H33C30.2386 78 28 80.2386 28 83V93C28 95.7614 30.2386 98 33 98H63C65.7614 98 68 95.7614 68 93V83C68 80.2386 65.7614 78 63 78Z" fill="#17383A" stroke="#4EDDD6" stroke-width="3"/>
+<path id="Vector_10" d="M39 92C41.2091 92 43 90.2091 43 88C43 85.7909 41.2091 84 39 84C36.7909 84 35 85.7909 35 88C35 90.2091 36.7909 92 39 92Z" fill="#53F2E6"/>
+<path id="Vector_11" d="M59 84H50C48.8954 84 48 84.8954 48 86V89C48 90.1046 48.8954 91 50 91H59C60.1046 91 61 90.1046 61 89V86C61 84.8954 60.1046 84 59 84Z" fill="#A9C8C4"/>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_1">
+<rect width="96" height="140" fill="white"/>
+</clipPath>
+</defs>
+</svg>

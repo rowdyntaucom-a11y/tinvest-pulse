@@ -1,0 +1,35 @@
+<svg width="96" height="140" viewBox="0 0 96 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="96" height="140" fill="#E5E5E5"/>
+<g id="DNA WORLD &#194;&#183; CHARACTER PASS &#194;&#183; v14.15.0">
+<rect width="820" height="250" transform="translate(-415 -45)" fill="#04090A"/>
+<g id="SPRITE &#194;&#183; builderWork" clip-path="url(#clip0_0_1)">
+<g id="Frame">
+<path id="Vector" opacity="0.55" d="M48 136C63.464 136 76 133.314 76 130C76 126.686 63.464 124 48 124C32.536 124 20 126.686 20 130C20 133.314 32.536 136 48 136Z" fill="#001311"/>
+<path id="Vector_2" d="M32 126L39 94H61L67 126H56L51 102L46 126H32Z" fill="#3C3C35"/>
+<path id="Vector_3" d="M28 62H66L71 97H25L28 62Z" fill="#B8783F" stroke="#F0B267" stroke-width="3"/>
+<g id="Vector_4">
+<path d="M34 65L39 97L34 65ZM60 65L55 97L60 65Z" fill="black"/>
+<path d="M34 65L39 97M60 65L55 97" stroke="#F2D06C" stroke-width="5"/>
+</g>
+<path id="Vector_5" d="M47 64C56.9411 64 65 55.9411 65 46C65 36.0589 56.9411 28 47 28C37.0589 28 29 36.0589 29 46C29 55.9411 37.0589 64 47 64Z" fill="#C98A5F"/>
+<path id="Vector_6" d="M26 45C28 27 37 16 47 16C57 16 66 27 68 45H26Z" fill="#F0BD4F"/>
+<path id="Vector_7" d="M68 39H26C24.3431 39 23 40.3431 23 42V43C23 44.6569 24.3431 46 26 46H68C69.6569 46 71 44.6569 71 43V42C71 40.3431 69.6569 39 68 39Z" fill="#FFD068"/>
+<g id="Vector_8">
+<path d="M29 72L14 88L29 72Z" fill="black"/>
+<path d="M29 72L14 88" stroke="#C98A5F" stroke-width="8" stroke-linecap="round"/>
+</g>
+<g id="Vector_9">
+<path d="M64 70L81 84L64 70Z" fill="black"/>
+<path d="M64 70L81 84" stroke="#C98A5F" stroke-width="8" stroke-linecap="round"/>
+</g>
+<path id="Vector_10" d="M72 78L81 83L64 112L56 107L72 78Z" fill="#917055"/>
+<path id="Vector_11" d="M70 105H59C57.8954 105 57 105.895 57 107V110C57 111.105 57.8954 112 59 112H70C71.1046 112 72 111.105 72 110V107C72 105.895 71.1046 105 70 105Z" fill="#C3C9C6"/>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_1">
+<rect width="96" height="140" fill="white"/>
+</clipPath>
+</defs>
+</svg>

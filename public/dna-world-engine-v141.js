@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const V='14.14.0';let raf=0;
+const V='14.15.0';let raf=0;
 function boot(){
  const h=document.getElementById('iwScene');if(!h)return setTimeout(boot,120);
  if(getComputedStyle(h).position==='static')h.style.position='relative';
@@ -17,8 +17,8 @@ function boot(){
  const R=(x,y,w,z,k,a=1)=>{g.globalAlpha=a;g.fillStyle=k;g.fillRect(x,y,w,z);g.globalAlpha=1};
  const L=(x,y,a,b,k,w=1)=>{g.strokeStyle=k;g.lineWidth=w;g.beginPath();g.moveTo(x,y);g.lineTo(a,b);g.stroke()};
  function glow(x,y,r=26,a=.18,col='255,177,68'){g.save();g.globalCompositeOperation='screen';let q=g.createRadialGradient(x,y,1,x,y,r);q.addColorStop(0,`rgba(${col},${a})`);q.addColorStop(.35,`rgba(${col},${a*.45})`);q.addColorStop(1,`rgba(${col},0)`);g.fillStyle=q;g.fillRect(x-r,y-r,r*2,r*2);g.restore()}
- function worker(x,y,t,role='minerIdle',flip=false){const a=A();if(a&&a.draw(role,x-14,y-50,29,50,{flipX:flip,alpha:.99}))return;R(x-7,y-31,14,10,'#d79c70');R(x-10,y-21,20,21,'#248d88')}
- function cart(x,y,load){const a=A(),key=load?'cartLoaded':'cartEmpty';if(a&&a.draw(key,x-3,y-27,45,27,{alpha:.99}))return;R(x,y-18,39,15,'#68422d');R(x+5,y-3,7,7,'#07100e');R(x+28,y-3,7,7,'#07100e')}
+ function worker(x,y,t,role='minerIdle',flip=false){const a=A();if(a&&a.draw(role,x-17,y-56,34,56,{flipX:flip,alpha:.99}))return;R(x-7,y-31,14,10,'#d79c70');R(x-10,y-21,20,21,'#248d88')}
+ function cart(x,y,load){const a=A(),key=load?'cartLoaded':'cartEmpty';if(a&&a.draw(key,x-5,y-38,55,38,{alpha:.99}))return;R(x,y-18,39,15,'#68422d');R(x+5,y-3,7,7,'#07100e');R(x+28,y-3,7,7,'#07100e')}
  function crystal(x,y,s=1,large=false){const a=A(),key=large?'crystalLarge':'crystalSmall',w=(large?24:16)*s,h=(large?30:20)*s;if(a&&a.draw(key,x-w/2,y-h,w,h,{alpha:.98}))return;g.fillStyle='#39e5e4';g.beginPath();g.moveTo(x,y);g.lineTo(x+4*s,y-11*s);g.lineTo(x+8*s,y);g.fill();g.fillStyle='#9ffff8';g.beginPath();g.moveTo(x+5*s,y);g.lineTo(x+8*s,y-8*s);g.lineTo(x+11*s,y);g.fill()}
  function fallback(){
   let q=g.createLinearGradient(0,0,0,340);q.addColorStop(0,'#02091a');q.addColorStop(.48,'#0b2740');q.addColorStop(1,'#061516');g.fillStyle=q;g.fillRect(0,0,600,340);
@@ -58,7 +58,7 @@ function boot(){
  }
  function frame(ms){if(!document.body.contains(c))return;const t=ms/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,1200,680);g.setTransform(2,0,0,2,0,0);if(!artReady)fallback();else{}ambient(t);activity(t);raf=requestAnimationFrame(frame)}
  cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
- setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> FIGMA MASTER · v'+V+' · 5/11')},120)
+ setTimeout(()=>{h.querySelectorAll('.dnBadge').forEach(b=>b.innerHTML='<i></i> CHARACTERS · v'+V+' · 6/11')},120)
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 window.addEventListener('dna-game-remount',()=>setTimeout(boot,100));

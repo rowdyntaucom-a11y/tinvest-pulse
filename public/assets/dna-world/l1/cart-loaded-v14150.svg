@@ -1,0 +1,28 @@
+<svg width="130" height="90" viewBox="0 0 130 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="130" height="90" fill="#E5E5E5"/>
+<g id="DNA WORLD &#194;&#183; CHARACTER PASS &#194;&#183; v14.15.0">
+<rect width="820" height="250" transform="translate(-675 -45)" fill="#04090A"/>
+<g id="SPRITE &#194;&#183; cart" clip-path="url(#clip0_0_1)">
+<g id="Frame">
+<path id="Vector" opacity="0.55" d="M65 85C92.062 85 114 81.866 114 78C114 74.134 92.062 71 65 71C37.938 71 16 74.134 16 78C16 81.866 37.938 85 65 85Z" fill="#001311"/>
+<path id="Vector_2" d="M18 26H112L100 68H31L18 26Z" fill="#7B5138" stroke="#C88D59" stroke-width="5"/>
+<path id="Vector_3" d="M29 31H101L95 56H36L29 31Z" fill="#4B3227"/>
+<g id="Vector_4">
+<path d="M34 23L44 9L53 23L64 5L74 23L84 10L95 23" fill="#3DE4DB"/>
+<path d="M34 23L44 9L53 23L64 5L74 23L84 10L95 23" stroke="#B7FFF9" stroke-width="3"/>
+</g>
+<path id="Vector_5" d="M44 81C50.0751 81 55 76.0751 55 70C55 63.9249 50.0751 59 44 59C37.9249 59 33 63.9249 33 70C33 76.0751 37.9249 81 44 81Z" fill="#1B2929" stroke="#92AAA5" stroke-width="4"/>
+<path id="Vector_6" d="M88 81C94.0751 81 99 76.0751 99 70C99 63.9249 94.0751 59 88 59C81.9249 59 77 63.9249 77 70C77 76.0751 81.9249 81 88 81Z" fill="#1B2929" stroke="#92AAA5" stroke-width="4"/>
+<g id="Vector_7">
+<path d="M110 48H125H110Z" fill="black"/>
+<path d="M110 48H125" stroke="#C88D59" stroke-width="6" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_1">
+<rect width="130" height="90" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -5,12 +5,12 @@ const Module = require('module');
 const htmlPath = path.join(__dirname, 'public', 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
-// v14.14.0 — FIGMA MASTER PASS: richer local DNA world art and larger readable activity; finance/history unchanged.
+// v14.15.0 — FIGMA CHARACTER PASS: richer local DNA world art and larger readable activity; finance/history unchanged.
 const legacy = /\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:v840|v850|v860|v870|v960|v1021|version-lock|dna-world-v1021-final|dna-world-v1021-single|dna-game-l1|dna-world-polish-v106|dna-game-art-v107|dna-pixel-v108|dna-pixel-v109|dna-game-world-v110|dna-lighting-v111|dna-cinematic-v112|dna-daynight-v113|dna-market-weather-v114|dna-weather-alive-v115|dna-art-detail-v116|dna-environment-v117|dna-lights-life-v118|dna-foundation-v119|dna-game-quality-v120|dna-characters-depth-v121|dna-character-art-v122|dna-game-art-v123|dna-art-direction-v124|dna-game-art-v125|dna-scene-composition-v126|dna-depth-underground-v127|dna-game-art-v128|dna-character-material-v129|dna-art-reset-v130|dna-scene-composition-v131|dna-material-architecture-v132|dna-art-clarity-v133|dna-character-world-art-v134|dna-scene-hierarchy-v135|dna-visual-story-v136|dna-clean-scene-v137|dna-world-engine-v138|dna-world-engine-v139|dna-world-engine-v140|dna-world-engine-v141|dna-game-assets-v147|dna-art-scene-v148)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi;
 html=html.replace(legacy,'').replace(/\s*<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/(?:history-loader-v1191|history-chart-v142)\.js(?:\?[^"']*)?["'][^>]*>\s*<\/script>/gi,'');
-const art='<script src="/dna-art-scene-v148.js?rev=14140"></script>',assets='<script src="/dna-game-assets-v147.js?rev=14140"></script>',dna='<script src="/dna-world-engine-v141.js?rev=14140"></script>',history='<script src="/history-chart-v142.js?rev=14140"></script>';
-const versionLock=`<script>(function(){const V='v14.14.0';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length)return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});document.querySelectorAll('.dnBadge').forEach(function(b){const t=b.textContent||'';if(/GAME ASSETS|FOUNDATION WORKS|DNA ART|RESOURCES|MINEWORKS|CLEAN ART|FIGMA MASTER/i.test(t))b.innerHTML='<i></i> FIGMA MASTER · '+V+' · 5/11';});}lock();setTimeout(lock,250);setTimeout(lock,1000);})();</script>`;
-html=html.replace('</body>',history+art+assets+dna+versionLock+'</body>');fs.writeFileSync(htmlPath,html);process.env.TINVEST_BUILD='14.14.0';
+const art='<script src="/dna-art-scene-v148.js?rev=14150"></script>',assets='<script src="/dna-game-assets-v147.js?rev=14150"></script>',dna='<script src="/dna-world-engine-v141.js?rev=14150"></script>',history='<script src="/history-chart-v142.js?rev=14150"></script>';
+const versionLock=`<script>(function(){const V='v14.15.0';function lock(){document.querySelectorAll('*').forEach(function(el){if(el.children.length)return;const t=el.textContent||'';if(/INVESTOR DNA\\s*·\\s*v\\d+\\.\\d+\\.\\d+/i.test(t))el.textContent=t.replace(/v\\d+\\.\\d+\\.\\d+/i,V);});document.querySelectorAll('.dnBadge').forEach(function(b){const t=b.textContent||'';if(/GAME ASSETS|FOUNDATION WORKS|DNA ART|RESOURCES|MINEWORKS|CLEAN ART|CHARACTERS/i.test(t))b.innerHTML='<i></i> CHARACTERS · '+V+' · 5/11';});}lock();setTimeout(lock,250);setTimeout(lock,1000);})();</script>`;
+html=html.replace('</body>',history+art+assets+dna+versionLock+'</body>');fs.writeFileSync(htmlPath,html);process.env.TINVEST_BUILD='14.15.0';
 
 const corePath=path.join(__dirname,'server-core.js');let core=fs.readFileSync(corePath,'utf8');
 core=core.replace(/\n  \/\/ Enrich a small number of positions with instrument names\.[\s\S]*?\n  const portfolioValue =/,'\n  // Live dashboard stays lightweight; history owns its own refresh.\n  const portfolioValue =');
@@ -37,7 +37,7 @@ const DNA_ART_REMOTE=${JSON.stringify(DNA_ART_REMOTE)};
 function fetchDnaArtUrl(url,hops=0){
  return new Promise((resolve,reject)=>{
   let settled=false;
-  const req=https.get(url,{headers:{'User-Agent':'Mozilla/5.0 TInvestPulse/14.14.0','Accept':'image/avif,image/webp,image/*,*/*;q=0.8'}},r=>{
+  const req=https.get(url,{headers:{'User-Agent':'Mozilla/5.0 TInvestPulse/14.15.0','Accept':'image/avif,image/webp,image/*,*/*;q=0.8'}},r=>{
    if(r.statusCode>=300&&r.statusCode<400&&r.headers.location&&hops<5){r.resume();settled=true;return resolve(fetchDnaArtUrl(new URL(r.headers.location,url).toString(),hops+1));}
    if(r.statusCode!==200){r.resume();settled=true;return reject(new Error('HTTP '+r.statusCode));}
    const chunks=[];let size=0;
@@ -54,7 +54,7 @@ function ensureDnaArt(){
  DNA_ART_FETCHING=fetchDnaArtUrl(DNA_ART_REMOTE).then(({buffer,type})=>{if(!buffer||buffer.length<10000)throw new Error('DNA art payload too small');DNA_ART_CACHE=buffer;DNA_ART_TYPE=type;DNA_ART_ERROR=null;console.log('Legacy DNA art v14.8.6 cached',buffer.length,type);return buffer;}).catch(err=>{DNA_ART_ERROR=err.message;console.warn('Legacy DNA art proxy failed:',err.message);throw err;}).finally(()=>{DNA_ART_FETCHING=null;});
  return DNA_ART_FETCHING;
 }
-app.get('/api/dna-art/status',(req,res)=>{res.setHeader('Cache-Control','no-store');res.json({ok:true,version:'14.14.0',build:'14.14.0',source:'figma-master',path:'/assets/dna-world/l1/figma-master-v14140.svg'});});
+app.get('/api/dna-art/status',(req,res)=>{res.setHeader('Cache-Control','no-store');res.json({ok:true,version:'14.15.0',build:'14.15.0',source:'figma-master',path:'/assets/dna-world/l1/figma-master-v14150.svg'});});
 app.get('/dna-art-v148.webp',async(req,res)=>{try{const buffer=await ensureDnaArt();res.setHeader('Content-Type',DNA_ART_TYPE);res.setHeader('Cache-Control','public, max-age=21600, immutable');res.setHeader('Content-Length',String(buffer.length));res.end(buffer);}catch(err){res.status(502).type('text/plain').send('Legacy DNA art unavailable');}});
 
 app.get('*', (req, res) => {`);

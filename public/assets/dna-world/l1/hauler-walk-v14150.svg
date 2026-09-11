@@ -1,0 +1,34 @@
+<svg width="96" height="140" viewBox="0 0 96 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="96" height="140" fill="#E5E5E5"/>
+<g id="DNA WORLD &#194;&#183; CHARACTER PASS &#194;&#183; v14.15.0">
+<rect width="820" height="250" transform="translate(-285 -45)" fill="#04090A"/>
+<g id="SPRITE &#194;&#183; haulerWalk" clip-path="url(#clip0_0_1)">
+<g id="Frame">
+<path id="Vector" opacity="0.55" d="M48 136C63.464 136 76 133.314 76 130C76 126.686 63.464 124 48 124C32.536 124 20 126.686 20 130C20 133.314 32.536 136 48 136Z" fill="#001311"/>
+<path id="Vector_2" d="M32 123L47 95L65 109L59 118L47 109L41 128L32 123Z" fill="#263E3C"/>
+<path id="Vector_3" d="M31 63H65L70 98H26L31 63Z" fill="#208F89" stroke="#75E6DA" stroke-width="3"/>
+<path id="Vector_4" d="M48 65C57.9411 65 66 56.9411 66 47C66 37.0589 57.9411 29 48 29C38.0589 29 30 37.0589 30 47C30 56.9411 38.0589 65 48 65Z" fill="#C98A5F"/>
+<path id="Vector_5" d="M27 46C28 27 38 17 48 17C58 17 68 27 69 46H27Z" fill="#E7B44D"/>
+<path id="Vector_6" d="M69 40H27C25.3431 40 24 41.3431 24 43V44C24 45.6569 25.3431 47 27 47H69C70.6569 47 72 45.6569 72 44V43C72 41.3431 70.6569 40 69 40Z" fill="#F0C55F"/>
+<g id="Vector_7">
+<path d="M29 70L12 89L29 70Z" fill="black"/>
+<path d="M29 70L12 89" stroke="#C98A5F" stroke-width="8" stroke-linecap="round"/>
+</g>
+<g id="Vector_8">
+<path d="M65 70L83 84L65 70Z" fill="black"/>
+<path d="M65 70L83 84" stroke="#C98A5F" stroke-width="8" stroke-linecap="round"/>
+</g>
+<path id="Vector_9" d="M82 79H63C61.3431 79 60 80.3431 60 82V94C60 95.6569 61.3431 97 63 97H82C83.6569 97 85 95.6569 85 94V82C85 80.3431 83.6569 79 82 79Z" fill="#75503A" stroke="#C58C56" stroke-width="3"/>
+<g id="Vector_10">
+<path d="M63 82L82 94L63 82ZM82 82L63 94L82 82Z" fill="black"/>
+<path d="M63 82L82 94M82 82L63 94" stroke="#C58C56" stroke-width="2"/>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_1">
+<rect width="96" height="140" fill="white"/>
+</clipPath>
+</defs>
+</svg>
