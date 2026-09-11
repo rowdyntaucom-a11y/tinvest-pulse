@@ -51,53 +51,81 @@ Capital controls **world development**, while real local time controls **world s
 
 Technical direction: do not migrate the whole application. Keep Node/Express, T-Bank integration, Render and existing financial screens. Replace/evolve only the DNA WORLD renderer. First quality gate remains reference-quality Level 1 `ФУНДАМЕНТ` before scaling to Levels 2–11.
 
-## 8. Current production state — 2026-09-10
-Financial dashboard remains healthy. Current production checkpoint is **v14.8.5 NATIVE ATMOSPHERIC DNA LAYER**. `public/dna-world-engine-v141.js` remains the single production renderer, `public/dna-game-assets-v147.js` remains the asset registry, and `public/dna-art-scene-v148.js` points to the same-origin route `/dna-art-v148.webp?rev=1485`.
+## 8. Current production state — historical checkpoint 2026-09-10
+Financial dashboard remains healthy. Current production checkpoint at this historical point was **v14.8.5 NATIVE ATMOSPHERIC DNA LAYER**. This section is retained for failure lessons; see the latest-state override at the end of this file for the current direction.
 
-Samsung screenshots established four separate delivery/rendering failures before this fix:
-- v14.8.1: dependency order was correct but baked Base64 scene did not decode; primitive fallback remained.
-- v14.8.2: Blob conversion still failed to make the scene visible; structured fallback proved the renderer itself was alive.
-- v14.8.3: direct browser loading from the OpenArt CDN also failed on Samsung.
-- v14.8.4: Render successfully cached and served the approved scene server-side (650108 bytes, `image/webp`), but Samsung still showed fallback. This proved the server had the art bytes while the registry→Canvas preload path was still not completing in the browser.
+Samsung screenshots established several delivery/rendering failures before later architecture work. Important lesson: repeatedly stacking multiple DNA renderers, CSS loops, observers and runtime patches caused performance regressions and made version ownership unclear.
 
-v14.8.5 bypasses that fragile registry→Canvas background path entirely. The renderer now creates a native `<img>` layer (`#dnaWorldArt148`) directly inside `#iwScene`, loads `/dna-art-v148.webp?rev=1485` eagerly from the same origin, and keeps a transparent Canvas above it only for animation/FX. Until the image's native `onload` fires, the structured fallback remains; after load, fallback is no longer painted and the approved art becomes the world background. This preserves one active renderer/update loop while using the browser's native image pipeline for the heavy background.
+The user approved a high-quality visual direction generated during GAME ASSET PASS: environment/world assets with mountains, forest, distant illuminated city/castle, mine entrance, construction, workshop, warehouse, crane, rail/tunnel/materials; and character/prop assets with detailed miner roles, carts, cyan crystals, masonry, logs, crates, barrels, lamps, smoke, glow/particles and crane/rail props. This art direction remains preferred; do not revert to simplistic geometric SVG as the intended final look.
 
-The user approved a new high-quality art direction generated during GAME ASSET PASS. Two cohesive asset-sheet images were created/approved: (1) environment/world assets with mountains, forest, distant illuminated city/castle, mine entrance, construction, workshop, warehouse, crane, rail/tunnel/materials; (2) character/prop assets with detailed miner roles, carts, cyan crystals, masonry, logs, crates, barrels, lamps, smoke, glow/particles and crane/rail props. This art direction is now the preferred visual basis; do not revert to simplistic geometric SVG as the intended final look.
-
-OpenArt is connected and was used for an atmospheric image-to-image pass from the user's approved reference. The desired result is explicitly **more atmospheric, larger-feeling, deeper, richer and easier on the eye**, with mountain/forest/water/city depth beyond the playable foreground.
-
-Figma subscription reports tier **`student`** for `Роман's team` (`team::1679809924021318972`), while MCP previously reported seat **`View`**. Do not assume Figma writes are impossible solely from the seat label; test a real create/write operation when needed and report the concrete tool error if permission fails.
+OpenArt is connected and was used for an atmospheric image-to-image pass from the user's approved reference. Figma is also connected and should be used when it materially improves UI/art/system design. Do not generate or send images merely because the user says visual quality is poor; treat such feedback as an instruction to improve the project unless the user explicitly asks for image generation.
 
 ## 9. DNA level model
-Thresholds: `0, 100k, 250k, 500k, 1m, 2.5m, 5m, 10m, 25m, 50m, 100m RUB`, mapping to 11 levels. Historical names: 1 ФУНДАМЕНТ, 2 ДОМ, 3 МАСТЕРСКАЯ, 4 УСАДЬБА, 5 КАПИТАЛЬНЫЙ ДОМ, 6 БАШНЯ, 7 КРЕПОСТЬ, 8 ЦИТАДЕЛЬ, 9 ГОРОД, 10 ИМПЕРИЯ, 11 ЛЕГЕНДА. Names/art can evolve if a stronger coherent progression is designed.
+Thresholds: `0, 100k, 250k, 500k, 1m, 2.5m, 5m, 10m, 25m, 50m, 100m RUB`, mapping to 11 levels. Historical names evolved during development. Current preferred conceptual progression is world-scale growth rather than small object additions. Levels must visibly differ in territory, infrastructure, population and completion state. Final levels should complete construction rather than leave permanent scaffolding/cranes everywhere.
 
 ## 10. Implemented vs remaining
-Implemented/established: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; independent history/IMOEX loading architecture; INTEL engines; PULSE presentation; Investor DNA concept; animated Level 1; 11-level capital model; single-renderer architecture; real-time day/night; market-weather; environment/lights/detail layers; stable production-owned version labels; mine→cart→delivery animation loop; external game-asset registry/pipeline; role-aware worker/logistics animation state machine; approved reference-quality art direction; first coherent environment/character asset sheets; atmospheric sceneBase packaging; cache-safe production ordering; structured renderer fallback; same-origin Render art proxy; native DOM background layer in v14.8.5.
+Implemented/established in v1: live T-Bank data; portfolio positions/capital; passive-income calculations; dashboard analytics; independent history/IMOEX architecture; INTEL engines; PULSE presentation; Investor DNA concept; 11-level capital model; multiple experiments with animated world rendering; Samsung/Android performance diagnostics; desktop responsiveness experiments.
 
-Remaining priorities: validate v14.8.5 visually on Samsung/Android; once the real atmospheric base is visible, decompose approved art into independent production-ready transparent PNG/WebP sprites/layers; replace temporary SVG workers/carts with detailed animated sprites; tie visible construction progress continuously to capital; build distinct evolution across Levels 2–11; deeper Portfolio DNA diagnostics; analytics validation; mobile performance.
+Key remaining priorities are now being moved into v2 rather than patched indefinitely in v1: reliable analytics core, historical chart, IMOEX, TWR/XIRR/Sharpe/health score, portfolio categories, dividend/coupon calendar, broker abstraction, future AI chat, and a performant living DNA WORLD.
 
 ## 11. Development/deployment architecture
-Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. Important files: `server.js`, `server-core.js`, `public/index.html`, historical `public/v*.js`, `public/dna-world-engine-v141.js` (single production world renderer), `public/dna-game-assets-v147.js` (asset registry/pipeline), `public/dna-art-scene-v148.js` (scene source pointer), `production-bootstrap.js`, `render.yaml`, `package.json`, `PROJECT_CONTEXT.md`. Do not confuse root historical `index.html` with served `public/index.html`.
+Repo `rowdyntaucom-a11y/tinvest-pulse`, primary branch `main`, Render Auto-Deploy. v1 remains the production fallback and source for working T-Bank integration. Do not break v1 while v2 is under construction.
 
-Important current delivery architecture: OpenArt remains the creative source, but production browser rendering should prefer **same-origin assets**. v14.8.4 established the server-proxy pattern; v14.8.5 uses a native DOM image layer rather than relying on registry preload to paint the heavy scene into Canvas. Long-term, final art should be stored as normal production assets rather than depending permanently on third-party hotlinks.
+### TInvest Pulse 2.0 architecture
+A clean `/v2` application now exists in the same repository and is the forward development path.
+- UI: React + TypeScript + Vite.
+- DNA WORLD: PixiJS/WebGL, isolated from normal financial UI rendering.
+- Data: v2 initially consumes the existing `/api/portfolio` and other stable v1 API routes.
+- Responsive target: one coherent product for phone, tablet and desktop; do not simply stretch the mobile layout on desktop.
+- Performance: world renderer must pause offscreen/in background, control DPR, avoid multiple concurrent renderers, and keep static scenery static.
+- Future backend evolution: modular Node backend, PostgreSQL for normalized financial data, Redis/queue for broker sync/background work, encrypted read-only broker credentials.
+- Distribution path: web/PWA first; later Capacitor or a dedicated mobile client only when the web core is stable.
+
+Reference architecture source provided by user: `Архитектура_Ладья.pdf`. Product-feature synthesis source provided by user: `Анализ_HADL_Intelinvest_Snowball.pdf`. Use them as design inputs, not as unquestioned truth where implementation/legal/current-market details need verification.
 
 ## 12. Working agreement
-Normal feature rhythm: assistant analyzes/proposes next step → user says `Ок`/correction → assistant implements, tests, commits and pushes to `main` without asking again → user sends production screenshot → if good, discuss next step and await next `Ок`.
-Bug rhythm: if screenshot shows a clear bug/regression/wrong data/version conflict, do not ask approval. Diagnose, fix, test, commit/push, then tell user what to check. Do not require repeated `Ок`.
+Normal feature rhythm: assistant analyzes/proposes next step → user says `Ок`/correction → assistant implements, tests, commits and pushes without asking again when the task is clear → user sends screenshot/video → if good, continue to the next meaningful checkpoint.
+
+Bug rhythm: if screenshot/video shows a clear bug, regression, wrong data, version conflict or performance issue, do not ask approval. Diagnose, fix, test, commit/push, then tell the user what to check. Do not require repeated `Ок`.
+
 The user does not want repeated status-only replies. After approval, continue tool work to a real checkpoint whenever possible and report the result rather than saying only “continuing”.
+
+The user explicitly trusts the assistant to make implementation decisions within the agreed architecture. Do not stop the project to ask about minor choices that can be resolved safely from context.
 
 ## 13. Source-of-truth hierarchy
 New chat: read `PROJECT_CONTEXT.md`; inspect current `main` and recent commits; inspect relevant files; use memory/prior-chat context for product intent. If docs/code disagree on implementation, current `main` wins; this file records intent unless user changed it. Update this file after meaningful decisions/milestones.
 
 ## 14. Safety / secrets
-Never commit T-Bank API token/credentials. Keep secrets in Render/environment variables. Avoid exposing account identifiers/secrets.
+Never commit T-Bank API token/credentials. Keep secrets in Render/environment variables. Avoid exposing account identifiers/secrets. Future multi-user product must use read-only broker access and encrypted server-side credential storage; never store broker API keys in frontend/localStorage or the repository.
 
-## 15. Immediate next milestone
-**Validate v14.8.5 on the user's Samsung production browser.** Expected header: `INVESTOR DNA · v14.8.5`. The critical visual check is whether the approved atmospheric artwork now appears as the native DOM background layer while Canvas animation/FX remain above it. If the image still fails, inspect whether `/dna-art-v148.webp?rev=1485` is requested at all; at that point the failure is no longer inside the asset registry.
+## 15. Product target expansion — investment platform
+The user supplied a synthesized target concept combining strong ideas from HADL, Intelinvest and Snowball Income. Treat it as the long-term product map, not as an instruction to implement everything at once.
 
-If the atmospheric base is visible, continue GAME ASSET PASS by splitting the baked scene into independent layers/sprites: background depth, mine, workshop/warehouse, construction/foundation, crane, workers, carts, crystals/resources, light/FX. Preserve fallbacks until each replacement group is visually validated. Do not expand Levels 2–11 until Level 1 reaches the visual quality gate.
+Target layers:
+1. Data: multi-broker import, unified assets/transactions, multi-currency, manual/non-traded assets.
+2. Intelligence: portfolio-aware AI chat, market context, natural-language screeners, controlled external AI/MCP access.
+3. Analytics: portfolio health score, TWR/XIRR, Sharpe, drawdown, true diversification/look-through, bond diversification, passive-income analytics, benchmarks.
+4. Action: scenario-based rebalancing (`перекладка`, `довнести`, `вывести`) and target allocations. Prefer scenarios/explanations over direct personalized buy/sell commands.
+5. Life context: optional personal budget, later optional business finance, community/public portfolios and eventual B2B/white-label only after the core product is mature.
 
 ## 16. Continuity / project memory policy
 The user explicitly asks that **requirements, wishes, plans, ideas, approved/rejected visual directions, architecture constraints, bug lessons, workflow decisions and current resume point** be preserved so a new chat can continue without re-explaining the project.
 
 Practical rule: after any meaningful product decision, visual approval, architectural change, milestone, failure lesson or roadmap change, update this file in the same development cycle. Do not rely on chat history alone. At the start of a new chat, treat this file + current `main` + recent commits as the continuity package. Keep it concise enough to remain maintainable, but complete enough to resume work accurately.
+
+A complete verbatim archive of every chat message is not guaranteed by the assistant. Therefore important conversation outcomes must be converted into durable project context in this repository.
+
+## 17. Latest-state override — 2026-09-11
+This section overrides stale implementation-specific instructions above when they conflict.
+
+- v1 production reached `v15.8.0 SINGLE RUNTIME` after performance debugging. The core lesson was that stacking many generations of DNA scripts caused severe FPS degradation; never repeat that architecture in v2.
+- The user approved pivoting active development to **TInvest Pulse 2.0** instead of continuing to patch v1 indefinitely.
+- `/v2` foundation has been merged to `main` and its isolated build CI passed.
+- v2 starts with React + TypeScript + Vite + PixiJS/WebGL and a live adapter to current portfolio API data.
+- v1 remains available as working production/reference while v2 grows in parallel.
+- Immediate v2 milestones: real portfolio dashboard data → historical chart/IMOEX → analytics core → performant DNA WORLD using proper assets/scene graph → later PWA/mobile packaging.
+- DNA WORLD population should feel alive but not crowded. Approved future life elements include male and female adults in varied roles, a small number of children as residents (never workers), sparse birds, 1–2 animals, vegetation and weather. Density should remain restrained and level-dependent.
+- Level transitions should visibly communicate construction/progress without heavy effects; final stages should finish construction and remove temporary scaffolding/cranes where appropriate.
+- User feedback like “quality is poor” means improve the actual project. **Do not generate/send standalone images unless the user explicitly asks for image generation.**
+- The user wants the project to work well both on smartphone and desktop with preserved composition/proportions.
+- When a plugin/connector could materially improve implementation, proactively search/suggest it. Existing useful connections include GitHub, Render, Figma and OpenArt. Connecting/installing new plugins still requires the user's explicit action; avoid adding tools just for novelty.
