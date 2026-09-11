@@ -1,0 +1,41 @@
+name: DNA runtime v14.18.0
+on:
+  push:
+    branches: [dna-runtime-v14180]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dna-runtime-v14180
+      - name: Wire runtime and bump production build
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js');s=p.read_text()
+          s=s.replace('// v14.17.0 — FIGMA MOBILE MASTER: production master scene replaces primitive overlay art; finance/history unchanged.','// v14.18.0 — DNA WORLD RUNTIME: live motion + level-driven world state; finance/history unchanged.')
+          s=s.replace('dna-game-assets-v147|dna-art-scene-v148)', 'dna-game-assets-v147|dna-art-scene-v148|dna-motion-hotfix-v14170|dna-world-runtime-v14180)')
+          old="const art='<script src=\"/dna-art-scene-v148.js?rev=14170\"></script>',assets='<script src=\"/dna-game-assets-v147.js?rev=14170\"></script>',dna='<script src=\"/dna-world-engine-v141.js?rev=14170\"></script>',history='<script src=\"/history-chart-v142.js?rev=14170\"></script>';"
+          new="const art='<script src=\"/dna-art-scene-v148.js?rev=14180\"></script>',assets='<script src=\"/dna-game-assets-v147.js?rev=14180\"></script>',dna='<script src=\"/dna-world-engine-v141.js?rev=14180\"></script>',runtime='<script src=\"/dna-world-runtime-v14180.js?rev=14180\"></script>',history='<script src=\"/history-chart-v142.js?rev=14180\"></script>';"
+          if old not in s: raise SystemExit('script injection target not found')
+          s=s.replace(old,new)
+          s=s.replace("const V='v14.17.0'","const V='v14.18.0'")
+          s=s.replace("b.innerHTML='<i></i> MOBILE MASTER · '+V+' · 8/11'","b.innerHTML='<i></i> WORLD RUNTIME · '+V+' · 9/11'")
+          s=s.replace("history+art+assets+dna+versionLock+'</body>'","history+art+assets+dna+runtime+versionLock+'</body>'")
+          s=s.replace("process.env.TINVEST_BUILD='14.17.0'","process.env.TINVEST_BUILD='14.18.0'")
+          p.write_text(s)
+          e=Path('public/dna-world-engine-v141.js');x=e.read_text().replace("const V='14.17.0'","const V='14.18.0'")
+          e.write_text(x)
+          PY
+      - name: Commit runtime wiring
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js public/dna-world-engine-v141.js
+          git diff --cached --quiet && exit 0
+          git commit -m "wire DNA World runtime v14.18.0"
+          git push origin HEAD:dna-runtime-v14180
