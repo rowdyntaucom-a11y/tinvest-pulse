@@ -1,0 +1,240 @@
+.portfolio-workspace {
+  display: grid;
+  gap: 10px;
+}
+
+.portfolio-overview {
+  display: grid;
+  gap: 10px;
+}
+
+.portfolio-summary--overview {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr .85fr;
+  gap: 11px;
+}
+
+.portfolio-chart-panel {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-chart {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 9px;
+}
+
+.portfolio-chart__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.portfolio-chart__modes,
+.portfolio-chart__periods {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.portfolio-chart__modes button,
+.portfolio-chart__periods button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #89a59e;
+  background: rgba(7,19,17,.72);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+.portfolio-chart__modes button.is-active,
+.portfolio-chart__periods button.is-active {
+  color: #04110e;
+  background: var(--mint);
+  border-color: var(--mint);
+}
+
+.portfolio-chart__controls > strong {
+  color: var(--mint);
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.portfolio-chart__canvas {
+  min-height: 220px;
+}
+
+.portfolio-chart__canvas svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+}
+
+.portfolio-chart__grid {
+  stroke: rgba(126,182,171,.11);
+  stroke-width: 1;
+}
+
+.portfolio-chart__zero {
+  stroke: rgba(239,183,98,.45);
+  stroke-width: 1;
+  stroke-dasharray: 7 7;
+}
+
+.portfolio-chart__line {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.portfolio-chart__line--primary { stroke: var(--mint); }
+.portfolio-chart__line--secondary { stroke: var(--amber); stroke-width: 2; opacity: .88; stroke-dasharray: 7 5; }
+
+.portfolio-chart__legend {
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #8ea9a3;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.portfolio-chart__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.portfolio-chart__legend small {
+  margin-left: auto;
+  color: #607b75;
+}
+
+.portfolio-chart__periods {
+  justify-content: center;
+}
+
+.portfolio-chart-empty {
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  color: #6f8f87;
+  text-align: center;
+  font-size: 12px;
+}
+
+.portfolio-fill-panel {
+  min-height: 360px;
+}
+
+.portfolio-allocation-list {
+  max-width: 900px;
+}
+
+@media (max-width: 620px) {
+  .portfolio-workspace {
+    height: 100%;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .portfolio-overview {
+    height: 100%;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .portfolio-summary--overview {
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }
+
+  .portfolio-summary--overview .context-card {
+    grid-column: 1 / -1;
+  }
+
+  .portfolio-chart-panel {
+    min-height: 0;
+    padding-bottom: 8px;
+  }
+
+  .portfolio-chart {
+    gap: 4px;
+  }
+
+  .portfolio-chart__controls {
+    gap: 5px;
+  }
+
+  .portfolio-chart__modes,
+  .portfolio-chart__periods {
+    gap: 3px;
+    flex-wrap: nowrap;
+  }
+
+  .portfolio-chart__modes button,
+  .portfolio-chart__periods button {
+    padding: 5px 6px;
+    font-size: 6.1px;
+    letter-spacing: 0;
+  }
+
+  .portfolio-chart__controls > strong {
+    font-size: 11px;
+  }
+
+  .portfolio-chart__canvas {
+    min-height: 0;
+  }
+
+  .portfolio-chart__canvas svg {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .portfolio-chart__legend {
+    min-height: 14px;
+    gap: 6px;
+    font-size: 6.4px;
+  }
+
+  .portfolio-chart__legend small {
+    display: none;
+  }
+
+  .portfolio-chart__periods {
+    justify-content: space-between;
+  }
+
+  .portfolio-fill-panel {
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .portfolio-fill-panel .positions-list,
+  .portfolio-allocation-list {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .portfolio-allocation-list {
+    display: grid;
+    align-content: center;
+    gap: 10px;
+  }
+}
