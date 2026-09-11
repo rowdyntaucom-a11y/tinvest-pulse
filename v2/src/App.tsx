@@ -7,6 +7,7 @@ import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analy
 import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
 import { RiskWorkspace } from './features/analytics/RiskWorkspace'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
+import { KeyRateWidget } from './features/macro/KeyRateWidget'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
@@ -91,6 +92,7 @@ export default function App() {
           <h1>QVANIX</h1>
           <p>{snapshot.accountName} · финансовое ядро, аналитика и живой мир без лишнего дублирования.</p>
         </div>
+        <KeyRateWidget />
         <nav className="topbar__nav" aria-label="Разделы">
           <button onClick={() => setTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
           <button onClick={() => setTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
