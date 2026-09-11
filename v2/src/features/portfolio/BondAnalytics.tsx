@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
+import { buildBondRiskDimensions, type BondDimension } from './bondRiskDimensions'
 import './bondAnalytics.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -64,7 +65,29 @@ function addBucket(map: Map<string, number>, key: string, value: number) {
   map.set(key, (map.get(key) || 0) + value)
 }
 
+function BondRiskLine({ label, dimension }: { label: string; dimension: BondDimension }) {
+  const top = dimension.rows[0]
+  if (!dimension.available || !top) {
+    return (
+      <div className="bond-risk-line">
+        <span>{label}</span>
+        <small>нет metadata</small>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bond-risk-line">
+      <span>{label} · покрытие {pct.format(dimension.coverageRatio * 100)}%</span>
+      <small title={`HHI ${dimension.hhi == null ? '—' : dimension.hhi.toFixed(3)} · эффективное число ${dimension.effectiveCount == null ? '—' : dimension.effectiveCount.toFixed(2)}`}>
+        {top.label} {pct.format(top.shareOfCovered * 100)}% покрытого · Nₑ {dimension.effectiveCount == null ? '—' : pct.format(dimension.effectiveCount)}
+      </small>
+    </div>
+  )
+}
+
 export function BondAnalytics({ positions }: Props) {
+  const riskDimensions = useMemo(() => buildBondRiskDimensions(positions), [positions])
   const model = useMemo(() => {
     const now = Date.now()
     const bonds = positions.filter(isBond)
@@ -180,17 +203,19 @@ export function BondAnalytics({ positions }: Props) {
             <div className="bond-mini-list">
               {model.couponRows.map(row => <div key={row.key}><span>{row.label}</span><b>{pct.format(model.total > 0 ? row.value / model.total * 100 : 0)}%</b></div>)}
             </div>
+            <BondRiskLine label="СЕКТОР" dimension={riskDimensions.sector} />
           </div>
           <div>
             <div className="bond-block__head"><strong>ВАЛЮТА НОМИНАЛА</strong><span>из metadata</span></div>
             <div className="bond-mini-list">
               {model.currencyRows.map(row => <div key={row.key}><span>{row.label}</span><b>{pct.format(model.total > 0 ? row.value / model.total * 100 : 0)}%</b></div>)}
             </div>
+            <BondRiskLine label="СТРАНА РИСКА" dimension={riskDimensions.countryOfRisk} />
           </div>
         </section>
       </div>
 
-      <p className="bond-method-note">Погашения, валюта и тип купона показываются только из инструментальных данных Т‑Банка. Средний срок — взвешенный текущей стоимостью календарный срок до подтверждённых будущих дат погашения; бессрочные и выпуски без валидной даты из среднего исключаются. Это не duration и не оценка чувствительности цены. Доходность к погашению пока намеренно не показывается: сначала нужно зафиксировать и проверить семантику цены и номинала для всех выпусков.</p>
+      <p className="bond-method-note">Погашения, валюта, тип купона, сектор и страна риска показываются только из инструментальных данных Т‑Банка. Для sector/country доля лидера и Nₑ считаются только внутри покрытой metadata-выборки, поэтому покрытие всегда показывается отдельно. Issuer concentration пока недоступна: в текущем snapshot нет проверенного issuer ID. Средний срок — взвешенный текущей стоимостью календарный срок до подтверждённых будущих дат погашения; бессрочные и выпуски без валидной даты из среднего исключаются. Это не duration и не оценка чувствительности цены. Доходность к погашению пока намеренно не показывается: сначала нужно зафиксировать и проверить семантику цены и номинала для всех выпусков.</p>
     </div>
   )
 }
