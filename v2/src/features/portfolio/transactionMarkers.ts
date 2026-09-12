@@ -84,9 +84,10 @@ export function normalizeTransactionMarkers(
     const figi = cleanString(input.figi)
     const instrumentUid = cleanString(input.instrumentUid)
 
-    // T-Bank documents OperationItem.id as a broker-reported operation ID that
-    // may change over time. We therefore use it only to de-duplicate one fetched
-    // snapshot / provide a React key. It is NOT a durable event identity.
+    // `operationId` is only a current-snapshot de-duplication key. Production
+    // hashes the broker OperationItem.id before it reaches the browser because
+    // T-Bank documents that the underlying ID may change over time. It must
+    // never be treated as a durable event identity.
     // A chart marker still requires an exact broker timestamp plus explicit
     // instrument identity; no price or cash-sign inference is allowed here.
     if (!id || !date || !side || (!figi && !instrumentUid)) {
