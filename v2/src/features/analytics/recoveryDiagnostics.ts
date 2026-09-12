@@ -1,5 +1,7 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
+export const RECOVERY_DIAGNOSTICS_CALC_VERSION = '1.0' as const
+
 export type DrawdownRecoveryQuality = 'SHORT' | 'DEVELOPING' | 'MATURE'
 
 export type DrawdownEpisode = {
@@ -23,6 +25,7 @@ export type ActiveDrawdown = {
 }
 
 export type RecoveryDiagnostics = {
+  calcVersion: typeof RECOVERY_DIAGNOSTICS_CALC_VERSION
   available: boolean
   quality: DrawdownRecoveryQuality
   returnObservations: number
@@ -77,6 +80,7 @@ export function calculateRecoveryDiagnostics(history: AnalyticsHistoryPoint[]): 
 
   if (returnObservations < MIN_RETURNS) {
     return {
+      calcVersion: RECOVERY_DIAGNOSTICS_CALC_VERSION,
       available: false,
       quality,
       returnObservations,
@@ -145,6 +149,7 @@ export function calculateRecoveryDiagnostics(history: AnalyticsHistoryPoint[]): 
     : null
 
   return {
+    calcVersion: RECOVERY_DIAGNOSTICS_CALC_VERSION,
     available: true,
     quality,
     returnObservations,
