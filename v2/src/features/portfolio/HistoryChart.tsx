@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { HistoryPoint } from '../../lib/portfolioApi'
 import { loadTransactionMarkers, type TransactionMarkerPayload } from './transactionMarkerApi'
-import type { TransactionMarker } from './transactionMarkers'
+import { buildTransactionMarkerPresentation } from './transactionMarkerPresentation'
 import './transactionMarkers.css'
 
 type Props = { points: HistoryPoint[] }
@@ -10,7 +10,6 @@ const W = 900
 const H = 280
 const PAD_X = 34
 const PAD_Y = 24
-const MAX_VISIBLE_EVENT_DAYS = 18
 
 const linePath = (values: Array<number | null>, min: number, max: number) => {
   const finite = values.filter((v): v is number => typeof v === 'number' && Number.isFinite(v))
@@ -36,31 +35,6 @@ const lastFinite = (values: Array<number | null>) => {
   return null
 }
 
-type MarkerDay = {
-  date: string
-  index: number
-  buys: number
-  sells: number
-}
-
-function markerDaysForChart(markers: TransactionMarker[], chartPoints: HistoryPoint[]): MarkerDay[] {
-  const indexByDate = new Map(chartPoints.map((point, index) => [point.date, index]))
-  const grouped = new Map<string, { buys: number; sells: number }>()
-
-  for (const marker of markers) {
-    const date = marker.date.slice(0, 10)
-    if (!indexByDate.has(date)) continue
-    const row = grouped.get(date) ?? { buys: 0, sells: 0 }
-    if (marker.side === 'BUY') row.buys += 1
-    else row.sells += 1
-    grouped.set(date, row)
-  }
-
-  return [...grouped.entries()]
-    .map(([date, row]) => ({ date, index: indexByDate.get(date)!, ...row }))
-    .sort((a, b) => a.index - b.index)
-}
-
 export function HistoryChart({ points }: Props) {
   const [markerPayload, setMarkerPayload] = useState<TransactionMarkerPayload | null>(null)
   const chartPoints = useMemo(
@@ -76,8 +50,8 @@ export function HistoryChart({ points }: Props) {
     return () => { active = false }
   }, [])
 
-  const markerDays = useMemo(
-    () => markerDaysForChart(markerPayload?.markers ?? [], chartPoints),
+  const markerPresentation = useMemo(
+    () => buildTransactionMarkerPresentation(markerPayload?.markers ?? [], chartPoints),
     [markerPayload, chartPoints],
   )
 
@@ -103,10 +77,7 @@ export function HistoryChart({ points }: Props) {
   const latestImoex = lastFinite(imoexValues)
   const first = chartPoints[0]?.date
   const last = chartPoints.at(-1)?.date
-  const visibleMarkerDays = markerDays.slice(-MAX_VISIBLE_EVENT_DAYS)
   const eventDenom = Math.max(1, chartPoints.length - 1)
-  const totalBuys = markerDays.reduce((sum, row) => sum + row.buys, 0)
-  const totalSells = markerDays.reduce((sum, row) => sum + row.sells, 0)
 
   return (
     <div className="history-chart">
@@ -116,7 +87,7 @@ export function HistoryChart({ points }: Props) {
         ))}
         {portfolioPath && <path d={portfolioPath} className="history-line history-line--portfolio" />}
         {hasImoex && imoexPath && <path d={imoexPath} className="history-line history-line--imoex" />}
-        {visibleMarkerDays.map(day => {
+        {markerPresentation.visibleEventDays.map(day => {
           const x = PAD_X + (day.index / eventDenom) * (W - PAD_X * 2)
           const tone = day.buys > 0 && day.sells > 0 ? 'mixed' : day.buys > 0 ? 'buy' : 'sell'
           return (
@@ -138,8 +109,8 @@ export function HistoryChart({ points }: Props) {
         {hasImoex
           ? <span><i className="legend-dot legend-dot--imoex" />IMOEX{latestImoex == null ? '' : ` · ${latestImoex.toFixed(1)}`} · покрытие {benchmarkCoverage}%</span>
           : <span>IMOEX: данные ещё не готовы</span>}
-        <small title={markerDays.length ? 'Сделки отмечены только по дате исполнения. Цена сделки и координата доходности не реконструируются.' : undefined}>
-          {first} → {last}{markerDays.length ? ` · сделки ${visibleMarkerDays.length}/${markerDays.length} дн. · B${totalBuys}/S${totalSells}` : ''}
+        <small title={markerPresentation.eventDays.length ? 'Сделки отмечены только по дате исполнения. Цена сделки и координата доходности не реконструируются.' : undefined}>
+          {first} → {last}{markerPresentation.eventDays.length ? ` · сделки ${markerPresentation.visibleEventDays.length}/${markerPresentation.eventDays.length} дн. · B${markerPresentation.totalBuys}/S${markerPresentation.totalSells}` : ''}
         </small>
       </div>
     </div>
