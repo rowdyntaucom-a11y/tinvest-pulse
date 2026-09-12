@@ -37,6 +37,8 @@ jobs:
           cache: npm
           cache-dependency-path: v2/package.json
       - run: npm install --no-audit --no-fund
+      - name: Dependency security gate
+        run: npm audit --audit-level=high
       - run: npm run build
       - run: npm run test:core
       - run: node --check ../payouts-core.js
