@@ -5,6 +5,7 @@ import { PortfolioValueChart } from './PortfolioValueChart'
 import { BondAnalytics } from './BondAnalytics'
 import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './portfolioAttribution'
 import { buildPortfolioDataContext } from './portfolioDataContext'
+import { calculatePortfolioTopExposure } from './portfolioExposureDiagnostics'
 import { calculatePositionIncomeContribution } from './positionIncomeContribution'
 import './portfolio.css'
 
@@ -168,6 +169,10 @@ export function PortfolioWorkspace({ snapshot }: Props) {
     () => calculatePortfolioPnlAttribution(snapshot.positionItems),
     [snapshot.positionItems],
   )
+  const topExposure = useMemo(
+    () => calculatePortfolioTopExposure(snapshot.positionItems, 3),
+    [snapshot.positionItems],
+  )
   const dataContext = useMemo(() => buildPortfolioDataContext(snapshot), [snapshot])
 
   const sortedPositions = useMemo(() => {
@@ -203,7 +208,6 @@ export function PortfolioWorkspace({ snapshot }: Props) {
     : null
 
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
-  const top3 = snapshot.positionItems.slice(0, 3).reduce((sum, item) => sum + item.weight, 0)
   const positionValue = snapshot.positionItems.reduce(
     (sum, item) => sum + (Number.isFinite(item.currentValue) ? item.currentValue : 0),
     0,
@@ -390,7 +394,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
               <p className="method-note">
                 Вес класса = стоимость класса / база positionItems, а не / весь live-капитал; 100% классов = {money.format(positionValue)} ₽
                 {allocationCoverage == null ? '' : ` · покрытие ${pctPlain.format(allocationCoverage * 100)}% капитала`}.
-                TOP 3 позиций · {pctPlain.format(top3 * 100)}% live-капитала. P/L по классам — broker `expectedYield`; доля |P/L| = gross absolute P/L класса / сумма |P/L| текущих позиций. Это не TWR и не историческая return attribution.
+                TOP 3 позиций · {topExposure.topWeight == null ? '—' : `${pctPlain.format(topExposure.topWeight * 100)}%`} live-капитала. P/L по классам — broker `expectedYield`; доля |P/L| = gross absolute P/L класса / сумма |P/L| текущих позиций. Это не TWR и не историческая return attribution.
               </p>
             </>
           ) : (
