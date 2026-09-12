@@ -20,6 +20,15 @@ export type BondMetadata = {
   sector: string | null
 }
 
+export type AccountContext = {
+  available: boolean
+  type: string | null
+  status: string | null
+  openedDate: string | null
+  accessLevel: string | null
+  source: 'accounts' | 'unavailable'
+}
+
 export type PositionSnapshot = {
   figi: string | null
   instrumentUid: string | null
@@ -38,6 +47,7 @@ export type PositionSnapshot = {
 
 export type PortfolioSnapshot = {
   accountName: string
+  accountContext?: AccountContext
   value: number
   profit: number
   profitPct: number
@@ -91,6 +101,63 @@ const ratioToPercent = (value: unknown): number => {
   const parsed = nullableNumber(value)
   if (parsed == null) return 0
   return parsed * 100
+}
+
+const normaliseDate = (value: unknown): string | null => {
+  const parsed = nullableString(value)
+  if (!parsed) return null
+  const date = new Date(parsed)
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null
+}
+
+const unavailableAccountContext = (): AccountContext => ({
+  available: false,
+  type: null,
+  status: null,
+  openedDate: null,
+  accessLevel: null,
+  source: 'unavailable',
+})
+
+const normaliseAccountContext = (value: unknown): AccountContext => {
+  if (!value || typeof value !== 'object') return unavailableAccountContext()
+  const row = value as Record<string, unknown>
+  return {
+    available: true,
+    type: nullableString(row.type ?? row.accountType),
+    status: nullableString(row.status),
+    openedDate: normaliseDate(row.openedDate ?? row.openDate ?? row.createdAt ?? row.createdDate),
+    accessLevel: nullableString(row.accessLevel),
+    source: 'accounts',
+  }
+}
+
+const ACCOUNT_CONTEXT_TTL_MS = 15 * 60_000
+let accountContextCache: { accountId: string; expiresAt: number; value: AccountContext } | null = null
+
+async function loadAccountContext(accountId: string | null): Promise<AccountContext> {
+  if (!accountId) return unavailableAccountContext()
+  const now = Date.now()
+  if (accountContextCache?.accountId === accountId && accountContextCache.expiresAt > now) {
+    return accountContextCache.value
+  }
+
+  try {
+    const response = await fetch('/api/accounts', { cache: 'no-store' })
+    if (!response.ok) throw new Error(`accounts ${response.status}`)
+    const raw = await response.json() as unknown
+    const root = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {}
+    const rows = Array.isArray(root.accounts) ? root.accounts : Array.isArray(raw) ? raw : []
+    const selected = rows.find(item => {
+      if (!item || typeof item !== 'object') return false
+      return String((item as Record<string, unknown>).id ?? '') === accountId
+    })
+    const value = selected ? normaliseAccountContext(selected) : unavailableAccountContext()
+    accountContextCache = { accountId, expiresAt: now + ACCOUNT_CONTEXT_TTL_MS, value }
+    return value
+  } catch {
+    return unavailableAccountContext()
+  }
 }
 
 const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
@@ -179,6 +246,7 @@ const normalisePositions = (rawPositions: unknown, portfolioValue: number): Posi
 
 const fallbackSnapshot = (): PortfolioSnapshot => ({
   accountName: 'Кряхтящий фонд',
+  accountContext: unavailableAccountContext(),
   value: 0,
   profit: 0,
   profitPct: 0,
@@ -208,9 +276,12 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
   const value = n(portfolio.value ?? raw.totalValue ?? raw.portfolioValue)
   const positionsRaw = portfolio.positions ?? portfolio.assets ?? raw.assets
   const positionItems = normalisePositions(positionsRaw, value)
+  const accountId = nullableString(account.id)
+  const accountContext = await loadAccountContext(accountId)
 
   return {
     accountName: String(account.name || 'Кряхтящий фонд'),
+    accountContext,
     value,
     profit: n(portfolio.profit ?? portfolio.growth ?? raw.profit),
     profitPct: ratioToPercent(portfolio.profitPercent ?? portfolio.growthPercent ?? raw.profitPct),

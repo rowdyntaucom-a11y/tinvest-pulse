@@ -59,6 +59,48 @@ function compactDate(value: string | null) {
   return match ? `${match[3]}.${match[2]}` : value
 }
 
+function enumTail(value: string | null | undefined) {
+  const raw = String(value || '').trim().toUpperCase()
+  if (!raw) return null
+  return raw
+    .replace(/^ACCOUNT_TYPE_/, '')
+    .replace(/^ACCOUNT_STATUS_/, '')
+    .replace(/^ACCOUNT_ACCESS_LEVEL_/, '')
+    .replace(/^TINKOFF_/, '')
+    .replace(/_/g, ' ')
+}
+
+function accountTypeLabel(value: string | null | undefined) {
+  const raw = String(value || '').toUpperCase()
+  if (!raw) return null
+  if (raw.includes('IIS')) return 'ИИС'
+  if (raw.includes('TINKOFF') || raw.includes('BROKER')) return 'БРОКЕРСКИЙ'
+  return enumTail(value)
+}
+
+function accountStatusLabel(value: string | null | undefined) {
+  const raw = String(value || '').toUpperCase()
+  if (!raw) return null
+  if (raw.includes('OPEN')) return 'ОТКРЫТ'
+  if (raw.includes('CLOSED')) return 'ЗАКРЫТ'
+  return enumTail(value)
+}
+
+function accountAccessLabel(value: string | null | undefined) {
+  const raw = String(value || '').toUpperCase()
+  if (!raw) return null
+  if (raw.includes('READ_ONLY')) return 'READ ONLY'
+  if (raw.includes('FULL_ACCESS')) return 'FULL ACCESS'
+  if (raw.includes('NO_ACCESS')) return 'NO ACCESS'
+  return enumTail(value)
+}
+
+function accountDate(value: string | null | undefined) {
+  if (!value) return null
+  const date = new Date(value)
+  return Number.isFinite(date.getTime()) ? date.toLocaleDateString('ru-RU') : null
+}
+
 function PositionList({ positions, selectedKey, onSelect }: {
   positions: PositionSnapshot[]
   selectedKey: string
@@ -149,10 +191,17 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const historyLabel = dataContext.history.points
     ? `${dataContext.history.points} т. · ${historyFrom ?? '—'}→${historyTo ?? '—'}`
     : 'история загружается'
+  const account = snapshot.accountContext
+  const accountSummary = account?.available
+    ? [accountTypeLabel(account.type), accountStatusLabel(account.status), accountAccessLabel(account.accessLevel)].filter(Boolean).join(' · ') || 'ПОДТВЕРЖДЁН'
+    : 'НЕ ПОДТВЕРЖДЁН'
+  const accountOpened = account?.available ? accountDate(account.openedDate) : null
   const sourceTitle = [
-    `Источник: ${dataContext.source}`,
+    `Источник портфеля: ${dataContext.source}`,
     `timestamp: ${dataContext.timestampState}`,
     dataContext.reportedAt ? `reportedAt: ${new Date(dataContext.reportedAt).toLocaleString('ru-RU')}` : null,
+    account?.available ? `accounts: ${account.type ?? 'type unknown'} · ${account.status ?? 'status unknown'} · ${account.accessLevel ?? 'access unknown'}` : 'accounts: unavailable',
+    accountOpened ? `opened: ${accountOpened}` : null,
   ].filter(Boolean).join(' · ')
 
   const chooseSort = (sort: PositionSort) => {
@@ -186,7 +235,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
             <article className="metric-card metric-card--hero">
               <span className="metric-label">КАПИТАЛ</span>
               <strong>{snapshot.value ? `${money.format(snapshot.value)} ₽` : '—'}</strong>
-              <small>{startDate === '—' ? 'текущая стоимость портфеля' : `с ${startDate} · текущая стоимость`}</small>
+              <small>{accountOpened ? `счёт открыт ${accountOpened}` : startDate === '—' ? 'текущая стоимость портфеля' : `с ${startDate} · текущая стоимость`}</small>
             </article>
             <article className="metric-card">
               <span className="metric-label">ДЕНЕЖНЫЙ РЕЗУЛЬТАТ</span>
@@ -194,8 +243,8 @@ export function PortfolioWorkspace({ snapshot }: Props) {
               <small>{snapshot.value ? `${pctSigned.format(snapshot.profitPct)}% к внешним потокам` : 'ожидаем данные'}</small>
             </article>
             <article className="context-card" title={sourceTitle}>
-              <span>ИСТОЧНИК</span><strong>{dataContext.source}</strong>
-              <span>СНИМОК</span><strong>{snapshotLabel}</strong>
+              <span>СЧЁТ</span><strong>{accountSummary}</strong>
+              <span>ИСТОЧНИК / СНИМОК</span><strong>{dataContext.source} · {snapshotLabel}</strong>
               <span>ЦЕНЫ / БАЗА</span><strong>{dataContext.positions.priced}/{dataContext.positions.total} · {dataContext.positions.withCostBasis}/{dataContext.positions.total}</strong>
             </article>
           </section>
