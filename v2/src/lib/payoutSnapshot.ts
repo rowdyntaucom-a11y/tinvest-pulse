@@ -1,82 +1,106 @@
 import { useSyncExternalStore } from 'react'
 import { loadPayoutCalendar, type PayoutCalendar } from './payoutsApi'
 
-export const PAYOUT_SNAPSHOT_VERSION = '1.0' as const
+export const PAYOUT_SNAPSHOT_VERSION = '1.1' as const
 export const PAYOUT_SNAPSHOT_REFRESH_MS = 10 * 60_000
 
-type PayoutSnapshotState = {
+export type PayoutSnapshotState = {
   calendar: PayoutCalendar | null
   loading: boolean
 }
 
 type Listener = () => void
 
-let state: PayoutSnapshotState = { calendar: null, loading: true }
-let lastLoadedAt = 0
-let inFlight: Promise<PayoutCalendar> | null = null
-let timer: ReturnType<typeof setInterval> | null = null
-const listeners = new Set<Listener>()
-
-function publish(next: PayoutSnapshotState) {
-  state = next
-  for (const listener of listeners) listener()
+type PayoutSnapshotStoreOptions = {
+  loader: () => Promise<PayoutCalendar>
+  refreshMs?: number
+  now?: () => number
 }
 
-async function refresh(force = false) {
-  const now = Date.now()
-  if (!force && state.calendar && now - lastLoadedAt < PAYOUT_SNAPSHOT_REFRESH_MS) {
-    return state.calendar
+export function createPayoutSnapshotStore({
+  loader,
+  refreshMs = PAYOUT_SNAPSHOT_REFRESH_MS,
+  now = Date.now,
+}: PayoutSnapshotStoreOptions) {
+  let state: PayoutSnapshotState = { calendar: null, loading: true }
+  let lastLoadedAt = 0
+  let inFlight: Promise<PayoutCalendar | null> | null = null
+  let timer: ReturnType<typeof setInterval> | null = null
+  const listeners = new Set<Listener>()
+
+  const publish = (next: PayoutSnapshotState) => {
+    state = next
+    for (const listener of listeners) listener()
   }
-  if (inFlight) return inFlight
 
-  if (!state.calendar && !state.loading) publish({ ...state, loading: true })
+  const refresh = async (force = false): Promise<PayoutCalendar | null> => {
+    const currentTime = now()
+    if (!force && state.calendar && currentTime - lastLoadedAt < refreshMs) {
+      return state.calendar
+    }
+    if (inFlight) return inFlight
 
-  inFlight = loadPayoutCalendar()
-    .then(calendar => {
-      lastLoadedAt = Date.now()
-      publish({ calendar, loading: false })
-      return calendar
-    })
-    .catch(() => {
-      publish({ ...state, loading: false })
-      return state.calendar as PayoutCalendar
-    })
-    .finally(() => {
-      inFlight = null
-    })
+    if (!state.calendar && !state.loading) publish({ ...state, loading: true })
 
-  return inFlight
-}
+    inFlight = loader()
+      .then(calendar => {
+        lastLoadedAt = now()
+        publish({ calendar, loading: false })
+        return calendar
+      })
+      .catch(() => {
+        publish({ ...state, loading: false })
+        return state.calendar
+      })
+      .finally(() => {
+        inFlight = null
+      })
 
-function startRefreshLoop() {
-  void refresh(false)
-  if (timer != null) return
-  timer = setInterval(() => { void refresh(true) }, PAYOUT_SNAPSHOT_REFRESH_MS)
-}
+    return inFlight
+  }
 
-function stopRefreshLoop() {
-  if (timer == null) return
-  clearInterval(timer)
-  timer = null
-}
+  const startRefreshLoop = () => {
+    void refresh(false)
+    if (timer != null) return
+    timer = setInterval(() => { void refresh(true) }, refreshMs)
+  }
 
-function subscribe(listener: Listener) {
-  listeners.add(listener)
-  if (listeners.size === 1) startRefreshLoop()
-  return () => {
-    listeners.delete(listener)
-    if (listeners.size === 0) stopRefreshLoop()
+  const stopRefreshLoop = () => {
+    if (timer == null) return
+    clearInterval(timer)
+    timer = null
+  }
+
+  const subscribe = (listener: Listener) => {
+    listeners.add(listener)
+    if (listeners.size === 1) startRefreshLoop()
+    return () => {
+      listeners.delete(listener)
+      if (listeners.size === 0) stopRefreshLoop()
+    }
+  }
+
+  const getSnapshot = () => state
+
+  return {
+    version: PAYOUT_SNAPSHOT_VERSION,
+    refreshMs,
+    getSnapshot,
+    subscribe,
+    refresh,
   }
 }
+
+const payoutSnapshotStore = createPayoutSnapshotStore({ loader: loadPayoutCalendar })
 
 function idleSubscribe() {
   return () => undefined
 }
 
-function getSnapshot() {
-  return state
-}
-
 export function usePayoutSnapshot(enabled = true) {
-  return useSyncExternalStore(enabled ? subscribe : idleSubscribe, getSnapshot, getSnapshot)
+  return useSyncExternalStore(
+    enabled ? payoutSnapshotStore.subscribe : idleSubscribe,
+    payoutSnapshotStore.getSnapshot,
+    payoutSnapshotStore.getSnapshot,
+  )
 }
