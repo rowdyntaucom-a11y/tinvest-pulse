@@ -61,6 +61,12 @@ function compactDate(value: string | null) {
   return match ? `${match[3]}.${match[2]}` : value
 }
 
+function compactObservationDate(value: string | null) {
+  if (!value) return null
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  return match ? `${match[3]}.${match[2]}.${match[1].slice(2)}` : null
+}
+
 function enumTail(value: string | null | undefined) {
   const raw = String(value || '').trim().toUpperCase()
   if (!raw) return null
@@ -190,6 +196,11 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   )
   const selectedIncomeVisible = selectedIncome?.available === true
     && (selectedIncome.factNet != null || selectedIncome.scheduledGross != null)
+  const factWindowFrom = compactObservationDate(selectedIncome?.factObservationFrom ?? null)
+  const factWindowTo = compactObservationDate(selectedIncome?.factObservationTo ?? null)
+  const selectedFactWindow = factWindowFrom && factWindowTo
+    ? `${factWindowFrom}→${factWindowTo}${selectedIncome?.factObservationCompleteMonths == null ? '' : ` · ${selectedIncome.factObservationCompleteMonths} полн. мес.`}`
+    : null
 
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
   const top3 = snapshot.positionItems.slice(0, 3).reduce((sum, item) => sum + item.weight, 0)
@@ -315,6 +326,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                   <>
                     <br />Доход · exact FIGI: FACT observed net {selectedIncome.factNet == null ? '—' : `${money2.format(selectedIncome.factNet)} ₽`}
                     {selectedIncome.factShare == null ? '' : ` · ${pctPlain.format(selectedIncome.factShare * 100)}% наблюдаемых FACT`}
+                    {selectedFactWindow == null ? '' : ` · окно ${selectedFactWindow}`}
                     {' · '}12M schedule gross {selectedIncome.scheduledGross == null ? '—' : `${money2.format(selectedIncome.scheduledGross)} ₽`}
                     {selectedIncome.scheduledShare == null ? '' : ` · ${pctPlain.format(selectedIncome.scheduledShare * 100)}% расписания`}.
                     FACT и schedule имеют разные базы; сопоставление конкретной выплаты с конкретной строкой расписания не реконструируется.
