@@ -15,9 +15,9 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Current broker P/L attribution by holding and asset class, explicitly separated from TWR / alpha / historical return attribution.
 - Compact data context: source, reported timestamp age, price/cost-basis coverage and history coverage.
 - FIGI / instrument UID preserved in normalized position snapshots for deterministic cross-feature matching.
+- Verified account context from the existing read-only accounts boundary: account type, status, open date and access level, matched to the dashboard account ID and cached client-side; missing context fails closed.
 
 ### ACTIVE / next depth pass
-- Verified account context: IIS / brokerage account type, status/open date/access level using the existing read-only accounts endpoint.
 - Transaction markers on history charts only where operation type/date/instrument identity is reliable enough to avoid misleading reconstruction.
 - Better compact movers / largest exposures presentation only if it adds information beyond existing P/L sorting and Analytics concentration.
 - Income contribution inside position drill-down only where payout-to-position linkage is unambiguous.
@@ -53,7 +53,8 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Current broker P/L contribution / attribution by holding and asset class.
 - Rebalancing diagnostics for existing capital / explicit additions / explicit withdrawals.
 - Drawdown recovery diagnostics with completed-vs-active episode separation and short-history gate.
-- Risk-only Pro/Terminal allocation calculation boundary: equal weight, long-only minimum variance and equal-risk-contribution on one common real-return sample; no expected-return assumptions.
+- Risk-only allocation calculation boundary: equal weight, long-only minimum variance and equal-risk-contribution on one common real-return sample; no expected-return assumptions.
+- Compact collapsed Allocation Lab inside CORR reusing the same asset-history sample; 60-return gate, 252-return maturity state and solver convergence remain explicit. It is scenario diagnostics, not a target portfolio recommendation.
 
 ### ACTIVE / next depth pass
 - Side-by-side deterministic strategy scenario comparison beyond the current rebalancing modes, only when inputs are explicit and methodology is distinct.
@@ -88,6 +89,7 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 ### ACTIVE / next depth pass
 - Upcoming-payment risk/status labels only when an official source exposes a defensible status field.
 - Deeper goal scenarios only if every reinvestment/contribution/return assumption is explicit and testable.
+- Verified linkage from bond cash-flow analytics to Income only where coupon/payment identity can be reused without double-counting already scheduled or realized events.
 
 ### GATED
 - Payout growth: require two comparable realized annual periods; no annualization of short history.
@@ -106,9 +108,9 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Fixed / floating / other coupon-type split where metadata exists.
 - Nominal currency split.
 - Country-of-risk and sector concentration with metadata coverage and effective-category count.
+- Verified issuer concentration using bond asset UID → T-Bank AssetFull brand UID/name. Grouping is strictly by UID; issuer name is display-only, missing UID stays outside coverage, and asset→brand metadata is cached server-side.
 
 ### ACTIVE / next depth pass
-- Verified issuer concentration once the broker metadata boundary exposes a trustworthy issuer identifier; sector/country must not be relabelled as issuer.
 - Explicit bond cash-flow linkage to Income without double-counting coupons already present in the payout schedule.
 
 ### GATED
@@ -132,9 +134,10 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Compact world-state boundary separated from Pixi rendering.
 - Render-neutral XP-to-world-event adapter with stable IDs and no XP-amount-to-visual-intensity inference.
 
-### ACTIVE
-- Connect only reviewed relative signals: TWR, consistency, Health, realized income growth when valid and strategy-adherence events when the rule is explicit.
-- Continue world-event semantics / progression persistence before subjective final art changes.
+### DEFERRED UNTIL FINANCIAL CORE IS STRONGER
+- The Living World specification remains preserved, including two-layer weather, hysteresis, Chronicle/scars, first sunrise, progressive HUD and performance/accessibility rules.
+- Do not spend the current build phase on subjective world art/effects while Portfolio / Analytics / Income / Bonds / data quality / mobile reliability still have higher-value depth work.
+- After the deterministic financial core reaches the agreed quality bar, resume reviewed relative XP signals and Living World implementation.
 
 ### GATED / later
 - Final XP weights and long-term level economy require validation against real user behavior.
@@ -146,6 +149,7 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Real per-asset daily market-history boundary for the current top positions.
 - Correlation/stress primitives and live correlation mode.
 - Risk-only allocation diagnostics: equal weight, long-only minimum variance, equal-risk-contribution.
+- Allocation Lab is exposed as an opt-in collapsed drill-down rather than a new default-mobile tab.
 
 ### ACTIVE / next
 - Define a separate Pro/Terminal shell only when it can host several real modules without crowding the default Portfolio/Analytics/Income/DNA mobile navigation.
@@ -191,9 +195,11 @@ A tab is not 'done' because it has no empty pixels. It is done only when:
 7. No placeholder, fake forecast or decorative-only analytics is presented as fact.
 
 ## Immediate build queue — refreshed 2026-09-12
-1. Finish verified Portfolio account context and decide whether reliable transaction markers add enough value without clutter.
-2. Close remaining bond identity gap: issuer identifier / issuer concentration, otherwise keep it explicitly gated.
-3. Keep Income growth / goal-date forecasting gated; only deepen with explicit user assumptions and full comparable history.
-4. Mature Pro/Terminal calculation boundaries (risk-only allocation first) before exposing a separate shell.
-5. Continue XP world-event semantics/persistence without locking final XP economy or subjective art direction.
-6. Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
+1. Audit transaction-marker reliability and add markers only if operation type/date/instrument identity can be represented without clutter or false precision.
+2. Close bond→Income cash-flow linkage only where the same event identity can prevent duplicate scheduled/realized coupon counting.
+3. Keep Income growth / goal-date forecasting gated; deepen only with explicit user assumptions and full comparable history.
+4. Continue data-quality/live validation and Samsung/mobile density review for advanced drill-downs, including issuer coverage and Allocation Lab.
+5. Mature additional Pro/Terminal calculation boundaries before creating a separate shell; do not add a new top-level mode just to expose one metric.
+6. Review npm moderate vulnerabilities deliberately; never apply blind `npm audit fix`.
+7. Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
+8. Resume Living World implementation only after the financial core and the items above reach the agreed quality bar.
