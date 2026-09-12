@@ -4,6 +4,7 @@ import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { getIncomeIntegrity } from './incomeIntegrity'
 import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration, calculateIncomeStability } from './incomeHistory'
 import { calculateIncomeComparablePeriod } from './incomeComparables'
+import { buildBondIncomeLinkage } from './bondIncomeLinkage'
 import { IncomeGoalCompact } from './IncomeGoalCompact'
 import './income.css'
 import './incomeCompact.css'
@@ -92,6 +93,10 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const visibleUpcoming = upcoming.slice(safePage * pageSize, safePage * pageSize + pageSize)
 
   const integrity = useMemo(() => getIncomeIntegrity(data, loading), [data, loading])
+  const bondIncomeLinkage = useMemo(
+    () => buildBondIncomeLinkage(positions, data.events),
+    [positions, data.events],
+  )
 
   const sourceRows = useMemo(() => {
     const positionByFigi = new Map<string, PositionSnapshot>()
@@ -215,6 +220,9 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
   const coverage = integrity.coveragePct
   const next = data.next
+  const bondLinkCoveragePct = bondIncomeLinkage.eligibleBondCount
+    ? bondIncomeLinkage.valueCoverage * 100
+    : null
 
   return (
     <div className="income-workspace">
@@ -335,6 +343,13 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
               </div>
             )) : <div className="income-empty">Нет данных для разбивки.</div>}
           </div>
+          {bondIncomeLinkage.eligibleBondCount > 0 && (
+            <div className="income-integrity" title={bondIncomeLinkage.note}>
+              <span>BOND → INCOME · {bondIncomeLinkage.linkedBondCount}/{bondIncomeLinkage.eligibleBondCount} по FIGI · {bondIncomeLinkage.couponEvents} куп.</span>
+              <i><b style={{ width: `${Math.min(100, Math.max(0, bondLinkCoveragePct ?? 0))}%` }} /></i>
+              <strong>{bondLinkCoveragePct == null ? '—' : `${pct.format(bondLinkCoveragePct)}% · ${money.format(bondIncomeLinkage.scheduledGross)} ₽`}</strong>
+            </div>
+          )}
           <div className="income-integrity">
             <span>Покрытие расписания · {integrity.resolvedAssets}/{integrity.eligibleAssets || '—'}</span>
             <i><b style={{ width: `${coverage == null ? 0 : Math.min(100, coverage)}%` }} /></i>
@@ -344,6 +359,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
           </div>
           <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. TOP SOURCE показывает долю лидера, число источников и эффективное число источников Neff = 1/HHI.</p>
+          <p className="income-method-note">BOND → INCOME не создаёт второй купонный прогноз: он повторно использует уже показанные 12М coupon-events и связывает их с текущими облигациями только по FIGI. Сумма справа — часть существующего forecast, а не дополнительный доход. FACT с прогнозом не складывается; reconciliation конкретного полученного купона со строкой schedule остаётся закрытым до общего идентификатора события.</p>
           <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Связь выплаты с текущей позицией сначала проверяется по FIGI; ticker/name используются только как fallback. Это не текущая дивидендная доходность.</p>
           <p className="income-method-note">OBS считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Сравнение периодов появляется только при ≥3 точных парах одинаковых полных месяцев текущего и предыдущего года; 12 пар — зрелое сравнение. Годовой прогноз и годификация короткой истории не применяются.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
