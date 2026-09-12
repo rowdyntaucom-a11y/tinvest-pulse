@@ -3,6 +3,7 @@ import type { PositionSnapshot } from '../../lib/portfolioApi'
 import type { AnalyticsHistoryPoint, PortfolioAnalytics } from './metrics'
 import { CorrelationPanel } from './CorrelationPanel'
 import { StressPanel } from './StressPanel'
+import { calculateRecoveryDiagnostics } from './recoveryDiagnostics'
 import { calculateRelativePerformance } from './relativePerformance'
 import { calculateRollingRisk } from './rollingRisk'
 import { calculateTailRisk } from './tailRisk'
@@ -33,11 +34,28 @@ function plainRatio(value: number | null) {
   return `${pctPlain.format(value * 100)}%`
 }
 
+function recoverySummary(recovery: ReturnType<typeof calculateRecoveryDiagnostics>) {
+  if (!recovery.available) return recovery.reason || 'Recovery diagnostics пока недоступна.'
+
+  const parts = [`RECOVERY ${recovery.quality}`, `${recovery.completedEpisodes.length} заверш. эпиз.`]
+  if (recovery.medianRecoveryDays != null) parts.push(`медиана от дна ${number.format(recovery.medianRecoveryDays)} дн.`)
+  if (recovery.worstCompletedEpisode) {
+    parts.push(`худшая завершённая −${pctPlain.format(recovery.worstCompletedEpisode.depth * 100)}% / ${recovery.worstCompletedEpisode.troughToRecoveryDays} дн. до возврата`)
+  }
+  if (recovery.activeDrawdown) {
+    parts.push(`активная сейчас −${pctPlain.format(recovery.activeDrawdown.currentDrawdown * 100)}% от пика · ${recovery.activeDrawdown.daysSincePeak} дн.`)
+  } else {
+    parts.push('активной просадки нет')
+  }
+  return parts.join(' · ')
+}
+
 export function RiskWorkspace({ analytics, history, positions, riskFreeRate, analyticsMature, historyLabel }: Props) {
   const [mode, setMode] = useState<Mode>('portfolio')
   const relative = useMemo(() => calculateRelativePerformance(history), [history])
   const rolling = useMemo(() => calculateRollingRisk(history), [history])
   const tail = useMemo(() => calculateTailRisk(history), [history])
+  const recovery = useMemo(() => calculateRecoveryDiagnostics(history), [history])
   const roll = rolling.activeWindow
 
   const modeStatus = mode === 'portfolio'
@@ -76,9 +94,9 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
             <article className="risk-card"><span>ЭКВ. ПОЗИЦИЙ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
           </section>
           <section className="panel analytics-note">
-            <span className="eyebrow">КАЧЕСТВО ВЫБОРКИ</span>
+            <span className="eyebrow">КАЧЕСТВО ВЫБОРКИ · RECOVERY</span>
             <h2>{analyticsMature ? 'ИСТОРИЯ ДОСТАТОЧНА' : 'МЕТРИКИ ПРЕДВАРИТЕЛЬНЫЕ'}</h2>
-            <p>Сейчас доступно {historyLabel}. Годовая волатильность, Sharpe и Sortino математически считаются, но до накопления 12 месяцев показываются как предварительные, а не как зрелая характеристика риска.</p>
+            <p>Сейчас доступно {historyLabel}. Годовая волатильность, Sharpe и Sortino до накопления 12 месяцев остаются предварительными. {recoverySummary(recovery)}</p>
           </section>
         </>
       )}
