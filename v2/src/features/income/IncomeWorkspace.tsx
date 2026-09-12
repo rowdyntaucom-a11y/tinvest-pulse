@@ -5,6 +5,7 @@ import { getIncomeIntegrity } from './incomeIntegrity'
 import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration, calculateIncomeStability } from './incomeHistory'
 import { calculateIncomeComparablePeriod } from './incomeComparables'
 import { buildBondIncomeLinkage } from './bondIncomeLinkage'
+import { buildIncomeSourceRows } from './incomeSourceRows'
 import { IncomeGoalCompact } from './IncomeGoalCompact'
 import './income.css'
 import './incomeCompact.css'
@@ -62,8 +63,11 @@ function eventKind(event: PayoutEvent) {
   return 'Доход'
 }
 
-function keyOf(value: unknown) {
-  return String(value || '').trim().toUpperCase()
+function incomeSourceIdentityNote(state: ReturnType<typeof buildIncomeSourceRows>[number]['identityState']) {
+  if (state === 'NO_FIGI') return 'нет FIGI'
+  if (state === 'INCOMPLETE_FIGI') return 'FIGI частично'
+  if (state === 'AMBIGUOUS_FIGI') return 'FIGI конфликт'
+  return 'база недоступна'
 }
 
 export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions }: Props) {
@@ -98,75 +102,11 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
     [positions, data.events],
   )
 
-  const sourceRows = useMemo(() => {
-    const positionByFigi = new Map<string, PositionSnapshot>()
-    const positionByAlias = new Map<string, PositionSnapshot>()
-    for (const position of positions) {
-      const figiKey = keyOf(position.figi)
-      const tickerKey = keyOf(position.ticker)
-      const nameKey = keyOf(position.name)
-      if (figiKey) positionByFigi.set(figiKey, position)
-      if (tickerKey) positionByAlias.set(tickerKey, position)
-      if (nameKey) positionByAlias.set(nameKey, position)
-    }
-
-    type SourceRow = {
-      figi: string | null
-      ticker: string
-      name: string
-      fact: number
-      forecast: number
-      factCount: number
-      forecastCount: number
-    }
-
-    const map = new Map<string, SourceRow>()
-    for (const event of data.actual.items) {
-      const key = event.ticker || event.name || '—'
-      const row = map.get(key) ?? {
-        figi: event.figi ? String(event.figi) : null,
-        ticker: key,
-        name: event.name || key,
-        fact: 0,
-        forecast: 0,
-        factCount: 0,
-        forecastCount: 0,
-      }
-      if (!row.figi && event.figi) row.figi = String(event.figi)
-      row.fact += eventAmount(event, true)
-      row.factCount += 1
-      map.set(key, row)
-    }
-    for (const event of data.events) {
-      const key = event.ticker || event.name || '—'
-      const row = map.get(key) ?? {
-        figi: event.figi ? String(event.figi) : null,
-        ticker: key,
-        name: event.name || key,
-        fact: 0,
-        forecast: 0,
-        factCount: 0,
-        forecastCount: 0,
-      }
-      if (!row.figi && event.figi) row.figi = String(event.figi)
-      row.forecast += eventAmount(event)
-      row.forecastCount += 1
-      map.set(key, row)
-    }
-
-    return [...map.values()]
-      .map(row => {
-        const figiPosition = row.figi ? positionByFigi.get(keyOf(row.figi)) : undefined
-        const aliasPosition = positionByAlias.get(keyOf(row.ticker)) ?? positionByAlias.get(keyOf(row.name))
-        const position = figiPosition ?? aliasPosition
-        const matchBasis = figiPosition ? 'FIGI' : aliasPosition ? 'ALIAS' : null
-        const costBasis = position?.costBasis ?? 0
-        const yoc12m = costBasis > 0 && row.forecast > 0 ? row.forecast / costBasis : null
-        return { ...row, costBasis, yoc12m, matchBasis }
-      })
-      .sort((a, b) => (b.fact + b.forecast) - (a.fact + a.forecast))
-      .slice(0, 6)
-  }, [data.actual.items, data.events, positions])
+  const allSourceRows = useMemo(
+    () => buildIncomeSourceRows(data.actual.items, data.events, positions, Number.MAX_SAFE_INTEGER),
+    [data.actual.items, data.events, positions],
+  )
+  const sourceRows = allSourceRows.slice(0, 6)
 
   const incomeProfile = useMemo(() => {
     let actualCoupons = 0
@@ -190,8 +130,8 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const realizedStability = useMemo(() => calculateIncomeStability(realizedHistory), [realizedHistory])
   const comparableIncome = useMemo(() => calculateIncomeComparablePeriod(realizedHistory.months), [realizedHistory.months])
   const realizedTopSource = useMemo(
-    () => [...sourceRows].filter(row => row.fact > 0).sort((a, b) => b.fact - a.fact)[0] ?? null,
-    [sourceRows],
+    () => [...allSourceRows].filter(row => row.fact > 0).sort((a, b) => b.fact - a.fact)[0] ?? null,
+    [allSourceRows],
   )
   const latestPayoutMonth = useMemo(
     () => [...realizedHistory.months].reverse().find(month => month.totalNet > 0) ?? null,
@@ -333,12 +273,12 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className="income-source-table">
             <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М / YoC</span></div>
             {sourceRows.length ? sourceRows.map(row => (
-              <div className="income-source-row" key={row.ticker}>
+              <div className="income-source-row" key={row.key}>
                 <div><strong>{row.ticker}</strong><small>{row.name !== row.ticker ? row.name : `${row.factCount + row.forecastCount} событий`}</small></div>
                 <b>{row.fact ? `${money2.format(row.fact)} ₽` : '—'}</b>
                 <div className="income-source-forecast">
                   <b>{row.forecast ? `${money2.format(row.forecast)} ₽` : '—'}</b>
-                  <small>{row.yoc12m == null ? 'YoC —' : `YoC ${pct1.format(row.yoc12m * 100)}% · ${row.matchBasis}`}</small>
+                  <small>{row.yoc12m == null ? `YoC — · ${incomeSourceIdentityNote(row.identityState)}` : `YoC ${pct1.format(row.yoc12m * 100)}% · FIGI`}</small>
                 </div>
               </div>
             )) : <div className="income-empty">Нет данных для разбивки.</div>}
@@ -360,7 +300,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           </div>
           <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. TOP SOURCE показывает долю лидера, число источников и эффективное число источников Neff = 1/HHI.</p>
           <p className="income-method-note">BOND → INCOME не создаёт второй купонный прогноз: он повторно использует уже показанные 12М coupon-events и связывает их с текущими облигациями только по FIGI. Сумма справа — часть существующего forecast, а не дополнительный доход. FACT с прогнозом не складывается; reconciliation конкретного полученного купона со строкой schedule остаётся закрытым до общего идентификатора события.</p>
-          <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Связь выплаты с текущей позицией сначала проверяется по FIGI; ticker/name используются только как fallback. Это не текущая дивидендная доходность.</p>
+          <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Cost basis используется только когда все события строки несут один и тот же FIGI и он однозначно соответствует одной текущей позиции. Ticker/name служат только подписью и никогда не выбирают cost basis. Это не текущая дивидендная доходность.</p>
           <p className="income-method-note">OBS считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Сравнение периодов появляется только при ≥3 точных парах одинаковых полных месяцев текущего и предыдущего года; 12 пар — зрелое сравнение. Годовой прогноз и годификация короткой истории не применяются.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
