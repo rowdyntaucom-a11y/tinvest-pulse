@@ -1,6 +1,13 @@
-export const PORTFOLIO_EXPOSURE_DIAGNOSTICS_VERSION = '1.0'
+export const PORTFOLIO_EXPOSURE_DIAGNOSTICS_VERSION = '1.1'
 
 type ExposurePosition = {
+  weight: number
+  ticker?: string | null
+  name?: string | null
+}
+
+export type PortfolioExposureItem = {
+  label: string | null
   weight: number
 }
 
@@ -10,8 +17,17 @@ export type PortfolioExposureDiagnostics = {
   requestedCount: number
   eligibleCount: number
   includedCount: number
+  identifiedIncludedCount: number
   topWeight: number | null
   eligibleWeight: number | null
+  topPositions: PortfolioExposureItem[]
+}
+
+function positionLabel(position: ExposurePosition) {
+  const ticker = String(position.ticker || '').trim()
+  if (ticker) return ticker
+  const name = String(position.name || '').trim()
+  return name || null
 }
 
 export function calculatePortfolioTopExposure(
@@ -19,23 +35,32 @@ export function calculatePortfolioTopExposure(
   requestedCount = 3,
 ): PortfolioExposureDiagnostics {
   const count = Number.isInteger(requestedCount) && requestedCount > 0 ? requestedCount : 0
-  const weights = positions
-    .map(position => Number(position.weight))
-    .filter(weight => Number.isFinite(weight) && weight > 0)
-    .sort((a, b) => b - a)
+  const eligible = positions
+    .map(position => ({
+      weight: Number(position.weight),
+      label: positionLabel(position),
+    }))
+    .filter(item => Number.isFinite(item.weight) && item.weight > 0)
+    .sort((a, b) => {
+      const byWeight = b.weight - a.weight
+      if (Math.abs(byWeight) > 1e-15) return byWeight
+      return String(a.label || '').localeCompare(String(b.label || ''), 'ru')
+    })
 
-  const eligibleWeight = weights.reduce((sum, weight) => sum + weight, 0)
-  const included = count > 0 ? weights.slice(0, count) : []
+  const eligibleWeight = eligible.reduce((sum, item) => sum + item.weight, 0)
+  const included = count > 0 ? eligible.slice(0, count) : []
 
   return {
     calcVersion: PORTFOLIO_EXPOSURE_DIAGNOSTICS_VERSION,
-    available: count > 0 && weights.length > 0,
+    available: count > 0 && eligible.length > 0,
     requestedCount: count,
-    eligibleCount: weights.length,
+    eligibleCount: eligible.length,
     includedCount: included.length,
+    identifiedIncludedCount: included.filter(item => item.label != null).length,
     topWeight: count > 0 && included.length > 0
-      ? included.reduce((sum, weight) => sum + weight, 0)
+      ? included.reduce((sum, item) => sum + item.weight, 0)
       : null,
-    eligibleWeight: weights.length > 0 ? eligibleWeight : null,
+    eligibleWeight: eligible.length > 0 ? eligibleWeight : null,
+    topPositions: included.map(item => ({ label: item.label, weight: item.weight })),
   }
 }
