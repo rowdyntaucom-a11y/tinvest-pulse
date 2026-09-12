@@ -32,7 +32,7 @@ const EPSILON = 1e-8
 const MAX_SCENARIOS = 4
 
 function validStrategy(strategy: StrategyConfig) {
-  if (!strategy || strategy.version !== '1.0' || !strategy.targets.length) return false
+  if (!strategy || strategy.version !== '1.0' || strategy.targets.length !== 2) return false
   const keys = new Set<string>()
   let total = 0
   for (const target of strategy.targets) {
@@ -42,6 +42,7 @@ function validStrategy(strategy: StrategyConfig) {
     if (!Number.isFinite(target.target) || target.target <= 0) return false
     total += target.target
   }
+  if (!keys.has('equity') || !keys.has('bond')) return false
   if (Math.abs(total - 1) > EPSILON) return false
   return Number.isFinite(strategy.absoluteTolerance)
     && strategy.absoluteTolerance >= 0
@@ -96,7 +97,7 @@ export function compareStrategyScenarios(
     return {
       available: false,
       rows: [],
-      reason: 'At least two valid, uniquely identified user-supplied strategy scenarios are required.',
+      reason: 'At least two valid, uniquely identified user-supplied two-class strategy scenarios are required.',
       note: 'QVANIX does not invent or normalize comparison strategies.',
     }
   }
