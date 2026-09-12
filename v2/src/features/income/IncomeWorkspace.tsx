@@ -3,6 +3,7 @@ import { loadPayoutCalendar, type PayoutCalendar, type PayoutEvent } from '../..
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { getIncomeIntegrity } from './incomeIntegrity'
 import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration, calculateIncomeStability } from './incomeHistory'
+import { calculateIncomeComparablePeriod } from './incomeComparables'
 import './income.css'
 import './incomeCompact.css'
 
@@ -147,6 +148,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   )
   const realizedConcentration = useMemo(() => calculateIncomeSourceConcentration(data.actual.items), [data.actual.items])
   const realizedStability = useMemo(() => calculateIncomeStability(realizedHistory), [realizedHistory])
+  const comparableIncome = useMemo(() => calculateIncomeComparablePeriod(realizedHistory.months), [realizedHistory.months])
   const realizedTopSource = useMemo(
     () => [...sourceRows].filter(row => row.fact > 0).sort((a, b) => b.fact - a.fact)[0] ?? null,
     [sourceRows],
@@ -165,6 +167,14 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const stabilityDetail = realizedStability.available
     ? `${money.format(realizedStability.averageMonthlyNet ?? 0)} ₽/мес. · 0 ₽: ${realizedStability.zeroIncomeMonths} мес.`
     : `полных месяцев · нужно ≥3`
+  const comparableValue = comparableIncome.available
+    ? comparableIncome.changeRatio == null
+      ? `${(comparableIncome.changeNet ?? 0) >= 0 ? '+' : ''}${money.format(comparableIncome.changeNet ?? 0)} ₽`
+      : `${comparableIncome.changeRatio >= 0 ? '+' : ''}${pct1.format(comparableIncome.changeRatio * 100)}%`
+    : null
+  const comparableDetail = comparableIncome.available
+    ? `те же ${comparableIncome.monthCount} мес. · ${comparableIncome.currentYear}/${comparableIncome.previousYear} · net`
+    : null
 
   const monthRows = data.months.slice(0, 6)
   const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
@@ -268,7 +278,11 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             <article><span>ФАКТ · КУПОНЫ</span><strong>{incomeProfile.actualCoupons ? `${money.format(incomeProfile.actualCoupons)} ₽` : '—'}</strong><small>{data.actual.year ?? 'период'} · {observationCompact}</small></article>
             <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{latestPayoutMonth ? `${latestPayoutMonth.key} · ${money.format(latestPayoutMonth.totalNet)} ₽ net` : 'нет FACT-выплат'}</small></article>
             <article><span>ФАКТ · TOP SOURCE</span><strong>{realizedTopSource?.ticker ?? '—'}</strong><small>{realizedConcentration.topSourceShare == null ? 'нет FACT-источников' : `${pct1.format(realizedConcentration.topSourceShare * 100)}% · ${realizedConcentration.sourceCount} ист. · Neff ${number2.format(realizedConcentration.effectiveSources ?? 0)}`}</small></article>
-            <article><span>ФАКТ · СТАБИЛЬНОСТЬ</span><strong>{stabilityValue}</strong><small>{stabilityDetail}</small></article>
+            {comparableIncome.available ? (
+              <article><span>ФАКТ · СРАВНЕНИЕ</span><strong>{comparableValue}</strong><small>{comparableDetail}</small></article>
+            ) : (
+              <article><span>ФАКТ · СТАБИЛЬНОСТЬ</span><strong>{stabilityValue}</strong><small>{stabilityDetail}</small></article>
+            )}
           </div>
 
           <div className="income-source-table">
@@ -294,7 +308,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           </div>
           <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. TOP SOURCE показывает долю лидера, число источников и эффективное число источников Neff = 1/HHI.</p>
           <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Это не текущая дивидендная доходность.</p>
-          <p className="income-method-note">OBS считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Цель дохода по короткой истории не годифицируется.</p>
+          <p className="income-method-note">OBS считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Сравнение периодов появляется только при ≥3 точных парах одинаковых полных месяцев текущего и предыдущего года; 12 пар — зрелое сравнение. Годовой прогноз и годификация короткой истории не применяются.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
       )}
