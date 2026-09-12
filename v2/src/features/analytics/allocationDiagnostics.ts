@@ -1,5 +1,4 @@
 import type { RiskSeries } from './riskMatrix'
-import { buildReturnIntervalMap, commonReturnIntervalKeys } from './returnIntervals'
 
 export const ALLOCATION_DIAGNOSTICS_CALC_VERSION = '1.2' as const
 
@@ -43,6 +42,29 @@ const TRADING_DAYS = 252
 const MAX_ASSETS = 10
 const EPS = 1e-12
 
+type ReturnObservation = {
+  from: string
+  to: string
+  value: number
+}
+
+function returnIntervalMap(series: RiskSeries) {
+  const sorted = series.points
+    .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
+    .sort((a, b) => a.date.localeCompare(b.date))
+  const map = new Map<string, ReturnObservation>()
+  for (let i = 1; i < sorted.length; i += 1) {
+    const prior = sorted[i - 1]
+    const current = sorted[i]
+    if (prior.date >= current.date) continue
+    const value = current.value / prior.value - 1
+    if (Number.isFinite(value) && value > -0.95 && value < 10) {
+      map.set(`${prior.date}\u0000${current.date}`, { from: prior.date, to: current.date, value })
+    }
+  }
+  return map
+}
+
 function alignSeries(series: RiskSeries[]) {
   const normalized = series
     .filter(item => item?.key && item?.label && Array.isArray(item.points))
@@ -51,21 +73,21 @@ function alignSeries(series: RiskSeries[]) {
   if (unique.size !== normalized.length || normalized.length < 2) {
     return {
       series: normalized,
-      intervalKeys: [] as string[],
       rows: [] as number[][],
       from: null as string | null,
       to: null as string | null,
     }
   }
 
-  const maps = normalized.map(item => buildReturnIntervalMap(item.points))
-  const intervalKeys = commonReturnIntervalKeys(maps)
+  const maps = normalized.map(returnIntervalMap)
+  const intervalKeys = [...maps[0].keys()]
+    .filter(key => maps.every(map => map.has(key)))
+    .sort((a, b) => a.localeCompare(b))
   const rows = intervalKeys.map(key => maps.map(map => map.get(key)!.value))
   const first = intervalKeys[0] ? maps[0].get(intervalKeys[0]) : null
   const last = intervalKeys.at(-1) ? maps[0].get(intervalKeys.at(-1)!) : null
   return {
     series: normalized,
-    intervalKeys,
     rows,
     from: first?.from ?? null,
     to: last?.to ?? null,
