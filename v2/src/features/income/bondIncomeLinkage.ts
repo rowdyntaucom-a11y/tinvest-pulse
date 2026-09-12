@@ -1,6 +1,8 @@
 import type { PayoutEvent } from '../../lib/payoutsApi'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
+export const BOND_INCOME_LINKAGE_CALC_VERSION = '1.1' as const
+
 export type BondIncomeLinkRow = {
   figi: string
   ticker: string
@@ -11,7 +13,7 @@ export type BondIncomeLinkRow = {
 }
 
 export type BondIncomeLinkage = {
-  version: '1.0'
+  version: typeof BOND_INCOME_LINKAGE_CALC_VERSION
   eligibleBondCount: number
   linkedBondCount: number
   totalBondValue: number
@@ -38,6 +40,17 @@ function figiKey(value: unknown) {
   return typeof value === 'string' ? value.trim().toUpperCase() : ''
 }
 
+function isScheduledCoupon(event: PayoutEvent) {
+  if (String(event?.kind || '').toUpperCase() !== 'COUPON') return false
+  // FACT payouts belong to the realized-income layer and must never be folded
+  // into the forward schedule even if a future caller passes a mixed event set.
+  if (String(event?.status || '').toUpperCase() === 'FACT') return false
+  const figi = figiKey(event?.figi)
+  if (!figi) return false
+  const date = Date.parse(String(event?.date || ''))
+  return Number.isFinite(date)
+}
+
 export function buildBondIncomeLinkage(
   positions: PositionSnapshot[],
   scheduledEvents: PayoutEvent[],
@@ -50,11 +63,8 @@ export function buildBondIncomeLinkage(
   const couponEventsByFigi = new Map<string, PayoutEvent[]>()
 
   for (const event of Array.isArray(scheduledEvents) ? scheduledEvents : []) {
-    if (String(event?.kind || '').toUpperCase() !== 'COUPON') continue
-    const figi = figiKey(event?.figi)
-    if (!figi) continue
-    const date = Date.parse(String(event?.date || ''))
-    if (!Number.isFinite(date)) continue
+    if (!isScheduledCoupon(event)) continue
+    const figi = figiKey(event.figi)
     const rows = couponEventsByFigi.get(figi) ?? []
     rows.push(event)
     couponEventsByFigi.set(figi, rows)
@@ -83,7 +93,7 @@ export function buildBondIncomeLinkage(
   const scheduledGross = rows.reduce((sum, row) => sum + row.scheduledGross, 0)
 
   return {
-    version: '1.0',
+    version: BOND_INCOME_LINKAGE_CALC_VERSION,
     eligibleBondCount: bonds.length,
     linkedBondCount: rows.length,
     totalBondValue,
@@ -92,6 +102,6 @@ export function buildBondIncomeLinkage(
     couponEvents,
     scheduledGross,
     rows,
-    note: 'Linkage reuses the existing 12M payout schedule and matches current bonds by FIGI only. It does not create new coupon events, does not add forecast to FACT, and therefore cannot double-count scheduled income. Actual-operation reconciliation remains separate until a shared coupon-event identity is available.',
+    note: 'Linkage reuses the existing 12M payout schedule and matches current bonds by FIGI only. FACT events are rejected, no new coupon events are created, and scheduled income is not added to realized income. Actual-operation reconciliation remains separate until a shared coupon-event identity is available.',
   }
 }
