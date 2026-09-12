@@ -1,6 +1,9 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
+export const RELATIVE_PERFORMANCE_CALC_VERSION = '1.1' as const
+
 export type RelativePerformance = {
+  calcVersion: typeof RELATIVE_PERFORMANCE_CALC_VERSION
   available: boolean
   status: 'insufficient_history' | 'preview' | 'mature'
   overlapPoints: number
@@ -86,9 +89,9 @@ export function calculateRelativePerformance(history: AnalyticsHistoryPoint[]): 
     const covariance = sampleCovariance(portfolioReturns, benchmarkReturns)
     const activeStdev = activeVariance == null ? null : Math.sqrt(Math.max(0, activeVariance))
 
-    if (activeStdev != null && activeStdev > 0) {
+    if (activeStdev != null) {
       trackingError = activeStdev * Math.sqrt(252)
-      informationRatio = (mean(active) / activeStdev) * Math.sqrt(252)
+      if (activeStdev > 0) informationRatio = (mean(active) / activeStdev) * Math.sqrt(252)
     }
     if (covariance != null && benchmarkVariance != null && benchmarkVariance > 0) beta = covariance / benchmarkVariance
     if (covariance != null && benchmarkVariance != null && benchmarkVariance > 0 && portfolioVariance != null && portfolioVariance > 0) {
@@ -100,6 +103,7 @@ export function calculateRelativePerformance(history: AnalyticsHistoryPoint[]): 
   const available = points.length >= 2
 
   return {
+    calcVersion: RELATIVE_PERFORMANCE_CALC_VERSION,
     available,
     status: sufficient ? (mature ? 'mature' : 'preview') : 'insufficient_history',
     overlapPoints: points.length,
