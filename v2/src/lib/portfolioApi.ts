@@ -47,7 +47,7 @@ export type PositionSnapshot = {
 
 export type PortfolioSnapshot = {
   accountName: string
-  accountContext: AccountContext
+  accountContext?: AccountContext
   value: number
   profit: number
   profitPct: number
