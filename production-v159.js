@@ -75,10 +75,56 @@ const assetHistoryCode=[
 core=core.replace(assetHistoryMarker,'\n'+assetHistoryCode+assetHistoryMarker);
 `;
 
-const bridge=`const assetHistoryBridge=${JSON.stringify(assetHistoryInjectedCode)};\n`;
-src=src.replace(marker,bridge+marker);
+const transactionMarkersInjectedCode=String.raw`
+const transactionMarkerRouteMarker="\napp.get('*', (req, res) => {";
+if(!core.includes(transactionMarkerRouteMarker))throw new Error('QVANIX v2: transaction marker route marker changed');
+const transactionMarkerRouteCode=[
+ "const qvanixTransactionMarkerCache={expiresAt:0,payload:null};",
+ "const qvanixTransactionMarkerTypes=new Set(['OPERATION_TYPE_BUY','OPERATION_TYPE_DELIVERY_BUY','OPERATION_TYPE_PRIMARY_ORDER','OPERATION_TYPE_SELL','OPERATION_TYPE_DELIVERY_SELL']);",
+ "app.get('/api/transaction-markers',async(req,res)=>{",
+ "  try{",
+ "    const now=Date.now();",
+ "    if(qvanixTransactionMarkerCache.payload&&qvanixTransactionMarkerCache.expiresAt>now){",
+ "      res.setHeader('Cache-Control','private, max-age=300');",
+ "      return res.json(qvanixTransactionMarkerCache.payload);",
+ "    }",
+ "    const accountsResponse=await getAccounts();",
+ "    const account=selectAccount(accountsResponse);",
+ "    if(!account?.id)return res.status(404).json({version:'1.0',available:false,markers:[],error:'No open account'});",
+ "    const operations=await getOperations(account.id);",
+ "    const markers=[];",
+ "    for(const op of Array.isArray(operations)?operations:[]){",
+ "      const type=String(op?.type||'').toUpperCase();",
+ "      const operationId=typeof op?.id==='string'&&op.id.trim()?op.id.trim():null;",
+ "      const date=typeof op?.date==='string'&&Number.isFinite(Date.parse(op.date))?new Date(op.date).toISOString():null;",
+ "      const figi=typeof op?.figi==='string'&&op.figi.trim()?op.figi.trim():null;",
+ "      const instrumentUid=typeof op?.instrumentUid==='string'&&op.instrumentUid.trim()?op.instrumentUid.trim():null;",
+ "      if(!qvanixTransactionMarkerTypes.has(type)||!operationId||!date||(!figi&&!instrumentUid))continue;",
+ "      const quantityDone=Number(op?.quantityDone||0);",
+ "      const quantity=Number.isFinite(quantityDone)&&quantityDone>0?quantityDone:Number(op?.quantity||0);",
+ "      markers.push({operationId,date,type,figi,instrumentUid,quantity:Number.isFinite(quantity)&&quantity>0?quantity:null,ticker:typeof op?.ticker==='string'&&op.ticker.trim()?op.ticker.trim():null});",
+ "    }",
+ "    markers.sort((a,b)=>a.date.localeCompare(b.date)||a.operationId.localeCompare(b.operationId));",
+ "    const payload={version:'1.0',available:true,markers,source:'T-Bank GetOperationsByCursor',asOf:new Date(now).toISOString(),identitySemantics:'broker_operation_id_snapshot_only',priceIncluded:false,cacheSeconds:900};",
+ "    qvanixTransactionMarkerCache.payload=payload;",
+ "    qvanixTransactionMarkerCache.expiresAt=now+900000;",
+ "    res.setHeader('Cache-Control','private, max-age=300');",
+ "    return res.json(payload);",
+ "  }catch(error){",
+ "    console.warn('QVANIX transaction markers failed:',error?.message||error);",
+ "    return res.status(502).json({version:'1.0',available:false,markers:[],error:'transaction markers unavailable'});",
+ "  }",
+ "});",
+ ""
+].join('\n');
+core=core.replace(transactionMarkerRouteMarker,'\n'+transactionMarkerRouteCode+transactionMarkerRouteMarker);
+`;
+
+const assetHistoryBridge=`const assetHistoryBridge=${JSON.stringify(assetHistoryInjectedCode)};\n`;
+const transactionMarkersBridge=`const transactionMarkersBridge=${JSON.stringify(transactionMarkersInjectedCode)};\n`;
+src=src.replace(marker,assetHistoryBridge+transactionMarkersBridge+marker);
 const oldCompose='src=src.replace(coreCompile,benchmarkBridge+bondMetaBridge+v2Bridge+coreCompile);';
-const newCompose='src=src.replace(coreCompile,benchmarkBridge+bondMetaBridge+assetHistoryBridge+v2Bridge+coreCompile);';
+const newCompose='src=src.replace(coreCompile,benchmarkBridge+bondMetaBridge+assetHistoryBridge+transactionMarkersBridge+v2Bridge+coreCompile);';
 if(!src.includes(oldCompose))throw new Error('v15.9: v15.8 bridge composition changed');
 src=src.replace(oldCompose,newCompose);
 
