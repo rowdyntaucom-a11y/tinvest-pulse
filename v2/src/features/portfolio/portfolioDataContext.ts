@@ -1,9 +1,12 @@
 import type { PortfolioSnapshot } from '../../lib/portfolioApi'
 
+export const PORTFOLIO_DATA_CONTEXT_CALC_VERSION = '1.1' as const
+
 export type PortfolioDataSource = 'DASHBOARD' | 'PORTFOLIO' | 'FALLBACK'
 export type TimestampState = 'REPORTED' | 'MISSING' | 'INVALID'
 
 export type PortfolioDataContext = {
+  calcVersion: typeof PORTFOLIO_DATA_CONTEXT_CALC_VERSION
   accountName: string | null
   source: PortfolioDataSource
   reportedAt: string | null
@@ -11,6 +14,7 @@ export type PortfolioDataContext = {
   ageMinutes: number | null
   history: {
     points: number
+    validDatePoints: number
     firstDate: string | null
     lastDate: string | null
   }
@@ -49,12 +53,20 @@ function parseReportedAt(value: string | null, nowMs: number) {
   }
 }
 
+function strictHistoryDate(value: unknown) {
+  const raw = String(value || '').slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null
+  const timestamp = Date.parse(`${raw}T00:00:00.000Z`)
+  if (!Number.isFinite(timestamp)) return null
+  return new Date(timestamp).toISOString().slice(0, 10) === raw ? raw : null
+}
+
 export function buildPortfolioDataContext(snapshot: PortfolioSnapshot, now: Date = new Date()): PortfolioDataContext {
   const nowMs = Number.isFinite(now.getTime()) ? now.getTime() : Date.now()
   const timestamp = parseReportedAt(snapshot.updatedAt, nowMs)
   const datedHistory = snapshot.history
-    .map(point => String(point.date || '').slice(0, 10))
-    .filter(Boolean)
+    .map(point => strictHistoryDate(point.date))
+    .filter((date): date is string => date != null)
     .sort((a, b) => a.localeCompare(b))
 
   let priced = 0
@@ -66,11 +78,13 @@ export function buildPortfolioDataContext(snapshot: PortfolioSnapshot, now: Date
   }
 
   return {
+    calcVersion: PORTFOLIO_DATA_CONTEXT_CALC_VERSION,
     accountName: normaliseAccountName(snapshot.accountName),
     source: sourceLabel(snapshot.source),
     ...timestamp,
     history: {
       points: snapshot.history.length,
+      validDatePoints: datedHistory.length,
       firstDate: datedHistory[0] ?? null,
       lastDate: datedHistory.at(-1) ?? null,
     },
