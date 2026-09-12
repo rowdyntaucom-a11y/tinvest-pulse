@@ -147,6 +147,19 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Status could not be queried because the Render connector requires a user-confirmed workspace and autonomous mode must not choose one implicitly.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 
+### 02:59 MSK autonomous pass — passive-income comparable periods
+- Added `v2/src/features/income/incomeComparables.ts` through PR #74 and squash-merged as `14ffbde94fe797fa09721212332c5bd95abef8b3`.
+- The comparison uses only realized `FACT` history already normalized by `incomeHistory`: latest observed year versus the exact same fully observed calendar months of the preceding year.
+- Partial or unobserved months are excluded rather than treated as zero. Fewer than 3 exact month pairs stays unavailable; 3–11 pairs is `PREVIEW`; 12 pairs is `MATURE`.
+- Current/prior net totals and coupon/dividend subtotals are exposed. Percentage change is withheld when the prior comparable total is zero, avoiding an undefined growth rate.
+- No short-history annualization, payout forecast, reinvestment assumption, goal date, personalized recommendation or LLM-derived financial number is introduced.
+- Quant methodology pass: checked exact-month pairing, zero-base behavior and maturity gates; comparable-period output is explicitly a realized historical diagnostic rather than payout-growth forecasting.
+- Code-quality pass: the module is pure TypeScript and type-only imports the existing history shape; GitHub `v2 build` workflow run #98 passed, including `tsc -b`, Vite build and `payouts-core.js` syntax check.
+- Mobile-UX pass: no rendering/layout change in this batch, so Samsung/Android density and no-duplication rules are unchanged.
+- Release pass: one new deterministic calculation module only; no backend/broker route, renderer, credential, legal/payment text or deployment configuration changed.
+- Render auto-deploy was not manually triggered. Deploy status could not be queried in this pass because the Render connector requires a user-confirmed workspace and autonomous mode must not choose one implicitly.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; deepen it only with validated live sample coverage and mobile density.
@@ -155,4 +168,5 @@ This log is maintained by autonomous development runs. Production changes must r
 - Portfolio data context is now compactly surfaced in the existing Portfolio shell; account type remains gated until the backend exposes a verified account-type field.
 - Broker P/L attribution remains clearly labelled current unrealized contribution; historical/TWR attribution stays gated on trustworthy per-position history.
 - Recovery diagnostics are deterministic but should remain out of the UI until the live sample gate is met.
+- Income now has exact-month realized comparable-period groundwork; surface it only as a compact drill-down when enough paired months exist, and keep goal progress gated until the user supplies an explicit target.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
