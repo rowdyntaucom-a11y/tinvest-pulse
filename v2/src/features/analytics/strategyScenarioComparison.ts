@@ -1,6 +1,6 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
-import { calculateAllocationDrift, type DriftResult, type StrategyConfig } from './drift'
-import { calculateRebalanceScenario } from './rebalanceScenarios'
+import { calculateAllocationDrift, type DriftResult, type StrategyConfig } from './drift.ts'
+import { calculateRebalanceScenario } from './rebalanceScenarios.ts'
 
 export type StrategyScenarioInput = {
   id: string
