@@ -25,6 +25,10 @@ function pattern(length: number) {
   return Array.from({ length }, (_, index) => index % 2 === 0 ? 0.01 : -0.005)
 }
 
+function repeating(length: number, values: number[]) {
+  return Array.from({ length }, (_, index) => values[index % values.length])
+}
+
 function close(actual: number | null, expected: number, tolerance = 1e-10) {
   assert.notEqual(actual, null)
   assert.ok(Math.abs((actual as number) - expected) <= tolerance, `expected ${expected}, got ${actual}`)
@@ -35,12 +39,15 @@ const short = calculateCurrentRiskContribution([
   makeSeries('B', pattern(59), 40),
 ], 125)
 assert.equal(short.calcVersion, CURRENT_RISK_CONTRIBUTION_CALC_VERSION)
-assert.equal(short.calcVersion, '1.0')
+assert.equal(short.calcVersion, '1.1')
 assert.equal(short.available, false)
 assert.equal(short.status, 'INSUFFICIENT_HISTORY')
 assert.equal(short.commonReturns, 59)
 assert.equal(short.assetCount, 2)
 close(short.coverageRatio, 0.8)
+assert.equal(short.diversificationRatio, null)
+assert.equal(short.effectiveCapitalCount, null)
+assert.equal(short.effectiveRiskContributorCount, null)
 
 const preview = calculateCurrentRiskContribution([
   makeSeries('A', pattern(60), 60),
@@ -60,6 +67,12 @@ assert.ok((preview.annualizedVolatility ?? 0) > 0)
 close(preview.coveredValue, 100)
 close(preview.totalPortfolioValue, 125)
 close(preview.coverageRatio, 0.8)
+close(preview.diversificationRatio, 1)
+close(preview.capitalHhi, 0.52)
+close(preview.effectiveCapitalCount, 1 / 0.52)
+close(preview.riskMagnitudeHhi, 0.52)
+close(preview.effectiveRiskContributorCount, 1 / 0.52)
+close(preview.topAbsoluteRiskShare, 0.6)
 
 const mature = calculateCurrentRiskContribution([
   makeSeries('A', pattern(252), 75),
@@ -72,6 +85,36 @@ assert.equal(mature.matureReturns, 252)
 close(mature.rows[0].riskContributionShare, 0.75)
 close(mature.rows[1].riskContributionShare, 0.25)
 close(mature.coverageRatio, 1)
+close(mature.capitalHhi, 0.625)
+close(mature.riskMagnitudeHhi, 0.625)
+close(mature.effectiveCapitalCount, 1.6)
+close(mature.effectiveRiskContributorCount, 1.6)
+
+const diversified = calculateCurrentRiskContribution([
+  makeSeries('A', repeating(60, [0.01, -0.01, 0.01, -0.01]), 50),
+  makeSeries('B', repeating(60, [0.01, 0.01, -0.01, -0.01]), 50),
+], 100)
+assert.equal(diversified.available, true)
+close(diversified.diversificationRatio, Math.SQRT2, 1e-8)
+close(diversified.effectiveCapitalCount, 2)
+close(diversified.effectiveRiskContributorCount, 2)
+close(diversified.topAbsoluteRiskShare, 0.5)
+
+const offsetting = calculateCurrentRiskContribution([
+  makeSeries('LONG_A', repeating(60, [0.01, -0.01]), 80),
+  makeSeries('OFFSET_B', repeating(60, [-0.005, 0.005]), 20),
+], 100)
+assert.equal(offsetting.available, true)
+close(offsetting.rows[0].riskContributionShare, 8 / 7, 1e-8)
+close(offsetting.rows[1].riskContributionShare, -1 / 7, 1e-8)
+close(offsetting.rows.reduce((sum, row) => sum + (row.riskContributionShare ?? 0), 0), 1, 1e-8)
+close(offsetting.diversificationRatio, 9 / 7, 1e-8)
+close(offsetting.capitalHhi, 0.68)
+close(offsetting.effectiveCapitalCount, 25 / 17, 1e-8)
+close(offsetting.riskMagnitudeHhi, 65 / 81, 1e-8)
+close(offsetting.effectiveRiskContributorCount, 81 / 65, 1e-8)
+close(offsetting.topAbsoluteRiskShare, 8 / 9, 1e-8)
+assert.match(offsetting.note, /absolute contribution magnitudes/)
 
 const duplicate = calculateCurrentRiskContribution([
   makeSeries('DUP', pattern(60), 50),
@@ -79,6 +122,7 @@ const duplicate = calculateCurrentRiskContribution([
 ], 100)
 assert.equal(duplicate.available, false)
 assert.match(duplicate.reason ?? '', /Duplicate series keys/)
+assert.equal(duplicate.diversificationRatio, null)
 
 const flat = calculateCurrentRiskContribution([
   makeSeries('FLAT_A', new Array(60).fill(0), 60),
@@ -88,6 +132,7 @@ assert.equal(flat.available, false)
 close(flat.annualizedVolatility, 0)
 assert.equal(flat.rows.length, 0)
 assert.equal(flat.topAbsoluteContributor, null)
+assert.equal(flat.effectiveRiskContributorCount, null)
 
 const invalidValues = calculateCurrentRiskContribution([
   makeSeries('GOOD', pattern(60), 100),
@@ -98,5 +143,6 @@ assert.equal(invalidValues.available, false)
 assert.equal(invalidValues.assetCount, 1)
 close(invalidValues.coveredValue, 100)
 close(invalidValues.coverageRatio, 1)
+assert.equal(invalidValues.capitalHhi, null)
 
 console.log('current risk contribution regression: ok')
