@@ -21,6 +21,8 @@ export type BondMetadata = {
 }
 
 export type PositionSnapshot = {
+  figi: string | null
+  instrumentUid: string | null
   ticker: string
   name: string
   instrumentType: string
@@ -77,6 +79,12 @@ const nullableNumber = (value: unknown): number | null => {
 const nullableBoolean = (value: unknown): boolean | null => {
   if (typeof value === 'boolean') return value
   return null
+}
+
+const nullableString = (value: unknown): string | null => {
+  if (value == null) return null
+  const parsed = String(value).trim()
+  return parsed ? parsed : null
 }
 
 const ratioToPercent = (value: unknown): number => {
@@ -147,6 +155,8 @@ const normalisePositions = (rawPositions: unknown, portfolioValue: number): Posi
     const currentValue = n(row.currentValue) || quantity * currentPrice
     const costBasis = averagePrice > 0 && quantity > 0 ? averagePrice * quantity : 0
     return {
+      figi: nullableString(row.figi),
+      instrumentUid: nullableString(row.instrumentUid),
       ticker: String(row.ticker || row.figi || row.instrumentUid || '—'),
       name: String(row.name || row.ticker || row.figi || 'Актив'),
       instrumentType: String(row.instrumentType || row.type || ''),
