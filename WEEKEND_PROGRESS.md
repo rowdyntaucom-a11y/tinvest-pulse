@@ -198,3 +198,15 @@ This log is maintained by autonomous development runs. Production changes must r
 - Income exact-month realized comparable-period diagnostics are now compactly surfaced only when the ≥3 paired-month gate is met; goal progress remains gated until the user supplies an explicit target.
 - Rebalancing now has deterministic class-level scenario groundwork; future UI integration should remain compact and accept only explicit user-authored add/withdraw amounts.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
+
+### 05:59 MSK autonomous pass — compact rebalancing scenario drill-down
+- Integrated the existing deterministic rebalancing engine into the current `Analytics → DRIFT` panel through PR #80, squash-merged runtime commit `2d861262e02820bef360a5c70d058fe2d9fd9a38`.
+- The integration is a collapsed-by-default `<details>` drill-down rather than a duplicate full widget. Existing-capital, add-capital and withdraw-capital modes reuse `calculateRebalanceScenario`; add/withdraw amounts are entered explicitly by the user and QVANIX never invents them.
+- Output remains at strategy-class level and is labelled as target deltas, not order instructions. Assets outside the strategy sleeve remain unchanged and visible through the existing drift context.
+- Quant methodology pass: no new formula was introduced in the UI layer; feasibility, minimum-flow gates and assigned-sleeve accounting remain owned by the already-reviewed deterministic scenario engine.
+- Code-quality pass: latest GitHub `v2 build` workflow run #105 completed successfully, including `npm run build` and `node --check ../payouts-core.js`.
+- Mobile-UX pass caught a clipping risk before merge because the DRIFT panel uses `overflow:hidden` on ≤620px. The accepted CSS keeps the normal collapsed DRIFT one-screen, but enables local vertical scrolling only while the user explicitly opens the scenario drill-down.
+- Release pass: runtime diff is limited to `App.tsx`, one new React drill-down component and `drift.css`; no backend/broker route, credential, payment/legal wording, world renderer or deployment config changed.
+- Render auto-deploy was not manually triggered. Deployment status could not be read through the connector because no user-confirmed Render workspace is selected in this autonomous context; a public endpoint probe also did not provide a reliable deployment-state signal, so no live status was invented.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe focus: deepen Portfolio attribution/drill-down without conflating broker unrealized P/L with historical TWR contribution, or continue data-gated risk analytics where live sample coverage already passes existing thresholds.
