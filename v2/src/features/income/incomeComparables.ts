@@ -1,8 +1,11 @@
 import type { IncomeHistoryMonth } from './incomeHistory'
 
+export const INCOME_COMPARABLES_CALC_VERSION = '1.1' as const
+
 export type IncomeComparableKind = 'COUPON' | 'DIVIDEND' | 'OTHER' | 'TOTAL'
 
 export type IncomeComparablePeriod = {
+  calcVersion: typeof INCOME_COMPARABLES_CALC_VERSION
   available: boolean
   status: 'INSUFFICIENT' | 'PREVIEW' | 'MATURE'
   currentYear: number | null
@@ -47,6 +50,7 @@ const addMonth = (bucket: ComparableBucket, month: IncomeHistoryMonth) => {
 }
 
 const emptyResult = (note: string, currentYear: number | null = null): IncomeComparablePeriod => ({
+  calcVersion: INCOME_COMPARABLES_CALC_VERSION,
   available: false,
   status: 'INSUFFICIENT',
   currentYear,
@@ -83,6 +87,14 @@ export function calculateIncomeComparablePeriod(months: IncomeHistoryMonth[]): I
   if (!latest) return emptyResult('Comparable income is unavailable until complete observed calendar months exist.')
 
   const currentYear = latest.parsed.year
+  const seen = new Set<string>()
+  for (const item of complete) {
+    if (seen.has(item.month.key)) {
+      return emptyResult('Comparable income is unavailable because duplicate complete calendar months were supplied.', currentYear)
+    }
+    seen.add(item.month.key)
+  }
+
   const previousYear = currentYear - 1
   const byYearMonth = new Map<string, IncomeHistoryMonth>()
   for (const item of complete) byYearMonth.set(`${item.parsed.year}-${String(item.parsed.month).padStart(2, '0')}`, item.month)
@@ -118,6 +130,7 @@ export function calculateIncomeComparablePeriod(months: IncomeHistoryMonth[]): I
   const status = pairedMonths.length === 12 ? 'MATURE' : 'PREVIEW'
 
   return {
+    calcVersion: INCOME_COMPARABLES_CALC_VERSION,
     available: true,
     status,
     currentYear,
