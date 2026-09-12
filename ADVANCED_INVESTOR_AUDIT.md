@@ -16,9 +16,9 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Compact data context: source, reported timestamp age, price/cost-basis coverage and history coverage.
 - FIGI / instrument UID preserved in normalized position snapshots for deterministic cross-feature matching.
 - Verified account context from the existing read-only accounts boundary: account type, status, open date and access level, matched to the dashboard account ID and cached client-side; missing context fails closed.
+- Date-only BUY/SELL transaction markers on portfolio history from verified broker operation ID/timestamp/type/instrument identity. Markers sit on the chart baseline rather than a reconstructed execution-price coordinate, aggregate same-day activity and cap visible event days for mobile density.
 
 ### ACTIVE / next depth pass
-- Transaction markers on history charts only where operation type/date/instrument identity is reliable enough to avoid misleading reconstruction.
 - Better compact movers / largest exposures presentation only if it adds information beyond existing P/L sorting and Analytics concentration.
 - Income contribution inside position drill-down only where payout-to-position linkage is unambiguous.
 
@@ -85,13 +85,14 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Coupon vs dividend realized split.
 - Compact explicit annual net-income goal input; progress opens only after a complete realized 12-month calendar year.
 - Asset and month drill-down already present; category split is represented by coupon/dividend/other fact history.
+- Bond → Income schedule linkage reuses the existing 12M coupon events and matches current bonds by FIGI only. It reports linkage/value coverage without creating a second payout stream; the pure boundary rejects FACT events so scheduled and realized income cannot be folded together by a future mixed caller.
 
 ### ACTIVE / next depth pass
 - Upcoming-payment risk/status labels only when an official source exposes a defensible status field.
 - Deeper goal scenarios only if every reinvestment/contribution/return assumption is explicit and testable.
-- Verified linkage from bond cash-flow analytics to Income only where coupon/payment identity can be reused without double-counting already scheduled or realized events.
 
 ### GATED
+- Exact realized-operation ↔ scheduled-coupon reconciliation until a shared verified coupon-event identity exists end-to-end.
 - Payout growth: require two comparable realized annual periods; no annualization of short history.
 - Dividend reliability score: only after a defensible deterministic issuer-data model exists.
 - Ex-dividend calendar: only from a reliable official/market source.
@@ -109,11 +110,10 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Nominal currency split.
 - Country-of-risk and sector concentration with metadata coverage and effective-category count.
 - Verified issuer concentration using bond asset UID → T-Bank AssetFull brand UID/name. Grouping is strictly by UID; issuer name is display-only, missing UID stays outside coverage, and asset→brand metadata is cached server-side.
-
-### ACTIVE / next depth pass
-- Explicit bond cash-flow linkage to Income without double-counting coupons already present in the payout schedule.
+- Explicit Bond → Income 12M coupon-schedule linkage by FIGI, without creating new payout events or adding forecast to FACT; linkage coverage is exposed separately.
 
 ### GATED
+- Exact received-coupon ↔ scheduled-coupon reconciliation until common event identity is available across broker operations and schedule data.
 - Duration / YTM / yield-to-call metrics until source/price/nominal semantics and amortization treatment are verified end-to-end.
 - Price-shock stress from yield-bp moves until duration semantics are verified.
 
@@ -194,12 +194,11 @@ A tab is not 'done' because it has no empty pixels. It is done only when:
 6. Mobile remains usable on the primary Samsung/Android target.
 7. No placeholder, fake forecast or decorative-only analytics is presented as fact.
 
-## Immediate build queue — refreshed 2026-09-12
-1. Audit transaction-marker reliability and add markers only if operation type/date/instrument identity can be represented without clutter or false precision.
-2. Close bond→Income cash-flow linkage only where the same event identity can prevent duplicate scheduled/realized coupon counting.
-3. Keep Income growth / goal-date forecasting gated; deepen only with explicit user assumptions and full comparable history.
-4. Continue data-quality/live validation and Samsung/mobile density review for advanced drill-downs, including issuer coverage and Allocation Lab.
-5. Mature additional Pro/Terminal calculation boundaries before creating a separate shell; do not add a new top-level mode just to expose one metric.
-6. Review npm moderate vulnerabilities deliberately; never apply blind `npm audit fix`.
-7. Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
-8. Resume Living World implementation only after the financial core and the items above reach the agreed quality bar.
+## Immediate build queue — refreshed 2026-09-12 12:02 MSK
+1. Keep exact realized coupon ↔ scheduled-coupon reconciliation gated until a shared verified event identity exists; do not infer it from ticker/date/amount proximity.
+2. Continue data-quality/live validation and Samsung/mobile density review for advanced drill-downs, including issuer coverage, Allocation Lab and the transaction-marker event-day cap.
+3. Review npm moderate vulnerabilities deliberately; never apply blind `npm audit fix`.
+4. Mature additional Pro/Terminal calculation boundaries before creating a separate shell; do not add a new top-level mode just to expose one metric.
+5. Keep Income growth / goal-date forecasting gated; deepen only with explicit user assumptions and full comparable history.
+6. Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
+7. Resume Living World implementation only after the financial core and the items above reach the agreed quality bar.
