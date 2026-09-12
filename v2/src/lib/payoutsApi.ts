@@ -1,3 +1,5 @@
+export const PAYOUTS_NORMALIZATION_VERSION = '1.0' as const
+
 export type PayoutKind = 'COUPON' | 'DIVIDEND' | 'INCOME'
 
 export type PayoutEvent = {
@@ -116,14 +118,167 @@ const emptyCalendar = (): PayoutCalendar => ({
   note: null,
 })
 
-const n = (value: unknown) => {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : 0
+const finiteNumber = (value: unknown): number | null => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value === 'string') {
+    const normalized = value.replace(/\s/g, '').replace(',', '.')
+    if (!normalized) return null
+    const parsed = Number(normalized)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  if (value && typeof value === 'object') {
+    const row = value as Record<string, unknown>
+    if ('units' in row) {
+      const units = finiteNumber(row.units)
+      const nano = row.nano == null ? 0 : finiteNumber(row.nano)
+      if (units == null || nano == null) return null
+      const parsed = units + nano / 1e9
+      return Number.isFinite(parsed) ? parsed : null
+    }
+    if ('value' in row) return finiteNumber(row.value)
+  }
+  return null
+}
+
+const numberOrZero = (value: unknown) => finiteNumber(value) ?? 0
+
+const nonNegativeInteger = (value: unknown) => {
+  const parsed = finiteNumber(value)
+  return parsed != null && parsed >= 0 && Number.isInteger(parsed) ? parsed : 0
+}
+
+const positiveIntegerOrNull = (value: unknown) => {
+  const parsed = finiteNumber(value)
+  return parsed != null && parsed > 0 && Number.isInteger(parsed) ? parsed : null
+}
+
+const ratio01 = (value: unknown, fallback = 0) => {
+  const parsed = finiteNumber(value)
+  return parsed != null && parsed >= 0 && parsed <= 1 ? parsed : fallback
+}
+
+const text = (value: unknown) => {
+  if (value == null) return null
+  const parsed = String(value).trim()
+  return parsed || null
+}
+
+const dateOnly = (value: unknown) => {
+  const raw = text(value)
+  if (!raw) return null
+  const day = raw.slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null
+  const timestamp = Date.parse(`${day}T00:00:00.000Z`)
+  if (!Number.isFinite(timestamp)) return null
+  return new Date(timestamp).toISOString().slice(0, 10) === day ? day : null
+}
+
+const isoDate = (value: unknown) => {
+  const raw = text(value)
+  if (!raw || dateOnly(raw) == null) return null
+  const timestamp = Date.parse(raw)
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null
+}
+
+const monthKey = (value: unknown) => {
+  const raw = text(value)
+  if (!raw) return null
+  const key = raw.slice(0, 7)
+  if (!/^\d{4}-\d{2}$/.test(key)) return null
+  const month = Number(key.slice(5, 7))
+  return month >= 1 && month <= 12 ? key : null
 }
 
 const monthKeys = (value: unknown) => {
   if (!Array.isArray(value)) return []
-  return [...new Set(value.map(item => String(item || '').slice(0, 7)).filter(key => /^\d{4}-\d{2}$/.test(key)))].sort()
+  return [...new Set(value.map(monthKey).filter((key): key is string => key != null))].sort()
+}
+
+const optionalNumber = (value: unknown) => {
+  const parsed = finiteNumber(value)
+  return parsed == null ? undefined : parsed
+}
+
+const nullableNumber = (value: unknown) => finiteNumber(value)
+
+const normalizeEvent = (value: unknown): PayoutEvent | null => {
+  if (!value || typeof value !== 'object') return null
+  const row = value as Record<string, unknown>
+  const date = isoDate(row.date)
+  if (!date) return null
+
+  const ticker = text(row.ticker)
+  const name = text(row.name)
+  const currency = text(row.currency)
+  const confidence = text(row.confidence)
+  const source = text(row.source)
+  const status = text(row.status)
+
+  return {
+    kind: text(row.kind)?.toUpperCase() || '',
+    ticker: ticker || name || '—',
+    name: name || ticker || '—',
+    figi: text(row.figi),
+    instrumentUid: text(row.instrumentUid),
+    couponNumber: positiveIntegerOrNull(row.couponNumber),
+    scheduleId: text(row.scheduleId),
+    date,
+    recordDate: isoDate(row.recordDate),
+    lastBuyDate: isoDate(row.lastBuyDate),
+    quantity: optionalNumber(row.quantity),
+    perSecurity: optionalNumber(row.perSecurity),
+    currency: currency?.toUpperCase(),
+    gross: nullableNumber(row.gross),
+    tax: nullableNumber(row.tax),
+    net: nullableNumber(row.net),
+    confidence: confidence?.toUpperCase(),
+    source: source || undefined,
+    status: status?.toUpperCase(),
+    days: optionalNumber(row.days),
+  }
+}
+
+const normalizeEvents = (value: unknown) => Array.isArray(value)
+  ? value.map(normalizeEvent).filter((event): event is PayoutEvent => event != null)
+  : []
+
+const normalizeMonth = (value: unknown): PayoutMonth | null => {
+  if (!value || typeof value !== 'object') return null
+  const row = value as Record<string, unknown>
+  const fromKey = monthKey(row.key)
+  const year = finiteNumber(row.year)
+  const month = finiteNumber(row.month)
+  const fromParts = Number.isInteger(year) && Number.isInteger(month) && (month as number) >= 1 && (month as number) <= 12
+    ? `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}`
+    : null
+  const key = fromKey || fromParts
+  if (!key) return null
+
+  return {
+    key,
+    year: Number(key.slice(0, 4)),
+    month: Number(key.slice(5, 7)),
+    gross: numberOrZero(row.gross),
+    tax: numberOrZero(row.tax),
+    net: numberOrZero(row.net),
+    count: nonNegativeInteger(row.count),
+    items: normalizeEvents(row.items),
+  }
+}
+
+const normalizeMonths = (value: unknown) => Array.isArray(value)
+  ? value.map(normalizeMonth).filter((month): month is PayoutMonth => month != null).sort((a, b) => a.key.localeCompare(b.key))
+  : []
+
+const normalizeErrors = (value: unknown) => {
+  if (!Array.isArray(value)) return []
+  return value.flatMap(item => {
+    if (!item || typeof item !== 'object') return []
+    const row = item as Record<string, unknown>
+    const ticker = text(row.ticker)
+    const error = text(row.error)
+    return ticker || error ? [{ ...(ticker ? { ticker } : {}), ...(error ? { error } : {}) }] : []
+  })
 }
 
 export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
@@ -137,59 +292,61 @@ export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
     const coverage = raw.coverage ?? {}
     const identity = raw.identity ?? {}
     const integrity = raw.integrity ?? {}
+    const observationAvailable = observation.available === true
+
     return {
       available: raw.available !== false,
-      version: raw.version ? String(raw.version) : undefined,
-      generatedAt: raw.generatedAt ? String(raw.generatedAt) : null,
+      version: text(raw.version) ?? undefined,
+      generatedAt: isoDate(raw.generatedAt),
       period: {
-        from: raw.period?.from ? String(raw.period.from) : null,
-        to: raw.period?.to ? String(raw.period.to) : null,
+        from: isoDate(raw.period?.from),
+        to: isoDate(raw.period?.to),
       },
-      basis: raw.basis ? String(raw.basis) : null,
-      displayBasis: raw.displayBasis ? String(raw.displayBasis) : null,
+      basis: text(raw.basis),
+      displayBasis: text(raw.displayBasis),
       actual: {
-        year: actual.year == null ? null : n(actual.year),
-        items: Array.isArray(actual.items) ? actual.items : [],
-        totalNet: n(actual.totalNet),
-        count: n(actual.count),
+        year: positiveIntegerOrNull(actual.year),
+        items: normalizeEvents(actual.items),
+        totalNet: numberOrZero(actual.totalNet),
+        count: nonNegativeInteger(actual.count),
         observation: {
-          available: Boolean(observation.available),
-          from: observation.from ? String(observation.from) : null,
-          to: observation.to ? String(observation.to) : null,
-          completeMonths: monthKeys(observation.completeMonths),
-          partialMonths: monthKeys(observation.partialMonths),
-          basis: observation.basis ? String(observation.basis) : null,
+          available: observationAvailable,
+          from: observationAvailable ? isoDate(observation.from) : null,
+          to: observationAvailable ? isoDate(observation.to) : null,
+          completeMonths: observationAvailable ? monthKeys(observation.completeMonths) : [],
+          partialMonths: observationAvailable ? monthKeys(observation.partialMonths) : [],
+          basis: text(observation.basis),
         },
       },
       forecast: {
-        gross: n(forecast.gross),
-        tax: n(forecast.tax),
-        net: n(forecast.net),
-        count: n(forecast.count),
+        gross: numberOrZero(forecast.gross),
+        tax: numberOrZero(forecast.tax),
+        net: numberOrZero(forecast.net),
+        count: nonNegativeInteger(forecast.count),
       },
-      next: raw.next ?? null,
-      months: Array.isArray(raw.months) ? raw.months : [],
-      events: Array.isArray(raw.events) ? raw.events : [],
+      next: normalizeEvent(raw.next),
+      months: normalizeMonths(raw.months),
+      events: normalizeEvents(raw.events),
       coverage: {
-        eligibleAssets: n(coverage.eligibleAssets),
-        scheduledEvents: n(coverage.scheduledEvents),
-        resolvedAssets: n(coverage.resolvedAssets),
-        coverageRatio: n(coverage.coverageRatio),
-        errors: Array.isArray(coverage.errors) ? coverage.errors : [],
+        eligibleAssets: nonNegativeInteger(coverage.eligibleAssets),
+        scheduledEvents: nonNegativeInteger(coverage.scheduledEvents),
+        resolvedAssets: nonNegativeInteger(coverage.resolvedAssets),
+        coverageRatio: ratio01(coverage.coverageRatio),
+        errors: normalizeErrors(coverage.errors),
       },
       identity: {
-        couponScheduleEvents: n(identity.couponScheduleEvents),
-        couponScheduleIdentified: n(identity.couponScheduleIdentified),
-        couponScheduleCoverage: n(identity.couponScheduleCoverage),
-        basis: identity.basis ? String(identity.basis) : null,
+        couponScheduleEvents: nonNegativeInteger(identity.couponScheduleEvents),
+        couponScheduleIdentified: nonNegativeInteger(identity.couponScheduleIdentified),
+        couponScheduleCoverage: ratio01(identity.couponScheduleCoverage),
+        basis: text(identity.basis),
       },
       integrity: {
-        complete: Boolean(integrity.complete),
-        minimumCoverage: n(integrity.minimumCoverage) || .95,
+        complete: integrity.complete === true,
+        minimumCoverage: ratio01(integrity.minimumCoverage, .95),
       },
-      stale: Boolean(raw.stale),
-      warning: raw.warning ? String(raw.warning) : null,
-      note: raw.note ? String(raw.note) : null,
+      stale: raw.stale === true,
+      warning: text(raw.warning),
+      note: text(raw.note),
     }
   } catch {
     return emptyCalendar()
