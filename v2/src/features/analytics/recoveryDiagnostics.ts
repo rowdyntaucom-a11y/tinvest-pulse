@@ -1,6 +1,6 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
-export const RECOVERY_DIAGNOSTICS_CALC_VERSION = '1.0' as const
+export const RECOVERY_DIAGNOSTICS_CALC_VERSION = '1.1' as const
 
 export type DrawdownRecoveryQuality = 'SHORT' | 'DEVELOPING' | 'MATURE'
 
@@ -41,22 +41,42 @@ const MIN_RETURNS = 60
 const MATURE_RETURNS = 252
 const DAY_MS = 86_400_000
 
+function canonicalDay(value: unknown) {
+  const raw = String(value || '').trim()
+  if (!raw) return null
+  const day = raw.slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null
+  const timestamp = Date.parse(`${day}T00:00:00.000Z`)
+  if (!Number.isFinite(timestamp)) return null
+  return new Date(timestamp).toISOString().slice(0, 10) === day ? day : null
+}
+
 function validIndex(history: AnalyticsHistoryPoint[]) {
-  return history
-    .map(point => ({ date: String(point.date || ''), value: point.portfolio }))
-    .filter((point): point is { date: string; value: number } => {
-      return Boolean(point.date)
-        && typeof point.value === 'number'
-        && Number.isFinite(point.value)
-        && point.value > 0
-        && Number.isFinite(Date.parse(point.date))
-    })
+  const byDate = new Map<string, number | null>()
+
+  for (const point of history) {
+    const date = canonicalDay(point.date)
+    const value = point.portfolio
+    if (!date || typeof value !== 'number' || !Number.isFinite(value) || value <= 0) continue
+
+    if (!byDate.has(date)) {
+      byDate.set(date, value)
+      continue
+    }
+
+    const existing = byDate.get(date)
+    if (existing != null && existing !== value) byDate.set(date, null)
+  }
+
+  return [...byDate.entries()]
+    .filter((entry): entry is [string, number] => entry[1] != null)
+    .map(([date, value]) => ({ date, value }))
     .sort((a, b) => a.date.localeCompare(b.date))
 }
 
 function daysBetween(start: string, end: string) {
-  const startMs = Date.parse(start)
-  const endMs = Date.parse(end)
+  const startMs = Date.parse(`${start}T00:00:00.000Z`)
+  const endMs = Date.parse(`${end}T00:00:00.000Z`)
   if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) return 0
   return Math.max(0, Math.round((endMs - startMs) / DAY_MS))
 }

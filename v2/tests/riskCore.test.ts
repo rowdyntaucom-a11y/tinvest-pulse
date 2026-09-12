@@ -83,7 +83,7 @@ assert.equal(recovery59.returnObservations, 59)
 const recoveryValues = [100, 90, 100, ...Array.from({ length: 57 }, () => 100), 95]
 const recoveryHistory = recoveryValues.map((portfolio, index) => ({ date: dateAt(index), portfolio, imoex: null }))
 const recovery = calculateRecoveryDiagnostics(recoveryHistory)
-assert.equal(recovery.calcVersion, '1.0')
+assert.equal(recovery.calcVersion, RECOVERY_DIAGNOSTICS_CALC_VERSION)
 assert.equal(recovery.available, true)
 assert.equal(recovery.quality, 'DEVELOPING')
 assert.equal(recovery.returnObservations, 60)
