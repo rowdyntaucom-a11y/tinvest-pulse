@@ -1,3 +1,5 @@
+export const STRESS_CALC_VERSION = '1.1' as const
+
 export type StressExposure = {
   key: string
   label: string
@@ -24,6 +26,7 @@ export type StressRow = {
 }
 
 export type StressResult = {
+  calcVersion: typeof STRESS_CALC_VERSION
   available: boolean
   scenarioId: string
   scenarioLabel: string
@@ -39,12 +42,17 @@ export type StressResult = {
   note: string
 }
 
+function validShock(value: unknown): number | null {
+  const shock = Number(value)
+  if (!Number.isFinite(shock)) return null
+  return shock >= -1 ? shock : null
+}
+
 export function calculateStressScenario(exposures: StressExposure[], scenario: StressScenario): StressResult {
   const rows = exposures
     .filter(exposure => Number.isFinite(exposure.currentValue) && exposure.currentValue > 0)
     .map(exposure => {
-      const rawShock = scenario.shocks[exposure.classKey]
-      const shock = Number.isFinite(rawShock) ? rawShock : null
+      const shock = validShock(scenario.shocks[exposure.classKey])
       const shockedValue = shock == null ? null : exposure.currentValue * (1 + shock)
       return {
         ...exposure,
@@ -62,6 +70,7 @@ export function calculateStressScenario(exposures: StressExposure[], scenario: S
   const coverageRatio = currentValue > 0 ? coveredValue / currentValue : 0
 
   return {
+    calcVersion: STRESS_CALC_VERSION,
     available: coveredRows.length > 0,
     scenarioId: scenario.id,
     scenarioLabel: scenario.label,
@@ -75,7 +84,7 @@ export function calculateStressScenario(exposures: StressExposure[], scenario: S
     pnlCoveredPct: pnlCovered == null || coveredValue <= 0 ? null : pnlCovered / coveredValue,
     rows,
     note: coveredRows.length
-      ? `Сценарий применён только к классам с явным shock-return. Покрытие ${(coverageRatio * 100).toFixed(1)}%. Непокрытые активы не получают выдуманный шок.`
-      : 'Нет ни одного класса активов с заданным shock-return; результат не рассчитывается.',
+      ? `Сценарий применён только к классам с явным валидным shock-return. Покрытие ${(coverageRatio * 100).toFixed(1)}%. Непокрытые или некорректные классы не получают выдуманный шок.`
+      : 'Нет ни одного класса активов с валидным shock-return; результат не рассчитывается.',
   }
 }
