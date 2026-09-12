@@ -16,11 +16,13 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Compact data context: source, reported timestamp age, price/cost-basis coverage and history coverage.
 - FIGI / instrument UID preserved in normalized position snapshots for deterministic cross-feature matching.
 - Verified account context from the existing read-only accounts boundary: account type, status, open date and access level, matched to the dashboard account ID and cached client-side; missing context fails closed.
-- Date-only BUY/SELL transaction markers on portfolio history from verified broker operation ID/timestamp/type/instrument identity. Markers sit on the chart baseline rather than a reconstructed execution-price coordinate, aggregate same-day activity and cap visible event days for mobile density.
+- Date-only BUY/SELL transaction markers on portfolio history from verified broker operation ID/timestamp/type/instrument identity. Markers sit on the chart baseline rather than a reconstructed execution-price coordinate, aggregate same-day activity and cap visible event days for mobile density. The capped presentation samples the full available event-day span rather than only the newest days.
+- Exact-FIGI passive-income contribution inside the existing position inspector: realized FACT net and future 12M schedule gross remain separate bases; the observed FACT window is shown when broker observation boundaries are available.
+- Deterministic Top-N exposure diagnostics are order-independent and expose the actual position identities/weights behind the concentration figure; class weights separately expose their `positionItems` denominator and live-capital coverage.
 
 ### ACTIVE / next depth pass
-- Better compact movers / largest exposures presentation only if it adds information beyond existing P/L sorting and Analytics concentration.
-- Income contribution inside position drill-down only where payout-to-position linkage is unambiguous.
+- Further compact movers presentation only if it adds information beyond existing P/L sorting, deterministic Top-N exposure and Analytics concentration.
+- Continue live/mobile validation of the current position inspector and structure screen rather than adding duplicate Portfolio widgets.
 
 ### GATED
 - Historical/TWR contribution by position until trustworthy position-level return history and external-flow treatment exist.
@@ -55,9 +57,10 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Drawdown recovery diagnostics with completed-vs-active episode separation and short-history gate.
 - Risk-only allocation calculation boundary: equal weight, long-only minimum variance and equal-risk-contribution on one common real-return sample; no expected-return assumptions.
 - Compact collapsed Allocation Lab inside CORR reusing the same asset-history sample; 60-return gate, 252-return maturity state and solver convergence remain explicit. It is scenario diagnostics, not a target portfolio recommendation.
+- Deterministic strategy-scenario comparison boundary for 2–4 explicit user-authored equity/bond strategies. Invalid weights fail closed; QVANIX does not generate candidates, normalize invalid inputs, rank a winner or attach expected returns.
 
 ### ACTIVE / next depth pass
-- Side-by-side deterministic strategy scenario comparison beyond the current rebalancing modes, only when inputs are explicit and methodology is distinct.
+- Expose strategy-scenario comparison in the shell only when explicit user-authored inputs can fit the existing DRIFT information architecture without creating another default-mobile screen.
 - Compact Pro/Terminal information architecture once enough advanced modules justify a separate mode; do not overload the default mobile shell.
 - Further correlation/stress depth only from validated live coverage and versioned sourced scenarios.
 
@@ -86,6 +89,7 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Compact explicit annual net-income goal input; progress opens only after a complete realized 12-month calendar year.
 - Asset and month drill-down already present; category split is represented by coupon/dividend/other fact history.
 - Bond → Income schedule linkage reuses the existing 12M coupon events and matches current bonds by FIGI only. It reports linkage/value coverage without creating a second payout stream; the pure boundary rejects FACT events so scheduled and realized income cannot be folded together by a future mixed caller.
+- Mobile Sources/Goal drill-down readability pass: the normal one-screen shell remains compact, while the explicitly opened Goal detail may use local scrolling rather than forcing sub-5px methodology/input text.
 
 ### ACTIVE / next depth pass
 - Upcoming-payment risk/status labels only when an official source exposes a defensible status field.
@@ -111,6 +115,7 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Country-of-risk and sector concentration with metadata coverage and effective-category count.
 - Verified issuer concentration using bond asset UID → T-Bank AssetFull brand UID/name. Grouping is strictly by UID; issuer name is display-only, missing UID stays outside coverage, and asset→brand metadata is cached server-side.
 - Explicit Bond → Income 12M coupon-schedule linkage by FIGI, without creating new payout events or adding forecast to FACT; linkage coverage is exposed separately.
+- Partial issuer/sector/country metadata coverage is explicitly labelled and cannot masquerade as complete coverage; top-category shares and effective counts remain statistics of the covered subset only.
 
 ### GATED
 - Exact received-coupon ↔ scheduled-coupon reconciliation until common event identity is available across broker operations and schedule data.
@@ -133,6 +138,7 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Storage-agnostic XP persistence boundary that fails closed on invalid/corrupt payloads.
 - Compact world-state boundary separated from Pixi rendering.
 - Render-neutral XP-to-world-event adapter with stable IDs and no XP-amount-to-visual-intensity inference.
+- Pixi/DNA is dynamically loaded only when the DNA view mounts; build budgets separately guard first-load JS and the deferred DNA renderer chunk.
 
 ### DEFERRED UNTIL FINANCIAL CORE IS STRONGER
 - The Living World specification remains preserved, including two-layer weather, hysteresis, Chronicle/scars, first sunrise, progressive HUD and performance/accessibility rules.
@@ -150,6 +156,7 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Correlation/stress primitives and live correlation mode.
 - Risk-only allocation diagnostics: equal weight, long-only minimum variance, equal-risk-contribution.
 - Allocation Lab is exposed as an opt-in collapsed drill-down rather than a new default-mobile tab.
+- Current-risk contribution depth exposes market-history coverage, diversification ratio and effective risk-contributor count on the common return sample.
 
 ### ACTIVE / next
 - Define a separate Pro/Terminal shell only when it can host several real modules without crowding the default Portfolio/Analytics/Income/DNA mobile navigation.
@@ -193,11 +200,12 @@ A tab is not 'done' because it has no empty pixels. It is done only when:
 5. Every non-obvious metric exposes methodology, source and sample-quality state.
 6. Mobile remains usable on the primary Samsung/Android target.
 7. No placeholder, fake forecast or decorative-only analytics is presented as fact.
+8. First-load code stays inside an explicit CI bundle budget; heavy DNA/Pixi code remains deferred and separately budgeted.
 
-## Immediate build queue — refreshed 2026-09-12 12:02 MSK
+## Immediate build queue — refreshed 2026-09-12 23:17 MSK
 1. Keep exact realized coupon ↔ scheduled-coupon reconciliation gated until a shared verified event identity exists; do not infer it from ticker/date/amount proximity.
-2. Continue data-quality/live validation and Samsung/mobile density review for advanced drill-downs, including issuer coverage, Allocation Lab and the transaction-marker event-day cap.
-3. Review npm moderate vulnerabilities deliberately; never apply blind `npm audit fix`.
+2. Continue Samsung/mobile live validation of accepted drill-downs. Issuer coverage, transaction-marker full-span density, Allocation Lab readability and Income Sources/Goal legibility have dedicated passes; only change additional screens when a real density/readability problem is identified.
+3. Maintain the reproducible dependency/build baseline: committed lockfile, `npm ci`, dependency-security gates and first-load/deferred-DNA bundle budgets. Investigate future advisories deliberately; never apply blind `npm audit fix`.
 4. Mature additional Pro/Terminal calculation boundaries before creating a separate shell; do not add a new top-level mode just to expose one metric.
 5. Keep Income growth / goal-date forecasting gated; deepen only with explicit user assumptions and full comparable history.
 6. Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
