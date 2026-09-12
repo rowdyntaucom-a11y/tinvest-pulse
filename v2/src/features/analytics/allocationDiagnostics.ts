@@ -1,5 +1,7 @@
 import type { RiskSeries } from './riskMatrix'
 
+export const ALLOCATION_DIAGNOSTICS_CALC_VERSION = '1.1' as const
+
 export type AllocationWeight = {
   key: string
   label: string
@@ -19,7 +21,7 @@ export type AllocationScenario = {
 }
 
 export type AllocationDiagnosticsResult = {
-  version: '1.0'
+  version: typeof ALLOCATION_DIAGNOSTICS_CALC_VERSION
   available: boolean
   status: 'INSUFFICIENT_HISTORY' | 'PREVIEW' | 'MATURE'
   commonReturns: number
@@ -104,7 +106,8 @@ function variance(matrix: number[][], weights: number[]) {
 
 function annualizedVolatility(matrix: number[][], weights: number[]) {
   const value = variance(matrix, weights)
-  return value > 0 && Number.isFinite(value) ? Math.sqrt(value * TRADING_DAYS) : null
+  if (!Number.isFinite(value) || value < -EPS) return null
+  return Math.sqrt(Math.max(0, value) * TRADING_DAYS)
 }
 
 function projectSimplex(values: number[]) {
@@ -227,7 +230,7 @@ function buildScenario(
 export function calculateAllocationDiagnostics(series: RiskSeries[]): AllocationDiagnosticsResult {
   const aligned = alignSeries(Array.isArray(series) ? series : [])
   const base = {
-    version: '1.0' as const,
+    version: ALLOCATION_DIAGNOSTICS_CALC_VERSION,
     commonReturns: aligned.rows.length,
     minimumReturns: MIN_COMMON_RETURNS,
     matureReturns: MATURE_COMMON_RETURNS,
