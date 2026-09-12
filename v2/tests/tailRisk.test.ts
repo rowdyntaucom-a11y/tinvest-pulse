@@ -19,13 +19,17 @@ function historyFromReturns(returns: number[]) {
 
 const insufficient = calculateTailRisk(historyFromReturns(Array.from({ length: 125 }, () => 0.001)))
 assert.equal(insufficient.calcVersion, TAIL_RISK_CALC_VERSION)
-assert.equal(insufficient.calcVersion, '1.1')
+assert.equal(insufficient.calcVersion, '1.2')
 assert.equal(insufficient.available, false)
 assert.equal(insufficient.status, 'insufficient_history')
 assert.equal(insufficient.returns, 125)
 assert.equal(insufficient.minimumReturns, 126)
 assert.equal(insufficient.var95Loss, null)
 assert.equal(insufficient.cvar95Loss, null)
+assert.equal(insufficient.sampleFrom, '2026-01-01')
+assert.equal(insufficient.sampleTo, '2026-05-06')
+assert.equal(insufficient.duplicateRowsCollapsed, 0)
+assert.equal(insufficient.conflictingDates, 0)
 
 const tailReturns = [
   -0.60, -0.10, -0.08, -0.06, -0.05, -0.04, -0.03,
@@ -48,11 +52,39 @@ assert.ok((preview.cvar95Loss ?? 0) >= (preview.var95Loss ?? 0))
 assert.equal(preview.returns, tailReturns.length)
 close(preview.worstDay, -0.60)
 
+const exactDuplicateHistory = historyFromReturns(tailReturns)
+exactDuplicateHistory.push({ ...exactDuplicateHistory[40] })
+const exactDuplicate = calculateTailRisk(exactDuplicateHistory)
+assert.equal(exactDuplicate.available, true)
+assert.equal(exactDuplicate.status, 'preview')
+assert.equal(exactDuplicate.returns, 126)
+assert.equal(exactDuplicate.duplicateRowsCollapsed, 1)
+assert.equal(exactDuplicate.conflictingDates, 0)
+close(exactDuplicate.var95Loss, preview.var95Loss ?? 0)
+close(exactDuplicate.cvar95Loss, preview.cvar95Loss ?? 0)
+
+const conflictingHistory = historyFromReturns(tailReturns)
+conflictingHistory.push({
+  ...conflictingHistory[40],
+  portfolio: conflictingHistory[40].portfolio * 1.01,
+})
+const conflicting = calculateTailRisk(conflictingHistory)
+assert.equal(conflicting.available, false)
+assert.equal(conflicting.status, 'invalid_history')
+assert.equal(conflicting.conflictingDates, 1)
+assert.equal(conflicting.var95Loss, null)
+assert.equal(conflicting.cvar95Loss, null)
+assert.equal(conflicting.worstDay, null)
+assert.equal(conflicting.downsideFrequency, null)
+assert.equal(conflicting.tailObservations, 0)
+
 const matureReturns = Array.from({ length: 252 }, (_, index) => index % 3 === 0 ? -0.004 : 0.003)
 const mature = calculateTailRisk(historyFromReturns(matureReturns))
 assert.equal(mature.available, true)
 assert.equal(mature.status, 'mature')
 assert.equal(mature.returns, 252)
 assert.equal(mature.matureReturns, 252)
+assert.equal(mature.duplicateRowsCollapsed, 0)
+assert.equal(mature.conflictingDates, 0)
 
 console.log('tail risk regression: ok')
