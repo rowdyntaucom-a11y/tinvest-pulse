@@ -18,6 +18,8 @@ export type BondMetadata = {
   countryOfRisk: string | null
   countryOfRiskName: string | null
   sector: string | null
+  issuerUid: string | null
+  issuerName: string | null
 }
 
 export type AccountContext = {
@@ -209,6 +211,8 @@ const normaliseBond = (value: unknown): BondMetadata | null => {
     countryOfRisk: row.countryOfRisk ? String(row.countryOfRisk) : null,
     countryOfRiskName: row.countryOfRiskName ? String(row.countryOfRiskName) : null,
     sector: row.sector ? String(row.sector) : null,
+    issuerUid: nullableString(row.issuerUid),
+    issuerName: nullableString(row.issuerName),
   }
 }
 
