@@ -28,13 +28,14 @@ markers.push({ ...marker(1, 'BUY', '-outside'), id: 'outside', date: '2025-02-01
 
 const presentation = buildTransactionMarkerPresentation(markers, chart)
 assert.equal(presentation.version, TRANSACTION_MARKER_PRESENTATION_VERSION)
-assert.equal(presentation.version, '1.0')
+assert.equal(presentation.version, '1.1')
 assert.equal(MAX_VISIBLE_TRANSACTION_EVENT_DAYS, 18)
 assert.equal(presentation.eventDays.length, 20)
 assert.equal(presentation.visibleEventDays.length, 18)
 assert.equal(presentation.hiddenEventDays, 2)
-assert.equal(presentation.visibleEventDays[0].date, '2025-01-03')
+assert.equal(presentation.visibleEventDays[0].date, '2025-01-01')
 assert.equal(presentation.visibleEventDays.at(-1)?.date, '2025-01-20')
+assert.ok(presentation.visibleEventDays.some(row => row.date === '2025-01-10'))
 assert.equal(presentation.totalBuys, 11)
 assert.equal(presentation.totalSells, 10)
 const lastDay = presentation.eventDays.at(-1)!
@@ -42,10 +43,14 @@ assert.equal(lastDay.buys, 1)
 assert.equal(lastDay.sells, 1)
 
 const compact = buildTransactionMarkerPresentation(markers, chart, 2)
-assert.deepEqual(compact.visibleEventDays.map(row => row.date), ['2025-01-19', '2025-01-20'])
+assert.deepEqual(compact.visibleEventDays.map(row => row.date), ['2025-01-01', '2025-01-20'])
 assert.equal(compact.hiddenEventDays, 18)
 assert.equal(compact.totalBuys, 11)
 assert.equal(compact.totalSells, 10)
+
+const single = buildTransactionMarkerPresentation(markers, chart, 1)
+assert.deepEqual(single.visibleEventDays.map(row => row.date), ['2025-01-20'])
+assert.equal(single.hiddenEventDays, 19)
 
 const hidden = buildTransactionMarkerPresentation(markers, chart, 0)
 assert.equal(hidden.visibleEventDays.length, 0)

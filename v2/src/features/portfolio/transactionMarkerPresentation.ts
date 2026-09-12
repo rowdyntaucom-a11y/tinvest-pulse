@@ -1,7 +1,7 @@
 import type { HistoryPoint } from '../../lib/portfolioApi'
 import type { TransactionMarker } from './transactionMarkers'
 
-export const TRANSACTION_MARKER_PRESENTATION_VERSION = '1.0' as const
+export const TRANSACTION_MARKER_PRESENTATION_VERSION = '1.1' as const
 export const MAX_VISIBLE_TRANSACTION_EVENT_DAYS = 18
 
 export type TransactionMarkerDay = {
@@ -28,10 +28,28 @@ function dateOnly(value: unknown) {
   return new Date(timestamp).toISOString().slice(0, 10) === raw ? raw : null
 }
 
+function sampleEventDays(eventDays: readonly TransactionMarkerDay[], limit: number) {
+  if (limit <= 0 || eventDays.length === 0) return []
+  if (limit >= eventDays.length) return [...eventDays]
+  if (limit === 1) return [eventDays[eventDays.length - 1]]
+
+  const lastIndex = eventDays.length - 1
+  return Array.from({ length: limit }, (_, sampleIndex) => {
+    const sourceIndex = Math.round((sampleIndex * lastIndex) / (limit - 1))
+    return eventDays[sourceIndex]
+  })
+}
+
 /**
  * Groups verified BUY/SELL operations by chart day and caps only the visual
  * event-day layer. Totals always describe all matched event days, including
  * days hidden by the mobile-density cap.
+ *
+ * When the visual cap is exceeded, event days are sampled deterministically
+ * across the full chart span rather than taking only the newest days. This
+ * preserves temporal context and avoids a recency-biased marker cluster while
+ * still keeping the Samsung/Android chart layer bounded. With a limit >= 2,
+ * the first and last matched event days are always retained.
  *
  * Duplicate chart dates are ambiguous for x-coordinate placement and therefore
  * fail closed for markers on that date instead of letting input order choose a
@@ -74,7 +92,7 @@ export function buildTransactionMarkerPresentation(
 
   const rawLimit = Number(maxVisibleEventDays)
   const safeLimit = Number.isFinite(rawLimit) && rawLimit >= 0 ? Math.floor(rawLimit) : MAX_VISIBLE_TRANSACTION_EVENT_DAYS
-  const visibleEventDays = safeLimit === 0 ? [] : eventDays.slice(-safeLimit)
+  const visibleEventDays = sampleEventDays(eventDays, safeLimit)
 
   return {
     version: TRANSACTION_MARKER_PRESENTATION_VERSION,
