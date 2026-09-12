@@ -4,6 +4,7 @@ import { HistoryChart } from './features/portfolio/HistoryChart'
 import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
 import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analytics/drift'
+import { RebalanceScenarioDetails } from './features/analytics/RebalanceScenarioDetails'
 import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
 import { RiskWorkspace } from './features/analytics/RiskWorkspace'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
@@ -202,6 +203,8 @@ export default function App() {
                     </div>
                   ))}
                 </div>
+
+                <RebalanceScenarioDetails drift={drift} />
 
                 <p className="method-note">Drift v1 сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это диагностический триггер для проверки стратегии, а не команда купить или продать.</p>
               </section>
