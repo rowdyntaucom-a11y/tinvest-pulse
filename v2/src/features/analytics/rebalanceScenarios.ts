@@ -187,6 +187,7 @@ export function calculateRebalanceScenario(
       : `Exact target requires at least ${minimumFlowForExactTarget.toFixed(2)} of withdrawal if no class is increased.`
 
   return {
+    calcVersion: REBALANCE_SCENARIO_CALC_VERSION,
     available: true,
     mode,
     requestedFlow: requestedFlow ?? 0,
