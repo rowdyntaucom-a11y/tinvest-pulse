@@ -19,6 +19,8 @@ Benchmark-relative analytics use only overlapping portfolio / IMOEX dates. Track
 
 Tail risk uses historical one-day portfolio TWR returns. VaR 95% / CVaR (Expected Shortfall) are withheld below the configured history gate and are explicitly historical risk diagnostics, not maximum-loss forecasts.
 
+Allocation diagnostics in `allocationDiagnostics.ts` are a Pro/Terminal calculation boundary, not a trade recommendation. The engine aligns all selected assets on one common daily-return sample and fails closed below 60 common returns; 252 common returns marks a mature sample. It exposes three risk-only scenarios: equal weight as a control, long-only minimum variance solved deterministically on the sample covariance matrix, and equal-risk-contribution solved by deterministic cyclic coordinate updates. Expected returns, target prices and LLM-derived assumptions are not inputs. Every output retains per-asset sample volatility, portfolio sample volatility and risk-contribution shares so the result can be audited before any future UI integration.
+
 The portfolio and IMOEX lines must always share one Y scale. Never independently rescale comparison series.
 
 History shorter than the intended 12-month window must be labeled as the actually available period rather than presented as a full-year sample.
