@@ -155,7 +155,7 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
         </>
       )}
 
-      {mode === 'corr' && <CorrelationPanel />}
+      {mode === 'corr' && <CorrelationPanel positions={positions} />}
       {mode === 'stress' && <StressPanel positions={positions} />}
     </div>
   )
