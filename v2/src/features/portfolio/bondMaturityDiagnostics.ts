@@ -52,11 +52,22 @@ function positiveValue(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0
 }
 
+function validMaturityTimestamp(value: string | null | undefined) {
+  const raw = String(value || '').trim()
+  if (!raw) return null
+  const datePart = raw.slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return null
+  const canonicalDay = Date.parse(`${datePart}T00:00:00.000Z`)
+  if (!Number.isFinite(canonicalDay) || new Date(canonicalDay).toISOString().slice(0, 10) !== datePart) return null
+  const timestamp = Date.parse(raw)
+  return Number.isFinite(timestamp) ? timestamp : null
+}
+
 function hasVerifiedBondMeta(position: PositionSnapshot) {
   const meta = position.bond
   if (!meta) return false
   return Boolean(
-    meta.maturityDate ||
+    validMaturityTimestamp(meta.maturityDate) != null ||
     (meta.nominal != null && meta.nominal > 0) ||
     meta.currency ||
     meta.couponQuantityPerYear != null ||
@@ -70,17 +81,6 @@ function hasVerifiedBondMeta(position: PositionSnapshot) {
     meta.perpetual != null ||
     meta.amortizing != null
   )
-}
-
-function validMaturityTimestamp(value: string | null | undefined) {
-  const raw = String(value || '').trim()
-  if (!raw) return null
-  const datePart = raw.slice(0, 10)
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return null
-  const canonicalDay = Date.parse(`${datePart}T00:00:00.000Z`)
-  if (!Number.isFinite(canonicalDay) || new Date(canonicalDay).toISOString().slice(0, 10) !== datePart) return null
-  const timestamp = Date.parse(raw)
-  return Number.isFinite(timestamp) ? timestamp : null
 }
 
 function futureMaturity(position: PositionSnapshot, nowMs: number) {
