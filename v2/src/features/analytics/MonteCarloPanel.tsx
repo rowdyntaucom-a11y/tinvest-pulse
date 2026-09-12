@@ -22,8 +22,8 @@ export function MonteCarloPanel({ history, currentValue }: { history: HistoryPoi
   return (
     <section className="panel mc-panel">
       <div className="panel-head">
-        <div><span className="eyebrow">BOOTSTRAP v1 · 12M</span><h2>MONTE CARLO</h2></div>
-        <small>{result.available ? `${result.simulations} траекторий` : `${result.historyReturns}/${result.minimumReturns} дневных доходностей`}</small>
+        <div><span className="eyebrow">BLOCK BOOTSTRAP v2 · 12M</span><h2>MONTE CARLO</h2></div>
+        <small>{result.available ? `${result.simulations} траекторий · блок ${result.blockTradingDays}д` : `${result.historyReturns}/${result.minimumReturns} дневных доходностей`}</small>
       </div>
 
       {!result.available ? (
@@ -47,7 +47,7 @@ export function MonteCarloPanel({ history, currentValue }: { history: HistoryPoi
               <span>P10</span>
               <strong>{formatReturn(result.terminalReturn?.p10)}</strong>
               <b>{formatValue(result.terminalValue?.p10)}</b>
-              <small>10-й перцентиль результата через 252 торговых дня</small>
+              <small>10-й перцентиль результата через {result.horizonTradingDays} торговых дней</small>
             </article>
             <article className="mc-card mc-card--median">
               <span>МЕДИАНА · P50</span>
@@ -59,18 +59,18 @@ export function MonteCarloPanel({ history, currentValue }: { history: HistoryPoi
               <span>P90</span>
               <strong>{formatReturn(result.terminalReturn?.p90)}</strong>
               <b>{formatValue(result.terminalValue?.p90)}</b>
-              <small>90-й перцентиль результата через 252 торговых дня</small>
+              <small>90-й перцентиль результата через {result.horizonTradingDays} торговых дней</small>
             </article>
           </div>
           <div className="mc-integrity">
             <span className={result.status === 'mature' ? 'is-mature' : 'is-preview'}>{result.status === 'mature' ? 'ЗРЕЛАЯ ВЫБОРКА' : 'PREVIEW'}</span>
-            <b>{result.historyReturns} дневных доходностей</b>
+            <b>{result.historyReturns} дневных доходностей · блок {result.blockTradingDays}д{result.excludedReturns ? ` · исключено ${result.excludedReturns}` : ''}</b>
             <small>{result.note}</small>
           </div>
         </>
       )}
 
-      <p className="method-note">Метод: historical bootstrap дневных TWR-доходностей. P10 / P50 / P90 — перцентили распределения сценариев, а не гарантии. Модель не добавляет будущие пополнения, снятия, комиссии, налоги или выдуманные ожидания рынка.</p>
+      <p className="method-note">Метод: historical block bootstrap фактических дневных TWR-доходностей, непрерывными {result.blockTradingDays}-дневными блоками. P10 / P50 / P90 — перцентили сценарного распределения, а не прогноз или гарантия. Модель не добавляет будущие пополнения, снятия, комиссии, налоги или выдуманные ожидания рынка.</p>
     </section>
   )
 }
