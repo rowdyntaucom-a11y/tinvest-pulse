@@ -1,4 +1,4 @@
-export const PORTFOLIO_NORMALIZATION_VERSION = '1.2' as const
+export const PORTFOLIO_NORMALIZATION_VERSION = '1.3' as const
 
 export type HistoryPoint = {
   date: string
@@ -185,6 +185,8 @@ async function loadAccountContext(accountId: string | null): Promise<AccountCont
   }
 }
 
+type HistoryNumericField = 'portfolio' | 'imoex' | 'value' | 'invested'
+
 const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
   if (!historyRaw || typeof historyRaw !== 'object') return []
   const history = historyRaw as Record<string, unknown>
@@ -193,27 +195,43 @@ const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
   const investedPoints = Array.isArray(history.investedPoints) ? history.investedPoints as Record<string, unknown>[] : []
 
   const byDate = new Map<string, HistoryPoint>()
+  const conflicts = new Map<string, Set<HistoryNumericField>>()
   const ensure = (date: unknown) => {
     const key = normaliseDateOnly(date)
     if (!key) return null
     if (!byDate.has(key)) byDate.set(key, { date: key, portfolio: null, imoex: null, value: null, invested: null })
     return byDate.get(key)!
   }
+  const mergeNumeric = (date: unknown, field: HistoryNumericField, rawValue: unknown) => {
+    const point = ensure(date)
+    if (!point) return
+    const value = nullableNumber(rawValue)
+    if (value == null) return
+
+    let dateConflicts = conflicts.get(point.date)
+    if (!dateConflicts) {
+      dateConflicts = new Set<HistoryNumericField>()
+      conflicts.set(point.date, dateConflicts)
+    }
+    if (dateConflicts.has(field)) return
+
+    const existing = point[field]
+    if (existing == null) {
+      point[field] = value
+      return
+    }
+    if (existing !== value) {
+      point[field] = null
+      dateConflicts.add(field)
+    }
+  }
 
   for (const row of indexPoints) {
-    const point = ensure(row.date)
-    if (!point) continue
-    point.portfolio = nullableNumber(row.portfolio ?? row.index ?? row.twr)
-    point.imoex = nullableNumber(row.imoex ?? row.benchmark)
+    mergeNumeric(row.date, 'portfolio', row.portfolio ?? row.index ?? row.twr)
+    mergeNumeric(row.date, 'imoex', row.imoex ?? row.benchmark)
   }
-  for (const row of valuePoints) {
-    const point = ensure(row.date)
-    if (point) point.value = nullableNumber(row.value)
-  }
-  for (const row of investedPoints) {
-    const point = ensure(row.date)
-    if (point) point.invested = nullableNumber(row.value)
-  }
+  for (const row of valuePoints) mergeNumeric(row.date, 'value', row.value)
+  for (const row of investedPoints) mergeNumeric(row.date, 'invested', row.value)
 
   return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date))
 }
