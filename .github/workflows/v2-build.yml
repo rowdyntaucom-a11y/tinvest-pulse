@@ -37,8 +37,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: v2/package.json
-      - run: npm install --no-audit --no-fund
+          cache-dependency-path: v2/package-lock.json
+      - run: npm ci --no-audit --no-fund
       - name: Dependency security gate
         run: npm audit --audit-level=high
       - name: Root runtime dependency security gate
