@@ -4,6 +4,7 @@ import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { getIncomeIntegrity } from './incomeIntegrity'
 import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration, calculateIncomeStability } from './incomeHistory'
 import { calculateIncomeComparablePeriod } from './incomeComparables'
+import { IncomeGoalCompact } from './IncomeGoalCompact'
 import './income.css'
 import './incomeCompact.css'
 
@@ -284,6 +285,8 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
               <article><span>ФАКТ · СТАБИЛЬНОСТЬ</span><strong>{stabilityValue}</strong><small>{stabilityDetail}</small></article>
             )}
           </div>
+
+          <IncomeGoalCompact history={realizedHistory} />
 
           <div className="income-source-table">
             <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М / YoC</span></div>
