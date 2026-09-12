@@ -223,3 +223,18 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Deployment status still cannot be read safely because no user-confirmed Render workspace is selected in this automation context; no live state is guessed.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 - Next safe focus: wire persisted XP events into a render-neutral world-state input boundary, or continue remaining Portfolio/Analytics depth where source-data gates already pass.
+
+### 08:05 MSK autonomous pass — explicit strategy scenario comparison groundwork
+- Audited the transaction-marker queue item first. The current Portfolio chart receives only daily history points, while `server-core.js` does retain reliable T-Bank operation date/type/FIGI during history reconstruction. Markers are therefore feasible only after a deliberate backend contract is added; no frontend reconstruction from indirect data was introduced in this pass.
+- Added `v2/src/features/analytics/strategyScenarioComparison.ts` through PR #95 and squash-merged runtime commit `9d9fd421a19d403d6fbca67e532825e9c2583b6c`.
+- The comparison accepts only 2–4 explicitly supplied, uniquely identified user strategy scenarios. QVANIX does not generate candidate allocations, rank a winner or attach expected returns.
+- Each strategy must contain the complete supported two-class sleeve (`equity` + `bond`), positive finite weights summing exactly to 100%, and explicit non-negative tolerances. Invalid configs fail closed and are never silently normalized.
+- Quant methodology review caught a pre-merge denominator mismatch risk for one-class 100% strategies; validator was tightened to require both supported classes before acceptance.
+- For each accepted strategy the module reuses existing drift/rebalance math and reports current maximum absolute drift, unassigned weight, tolerance state and class-level existing-capital turnover. Turnover is half the gross absolute target deltas because class increases/decreases offset under zero external flow; unassigned assets are excluded and left unchanged.
+- Output is deterministic diagnostics only: no personalized buy/sell recommendation, no instrument order list, no return forecast and no execution path.
+- Code-quality pass: GitHub `v2 build` workflow run #130 completed successfully. `npm run build`, `node --check ../payouts-core.js`, `node --check ../server-core.js`, `production-v158.js` and `production-v159.js` all passed.
+- Mobile-UX pass: no UI/CSS/rendering changes; Samsung/Android density and no-duplication rules are unchanged.
+- Release pass: runtime diff is one pure TypeScript module; no broker/backend route, credential, legal/payment wording, DNA renderer or deployment configuration changed.
+- Render auto-deploy was not manually triggered. Deploy status could not be queried because the Render connector has no user-confirmed workspace selected and autonomous mode must not guess one.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe focus: add a deliberate transaction-marker backend contract that exposes only verified date/side/instrument identity, then integrate time-only markers without implying execution-price precision; alternatively continue bond→Income event-identity deduplication if that backend path proves lower risk.
