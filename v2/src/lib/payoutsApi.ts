@@ -5,6 +5,9 @@ export type PayoutEvent = {
   ticker: string
   name: string
   figi?: string | null
+  instrumentUid?: string | null
+  couponNumber?: number | null
+  scheduleId?: string | null
   date: string
   recordDate?: string | null
   lastBuyDate?: string | null
@@ -70,6 +73,12 @@ export type PayoutCalendar = {
     coverageRatio: number
     errors: Array<{ ticker?: string; error?: string }>
   }
+  identity?: {
+    couponScheduleEvents: number
+    couponScheduleIdentified: number
+    couponScheduleCoverage: number
+    basis: string | null
+  }
   integrity: {
     complete: boolean
     minimumCoverage: number
@@ -100,6 +109,7 @@ const emptyCalendar = (): PayoutCalendar => ({
   months: [],
   events: [],
   coverage: { eligibleAssets: 0, scheduledEvents: 0, resolvedAssets: 0, coverageRatio: 0, errors: [] },
+  identity: { couponScheduleEvents: 0, couponScheduleIdentified: 0, couponScheduleCoverage: 0, basis: null },
   integrity: { complete: false, minimumCoverage: .95 },
   stale: false,
   warning: null,
@@ -125,6 +135,7 @@ export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
     const observation = actual.observation ?? {}
     const forecast = raw.forecast ?? {}
     const coverage = raw.coverage ?? {}
+    const identity = raw.identity ?? {}
     const integrity = raw.integrity ?? {}
     return {
       available: raw.available !== false,
@@ -165,6 +176,12 @@ export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
         resolvedAssets: n(coverage.resolvedAssets),
         coverageRatio: n(coverage.coverageRatio),
         errors: Array.isArray(coverage.errors) ? coverage.errors : [],
+      },
+      identity: {
+        couponScheduleEvents: n(identity.couponScheduleEvents),
+        couponScheduleIdentified: n(identity.couponScheduleIdentified),
+        couponScheduleCoverage: n(identity.couponScheduleCoverage),
+        basis: identity.basis ? String(identity.basis) : null,
       },
       integrity: {
         complete: Boolean(integrity.complete),
