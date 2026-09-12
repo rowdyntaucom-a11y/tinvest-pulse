@@ -1,5 +1,7 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
+export const PORTFOLIO_PNL_ATTRIBUTION_CALC_VERSION = '1.0' as const
+
 export type PositionPnlAttribution = {
   key: string
   ticker: string
@@ -19,6 +21,7 @@ export type AssetClassPnlAttribution = {
 }
 
 export type PortfolioPnlAttribution = {
+  calcVersion: typeof PORTFOLIO_PNL_ATTRIBUTION_CALC_VERSION
   netPnl: number
   grossAbsolutePnl: number
   positivePnl: number
@@ -99,6 +102,7 @@ export function calculatePortfolioPnlAttribution(positions: PositionSnapshot[]):
     .sort((a, b) => b.grossAbsolutePnl - a.grossAbsolutePnl)
 
   return {
+    calcVersion: PORTFOLIO_PNL_ATTRIBUTION_CALC_VERSION,
     netPnl,
     grossAbsolutePnl,
     positivePnl,
