@@ -1,7 +1,7 @@
 import type { PayoutCalendar, PayoutEvent } from '../../lib/payoutsApi'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
-export const POSITION_INCOME_CONTRIBUTION_VERSION = '1.1' as const
+export const POSITION_INCOME_CONTRIBUTION_VERSION = '1.2' as const
 
 export type PositionIncomeContribution = {
   version: typeof POSITION_INCOME_CONTRIBUTION_VERSION
@@ -43,8 +43,9 @@ function exactFigi(event: PayoutEvent, figi: string) {
  *
  * FACT and future schedule are deliberately separate aggregates. This function
  * never claims that a realized payment reconciles to a particular scheduled
- * coupon/dividend event. FACT share always carries the broker observation
- * window so partial history cannot look like lifetime contribution.
+ * coupon/dividend event. FACT share is exposed only when the broker observation
+ * window itself is available, so partial/unknown history cannot look like a
+ * comparable or lifetime contribution share.
  */
 export function calculatePositionIncomeContribution(
   position: Pick<PositionSnapshot, 'figi'>,
@@ -105,11 +106,11 @@ export function calculatePositionIncomeContribution(
     available: true,
     factNet,
     factCount: matchedFacts.length,
-    factShare: factNet != null && factTotal > 0 ? factNet / factTotal : null,
+    factShare: observationAvailable && factNet != null && factTotal > 0 ? factNet / factTotal : null,
     scheduledGross,
     scheduledCount: matchedScheduled.length,
     scheduledShare: scheduledGross != null && scheduleTotal > 0 ? scheduledGross / scheduleTotal : null,
     reason: null,
-    note: 'Exact FIGI only. FACT share is limited to the reported observation window; 12M schedule uses future gross events. FACT↔schedule event reconciliation is not inferred.',
+    note: 'Exact FIGI only. FACT share is available only inside a reported observation window; 12M schedule uses future gross events. FACT↔schedule event reconciliation is not inferred.',
   }
 }
