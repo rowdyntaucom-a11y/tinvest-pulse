@@ -1,5 +1,7 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
+export const MONTE_CARLO_CALC_VERSION = '2.0' as const
+
 export type MonteCarloPercentiles = {
   p10: number
   median: number
@@ -7,6 +9,7 @@ export type MonteCarloPercentiles = {
 }
 
 export type MonteCarloResult = {
+  calcVersion: typeof MONTE_CARLO_CALC_VERSION
   available: boolean
   status: 'insufficient_history' | 'preview' | 'mature'
   method: 'historical_block_bootstrap_v2'
@@ -46,6 +49,9 @@ function dailyReturns(history: AnalyticsHistoryPoint[]) {
     if (prior <= 0 || current <= 0) continue
     const value = current / prior - 1
     if (!Number.isFinite(value)) continue
+    // Monte Carlo v2 deliberately excludes extreme one-day observations from
+    // the bootstrap sample. Unlike historical tail risk, this is an explicit
+    // model rule and the exclusion count is surfaced in every result.
     if (value <= -0.5 || value >= 0.5) {
       excludedReturns += 1
       continue
@@ -105,6 +111,7 @@ export function calculateMonteCarlo(
   const paths = positiveInteger(simulations, DEFAULT_SIMULATIONS, 100_000)
   const blockDays = positiveInteger(blockTradingDays, DEFAULT_BLOCK_DAYS, 20)
   const base = {
+    calcVersion: MONTE_CARLO_CALC_VERSION,
     method: 'historical_block_bootstrap_v2' as const,
     historyReturns: returns.length,
     excludedReturns: sample.excludedReturns,
