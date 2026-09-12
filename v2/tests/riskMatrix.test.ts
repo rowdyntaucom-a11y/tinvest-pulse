@@ -29,7 +29,7 @@ const short = calculateCorrelationMatrix([
   { key: 'A', label: 'A', points: pointsFromReturns(same59) },
   { key: 'B', label: 'B', points: pointsFromReturns(same59) },
 ])
-assert.equal(short.version, '1.2')
+assert.equal(short.version, '1.3')
 assert.equal(short.minimumPairedReturns, 60)
 assert.equal(short.maturePairedReturns, 252)
 const shortPair = pair(short, 'A', 'B')!
@@ -37,6 +37,9 @@ assert.equal(shortPair.pairedReturns, 59)
 assert.equal(shortPair.available, false)
 assert.equal(shortPair.mature, false)
 assert.equal(shortPair.correlation, null)
+assert.equal(short.series[0].integrity, 'VALID')
+assert.equal(short.series[0].sampleFrom, '2025-01-01')
+assert.equal(short.series[0].sampleTo, pointsFromReturns(same59).at(-1)!.date)
 
 const perfectSeries: RiskSeries[] = [
   { key: 'A', label: 'A', points: pointsFromReturns(base60) },
@@ -80,8 +83,6 @@ assert.equal(maturePair.mature, true)
 close(maturePair.correlation, 1)
 
 // One missing intermediate candle invalidates both adjacent exact intervals.
-// Matching only on the ending date would incorrectly retain the wider return
-// ending after the gap and count 59 rather than 58 common observations.
 const missingDateB = pointsFromReturns(base60).filter((_, index) => index !== 20)
 const missingDate = calculateCorrelationMatrix([
   { key: 'A', label: 'A', points: pointsFromReturns(base60) },
@@ -92,8 +93,6 @@ assert.equal(missingPair.pairedReturns, 58)
 assert.equal(missingPair.available, false)
 assert.equal(missingPair.correlation, null)
 
-// Protect the 60-return availability gate itself: 61 nominal returns with one
-// internal missing candle leave only 59 exact shared intervals, not 60.
 const base61 = Array.from({ length: 61 }, (_, index) => index % 4 === 0 ? -0.012 : index % 3 === 0 ? 0.008 : 0.002)
 const gatedGap = calculateCorrelationMatrix([
   { key: 'A', label: 'A', points: pointsFromReturns(base61) },
@@ -103,5 +102,42 @@ const gatedGapPair = pair(gatedGap, 'A', 'B')!
 assert.equal(gatedGapPair.pairedReturns, 59)
 assert.equal(gatedGapPair.available, false)
 assert.equal(gatedGapPair.correlation, null)
+
+// Exact duplicate dates with the same value are harmless and collapse deterministically.
+const exactDuplicatePoints = pointsFromReturns(base60)
+exactDuplicatePoints.splice(12, 0, { ...exactDuplicatePoints[11] })
+const exactDuplicate = calculateCorrelationMatrix([
+  { key: 'A', label: 'A', points: exactDuplicatePoints },
+  { key: 'B', label: 'B', points: pointsFromReturns(base60) },
+])
+const exactDuplicatePair = pair(exactDuplicate, 'A', 'B')!
+assert.equal(exactDuplicate.series[0].integrity, 'VALID')
+assert.equal(exactDuplicate.series[0].duplicateRowsCollapsed, 1)
+assert.equal(exactDuplicate.series[0].conflictingDates, 0)
+assert.equal(exactDuplicatePair.pairedReturns, 60)
+assert.equal(exactDuplicatePair.available, true)
+close(exactDuplicatePair.correlation, 1)
+
+// Conflicting values on the same date invalidate the entire affected series.
+const conflictingPoints = pointsFromReturns(base60)
+const conflictingDate = conflictingPoints[11].date
+conflictingPoints.splice(12, 0, { date: conflictingDate, value: conflictingPoints[11].value * 1.01 })
+const conflict = calculateCorrelationMatrix([
+  { key: 'A', label: 'A', points: conflictingPoints },
+  { key: 'B', label: 'B', points: pointsFromReturns(base60) },
+])
+const conflictPair = pair(conflict, 'A', 'B')!
+assert.equal(conflict.series[0].integrity, 'CONFLICT')
+assert.equal(conflict.series[0].conflictingDates, 1)
+assert.equal(conflict.series[0].returns, 0)
+assert.equal(conflict.series[0].sampleFrom, null)
+assert.equal(conflict.series[0].sampleTo, null)
+assert.equal(conflictPair.pairedReturns, 0)
+assert.equal(conflictPair.available, false)
+assert.equal(conflictPair.mature, false)
+assert.equal(conflictPair.correlation, null)
+const conflictDiagonal = pair(conflict, 'A', 'A')!
+assert.equal(conflictDiagonal.available, false)
+assert.equal(conflictDiagonal.correlation, null)
 
 console.log('risk matrix regression: ok')

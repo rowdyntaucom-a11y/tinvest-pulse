@@ -11,19 +11,63 @@ export type CorrelationCell = {
 }
 
 export type CorrelationMatrixResult = {
-  version: '1.2'
+  version: '1.3'
   minimumPairedReturns: number
   maturePairedReturns: number
-  series: Array<{ key: string; label: string; returns: number }>
+  series: Array<{
+    key: string
+    label: string
+    returns: number
+    sampleFrom: string | null
+    sampleTo: string | null
+    duplicateRowsCollapsed: number
+    conflictingDates: number
+    integrity: 'VALID' | 'CONFLICT'
+  }>
   cells: CorrelationCell[]
 }
 
 const MIN_PAIRED_RETURNS = 60
 const MATURE_PAIRED_RETURNS = 252
 
-function returnIntervalMap(points: PricePoint[]) {
-  const sorted = points
-    .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
+type SeriesIntervals = {
+  returns: Map<string, number>
+  sampleFrom: string | null
+  sampleTo: string | null
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+  integrity: 'VALID' | 'CONFLICT'
+}
+
+function returnIntervalMap(points: PricePoint[]): SeriesIntervals {
+  const byDate = new Map<string, number>()
+  const conflictingDates = new Set<string>()
+  let duplicateRowsCollapsed = 0
+
+  for (const point of points) {
+    if (!point.date || !Number.isFinite(point.value) || point.value <= 0) continue
+    const existing = byDate.get(point.date)
+    if (existing == null) {
+      byDate.set(point.date, point.value)
+      continue
+    }
+    if (Math.abs(existing - point.value) <= 1e-12) duplicateRowsCollapsed += 1
+    else conflictingDates.add(point.date)
+  }
+
+  if (conflictingDates.size > 0) {
+    return {
+      returns: new Map(),
+      sampleFrom: null,
+      sampleTo: null,
+      duplicateRowsCollapsed,
+      conflictingDates: conflictingDates.size,
+      integrity: 'CONFLICT',
+    }
+  }
+
+  const sorted = [...byDate.entries()]
+    .map(([date, value]) => ({ date, value }))
     .sort((a, b) => a.date.localeCompare(b.date))
   const out = new Map<string, number>()
   for (let i = 1; i < sorted.length; i += 1) {
@@ -35,7 +79,14 @@ function returnIntervalMap(points: PricePoint[]) {
       out.set(`${prior.date}\u0000${current.date}`, value)
     }
   }
-  return out
+  return {
+    returns: out,
+    sampleFrom: sorted.length > 0 ? sorted[0].date : null,
+    sampleTo: sorted.length > 0 ? sorted[sorted.length - 1].date : null,
+    duplicateRowsCollapsed,
+    conflictingDates: 0,
+    integrity: 'VALID',
+  }
 }
 
 function commonIntervalKeys(maps: Array<Map<string, number>>) {
@@ -64,36 +115,49 @@ function correlation(a: number[], b: number[]) {
 }
 
 export function calculateCorrelationMatrix(series: RiskSeries[]): CorrelationMatrixResult {
-  const maps = new Map(series.map(item => [item.key, returnIntervalMap(item.points)]))
+  const intervalData = new Map(series.map(item => [item.key, returnIntervalMap(item.points)]))
   const cells: CorrelationCell[] = []
 
   for (let i = 0; i < series.length; i += 1) {
     for (let j = i; j < series.length; j += 1) {
       const a = series[i]
       const b = series[j]
-      const mapA = maps.get(a.key)!
-      const mapB = maps.get(b.key)!
-      const intervalKeys = commonIntervalKeys([mapA, mapB])
-      const valuesA = intervalKeys.map(key => mapA.get(key)!)
-      const valuesB = intervalKeys.map(key => mapB.get(key)!)
-      const available = a.key === b.key || intervalKeys.length >= MIN_PAIRED_RETURNS
-      const mature = intervalKeys.length >= MATURE_PAIRED_RETURNS
+      const dataA = intervalData.get(a.key)!
+      const dataB = intervalData.get(b.key)!
+      const validIntegrity = dataA.integrity === 'VALID' && dataB.integrity === 'VALID'
+      const intervalKeys = validIntegrity ? commonIntervalKeys([dataA.returns, dataB.returns]) : []
+      const valuesA = intervalKeys.map(key => dataA.returns.get(key)!)
+      const valuesB = intervalKeys.map(key => dataB.returns.get(key)!)
+      const available = validIntegrity && (a.key === b.key || intervalKeys.length >= MIN_PAIRED_RETURNS)
+      const mature = validIntegrity && intervalKeys.length >= MATURE_PAIRED_RETURNS
       cells.push({
         a: a.key,
         b: b.key,
         pairedReturns: intervalKeys.length,
         available,
         mature,
-        correlation: a.key === b.key ? 1 : available ? correlation(valuesA, valuesB) : null,
+        correlation: a.key === b.key && validIntegrity ? 1 : available ? correlation(valuesA, valuesB) : null,
       })
     }
   }
 
   return {
-    version: '1.2',
+    version: '1.3',
     minimumPairedReturns: MIN_PAIRED_RETURNS,
     maturePairedReturns: MATURE_PAIRED_RETURNS,
-    series: series.map(item => ({ key: item.key, label: item.label, returns: maps.get(item.key)?.size || 0 })),
+    series: series.map(item => {
+      const data = intervalData.get(item.key)!
+      return {
+        key: item.key,
+        label: item.label,
+        returns: data.returns.size,
+        sampleFrom: data.sampleFrom,
+        sampleTo: data.sampleTo,
+        duplicateRowsCollapsed: data.duplicateRowsCollapsed,
+        conflictingDates: data.conflictingDates,
+        integrity: data.integrity,
+      }
+    }),
     cells,
   }
 }
