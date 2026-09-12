@@ -54,9 +54,9 @@
 
   .income-profile-grid{flex:0 0 auto;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;margin-top:4px}
   .income-profile-grid article{padding:5px 5px;border-radius:8px;gap:2px}
-  .income-profile-grid span{font-size:4.9px;letter-spacing:0}
-  .income-profile-grid strong{font-size:7.5px}
-  .income-profile-grid small{font-size:4.8px}
+  .income-profile-grid span{font-size:5.7px;line-height:1.15;letter-spacing:0}
+  .income-profile-grid strong{font-size:7.8px}
+  .income-profile-grid small{font-size:5.4px}
   .income-source-table{flex:1 1 auto;min-height:0;margin-top:4px;overflow:hidden}
   .income-source-row{min-height:0;height:calc((100% - 20px)/6);grid-template-columns:minmax(0,1fr) 58px 76px;gap:5px;padding:2px 1px}
   .income-source-row--head{height:20px;min-height:20px;font-size:6.2px}
@@ -66,6 +66,6 @@
   .income-integrity{margin-top:4px;gap:6px;font-size:6px}
   .income-integrity i{height:4px}
   .income-integrity strong{font-size:6.5px}
-  .income-integrity-status{margin-top:4px;padding:4px 6px;font-size:5.5px}
-  .income-integrity-status b{font-size:5.5px;white-space:nowrap}
+  .income-integrity-status{margin-top:4px;padding:4px 6px;font-size:5.8px}
+  .income-integrity-status b{font-size:5.8px;white-space:nowrap}
 }

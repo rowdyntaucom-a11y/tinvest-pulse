@@ -15,14 +15,15 @@
 .income-goal-details>p{margin:0;padding:0 9px 7px;color:#668078;font-size:6.4px;line-height:1.35}
 
 @media(max-width:620px){
+  .income-sources-panel:has(.income-goal-details[open]){overflow-y:auto;overscroll-behavior:contain}
   .income-goal-details{margin-top:3px;border-radius:8px}
-  .income-goal-details summary{min-height:22px;padding:3px 5px;font-size:4.8px;letter-spacing:0}
-  .income-goal-details summary b{font-size:5.2px;white-space:nowrap}
-  .income-goal-body{padding:4px 5px 3px;grid-template-columns:74px minmax(0,1fr);gap:5px}
-  .income-goal-body label{gap:2px;font-size:4.7px}
-  .income-goal-body input{padding:3px 4px;border-radius:6px;font-size:5.8px}
-  .income-goal-progress{gap:2px}
-  .income-goal-progress>div{font-size:4.7px;gap:4px}
-  .income-goal-progress>i{height:3px}
-  .income-goal-details>p{padding:0 5px 4px;font-size:4.6px;line-height:1.2}
+  .income-goal-details summary{min-height:24px;padding:4px 6px;font-size:5.8px;letter-spacing:0}
+  .income-goal-details summary b{font-size:6.2px;white-space:nowrap}
+  .income-goal-body{padding:5px 6px 4px;grid-template-columns:96px minmax(0,1fr);gap:6px}
+  .income-goal-body label{gap:3px;font-size:5.6px}
+  .income-goal-body input{padding:4px 5px;border-radius:6px;font-size:7px}
+  .income-goal-progress{gap:3px}
+  .income-goal-progress>div{font-size:5.6px;gap:5px}
+  .income-goal-progress>i{height:4px}
+  .income-goal-details>p{padding:0 6px 5px;font-size:5.6px;line-height:1.35}
 }
