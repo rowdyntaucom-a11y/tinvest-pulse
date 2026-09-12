@@ -6,8 +6,9 @@
   "main":"server.js",
   "scripts":{
     "start":"node server.js",
-    "postinstall":"cd v2 && npm install --no-audit --no-fund && npm run build"
+    "postinstall":"cd v2 && npm ci --no-audit --no-fund && npm run build"
   },
   "engines":{"node":">=20 <25"},
-  "dependencies":{"dotenv":"^16.4.7","express":"^4.21.2"}
+  "dependencies":{"dotenv":"^16.4.7","express":"^4.21.2"},
+  "overrides":{"qs":"6.16.0"}
 }
