@@ -139,8 +139,43 @@
   min-height: 360px;
 }
 
+.allocation-basis {
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(89,240,209,.1);
+  border-radius: 12px;
+  background: rgba(89,240,209,.025);
+}
+
+.allocation-basis span {
+  color: var(--muted);
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.allocation-basis strong {
+  color: #dff4ee;
+  font-size: 11px;
+}
+
+.allocation-basis small {
+  justify-self: end;
+  color: #78958e;
+  font-size: 8px;
+}
+
 .portfolio-allocation-list {
   max-width: 900px;
+}
+
+.portfolio-allocation-list .allocation-row > b {
+  white-space: nowrap;
 }
 
 .position-sortbar {
@@ -390,10 +425,38 @@
     min-height: 0;
   }
 
+  .allocation-basis {
+    flex: 0 0 auto;
+    grid-template-columns: auto 1fr;
+    gap: 2px 7px;
+    margin-bottom: 3px;
+    padding: 5px 7px;
+    border-radius: 9px;
+  }
+
+  .allocation-basis span {
+    font-size: 5.5px;
+  }
+
+  .allocation-basis strong {
+    justify-self: end;
+    font-size: 7.5px;
+  }
+
+  .allocation-basis small {
+    grid-column: 1 / -1;
+    justify-self: start;
+    font-size: 5.8px;
+  }
+
   .portfolio-allocation-list {
     display: grid;
-    align-content: center;
-    gap: 10px;
+    align-content: space-evenly;
+    gap: 8px;
+  }
+
+  .portfolio-allocation-list .allocation-row > b {
+    font-size: 7.2px;
   }
 
   .portfolio-positions-panel {
@@ -490,7 +553,7 @@
 
   .position-inspector p {
     margin-top: 4px;
-    font-size: 5.4px;
-    line-height: 1.25;
+    font-size: 5.9px;
+    line-height: 1.28;
   }
 }
