@@ -46,10 +46,38 @@ const benchmarkCode=[
 core=core.replace(benchmarkMarker,benchmarkCode);
 `;
 
-// QVANIX bond metadata bridge. Do not infer maturity/coupon/currency from a
-// ticker. Enrich current bond positions only from T-Bank instrument metadata;
-// the v2 UI then exposes coverage and leaves missing fields unknown.
+// QVANIX bond metadata bridge. Do not infer maturity/coupon/currency/issuer
+// from ticker or display names. Enrich bonds only from T-Bank instrument +
+// asset/brand metadata; the v2 UI exposes coverage and leaves gaps unknown.
 const bondMetaBridge=`
+const bondIssuerHelperMarker="async function getInstrumentMeta(figi, instrumentType) {";
+if(!core.includes(bondIssuerHelperMarker))throw new Error('QVANIX v2: instrument metadata helper marker changed');
+const bondIssuerHelperCode=[
+ "const qvanixBondIssuerCache=new Map();",
+ "const QVANIX_BOND_ISSUER_CACHE_TTL_MS=21600000;",
+ "async function qvanixGetBondIssuer(bond){",
+ "  const inlineBrand=bond?.brand||null;",
+ "  if(inlineBrand?.uid)return {uid:String(inlineBrand.uid),name:String(inlineBrand.name||inlineBrand.company||'').trim()||null};",
+ "  const assetUid=String(bond?.assetUid||'').trim();",
+ "  if(!assetUid)return {uid:null,name:null};",
+ "  const now=Date.now();",
+ "  const cached=qvanixBondIssuerCache.get(assetUid);",
+ "  if(cached&&cached.expiresAt>now)return cached.value;",
+ "  try{",
+ "    const data=await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/GetAssetBy',{id:assetUid});",
+ "    const asset=data?.asset||data||{};",
+ "    const brand=asset?.brand||null;",
+ "    const value={uid:brand?.uid?String(brand.uid):null,name:String(brand?.name||brand?.company||'').trim()||null};",
+ "    qvanixBondIssuerCache.set(assetUid,{expiresAt:now+QVANIX_BOND_ISSUER_CACHE_TTL_MS,value});",
+ "    return value;",
+ "  }catch(error){",
+ "    console.warn('QVANIX bond issuer metadata failed for '+assetUid+': '+(error?.message||error));",
+ "    return {uid:null,name:null};",
+ "  }",
+ "}",
+ ""
+].join('\\n');
+core=core.replace(bondIssuerHelperMarker,bondIssuerHelperCode+bondIssuerHelperMarker);
 const bondMetaMarker="  // Live dashboard stays lightweight; history owns its own refresh.";
 if(!core.includes(bondMetaMarker))throw new Error('QVANIX v2: bond metadata marker changed');
 const bondMetaCode=[
@@ -57,6 +85,7 @@ const bondMetaCode=[
  "  for (const position of positions.slice(0, 30)) {",
  "    if (!position.figi || !String(position.instrumentType || '').toUpperCase().includes('BOND')) continue;",
  "    const bond = await getInstrumentMeta(position.figi, position.instrumentType);",
+ "    const issuer = await qvanixGetBondIssuer(bond);",
  "    const nominal = bond?.nominal || bond?.initialNominal || null;",
  "    const currency = String(nominal?.currency || bond?.currency || '').toUpperCase();",
  "    position.bond = {",
@@ -70,7 +99,9 @@ const bondMetaCode=[
  "      issueKind: bond?.issueKind || null,",
  "      countryOfRisk: bond?.countryOfRisk || null,",
  "      countryOfRiskName: bond?.countryOfRiskName || null,",
- "      sector: bond?.sector || null",
+ "      sector: bond?.sector || null,",
+ "      issuerUid: issuer.uid || null,",
+ "      issuerName: issuer.name || null",
  "    };",
  "    position.name = bond?.name || position.name;",
  "    position.ticker = bond?.ticker || position.ticker;",
