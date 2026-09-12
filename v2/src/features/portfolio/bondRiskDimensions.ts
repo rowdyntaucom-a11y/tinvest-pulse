@@ -23,10 +23,12 @@ export type BondRiskDimensions = {
   totalBondValue: number
   countryOfRisk: BondDimension
   sector: BondDimension
-  issuer: {
-    available: false
-    reason: 'ISSUER_ID_NOT_IN_SNAPSHOT'
-  }
+  issuer: BondDimension
+}
+
+type DimensionIdentity = {
+  key: string
+  label: string
 }
 
 function isBond(position: PositionSnapshot) {
@@ -40,28 +42,37 @@ function normalizedLabel(value: string | null | undefined) {
   return label || null
 }
 
+function identityFromLabel(value: string | null | undefined): DimensionIdentity | null {
+  const label = normalizedLabel(value)
+  return label ? { key: label.toUpperCase(), label } : null
+}
+
 function buildDimension(
   bonds: PositionSnapshot[],
-  labelOf: (position: PositionSnapshot) => string | null,
+  identityOf: (position: PositionSnapshot) => DimensionIdentity | null,
 ): BondDimension {
   const totalBondValue = bonds.reduce((sum, position) => sum + Math.max(0, position.currentValue), 0)
-  const values = new Map<string, number>()
+  const groups = new Map<string, { label: string; value: number }>()
 
   for (const position of bonds) {
-    const label = labelOf(position)
-    if (!label) continue
+    const identity = identityOf(position)
+    if (!identity) continue
     const value = Math.max(0, position.currentValue)
     if (!Number.isFinite(value) || value <= 0) continue
-    values.set(label, (values.get(label) || 0) + value)
+    const current = groups.get(identity.key)
+    groups.set(identity.key, {
+      label: current?.label || identity.label,
+      value: (current?.value || 0) + value,
+    })
   }
 
-  const coveredValue = [...values.values()].reduce((sum, value) => sum + value, 0)
-  const rows = [...values.entries()]
-    .map(([label, value]) => ({
-      key: label.toUpperCase(),
-      label,
-      value,
-      shareOfCovered: coveredValue > 0 ? value / coveredValue : 0,
+  const coveredValue = [...groups.values()].reduce((sum, row) => sum + row.value, 0)
+  const rows = [...groups.entries()]
+    .map(([key, row]) => ({
+      key,
+      label: row.label,
+      value: row.value,
+      shareOfCovered: coveredValue > 0 ? row.value / coveredValue : 0,
     }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'ru'))
 
@@ -88,14 +99,21 @@ export function buildBondRiskDimensions(positions: PositionSnapshot[]): BondRisk
   return {
     bondCount: bonds.length,
     totalBondValue,
-    countryOfRisk: buildDimension(bonds, position => (
-      normalizedLabel(position.bond?.countryOfRiskName)
-      ?? normalizedLabel(position.bond?.countryOfRisk)
-    )),
-    sector: buildDimension(bonds, position => normalizedLabel(position.bond?.sector)),
-    issuer: {
-      available: false,
-      reason: 'ISSUER_ID_NOT_IN_SNAPSHOT',
-    },
+    countryOfRisk: buildDimension(bonds, position => {
+      const code = normalizedLabel(position.bond?.countryOfRisk)
+      const name = normalizedLabel(position.bond?.countryOfRiskName)
+      if (!code && !name) return null
+      return { key: (code || name!).toUpperCase(), label: name || code! }
+    }),
+    sector: buildDimension(bonds, position => identityFromLabel(position.bond?.sector)),
+    issuer: buildDimension(bonds, position => {
+      const uid = normalizedLabel(position.bond?.issuerUid)
+      if (!uid) return null
+      const name = normalizedLabel(position.bond?.issuerName)
+      return {
+        key: uid,
+        label: name || `Эмитент ${uid.slice(0, 8)}…`,
+      }
+    }),
   }
 }
