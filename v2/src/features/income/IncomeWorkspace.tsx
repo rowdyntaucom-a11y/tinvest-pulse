@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { loadPayoutCalendar, type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
+import { useMemo, useState } from 'react'
+import { type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
+import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { getIncomeIntegrity } from './incomeIntegrity'
 import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration, calculateIncomeStability } from './incomeHistory'
@@ -71,24 +72,10 @@ function incomeSourceIdentityNote(state: ReturnType<typeof buildIncomeSourceRows
 }
 
 export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions }: Props) {
-  const [data, setData] = useState<PayoutCalendar>(empty)
   const [view, setView] = useState<View>('overview')
-  const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
-
-  useEffect(() => {
-    let active = true
-    const load = async () => {
-      const next = await loadPayoutCalendar()
-      if (active) {
-        setData(next)
-        setLoading(false)
-      }
-    }
-    void load()
-    const timer = window.setInterval(load, 10 * 60_000)
-    return () => { active = false; window.clearInterval(timer) }
-  }, [])
+  const { calendar, loading } = usePayoutSnapshot(true)
+  const data = calendar ?? empty
 
   const upcoming = data.events.slice(0, 20)
   const pageSize = 5
