@@ -1,6 +1,9 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
+export const TAIL_RISK_CALC_VERSION = '1.1' as const
+
 export type TailRiskResult = {
+  calcVersion: typeof TAIL_RISK_CALC_VERSION
   available: boolean
   status: 'insufficient_history' | 'preview' | 'mature'
   method: 'historical_daily_twr_var_cvar_v1'
@@ -30,7 +33,10 @@ function portfolioReturns(history: AnalyticsHistoryPoint[]) {
     const prior = index[i - 1].value
     const current = index[i].value
     const value = current / prior - 1
-    if (Number.isFinite(value) && value > -0.5 && value < 0.5) returns.push(value)
+    // Historical tail risk must retain every finite observed TWR return.
+    // Data-quality anomalies belong in the data-quality layer, not in a silent
+    // magnitude filter that could remove the very losses VaR/CVaR must measure.
+    if (Number.isFinite(value)) returns.push(value)
   }
   return returns
 }
@@ -48,6 +54,7 @@ function quantile(sorted: number[], q: number) {
 export function calculateTailRisk(history: AnalyticsHistoryPoint[]): TailRiskResult {
   const returns = portfolioReturns(history)
   const base = {
+    calcVersion: TAIL_RISK_CALC_VERSION,
     method: 'historical_daily_twr_var_cvar_v1' as const,
     confidence: 0.95 as const,
     returns: returns.length,
