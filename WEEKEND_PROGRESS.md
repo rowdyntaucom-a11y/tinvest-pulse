@@ -238,3 +238,17 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Deploy status could not be queried because the Render connector has no user-confirmed workspace selected and autonomous mode must not guess one.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 - Next safe focus: add a deliberate transaction-marker backend contract that exposes only verified date/side/instrument identity, then integrate time-only markers without implying execution-price precision; alternatively continue bond→Income event-identity deduplication if that backend path proves lower risk.
+
+### 09:00 MSK autonomous pass — strict transaction-marker contract groundwork
+- Re-read the mandatory product/audit/terminal/legal documents before changes. The immediate audit queue still prioritizes transaction-marker reliability, while legal publication remains blocked.
+- Added `v2/src/features/portfolio/transactionMarkers.ts` through PR #97 and squash-merged runtime commit `80ecea3384493335646cb6b33c0a62c88821e88e`.
+- The boundary accepts markers only when a stable broker operation ID, valid exact timestamp, explicit supported buy/sell operation type and at least one explicit instrument identity (`FIGI` or instrument UID) are present. Invalid rows fail closed; duplicates are removed by operation ID and output ordering is deterministic.
+- Marker data intentionally contains no execution price/Y-coordinate and never infers side from cash sign, so a future chart cannot claim price precision the current history contract does not provide.
+- Post-merge council review found that the first allow-list included three broker enum labels not explicitly evidenced by the current server code. A corrective PR #98 narrowed the allow-list to the exact reviewed types already represented in current history logic and squash-merged as `6411ddf321714270039953c10fe0685a21757bab`.
+- Quant methodology pass: markers are event annotations only, not return attribution; no trade price, P&L contribution, TWR contribution or recommendation is reconstructed.
+- Code-quality pass: `v2 build` run #132 passed before the initial merge; corrective run #134 also passed. Both included `npm run build` plus syntax checks for `payouts-core.js`, `server-core.js`, `production-v158.js` and `production-v159.js`.
+- Mobile-UX pass: no rendering/UI change in this batch; chart density remains unchanged until a later reviewed integration pass.
+- Release pass: runtime change is one pure TypeScript normalization module; no backend route, broker call, credential, legal/payment text or deployment configuration changed. The correction only narrows accepted enum values.
+- Render auto-deploy was not manually triggered. Render deploy state cannot be queried safely because no user-confirmed workspace is selected; the connector explicitly prohibits autonomous workspace selection, so no live status is guessed.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe step: add a narrow backend marker endpoint only if it can expose the same verified operation ID/date/type/instrument identity without account IDs, tokens or price reconstruction; otherwise switch to bond→Income identity/deduplication groundwork.
