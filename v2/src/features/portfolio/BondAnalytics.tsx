@@ -13,19 +13,23 @@ type Props = { positions: PositionSnapshot[] }
 
 function BondRiskLine({ label, dimension }: { label: string; dimension: BondDimension }) {
   const top = dimension.rows[0]
+  const coveragePct = pct.format(dimension.coverageRatio * 100)
+  const coverageTitle = `Покрыто ${money.format(dimension.coveredValue)} ₽ из ${money.format(dimension.totalBondValue)} ₽ bond-составляющей`
+  const coverageLabel = `${label} · покрытие ${coveragePct}%${dimension.coverageRatio > 0 && dimension.coverageRatio < 1 ? ' · частично' : ''}`
+
   if (!dimension.available || !top) {
     return (
-      <div className="bond-risk-line">
-        <span>{label}</span>
-        <small>нет metadata</small>
+      <div className="bond-risk-line" title={coverageTitle}>
+        <span>{coverageLabel}</span>
+        <small>нет подтверждённой metadata</small>
       </div>
     )
   }
 
   return (
     <div className="bond-risk-line">
-      <span>{label} · покрытие {pct.format(dimension.coverageRatio * 100)}%</span>
-      <small title={`HHI ${dimension.hhi == null ? '—' : dimension.hhi.toFixed(3)} · эффективное число ${dimension.effectiveCount == null ? '—' : dimension.effectiveCount.toFixed(2)}`}>
+      <span title={coverageTitle}>{coverageLabel}</span>
+      <small title={`${coverageTitle} · HHI ${dimension.hhi == null ? '—' : dimension.hhi.toFixed(3)} · эффективное число ${dimension.effectiveCount == null ? '—' : dimension.effectiveCount.toFixed(2)}`}>
         {top.label} {pct.format(top.shareOfCovered * 100)}% покрытого · Nₑ {dimension.effectiveCount == null ? '—' : pct.format(dimension.effectiveCount)}
       </small>
     </div>
@@ -84,7 +88,7 @@ export function BondAnalytics({ positions }: Props) {
         </section>
       </div>
 
-      <p className="bond-method-note">Погашения, валюта, тип купона, сектор и страна риска показываются только из инструментальных данных Т‑Банка. Эмитент определяется только через подтверждённую цепочку bond asset UID → AssetFull brand UID; название используется лишь как подпись, группировка — по UID. Для issuer/sector/country доля лидера и Nₑ считаются только внутри покрытой metadata-выборки, поэтому покрытие всегда показывается отдельно. Средний срок — взвешенный текущей стоимостью календарный срок до подтверждённых будущих дат погашения; бессрочные и выпуски без валидной даты из среднего исключаются. Это не duration и не оценка чувствительности цены. Доходность к погашению пока намеренно не показывается: сначала нужно зафиксировать и проверить семантику цены и номинала для всех выпусков.</p>
+      <p className="bond-method-note">Погашения, валюта, тип купона, сектор и страна риска показываются только из инструментальных данных Т‑Банка. Эмитент определяется только через подтверждённую цепочку bond asset UID → AssetFull brand UID; название используется лишь как подпись, группировка — по UID. Для issuer/sector/country доля лидера и Nₑ считаются только внутри покрытой metadata-выборки, поэтому покрытие всегда показывается отдельно; при неполном покрытии строка явно помечается как частичная, а точная покрытая стоимость доступна в подсказке. Средний срок — взвешенный текущей стоимостью календарный срок до подтверждённых будущих дат погашения; бессрочные и выпуски без валидной даты из среднего исключаются. Это не duration и не оценка чувствительности цены. Доходность к погашению пока намеренно не показывается: сначала нужно зафиксировать и проверить семантику цены и номинала для всех выпусков.</p>
     </div>
   )
 }
