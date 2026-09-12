@@ -18,6 +18,18 @@ function compactLabel(value: string) {
   return text.length <= 8 ? text : `${text.slice(0, 7)}…`
 }
 
+function compactDate(value: string | null) {
+  if (!value) return null
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  return match ? `${match[3]}.${match[2]}.${match[1].slice(2)}` : value
+}
+
+function sampleRange(from: string | null, to: string | null) {
+  const start = compactDate(from)
+  const end = compactDate(to)
+  return start && end ? `${start}→${end}` : null
+}
+
 function cellTone(value: number | null) {
   if (value == null) return 'is-na'
   if (value < 0) return 'is-negative'
@@ -136,10 +148,12 @@ export function CorrelationPanel({ positions }: Props) {
   const availableSeries = Math.max(series.length, payload?.availableSeries ?? 0)
   const allocationScenarios = [allocation.equalWeight, allocation.minimumVariance, allocation.equalRiskContribution]
     .filter((scenario): scenario is AllocationScenario => scenario != null)
+  const allocationSample = sampleRange(allocation.from, allocation.to)
+  const currentRiskSample = sampleRange(currentRisk.sampleFrom, currentRisk.sampleTo)
   const topRisk = currentRisk.topAbsoluteContributor
   const topRiskLine = topRisk?.riskContributionShare == null
     ? null
-    : `coverage ${currentRisk.coverageRatio == null ? '—' : `${pct.format(currentRisk.coverageRatio * 100)}%`} · ${compactLabel(topRisk.label)} · капитал ${pct.format(topRisk.weight * 100)}% · вклад ${pctSigned.format(topRisk.riskContributionShare * 100)}%${currentRisk.topAbsoluteRiskShare == null ? '' : ` · |risk| ${pct.format(currentRisk.topAbsoluteRiskShare * 100)}%`}`
+    : `coverage ${currentRisk.coverageRatio == null ? '—' : `${pct.format(currentRisk.coverageRatio * 100)}%`} · ${compactLabel(topRisk.label)} · капитал ${pct.format(topRisk.weight * 100)}% · вклад ${pctSigned.format(topRisk.riskContributionShare * 100)}%${currentRisk.topAbsoluteRiskShare == null ? '' : ` · |risk| ${pct.format(currentRisk.topAbsoluteRiskShare * 100)}%`}${currentRiskSample ? ` · ${currentRiskSample}` : ''}`
   const riskDepthBadge = currentRisk.available
     ? `DR ${currentRisk.diversificationRatio == null ? '—' : number.format(currentRisk.diversificationRatio)} · Nₑ ${currentRisk.effectiveRiskContributorCount == null ? '—' : number.format(currentRisk.effectiveRiskContributorCount)}/${currentRisk.effectiveCapitalCount == null ? '—' : number.format(currentRisk.effectiveCapitalCount)}`
     : null
@@ -203,7 +217,7 @@ export function CorrelationPanel({ positions }: Props) {
         <summary>
           <span>ALLOCATION LAB · RISK ONLY</span>
           <strong>{allocation.status}</strong>
-          <small>{allocation.commonReturns} общих интервалов</small>
+          <small>{allocation.commonReturns} общих интервалов{allocationSample ? ` · ${allocationSample}` : ''}</small>
         </summary>
         {currentRisk.available ? (
           <article className="current-risk-diagnostic">
