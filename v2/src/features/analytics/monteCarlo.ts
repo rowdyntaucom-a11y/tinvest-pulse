@@ -9,10 +9,12 @@ export type MonteCarloPercentiles = {
 export type MonteCarloResult = {
   available: boolean
   status: 'insufficient_history' | 'preview' | 'mature'
-  method: 'historical_daily_return_bootstrap_v1'
+  method: 'historical_block_bootstrap_v2'
   historyReturns: number
+  excludedReturns: number
   minimumReturns: number
   matureReturns: number
+  blockTradingDays: number
   horizonTradingDays: number
   simulations: number
   terminalReturn: MonteCarloPercentiles | null
@@ -22,6 +24,7 @@ export type MonteCarloResult = {
 
 const MIN_BOOTSTRAP_RETURNS = 60
 const MATURE_BOOTSTRAP_RETURNS = 252
+const DEFAULT_BLOCK_DAYS = 5
 const DEFAULT_HORIZON_DAYS = 252
 const DEFAULT_SIMULATIONS = 2000
 
@@ -35,19 +38,27 @@ function validIndex(history: AnalyticsHistoryPoint[]) {
 function dailyReturns(history: AnalyticsHistoryPoint[]) {
   const index = validIndex(history)
   const values: number[] = []
+  let excludedReturns = 0
+
   for (let i = 1; i < index.length; i += 1) {
     const prior = index[i - 1].value
     const current = index[i].value
     if (prior <= 0 || current <= 0) continue
     const value = current / prior - 1
-    if (Number.isFinite(value) && value > -0.5 && value < 0.5) values.push(value)
+    if (!Number.isFinite(value)) continue
+    if (value <= -0.5 || value >= 0.5) {
+      excludedReturns += 1
+      continue
+    }
+    values.push(value)
   }
-  return values
+
+  return { values, excludedReturns }
 }
 
-function hashSeed(values: number[], horizon: number, simulations: number) {
+function hashSeed(values: number[], horizon: number, simulations: number, blockDays: number) {
   let hash = 2166136261 >>> 0
-  const source = `${values.map(value => value.toFixed(8)).join('|')}|${horizon}|${simulations}`
+  const source = `${values.map(value => value.toFixed(8)).join('|')}|${horizon}|${simulations}|${blockDays}`
   for (let i = 0; i < source.length; i += 1) {
     hash ^= source.charCodeAt(i)
     hash = Math.imul(hash, 16777619) >>> 0
@@ -76,20 +87,32 @@ function percentile(sorted: number[], q: number) {
   return sorted[lower] * (1 - weight) + sorted[upper] * weight
 }
 
+function positiveInteger(value: number, fallback: number, max: number) {
+  if (!Number.isFinite(value)) return fallback
+  return Math.max(1, Math.min(max, Math.floor(value)))
+}
+
 export function calculateMonteCarlo(
   history: AnalyticsHistoryPoint[],
   currentPortfolioValue: number,
   horizonTradingDays = DEFAULT_HORIZON_DAYS,
   simulations = DEFAULT_SIMULATIONS,
+  blockTradingDays = DEFAULT_BLOCK_DAYS,
 ): MonteCarloResult {
-  const returns = dailyReturns(history)
+  const sample = dailyReturns(history)
+  const returns = sample.values
+  const horizon = positiveInteger(horizonTradingDays, DEFAULT_HORIZON_DAYS, 2520)
+  const paths = positiveInteger(simulations, DEFAULT_SIMULATIONS, 100_000)
+  const blockDays = positiveInteger(blockTradingDays, DEFAULT_BLOCK_DAYS, 20)
   const base = {
-    method: 'historical_daily_return_bootstrap_v1' as const,
+    method: 'historical_block_bootstrap_v2' as const,
     historyReturns: returns.length,
+    excludedReturns: sample.excludedReturns,
     minimumReturns: MIN_BOOTSTRAP_RETURNS,
     matureReturns: MATURE_BOOTSTRAP_RETURNS,
-    horizonTradingDays,
-    simulations,
+    blockTradingDays: blockDays,
+    horizonTradingDays: horizon,
+    simulations: paths,
   }
 
   if (returns.length < MIN_BOOTSTRAP_RETURNS || !Number.isFinite(currentPortfolioValue) || currentPortfolioValue <= 0) {
@@ -99,19 +122,28 @@ export function calculateMonteCarlo(
       status: 'insufficient_history',
       terminalReturn: null,
       terminalValue: null,
-      note: `Нужно минимум ${MIN_BOOTSTRAP_RETURNS} дневных доходностей TWR. Сейчас доступно ${returns.length}. QVANIX не строит прогноз из слишком короткой выборки.`,
+      note: `Нужно минимум ${MIN_BOOTSTRAP_RETURNS} валидных дневных доходностей TWR. Сейчас доступно ${returns.length}.${sample.excludedReturns ? ` Исключено экстремальных наблюдений: ${sample.excludedReturns}.` : ''} QVANIX не строит сценарное распределение из слишком короткой выборки.`,
     }
   }
 
-  const rng = mulberry32(hashSeed(returns, horizonTradingDays, simulations))
-  const terminalFactors = new Array<number>(simulations)
+  const rng = mulberry32(hashSeed(returns, horizon, paths, blockDays))
+  const terminalFactors = new Array<number>(paths)
 
-  for (let path = 0; path < simulations; path += 1) {
+  for (let path = 0; path < paths; path += 1) {
     let factor = 1
-    for (let day = 0; day < horizonTradingDays; day += 1) {
-      const sampleIndex = Math.min(returns.length - 1, Math.floor(rng() * returns.length))
-      factor *= 1 + returns[sampleIndex]
+    let day = 0
+
+    while (day < horizon) {
+      const blockLength = Math.min(blockDays, horizon - day, returns.length)
+      const maxStart = Math.max(1, returns.length - blockLength + 1)
+      const startIndex = Math.min(maxStart - 1, Math.floor(rng() * maxStart))
+
+      for (let offset = 0; offset < blockLength; offset += 1) {
+        factor *= 1 + returns[startIndex + offset]
+      }
+      day += blockLength
     }
+
     terminalFactors[path] = factor
   }
 
@@ -133,6 +165,7 @@ export function calculateMonteCarlo(
     p90: currentPortfolioValue * factors.p90,
   }
   const mature = returns.length >= MATURE_BOOTSTRAP_RETURNS
+  const integritySuffix = sample.excludedReturns ? ` Исключено экстремальных дневных наблюдений: ${sample.excludedReturns}.` : ''
 
   return {
     ...base,
@@ -141,7 +174,7 @@ export function calculateMonteCarlo(
     terminalReturn,
     terminalValue,
     note: mature
-      ? 'Bootstrap случайно пересобирает 12 месяцев из фактических дневных TWR-доходностей. Будущие пополнения и снятия не моделируются.'
-      : `Предварительная модель: ${returns.length} дневных доходностей. Для зрелой оценки QVANIX ждёт не менее ${MATURE_BOOTSTRAP_RETURNS}. Будущие пополнения и снятия не моделируются.`,
+      ? `Block bootstrap пересобирает ${horizon} торговых дней из непрерывных ${blockDays}-дневных блоков фактических TWR-доходностей.${integritySuffix} Будущие пополнения и снятия не моделируются.`
+      : `Предварительная модель: ${returns.length} дневных доходностей, блок ${blockDays} торговых дней. Для зрелой оценки QVANIX ждёт не менее ${MATURE_BOOTSTRAP_RETURNS}.${integritySuffix} Будущие пополнения и снятия не моделируются.`,
   }
 }
