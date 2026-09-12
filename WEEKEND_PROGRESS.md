@@ -172,6 +172,21 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Deploy status could not be queried because no Render workspace is selected/confirmed for this automation context; the connector explicitly requires user-confirmed workspace selection and autonomous mode must not guess.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 
+### 05:04 MSK autonomous pass — deterministic rebalancing scenario groundwork
+- Added `v2/src/features/analytics/rebalanceScenarios.ts` through PR #78 and squash-merged as `85dd0ca803ba4af6f0bac80c28885fbfe3310b31`.
+- Scenarios reuse the existing drift strategy but operate only on the strategy-assigned equity/bond sleeve. Assets outside that sleeve are not redistributed or silently folded into the 50/50 target; their unassigned weight remains explicit.
+- `REBALANCE_EXISTING` computes class-level target deltas with zero external flow.
+- `ADD_CAPITAL` requires an explicit positive user-supplied amount and never assumes reductions of existing classes. It reports whether the exact target is reachable with additions only and the minimum add-only flow needed when it is not.
+- `WITHDRAW_CAPITAL` requires an explicit positive user-supplied amount, must leave a positive assigned sleeve, and never assumes purchases/increases. It reports whether the exact target is reachable with withdrawals only and the minimum withdrawal required when it is not.
+- Invalid target configurations fail closed; target weights are never silently normalized. Full-liquidation scenarios remain outside this diagnostic.
+- Output is a deterministic class-level scenario, not a personalized buy/sell recommendation and not an execution instruction.
+- Quant methodology pass: checked assigned-sleeve accounting, one-direction feasibility gates and minimum-flow formulas; no expected-return assumption or invented market value is introduced.
+- Code-quality pass: GitHub `v2 build` workflow run #102 completed successfully, including `npm run build` and `node --check ../payouts-core.js`.
+- Mobile-UX pass: no UI/layout change in this batch; Samsung/Android density and no-duplication rules are unchanged.
+- Release pass: one pure TypeScript calculation module only; no backend/broker route, credential, legal/payment text, renderer or deployment configuration changed.
+- Render auto-deploy was not manually triggered. Deploy status could not be queried because no Render workspace is selected/confirmed for this automation context; autonomous mode must not guess a workspace.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; deepen it only with validated live sample coverage and mobile density.
@@ -181,4 +196,5 @@ This log is maintained by autonomous development runs. Production changes must r
 - Broker P/L attribution remains clearly labelled current unrealized contribution; historical/TWR attribution stays gated on trustworthy per-position history.
 - Recovery diagnostics are deterministic but should remain out of the UI until the live sample gate is met.
 - Income exact-month realized comparable-period diagnostics are now compactly surfaced only when the ≥3 paired-month gate is met; goal progress remains gated until the user supplies an explicit target.
+- Rebalancing now has deterministic class-level scenario groundwork; future UI integration should remain compact and accept only explicit user-authored add/withdraw amounts.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
