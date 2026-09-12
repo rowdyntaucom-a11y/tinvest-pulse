@@ -129,7 +129,7 @@ This log is maintained by autonomous development runs. Production changes must r
 - Issuer concentration remains explicitly unavailable because the current normalized snapshot contains no verified issuer identifier; sector/country are not relabelled as issuer concentration.
 - No YTM, duration, expected return, stress assumption, LLM-derived number or personalized buy/sell output was added.
 - Quant methodology pass: incomplete metadata cannot masquerade as full bond concentration because `coverageRatio` and `shareOfCovered` are separate quantities.
-- Code-quality pass: the module is pure and side-effect free; GitHub `v2 build` workflow run #94 passed, including `tsc -b`, Vite build and `payouts-core.js` syntax check.
+- Code-quality pass: the module is pure and side effect free; GitHub `v2 build` workflow run #94 passed, including `tsc -b`, Vite build and `payouts-core.js` syntax check.
 - Mobile-UX pass: no rendering/layout change in this batch; Samsung/Android density and no-duplication rules are unaffected.
 - Release pass: one new calculation primitive only; no broker/backend route, renderer, secrets, legal/payment text or deployment config changed.
 - Render auto-deploy was not manually triggered. Deploy status could not be queried because the Render connector requires a user-confirmed workspace and autonomous mode must not choose one implicitly.
@@ -309,3 +309,19 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Read-only monitoring was attempted, but the connector returned `no workspace selected` and explicitly prohibits autonomous workspace selection; deploy status for `tinvest-pulse-v2-preview` and `tinvest-pulse` is therefore not guessed.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 - Next safe focus: make dependency installs reproducible only through an explicitly generated/reviewed lockfile and `npm ci` path, or continue the approved live/mobile data-quality review for issuer coverage, Allocation Lab and transaction-marker density if lockfile generation cannot be performed safely in the current tool environment.
+
+### 14:05 MSK autonomous pass — position-income observation context
+- Re-read the mandatory project/product/audit/terminal/legal/progress documents and reconciled them with current `main` before changing code.
+- Reproducible dependency installation was considered first, but the current execution environment cannot resolve GitHub/npm while the repository still has no `v2/package-lock.json`. No hand-authored or unverified lockfile was introduced.
+- Current `main` already contained exact-FIGI position passive-income contribution. Review found a data-honesty gap: FACT share was correctly labelled observed, but the calculation result did not carry the observation-window provenance needed to prevent partial history from later looking like lifetime contribution.
+- PR #139 bumps `POSITION_INCOME_CONTRIBUTION_VERSION` to `1.1` and adds `factObservationFrom`, `factObservationTo` and `factObservationCompleteMonths`. These fields are populated only when `actual.observation.available=true`; unavailable observation metadata fails closed.
+- FACT/schedule arithmetic is unchanged: exact FIGI only; FACT uses realized net income; the 12M schedule uses future gross events; realized payment ↔ scheduled-event reconciliation is still not inferred.
+- Regression coverage now locks both observation-window propagation and fail-closed behavior when a caller supplies dates/months but marks the observation unavailable.
+- Quant methodology pass: no new financial formula, annualization, forecast, reinvestment assumption or recommendation was introduced; this change adds denominator provenance only.
+- Code-quality pass: GitHub `v2 build` PR run #203 completed successfully, including dependency security gates, TypeScript/Vite build, full `test:core` and syntax checks for `payouts-core.js`, `server-core.js`, `production-v158.js`, `production-v159.js` and `production-v160.js`.
+- Mobile-UX pass: no UI/CSS/layout change; Samsung/Android one-screen density and no-duplication behavior are unchanged.
+- Release pass: the runtime diff is limited to the pure position-income boundary plus its regression test; no broker/backend route, credential, legal/payment wording, DNA renderer or trade behavior changed. PR #139 was squash-merged to `main` as `93f1f8d66386e73c8d9ea2b8f0dff573f3f5ae5f`.
+- Post-merge `main` `v2 build` run #204 completed successfully. Several stale historical patch workflows still fail on ordinary pushes, but the scoped v2 production gate is green and no regression attributable to this change was identified.
+- Render auto-deploy was not manually triggered. Read-only monitoring was attempted again, but the connector returned `no workspace selected` and explicitly forbids autonomous workspace selection; no `live` status is guessed.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe focus: surface the observation-window context in the existing position drill-down only if it fits without adding a duplicate widget or breaking Samsung density; otherwise continue issuer/Allocation Lab live-data quality review. Keep lockfile/`npm ci` work blocked until a trusted dependency-resolution environment is available.
