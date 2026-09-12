@@ -20,7 +20,7 @@ function close(actual: number | null, expected: number, tolerance = 1e-12) {
   assert.ok(Math.abs((actual as number) - expected) <= tolerance, `expected ${expected}, got ${actual}`)
 }
 
-assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.2')
+assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.3')
 
 dashboardPayload = {
   portfolio: {
@@ -200,5 +200,52 @@ assert.equal(legitimateZeros.positionItems[0].bond?.maturityDate, '2030-12-31')
 close(legitimateZeros.positionItems[0].bond?.nominal ?? null, 0)
 close(legitimateZeros.positionItems[0].bond?.couponQuantityPerYear ?? null, 0)
 assert.equal(legitimateZeros.positionItems[0].bond?.currency, 'USD')
+
+// Same-day duplicates are safe only when their finite values agree. A
+// conflicting duplicate must not win by array order, because that would make
+// TWR/benchmark/value diagnostics depend on arbitrary transport ordering.
+dashboardPayload = {
+  portfolio: { value: 100, profit: 0, profitPercent: 0, positions: [] },
+  account: { name: 'History Conflict Test' },
+  history: {
+    points: [
+      { date: '2026-09-04', portfolio: 1.1, imoex: 2.2 },
+      { date: '2026-09-04T18:00:00Z', portfolio: 1.1, imoex: 2.2 },
+      { date: '2026-09-05', portfolio: 1.2, imoex: 2.3 },
+      { date: '2026-09-05T19:00:00Z', portfolio: 1.25, imoex: 2.3 },
+      { date: '2026-09-05', portfolio: 1.2, imoex: 2.3 },
+      { date: '2026-09-06', portfolio: 'bad', imoex: 2.4 },
+      { date: '2026-09-06', portfolio: 1.3, imoex: 2.4 },
+    ],
+    valuePoints: [
+      { date: '2026-09-04', value: 100 },
+      { date: '2026-09-04', value: 100 },
+      { date: '2026-09-05', value: 110 },
+      { date: '2026-09-05', value: 111 },
+      { date: '2026-09-05', value: 110 },
+    ],
+    investedPoints: [
+      { date: '2026-09-04', value: 90 },
+      { date: '2026-09-04', value: 'bad' },
+      { date: '2026-09-05', value: 95 },
+      { date: '2026-09-05', value: 96 },
+    ],
+  },
+}
+
+const conflictGuard = await loadPortfolio()
+assert.deepEqual(conflictGuard.history.map(point => point.date), ['2026-09-04', '2026-09-05', '2026-09-06'])
+close(conflictGuard.history[0].portfolio, 1.1)
+close(conflictGuard.history[0].imoex, 2.2)
+close(conflictGuard.history[0].value, 100)
+close(conflictGuard.history[0].invested, 90)
+assert.equal(conflictGuard.history[1].portfolio, null)
+close(conflictGuard.history[1].imoex, 2.3)
+assert.equal(conflictGuard.history[1].value, null)
+assert.equal(conflictGuard.history[1].invested, null)
+close(conflictGuard.history[2].portfolio, 1.3)
+close(conflictGuard.history[2].imoex, 2.4)
+assert.equal(conflictGuard.history[2].value, null)
+assert.equal(conflictGuard.history[2].invested, null)
 
 console.log('portfolio API normalization regression: ok')
