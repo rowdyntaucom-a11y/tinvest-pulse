@@ -5,6 +5,8 @@ on:
     paths:
       - 'package.json'
       - 'v2/**'
+      - 'tests/**'
+      - 'asset-history-core.js'
       - 'payouts-core.js'
       - 'payouts.js'
       - 'server-core.js'
@@ -17,6 +19,8 @@ on:
     paths:
       - 'package.json'
       - 'v2/**'
+      - 'tests/**'
+      - 'asset-history-core.js'
       - 'payouts-core.js'
       - 'payouts.js'
       - 'server-core.js'
@@ -48,6 +52,8 @@ jobs:
           npm audit --omit=dev --audit-level=high
       - run: npm run build
       - run: npm run test:core
+      - run: node --check ../asset-history-core.js
+      - run: node ../tests/asset-history-core.test.js
       - run: node --check ../payouts-core.js
       - run: node --check ../server-core.js
       - run: node --check ../production-v158.js
