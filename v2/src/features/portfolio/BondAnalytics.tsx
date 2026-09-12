@@ -35,6 +35,8 @@ function hasVerifiedBondMeta(position: PositionSnapshot) {
     meta.countryOfRisk ||
     meta.countryOfRiskName ||
     meta.sector ||
+    meta.issuerUid ||
+    meta.issuerName ||
     meta.floatingCoupon === true ||
     meta.perpetual === true ||
     meta.amortizing === true
@@ -203,6 +205,7 @@ export function BondAnalytics({ positions }: Props) {
             <div className="bond-mini-list">
               {model.couponRows.map(row => <div key={row.key}><span>{row.label}</span><b>{pct.format(model.total > 0 ? row.value / model.total * 100 : 0)}%</b></div>)}
             </div>
+            <BondRiskLine label="ЭМИТЕНТ" dimension={riskDimensions.issuer} />
             <BondRiskLine label="СЕКТОР" dimension={riskDimensions.sector} />
           </div>
           <div>
@@ -215,7 +218,7 @@ export function BondAnalytics({ positions }: Props) {
         </section>
       </div>
 
-      <p className="bond-method-note">Погашения, валюта, тип купона, сектор и страна риска показываются только из инструментальных данных Т‑Банка. Для sector/country доля лидера и Nₑ считаются только внутри покрытой metadata-выборки, поэтому покрытие всегда показывается отдельно. Issuer concentration пока недоступна: в текущем snapshot нет проверенного issuer ID. Средний срок — взвешенный текущей стоимостью календарный срок до подтверждённых будущих дат погашения; бессрочные и выпуски без валидной даты из среднего исключаются. Это не duration и не оценка чувствительности цены. Доходность к погашению пока намеренно не показывается: сначала нужно зафиксировать и проверить семантику цены и номинала для всех выпусков.</p>
+      <p className="bond-method-note">Погашения, валюта, тип купона, сектор и страна риска показываются только из инструментальных данных Т‑Банка. Эмитент определяется только через подтверждённую цепочку bond asset UID → AssetFull brand UID; название используется лишь как подпись, группировка — по UID. Для issuer/sector/country доля лидера и Nₑ считаются только внутри покрытой metadata-выборки, поэтому покрытие всегда показывается отдельно. Средний срок — взвешенный текущей стоимостью календарный срок до подтверждённых будущих дат погашения; бессрочные и выпуски без валидной даты из среднего исключаются. Это не duration и не оценка чувствительности цены. Доходность к погашению пока намеренно не показывается: сначала нужно зафиксировать и проверить семантику цены и номинала для всех выпусков.</p>
     </div>
   )
 }
