@@ -1,23 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { loadAssetHistory, type AssetHistoryPayload } from '../../lib/assetHistoryApi'
 import { calculateAllocationDiagnostics, type AllocationScenario } from './allocationDiagnostics'
 import { calculateCorrelationMatrix, type CorrelationCell, type RiskSeries } from './riskMatrix'
 import './correlation.css'
-
-type AssetHistoryResponse = {
-  version: '1.0'
-  available: boolean
-  from?: string
-  to?: string
-  requested?: number
-  availableSeries?: number
-  source?: string
-  series?: Array<{
-    key?: string
-    label?: string
-    instrumentId?: string
-    points?: Array<{ date?: string; value?: number }>
-  }>
-}
 
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
@@ -59,21 +44,16 @@ function AllocationScenarioRow({ scenario }: { scenario: AllocationScenario }) {
 }
 
 export function CorrelationPanel() {
-  const [payload, setPayload] = useState<AssetHistoryResponse | null>(null)
+  const [payload, setPayload] = useState<AssetHistoryPayload | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const controller = new AbortController()
     const load = async () => {
-      try {
-        const response = await fetch('/api/asset-history', { cache: 'no-store', signal: controller.signal })
-        if (!response.ok) throw new Error(`asset-history ${response.status}`)
-        const raw = await response.json() as AssetHistoryResponse
-        setPayload(raw)
-      } catch (error) {
-        if (!controller.signal.aborted) setPayload({ version: '1.0', available: false, series: [] })
-      } finally {
-        if (!controller.signal.aborted) setLoading(false)
+      const next = await loadAssetHistory(controller.signal)
+      if (!controller.signal.aborted) {
+        setPayload(next)
+        setLoading(false)
       }
     }
     void load()
@@ -81,17 +61,11 @@ export function CorrelationPanel() {
   }, [])
 
   const series = useMemo<RiskSeries[]>(() => {
-    const rows = Array.isArray(payload?.series) ? payload.series : []
+    const rows = payload?.series ?? []
     return rows
-      .map((item, index) => ({
-        key: String(item.key || item.instrumentId || `asset-${index + 1}`),
-        label: String(item.label || item.key || item.instrumentId || `Актив ${index + 1}`),
-        points: (Array.isArray(item.points) ? item.points : [])
-          .map(point => ({ date: String(point.date || '').slice(0, 10), value: Number(point.value) }))
-          .filter(point => point.date && Number.isFinite(point.value) && point.value > 0),
-      }))
       .filter(item => item.points.length >= 2)
       .slice(0, 6)
+      .map(item => ({ key: item.key, label: item.label, points: item.points }))
   }, [payload])
 
   const matrix = useMemo(() => calculateCorrelationMatrix(series), [series])
@@ -111,8 +85,8 @@ export function CorrelationPanel() {
   const lowest = readyPairs.length ? readyPairs.reduce((best, cell) => (cell.correlation! < best.correlation! ? cell : best)) : null
   const highest = readyPairs.length ? readyPairs.reduce((best, cell) => (cell.correlation! > best.correlation! ? cell : best)) : null
   const labelByKey = new Map(series.map(item => [item.key, item.label]))
-  const requestedSeries = Math.max(series.length, Number(payload?.requested) || 0)
-  const availableSeries = Math.max(series.length, Number(payload?.availableSeries) || 0)
+  const requestedSeries = Math.max(series.length, payload?.requested ?? 0)
+  const availableSeries = Math.max(series.length, payload?.availableSeries ?? 0)
   const allocationScenarios = [allocation.equalWeight, allocation.minimumVariance, allocation.equalRiskContribution]
     .filter((scenario): scenario is AllocationScenario => scenario != null)
 
