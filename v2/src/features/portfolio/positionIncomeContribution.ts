@@ -1,7 +1,7 @@
 import type { PayoutCalendar, PayoutEvent } from '../../lib/payoutsApi'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
-export const POSITION_INCOME_CONTRIBUTION_VERSION = '1.0' as const
+export const POSITION_INCOME_CONTRIBUTION_VERSION = '1.1' as const
 
 export type PositionIncomeContribution = {
   version: typeof POSITION_INCOME_CONTRIBUTION_VERSION
@@ -10,6 +10,9 @@ export type PositionIncomeContribution = {
   factNet: number | null
   factCount: number
   factShare: number | null
+  factObservationFrom: string | null
+  factObservationTo: string | null
+  factObservationCompleteMonths: number | null
   scheduledGross: number | null
   scheduledCount: number
   scheduledShare: number | null
@@ -40,19 +43,25 @@ function exactFigi(event: PayoutEvent, figi: string) {
  *
  * FACT and future schedule are deliberately separate aggregates. This function
  * never claims that a realized payment reconciles to a particular scheduled
- * coupon/dividend event.
+ * coupon/dividend event. FACT share always carries the broker observation
+ * window so partial history cannot look like lifetime contribution.
  */
 export function calculatePositionIncomeContribution(
   position: Pick<PositionSnapshot, 'figi'>,
   calendar: PayoutCalendar | null,
 ): PositionIncomeContribution {
   const figi = identity(position.figi)
+  const observation = calendar?.actual.observation
+  const observationAvailable = observation?.available === true
   const base = {
     version: POSITION_INCOME_CONTRIBUTION_VERSION,
     figi,
     factNet: null,
     factCount: 0,
     factShare: null,
+    factObservationFrom: observationAvailable ? observation?.from ?? null : null,
+    factObservationTo: observationAvailable ? observation?.to ?? null : null,
+    factObservationCompleteMonths: observationAvailable ? observation?.completeMonths.length ?? 0 : null,
     scheduledGross: null,
     scheduledCount: 0,
     scheduledShare: null,
@@ -101,6 +110,6 @@ export function calculatePositionIncomeContribution(
     scheduledCount: matchedScheduled.length,
     scheduledShare: scheduledGross != null && scheduleTotal > 0 ? scheduledGross / scheduleTotal : null,
     reason: null,
-    note: 'Exact FIGI only. FACT uses realized net income; 12M schedule uses future gross events. FACT↔schedule event reconciliation is not inferred.',
+    note: 'Exact FIGI only. FACT share is limited to the reported observation window; 12M schedule uses future gross events. FACT↔schedule event reconciliation is not inferred.',
   }
 }
