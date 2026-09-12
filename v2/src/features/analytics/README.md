@@ -2,7 +2,7 @@
 
 The analytics layer is deterministic and explainable. It must never depend on an LLM for numerical results.
 
-Current v1 methodology implemented in `metrics.ts`:
+Current methodology implemented in `metrics.ts`:
 - TWR from the normalized portfolio index;
 - Max Drawdown from running peak;
 - annualized volatility from daily TWR-index returns (`σ_daily × √252`);
@@ -13,8 +13,14 @@ Current v1 methodology implemented in `metrics.ts`:
 
 Drawdown recovery diagnostics in `recoveryDiagnostics.ts` use the same portfolio TWR index. A completed recovery is recorded only when the index regains the prior peak. Active drawdowns stay separate from completed episodes. Recovery statistics fail closed below 60 daily return observations; 252 observations marks a mature sample. The module reports historical episode depth and calendar durations only and does not forecast a future recovery date.
 
+Monte Carlo scenario diagnostics in `monteCarlo.ts` use deterministic historical block bootstrap v2. The engine resamples contiguous 5-trading-day blocks of actual daily portfolio TWR returns rather than sampling every day independently, preserving a limited amount of short-horizon serial structure without inventing an expected return or volatility model. The scenario gate remains 60 valid daily returns for preview and 252 for a mature sample. P10 / P50 / P90 are distribution percentiles, not forecasts or guarantees. Future contributions, withdrawals, taxes and commissions are not inferred. Daily TWR moves outside the current integrity band (`<= -50%` or `>= +50%`) are excluded from the bootstrap sample and the excluded count is exposed to the UI instead of being hidden.
+
+Benchmark-relative analytics use only overlapping portfolio / IMOEX dates. Tracking Error, Information Ratio, Beta and correlation stay gated until the paired-return sample is sufficient; no coefficient is extrapolated from missing benchmark observations.
+
+Tail risk uses historical one-day portfolio TWR returns. VaR 95% / CVaR (Expected Shortfall) are withheld below the configured history gate and are explicitly historical risk diagnostics, not maximum-loss forecasts.
+
 The portfolio and IMOEX lines must always share one Y scale. Never independently rescale comparison series.
 
 History shorter than the intended 12-month window must be labeled as the actually available period rather than presented as a full-year sample.
 
-Future additions remain gated by reliable data and explicit methodology: broader attribution, richer rebalancing scenarios, look-through and advanced risk metrics.
+Future additions remain gated by reliable data and explicit methodology: historical position-level return attribution, verified issuer-level bond concentration, duration/YTM semantics, and any further optimization or Terminal analytics that require new market-data assumptions.
