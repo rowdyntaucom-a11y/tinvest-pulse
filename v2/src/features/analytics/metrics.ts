@@ -1,3 +1,5 @@
+export const PORTFOLIO_ANALYTICS_CALC_VERSION = '1.0' as const
+
 export type AnalyticsPosition = {
   ticker: string
   name: string
@@ -21,6 +23,7 @@ export type HealthComponent = {
 }
 
 export type PortfolioAnalytics = {
+  calcVersion: typeof PORTFOLIO_ANALYTICS_CALC_VERSION
   available: boolean
   historyDays: number
   historyPoints: number
@@ -174,6 +177,7 @@ export function calculatePortfolioAnalytics(
   }))
 
   return {
+    calcVersion: PORTFOLIO_ANALYTICS_CALC_VERSION,
     available: index.length >= 2 || positions.length > 0,
     historyDays,
     historyPoints: index.length,
