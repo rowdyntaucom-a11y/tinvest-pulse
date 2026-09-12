@@ -1,6 +1,7 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { calculateAllocationDrift, type DriftResult, type StrategyConfig } from './drift'
 import { calculateRebalanceScenario } from './rebalanceScenarios'
+import { acceptStrategyScenarioInputs } from './strategyScenarioPolicy'
 
 export type StrategyScenarioInput = {
   id: string
@@ -26,28 +27,6 @@ export type StrategyScenarioComparison = {
   rows: StrategyScenarioComparisonRow[]
   reason: string | null
   note: string
-}
-
-const EPSILON = 1e-8
-const MAX_SCENARIOS = 4
-
-function validStrategy(strategy: StrategyConfig) {
-  if (!strategy || strategy.version !== '1.0' || strategy.targets.length !== 2) return false
-  const keys = new Set<string>()
-  let total = 0
-  for (const target of strategy.targets) {
-    if (target.key !== 'equity' && target.key !== 'bond') return false
-    if (keys.has(target.key)) return false
-    keys.add(target.key)
-    if (!Number.isFinite(target.target) || target.target <= 0) return false
-    total += target.target
-  }
-  if (!keys.has('equity') || !keys.has('bond')) return false
-  if (Math.abs(total - 1) > EPSILON) return false
-  return Number.isFinite(strategy.absoluteTolerance)
-    && strategy.absoluteTolerance >= 0
-    && Number.isFinite(strategy.relativeTolerance)
-    && strategy.relativeTolerance >= 0
 }
 
 function targetFor(drift: DriftResult, key: 'equity' | 'bond') {
@@ -83,15 +62,7 @@ export function compareStrategyScenarios(
   positions: PositionSnapshot[],
   inputs: StrategyScenarioInput[],
 ): StrategyScenarioComparison {
-  const uniqueIds = new Set<string>()
-  const accepted: StrategyScenarioInput[] = []
-
-  for (const input of inputs.slice(0, MAX_SCENARIOS)) {
-    const id = String(input?.id || '').trim()
-    if (!id || uniqueIds.has(id) || !validStrategy(input.strategy)) continue
-    uniqueIds.add(id)
-    accepted.push({ ...input, id })
-  }
+  const accepted = acceptStrategyScenarioInputs(inputs)
 
   if (accepted.length < 2) {
     return {
