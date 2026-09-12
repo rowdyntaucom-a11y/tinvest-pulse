@@ -39,7 +39,7 @@ const short = calculateCurrentRiskContribution([
   makeSeries('B', pattern(59), 40),
 ], 125)
 assert.equal(short.calcVersion, CURRENT_RISK_CONTRIBUTION_CALC_VERSION)
-assert.equal(short.calcVersion, '1.1')
+assert.equal(short.calcVersion, '1.2')
 assert.equal(short.available, false)
 assert.equal(short.status, 'INSUFFICIENT_HISTORY')
 assert.equal(short.commonReturns, 59)
@@ -73,6 +73,18 @@ close(preview.effectiveCapitalCount, 1 / 0.52)
 close(preview.riskMagnitudeHhi, 0.52)
 close(preview.effectiveRiskContributorCount, 1 / 0.52)
 close(preview.topAbsoluteRiskShare, 0.6)
+
+// 61 nominal returns with one internal missing candle leave only 59 exact
+// shared intervals. Ending-date-only matching would incorrectly accept the
+// wider return after the gap and cross the 60-return gate.
+const gapA = makeSeries('GAP_A', pattern(61), 55)
+const gapBBase = makeSeries('GAP_B', repeating(61, [0.004, -0.003, 0.006, -0.002]), 45)
+const gapB = { ...gapBBase, points: gapBBase.points.filter((_, index) => index !== 20) }
+const gapGuard = calculateCurrentRiskContribution([gapA, gapB], 100)
+assert.equal(gapGuard.commonReturns, 59)
+assert.equal(gapGuard.available, false)
+assert.equal(gapGuard.status, 'INSUFFICIENT_HISTORY')
+assert.match(gapGuard.reason ?? '', /identical observation intervals/)
 
 const mature = calculateCurrentRiskContribution([
   makeSeries('A', pattern(252), 75),

@@ -11,7 +11,7 @@ export type CorrelationCell = {
 }
 
 export type CorrelationMatrixResult = {
-  version: '1.1'
+  version: '1.2'
   minimumPairedReturns: number
   maturePairedReturns: number
   series: Array<{ key: string; label: string; returns: number }>
@@ -21,18 +21,28 @@ export type CorrelationMatrixResult = {
 const MIN_PAIRED_RETURNS = 60
 const MATURE_PAIRED_RETURNS = 252
 
-function dailyReturnMap(points: PricePoint[]) {
+function returnIntervalMap(points: PricePoint[]) {
   const sorted = points
     .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
     .sort((a, b) => a.date.localeCompare(b.date))
   const out = new Map<string, number>()
   for (let i = 1; i < sorted.length; i += 1) {
-    const prior = sorted[i - 1].value
-    const current = sorted[i].value
-    const value = current / prior - 1
-    if (Number.isFinite(value) && value > -0.95 && value < 10) out.set(sorted[i].date, value)
+    const prior = sorted[i - 1]
+    const current = sorted[i]
+    if (prior.date >= current.date) continue
+    const value = current.value / prior.value - 1
+    if (Number.isFinite(value) && value > -0.95 && value < 10) {
+      out.set(`${prior.date}\u0000${current.date}`, value)
+    }
   }
   return out
+}
+
+function commonIntervalKeys(maps: Array<Map<string, number>>) {
+  if (!maps.length) return [] as string[]
+  return [...maps[0].keys()]
+    .filter(key => maps.every(map => map.has(key)))
+    .sort((a, b) => a.localeCompare(b))
 }
 
 function correlation(a: number[], b: number[]) {
@@ -54,7 +64,7 @@ function correlation(a: number[], b: number[]) {
 }
 
 export function calculateCorrelationMatrix(series: RiskSeries[]): CorrelationMatrixResult {
-  const maps = new Map(series.map(item => [item.key, dailyReturnMap(item.points)]))
+  const maps = new Map(series.map(item => [item.key, returnIntervalMap(item.points)]))
   const cells: CorrelationCell[] = []
 
   for (let i = 0; i < series.length; i += 1) {
@@ -63,15 +73,15 @@ export function calculateCorrelationMatrix(series: RiskSeries[]): CorrelationMat
       const b = series[j]
       const mapA = maps.get(a.key)!
       const mapB = maps.get(b.key)!
-      const dates = [...mapA.keys()].filter(date => mapB.has(date)).sort()
-      const valuesA = dates.map(date => mapA.get(date)!)
-      const valuesB = dates.map(date => mapB.get(date)!)
-      const available = a.key === b.key || dates.length >= MIN_PAIRED_RETURNS
-      const mature = dates.length >= MATURE_PAIRED_RETURNS
+      const intervalKeys = commonIntervalKeys([mapA, mapB])
+      const valuesA = intervalKeys.map(key => mapA.get(key)!)
+      const valuesB = intervalKeys.map(key => mapB.get(key)!)
+      const available = a.key === b.key || intervalKeys.length >= MIN_PAIRED_RETURNS
+      const mature = intervalKeys.length >= MATURE_PAIRED_RETURNS
       cells.push({
         a: a.key,
         b: b.key,
-        pairedReturns: dates.length,
+        pairedReturns: intervalKeys.length,
         available,
         mature,
         correlation: a.key === b.key ? 1 : available ? correlation(valuesA, valuesB) : null,
@@ -80,7 +90,7 @@ export function calculateCorrelationMatrix(series: RiskSeries[]): CorrelationMat
   }
 
   return {
-    version: '1.1',
+    version: '1.2',
     minimumPairedReturns: MIN_PAIRED_RETURNS,
     maturePairedReturns: MATURE_PAIRED_RETURNS,
     series: series.map(item => ({ key: item.key, label: item.label, returns: maps.get(item.key)?.size || 0 })),

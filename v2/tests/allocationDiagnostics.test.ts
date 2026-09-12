@@ -42,7 +42,7 @@ const a59 = makeSeries('A', pattern(59, [0.012, -0.009, 0.006, -0.004, 0.011, -0
 const b59 = makeSeries('B', pattern(59, [-0.003, 0.005, -0.001, 0.004, -0.002, 0.003, -0.004, 0.006]))
 const short = calculateAllocationDiagnostics([a59, b59])
 assert.equal(short.version, ALLOCATION_DIAGNOSTICS_CALC_VERSION)
-assert.equal(short.version, '1.1')
+assert.equal(short.version, '1.2')
 assert.equal(short.available, false)
 assert.equal(short.status, 'INSUFFICIENT_HISTORY')
 assert.equal(short.commonReturns, 59)
@@ -75,6 +75,18 @@ assertLongOnly(preview.equalRiskContribution!)
 const ercContributions = preview.equalRiskContribution!.weights.map(row => row.riskContribution)
 assert.equal(ercContributions.every(value => value != null), true)
 for (const contribution of ercContributions) close(contribution, 0.5, 2e-6)
+
+// 61 nominal returns with one missing intermediate candle leave 59 exact
+// common return intervals. Ending-date-only alignment would incorrectly count
+// the wider return after the gap and cross the 60-return availability gate.
+const gapA = makeSeries('GAP_A', pattern(61, [0.012, -0.009, 0.006, -0.004, 0.011, -0.007, 0.002, -0.003]))
+const gapBBase = makeSeries('GAP_B', pattern(61, [-0.003, 0.005, -0.001, 0.004, -0.002, 0.003, -0.004, 0.006]))
+const gapB = { ...gapBBase, points: gapBBase.points.filter((_, index) => index !== 20) }
+const gapGuard = calculateAllocationDiagnostics([gapA, gapB])
+assert.equal(gapGuard.commonReturns, 59)
+assert.equal(gapGuard.available, false)
+assert.equal(gapGuard.status, 'INSUFFICIENT_HISTORY')
+assert.match(gapGuard.note, /одинаковым интервалам наблюдения/)
 
 const mature = calculateAllocationDiagnostics([
   makeSeries('A', pattern(252, [0.012, -0.009, 0.006, -0.004, 0.011, -0.007, 0.002, -0.003])),

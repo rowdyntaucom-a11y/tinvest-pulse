@@ -1,6 +1,6 @@
 import type { RiskSeries } from './riskMatrix'
 
-export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.1' as const
+export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.2' as const
 
 export type CurrentRiskSeriesInput = RiskSeries & {
   currentValue: number
@@ -44,18 +44,28 @@ const MATURE_COMMON_RETURNS = 252
 const TRADING_DAYS = 252
 const EPS = 1e-12
 
-function returnMap(series: RiskSeries) {
+function returnIntervalMap(series: RiskSeries) {
   const sorted = series.points
     .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
     .sort((a, b) => a.date.localeCompare(b.date))
   const map = new Map<string, number>()
   for (let i = 1; i < sorted.length; i += 1) {
-    const prior = sorted[i - 1].value
-    const current = sorted[i].value
-    const value = current / prior - 1
-    if (Number.isFinite(value) && value > -0.95 && value < 10) map.set(sorted[i].date, value)
+    const prior = sorted[i - 1]
+    const current = sorted[i]
+    if (prior.date >= current.date) continue
+    const value = current.value / prior.value - 1
+    if (Number.isFinite(value) && value > -0.95 && value < 10) {
+      map.set(`${prior.date}\u0000${current.date}`, value)
+    }
   }
   return map
+}
+
+function commonIntervalKeys(maps: Array<Map<string, number>>) {
+  if (!maps.length) return [] as string[]
+  return [...maps[0].keys()]
+    .filter(key => maps.every(map => map.has(key)))
+    .sort((a, b) => a.localeCompare(b))
 }
 
 function covarianceMatrix(rows: number[][]) {
@@ -104,11 +114,9 @@ export function calculateCurrentRiskContribution(
   const coveredValue = series.reduce((sum, item) => sum + item.currentValue, 0)
   const coverageRatio = total > 0 ? Math.min(1, coveredValue / total) : null
 
-  const maps = unique.size === series.length ? series.map(returnMap) : []
-  const dates = maps.length
-    ? [...maps[0].keys()].filter(date => maps.every(map => map.has(date))).sort((a, b) => a.localeCompare(b))
-    : []
-  const rows = dates.map(date => maps.map(map => map.get(date)!))
+  const maps = unique.size === series.length ? series.map(returnIntervalMap) : []
+  const intervalKeys = maps.length ? commonIntervalKeys(maps) : []
+  const rows = intervalKeys.map(key => maps.map(map => map.get(key)!))
   const status: CurrentRiskContributionResult['status'] = rows.length >= MATURE_COMMON_RETURNS
     ? 'MATURE'
     : rows.length >= MIN_COMMON_RETURNS
@@ -137,8 +145,8 @@ export function calculateCurrentRiskContribution(
       topAbsoluteContributor: null,
       reason: unique.size !== series.length
         ? 'Duplicate series keys make current risk contribution ambiguous.'
-        : `Need at least 2 matched assets and ${MIN_COMMON_RETURNS} common daily returns.`,
-      note: 'Current risk contribution is withheld until a common, uniquely identified return sample exists.',
+        : `Need at least 2 matched assets and ${MIN_COMMON_RETURNS} common daily returns on identical observation intervals.`,
+      note: 'Current risk contribution is withheld until a common, uniquely identified return-interval sample exists.',
     }
   }
 
@@ -224,6 +232,6 @@ export function calculateCurrentRiskContribution(
     rows: resultRows,
     topAbsoluteContributor,
     reason: null,
-    note: `${status}: current market-value weights on ${rows.length} common daily returns. Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. Diversification ratio = weighted standalone volatility / portfolio volatility. Risk Nₑ = 1/HHI of normalized absolute contribution magnitudes. No expected-return assumption is used.`,
+    note: `${status}: current market-value weights on ${rows.length} common daily returns matched by identical observation intervals. Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. Diversification ratio = weighted standalone volatility / portfolio volatility. Risk Nₑ = 1/HHI of normalized absolute contribution magnitudes. No expected-return assumption is used.`,
   }
 }
