@@ -267,3 +267,17 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Read-only deployment monitoring is still blocked because the connector has no user-confirmed workspace selected and explicitly forbids autonomous workspace selection; no deploy state is guessed.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 - Next safe step: add a typed v2 client adapter for `/api/transaction-markers` and only then integrate compact time-only buy/sell annotations into the existing Portfolio history view, with no Y-position/execution-price claim and with density gating on Samsung/Android.
+
+### 11:04 MSK autonomous pass — transaction-marker regression lock
+- Re-read the mandatory project/product/audit/terminal/legal/progress documents before changes and reconciled them with the actual current `main`.
+- Current `main` already contained the typed marker client, compact date-only BUY/SELL ticks on the existing history chart, verified bond→Income schedule linkage and newer analytics-core regression work, so no duplicate UI or bond/income implementation was introduced.
+- Added `v2/tests/transactionMarkers.test.ts` through PR #111 and squash-merged as `04777124bc383804957e81d39ee776170ab5b695`.
+- Regression coverage locks the reviewed marker contract: stable operation IDs, exact timestamp normalization, exact supported operation-type allow-list, explicit FIGI/instrument UID identity, deterministic duplicate rejection, positive-quantity sanitation and UID-first instrument matching.
+- Unsupported BUY-like enum text, invalid timestamps and missing instrument identity fail closed. No execution price, Y-coordinate, P/L contribution, TWR attribution or recommendation is reconstructed.
+- Quant methodology pass: marker events remain time-only annotations of verified executed operations; the test change introduces no financial formula or inferred market value.
+- Code-quality pass: GitHub `v2 build` PR run #151 completed successfully. `npm run build`, the full `npm run test:core` suite and syntax checks for `payouts-core.js`, `server-core.js`, `production-v158.js`, `production-v159.js` and `production-v160.js` all passed.
+- Mobile-UX pass: no UI/CSS/runtime rendering change in this batch; Samsung/Android density and existing marker cap are unchanged.
+- Release pass: runtime behavior is unchanged except that CI now guards the marker boundary against future regressions. Diff is limited to one regression test plus the `test:core` command.
+- Render auto-deploy was not manually triggered. Read-only deployment status could not be queried because no user-confirmed Render workspace is selected; the connector explicitly prohibits autonomous workspace selection and no live state was guessed.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe focus: refresh audit status against the now-landed marker and bond→Income work, continue live/mobile validation of advanced drill-downs, and deliberately review the existing moderate npm vulnerabilities without blind `npm audit fix`.
