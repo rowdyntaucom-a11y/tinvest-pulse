@@ -1,6 +1,6 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
-export const MONTE_CARLO_CALC_VERSION = '2.0' as const
+export const MONTE_CARLO_CALC_VERSION = '2.1' as const
 
 export type MonteCarloPercentiles = {
   p10: number
@@ -15,6 +15,10 @@ export type MonteCarloResult = {
   method: 'historical_block_bootstrap_v2'
   historyReturns: number
   excludedReturns: number
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+  sampleFrom: string | null
+  sampleTo: string | null
   minimumReturns: number
   matureReturns: number
   blockTradingDays: number
@@ -31,15 +35,47 @@ const DEFAULT_BLOCK_DAYS = 5
 const DEFAULT_HORIZON_DAYS = 252
 const DEFAULT_SIMULATIONS = 2000
 
-function validIndex(history: AnalyticsHistoryPoint[]) {
-  return history
+function normalizedIndex(history: AnalyticsHistoryPoint[]) {
+  const candidates = history
     .map(point => ({ date: point.date, value: point.portfolio }))
-    .filter((point): point is { date: string; value: number } => typeof point.value === 'number' && Number.isFinite(point.value) && point.value > 0)
+    .filter((point): point is { date: string; value: number } => Boolean(point.date) && typeof point.value === 'number' && Number.isFinite(point.value) && point.value > 0)
     .sort((a, b) => a.date.localeCompare(b.date))
+
+  const byDate = new Map<string, number>()
+  const conflicts = new Set<string>()
+  let duplicateRowsCollapsed = 0
+
+  for (const point of candidates) {
+    const existing = byDate.get(point.date)
+    if (existing == null) {
+      byDate.set(point.date, point.value)
+      continue
+    }
+    if (existing === point.value) {
+      duplicateRowsCollapsed += 1
+      continue
+    }
+    conflicts.add(point.date)
+  }
+
+  if (conflicts.size) {
+    return {
+      index: [] as Array<{ date: string; value: number }>,
+      duplicateRowsCollapsed,
+      conflictingDates: conflicts.size,
+    }
+  }
+
+  return {
+    index: [...byDate.entries()].map(([date, value]) => ({ date, value })),
+    duplicateRowsCollapsed,
+    conflictingDates: 0,
+  }
 }
 
 function dailyReturns(history: AnalyticsHistoryPoint[]) {
-  const index = validIndex(history)
+  const normalized = normalizedIndex(history)
+  const index = normalized.index
   const values: number[] = []
   let excludedReturns = 0
 
@@ -59,7 +95,14 @@ function dailyReturns(history: AnalyticsHistoryPoint[]) {
     values.push(value)
   }
 
-  return { values, excludedReturns }
+  return {
+    values,
+    excludedReturns,
+    duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
+    conflictingDates: normalized.conflictingDates,
+    sampleFrom: index[0]?.date ?? null,
+    sampleTo: index.at(-1)?.date ?? null,
+  }
 }
 
 function hashSeed(values: number[], horizon: number, simulations: number, blockDays: number) {
@@ -115,11 +158,26 @@ export function calculateMonteCarlo(
     method: 'historical_block_bootstrap_v2' as const,
     historyReturns: returns.length,
     excludedReturns: sample.excludedReturns,
+    duplicateRowsCollapsed: sample.duplicateRowsCollapsed,
+    conflictingDates: sample.conflictingDates,
+    sampleFrom: sample.sampleFrom,
+    sampleTo: sample.sampleTo,
     minimumReturns: MIN_BOOTSTRAP_RETURNS,
     matureReturns: MATURE_BOOTSTRAP_RETURNS,
     blockTradingDays: blockDays,
     horizonTradingDays: horizon,
     simulations: paths,
+  }
+
+  if (sample.conflictingDates > 0) {
+    return {
+      ...base,
+      available: false,
+      status: 'insufficient_history',
+      terminalReturn: null,
+      terminalValue: null,
+      note: `История содержит ${sample.conflictingDates} дат(ы) с конфликтующими значениями TWR-индекса. Monte Carlo fail-closed: сценарное распределение не строится, пока одна дата не имеет единственного подтверждённого значения.`,
+    }
   }
 
   if (returns.length < MIN_BOOTSTRAP_RETURNS || !Number.isFinite(currentPortfolioValue) || currentPortfolioValue <= 0) {
@@ -129,7 +187,7 @@ export function calculateMonteCarlo(
       status: 'insufficient_history',
       terminalReturn: null,
       terminalValue: null,
-      note: `Нужно минимум ${MIN_BOOTSTRAP_RETURNS} валидных дневных доходностей TWR. Сейчас доступно ${returns.length}.${sample.excludedReturns ? ` Исключено экстремальных наблюдений: ${sample.excludedReturns}.` : ''} QVANIX не строит сценарное распределение из слишком короткой выборки.`,
+      note: `Нужно минимум ${MIN_BOOTSTRAP_RETURNS} валидных дневных доходностей TWR. Сейчас доступно ${returns.length}.${sample.excludedReturns ? ` Исключено экстремальных наблюдений: ${sample.excludedReturns}.` : ''}${sample.duplicateRowsCollapsed ? ` Совпадающих дублей дат свёрнуто: ${sample.duplicateRowsCollapsed}.` : ''} QVANIX не строит сценарное распределение из слишком короткой выборки.`,
     }
   }
 
@@ -172,7 +230,11 @@ export function calculateMonteCarlo(
     p90: currentPortfolioValue * factors.p90,
   }
   const mature = returns.length >= MATURE_BOOTSTRAP_RETURNS
-  const integritySuffix = sample.excludedReturns ? ` Исключено экстремальных дневных наблюдений: ${sample.excludedReturns}.` : ''
+  const integritySuffix = [
+    sample.excludedReturns ? `Исключено экстремальных дневных наблюдений: ${sample.excludedReturns}.` : '',
+    sample.duplicateRowsCollapsed ? `Совпадающих дублей дат свёрнуто: ${sample.duplicateRowsCollapsed}.` : '',
+    sample.sampleFrom && sample.sampleTo ? `Выборка: ${sample.sampleFrom} → ${sample.sampleTo}.` : '',
+  ].filter(Boolean).join(' ')
 
   return {
     ...base,
@@ -181,7 +243,7 @@ export function calculateMonteCarlo(
     terminalReturn,
     terminalValue,
     note: mature
-      ? `Block bootstrap пересобирает ${horizon} торговых дней из непрерывных ${blockDays}-дневных блоков фактических TWR-доходностей.${integritySuffix} Будущие пополнения и снятия не моделируются.`
-      : `Предварительная модель: ${returns.length} дневных доходностей, блок ${blockDays} торговых дней. Для зрелой оценки QVANIX ждёт не менее ${MATURE_BOOTSTRAP_RETURNS}.${integritySuffix} Будущие пополнения и снятия не моделируются.`,
+      ? `Block bootstrap пересобирает ${horizon} торговых дней из непрерывных ${blockDays}-дневных блоков фактических TWR-доходностей.${integritySuffix ? ` ${integritySuffix}` : ''} Будущие пополнения и снятия не моделируются.`
+      : `Предварительная модель: ${returns.length} дневных доходностей, блок ${blockDays} торговых дней. Для зрелой оценки QVANIX ждёт не менее ${MATURE_BOOTSTRAP_RETURNS}.${integritySuffix ? ` ${integritySuffix}` : ''} Будущие пополнения и снятия не моделируются.`,
   }
 }
