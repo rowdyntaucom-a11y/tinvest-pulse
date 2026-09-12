@@ -54,7 +54,14 @@ const data = calendar({
     year: 2026,
     totalNet: 300,
     count: 4,
-    observation: { available: true, from: '2026-01-01T00:00:00.000Z', to: '2026-09-12T00:00:00.000Z', completeMonths: [], partialMonths: [], basis: 'TEST' },
+    observation: {
+      available: true,
+      from: '2026-01-01T00:00:00.000Z',
+      to: '2026-09-12T00:00:00.000Z',
+      completeMonths: ['2026-01', '2026-02', '2026-03'],
+      partialMonths: ['2026-09'],
+      basis: 'TEST',
+    },
     items: [
       event({ figi: 'FIGI_A', status: 'FACT', net: 100 }),
       event({ figi: ' figi_a ', status: 'fact', net: 50 }),
@@ -74,18 +81,22 @@ const data = calendar({
 
 const exact = calculatePositionIncomeContribution({ figi: 'figi_a' }, data)
 assert.equal(exact.version, POSITION_INCOME_CONTRIBUTION_VERSION)
-assert.equal(exact.version, '1.0')
+assert.equal(exact.version, '1.1')
 assert.equal(exact.available, true)
 assert.equal(exact.figi, 'FIGI_A')
 close(exact.factNet, 150)
 assert.equal(exact.factCount, 2)
 close(exact.factShare, 0.5)
+assert.equal(exact.factObservationFrom, '2026-01-01T00:00:00.000Z')
+assert.equal(exact.factObservationTo, '2026-09-12T00:00:00.000Z')
+assert.equal(exact.factObservationCompleteMonths, 3)
 close(exact.scheduledGross, 100)
 assert.equal(exact.scheduledCount, 2)
 close(exact.scheduledShare, 0.25)
 close(exact.scheduleCoverageRatio, 0.75)
 assert.equal(exact.reason, null)
 assert.match(exact.note, /Exact FIGI only/)
+assert.match(exact.note, /observation window/)
 assert.match(exact.note, /FACT↔schedule/)
 
 const aliasOnly = calculatePositionIncomeContribution({ figi: 'FIGI_C' }, calendar({
@@ -102,9 +113,26 @@ assert.equal(aliasOnly.available, true)
 assert.equal(aliasOnly.factNet, null)
 assert.equal(aliasOnly.factCount, 0)
 assert.equal(aliasOnly.factShare, null)
+assert.equal(aliasOnly.factObservationFrom, null)
+assert.equal(aliasOnly.factObservationTo, null)
+assert.equal(aliasOnly.factObservationCompleteMonths, 0)
 assert.equal(aliasOnly.scheduledGross, null)
 assert.equal(aliasOnly.scheduledCount, 0)
 assert.equal(aliasOnly.scheduledShare, null)
+
+const noObservation = calculatePositionIncomeContribution({ figi: 'FIGI_A' }, calendar({
+  actual: {
+    year: 2026,
+    totalNet: 100,
+    count: 1,
+    observation: { available: false, from: '2026-01-01T00:00:00.000Z', to: '2026-09-12T00:00:00.000Z', completeMonths: ['2026-01'], partialMonths: [], basis: 'TEST' },
+    items: [event({ figi: 'FIGI_A', status: 'FACT', net: 100 })],
+  },
+}))
+close(noObservation.factNet, 100)
+assert.equal(noObservation.factObservationFrom, null)
+assert.equal(noObservation.factObservationTo, null)
+assert.equal(noObservation.factObservationCompleteMonths, null)
 
 const noFigi = calculatePositionIncomeContribution({ figi: null }, data)
 assert.equal(noFigi.available, false)
