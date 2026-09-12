@@ -94,25 +94,56 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const integrity = useMemo(() => getIncomeIntegrity(data, loading), [data, loading])
 
   const sourceRows = useMemo(() => {
-    const positionMap = new Map<string, PositionSnapshot>()
+    const positionByFigi = new Map<string, PositionSnapshot>()
+    const positionByAlias = new Map<string, PositionSnapshot>()
     for (const position of positions) {
+      const figiKey = keyOf(position.figi)
       const tickerKey = keyOf(position.ticker)
       const nameKey = keyOf(position.name)
-      if (tickerKey) positionMap.set(tickerKey, position)
-      if (nameKey) positionMap.set(nameKey, position)
+      if (figiKey) positionByFigi.set(figiKey, position)
+      if (tickerKey) positionByAlias.set(tickerKey, position)
+      if (nameKey) positionByAlias.set(nameKey, position)
     }
 
-    const map = new Map<string, { ticker: string; name: string; fact: number; forecast: number; factCount: number; forecastCount: number }>()
+    type SourceRow = {
+      figi: string | null
+      ticker: string
+      name: string
+      fact: number
+      forecast: number
+      factCount: number
+      forecastCount: number
+    }
+
+    const map = new Map<string, SourceRow>()
     for (const event of data.actual.items) {
       const key = event.ticker || event.name || '—'
-      const row = map.get(key) ?? { ticker: key, name: event.name || key, fact: 0, forecast: 0, factCount: 0, forecastCount: 0 }
+      const row = map.get(key) ?? {
+        figi: event.figi ? String(event.figi) : null,
+        ticker: key,
+        name: event.name || key,
+        fact: 0,
+        forecast: 0,
+        factCount: 0,
+        forecastCount: 0,
+      }
+      if (!row.figi && event.figi) row.figi = String(event.figi)
       row.fact += eventAmount(event, true)
       row.factCount += 1
       map.set(key, row)
     }
     for (const event of data.events) {
       const key = event.ticker || event.name || '—'
-      const row = map.get(key) ?? { ticker: key, name: event.name || key, fact: 0, forecast: 0, factCount: 0, forecastCount: 0 }
+      const row = map.get(key) ?? {
+        figi: event.figi ? String(event.figi) : null,
+        ticker: key,
+        name: event.name || key,
+        fact: 0,
+        forecast: 0,
+        factCount: 0,
+        forecastCount: 0,
+      }
+      if (!row.figi && event.figi) row.figi = String(event.figi)
       row.forecast += eventAmount(event)
       row.forecastCount += 1
       map.set(key, row)
@@ -120,10 +151,13 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
     return [...map.values()]
       .map(row => {
-        const position = positionMap.get(keyOf(row.ticker)) ?? positionMap.get(keyOf(row.name))
+        const figiPosition = row.figi ? positionByFigi.get(keyOf(row.figi)) : undefined
+        const aliasPosition = positionByAlias.get(keyOf(row.ticker)) ?? positionByAlias.get(keyOf(row.name))
+        const position = figiPosition ?? aliasPosition
+        const matchBasis = figiPosition ? 'FIGI' : aliasPosition ? 'ALIAS' : null
         const costBasis = position?.costBasis ?? 0
         const yoc12m = costBasis > 0 && row.forecast > 0 ? row.forecast / costBasis : null
-        return { ...row, costBasis, yoc12m }
+        return { ...row, costBasis, yoc12m, matchBasis }
       })
       .sort((a, b) => (b.fact + b.forecast) - (a.fact + a.forecast))
       .slice(0, 6)
@@ -296,7 +330,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
                 <b>{row.fact ? `${money2.format(row.fact)} ₽` : '—'}</b>
                 <div className="income-source-forecast">
                   <b>{row.forecast ? `${money2.format(row.forecast)} ₽` : '—'}</b>
-                  <small>{row.yoc12m == null ? 'YoC —' : `YoC ${pct1.format(row.yoc12m * 100)}%`}</small>
+                  <small>{row.yoc12m == null ? 'YoC —' : `YoC ${pct1.format(row.yoc12m * 100)}% · ${row.matchBasis}`}</small>
                 </div>
               </div>
             )) : <div className="income-empty">Нет данных для разбивки.</div>}
@@ -310,7 +344,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
           </div>
           <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. TOP SOURCE показывает долю лидера, число источников и эффективное число источников Neff = 1/HHI.</p>
-          <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Это не текущая дивидендная доходность.</p>
+          <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Связь выплаты с текущей позицией сначала проверяется по FIGI; ticker/name используются только как fallback. Это не текущая дивидендная доходность.</p>
           <p className="income-method-note">OBS считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Сравнение периодов появляется только при ≥3 точных парах одинаковых полных месяцев текущего и предыдущего года; 12 пар — зрелое сравнение. Годовой прогноз и годификация короткой истории не применяются.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
