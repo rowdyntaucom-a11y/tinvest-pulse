@@ -1,6 +1,6 @@
 import type { RiskSeries } from './riskMatrix'
 
-export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.2' as const
+export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.3' as const
 
 export type CurrentRiskSeriesInput = RiskSeries & {
   currentValue: number
@@ -20,6 +20,8 @@ export type CurrentRiskContributionResult = {
   available: boolean
   status: 'INSUFFICIENT_HISTORY' | 'PREVIEW' | 'MATURE'
   commonReturns: number
+  sampleFrom: string | null
+  sampleTo: string | null
   minimumReturns: number
   matureReturns: number
   assetCount: number
@@ -43,6 +45,7 @@ const MIN_COMMON_RETURNS = 60
 const MATURE_COMMON_RETURNS = 252
 const TRADING_DAYS = 252
 const EPS = 1e-12
+const INTERVAL_SEPARATOR = '\u0000'
 
 function returnIntervalMap(series: RiskSeries) {
   const sorted = series.points
@@ -55,7 +58,7 @@ function returnIntervalMap(series: RiskSeries) {
     if (prior.date >= current.date) continue
     const value = current.value / prior.value - 1
     if (Number.isFinite(value) && value > -0.95 && value < 10) {
-      map.set(`${prior.date}\u0000${current.date}`, value)
+      map.set(`${prior.date}${INTERVAL_SEPARATOR}${current.date}`, value)
     }
   }
   return map
@@ -66,6 +69,15 @@ function commonIntervalKeys(maps: Array<Map<string, number>>) {
   return [...maps[0].keys()]
     .filter(key => maps.every(map => map.has(key)))
     .sort((a, b) => a.localeCompare(b))
+}
+
+function sampleBounds(intervalKeys: string[]) {
+  const first = intervalKeys[0]?.split(INTERVAL_SEPARATOR)
+  const last = intervalKeys.at(-1)?.split(INTERVAL_SEPARATOR)
+  return {
+    sampleFrom: first?.length === 2 ? first[0] : null,
+    sampleTo: last?.length === 2 ? last[1] : null,
+  }
 }
 
 function covarianceMatrix(rows: number[][]) {
@@ -117,6 +129,7 @@ export function calculateCurrentRiskContribution(
   const maps = unique.size === series.length ? series.map(returnIntervalMap) : []
   const intervalKeys = maps.length ? commonIntervalKeys(maps) : []
   const rows = intervalKeys.map(key => maps.map(map => map.get(key)!))
+  const bounds = sampleBounds(intervalKeys)
   const status: CurrentRiskContributionResult['status'] = rows.length >= MATURE_COMMON_RETURNS
     ? 'MATURE'
     : rows.length >= MIN_COMMON_RETURNS
@@ -127,6 +140,8 @@ export function calculateCurrentRiskContribution(
     calcVersion: CURRENT_RISK_CONTRIBUTION_CALC_VERSION,
     status,
     commonReturns: rows.length,
+    sampleFrom: bounds.sampleFrom,
+    sampleTo: bounds.sampleTo,
     minimumReturns: MIN_COMMON_RETURNS,
     matureReturns: MATURE_COMMON_RETURNS,
     assetCount: series.length,
@@ -232,6 +247,6 @@ export function calculateCurrentRiskContribution(
     rows: resultRows,
     topAbsoluteContributor,
     reason: null,
-    note: `${status}: current market-value weights on ${rows.length} common daily returns matched by identical observation intervals. Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. Diversification ratio = weighted standalone volatility / portfolio volatility. Risk Nₑ = 1/HHI of normalized absolute contribution magnitudes. No expected-return assumption is used.`,
+    note: `${status}: current market-value weights on ${rows.length} common daily returns matched by identical observation intervals (${bounds.sampleFrom} → ${bounds.sampleTo}). Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. Diversification ratio = weighted standalone volatility / portfolio volatility. Risk Nₑ = 1/HHI of normalized absolute contribution magnitudes. No expected-return assumption is used.`,
   }
 }
