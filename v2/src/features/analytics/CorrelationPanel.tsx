@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { calculateAllocationDiagnostics, type AllocationScenario } from './allocationDiagnostics'
 import { calculateCorrelationMatrix, type CorrelationCell, type RiskSeries } from './riskMatrix'
 import './correlation.css'
 
@@ -19,6 +20,7 @@ type AssetHistoryResponse = {
 }
 
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
+const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 
 function compactLabel(value: string) {
   const text = String(value || '—').trim()
@@ -31,6 +33,29 @@ function cellTone(value: number | null) {
   if (value >= 0.75) return 'is-high'
   if (value <= 0.25) return 'is-low'
   return 'is-mid'
+}
+
+function scenarioLabel(method: AllocationScenario['method']) {
+  if (method === 'EQUAL_WEIGHT') return 'EQUAL WEIGHT'
+  if (method === 'MIN_VARIANCE_LONG_ONLY') return 'MIN VAR · LONG ONLY'
+  return 'EQUAL RISK'
+}
+
+function AllocationScenarioRow({ scenario }: { scenario: AllocationScenario }) {
+  const weights = [...scenario.weights].sort((a, b) => b.weight - a.weight)
+  const weightLine = weights
+    .map(row => `${compactLabel(row.label)} ${pct.format(row.weight * 100)}%`)
+    .join(' · ')
+
+  return (
+    <article className={`allocation-scenario ${scenario.available ? '' : 'is-unavailable'}`}>
+      <div>
+        <span>{scenarioLabel(scenario.method)}</span>
+        <strong>{scenario.available && scenario.annualizedVolatility != null ? `${pct.format(scenario.annualizedVolatility * 100)}% vol` : '—'}</strong>
+      </div>
+      <small title={weightLine}>{scenario.available ? weightLine : scenario.note}</small>
+    </article>
+  )
 }
 
 export function CorrelationPanel() {
@@ -70,6 +95,7 @@ export function CorrelationPanel() {
   }, [payload])
 
   const matrix = useMemo(() => calculateCorrelationMatrix(series), [series])
+  const allocation = useMemo(() => calculateAllocationDiagnostics(series), [series])
   const cells = useMemo(() => {
     const map = new Map<string, CorrelationCell>()
     for (const cell of matrix.cells) {
@@ -87,6 +113,8 @@ export function CorrelationPanel() {
   const labelByKey = new Map(series.map(item => [item.key, item.label]))
   const requestedSeries = Math.max(series.length, Number(payload?.requested) || 0)
   const availableSeries = Math.max(series.length, Number(payload?.availableSeries) || 0)
+  const allocationScenarios = [allocation.equalWeight, allocation.minimumVariance, allocation.equalRiskContribution]
+    .filter((scenario): scenario is AllocationScenario => scenario != null)
 
   if (loading) {
     return <section className="panel corr-panel"><div className="corr-loading">ЗАГРУЖАЕМ 365 ДНЕЙ ИСТОРИИ АКТИВОВ…</div></section>
@@ -142,6 +170,24 @@ export function CorrelationPanel() {
       </div>
 
       <p className="corr-note">Pearson ρ считается по совпадающим дневным доходностям, а не по ценам. До {matrix.minimumPairedReturns} общих доходностей пара скрыта; {matrix.minimumPairedReturns}–{matrix.maturePairedReturns - 1} = preview, {matrix.maturePairedReturns}+ = mature. Это диагностика структуры портфеля, не торговый сигнал.</p>
+
+      <details className="allocation-diagnostics">
+        <summary>
+          <span>ALLOCATION LAB · RISK ONLY</span>
+          <strong>{allocation.status}</strong>
+          <small>{allocation.commonReturns} общих доходностей</small>
+        </summary>
+        {allocation.available ? (
+          <>
+            <div className="allocation-scenarios">
+              {allocationScenarios.map(scenario => <AllocationScenarioRow key={scenario.method} scenario={scenario} />)}
+            </div>
+            <p>{allocation.note} Веса показывают математические risk-only сценарии на одной исторической ковариационной выборке и не учитывают ожидаемую доходность, налоги, ликвидность или индивидуальные ограничения.</p>
+          </>
+        ) : (
+          <p>{allocation.note}</p>
+        )}
+      </details>
     </section>
   )
 }
