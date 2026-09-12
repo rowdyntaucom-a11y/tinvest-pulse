@@ -25,17 +25,17 @@ export interface TransactionMarkerNormalization {
   duplicates: number
 }
 
+// Keep this allow-list intentionally narrower than the server's broad
+// `type.includes('BUY'/'SELL')` history logic. History markers require exact,
+// reviewed broker operation types so future API additions fail closed.
 const BUY_TYPES = new Set([
   'OPERATION_TYPE_BUY',
-  'OPERATION_TYPE_BUY_CARD',
-  'OPERATION_TYPE_BUY_MARGIN',
   'OPERATION_TYPE_DELIVERY_BUY',
   'OPERATION_TYPE_PRIMARY_ORDER',
 ])
 
 const SELL_TYPES = new Set([
   'OPERATION_TYPE_SELL',
-  'OPERATION_TYPE_SELL_MARGIN',
   'OPERATION_TYPE_DELIVERY_SELL',
 ])
 
