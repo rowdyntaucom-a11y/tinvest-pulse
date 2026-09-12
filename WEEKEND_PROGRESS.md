@@ -160,6 +160,18 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Deploy status could not be queried in this pass because the Render connector requires a user-confirmed workspace and autonomous mode must not choose one implicitly.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 
+### 04:03 MSK autonomous pass — compact income comparable-period UI
+- Integrated the existing `calculateIncomeComparablePeriod` result into `Income → Источники` through PR #76 and squash-merged runtime commit `f08bc94f272cda02a3b521c1876f06c3a4a62765`.
+- The existing fourth profile card is reused: when at least 3 exact complete month pairs exist it shows realized comparable-period change; otherwise the existing stability diagnostic remains in place. No new full-size widget or vertical section was added.
+- Percentage change is shown only when the previous comparable-period net total is positive. A zero prior base falls back to absolute RUB change rather than displaying an undefined growth percentage.
+- The detail label states the exact matched-month count and current/previous years; 3–11 pairs remain a partial comparable-period preview and are not presented as a full-year YoY result.
+- Quant methodology pass: preserved exact-month pairing, FACT-only history, zero-base behavior, ≥3 availability gate and no annualization/reinvestment/forecast assumptions.
+- Code-quality pass: GitHub `v2 build` workflow run #100 completed successfully, including `npm run build` and `node --check ../payouts-core.js`.
+- Mobile-UX pass: reused the existing four-card `income-profile-grid`; no CSS expansion, extra navigation or new scrolling block was introduced.
+- Release pass: runtime diff was limited to `IncomeWorkspace.tsx`; no backend/broker route, credential, legal/payment text or deployment configuration changed.
+- Render auto-deploy was not manually triggered. Deploy status could not be queried because no Render workspace is selected/confirmed for this automation context; the connector explicitly requires user-confirmed workspace selection and autonomous mode must not guess.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+
 ### Current focus
 - Keep XP persistence storage-agnostic until an authenticated multi-user backend persistence boundary is approved.
 - Correlation matrix now has real per-asset market history; deepen it only with validated live sample coverage and mobile density.
@@ -168,5 +180,5 @@ This log is maintained by autonomous development runs. Production changes must r
 - Portfolio data context is now compactly surfaced in the existing Portfolio shell; account type remains gated until the backend exposes a verified account-type field.
 - Broker P/L attribution remains clearly labelled current unrealized contribution; historical/TWR attribution stays gated on trustworthy per-position history.
 - Recovery diagnostics are deterministic but should remain out of the UI until the live sample gate is met.
-- Income now has exact-month realized comparable-period groundwork; surface it only as a compact drill-down when enough paired months exist, and keep goal progress gated until the user supplies an explicit target.
+- Income exact-month realized comparable-period diagnostics are now compactly surfaced only when the ≥3 paired-month gate is met; goal progress remains gated until the user supplies an explicit target.
 - Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
