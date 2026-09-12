@@ -210,3 +210,16 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Deployment status could not be read through the connector because no user-confirmed Render workspace is selected in this autonomous context; a public endpoint probe also did not provide a reliable deployment-state signal, so no live status was invented.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 - Next safe focus: deepen Portfolio attribution/drill-down without conflating broker unrealized P/L with historical TWR contribution, or continue data-gated risk analytics where live sample coverage already passes existing thresholds.
+
+### 07:02 MSK autonomous pass — render-neutral DNA world-event boundary
+- Added `v2/src/features/dna/xpWorldEvents.ts` through PR #87 and squash-merged as `364c6b4773af6c688e912b8623bdc9f06269522f`.
+- The adapter converts only already-awarded, versioned XP events into compact semantic `WorldEvent` records for the future PixiJS world. It does not calculate XP, inspect RUB capital, derive progression, select biome/weather/art, or generate financial numbers.
+- Invalid timestamps, unknown XP kinds, missing rule versions, negative/non-finite XP and duplicate source IDs fail closed. World-event IDs are stable (`xp:<event-id>`), timestamps are normalized to ISO and ordering is deterministic.
+- `intensity` remains `null` intentionally: no arbitrary mapping from awarded XP to animation strength was invented. Renderer/art-direction choices remain a separate user-reviewed concern.
+- Quant/product pass: no new financial methodology, forecast, personalized recommendation or wealth-based DNA level logic was introduced.
+- Code-quality pass: GitHub `v2 build` workflow run #118 completed successfully; `npm run build` and `node --check ../payouts-core.js` both passed.
+- Mobile-UX pass: no UI/layout/rendering change; Samsung/Android density and no-duplication rules are unchanged.
+- Release pass: one pure TypeScript DNA adapter only; no backend/broker route, credential, legal/payment wording or deployment config changed.
+- Render auto-deploy was not manually triggered. Deployment status still cannot be read safely because no user-confirmed Render workspace is selected in this automation context; no live state is guessed.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe focus: wire persisted XP events into a render-neutral world-state input boundary, or continue remaining Portfolio/Analytics depth where source-data gates already pass.
