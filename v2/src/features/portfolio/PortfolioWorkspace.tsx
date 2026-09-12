@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi'
+import { loadPayoutCalendar, type PayoutCalendar } from '../../lib/payoutsApi'
 import { PortfolioValueChart } from './PortfolioValueChart'
 import { BondAnalytics } from './BondAnalytics'
 import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './portfolioAttribution'
 import { buildPortfolioDataContext } from './portfolioDataContext'
+import { calculatePositionIncomeContribution } from './positionIncomeContribution'
 import './portfolio.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -142,6 +144,16 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const [positionSort, setPositionSort] = useState<PositionSort>('weight')
   const [selectedPositionKey, setSelectedPositionKey] = useState('')
   const [structureMode, setStructureMode] = useState<StructureMode>('classes')
+  const [incomeCalendar, setIncomeCalendar] = useState<PayoutCalendar | null>(null)
+
+  useEffect(() => {
+    if (view !== 'positions' || incomeCalendar) return
+    let active = true
+    void loadPayoutCalendar().then(calendar => {
+      if (active) setIncomeCalendar(calendar)
+    })
+    return () => { active = false }
+  }, [view, incomeCalendar])
 
   const allocation = useMemo(() => {
     const groups = new Map<string, number>()
@@ -179,6 +191,14 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const selectedPosition = visiblePositions.find(position => positionKey(position) === selectedPositionKey) ?? visiblePositions[0] ?? null
   const selectedPnl = selectedPosition ? positionPnl(selectedPosition) : null
   const selectedAttribution = selectedPosition ? findPositionPnlAttribution(pnlAttribution, selectedPosition) : null
+  const selectedIncome = useMemo(
+    () => selectedPosition && incomeCalendar
+      ? calculatePositionIncomeContribution(selectedPosition, incomeCalendar)
+      : null,
+    [selectedPosition, incomeCalendar],
+  )
+  const selectedIncomeVisible = selectedIncome?.available === true
+    && (selectedIncome.factNet != null || selectedIncome.scheduledGross != null)
 
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
   const top3 = snapshot.positionItems.slice(0, 3).reduce((sum, item) => sum + item.weight, 0)
@@ -300,6 +320,15 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                 Результат позиции берётся из broker `expectedYield`; P/L-вклад = |P/L позиции| / сумма |P/L| текущих позиций
                 {selectedAttribution?.grossPnlShare == null ? '' : ` = ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}.
                 Это текущая нереализованная broker P/L attribution, а не TWR, alpha или исторический вклад в доходность.
+                {selectedIncomeVisible && selectedIncome ? (
+                  <>
+                    <br />Доход · exact FIGI: FACT observed net {selectedIncome.factNet == null ? '—' : `${money2.format(selectedIncome.factNet)} ₽`}
+                    {selectedIncome.factShare == null ? '' : ` · ${pctPlain.format(selectedIncome.factShare * 100)}% наблюдаемых FACT`}
+                    {' · '}12M schedule gross {selectedIncome.scheduledGross == null ? '—' : `${money2.format(selectedIncome.scheduledGross)} ₽`}
+                    {selectedIncome.scheduledShare == null ? '' : ` · ${pctPlain.format(selectedIncome.scheduledShare * 100)}% расписания`}.
+                    FACT и schedule имеют разные базы; сопоставление конкретной выплаты с конкретной строкой расписания не реконструируется.
+                  </>
+                ) : null}
               </p>
             </div>
           )}
