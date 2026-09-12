@@ -1,16 +1,20 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
-export const TAIL_RISK_CALC_VERSION = '1.1' as const
+export const TAIL_RISK_CALC_VERSION = '1.2' as const
 
 export type TailRiskResult = {
   calcVersion: typeof TAIL_RISK_CALC_VERSION
   available: boolean
-  status: 'insufficient_history' | 'preview' | 'mature'
+  status: 'insufficient_history' | 'preview' | 'mature' | 'invalid_history'
   method: 'historical_daily_twr_var_cvar_v1'
   confidence: 0.95
   returns: number
   minimumReturns: number
   matureReturns: number
+  sampleFrom: string | null
+  sampleTo: string | null
+  duplicateRowsCollapsed: number
+  conflictingDates: number
   var95Loss: number | null
   cvar95Loss: number | null
   worstDay: number | null
@@ -22,12 +26,41 @@ export type TailRiskResult = {
 const MIN_RETURNS = 126
 const MATURE_RETURNS = 252
 
-function portfolioReturns(history: AnalyticsHistoryPoint[]) {
-  const index = history
-    .map(point => ({ date: point.date, value: point.portfolio }))
-    .filter((point): point is { date: string; value: number } => typeof point.value === 'number' && Number.isFinite(point.value) && point.value > 0)
+type HistoryIntegrity = {
+  index: Array<{ date: string; value: number }>
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+}
+
+function normalizePortfolioIndex(history: AnalyticsHistoryPoint[]): HistoryIntegrity {
+  const rows = history
+    .map(point => ({ date: String(point.date || '').trim(), value: point.portfolio }))
+    .filter((point): point is { date: string; value: number } => Boolean(point.date) && typeof point.value === 'number' && Number.isFinite(point.value) && point.value > 0)
     .sort((a, b) => a.date.localeCompare(b.date))
 
+  const index: Array<{ date: string; value: number }> = []
+  let duplicateRowsCollapsed = 0
+  let conflictingDates = 0
+
+  for (const row of rows) {
+    const previous = index[index.length - 1]
+    if (!previous || previous.date !== row.date) {
+      index.push(row)
+      continue
+    }
+
+    if (Math.abs(previous.value - row.value) <= 1e-12) {
+      duplicateRowsCollapsed += 1
+      continue
+    }
+
+    conflictingDates += 1
+  }
+
+  return { index, duplicateRowsCollapsed, conflictingDates }
+}
+
+function portfolioReturns(index: Array<{ date: string; value: number }>) {
   const returns: number[] = []
   for (let i = 1; i < index.length; i += 1) {
     const prior = index[i - 1].value
@@ -52,7 +85,8 @@ function quantile(sorted: number[], q: number) {
 }
 
 export function calculateTailRisk(history: AnalyticsHistoryPoint[]): TailRiskResult {
-  const returns = portfolioReturns(history)
+  const integrity = normalizePortfolioIndex(history)
+  const returns = portfolioReturns(integrity.index)
   const base = {
     calcVersion: TAIL_RISK_CALC_VERSION,
     method: 'historical_daily_twr_var_cvar_v1' as const,
@@ -60,6 +94,24 @@ export function calculateTailRisk(history: AnalyticsHistoryPoint[]): TailRiskRes
     returns: returns.length,
     minimumReturns: MIN_RETURNS,
     matureReturns: MATURE_RETURNS,
+    sampleFrom: integrity.index[0]?.date ?? null,
+    sampleTo: integrity.index[integrity.index.length - 1]?.date ?? null,
+    duplicateRowsCollapsed: integrity.duplicateRowsCollapsed,
+    conflictingDates: integrity.conflictingDates,
+  }
+
+  if (integrity.conflictingDates > 0) {
+    return {
+      ...base,
+      available: false,
+      status: 'invalid_history',
+      var95Loss: null,
+      cvar95Loss: null,
+      worstDay: null,
+      downsideFrequency: null,
+      tailObservations: 0,
+      note: `История TWR неоднозначна: найдено ${integrity.conflictingDates} дат с разными значениями индекса. VaR/CVaR не рассчитываются до устранения конфликта.`,
+    }
   }
 
   if (returns.length < MIN_RETURNS) {
