@@ -295,3 +295,17 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Read-only monitoring remains blocked by the Render connector because no user-confirmed workspace is selected; the connector explicitly requires confirmation before any workspace is chosen, so deploy status is not guessed.
 - Legal publication blocker remains unchanged. No RU/EN offer, privacy-policy or consent wording was published.
 - Next safe focus: deliberate npm moderate-vulnerability review without blind `npm audit fix`, plus data-quality/mobile validation of issuer coverage, Allocation Lab and transaction-marker density; keep deeper coupon reconciliation gated until event identity exists.
+
+### 13:05 MSK autonomous pass — dependency security baseline
+- Re-read the required project/product/audit/terminal/legal/progress documents before changes and reconciled the audit queue with current `main`.
+- Reviewed the npm warning deliberately instead of applying `npm audit fix`. The v2 manifest still allowed Vite `^7.1.5`, while current GitHub security advisories identify multiple Vite dev-server vulnerabilities affecting 7.x through 7.3.1 and fixed in 7.3.2.
+- PR #133 raises only the supported Vite floor to `^7.3.2`; no major framework upgrade, financial runtime change, broker boundary, UI, DNA art/renderer, legal text or paid dependency was introduced.
+- Added a CI dependency security gate: `npm audit --audit-level=high`. High/critical advisories now fail the v2 build; moderate findings remain visible for deliberate review rather than becoming an automatic potentially breaking production fix.
+- The repository currently has no `v2/package-lock.json`, so exact transitive dependency resolution is not yet reproducible across CI/Render installs. This is recorded as a follow-up reliability issue rather than silently claiming the dependency graph is pinned.
+- Quant methodology pass: no financial formula, scenario assumption, return series or user-facing recommendation changed.
+- Code-quality pass: GitHub `v2 build` PR run #193 succeeded. `npm install`, the new high-severity audit gate, TypeScript/Vite build, full `test:core`, and syntax checks for `payouts-core.js`, `server-core.js`, `production-v158.js`, `production-v159.js` and `production-v160.js` all passed.
+- Mobile-UX pass: no UI/CSS/layout changes; Samsung/Android density and no-duplication behavior are unchanged.
+- Release pass: two-file narrow diff (`v2/package.json` and `.github/workflows/v2-build.yml`), rollback is trivial, and PR #133 was squash-merged to `main` as `bb310b876738ed60c0a547eeee9d15896e53f7e4`.
+- Render auto-deploy was not manually triggered. Read-only monitoring was attempted, but the connector returned `no workspace selected` and explicitly prohibits autonomous workspace selection; deploy status for `tinvest-pulse-v2-preview` and `tinvest-pulse` is therefore not guessed.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe focus: make dependency installs reproducible only through an explicitly generated/reviewed lockfile and `npm ci` path, or continue the approved live/mobile data-quality review for issuer coverage, Allocation Lab and transaction-marker density if lockfile generation cannot be performed safely in the current tool environment.
