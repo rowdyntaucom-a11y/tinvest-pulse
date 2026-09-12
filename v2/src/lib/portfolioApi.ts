@@ -1,4 +1,4 @@
-export const PORTFOLIO_NORMALIZATION_VERSION = '1.1' as const
+export const PORTFOLIO_NORMALIZATION_VERSION = '1.2' as const
 
 export type HistoryPoint = {
   date: string
@@ -64,6 +64,7 @@ export type PortfolioSnapshot = {
   cagr: number | null
   riskFreeRate: number | null
   riskFreeRateDate: string | null
+  nextRateMeeting: string | null
   startDate: string | null
   updatedAt: string | null
   history: HistoryPoint[]
@@ -285,6 +286,7 @@ const fallbackSnapshot = (): PortfolioSnapshot => ({
   cagr: null,
   riskFreeRate: null,
   riskFreeRateDate: null,
+  nextRateMeeting: null,
   startDate: null,
   updatedAt: null,
   history: [],
@@ -320,6 +322,7 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
     cagr: nullableNumber(portfolio.cagr),
     riskFreeRate: nullableNumber(cbr.rate),
     riskFreeRateDate: normaliseDateOnly(cbr.rateDate),
+    nextRateMeeting: normaliseDateOnly(cbr.nextMeeting),
     startDate: normaliseDate(portfolio.startDate ?? portfolio.createdAt),
     updatedAt: normaliseDate(raw.updatedAt),
     history: normaliseHistory(raw.history),

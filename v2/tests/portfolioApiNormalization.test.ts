@@ -20,7 +20,7 @@ function close(actual: number | null, expected: number, tolerance = 1e-12) {
   assert.ok(Math.abs((actual as number) - expected) <= tolerance, `expected ${expected}, got ${actual}`)
 }
 
-assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.1')
+assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.2')
 
 dashboardPayload = {
   portfolio: {
@@ -67,6 +67,7 @@ dashboardPayload = {
   cbr: {
     rate: 'Infinity',
     rateDate: '2026-09-12',
+    nextMeeting: '2026-10-23T13:30:00+03:00',
   },
   updatedAt: '2026-09-12T08:00:00.000Z',
   history: {
@@ -98,6 +99,7 @@ assert.equal(invalidNullable.xirr, null)
 assert.equal(invalidNullable.cagr, null)
 assert.equal(invalidNullable.riskFreeRate, null)
 assert.equal(invalidNullable.riskFreeRateDate, '2026-09-12')
+assert.equal(invalidNullable.nextRateMeeting, '2026-10-23')
 assert.equal(invalidNullable.startDate, '2026-07-26T12:34:56.000Z')
 assert.equal(invalidNullable.updatedAt, '2026-09-12T08:00:00.000Z')
 assert.equal(invalidNullable.positions, 1)
@@ -165,7 +167,11 @@ dashboardPayload = {
     ],
   },
   account: { name: 'Zero Test' },
-  cbr: { rate: { value: '0' }, rateDate: '2026-09-12T13:30:00+03:00' },
+  cbr: {
+    rate: { value: '0' },
+    rateDate: '2026-09-12T13:30:00+03:00',
+    nextMeeting: '2026-02-30',
+  },
   history: {
     points: [
       { date: '2026-09-03', portfolio: 0, imoex: { value: '0' } },
@@ -184,6 +190,7 @@ close(legitimateZeros.xirr, 0)
 close(legitimateZeros.cagr, 0)
 close(legitimateZeros.riskFreeRate, 0)
 assert.equal(legitimateZeros.riskFreeRateDate, '2026-09-12')
+assert.equal(legitimateZeros.nextRateMeeting, null)
 assert.equal(legitimateZeros.history.length, 1)
 close(legitimateZeros.history[0].portfolio, 0)
 close(legitimateZeros.history[0].imoex, 0)
