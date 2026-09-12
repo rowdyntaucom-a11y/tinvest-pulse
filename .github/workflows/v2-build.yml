@@ -3,6 +3,7 @@ name: v2 build
 on:
   pull_request:
     paths:
+      - 'package.json'
       - 'v2/**'
       - 'payouts-core.js'
       - 'payouts.js'
@@ -14,6 +15,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'package.json'
       - 'v2/**'
       - 'payouts-core.js'
       - 'payouts.js'
@@ -39,6 +41,11 @@ jobs:
       - run: npm install --no-audit --no-fund
       - name: Dependency security gate
         run: npm audit --audit-level=high
+      - name: Root runtime dependency security gate
+        working-directory: .
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm audit --omit=dev --audit-level=high
       - run: npm run build
       - run: npm run test:core
       - run: node --check ../payouts-core.js
