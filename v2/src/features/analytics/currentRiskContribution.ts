@@ -1,6 +1,6 @@
 import type { RiskSeries } from './riskMatrix'
 
-export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.0' as const
+export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.1' as const
 
 export type CurrentRiskSeriesInput = RiskSeries & {
   currentValue: number
@@ -27,6 +27,12 @@ export type CurrentRiskContributionResult = {
   totalPortfolioValue: number
   coverageRatio: number | null
   annualizedVolatility: number | null
+  diversificationRatio: number | null
+  capitalHhi: number | null
+  effectiveCapitalCount: number | null
+  riskMagnitudeHhi: number | null
+  effectiveRiskContributorCount: number | null
+  topAbsoluteRiskShare: number | null
   rows: CurrentRiskContributionRow[]
   topAbsoluteContributor: CurrentRiskContributionRow | null
   reason: string | null
@@ -77,6 +83,17 @@ function matVec(matrix: number[][], vector: number[]) {
   return matrix.map(row => row.reduce((sum, value, index) => sum + value * vector[index], 0))
 }
 
+function unavailableDepth() {
+  return {
+    diversificationRatio: null,
+    capitalHhi: null,
+    effectiveCapitalCount: null,
+    riskMagnitudeHhi: null,
+    effectiveRiskContributorCount: null,
+    topAbsoluteRiskShare: null,
+  }
+}
+
 export function calculateCurrentRiskContribution(
   input: CurrentRiskSeriesInput[],
   totalPortfolioValue: number,
@@ -115,6 +132,7 @@ export function calculateCurrentRiskContribution(
       ...base,
       available: false,
       annualizedVolatility: null,
+      ...unavailableDepth(),
       rows: [],
       topAbsoluteContributor: null,
       reason: unique.size !== series.length
@@ -130,6 +148,7 @@ export function calculateCurrentRiskContribution(
       ...base,
       available: false,
       annualizedVolatility: null,
+      ...unavailableDepth(),
       rows: [],
       topAbsoluteContributor: null,
       reason: 'Covariance matrix contains invalid values.',
@@ -145,6 +164,7 @@ export function calculateCurrentRiskContribution(
       ...base,
       available: false,
       annualizedVolatility: portfolioVariance >= -EPS ? 0 : null,
+      ...unavailableDepth(),
       rows: [],
       topAbsoluteContributor: null,
       reason: 'Portfolio variance is zero or not positive on the common sample.',
@@ -152,6 +172,7 @@ export function calculateCurrentRiskContribution(
     }
   }
 
+  const annualizedPortfolioVolatility = Math.sqrt(portfolioVariance * TRADING_DAYS)
   const resultRows: CurrentRiskContributionRow[] = series.map((item, index) => ({
     key: item.key,
     label: item.label,
@@ -164,13 +185,45 @@ export function calculateCurrentRiskContribution(
   const topAbsoluteContributor = [...resultRows]
     .sort((a, b) => Math.abs(b.riskContributionShare ?? 0) - Math.abs(a.riskContributionShare ?? 0))[0] ?? null
 
+  const capitalHhi = weights.reduce((sum, weight) => sum + weight * weight, 0)
+  const effectiveCapitalCount = capitalHhi > EPS ? 1 / capitalHhi : null
+
+  const absoluteRisk = resultRows.map(row => Math.abs(row.riskContributionShare ?? 0))
+  const absoluteRiskTotal = absoluteRisk.reduce((sum, value) => sum + value, 0)
+  const normalizedAbsoluteRisk = absoluteRiskTotal > EPS
+    ? absoluteRisk.map(value => value / absoluteRiskTotal)
+    : []
+  const riskMagnitudeHhi = normalizedAbsoluteRisk.length
+    ? normalizedAbsoluteRisk.reduce((sum, share) => sum + share * share, 0)
+    : null
+  const effectiveRiskContributorCount = riskMagnitudeHhi != null && riskMagnitudeHhi > EPS
+    ? 1 / riskMagnitudeHhi
+    : null
+  const topAbsoluteRiskShare = normalizedAbsoluteRisk.length
+    ? Math.max(...normalizedAbsoluteRisk)
+    : null
+
+  const weightedStandaloneVolatility = resultRows.reduce(
+    (sum, row) => sum + row.weight * row.annualizedVolatility,
+    0,
+  )
+  const diversificationRatio = annualizedPortfolioVolatility > EPS
+    ? weightedStandaloneVolatility / annualizedPortfolioVolatility
+    : null
+
   return {
     ...base,
     available: true,
-    annualizedVolatility: Math.sqrt(portfolioVariance * TRADING_DAYS),
+    annualizedVolatility: annualizedPortfolioVolatility,
+    diversificationRatio,
+    capitalHhi,
+    effectiveCapitalCount,
+    riskMagnitudeHhi,
+    effectiveRiskContributorCount,
+    topAbsoluteRiskShare,
     rows: resultRows,
     topAbsoluteContributor,
     reason: null,
-    note: `${status}: current market-value weights on ${rows.length} common daily returns. Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. No expected-return assumption is used.`,
+    note: `${status}: current market-value weights on ${rows.length} common daily returns. Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. Diversification ratio = weighted standalone volatility / portfolio volatility. Risk Nₑ = 1/HHI of normalized absolute contribution magnitudes. No expected-return assumption is used.`,
   }
 }
