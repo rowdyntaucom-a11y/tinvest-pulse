@@ -7,6 +7,7 @@ import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analy
 import { RebalanceScenarioDetails } from './features/analytics/RebalanceScenarioDetails'
 import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
 import { RiskWorkspace } from './features/analytics/RiskWorkspace'
+import { annualReturnRatioToPercent } from './features/analytics/returnUnits'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
 import { KeyRateWidget } from './features/macro/KeyRateWidget'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
@@ -17,11 +18,6 @@ const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
 type Tab = 'portfolio' | 'analytics' | 'income' | 'dna'
 type AnalyticsView = 'overview' | 'risk' | 'health' | 'drift' | 'montecarlo'
-
-function annualPct(value: number | null) {
-  if (value == null || !Number.isFinite(value)) return null
-  return Math.abs(value) <= 5 ? value * 100 : value
-}
 
 function signedRatio(value: number | null) {
   if (value == null || !Number.isFinite(value)) return '—'
@@ -80,7 +76,7 @@ export default function App() {
     [snapshot.positionItems],
   )
 
-  const xirr = annualPct(snapshot.xirr)
+  const xirr = annualReturnRatioToPercent(snapshot.xirr)
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
   const analyticsMature = analytics.historyDays >= 365
   const historyLabel = analytics.historyDays ? `${analytics.historyDays} дней` : 'нет истории'
