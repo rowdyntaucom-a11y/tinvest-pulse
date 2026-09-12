@@ -81,7 +81,7 @@ const data = calendar({
 
 const exact = calculatePositionIncomeContribution({ figi: 'figi_a' }, data)
 assert.equal(exact.version, POSITION_INCOME_CONTRIBUTION_VERSION)
-assert.equal(exact.version, '1.1')
+assert.equal(exact.version, '1.2')
 assert.equal(exact.available, true)
 assert.equal(exact.figi, 'FIGI_A')
 close(exact.factNet, 150)
@@ -130,9 +130,11 @@ const noObservation = calculatePositionIncomeContribution({ figi: 'FIGI_A' }, ca
   },
 }))
 close(noObservation.factNet, 100)
+assert.equal(noObservation.factShare, null)
 assert.equal(noObservation.factObservationFrom, null)
 assert.equal(noObservation.factObservationTo, null)
 assert.equal(noObservation.factObservationCompleteMonths, null)
+assert.match(noObservation.note, /available only inside a reported observation window/)
 
 const noFigi = calculatePositionIncomeContribution({ figi: null }, data)
 assert.equal(noFigi.available, false)
