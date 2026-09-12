@@ -352,3 +352,16 @@ This log is maintained by autonomous development runs. Production changes must r
 - Render auto-deploy was not manually triggered. Read-only deployment monitoring remains blocked because no user-confirmed Render workspace is selected; connector rules prohibit autonomous workspace selection, so `tinvest-pulse-v2-preview` / `tinvest-pulse` state is not guessed.
 - Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
 - Next safe focus: continue compact live/mobile data-quality review for Allocation Lab / transaction-marker density, or expose position-income observation-window provenance only if the existing inspector can carry it without a duplicate widget or Samsung one-screen regression.
+
+### 18:03 MSK autonomous pass — position-income observation provenance UI
+- Re-read the mandatory project/product/audit/terminal/legal/progress documents and started from `main` commit `3ddf1f2c3c17bf7e4b5fd61676bb02747be3060c`.
+- Chose the already-approved position-income provenance gap rather than adding a duplicate analytics widget. The deterministic v1.2 exact-FIGI boundary already carries the broker observation window and fails closed when that provenance is unavailable.
+- PR #153 reuses the existing Portfolio position inspector and appends a compact FACT observation-window token (`DD.MM.YY→DD.MM.YY · N полн. мес.`) only when both observation boundaries are reported. No new widget, navigation item, CSS block or scroll region was added.
+- Quant methodology pass: no P/L or passive-income arithmetic, share denominator, annualization, lifetime inference, forecast or recommendation changed. FACT and future 12M schedule remain separate bases; exact realized-payment ↔ scheduled-event reconciliation remains gated.
+- Code-quality pass: the production diff is one TSX file, +12/-0. GitHub `v2 build` PR run #233 passed `npm ci`, both dependency-security gates, TypeScript/Vite build, full `test:core`, asset-history regression and runtime syntax checks for the current server/wrapper files.
+- Mobile-UX pass: the provenance is an inline fragment inside the existing inspector methodology paragraph and may wrap naturally; it does not add a card or persistent control, preserving the current Samsung/Android density model.
+- Release pass: PR #153 was squash-merged to `main` as `9eb169c499d5f4aae93e39890716a752e6a38c00`. No backend/broker route, credential, legal/payment wording, DNA renderer or trading-execution behavior changed.
+- Several stale historical push workflows still fail independently of v2 changes; the scoped pre-merge `v2 build` gate is green and no regression attributable to this pass was found.
+- Render auto-deploy was not manually triggered. Read-only monitoring was attempted after merge, but the connector returned `no workspace selected` and explicitly prohibits autonomous workspace selection; deploy state for `tinvest-pulse-v2-preview` and `tinvest-pulse` is therefore not guessed.
+- Legal publication blocker remains unchanged; no RU/EN offer, privacy-policy or consent wording was published.
+- Next safe focus: continue transaction-marker mobile-density / Allocation Lab live-data-quality review, or deliberately inspect remaining moderate dependency findings without blind fixes.
