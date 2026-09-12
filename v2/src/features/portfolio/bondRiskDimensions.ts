@@ -1,5 +1,7 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
+export const BOND_RISK_DIMENSIONS_CALC_VERSION = '1.1' as const
+
 export type BondDimensionRow = {
   key: string
   label: string
@@ -19,6 +21,7 @@ export type BondDimension = {
 }
 
 export type BondRiskDimensions = {
+  calcVersion: typeof BOND_RISK_DIMENSIONS_CALC_VERSION
   bondCount: number
   totalBondValue: number
   countryOfRisk: BondDimension
@@ -37,6 +40,10 @@ function isBond(position: PositionSnapshot) {
   return type.includes('bond') || /^SU\d{5,}/.test(ticker) || /ОФЗ/i.test(position.name || '')
 }
 
+function normalizedPositiveValue(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0
+}
+
 function normalizedLabel(value: string | null | undefined) {
   const label = String(value || '').trim()
   return label || null
@@ -51,14 +58,14 @@ function buildDimension(
   bonds: PositionSnapshot[],
   identityOf: (position: PositionSnapshot) => DimensionIdentity | null,
 ): BondDimension {
-  const totalBondValue = bonds.reduce((sum, position) => sum + Math.max(0, position.currentValue), 0)
+  const totalBondValue = bonds.reduce((sum, position) => sum + normalizedPositiveValue(position.currentValue), 0)
   const groups = new Map<string, { label: string; value: number }>()
 
   for (const position of bonds) {
     const identity = identityOf(position)
     if (!identity) continue
-    const value = Math.max(0, position.currentValue)
-    if (!Number.isFinite(value) || value <= 0) continue
+    const value = normalizedPositiveValue(position.currentValue)
+    if (value <= 0) continue
     const current = groups.get(identity.key)
     groups.set(identity.key, {
       label: current?.label || identity.label,
@@ -94,9 +101,10 @@ function buildDimension(
 
 export function buildBondRiskDimensions(positions: PositionSnapshot[]): BondRiskDimensions {
   const bonds = positions.filter(isBond)
-  const totalBondValue = bonds.reduce((sum, position) => sum + Math.max(0, position.currentValue), 0)
+  const totalBondValue = bonds.reduce((sum, position) => sum + normalizedPositiveValue(position.currentValue), 0)
 
   return {
+    calcVersion: BOND_RISK_DIMENSIONS_CALC_VERSION,
     bondCount: bonds.length,
     totalBondValue,
     countryOfRisk: buildDimension(bonds, position => {
