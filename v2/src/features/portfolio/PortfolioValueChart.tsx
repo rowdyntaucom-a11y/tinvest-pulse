@@ -71,6 +71,11 @@ function formatValue(value: number, mode: Mode) {
   return `${money.format(value)} ₽`
 }
 
+function compactDate(value: string | undefined) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || '').trim())
+  return match ? `${match[3]}.${match[2]}` : String(value || '')
+}
+
 export function PortfolioValueChart({ points }: Props) {
   const [mode, setMode] = useState<Mode>('value')
   const [period, setPeriod] = useState<Period>('all')
@@ -105,6 +110,9 @@ export function PortfolioValueChart({ points }: Props) {
   const latestPrimary = [...primary].reverse().find(value => typeof value === 'number' && Number.isFinite(value)) ?? null
   const firstDate = filtered[0]?.date
   const lastDate = filtered.at(-1)?.date
+  const latestLabel = latestPrimary == null
+    ? '—'
+    : `${compactDate(lastDate)} · ${formatValue(latestPrimary, mode)}`
 
   const legendPrimary = mode === 'value' ? 'Стоимость' : mode === 'profit' ? 'Результат' : 'Портфель'
   const legendSecondary = mode === 'value' ? 'Внесено' : mode === 'return' ? 'IMOEX' : null
@@ -117,7 +125,7 @@ export function PortfolioValueChart({ points }: Props) {
           <button className={mode === 'profit' ? 'is-active' : ''} onClick={() => setMode('profit')}>РЕЗУЛЬТАТ</button>
           <button className={mode === 'return' ? 'is-active' : ''} onClick={() => setMode('return')}>ДОХОДНОСТЬ</button>
         </div>
-        <strong>{latestPrimary == null ? '—' : formatValue(latestPrimary, mode)}</strong>
+        <strong title="Последняя историческая точка, не live-снимок портфеля">{latestLabel}</strong>
       </div>
 
       <div className="portfolio-chart__canvas">
