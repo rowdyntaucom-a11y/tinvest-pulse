@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
 import './keyRateWidget.css'
 
-type CbrMacro = {
+type Props = {
   rate: number | null
   rateDate: string | null
   nextMeeting: string | null
@@ -24,11 +23,13 @@ const dateFmt = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: '2-dig
 
 function validIsoDate(value: unknown) {
   const text = String(value || '').slice(0, 10)
-  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : null
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null
+  const timestamp = Date.parse(`${text}T00:00:00.000Z`)
+  return Number.isFinite(timestamp) && new Date(timestamp).toISOString().slice(0, 10) === text ? text : null
 }
 
 function decisionTimestamp(date: string) {
-  // Bank of Russia publishes the scheduled rate decision at about 13:30 Moscow time (UTC+3).
+  // Scheduled key-rate decisions are published at about 13:30 Moscow time (UTC+3).
   return Date.parse(`${date}T10:30:00Z`)
 }
 
@@ -36,7 +37,7 @@ function resolveNextMeeting(reported: string | null) {
   const now = Date.now()
   const fromServer = validIsoDate(reported)
   if (fromServer && decisionTimestamp(fromServer) > now) return fromServer
-  return OFFICIAL_2026_MEETINGS.find(date => decisionTimestamp(date) > now) ?? fromServer
+  return OFFICIAL_2026_MEETINGS.find(date => decisionTimestamp(date) > now) ?? null
 }
 
 function shortDate(value: string | null, formatter: Intl.DateTimeFormat) {
@@ -45,38 +46,10 @@ function shortDate(value: string | null, formatter: Intl.DateTimeFormat) {
   return Number.isFinite(date.getTime()) ? formatter.format(date).replace('.', '') : '—'
 }
 
-export function KeyRateWidget() {
-  const [macro, setMacro] = useState<CbrMacro>({ rate: null, rateDate: null, nextMeeting: null })
-
-  useEffect(() => {
-    let active = true
-    const load = async () => {
-      try {
-        const response = await fetch('/api/dashboard', { cache: 'no-store' })
-        if (!response.ok) return
-        const raw = await response.json() as Record<string, unknown>
-        const cbr = (raw.cbr ?? {}) as Record<string, unknown>
-        const parsedRate = Number(cbr.rate)
-        if (!active) return
-        setMacro({
-          rate: Number.isFinite(parsedRate) && parsedRate > 0 ? parsedRate : null,
-          rateDate: validIsoDate(cbr.rateDate),
-          nextMeeting: validIsoDate(cbr.nextMeeting),
-        })
-      } catch {
-        // Fail closed: keep placeholders instead of inventing macro data.
-      }
-    }
-
-    void load()
-    const timer = window.setInterval(load, 60 * 60_000)
-    return () => {
-      active = false
-      window.clearInterval(timer)
-    }
-  }, [])
-
-  const nextMeeting = useMemo(() => resolveNextMeeting(macro.nextMeeting), [macro.nextMeeting])
+export function KeyRateWidget({ rate, rateDate, nextMeeting: reportedNextMeeting }: Props) {
+  const safeRate = rate != null && Number.isFinite(rate) ? rate : null
+  const safeRateDate = validIsoDate(rateDate)
+  const nextMeeting = resolveNextMeeting(reportedNextMeeting)
 
   return (
     <a
@@ -84,12 +57,12 @@ export function KeyRateWidget() {
       href="https://www.cbr.ru/press/keypr/"
       target="_blank"
       rel="noreferrer"
-      aria-label={`Ключевая ставка ${macro.rate == null ? 'нет данных' : `${rateFmt.format(macro.rate)} процентов`}. Следующее заседание ${shortDate(nextMeeting, meetingFmt)}.`}
+      aria-label={`Ключевая ставка ${safeRate == null ? 'нет данных' : `${rateFmt.format(safeRate)} процентов`}. Следующее заседание ${shortDate(nextMeeting, meetingFmt)}.`}
       title="Банк России · ключевая ставка и следующее заседание"
     >
       <span className="key-rate-widget__rate">
         <small>КЛЮЧЕВАЯ</small>
-        <strong>{macro.rate == null ? '—' : `${rateFmt.format(macro.rate)}%`}</strong>
+        <strong>{safeRate == null ? '—' : `${rateFmt.format(safeRate)}%`}</strong>
       </span>
       <i aria-hidden="true" />
       <span className="key-rate-widget__meeting">
@@ -97,7 +70,7 @@ export function KeyRateWidget() {
         <strong>{shortDate(nextMeeting, meetingFmt)}</strong>
         <b>13:30 МСК</b>
       </span>
-      <span className="key-rate-widget__source">ЦБ РФ{macro.rateDate ? ` · ${shortDate(macro.rateDate, dateFmt)}` : ''}</span>
+      <span className="key-rate-widget__source">ЦБ РФ{safeRateDate ? ` · ${shortDate(safeRateDate, dateFmt)}` : ''}</span>
     </a>
   )
 }
