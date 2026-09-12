@@ -139,7 +139,10 @@ export function CorrelationPanel({ positions }: Props) {
   const topRisk = currentRisk.topAbsoluteContributor
   const topRiskLine = topRisk?.riskContributionShare == null
     ? null
-    : `${compactLabel(topRisk.label)} · капитал ${pct.format(topRisk.weight * 100)}% · вклад ${pctSigned.format(topRisk.riskContributionShare * 100)}%`
+    : `coverage ${currentRisk.coverageRatio == null ? '—' : `${pct.format(currentRisk.coverageRatio * 100)}%`} · ${compactLabel(topRisk.label)} · капитал ${pct.format(topRisk.weight * 100)}% · вклад ${pctSigned.format(topRisk.riskContributionShare * 100)}%${currentRisk.topAbsoluteRiskShare == null ? '' : ` · |risk| ${pct.format(currentRisk.topAbsoluteRiskShare * 100)}%`}`
+  const riskDepthBadge = currentRisk.available
+    ? `DR ${currentRisk.diversificationRatio == null ? '—' : number.format(currentRisk.diversificationRatio)} · Nₑ ${currentRisk.effectiveRiskContributorCount == null ? '—' : number.format(currentRisk.effectiveRiskContributorCount)}/${currentRisk.effectiveCapitalCount == null ? '—' : number.format(currentRisk.effectiveCapitalCount)}`
+    : null
 
   if (loading) {
     return <section className="panel corr-panel"><div className="corr-loading">ЗАГРУЖАЕМ 365 ДНЕЙ ИСТОРИИ АКТИВОВ…</div></section>
@@ -207,7 +210,7 @@ export function CorrelationPanel({ positions }: Props) {
             <div>
               <span>ТЕКУЩИЕ ВЕСА · RISK CONTRIBUTION</span>
               <strong>{currentRisk.annualizedVolatility == null ? '—' : `${pct.format(currentRisk.annualizedVolatility * 100)}% vol`}</strong>
-              <b>coverage {currentRisk.coverageRatio == null ? '—' : `${pct.format(currentRisk.coverageRatio * 100)}%`}</b>
+              <b>{riskDepthBadge}</b>
             </div>
             <small title={currentRisk.note}>{topRiskLine ?? currentRisk.note}</small>
           </article>
@@ -219,7 +222,7 @@ export function CorrelationPanel({ positions }: Props) {
             <div className="allocation-scenarios">
               {allocationScenarios.map(scenario => <AllocationScenarioRow key={scenario.method} scenario={scenario} />)}
             </div>
-            <p>{allocation.note} Текущие risk-contribution веса нормализуются только внутри покрытой market-history части портфеля; coverage показан отдельно. Signed risk contribution может быть отрицательным из-за диверсификации. Сценарные веса не учитывают ожидаемую доходность, налоги, ликвидность или индивидуальные ограничения.</p>
+            <p>{allocation.note} Текущие risk-contribution веса нормализуются только внутри покрытой market-history части портфеля; coverage показан отдельно. DR = средневзвешенная standalone-vol / vol текущих весов. Nₑ показывает эффективное число вкладчиков риска по нормализованным |risk contribution| и рядом — эффективное число капитальных весов в той же покрытой выборке. Signed risk contribution может быть отрицательным из-за диверсификации. Сценарные веса не учитывают ожидаемую доходность, налоги, ликвидность или индивидуальные ограничения.</p>
           </>
         ) : (
           <p>{allocation.note}</p>
