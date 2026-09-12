@@ -1,4 +1,8 @@
 /* Final mobile shell pass before XP/DNA work. Keep this layer small and removable. */
+.analytics-subnav {
+  grid-template-columns: repeat(5, auto) 1fr;
+}
+
 @media (max-width: 620px) {
   .topbar {
     gap: 4px;
@@ -11,6 +15,21 @@
 
   .chip {
     padding: 6px 3px;
+  }
+
+  .analytics-subnav {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+    gap: 3px;
+  }
+
+  .analytics-subnav button {
+    min-width: 0;
+    padding-inline: 4px;
+  }
+
+  .analytics-subnav .sample-badge {
+    min-width: 0;
+    padding-inline: 5px;
   }
 
   .analytics-risk-view {
