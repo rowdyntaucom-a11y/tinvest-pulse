@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi'
-import { loadPayoutCalendar, type PayoutCalendar } from '../../lib/payoutsApi'
+import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import { PortfolioValueChart } from './PortfolioValueChart'
 import { BondAnalytics } from './BondAnalytics'
 import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './portfolioAttribution'
@@ -144,16 +144,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const [positionSort, setPositionSort] = useState<PositionSort>('weight')
   const [selectedPositionKey, setSelectedPositionKey] = useState('')
   const [structureMode, setStructureMode] = useState<StructureMode>('classes')
-  const [incomeCalendar, setIncomeCalendar] = useState<PayoutCalendar | null>(null)
-
-  useEffect(() => {
-    if (view !== 'positions' || incomeCalendar) return
-    let active = true
-    void loadPayoutCalendar().then(calendar => {
-      if (active) setIncomeCalendar(calendar)
-    })
-    return () => { active = false }
-  }, [view, incomeCalendar])
+  const { calendar: incomeCalendar } = usePayoutSnapshot(view === 'positions')
 
   const allocation = useMemo(() => {
     const groups = new Map<string, number>()
