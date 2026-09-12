@@ -1,5 +1,7 @@
 import type { PayoutEvent, PayoutObservation } from '../../lib/payoutsApi'
 
+export const INCOME_HISTORY_CALC_VERSION = '1.1' as const
+
 export type RealizedIncomeKind = 'COUPON' | 'DIVIDEND' | 'OTHER'
 
 export type IncomeHistoryMonth = {
@@ -101,8 +103,9 @@ const emptyMonth = (key: string): IncomeHistoryMonth => ({
 })
 
 export function buildRealizedIncomeHistory(events: PayoutEvent[], observation?: PayoutObservation | null) {
-  const completeMonths = validMonthKeys(observation?.completeMonths)
-  const partialMonths = validMonthKeys(observation?.partialMonths)
+  const observationAvailable = observation?.available === true
+  const completeMonths = observationAvailable ? validMonthKeys(observation?.completeMonths) : new Set<string>()
+  const partialMonths = observationAvailable ? validMonthKeys(observation?.partialMonths) : new Set<string>()
   for (const key of completeMonths) partialMonths.delete(key)
 
   const monthMap = new Map<string, IncomeHistoryMonth>()
@@ -161,7 +164,7 @@ export function buildRealizedIncomeHistory(events: PayoutEvent[], observation?: 
   }
 
   const observationSummary: IncomeObservationSummary = {
-    available: Boolean(observation?.available),
+    available: observationAvailable,
     from: observation?.from ?? null,
     to: observation?.to ?? null,
     completeMonths: completeMonths.size,
@@ -170,6 +173,7 @@ export function buildRealizedIncomeHistory(events: PayoutEvent[], observation?: 
   }
 
   return {
+    version: INCOME_HISTORY_CALC_VERSION,
     months,
     years: [...yearMap.values()].sort((a, b) => a.year - b.year),
     observation: observationSummary,
