@@ -1,5 +1,7 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
+export const DRIFT_CALC_VERSION = '1.0' as const
+
 export type StrategyAssetKey = 'equity' | 'bond'
 
 export type StrategyTarget = {
@@ -25,6 +27,7 @@ export type DriftRow = StrategyTarget & {
 }
 
 export type DriftResult = {
+  calcVersion: typeof DRIFT_CALC_VERSION
   available: boolean
   strategy: StrategyConfig
   rows: DriftRow[]
@@ -95,6 +98,7 @@ export function calculateAllocationDrift(
   const withinTolerance = available && rows.every(row => !row.outsideTolerance) && unassignedWeight < strategy.absoluteTolerance
 
   return {
+    calcVersion: DRIFT_CALC_VERSION,
     available,
     strategy,
     rows,

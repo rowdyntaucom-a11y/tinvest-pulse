@@ -1,5 +1,7 @@
 import type { DriftResult, StrategyAssetKey } from './drift'
 
+export const REBALANCE_SCENARIO_CALC_VERSION = '1.0' as const
+
 export type RebalanceScenarioMode = 'REBALANCE_EXISTING' | 'ADD_CAPITAL' | 'WITHDRAW_CAPITAL'
 
 export type RebalanceScenarioRow = {
@@ -13,6 +15,7 @@ export type RebalanceScenarioRow = {
 }
 
 export type RebalanceScenarioResult = {
+  calcVersion: typeof REBALANCE_SCENARIO_CALC_VERSION
   available: boolean
   mode: RebalanceScenarioMode
   requestedFlow: number
@@ -27,6 +30,7 @@ export type RebalanceScenarioResult = {
 }
 
 const EPSILON = 1e-8
+const VALID_MODES = new Set<RebalanceScenarioMode>(['REBALANCE_EXISTING', 'ADD_CAPITAL', 'WITHDRAW_CAPITAL'])
 
 function finitePositive(value: unknown) {
   const parsed = Number(value)
@@ -36,7 +40,9 @@ function finitePositive(value: unknown) {
 function validStrategy(drift: DriftResult) {
   if (!drift.strategy.targets.length) return false
   const sum = drift.strategy.targets.reduce((total, target) => total + target.target, 0)
-  return drift.strategy.targets.every(target => Number.isFinite(target.target) && target.target > 0)
+  const uniqueKeys = new Set(drift.strategy.targets.map(target => target.key))
+  return uniqueKeys.size === drift.strategy.targets.length
+    && drift.strategy.targets.every(target => Number.isFinite(target.target) && target.target > 0)
     && Math.abs(sum - 1) <= EPSILON
 }
 
@@ -84,6 +90,7 @@ export function calculateRebalanceScenario(
   }, 0)
 
   const base = {
+    calcVersion: REBALANCE_SCENARIO_CALC_VERSION,
     mode,
     requestedFlow: 0,
     assignedValueBefore,
@@ -92,6 +99,15 @@ export function calculateRebalanceScenario(
     exactTargetPossible: false,
     minimumFlowForExactTarget: null,
     rows: [] as RebalanceScenarioRow[],
+  }
+
+  if (!VALID_MODES.has(mode)) {
+    return {
+      available: false,
+      ...base,
+      reason: 'Unknown rebalancing scenario mode.',
+      note: 'Unsupported modes fail closed and do not produce target deltas.',
+    }
   }
 
   if (!drift.available || assignedValueBefore <= 0) {
@@ -107,8 +123,8 @@ export function calculateRebalanceScenario(
     return {
       available: false,
       ...base,
-      reason: 'Strategy targets must be positive finite weights summing to 100%.',
-      note: 'Invalid target weights are not normalized silently.',
+      reason: 'Strategy targets must be unique positive finite weights summing to 100%.',
+      note: 'Invalid or duplicate target weights are not normalized silently.',
     }
   }
 
@@ -171,6 +187,7 @@ export function calculateRebalanceScenario(
       : `Exact target requires at least ${minimumFlowForExactTarget.toFixed(2)} of withdrawal if no class is increased.`
 
   return {
+    calcVersion: REBALANCE_SCENARIO_CALC_VERSION,
     available: true,
     mode,
     requestedFlow: requestedFlow ?? 0,
