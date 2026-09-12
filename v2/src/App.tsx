@@ -41,7 +41,7 @@ function signedPoints(value: number | null) {
 const EMPTY: PortfolioSnapshot = {
   accountName: 'Кряхтящий фонд', value: 0, profit: 0, profitPct: 0, passiveIncome: 0,
   averageMonthlyPassiveIncome: 0, averageAnnualPassiveIncome: 0, positions: 0, positionItems: [],
-  xirr: null, cagr: null, riskFreeRate: null, riskFreeRateDate: null,
+  xirr: null, cagr: null, riskFreeRate: null, riskFreeRateDate: null, nextRateMeeting: null,
   startDate: null, updatedAt: null, history: [], source: 'fallback',
 }
 
@@ -93,7 +93,11 @@ export default function App() {
           <h1>QVANIX</h1>
           <p>{snapshot.accountName} · финансовое ядро, аналитика и живой мир без лишнего дублирования.</p>
         </div>
-        <KeyRateWidget />
+        <KeyRateWidget
+          rate={snapshot.riskFreeRate}
+          rateDate={snapshot.riskFreeRateDate}
+          nextMeeting={snapshot.nextRateMeeting}
+        />
         <nav className="topbar__nav" aria-label="Разделы">
           <button onClick={() => setTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
           <button onClick={() => setTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
