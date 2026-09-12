@@ -1,0 +1,2 @@
+.history-event-tick{stroke-width:4;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.9}.history-event-tick--buy{stroke:var(--mint)}.history-event-tick--sell{stroke:var(--amber)}.history-event-tick--mixed{stroke:#9ca8ff}.history-legend small{max-width:48%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:620px){.history-event-tick{stroke-width:3}.history-legend small{max-width:42%}}
