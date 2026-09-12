@@ -1,3 +1,5 @@
+export const PORTFOLIO_NORMALIZATION_VERSION = '1.1' as const
+
 export type HistoryPoint = {
   date: string
   portfolio: number | null
@@ -68,25 +70,33 @@ export type PortfolioSnapshot = {
   source: 'dashboard' | 'portfolio' | 'fallback'
 }
 
-const n = (value: unknown): number => {
-  if (typeof value === 'number' && Number.isFinite(value)) return value
+const finiteNumber = (value: unknown): number | null => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+
   if (typeof value === 'string') {
-    const parsed = Number(value.replace(/\s/g, '').replace(',', '.'))
-    return Number.isFinite(parsed) ? parsed : 0
+    const normalized = value.replace(/\s/g, '').replace(',', '.')
+    if (!normalized) return null
+    const parsed = Number(normalized)
+    return Number.isFinite(parsed) ? parsed : null
   }
+
   if (value && typeof value === 'object') {
-    const v = value as Record<string, unknown>
-    if ('units' in v) return n(v.units) + n(v.nano) / 1e9
-    if ('value' in v) return n(v.value)
+    const row = value as Record<string, unknown>
+    if ('units' in row) {
+      const units = finiteNumber(row.units)
+      const nano = row.nano == null ? 0 : finiteNumber(row.nano)
+      if (units == null || nano == null) return null
+      const parsed = units + nano / 1e9
+      return Number.isFinite(parsed) ? parsed : null
+    }
+    if ('value' in row) return finiteNumber(row.value)
   }
-  return 0
+
+  return null
 }
 
-const nullableNumber = (value: unknown): number | null => {
-  if (value == null || value === '') return null
-  const parsed = n(value)
-  return Number.isFinite(parsed) ? parsed : null
-}
+const n = (value: unknown): number => finiteNumber(value) ?? 0
+const nullableNumber = (value: unknown): number | null => finiteNumber(value)
 
 const nullableBoolean = (value: unknown): boolean | null => {
   if (typeof value === 'boolean') return value
@@ -105,11 +115,23 @@ const ratioToPercent = (value: unknown): number => {
   return parsed * 100
 }
 
+const normaliseDateOnly = (value: unknown): string | null => {
+  const parsed = nullableString(value)
+  if (!parsed) return null
+  const datePart = parsed.slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return null
+  const timestamp = Date.parse(`${datePart}T00:00:00.000Z`)
+  if (!Number.isFinite(timestamp)) return null
+  return new Date(timestamp).toISOString().slice(0, 10) === datePart ? datePart : null
+}
+
 const normaliseDate = (value: unknown): string | null => {
   const parsed = nullableString(value)
   if (!parsed) return null
-  const date = new Date(parsed)
-  return Number.isFinite(date.getTime()) ? date.toISOString() : null
+  const datePart = parsed.slice(0, 10)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(datePart) && normaliseDateOnly(datePart) == null) return null
+  const timestamp = Date.parse(parsed)
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null
 }
 
 const unavailableAccountContext = (): AccountContext => ({
@@ -171,7 +193,7 @@ const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
 
   const byDate = new Map<string, HistoryPoint>()
   const ensure = (date: unknown) => {
-    const key = String(date || '').slice(0, 10)
+    const key = normaliseDateOnly(date)
     if (!key) return null
     if (!byDate.has(key)) byDate.set(key, { date: key, portfolio: null, imoex: null, value: null, invested: null })
     return byDate.get(key)!
@@ -198,19 +220,19 @@ const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
 const normaliseBond = (value: unknown): BondMetadata | null => {
   if (!value || typeof value !== 'object') return null
   const row = value as Record<string, unknown>
-  const maturityRaw = row.maturityDate == null ? '' : String(row.maturityDate)
+  const currency = nullableString(row.currency)
   return {
-    maturityDate: maturityRaw ? maturityRaw.slice(0, 10) : null,
+    maturityDate: normaliseDateOnly(row.maturityDate),
     nominal: nullableNumber(row.nominal),
-    currency: row.currency ? String(row.currency).toUpperCase() : null,
+    currency: currency ? currency.toUpperCase() : null,
     couponQuantityPerYear: nullableNumber(row.couponQuantityPerYear),
     floatingCoupon: nullableBoolean(row.floatingCoupon),
     perpetual: nullableBoolean(row.perpetual),
     amortizing: nullableBoolean(row.amortizing),
-    issueKind: row.issueKind ? String(row.issueKind) : null,
-    countryOfRisk: row.countryOfRisk ? String(row.countryOfRisk) : null,
-    countryOfRiskName: row.countryOfRiskName ? String(row.countryOfRiskName) : null,
-    sector: row.sector ? String(row.sector) : null,
+    issueKind: nullableString(row.issueKind),
+    countryOfRisk: nullableString(row.countryOfRisk),
+    countryOfRiskName: nullableString(row.countryOfRiskName),
+    sector: nullableString(row.sector),
     issuerUid: nullableString(row.issuerUid),
     issuerName: nullableString(row.issuerName),
   }
@@ -297,9 +319,9 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
     xirr: nullableNumber(portfolio.xirr),
     cagr: nullableNumber(portfolio.cagr),
     riskFreeRate: nullableNumber(cbr.rate),
-    riskFreeRateDate: cbr.rateDate ? String(cbr.rateDate) : null,
-    startDate: portfolio.startDate ? String(portfolio.startDate) : portfolio.createdAt ? String(portfolio.createdAt) : null,
-    updatedAt: raw.updatedAt ? String(raw.updatedAt) : null,
+    riskFreeRateDate: normaliseDateOnly(cbr.rateDate),
+    startDate: normaliseDate(portfolio.startDate ?? portfolio.createdAt),
+    updatedAt: normaliseDate(raw.updatedAt),
     history: normaliseHistory(raw.history),
     source: 'dashboard',
   }
