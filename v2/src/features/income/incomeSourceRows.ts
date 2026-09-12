@@ -1,9 +1,9 @@
 import type { PayoutEvent } from '../../lib/payoutsApi'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
-export const INCOME_SOURCE_ROWS_VERSION = '1.0' as const
+export const INCOME_SOURCE_ROWS_VERSION = '1.1' as const
 
-export type IncomeSourceIdentityState = 'EXACT_FIGI' | 'AMBIGUOUS_FIGI' | 'NO_FIGI'
+export type IncomeSourceIdentityState = 'EXACT_FIGI' | 'AMBIGUOUS_FIGI' | 'INCOMPLETE_FIGI' | 'NO_FIGI'
 
 export type IncomeSourceRow = {
   key: string
@@ -22,6 +22,7 @@ export type IncomeSourceRow = {
 
 type WorkingRow = Omit<IncomeSourceRow, 'figi' | 'costBasis' | 'yoc12m' | 'matchBasis' | 'identityState'> & {
   figis: Set<string>
+  missingFigi: boolean
 }
 
 function clean(value: unknown) {
@@ -47,6 +48,7 @@ function sourceLabel(event: PayoutEvent) {
 function addIdentity(row: WorkingRow, event: PayoutEvent) {
   const figi = upper(event.figi)
   if (figi) row.figis.add(figi)
+  else row.missingFigi = true
 }
 
 /**
@@ -54,9 +56,10 @@ function addIdentity(row: WorkingRow, event: PayoutEvent) {
  * separate from display aliases.
  *
  * Rows remain grouped by the displayed source label for continuity with the
- * existing income UI. Yield-on-cost is stricter: it is available only when all
- * payout events in that row point to one FIGI and that FIGI maps to exactly one
- * current portfolio position. Ticker/name aliases never select cost basis.
+ * existing income UI. Yield-on-cost is stricter: it is available only when
+ * every included payout event carries the same FIGI and that FIGI maps to
+ * exactly one current portfolio position. Ticker/name aliases never select
+ * cost basis.
  */
 export function buildIncomeSourceRows(
   actualEvents: PayoutEvent[],
@@ -82,6 +85,7 @@ export function buildIncomeSourceRows(
       factCount: 0,
       forecastCount: 0,
       figis: new Set<string>(),
+      missingFigi: false,
     }
     addIdentity(row, event)
     rows.set(label.key, row)
@@ -120,11 +124,15 @@ export function buildIncomeSourceRows(
   return [...rows.values()]
     .map(row => {
       const figis = [...row.figis]
-      const identityState: IncomeSourceIdentityState = figis.length === 1
-        ? 'EXACT_FIGI'
-        : figis.length > 1
-          ? 'AMBIGUOUS_FIGI'
-          : 'NO_FIGI'
+      const identityState: IncomeSourceIdentityState = figis.length > 1
+        ? 'AMBIGUOUS_FIGI'
+        : row.missingFigi && figis.length === 1
+          ? 'INCOMPLETE_FIGI'
+          : row.missingFigi
+            ? 'NO_FIGI'
+            : figis.length === 1
+              ? 'EXACT_FIGI'
+              : 'NO_FIGI'
       const figi = identityState === 'EXACT_FIGI' ? figis[0] : null
       const matches = figi ? positionsByFigi.get(figi) ?? [] : []
       const position = matches.length === 1 ? matches[0] : null
