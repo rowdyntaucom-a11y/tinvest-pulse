@@ -6,6 +6,9 @@ on:
       - 'v2/**'
       - 'payouts-core.js'
       - 'payouts.js'
+      - 'server-core.js'
+      - 'production-v158.js'
+      - 'production-v159.js'
       - '.github/workflows/v2-build.yml'
   push:
     branches: [main]
@@ -13,6 +16,9 @@ on:
       - 'v2/**'
       - 'payouts-core.js'
       - 'payouts.js'
+      - 'server-core.js'
+      - 'production-v158.js'
+      - 'production-v159.js'
       - '.github/workflows/v2-build.yml'
 
 jobs:
@@ -31,3 +37,6 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run build
       - run: node --check ../payouts-core.js
+      - run: node --check ../server-core.js
+      - run: node --check ../production-v158.js
+      - run: node --check ../production-v159.js
