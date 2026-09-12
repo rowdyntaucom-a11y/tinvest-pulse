@@ -25,9 +25,6 @@ on:
       - 'production-v160.js'
       - '.github/workflows/v2-build.yml'
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,24 +33,12 @@ jobs:
         working-directory: v2
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: qvanix/v2-lockfile
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: v2/package.json
-      - run: npm install --no-audit --no-fund
-      - name: TEMP commit generated v2 lockfile to branch
-        working-directory: .
-        run: |
-          if [ -n "$(git status --porcelain -- v2/package-lock.json)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add v2/package-lock.json
-            git commit -m "QVANIX reliability · generate v2 lockfile"
-            git push origin HEAD:qvanix/v2-lockfile
-          fi
+          cache-dependency-path: v2/package-lock.json
+      - run: npm ci --no-audit --no-fund
       - name: Dependency security gate
         run: npm audit --audit-level=high
       - name: Root runtime dependency security gate
