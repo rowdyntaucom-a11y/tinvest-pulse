@@ -1,6 +1,7 @@
 import type { RiskSeries } from './riskMatrix'
+import { buildReturnIntervalMap, commonReturnIntervalKeys } from './returnIntervals'
 
-export const ALLOCATION_DIAGNOSTICS_CALC_VERSION = '1.1' as const
+export const ALLOCATION_DIAGNOSTICS_CALC_VERSION = '1.2' as const
 
 export type AllocationWeight = {
   key: string
@@ -42,35 +43,33 @@ const TRADING_DAYS = 252
 const MAX_ASSETS = 10
 const EPS = 1e-12
 
-function returnMap(series: RiskSeries) {
-  const sorted = series.points
-    .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
-    .sort((a, b) => a.date.localeCompare(b.date))
-  const map = new Map<string, number>()
-  for (let i = 1; i < sorted.length; i += 1) {
-    const prior = sorted[i - 1].value
-    const current = sorted[i].value
-    const value = current / prior - 1
-    if (Number.isFinite(value) && value > -0.95 && value < 10) map.set(sorted[i].date, value)
-  }
-  return map
-}
-
 function alignSeries(series: RiskSeries[]) {
   const normalized = series
     .filter(item => item?.key && item?.label && Array.isArray(item.points))
     .slice(0, MAX_ASSETS)
   const unique = new Set(normalized.map(item => item.key))
   if (unique.size !== normalized.length || normalized.length < 2) {
-    return { series: normalized, dates: [] as string[], rows: [] as number[][] }
+    return {
+      series: normalized,
+      intervalKeys: [] as string[],
+      rows: [] as number[][],
+      from: null as string | null,
+      to: null as string | null,
+    }
   }
 
-  const maps = normalized.map(returnMap)
-  const dates = [...maps[0].keys()]
-    .filter(date => maps.every(map => map.has(date)))
-    .sort((a, b) => a.localeCompare(b))
-  const rows = dates.map(date => maps.map(map => map.get(date)!))
-  return { series: normalized, dates, rows }
+  const maps = normalized.map(item => buildReturnIntervalMap(item.points))
+  const intervalKeys = commonReturnIntervalKeys(maps)
+  const rows = intervalKeys.map(key => maps.map(map => map.get(key)!.value))
+  const first = intervalKeys[0] ? maps[0].get(intervalKeys[0]) : null
+  const last = intervalKeys.at(-1) ? maps[0].get(intervalKeys.at(-1)!) : null
+  return {
+    series: normalized,
+    intervalKeys,
+    rows,
+    from: first?.from ?? null,
+    to: last?.to ?? null,
+  }
 }
 
 function mean(values: number[]) {
@@ -235,8 +234,8 @@ export function calculateAllocationDiagnostics(series: RiskSeries[]): Allocation
     minimumReturns: MIN_COMMON_RETURNS,
     matureReturns: MATURE_COMMON_RETURNS,
     assetCount: aligned.series.length,
-    from: aligned.dates[0] ?? null,
-    to: aligned.dates.at(-1) ?? null,
+    from: aligned.from,
+    to: aligned.to,
   }
 
   if (aligned.series.length < 2 || aligned.rows.length < MIN_COMMON_RETURNS) {
@@ -247,7 +246,7 @@ export function calculateAllocationDiagnostics(series: RiskSeries[]): Allocation
       equalWeight: null,
       minimumVariance: null,
       equalRiskContribution: null,
-      note: `Нужно минимум 2 актива и ${MIN_COMMON_RETURNS} общих дневных доходностей. Сейчас активов ${aligned.series.length}, общих доходностей ${aligned.rows.length}.`,
+      note: `Нужно минимум 2 актива и ${MIN_COMMON_RETURNS} общих дневных доходностей по одинаковым интервалам наблюдения. Сейчас активов ${aligned.series.length}, общих доходностей ${aligned.rows.length}.`,
     }
   }
 
@@ -290,6 +289,6 @@ export function calculateAllocationDiagnostics(series: RiskSeries[]): Allocation
         ? 'Equal-risk-contribution распределяет доли риска по выборочной ковариации; ожидаемые доходности не используются.'
         : 'Solver equal-risk-contribution не достиг критерия сходимости; результат не следует показывать как готовую диагностику.',
     ),
-    note: `${status}: расчёт использует ${aligned.rows.length} общих дневных доходностей ${aligned.series.length} активов (${base.from} → ${base.to}). Это сценарная диагностика риска, не персональная рекомендация по сделкам.`,
+    note: `${status}: расчёт использует ${aligned.rows.length} общих дневных доходностей ${aligned.series.length} активов по совпадающим интервалам наблюдения (${base.from} → ${base.to}). Это сценарная диагностика риска, не персональная рекомендация по сделкам.`,
   }
 }
