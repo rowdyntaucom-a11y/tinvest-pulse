@@ -7,6 +7,7 @@ export interface TransactionMarkerInput {
   figi?: unknown
   instrumentUid?: unknown
   quantity?: unknown
+  ticker?: unknown
 }
 
 export interface TransactionMarker {
@@ -16,6 +17,7 @@ export interface TransactionMarker {
   figi: string | null
   instrumentUid: string | null
   quantity: number | null
+  ticker: string | null
 }
 
 export interface TransactionMarkerNormalization {
@@ -25,8 +27,7 @@ export interface TransactionMarkerNormalization {
   duplicates: number
 }
 
-// Keep this allow-list intentionally narrower than the server's broad
-// `type.includes('BUY'/'SELL')` history logic. History markers require exact,
+// Keep this allow-list intentionally narrow. History markers require exact,
 // reviewed broker operation types so future API additions fail closed.
 const BUY_TYPES = new Set([
   'OPERATION_TYPE_BUY',
@@ -83,9 +84,11 @@ export function normalizeTransactionMarkers(
     const figi = cleanString(input.figi)
     const instrumentUid = cleanString(input.instrumentUid)
 
-    // A history marker must be traceable to one executed broker operation,
-    // one exact timestamp and one explicit instrument identity. We do not
-    // synthesize IDs, infer sides from cash signs or attach a fake trade price.
+    // T-Bank documents OperationItem.id as a broker-reported operation ID that
+    // may change over time. We therefore use it only to de-duplicate one fetched
+    // snapshot / provide a React key. It is NOT a durable event identity.
+    // A chart marker still requires an exact broker timestamp plus explicit
+    // instrument identity; no price or cash-sign inference is allowed here.
     if (!id || !date || !side || (!figi && !instrumentUid)) {
       rejected += 1
       continue
@@ -104,6 +107,7 @@ export function normalizeTransactionMarkers(
       figi,
       instrumentUid,
       quantity: normalizeQuantity(input.quantity),
+      ticker: cleanString(input.ticker),
     })
   }
 
