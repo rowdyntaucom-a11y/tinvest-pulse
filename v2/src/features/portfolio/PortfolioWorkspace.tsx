@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi'
 import { PortfolioValueChart } from './PortfolioValueChart'
 import { BondAnalytics } from './BondAnalytics'
+import { PortfolioAccountContext } from './PortfolioAccountContext'
 import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './portfolioAttribution'
 import { buildPortfolioDataContext } from './portfolioDataContext'
 import './portfolio.css'
@@ -194,7 +195,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
               <small>{snapshot.value ? `${pctSigned.format(snapshot.profitPct)}% к внешним потокам` : 'ожидаем данные'}</small>
             </article>
             <article className="context-card" title={sourceTitle}>
-              <span>ИСТОЧНИК</span><strong>{dataContext.source}</strong>
+              <PortfolioAccountContext />
               <span>СНИМОК</span><strong>{snapshotLabel}</strong>
               <span>ЦЕНЫ / БАЗА</span><strong>{dataContext.positions.priced}/{dataContext.positions.total} · {dataContext.positions.withCostBasis}/{dataContext.positions.total}</strong>
             </article>
