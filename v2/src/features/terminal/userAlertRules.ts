@@ -1,7 +1,7 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.6' as const
-export const USER_SCREENER_VERSION = '1.2' as const
+export const USER_ALERT_RULES_VERSION = '1.5' as const
+export const USER_SCREENER_VERSION = '1.1' as const
 export const MAX_USER_SCREENER_RULES = 8 as const
 const REQUIRED_TECHNICAL_INDICATORS_VERSION: TechnicalSnapshot['calcVersion'] = '1.4'
 
