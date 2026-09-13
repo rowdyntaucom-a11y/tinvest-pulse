@@ -4,6 +4,7 @@ import type { WorldState } from '../dna/worldState'
 import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 import { buildWorldPresentationMetadata } from './worldPresentationMetadata'
+import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLayer } from './worldSceneLayers'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
 
 type Props = {
@@ -83,25 +84,40 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       setRenderer(next.renderer.type === 1 ? 'webgl' : 'gpu')
 
       const world = new Container()
+      world.label = 'world:root'
       next.stage.addChild(world)
 
+      const layerContainers = new Map<WorldSceneLayer, InstanceType<typeof Container>>()
+      for (const layerName of WORLD_SCENE_LAYER_ORDER) {
+        const layer = new Container()
+        layer.label = `world:${layerName}`
+        layerContainers.set(layerName, layer)
+        world.addChild(layer)
+      }
+
+      const layer = (name: WorldSceneLayer) => {
+        const resolved = layerContainers.get(name)
+        if (!resolved) throw new Error(`Missing Living World scene layer: ${name}`)
+        return resolved
+      }
+
       const sky = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0x081d2a })
-      world.addChild(sky)
+      layer('background').addChild(sky)
 
       const horizon = new Graphics()
         .poly([0, 520, 180, 390, 330, 470, 520, 330, 740, 470, 940, 350, 1180, 500, 1380, 380, 1600, 510, 1600, 900, 0, 900])
         .fill({ color: 0x0c3034 })
-      world.addChild(horizon)
+      layer('terrain').addChild(horizon)
 
       const ground = new Graphics().rect(0, 585, 1600, 315).fill({ color: 0x07130f })
-      world.addChild(ground)
+      layer('terrain').addChild(ground)
 
       const development = new Graphics()
-      world.addChild(development)
+      layer('structures').addChild(development)
 
       const lamp = new Graphics().circle(0, 0, 13).fill({ color: 0x66ffe2, alpha: 0.9 })
       lamp.position.set(400, 560)
-      world.addChild(lamp)
+      layer('effects').addChild(lamp)
 
       let lastLevel = -1
       const renderLevel = (current: number) => {
@@ -176,6 +192,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-weather={presentation.weather}
       data-world-events={presentation.pendingEventCount}
       data-world-primary-event={presentation.primaryEventChannel ?? 'none'}
+      data-world-layer-version={WORLD_SCENE_LAYER_VERSION}
+      data-world-layer-count={WORLD_SCENE_LAYER_ORDER.length}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
