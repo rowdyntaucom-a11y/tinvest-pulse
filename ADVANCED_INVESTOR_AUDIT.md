@@ -132,18 +132,22 @@ Reference materials explicitly call out bond diversification by maturity / issue
 
 ## 6. DNA / XP
 
-### DONE / groundwork
+### DONE / deterministic groundwork
 - XP independent of absolute capital.
 - Deterministic versioned event ledger with idempotency / anti-gaming primitives.
 - Storage-agnostic XP persistence boundary that fails closed on invalid/corrupt payloads.
-- Compact world-state boundary separated from Pixi rendering.
+- Compact world-state boundary separated from Pixi rendering; malformed weather falls back to neutral rather than inventing a market atmosphere.
+- Runtime-state bridge composes reviewed quality, persisted XP and semantic events into renderer-ready state without inventing XP awards, level thresholds or RUB-based progression.
 - Render-neutral XP-to-world-event adapter with stable IDs and no XP-amount-to-visual-intensity inference.
+- Deterministic Chronicle v0.1 stores only resolved semantic event identity/time/title, merges idempotently by stable ID and ignores malformed/duplicate rows without rewriting accepted history.
+- First-sunrise lifecycle policy v0.1 emits at most one stable `world:first-sunrise` semantic event only after an explicit dawn observation and only when Chronicle does not already contain it; it assigns no XP, money meaning, weather, art or animation.
+- World event/memory presentation boundaries and regressions are separated from financial calculations; they do not create financial facts.
 - Pixi/DNA is dynamically loaded only when the DNA view mounts; build budgets separately guard first-load JS and the deferred DNA renderer chunk.
 
-### DEFERRED UNTIL FINANCIAL CORE IS STRONGER
-- The Living World specification remains preserved, including two-layer weather, hysteresis, Chronicle/scars, first sunrise, progressive HUD and performance/accessibility rules.
+### DEFERRED / REVIEWED VISUAL EXPANSION
+- Two-layer weather, hysteresis, scars/long-lived scene treatment, progressive HUD and subjective world art/effects remain deferred until the deterministic financial core and live mobile reliability are strong enough.
+- Chronicle plumbing and the first-sunrise semantic lifecycle are already deterministic groundwork; cinematic presentation of those events is not implied by their runtime acceptance.
 - Do not spend the current build phase on subjective world art/effects while Portfolio / Analytics / Income / Bonds / data quality / mobile reliability still have higher-value depth work.
-- After the deterministic financial core reaches the agreed quality bar, resume reviewed relative XP signals and Living World implementation.
 
 ### GATED / later
 - Final XP weights and long-term level economy require validation against real user behavior.
@@ -157,10 +161,14 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Risk-only allocation diagnostics: equal weight, long-only minimum variance, equal-risk-contribution.
 - Allocation Lab is exposed as an opt-in collapsed drill-down rather than a new default-mobile tab.
 - Current-risk contribution depth exposes market-history coverage, diversification ratio and effective risk-contributor count on the common return sample.
+- Deterministic daily-OHLCV Technical Indicators v1.4: SMA20, EMA20, RSI14, ATR14, MACD 12/26 + signal9/histogram, Bollinger 20/2σ and Stochastic K14/D3. Input-row provenance, exact-duplicate collapse and same-date conflict handling are versioned; invalid source rows are counted rather than hidden.
+- User-authored alert boundary v1.5: only explicit user thresholds/comparators are evaluated; metric domains, current technical calculation version, clean OHLCV provenance, temporal crossing order and metric-specific minimum sample windows all fail closed.
+- User-authored screener v1.1 composes up to eight explicit rules with ALL/ANY semantics. Duplicate rule IDs/invalid config fail closed; QVANIX does not generate candidates, thresholds, rankings, recommendations or trade actions.
 
 ### ACTIVE / next
-- Define a separate Pro/Terminal shell only when it can host several real modules without crowding the default Portfolio/Analytics/Income/DNA mobile navigation.
-- Technical-analysis foundation may follow using deterministic OHLCV indicators and user-authored alerts only.
+- Continue deterministic Terminal/data-quality hardening and live-data validation before building a separate shell.
+- Define a separate Pro/Terminal shell only when several accepted modules need a coherent home without crowding the default Portfolio/Analytics/Income/DNA mobile navigation.
+- Keep alert/screener boundaries calculation-only until a compact mobile presentation adds clear value; do not add a top-level mode merely because the primitives exist.
 
 ### GATED
 - VWAP until a session-aware intraday candle stream with verified volume semantics exists; do not derive a pseudo-VWAP from the current daily candles.
@@ -203,11 +211,11 @@ A tab is not 'done' because it has no empty pixels. It is done only when:
 7. No placeholder, fake forecast or decorative-only analytics is presented as fact.
 8. First-load code stays inside an explicit CI bundle budget; heavy DNA/Pixi code remains deferred and separately budgeted.
 
-## Immediate build queue — refreshed 2026-09-12 23:17 MSK
+## Immediate build queue — refreshed 2026-09-13 20:00 MSK
 1. Keep exact realized coupon ↔ scheduled-coupon reconciliation gated until a shared verified event identity exists; do not infer it from ticker/date/amount proximity.
 2. Continue Samsung/mobile live validation of accepted drill-downs. Issuer coverage, transaction-marker full-span density, Allocation Lab readability and Income Sources/Goal legibility have dedicated passes; only change additional screens when a real density/readability problem is identified.
 3. Maintain the reproducible dependency/build baseline: committed lockfile, `npm ci`, dependency-security gates and first-load/deferred-DNA bundle budgets. Investigate future advisories deliberately; never apply blind `npm audit fix`.
-4. Mature additional Pro/Terminal calculation boundaries before creating a separate shell; do not add a new top-level mode just to expose one metric.
+4. Mature and validate the accepted Terminal indicators / user-alert / user-screener boundaries before introducing any separate Pro/Terminal shell or notification layer.
 5. Keep Income growth / goal-date forecasting gated; deepen only with explicit user assumptions and full comparable history.
 6. Keep legal publication blocked until all P0 review issues and real operator/provider placeholders are resolved.
-7. Resume Living World implementation only after the financial core and the items above reach the agreed quality bar.
+7. Preserve the accepted deterministic Living World groundwork (runtime state, Chronicle and first-sunrise lifecycle), but keep subjective world art/effects secondary to financial-core, data-quality and Samsung/mobile reliability work.
