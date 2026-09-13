@@ -1,6 +1,7 @@
-import { TECHNICAL_INDICATORS_VERSION, type TechnicalSnapshot } from './technicalIndicators.ts'
+import type { TechnicalSnapshot } from './technicalIndicators'
 
 export const USER_ALERT_RULES_VERSION = '1.4' as const
+const REQUIRED_TECHNICAL_INDICATORS_VERSION: TechnicalSnapshot['calcVersion'] = '1.4'
 
 export type AlertMetric =
   | 'sma20'
@@ -107,7 +108,7 @@ function validRule(rule: UserAlertRule): boolean {
 
 function cleanSnapshotProvenance(snapshot: TechnicalSnapshot | null | undefined): snapshot is TechnicalSnapshot {
   if (!snapshot || snapshot.integrity !== 'OK') return false
-  if (snapshot.calcVersion !== TECHNICAL_INDICATORS_VERSION) return false
+  if (snapshot.calcVersion !== REQUIRED_TECHNICAL_INDICATORS_VERSION) return false
   if (!nonNegativeInteger(snapshot.inputRows)
     || !nonNegativeInteger(snapshot.invalidRowsDiscarded)
     || !nonNegativeInteger(snapshot.observations)
