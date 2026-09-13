@@ -1,4 +1,4 @@
-export const TECHNICAL_INDICATORS_VERSION = '1.2' as const
+export const TECHNICAL_INDICATORS_VERSION = '1.3' as const
 
 export type OhlcvCandle = {
   date: string
@@ -29,6 +29,8 @@ export type TechnicalSnapshot = {
   bollingerMiddle20: number | null
   bollingerUpper20: number | null
   bollingerLower20: number | null
+  stochasticK14: number | null
+  stochasticD3: number | null
 }
 
 type NormalizedResult = {
@@ -231,6 +233,32 @@ function bollinger(values: number[], period: number, deviations: number) {
   }
 }
 
+function stochastic(candles: OhlcvCandle[], kPeriod: number, dPeriod: number) {
+  if (kPeriod <= 0 || dPeriod <= 0 || candles.length < kPeriod) {
+    return { k: null, d: null }
+  }
+
+  const kValues: Array<number | null> = []
+  for (let end = kPeriod - 1; end < candles.length; end += 1) {
+    const window = candles.slice(end - kPeriod + 1, end + 1)
+    const highestHigh = Math.max(...window.map(candle => candle.high))
+    const lowestLow = Math.min(...window.map(candle => candle.low))
+    const range = highestHigh - lowestLow
+    const close = candles[end].close
+    kValues.push(range > 0 ? ((close - lowestLow) / range) * 100 : null)
+  }
+
+  const k = kValues.at(-1) ?? null
+  if (kValues.length < dPeriod) return { k, d: null }
+  const dWindow = kValues.slice(-dPeriod)
+  if (dWindow.some(value => value == null)) return { k, d: null }
+  const finiteWindow = dWindow as number[]
+  return {
+    k,
+    d: finiteWindow.reduce((sum, value) => sum + value, 0) / dPeriod,
+  }
+}
+
 export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnapshot {
   const normalized = normalizeCandles(input)
   if (normalized.integrity === 'CONFLICT') {
@@ -252,12 +280,15 @@ export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnaps
       bollingerMiddle20: null,
       bollingerUpper20: null,
       bollingerLower20: null,
+      stochasticK14: null,
+      stochasticD3: null,
     }
   }
 
   const closes = normalized.candles.map(candle => candle.close)
   const macdValues = macd(closes)
   const bollingerValues = bollinger(closes, 20, 2)
+  const stochasticValues = stochastic(normalized.candles, 14, 3)
 
   return {
     calcVersion: TECHNICAL_INDICATORS_VERSION,
@@ -277,5 +308,7 @@ export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnaps
     bollingerMiddle20: bollingerValues.middle,
     bollingerUpper20: bollingerValues.upper,
     bollingerLower20: bollingerValues.lower,
+    stochasticK14: stochasticValues.k,
+    stochasticD3: stochasticValues.d,
   }
 }
