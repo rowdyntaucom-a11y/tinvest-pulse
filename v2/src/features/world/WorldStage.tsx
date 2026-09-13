@@ -28,6 +28,16 @@ type AssetRuntimeState = {
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 let worldStageSequence = 0
 
+function preloadBrowserImage(assetPath: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.decoding = 'async'
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error('Living World asset preload failed'))
+    image.src = assetPath
+  })
+}
+
 export function WorldStage({ state, cursor }: Props) {
   const queue = resolveWorldEventQueue(state, cursor ?? emptyWorldEventCursor())
   const snapshot = buildWorldRenderSnapshot(state, queue)
@@ -73,7 +83,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     }
 
     const boot = async () => {
-      const { Application, Assets, Container, Graphics } = await import('pixi.js')
+      const { Application, Container, Graphics } = await import('pixi.js')
       if (disposed) return
 
       const resolution = clamp(window.devicePixelRatio || 1, 1, window.innerWidth < 900 ? 1.35 : 1.75)
@@ -138,9 +148,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       lamp.position.set(400, 560)
       layer('effects').addChild(lamp)
 
-      // Reviewed art is loaded independently from renderer boot. A missing/broken
+      // Reviewed art is preloaded independently from renderer boot. Browser-native
+      // image loading preserves the deferred Pixi bundle budget. A missing/broken
       // asset never removes the existing placeholder and never aborts the world.
-      void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), path => Assets.load(path))
+      void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), preloadBrowserImage)
         .then(result => {
           if (disposed) return
           setAssetRuntime({
