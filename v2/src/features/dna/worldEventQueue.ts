@@ -14,7 +14,11 @@ export type ResolvedWorldEventQueue = {
   acknowledgedVisibleEvents: number
 }
 
-const cleanId = (value: unknown) => String(value ?? '').trim()
+const cleanId = (value: unknown): string | null => {
+  if (typeof value !== 'string') return null
+  const id = value.trim()
+  return id || null
+}
 
 export function emptyWorldEventCursor(): WorldEventCursorDocument {
   return {
@@ -38,7 +42,8 @@ export function normalizeWorldEventCursor(value: unknown): WorldEventCursorDocum
   const unique = new Set<string>()
   for (const candidate of row.acknowledgedEventIds) {
     const id = cleanId(candidate)
-    if (id) unique.add(id)
+    if (!id) return emptyWorldEventCursor()
+    unique.add(id)
   }
 
   return {
@@ -67,25 +72,35 @@ export function resolveWorldEventQueue(
   }
 }
 
+/**
+ * Acknowledge only an event that is actually pending in the resolved queue.
+ * Unknown/stale ids are ignored so they cannot pre-acknowledge and later hide a legitimate event.
+ */
 export function acknowledgeWorldEvent(
   cursor: WorldEventCursorDocument,
+  queue: Pick<ResolvedWorldEventQueue, 'pending'>,
   eventId: unknown,
 ): WorldEventCursorDocument {
+  const normalized = normalizeWorldEventCursor(cursor)
   const id = cleanId(eventId)
-  if (!id) return normalizeWorldEventCursor(cursor)
+  if (!id) return normalized
+
+  const pendingIds = new Set(queue.pending.map(event => event.id))
+  if (!pendingIds.has(id)) return normalized
 
   return normalizeWorldEventCursor({
     version: WORLD_EVENT_QUEUE_VERSION,
-    acknowledgedEventIds: [...cursor.acknowledgedEventIds, id],
+    acknowledgedEventIds: [...normalized.acknowledgedEventIds, id],
   })
 }
 
 export function acknowledgeWorldEvents(
   cursor: WorldEventCursorDocument,
+  queue: Pick<ResolvedWorldEventQueue, 'pending'>,
   eventIds: Iterable<unknown>,
 ): WorldEventCursorDocument {
   let next = normalizeWorldEventCursor(cursor)
-  for (const eventId of eventIds) next = acknowledgeWorldEvent(next, eventId)
+  for (const eventId of eventIds) next = acknowledgeWorldEvent(next, queue, eventId)
   return next
 }
 
@@ -93,5 +108,5 @@ export function acknowledgePendingWorldEvents(
   cursor: WorldEventCursorDocument,
   queue: Pick<ResolvedWorldEventQueue, 'pending'>,
 ): WorldEventCursorDocument {
-  return acknowledgeWorldEvents(cursor, queue.pending.map(event => event.id))
+  return acknowledgeWorldEvents(cursor, queue, queue.pending.map(event => event.id))
 }
