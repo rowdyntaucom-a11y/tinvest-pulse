@@ -129,7 +129,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
     ? `${observation.completeMonths} полн. · ${observation.partialMonths} част.`
     : 'период не подтверждён'
   const stabilityValue = realizedStability.available
-    ? realizedStability.status === 'mature' ? 'MATURE' : 'PREVIEW'
+    ? realizedStability.status === 'mature' ? 'ЗРЕЛАЯ' : 'ПРЕДВ.'
     : `${realizedStability.observedMonths}/3 мес.`
   const stabilityDetail = realizedStability.available
     ? `${money.format(realizedStability.averageMonthlyNet ?? 0)} ₽/мес. · 0 ₽: ${realizedStability.zeroIncomeMonths} мес.`
@@ -140,7 +140,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
       : `${comparableIncome.changeRatio >= 0 ? '+' : ''}${pct1.format(comparableIncome.changeRatio * 100)}%`
     : null
   const comparableDetail = comparableIncome.available
-    ? `те же ${comparableIncome.monthCount} мес. · ${comparableIncome.currentYear}/${comparableIncome.previousYear} · net`
+    ? `те же ${comparableIncome.monthCount} мес. · ${comparableIncome.currentYear}/${comparableIncome.previousYear} · после налога`
     : null
 
   const monthRows = data.months.slice(0, 6)
@@ -176,7 +176,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <section className="income-forecast panel">
             <span className="eyebrow">12М · ПОДТВЕРЖДЁННЫЙ ГРАФИК</span>
             <strong>{data.available && data.forecast.gross ? `${money.format(data.forecast.gross)} ₽` : '—'}</strong>
-            <small>gross · только выплаты из расписания текущих позиций</small>
+            <small>до налога · только выплаты из расписания текущих позиций</small>
             <div className="forecast-meta">
               <span>{data.forecast.count || 0} выплат</span>
               <span>покрытие {coverage == null ? '—' : `${pct.format(coverage)}%`}</span>
@@ -189,13 +189,13 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
               <>
                 <strong>{next.ticker || next.name}</strong>
                 <div><b>{eventKind(next)}</b><span>{dateFmt.format(new Date(next.date))}</span></div>
-                <small>{eventAmount(next) ? `${money2.format(eventAmount(next))} ₽ gross` : 'сумма уточняется'}{typeof next.days === 'number' ? ` · через ${next.days} дн.` : ''}</small>
+                <small>{eventAmount(next) ? `${money2.format(eventAmount(next))} ₽ · до налога` : 'сумма уточняется'}{typeof next.days === 'number' ? ` · через ${next.days} дн.` : ''}</small>
               </>
             ) : <div className="income-empty">Подтверждённых будущих выплат пока нет.</div>}
           </section>
 
           <section className="income-months panel">
-            <div className="income-panel-head"><span className="eyebrow">БЛИЖАЙШИЕ 6 МЕСЯЦЕВ</span><small>gross</small></div>
+            <div className="income-panel-head"><span className="eyebrow">БЛИЖАЙШИЕ 6 МЕСЯЦЕВ</span><small>до налога</small></div>
             <div className="income-month-bars">
               {monthRows.length ? monthRows.map(row => {
                 const d = new Date(Date.UTC(row.year, row.month - 1, 1))
@@ -232,7 +232,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
               </div>
             )) : <div className="income-empty">{loading ? 'Получаем расписание Т-Банка…' : 'Будущие выплаты не найдены.'}</div>}
           </div>
-          <p className="income-method-note">Будущие суммы не смешиваются с фактом. Здесь показывается gross из официального расписания Т‑Банка для текущих позиций; дивиденды без подтверждённого события не прогнозируются.</p>
+          <p className="income-method-note">Будущие суммы не смешиваются с фактом. Здесь показываются суммы до налога из официального расписания Т‑Банка для текущих позиций; дивиденды без подтверждённого события не прогнозируются.</p>
           {data.stale && <p className="income-warning">Расписание временно не обновилось: используется последний полный снимок.</p>}
         </section>
       )}
@@ -241,13 +241,13 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
         <section className="panel income-sources-panel">
           <div className="income-panel-head">
             <div><span className="eyebrow">РАЗБИВКА ПО АКТИВАМ</span><h2>ИСТОЧНИКИ ДОХОДА</h2></div>
-            <small>{observation.available ? `OBS · ${observationCompact}` : 'факт ≠ прогноз'}</small>
+            <small>{observation.available ? `НАБЛЮДЕНИЕ · ${observationCompact}` : 'факт ≠ прогноз'}</small>
           </div>
 
           <div className="income-profile-grid">
             <article><span>ФАКТ · КУПОНЫ</span><strong>{incomeProfile.actualCoupons ? `${money.format(incomeProfile.actualCoupons)} ₽` : '—'}</strong><small>{data.actual.year ?? 'период'} · {observationCompact}</small></article>
-            <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{latestPayoutMonth ? `${latestPayoutMonth.key} · ${money.format(latestPayoutMonth.totalNet)} ₽ net` : 'нет FACT-выплат'}</small></article>
-            <article><span>ФАКТ · TOP SOURCE</span><strong>{realizedTopSource?.ticker ?? '—'}</strong><small>{realizedConcentration.topSourceShare == null ? 'нет FACT-источников' : `${pct1.format(realizedConcentration.topSourceShare * 100)}% · ${realizedConcentration.sourceCount} ист. · Neff ${number2.format(realizedConcentration.effectiveSources ?? 0)}`}</small></article>
+            <article><span>ФАКТ · ДИВИДЕНДЫ</span><strong>{incomeProfile.actualDividends ? `${money.format(incomeProfile.actualDividends)} ₽` : '—'}</strong><small>{latestPayoutMonth ? `${latestPayoutMonth.key} · ${money.format(latestPayoutMonth.totalNet)} ₽ после налога` : 'нет полученных выплат'}</small></article>
+            <article><span>ФАКТ · ГЛАВНЫЙ ИСТОЧНИК</span><strong>{realizedTopSource?.ticker ?? '—'}</strong><small>{realizedConcentration.topSourceShare == null ? 'нет полученных выплат' : `${pct1.format(realizedConcentration.topSourceShare * 100)}% · ${realizedConcentration.sourceCount} ист. · эфф. ${number2.format(realizedConcentration.effectiveSources ?? 0)}`}</small></article>
             {comparableIncome.available ? (
               <article><span>ФАКТ · СРАВНЕНИЕ</span><strong>{comparableValue}</strong><small>{comparableDetail}</small></article>
             ) : (
@@ -272,7 +272,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           </div>
           {bondIncomeLinkage.eligibleBondCount > 0 && (
             <div className="income-integrity" title={bondIncomeLinkage.note}>
-              <span>BOND → INCOME · {bondIncomeLinkage.linkedBondCount}/{bondIncomeLinkage.eligibleBondCount} по FIGI · {bondIncomeLinkage.couponEvents} куп.</span>
+              <span>ОБЛИГАЦИИ → ДОХОД · {bondIncomeLinkage.linkedBondCount}/{bondIncomeLinkage.eligibleBondCount} по FIGI · {bondIncomeLinkage.couponEvents} куп.</span>
               <i><b style={{ width: `${Math.min(100, Math.max(0, bondLinkCoveragePct ?? 0))}%` }} /></i>
               <strong>{bondLinkCoveragePct == null ? '—' : `${pct.format(bondLinkCoveragePct)}% · ${money.format(bondIncomeLinkage.scheduledGross)} ₽`}</strong>
             </div>
@@ -285,10 +285,10 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className={`income-integrity-status is-${integrity.state}`}>
             <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
           </div>
-          <p className="income-method-note">FACT-концентрация использует только реально полученные положительные net-выплаты со статусом FACT. TOP SOURCE показывает долю лидера, число источников и эффективное число источников Neff = 1/HHI.</p>
-          <p className="income-method-note">BOND → INCOME не создаёт второй купонный прогноз: он повторно использует уже показанные 12М coupon-events и связывает их с текущими облигациями только по FIGI. Сумма справа — часть существующего forecast, а не дополнительный доход. FACT с прогнозом не складывается; reconciliation конкретного полученного купона со строкой schedule остаётся закрытым до общего идентификатора события.</p>
-          <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые gross-выплаты на 12 месяцев / стоимость приобретения текущей позиции. Cost basis используется только когда все события строки несут один и тот же FIGI и он однозначно соответствует одной текущей позиции. Ticker/name служат только подписью и никогда не выбирают cost basis. Это не текущая дивидендная доходность.</p>
-          <p className="income-method-note">OBS считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Сравнение периодов появляется только при ≥3 точных парах одинаковых полных месяцев текущего и предыдущего года; 12 пар — зрелое сравнение. Годовой прогноз и годификация короткой истории не применяются.</p>
+          <p className="income-method-note">Концентрация фактического дохода использует только реально полученные положительные выплаты после налога. ГЛАВНЫЙ ИСТОЧНИК показывает долю лидера, число источников и эффективное число источников = 1/HHI.</p>
+          <p className="income-method-note">ОБЛИГАЦИИ → ДОХОД не создаёт второй купонный прогноз: блок повторно использует уже показанные купонные события на 12 месяцев и связывает их с текущими облигациями только по FIGI. Сумма справа — часть существующего расписания, а не дополнительный доход. Полученные выплаты с прогнозом не складываются; точная сверка конкретного купона со строкой расписания остаётся закрытой до общего идентификатора события.</p>
+          <p className="income-method-note">12М / YoC остаётся отдельным прогнозным слоем: подтверждённые выплаты до налога на 12 месяцев / стоимость приобретения текущей позиции. Стоимость приобретения используется только когда все события строки несут один и тот же FIGI и он однозначно соответствует одной текущей позиции. Тикер/название служат только подписью и никогда не выбирают стоимость приобретения. Это не текущая дивидендная доходность.</p>
+          <p className="income-method-note">НАБЛЮДЕНИЕ считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Сравнение периодов появляется только при ≥3 точных парах одинаковых полных месяцев текущего и предыдущего года; 12 пар — зрелое сравнение. Короткая история не пересчитывается в годовой темп.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
       )}
