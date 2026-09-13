@@ -82,21 +82,20 @@ function normalizeHistory(history: AnalyticsHistoryPoint[]): NormalizedHistory {
     duplicateRowsCollapsed += Math.max(0, rows.length - 1)
 
     const portfolioValues = [...new Set(rows.map(row => row.portfolio as number))]
-    if (portfolioValues.length !== 1) {
-      portfolioConflictingDates += 1
-      continue
-    }
-
     const benchmarkValues = [...new Set(rows
       .map(row => row.imoex)
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value) && value > 0))]
 
-    if (benchmarkValues.length > 1) benchmarkConflictingDates += 1
+    const portfolioConflict = portfolioValues.length !== 1
+    const benchmarkConflict = benchmarkValues.length > 1
+    if (portfolioConflict) portfolioConflictingDates += 1
+    if (benchmarkConflict) benchmarkConflictingDates += 1
+    if (portfolioConflict) continue
 
     points.push({
       date,
       portfolio: portfolioValues[0],
-      imoex: benchmarkValues.length === 1 ? benchmarkValues[0] : null,
+      imoex: benchmarkConflict ? null : benchmarkValues.length === 1 ? benchmarkValues[0] : null,
     })
   }
 
