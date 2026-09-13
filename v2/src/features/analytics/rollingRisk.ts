@@ -12,9 +12,17 @@ export type RollingWindowResult = {
   pairedBenchmarkReturns: number
 }
 
+export type RollingRiskIntegrityState = 'OK' | 'PORTFOLIO_CONFLICT' | 'BENCHMARK_CONFLICT' | 'BOTH_CONFLICT'
+
 export type RollingRiskResult = {
-  version: '1.0'
+  version: '1.1'
   availableReturns: number
+  sampleFrom: string | null
+  sampleTo: string | null
+  duplicateRowsCollapsed: number
+  portfolioConflictingDates: number
+  benchmarkConflictingDates: number
+  integrityState: RollingRiskIntegrityState
   windows: RollingWindowResult[]
   activeWindow: RollingWindowResult | null
   note: string
@@ -40,41 +48,128 @@ function maxDrawdown(values: number[]) {
   return worst
 }
 
-export function calculateRollingRisk(history: AnalyticsHistoryPoint[]): RollingRiskResult {
-  const points = history
-    .filter(point => typeof point.portfolio === 'number' && Number.isFinite(point.portfolio) && point.portfolio! > 0)
-    .sort((a, b) => a.date.localeCompare(b.date))
+type NormalizedPoint = {
+  date: string
+  portfolio: number
+  imoex: number | null
+}
 
-  const windows = WINDOWS.map(tradingDays => {
-    if (points.length < tradingDays + 1) {
-      return {
-        tradingDays,
-        available: false,
-        portfolioReturn: null,
-        benchmarkReturn: null,
-        excessReturn: null,
-        volatility: null,
-        maxDrawdown: null,
-        worstDay: null,
-        pairedBenchmarkReturns: 0,
-      }
+type NormalizedHistory = {
+  points: NormalizedPoint[]
+  duplicateRowsCollapsed: number
+  portfolioConflictingDates: number
+  benchmarkConflictingDates: number
+  integrityState: RollingRiskIntegrityState
+}
+
+function normalizeHistory(history: AnalyticsHistoryPoint[]): NormalizedHistory {
+  const grouped = new Map<string, AnalyticsHistoryPoint[]>()
+
+  for (const point of history) {
+    const date = String(point.date || '').trim()
+    if (!date || typeof point.portfolio !== 'number' || !Number.isFinite(point.portfolio) || point.portfolio <= 0) continue
+    const rows = grouped.get(date) ?? []
+    rows.push(point)
+    grouped.set(date, rows)
+  }
+
+  let duplicateRowsCollapsed = 0
+  let portfolioConflictingDates = 0
+  let benchmarkConflictingDates = 0
+  const points: NormalizedPoint[] = []
+
+  for (const [date, rows] of grouped.entries()) {
+    duplicateRowsCollapsed += Math.max(0, rows.length - 1)
+
+    const portfolioValues = [...new Set(rows.map(row => row.portfolio as number))]
+    if (portfolioValues.length !== 1) {
+      portfolioConflictingDates += 1
+      continue
     }
 
+    const benchmarkValues = [...new Set(rows
+      .map(row => row.imoex)
+      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value) && value > 0))]
+
+    if (benchmarkValues.length > 1) benchmarkConflictingDates += 1
+
+    points.push({
+      date,
+      portfolio: portfolioValues[0],
+      imoex: benchmarkValues.length === 1 ? benchmarkValues[0] : null,
+    })
+  }
+
+  points.sort((a, b) => a.date.localeCompare(b.date))
+
+  const integrityState: RollingRiskIntegrityState = portfolioConflictingDates > 0
+    ? benchmarkConflictingDates > 0 ? 'BOTH_CONFLICT' : 'PORTFOLIO_CONFLICT'
+    : benchmarkConflictingDates > 0 ? 'BENCHMARK_CONFLICT' : 'OK'
+
+  return {
+    points,
+    duplicateRowsCollapsed,
+    portfolioConflictingDates,
+    benchmarkConflictingDates,
+    integrityState,
+  }
+}
+
+function unavailableWindow(tradingDays: number): RollingWindowResult {
+  return {
+    tradingDays,
+    available: false,
+    portfolioReturn: null,
+    benchmarkReturn: null,
+    excessReturn: null,
+    volatility: null,
+    maxDrawdown: null,
+    worstDay: null,
+    pairedBenchmarkReturns: 0,
+  }
+}
+
+export function calculateRollingRisk(history: AnalyticsHistoryPoint[]): RollingRiskResult {
+  const normalized = normalizeHistory(history)
+  const points = normalized.points
+  const portfolioConflict = normalized.portfolioConflictingDates > 0
+
+  if (portfolioConflict) {
+    return {
+      version: '1.1',
+      availableReturns: 0,
+      sampleFrom: null,
+      sampleTo: null,
+      duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
+      portfolioConflictingDates: normalized.portfolioConflictingDates,
+      benchmarkConflictingDates: normalized.benchmarkConflictingDates,
+      integrityState: normalized.integrityState,
+      windows: WINDOWS.map(unavailableWindow),
+      activeWindow: null,
+      note: 'Rolling-метрики недоступны: в TWR-истории есть разные значения на одну и ту же дату.',
+    }
+  }
+
+  const windows = WINDOWS.map(tradingDays => {
+    if (points.length < tradingDays + 1) return unavailableWindow(tradingDays)
+
     const slice = points.slice(-(tradingDays + 1))
-    const values = slice.map(point => point.portfolio as number)
+    const values = slice.map(point => point.portfolio)
     const returns = values.slice(1).map((value, index) => value / values[index] - 1).filter(Number.isFinite)
     const stdev = sampleStdev(returns)
     const portfolioReturn = values.at(-1)! / values[0] - 1
 
-    const benchmarkPairs = slice
-      .filter((point): point is AnalyticsHistoryPoint & { imoex: number } => typeof point.imoex === 'number' && Number.isFinite(point.imoex) && point.imoex > 0)
-    let benchmarkReturn: number | null = null
     let pairedBenchmarkReturns = 0
-    if (benchmarkPairs.length >= tradingDays + 1) {
-      const benchmarkValues = benchmarkPairs.slice(-(tradingDays + 1)).map(point => point.imoex)
-      benchmarkReturn = benchmarkValues.at(-1)! / benchmarkValues[0] - 1
-      pairedBenchmarkReturns = tradingDays
+    for (let index = 1; index < slice.length; index += 1) {
+      const prior = slice[index - 1].imoex
+      const current = slice[index].imoex
+      if (prior != null && current != null && prior > 0 && current > 0) pairedBenchmarkReturns += 1
     }
+
+    const fullBenchmarkCoverage = pairedBenchmarkReturns === tradingDays
+    const benchmarkReturn = fullBenchmarkCoverage
+      ? slice.at(-1)!.imoex! / slice[0].imoex! - 1
+      : null
 
     return {
       tradingDays,
@@ -91,10 +186,18 @@ export function calculateRollingRisk(history: AnalyticsHistoryPoint[]): RollingR
 
   const activeWindow = [...windows].reverse().find(window => window.available) ?? null
   const availableReturns = Math.max(0, points.length - 1)
+  const sampleFrom = points[0]?.date ?? null
+  const sampleTo = points.at(-1)?.date ?? null
 
   return {
-    version: '1.0',
+    version: '1.1',
     availableReturns,
+    sampleFrom,
+    sampleTo,
+    duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
+    portfolioConflictingDates: normalized.portfolioConflictingDates,
+    benchmarkConflictingDates: normalized.benchmarkConflictingDates,
+    integrityState: normalized.integrityState,
     windows,
     activeWindow,
     note: activeWindow
