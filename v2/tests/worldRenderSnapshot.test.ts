@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { buildWorldState } from '../src/features/dna/worldState.ts'
 import { emptyWorldEventCursor, resolveWorldEventQueue } from '../src/features/dna/worldEventQueue.ts'
 import { WORLD_RENDER_SNAPSHOT_VERSION, buildWorldRenderSnapshot } from '../src/features/dna/worldRenderSnapshot.ts'
-import { WORLD_ASSET_MANIFEST_VERSION, resolveWorldAssetManifest, worldAssetFromManifest } from '../src/features/world/worldAssetManifest.ts'
+import { WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_MANIFEST_VERSION, resolveWorldAssetManifest, worldAssetFromManifest } from '../src/features/world/worldAssetManifest.ts'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION, worldAssetSlot, worldAssetSlotsForLayer } from '../src/features/world/worldAssetSlots.ts'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, worldSceneLayerIndex } from '../src/features/world/worldSceneLayers.ts'
 
@@ -32,6 +32,7 @@ assert.equal(worldAssetSlot('actors.workers')?.layer, 'actors')
 assert.equal(worldAssetSlotsForLayer('logistics').map(slot => slot.id).join(','), 'logistics.rails,logistics.carts,logistics.materials')
 
 assert.equal(WORLD_ASSET_MANIFEST_VERSION, '0.1')
+assert.deepEqual(WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_SLOTS.map(slot => slot.id))
 const manifest = resolveWorldAssetManifest([
   {
     slotId: 'background.sky',
