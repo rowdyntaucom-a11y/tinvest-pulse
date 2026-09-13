@@ -67,7 +67,8 @@ function normalizeEntry(value: unknown): WorldAssetManifestEntry | null {
 /**
  * Resolves only reviewed, local packaged Living World assets.
  * Unknown slots, remote URLs, path traversal, malformed provenance and duplicate
- * slot registrations fail closed. Duplicate slots invalidate that slot entirely.
+ * slot registrations fail closed. Duplicate slots invalidate every record for
+ * that slot rather than choosing an arbitrary winner.
  */
 export function resolveWorldAssetManifest(input: unknown): ResolvedWorldAssetManifest {
   if (!Array.isArray(input)) {
@@ -84,12 +85,19 @@ export function resolveWorldAssetManifest(input: unknown): ResolvedWorldAssetMan
       rejectedCount += 1
       continue
     }
-    if (accepted.has(entry.slotId) || duplicated.has(entry.slotId)) {
-      accepted.delete(entry.slotId)
-      duplicated.add(entry.slotId)
+
+    if (duplicated.has(entry.slotId)) {
       rejectedCount += 1
       continue
     }
+
+    if (accepted.has(entry.slotId)) {
+      accepted.delete(entry.slotId)
+      duplicated.add(entry.slotId)
+      rejectedCount += 2
+      continue
+    }
+
     accepted.set(entry.slotId, entry)
   }
 
