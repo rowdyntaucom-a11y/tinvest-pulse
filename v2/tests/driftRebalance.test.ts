@@ -93,7 +93,7 @@ const drift6040 = calculateAllocationDrift([
 
 const redistribute = calculateRebalanceScenario(drift6040, 'REBALANCE_EXISTING')
 assert.equal(redistribute.calcVersion, REBALANCE_SCENARIO_CALC_VERSION)
-assert.equal(redistribute.calcVersion, '1.0')
+assert.equal(redistribute.calcVersion, '1.1')
 assert.equal(redistribute.available, true)
 assert.equal(redistribute.exactTargetPossible, true)
 close(redistribute.assignedValueBefore, 100)
@@ -159,5 +159,53 @@ const duplicateDrift = calculateAllocationDrift([
 const duplicateScenario = calculateRebalanceScenario(duplicateDrift, 'REBALANCE_EXISTING')
 assert.equal(duplicateScenario.available, false)
 assert.match(duplicateScenario.reason ?? '', /unique/)
+
+const malformedNegativeValue = {
+  ...drift6040,
+  rows: drift6040.rows.map((row, index) => index === 0 ? { ...row, currentValue: -1 } : row),
+}
+const malformedNegativeScenario = calculateRebalanceScenario(malformedNegativeValue, 'REBALANCE_EXISTING')
+assert.equal(malformedNegativeScenario.available, false)
+assert.equal(malformedNegativeScenario.rows.length, 0)
+assert.match(malformedNegativeScenario.reason ?? '', /Drift rows/)
+
+const malformedNaNValue = {
+  ...drift6040,
+  rows: drift6040.rows.map((row, index) => index === 0 ? { ...row, currentValue: Number.NaN } : row),
+}
+const malformedNaNScenario = calculateRebalanceScenario(malformedNaNValue, 'ADD_CAPITAL', 20)
+assert.equal(malformedNaNScenario.available, false)
+assert.equal(malformedNaNScenario.rows.length, 0)
+assert.match(malformedNaNScenario.reason ?? '', /Drift rows/)
+
+const malformedTargetMismatch = {
+  ...drift6040,
+  rows: drift6040.rows.map((row, index) => index === 0 ? { ...row, target: row.target + 0.01 } : row),
+}
+const malformedTargetScenario = calculateRebalanceScenario(malformedTargetMismatch, 'REBALANCE_EXISTING')
+assert.equal(malformedTargetScenario.available, false)
+assert.equal(malformedTargetScenario.rows.length, 0)
+assert.match(malformedTargetScenario.reason ?? '', /Drift rows/)
+
+const malformedDuplicateRowKey = {
+  ...drift6040,
+  rows: [
+    drift6040.rows[0],
+    { ...drift6040.rows[1], key: drift6040.rows[0].key },
+  ],
+}
+const malformedDuplicateRowScenario = calculateRebalanceScenario(malformedDuplicateRowKey, 'REBALANCE_EXISTING')
+assert.equal(malformedDuplicateRowScenario.available, false)
+assert.equal(malformedDuplicateRowScenario.rows.length, 0)
+assert.match(malformedDuplicateRowScenario.reason ?? '', /Drift rows/)
+
+const malformedUnassignedWeight = {
+  ...drift6040,
+  unassignedWeight: 1.25,
+}
+const malformedUnassignedScenario = calculateRebalanceScenario(malformedUnassignedWeight, 'REBALANCE_EXISTING')
+assert.equal(malformedUnassignedScenario.available, false)
+assert.equal(malformedUnassignedScenario.rows.length, 0)
+assert.match(malformedUnassignedScenario.reason ?? '', /Drift rows/)
 
 console.log('drift/rebalance regression: ok')
