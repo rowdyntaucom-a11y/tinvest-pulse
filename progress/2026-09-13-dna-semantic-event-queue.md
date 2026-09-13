@@ -24,15 +24,17 @@ The branch was hardened before merge:
 - only ids actually present in the current resolved `pending` queue may be acknowledged;
 - unknown, stale and already-acknowledged ids are ignored rather than persisted;
 - cursor ids are strict non-empty strings; a malformed persisted id list fails closed to the empty cursor;
-- regression coverage now proves that an attempted early `ghost` acknowledgement cannot hide a later legitimate `ghost` event.
+- regression coverage proves that an attempted early `ghost` acknowledgement cannot hide a later legitimate `ghost` event.
 
 This preserves the intended safety direction: corrupt or hostile acknowledgement input may cause a legitimate event to replay, but must not silently hide a legitimate future event.
 
 ### Validation
-The earlier branch state passed GitHub `v2 build` run #320. After the council hardening, the mandatory workflow must be rerun on the latest branch head before production merge. `worldEventQueue.test.ts` now covers malformed cursor handling, strict id normalization, idempotent acknowledgement, unknown/stale ids, pending-order preservation, acknowledge-all behavior, replay prevention and future-event suppression prevention.
+GitHub `v2 build` run #327 completed `success` after the council hardening. It passed `npm ci`, both dependency-security gates, TypeScript/Vite build, full `test:core`, asset-history regression and runtime syntax checks through `production-v160.js`.
+
+`worldEventQueue.test.ts` covers malformed cursor handling, strict id normalization, idempotent acknowledgement, unknown/stale ids, pending-order preservation, acknowledge-all behavior, replay prevention and future-event suppression prevention.
 
 ### Release state
-The RU-first Analytics/checkpoint production queue settled successfully on both Render services before this branch hardening continued. PR #207 remains feature-branch-only until the latest CI is green and both Render queues are re-checked immediately before merge.
+The RU-first Analytics/checkpoint production queue settled successfully on both Render services before this branch hardening continued. PR #207 remains feature-branch-only until both Render queues are re-checked immediately before merge. No manual deploy is allowed.
 
 ### Next step
-Run the full latest-head CI. If green, re-check current `main`, PR scope/mergeability and both Render queues; merge only if production is still settled. After acceptance, the next safe DNA layer is a versioned presentation mapping contract (semantic event kind → abstract presentation intent), still without final art assets, random animation behavior or finance-derived visual intensity.
+Re-check current `main`, PR scope/mergeability and both Render queues. Merge only if production is still settled. After acceptance, the next safe DNA layer is a versioned presentation mapping contract (semantic event kind → abstract presentation intent), still without final art assets, random animation behavior or finance-derived visual intensity.
