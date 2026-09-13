@@ -1,6 +1,27 @@
-import { WORLD_ASSET_SLOTS, type WorldAssetSlotId } from './worldAssetSlots'
-
 export const WORLD_ASSET_MANIFEST_VERSION = '0.1' as const
+
+export const WORLD_ASSET_MANIFEST_SLOT_IDS = [
+  'background.sky',
+  'background.mountains',
+  'background.forest',
+  'background.distant-settlement',
+  'atmosphere.depth',
+  'terrain.ground',
+  'terrain.mine-entrance',
+  'structures.workshop',
+  'structures.storage',
+  'structures.construction',
+  'actors.workers',
+  'actors.residents',
+  'logistics.rails',
+  'logistics.carts',
+  'logistics.materials',
+  'effects.work-lights',
+  'effects.smoke-steam',
+  'effects.crystals',
+] as const
+
+export type WorldAssetSlotId = (typeof WORLD_ASSET_MANIFEST_SLOT_IDS)[number]
 
 export type WorldAssetProvenance = {
   source: 'figma-export' | 'reviewed-local'
@@ -21,7 +42,7 @@ export type ResolvedWorldAssetManifest = {
   rejectedCount: number
 }
 
-const SLOT_IDS = new Set<string>(WORLD_ASSET_SLOTS.map(slot => slot.id))
+const SLOT_IDS = new Set<string>(WORLD_ASSET_MANIFEST_SLOT_IDS)
 const LOCAL_WORLD_ASSET_PATH = /^\/assets\/world\/[A-Za-z0-9._/-]+\.(?:png|webp|svg)$/
 const FIGMA_NODE_ID = /^\d+[:\-]\d+$/
 const FIGMA_FILE_KEY = /^[0-9A-Za-z]{22,128}$/
