@@ -11,7 +11,7 @@ function candle(observation: number, close: number): OhlcvCandle {
 const rising39 = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) => candle(i + 1, 100 + i)))
 const rising40 = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
 
-assert.equal(USER_ALERT_RULES_VERSION, '1.4')
+assert.equal(USER_ALERT_RULES_VERSION, '1.5')
 
 const above: UserAlertRule = { id: 'rsi-high', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 }
 const aboveResult = evaluateUserAlertRule(above, rising40)
@@ -70,6 +70,56 @@ const short = calculateTechnicalSnapshot(Array.from({ length: 5 }, (_, i) => can
 const unavailableMetric = evaluateUserAlertRule(above, short)
 assert.equal(unavailableMetric.status, 'INSUFFICIENT_DATA')
 assert.equal(unavailableMetric.currentValue, null)
+
+// The alert boundary independently enforces the observation window required by
+// each deterministic indicator. This prevents a forged/stale snapshot from
+// attaching a non-null metric value to a sample that could not have produced it.
+const metricSampleFloors: Array<{
+  metric: UserAlertRule['metric']
+  minimum: number
+  threshold: number
+}> = [
+  { metric: 'sma20', minimum: 20, threshold: 1 },
+  { metric: 'ema20', minimum: 20, threshold: 1 },
+  { metric: 'rsi14', minimum: 15, threshold: 50 },
+  { metric: 'atr14', minimum: 15, threshold: 1 },
+  { metric: 'macd12_26', minimum: 26, threshold: 0 },
+  { metric: 'macdSignal9', minimum: 34, threshold: 0 },
+  { metric: 'macdHistogram', minimum: 34, threshold: 0 },
+  { metric: 'bollingerMiddle20', minimum: 20, threshold: 1 },
+  { metric: 'bollingerUpper20', minimum: 20, threshold: 1 },
+  { metric: 'bollingerLower20', minimum: 20, threshold: 0 },
+  { metric: 'stochasticK14', minimum: 14, threshold: 50 },
+  { metric: 'stochasticD3', minimum: 16, threshold: 50 },
+]
+
+for (const { metric, minimum, threshold } of metricSampleFloors) {
+  const exactMinimum = calculateTechnicalSnapshot(
+    Array.from({ length: minimum }, (_, i) => candle(i + 1, 100 + i)),
+  )
+  const exactResult = evaluateUserAlertRule({
+    id: `exact-${metric}`,
+    metric,
+    comparator: 'ABOVE',
+    threshold,
+  }, exactMinimum)
+  assert.notEqual(exactResult.status, 'INSUFFICIENT_DATA', `${metric} should evaluate at its exact deterministic minimum`)
+
+  const forgedTooShort = {
+    ...rising40,
+    observations: minimum - 1,
+    inputRows: minimum - 1,
+    duplicateRowsCollapsed: 0,
+  }
+  const forgedResult = evaluateUserAlertRule({
+    id: `forged-${metric}`,
+    metric,
+    comparator: 'ABOVE',
+    threshold,
+  }, forgedTooShort)
+  assert.equal(forgedResult.status, 'INSUFFICIENT_DATA', `${metric} must fail closed below its minimum sample`)
+  assert.equal(forgedResult.currentValue, null)
+}
 
 const matureInput = Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i))
 const conflictVariant = { ...matureInput[5], close: matureInput[5].close + 0.5, high: matureInput[5].high + 0.5 }
