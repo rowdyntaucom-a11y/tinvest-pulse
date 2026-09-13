@@ -1,10 +1,10 @@
-export const UI_PREFERENCES_VERSION = '1.0' as const
+export const UI_PREFERENCES_VERSION = '1.1' as const
 export const UI_PREFERENCES_STORAGE_KEY = 'qvanix.ui.preferences.v1' as const
 
 export type UiTheme = 'core' | 'horizon' | 'carbon' | 'aurora' | 'minimal'
 export type UiDensity = 'compact' | 'balanced' | 'focus'
 export type UiMotion = 'full' | 'reduced' | 'off'
-export type UiWorkspace = 'portfolio' | 'analytics' | 'income' | 'dna'
+export type UiWorkspace = 'board' | 'portfolio' | 'analytics' | 'income' | 'dna'
 
 export type UiModuleId =
   | 'portfolio.value'
@@ -31,7 +31,7 @@ export type UiPreferenceStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeI
 const THEMES = new Set<UiTheme>(['core', 'horizon', 'carbon', 'aurora', 'minimal'])
 const DENSITIES = new Set<UiDensity>(['compact', 'balanced', 'focus'])
 const MOTION = new Set<UiMotion>(['full', 'reduced', 'off'])
-const WORKSPACES = new Set<UiWorkspace>(['portfolio', 'analytics', 'income', 'dna'])
+const WORKSPACES = new Set<UiWorkspace>(['board', 'portfolio', 'analytics', 'income', 'dna'])
 const MODULES = new Set<UiModuleId>([
   'portfolio.value',
   'portfolio.pnl',
@@ -49,7 +49,7 @@ export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   theme: 'core',
   density: 'balanced',
   motion: 'full',
-  defaultWorkspace: 'portfolio',
+  defaultWorkspace: 'board',
   pinnedModules: [
     'portfolio.value',
     'portfolio.pnl',
