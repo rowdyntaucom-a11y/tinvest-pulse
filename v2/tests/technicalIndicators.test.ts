@@ -7,7 +7,7 @@ function candle(observation: number, close: number): OhlcvCandle {
   return { date, open: close, high: close + 1, low: close - 1, close, volume: 1000 + observation }
 }
 
-assert.equal(TECHNICAL_INDICATORS_VERSION, '1.2')
+assert.equal(TECHNICAL_INDICATORS_VERSION, '1.3')
 
 const short = calculateTechnicalSnapshot(Array.from({ length: 10 }, (_, i) => candle(i + 1, 100 + i)))
 assert.equal(short.calcVersion, TECHNICAL_INDICATORS_VERSION)
@@ -23,6 +23,8 @@ assert.equal(short.macdHistogram, null)
 assert.equal(short.bollingerMiddle20, null)
 assert.equal(short.bollingerUpper20, null)
 assert.equal(short.bollingerLower20, null)
+assert.equal(short.stochasticK14, null)
+assert.equal(short.stochasticD3, null)
 
 const matureInput = Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i))
 const mature = calculateTechnicalSnapshot(matureInput)
@@ -40,6 +42,22 @@ assert.ok(mature.macdHistogram != null)
 assert.equal(mature.bollingerMiddle20, mature.sma20)
 assert.ok(mature.bollingerUpper20 != null && mature.bollingerMiddle20 != null && mature.bollingerUpper20 > mature.bollingerMiddle20)
 assert.ok(mature.bollingerLower20 != null && mature.bollingerMiddle20 != null && mature.bollingerLower20 < mature.bollingerMiddle20)
+assert.ok(mature.stochasticK14 != null && mature.stochasticK14 > 0 && mature.stochasticK14 < 100)
+assert.ok(mature.stochasticD3 != null && mature.stochasticD3 > 0 && mature.stochasticD3 < 100)
+
+const stochastic13 = calculateTechnicalSnapshot(Array.from({ length: 13 }, (_, i) => candle(i + 1, 100 + i)))
+assert.equal(stochastic13.stochasticK14, null)
+assert.equal(stochastic13.stochasticD3, null)
+const stochastic14 = calculateTechnicalSnapshot(Array.from({ length: 14 }, (_, i) => candle(i + 1, 100 + i)))
+assert.ok(stochastic14.stochasticK14 != null)
+assert.equal(stochastic14.stochasticD3, null)
+const stochastic15 = calculateTechnicalSnapshot(Array.from({ length: 15 }, (_, i) => candle(i + 1, 100 + i)))
+assert.ok(stochastic15.stochasticK14 != null)
+assert.equal(stochastic15.stochasticD3, null)
+const stochastic16 = calculateTechnicalSnapshot(Array.from({ length: 16 }, (_, i) => candle(i + 1, 100 + i)))
+assert.ok(stochastic16.stochasticK14 != null)
+assert.ok(stochastic16.stochasticD3 != null)
+assert.ok(Math.abs(stochastic16.stochasticK14 - stochastic16.stochasticD3) <= 1e-12)
 
 const bollinger19 = calculateTechnicalSnapshot(Array.from({ length: 19 }, (_, i) => candle(i + 1, 100 + i)))
 assert.equal(bollinger19.bollingerMiddle20, null)
@@ -95,6 +113,8 @@ assert.equal(conflict.macdHistogram, null)
 assert.equal(conflict.bollingerMiddle20, null)
 assert.equal(conflict.bollingerUpper20, null)
 assert.equal(conflict.bollingerLower20, null)
+assert.equal(conflict.stochasticK14, null)
+assert.equal(conflict.stochasticD3, null)
 
 // Conflict provenance must describe unique dates and exact redundant rows,
 // independent of which valid candle variant happens to appear first.
@@ -134,5 +154,15 @@ assert.equal(flat.macdHistogram, 0)
 assert.equal(flat.bollingerMiddle20, 100)
 assert.equal(flat.bollingerUpper20, 100)
 assert.equal(flat.bollingerLower20, 100)
+assert.equal(flat.stochasticK14, 50)
+assert.equal(flat.stochasticD3, 50)
+
+const zeroRange = calculateTechnicalSnapshot(Array.from({ length: 20 }, (_, i) => {
+  const timestamp = Date.UTC(2026, 2, 1) + (i * 86_400_000)
+  const date = new Date(timestamp).toISOString().slice(0, 10)
+  return { date, open: 100, high: 100, low: 100, close: 100, volume: 1 }
+}))
+assert.equal(zeroRange.stochasticK14, null)
+assert.equal(zeroRange.stochasticD3, null)
 
 console.log('technical indicators regression: ok')
