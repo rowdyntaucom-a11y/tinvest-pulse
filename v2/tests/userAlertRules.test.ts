@@ -11,7 +11,7 @@ function candle(observation: number, close: number): OhlcvCandle {
 const rising39 = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) => candle(i + 1, 100 + i)))
 const rising40 = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
 
-assert.equal(USER_ALERT_RULES_VERSION, '1.3')
+assert.equal(USER_ALERT_RULES_VERSION, '1.4')
 
 const above: UserAlertRule = { id: 'rsi-high', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 }
 const aboveResult = evaluateUserAlertRule(above, rising40)
@@ -46,9 +46,17 @@ const reversedResult = evaluateUserAlertRule(crossBelow, rising39, rising40)
 assert.equal(reversedResult.status, 'INSUFFICIENT_DATA')
 assert.equal(reversedResult.matched, false)
 
+// Alert evaluation accepts only the current technical calculation version, even
+// for a simple threshold rule. A stale snapshot can remain displayable elsewhere
+// but must not drive a current user-authored alert.
+const staleCurrent = { ...rising40, calcVersion: '1.3' as never }
+const staleCurrentResult = evaluateUserAlertRule(above, staleCurrent)
+assert.equal(staleCurrentResult.status, 'INSUFFICIENT_DATA')
+assert.equal(staleCurrentResult.matched, false)
+
 // Crossing values produced by different calculation versions are not directly
 // comparable and must fail closed.
-const mismatchedVersion = { ...rising39, calcVersion: '1.2' as never }
+const mismatchedVersion = { ...rising39, calcVersion: '1.3' as never }
 const mismatchedVersionResult = evaluateUserAlertRule(crossAbove, rising40, mismatchedVersion)
 assert.equal(mismatchedVersionResult.status, 'INSUFFICIENT_DATA')
 assert.equal(mismatchedVersionResult.matched, false)
@@ -70,6 +78,40 @@ const conflictResult = evaluateUserAlertRule(above, conflict)
 assert.equal(conflict.integrity, 'CONFLICT')
 assert.equal(conflictResult.status, 'INSUFFICIENT_DATA')
 assert.equal(conflictResult.matched, false)
+
+// Technical diagnostics deliberately retain calculations when malformed source rows
+// were discarded, but alert execution is stricter: a dirty sample must not trigger.
+const dirtyCurrent = calculateTechnicalSnapshot([
+  ...matureInput,
+  { date: '2026-04-30', open: 0, high: 1, low: 0.5, close: 0.8, volume: 1 },
+])
+assert.equal(dirtyCurrent.integrity, 'OK')
+assert.equal(dirtyCurrent.invalidRowsDiscarded, 1)
+assert.ok(dirtyCurrent.rsi14 != null)
+const dirtyCurrentResult = evaluateUserAlertRule(above, dirtyCurrent)
+assert.equal(dirtyCurrentResult.status, 'INSUFFICIENT_DATA')
+assert.equal(dirtyCurrentResult.matched, false)
+assert.equal(dirtyCurrentResult.currentValue, null)
+
+// Exact duplicate source rows are deterministic rather than dirty. Their collapse
+// count reconciles raw input to observations, so they may still drive an alert.
+const duplicateCurrent = calculateTechnicalSnapshot([...matureInput, { ...matureInput[5] }])
+assert.equal(duplicateCurrent.invalidRowsDiscarded, 0)
+assert.equal(duplicateCurrent.duplicateRowsCollapsed, 1)
+assert.equal(evaluateUserAlertRule(above, duplicateCurrent).status, 'MATCH')
+
+// A dirty previous snapshot blocks crossing evaluation even when the current sample
+// is clean and both numeric values would otherwise satisfy the crossing rule.
+const dirtyPrevious = { ...rising39, invalidRowsDiscarded: 1, inputRows: rising39.inputRows + 1 }
+const dirtyPreviousResult = evaluateUserAlertRule(crossAbove, rising40, dirtyPrevious)
+assert.equal(dirtyPreviousResult.status, 'INSUFFICIENT_DATA')
+assert.equal(dirtyPreviousResult.matched, false)
+
+// Raw-row provenance must reconcile. Forged counts cannot be treated as clean data.
+const inconsistentProvenance = { ...rising40, inputRows: rising40.inputRows + 1 }
+const inconsistentProvenanceResult = evaluateUserAlertRule(above, inconsistentProvenance)
+assert.equal(inconsistentProvenanceResult.status, 'INSUFFICIENT_DATA')
+assert.equal(inconsistentProvenanceResult.matched, false)
 
 const invalidThreshold = evaluateUserAlertRule({ ...above, threshold: Number.NaN }, rising40)
 assert.equal(invalidThreshold.status, 'INVALID_RULE')
