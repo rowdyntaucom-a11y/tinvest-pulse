@@ -1,16 +1,21 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
-export const RELATIVE_PERFORMANCE_CALC_VERSION = '1.1' as const
+export const RELATIVE_PERFORMANCE_CALC_VERSION = '1.2' as const
 
 export type RelativePerformance = {
   calcVersion: typeof RELATIVE_PERFORMANCE_CALC_VERSION
   available: boolean
-  status: 'insufficient_history' | 'preview' | 'mature'
+  status: 'invalid_history' | 'insufficient_history' | 'preview' | 'mature'
+  integrity: 'OK' | 'CONFLICT'
   overlapPoints: number
   pairedReturns: number
   minimumReturns: number
   matureReturns: number
   periodDays: number
+  sampleFrom: string | null
+  sampleTo: string | null
+  duplicateRowsCollapsed: number
+  conflictingDates: number
   portfolioReturn: number | null
   benchmarkReturn: number | null
   excessReturn: number | null
@@ -41,33 +46,66 @@ function sampleCovariance(a: number[], b: number[]) {
   return sum / (a.length - 1)
 }
 
-function overlap(history: AnalyticsHistoryPoint[]) {
-  return history
-    .filter(point => (
-      typeof point.portfolio === 'number' && Number.isFinite(point.portfolio) && point.portfolio > 0
-      && typeof point.imoex === 'number' && Number.isFinite(point.imoex) && point.imoex > 0
-    ))
-    .map(point => ({ date: point.date, portfolio: point.portfolio as number, imoex: point.imoex as number }))
-    .sort((a, b) => a.date.localeCompare(b.date))
+type OverlapPoint = { date: string; portfolio: number; imoex: number }
+
+type OverlapIntegrity = {
+  points: OverlapPoint[]
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+}
+
+function overlap(history: AnalyticsHistoryPoint[]): OverlapIntegrity {
+  const byDate = new Map<string, OverlapPoint>()
+  const conflictDates = new Set<string>()
+  let duplicateRowsCollapsed = 0
+
+  for (const point of history) {
+    if (!(typeof point.portfolio === 'number' && Number.isFinite(point.portfolio) && point.portfolio > 0
+      && typeof point.imoex === 'number' && Number.isFinite(point.imoex) && point.imoex > 0)) continue
+
+    const candidate = { date: point.date, portfolio: point.portfolio, imoex: point.imoex }
+    const existing = byDate.get(candidate.date)
+    if (!existing) {
+      byDate.set(candidate.date, candidate)
+      continue
+    }
+
+    if (existing.portfolio === candidate.portfolio && existing.imoex === candidate.imoex) {
+      duplicateRowsCollapsed += 1
+      continue
+    }
+
+    conflictDates.add(candidate.date)
+  }
+
+  return {
+    points: [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date)),
+    duplicateRowsCollapsed,
+    conflictingDates: conflictDates.size,
+  }
 }
 
 export function calculateRelativePerformance(history: AnalyticsHistoryPoint[]): RelativePerformance {
-  const points = overlap(history)
+  const overlapResult = overlap(history)
+  const points = overlapResult.points
+  const hasConflict = overlapResult.conflictingDates > 0
   const portfolioReturns: number[] = []
   const benchmarkReturns: number[] = []
 
-  for (let i = 1; i < points.length; i += 1) {
-    const previous = points[i - 1]
-    const current = points[i]
-    const portfolioReturn = current.portfolio / previous.portfolio - 1
-    const benchmarkReturn = current.imoex / previous.imoex - 1
-    if (!Number.isFinite(portfolioReturn) || !Number.isFinite(benchmarkReturn)) continue
-    portfolioReturns.push(portfolioReturn)
-    benchmarkReturns.push(benchmarkReturn)
+  if (!hasConflict) {
+    for (let i = 1; i < points.length; i += 1) {
+      const previous = points[i - 1]
+      const current = points[i]
+      const portfolioReturn = current.portfolio / previous.portfolio - 1
+      const benchmarkReturn = current.imoex / previous.imoex - 1
+      if (!Number.isFinite(portfolioReturn) || !Number.isFinite(benchmarkReturn)) continue
+      portfolioReturns.push(portfolioReturn)
+      benchmarkReturns.push(benchmarkReturn)
+    }
   }
 
-  const first = points[0]
-  const last = points.at(-1)
+  const first = hasConflict ? null : points[0]
+  const last = hasConflict ? null : points.at(-1)
   const portfolioReturn = first && last ? last.portfolio / first.portfolio - 1 : null
   const benchmarkReturn = first && last ? last.imoex / first.imoex - 1 : null
   const excessReturn = portfolioReturn != null && benchmarkReturn != null ? portfolioReturn - benchmarkReturn : null
@@ -75,7 +113,7 @@ export function calculateRelativePerformance(history: AnalyticsHistoryPoint[]): 
   const lastDate = last?.date ? new Date(last.date) : null
   const periodDays = firstDate && lastDate ? Math.max(0, Math.round((lastDate.getTime() - firstDate.getTime()) / 86_400_000)) : 0
 
-  const sufficient = portfolioReturns.length >= MIN_RELATIVE_RETURNS
+  const sufficient = !hasConflict && portfolioReturns.length >= MIN_RELATIVE_RETURNS
   let trackingError: number | null = null
   let informationRatio: number | null = null
   let beta: number | null = null
@@ -99,18 +137,23 @@ export function calculateRelativePerformance(history: AnalyticsHistoryPoint[]): 
     }
   }
 
-  const mature = portfolioReturns.length >= MATURE_RELATIVE_RETURNS
-  const available = points.length >= 2
+  const mature = !hasConflict && portfolioReturns.length >= MATURE_RELATIVE_RETURNS
+  const available = !hasConflict && points.length >= 2
 
   return {
     calcVersion: RELATIVE_PERFORMANCE_CALC_VERSION,
     available,
-    status: sufficient ? (mature ? 'mature' : 'preview') : 'insufficient_history',
+    status: hasConflict ? 'invalid_history' : sufficient ? (mature ? 'mature' : 'preview') : 'insufficient_history',
+    integrity: hasConflict ? 'CONFLICT' : 'OK',
     overlapPoints: points.length,
     pairedReturns: portfolioReturns.length,
     minimumReturns: MIN_RELATIVE_RETURNS,
     matureReturns: MATURE_RELATIVE_RETURNS,
     periodDays,
+    sampleFrom: first?.date ?? null,
+    sampleTo: last?.date ?? null,
+    duplicateRowsCollapsed: overlapResult.duplicateRowsCollapsed,
+    conflictingDates: overlapResult.conflictingDates,
     portfolioReturn,
     benchmarkReturn,
     excessReturn,
@@ -118,12 +161,14 @@ export function calculateRelativePerformance(history: AnalyticsHistoryPoint[]): 
     informationRatio,
     beta,
     correlation,
-    note: !available
-      ? 'Для сравнения нужны совпадающие точки TWR портфеля и IMOEX.'
-      : sufficient
-        ? mature
-          ? `Относительные коэффициенты рассчитаны по ${portfolioReturns.length} парным дневным доходностям.`
-          : `Предварительная выборка: ${portfolioReturns.length} парных дневных доходностей. Для зрелой оценки QVANIX ждёт ${MATURE_RELATIVE_RETURNS}.`
-        : `Периодную доходность сравнивать можно, но Tracking Error / Information Ratio / Beta / корреляция скрыты до ${MIN_RELATIVE_RETURNS} парных дневных доходностей. Сейчас ${portfolioReturns.length}.`,
+    note: hasConflict
+      ? `История неоднозначна: ${overlapResult.conflictingDates} дат содержат разные значения TWR/IMOEX. Относительные метрики скрыты до устранения конфликта.`
+      : !available
+        ? 'Для сравнения нужны совпадающие точки TWR портфеля и IMOEX.'
+        : sufficient
+          ? mature
+            ? `Относительные коэффициенты рассчитаны по ${portfolioReturns.length} парным дневным доходностям.`
+            : `Предварительная выборка: ${portfolioReturns.length} парных дневных доходностей. Для зрелой оценки QVANIX ждёт ${MATURE_RELATIVE_RETURNS}.`
+          : `Периодную доходность сравнивать можно, но Tracking Error / Information Ratio / Beta / корреляция скрыты до ${MIN_RELATIVE_RETURNS} парных дневных доходностей. Сейчас ${portfolioReturns.length}.`,
   }
 }

@@ -29,20 +29,63 @@ const varyingReturns = Array.from({ length: 252 }, (_, index) => index % 2 === 0
 const relative59 = calculateRelativePerformance(dualHistory(varyingReturns.slice(0, 59)))
 assert.equal(relative59.calcVersion, RELATIVE_PERFORMANCE_CALC_VERSION)
 assert.equal(relative59.status, 'insufficient_history')
+assert.equal(relative59.integrity, 'OK')
 assert.equal(relative59.pairedReturns, 59)
 assert.equal(relative59.trackingError, null)
 assert.equal(relative59.beta, null)
 
-const perfectTracker = calculateRelativePerformance(dualHistory(varyingReturns.slice(0, 60)))
-assert.equal(perfectTracker.calcVersion, '1.1')
+const perfectTrackerHistory = dualHistory(varyingReturns.slice(0, 60))
+const perfectTracker = calculateRelativePerformance(perfectTrackerHistory)
+assert.equal(perfectTracker.calcVersion, '1.2')
 assert.equal(perfectTracker.available, true)
 assert.equal(perfectTracker.status, 'preview')
+assert.equal(perfectTracker.integrity, 'OK')
 assert.equal(perfectTracker.pairedReturns, 60)
+assert.equal(perfectTracker.sampleFrom, dateAt(0))
+assert.equal(perfectTracker.sampleTo, dateAt(60))
+assert.equal(perfectTracker.duplicateRowsCollapsed, 0)
+assert.equal(perfectTracker.conflictingDates, 0)
 close(perfectTracker.trackingError, 0)
 assert.equal(perfectTracker.informationRatio, null)
 close(perfectTracker.beta, 1)
 close(perfectTracker.correlation, 1)
 close(perfectTracker.excessReturn, 0)
+
+const exactDuplicate = calculateRelativePerformance([
+  ...perfectTrackerHistory,
+  { ...perfectTrackerHistory[20] },
+])
+assert.equal(exactDuplicate.available, true)
+assert.equal(exactDuplicate.status, 'preview')
+assert.equal(exactDuplicate.integrity, 'OK')
+assert.equal(exactDuplicate.overlapPoints, perfectTrackerHistory.length)
+assert.equal(exactDuplicate.pairedReturns, 60)
+assert.equal(exactDuplicate.duplicateRowsCollapsed, 1)
+assert.equal(exactDuplicate.conflictingDates, 0)
+close(exactDuplicate.beta, 1)
+close(exactDuplicate.correlation, 1)
+
+const conflictingDuplicate = calculateRelativePerformance([
+  ...perfectTrackerHistory,
+  {
+    ...perfectTrackerHistory[20],
+    portfolio: perfectTrackerHistory[20].portfolio * 1.01,
+  },
+])
+assert.equal(conflictingDuplicate.available, false)
+assert.equal(conflictingDuplicate.status, 'invalid_history')
+assert.equal(conflictingDuplicate.integrity, 'CONFLICT')
+assert.equal(conflictingDuplicate.conflictingDates, 1)
+assert.equal(conflictingDuplicate.pairedReturns, 0)
+assert.equal(conflictingDuplicate.sampleFrom, null)
+assert.equal(conflictingDuplicate.sampleTo, null)
+assert.equal(conflictingDuplicate.portfolioReturn, null)
+assert.equal(conflictingDuplicate.benchmarkReturn, null)
+assert.equal(conflictingDuplicate.excessReturn, null)
+assert.equal(conflictingDuplicate.trackingError, null)
+assert.equal(conflictingDuplicate.informationRatio, null)
+assert.equal(conflictingDuplicate.beta, null)
+assert.equal(conflictingDuplicate.correlation, null)
 
 const relativeMature = calculateRelativePerformance(dualHistory(varyingReturns))
 assert.equal(relativeMature.status, 'mature')
