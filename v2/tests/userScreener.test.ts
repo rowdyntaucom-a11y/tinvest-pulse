@@ -17,7 +17,7 @@ const previous = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) =>
 const current = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
 const partial = calculateTechnicalSnapshot(Array.from({ length: 15 }, (_, i) => candle(i + 1, 100 + i)))
 
-assert.equal(USER_SCREENER_VERSION, '1.0')
+assert.equal(USER_SCREENER_VERSION, '1.1')
 assert.equal(MAX_USER_SCREENER_RULES, 8)
 
 const all: UserScreenerConfig = {
@@ -112,6 +112,24 @@ result = evaluateUserScreener({
   rules: [{ id: 'rsi', metric: 'rsi14', comparator: 'ABOVE', threshold: 50 }],
 }, staleCurrent, previous)
 assert.equal(result.status, 'INSUFFICIENT_DATA')
+
+// Screeners inherit the metric-specific sample floor from the alert boundary.
+// A forged non-null RSI on 14 observations cannot turn a user-authored screener
+// into MATCH/NO_MATCH because RSI14 needs 15 closes in this calculation version.
+const forgedShortRsi = {
+  ...current,
+  observations: 14,
+  inputRows: 14,
+  duplicateRowsCollapsed: 0,
+}
+result = evaluateUserScreener({
+  id: 'forged-short-rsi',
+  mode: 'ANY',
+  rules: [{ id: 'rsi', metric: 'rsi14', comparator: 'ABOVE', threshold: 50 }],
+}, forgedShortRsi, previous)
+assert.equal(result.status, 'INSUFFICIENT_DATA')
+assert.equal(result.matched, false)
+assert.equal(result.rules[0]?.status, 'INSUFFICIENT_DATA')
 
 result = evaluateUserScreener({
   id: 'cross',
