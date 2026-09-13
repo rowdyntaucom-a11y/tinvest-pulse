@@ -1,4 +1,4 @@
-export const TECHNICAL_INDICATORS_VERSION = '1.3' as const
+export const TECHNICAL_INDICATORS_VERSION = '1.4' as const
 
 export type OhlcvCandle = {
   date: string
@@ -14,6 +14,8 @@ export type TechnicalIntegrity = 'OK' | 'CONFLICT'
 export type TechnicalSnapshot = {
   calcVersion: typeof TECHNICAL_INDICATORS_VERSION
   integrity: TechnicalIntegrity
+  inputRows: number
+  invalidRowsDiscarded: number
   observations: number
   sampleFrom: string | null
   sampleTo: string | null
@@ -35,6 +37,8 @@ export type TechnicalSnapshot = {
 
 type NormalizedResult = {
   integrity: TechnicalIntegrity
+  inputRows: number
+  invalidRowsDiscarded: number
   candles: OhlcvCandle[]
   duplicateRowsCollapsed: number
   conflictingDates: number
@@ -75,6 +79,7 @@ function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
       && candle.high >= Math.max(candle.open, candle.close, candle.low)
       && candle.low <= Math.min(candle.open, candle.close, candle.high)
       && (candle.volume == null || (typeof candle.volume === 'number' && Number.isFinite(candle.volume) && candle.volume >= 0)))
+  const invalidRowsDiscarded = Math.max(0, input.length - valid.length)
 
   const variantsByDate = new Map<string, Map<string, CandleVariant>>()
 
@@ -110,11 +115,20 @@ function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
   }
 
   if (conflictingDates > 0) {
-    return { integrity: 'CONFLICT', candles: [], duplicateRowsCollapsed, conflictingDates }
+    return {
+      integrity: 'CONFLICT',
+      inputRows: input.length,
+      invalidRowsDiscarded,
+      candles: [],
+      duplicateRowsCollapsed,
+      conflictingDates,
+    }
   }
 
   return {
     integrity: 'OK',
+    inputRows: input.length,
+    invalidRowsDiscarded,
     candles,
     duplicateRowsCollapsed,
     conflictingDates: 0,
@@ -265,6 +279,8 @@ export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnaps
     return {
       calcVersion: TECHNICAL_INDICATORS_VERSION,
       integrity: 'CONFLICT',
+      inputRows: normalized.inputRows,
+      invalidRowsDiscarded: normalized.invalidRowsDiscarded,
       observations: 0,
       sampleFrom: null,
       sampleTo: null,
@@ -293,6 +309,8 @@ export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnaps
   return {
     calcVersion: TECHNICAL_INDICATORS_VERSION,
     integrity: 'OK',
+    inputRows: normalized.inputRows,
+    invalidRowsDiscarded: normalized.invalidRowsDiscarded,
     observations: normalized.candles.length,
     sampleFrom: normalized.candles[0]?.date ?? null,
     sampleTo: normalized.candles.at(-1)?.date ?? null,
