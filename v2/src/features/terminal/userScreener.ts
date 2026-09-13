@@ -3,7 +3,7 @@ import {
   evaluateUserAlertRule,
   type AlertEvaluation,
   type UserAlertRule,
-} from './userAlertRules'
+} from './userAlertRules.ts'
 
 export const USER_SCREENER_VERSION = '1.0' as const
 export const MAX_USER_SCREENER_RULES = 8 as const
