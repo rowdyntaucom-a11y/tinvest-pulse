@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { buildWorldState } from '../src/features/dna/worldState.ts'
 import { emptyWorldEventCursor, resolveWorldEventQueue } from '../src/features/dna/worldEventQueue.ts'
 import { WORLD_RENDER_SNAPSHOT_VERSION, buildWorldRenderSnapshot } from '../src/features/dna/worldRenderSnapshot.ts'
+import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION, worldAssetSlot, worldAssetSlotsForLayer } from '../src/features/world/worldAssetSlots.ts'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, worldSceneLayerIndex } from '../src/features/world/worldSceneLayers.ts'
 
 assert.equal(WORLD_RENDER_SNAPSHOT_VERSION, '0.1')
@@ -18,6 +19,16 @@ assert.deepEqual(WORLD_SCENE_LAYER_ORDER, [
 assert.equal(new Set(WORLD_SCENE_LAYER_ORDER).size, WORLD_SCENE_LAYER_ORDER.length)
 assert.equal(worldSceneLayerIndex('background'), 0)
 assert.equal(worldSceneLayerIndex('effects'), WORLD_SCENE_LAYER_ORDER.length - 1)
+
+assert.equal(WORLD_ASSET_SLOT_VERSION, '0.1')
+assert.equal(new Set(WORLD_ASSET_SLOTS.map(slot => slot.id)).size, WORLD_ASSET_SLOTS.length)
+for (const slot of WORLD_ASSET_SLOTS) {
+  assert.equal(WORLD_SCENE_LAYER_ORDER.includes(slot.layer), true)
+  assert.equal(slot.labelRu.trim().length > 0, true)
+}
+assert.equal(worldAssetSlot('terrain.mine-entrance')?.layer, 'terrain')
+assert.equal(worldAssetSlot('actors.workers')?.layer, 'actors')
+assert.equal(worldAssetSlotsForLayer('logistics').map(slot => slot.id).join(','), 'logistics.rails,logistics.carts,logistics.materials')
 
 const state = buildWorldState({
   level: 4,

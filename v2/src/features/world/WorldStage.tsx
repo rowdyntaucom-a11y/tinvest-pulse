@@ -3,6 +3,7 @@ import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
 import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
 import { buildWorldPresentationMetadata } from './worldPresentationMetadata'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLayer } from './worldSceneLayers'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
@@ -102,20 +103,25 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       }
 
       const sky = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0x081d2a })
+      sky.label = 'asset-slot:background.sky'
       layer('background').addChild(sky)
 
       const horizon = new Graphics()
         .poly([0, 520, 180, 390, 330, 470, 520, 330, 740, 470, 940, 350, 1180, 500, 1380, 380, 1600, 510, 1600, 900, 0, 900])
         .fill({ color: 0x0c3034 })
-      layer('terrain').addChild(horizon)
+      horizon.label = 'asset-slot:background.mountains'
+      layer('background').addChild(horizon)
 
       const ground = new Graphics().rect(0, 585, 1600, 315).fill({ color: 0x07130f })
+      ground.label = 'asset-slot:terrain.ground'
       layer('terrain').addChild(ground)
 
       const development = new Graphics()
+      development.label = 'asset-slot:structures.construction'
       layer('structures').addChild(development)
 
       const lamp = new Graphics().circle(0, 0, 13).fill({ color: 0x66ffe2, alpha: 0.9 })
+      lamp.label = 'asset-slot:effects.work-lights'
       lamp.position.set(400, 560)
       layer('effects').addChild(lamp)
 
@@ -194,6 +200,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-primary-event={presentation.primaryEventChannel ?? 'none'}
       data-world-layer-version={WORLD_SCENE_LAYER_VERSION}
       data-world-layer-count={WORLD_SCENE_LAYER_ORDER.length}
+      data-world-asset-version={WORLD_ASSET_SLOT_VERSION}
+      data-world-asset-slots={WORLD_ASSET_SLOTS.length}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
