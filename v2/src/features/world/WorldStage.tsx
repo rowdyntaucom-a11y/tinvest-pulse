@@ -1,27 +1,39 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
+import { emptyWorldEventCursor, type WorldEventCursorDocument } from '../dna/worldEventQueue'
+import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
 
 type Props = {
   state: WorldState
+  cursor?: WorldEventCursorDocument
+}
+
+type PixiProps = {
+  snapshot: WorldRenderSnapshot
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 let worldStageSequence = 0
 
-export function WorldStage({ state }: Props) {
+export function WorldStage({ state, cursor }: Props) {
+  const snapshot = buildWorldRenderSnapshot(state, cursor ?? emptyWorldEventCursor())
+  return <WorldPixiStage snapshot={snapshot} />
+}
+
+function WorldPixiStage({ snapshot }: PixiProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const ownerIdRef = useRef<string | null>(null)
   const [renderer, setRenderer] = useState('initializing')
-  const stateRef = useRef(state)
+  const snapshotRef = useRef(snapshot)
 
   if (!ownerIdRef.current) {
     worldStageSequence += 1
     ownerIdRef.current = `world-stage-${worldStageSequence}`
   }
 
-  useEffect(() => { stateRef.current = state }, [state])
+  useEffect(() => { snapshotRef.current = snapshot }, [snapshot])
 
   useEffect(() => {
     const host = hostRef.current
@@ -117,9 +129,9 @@ export function WorldStage({ state }: Props) {
       next.ticker.maxFPS = window.innerWidth < 900 ? 45 : 60
       next.ticker.minFPS = 20
       next.ticker.add(() => {
-        // The renderer consumes already-resolved WorldState. It deliberately does not calculate XP,
-        // weather, market state, or event semantics inside the Pixi ticker.
-        renderLevel(stateRef.current.level)
+        // Pixi receives presentation-only state. XP totals, quality inputs, acknowledgement history,
+        // financial calculations and event filtering all stay outside this render loop.
+        renderLevel(snapshotRef.current.level)
         lamp.alpha = 0.72 + Math.sin(performance.now() / 550) * 0.16
       })
 
