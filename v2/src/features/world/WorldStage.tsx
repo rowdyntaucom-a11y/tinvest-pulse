@@ -1,27 +1,40 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
+import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
+import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
 
 type Props = {
   state: WorldState
+  cursor?: WorldEventCursorDocument
+}
+
+type PixiProps = {
+  snapshot: WorldRenderSnapshot
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 let worldStageSequence = 0
 
-export function WorldStage({ state }: Props) {
+export function WorldStage({ state, cursor }: Props) {
+  const queue = resolveWorldEventQueue(state, cursor ?? emptyWorldEventCursor())
+  const snapshot = buildWorldRenderSnapshot(state, queue)
+  return <WorldPixiStage snapshot={snapshot} />
+}
+
+function WorldPixiStage({ snapshot }: PixiProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const ownerIdRef = useRef<string | null>(null)
   const [renderer, setRenderer] = useState('initializing')
-  const stateRef = useRef(state)
+  const snapshotRef = useRef(snapshot)
 
   if (!ownerIdRef.current) {
     worldStageSequence += 1
     ownerIdRef.current = `world-stage-${worldStageSequence}`
   }
 
-  useEffect(() => { stateRef.current = state }, [state])
+  useEffect(() => { snapshotRef.current = snapshot }, [snapshot])
 
   useEffect(() => {
     const host = hostRef.current
@@ -43,8 +56,6 @@ export function WorldStage({ state }: Props) {
     }
 
     const boot = async () => {
-      // Pixi/WebGL is deliberately loaded only when DNA is actually mounted.
-      // Portfolio/Analytics/Income should never pay the runtime cost on first load.
       const { Application, Container, Graphics } = await import('pixi.js')
       if (disposed) return
 
@@ -72,9 +83,7 @@ export function WorldStage({ state }: Props) {
       const world = new Container()
       next.stage.addChild(world)
 
-      const sky = new Graphics()
-        .rect(0, 0, 1600, 900)
-        .fill({ color: 0x081d2a })
+      const sky = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0x081d2a })
       world.addChild(sky)
 
       const horizon = new Graphics()
@@ -82,17 +91,13 @@ export function WorldStage({ state }: Props) {
         .fill({ color: 0x0c3034 })
       world.addChild(horizon)
 
-      const ground = new Graphics()
-        .rect(0, 585, 1600, 315)
-        .fill({ color: 0x07130f })
+      const ground = new Graphics().rect(0, 585, 1600, 315).fill({ color: 0x07130f })
       world.addChild(ground)
 
       const development = new Graphics()
       world.addChild(development)
 
-      const lamp = new Graphics()
-        .circle(0, 0, 13)
-        .fill({ color: 0x66ffe2, alpha: 0.9 })
+      const lamp = new Graphics().circle(0, 0, 13).fill({ color: 0x66ffe2, alpha: 0.9 })
       lamp.position.set(400, 560)
       world.addChild(lamp)
 
@@ -101,10 +106,8 @@ export function WorldStage({ state }: Props) {
         if (current === lastLevel) return
         lastLevel = current
         development.clear()
-
         development.rect(80, 500, 210, 85).fill({ color: 0x3b2b20 })
         development.rect(105, 455, 160, 45).fill({ color: 0x8f5d38 })
-
         if (current >= 2) development.rect(360, 515, 150, 70).fill({ color: 0x4b3225 })
         if (current >= 3) development.rect(540, 485, 180, 100).fill({ color: 0x62402b })
         if (current >= 4) development.rect(750, 450, 210, 135).fill({ color: 0x2b3834 })
@@ -117,9 +120,7 @@ export function WorldStage({ state }: Props) {
       next.ticker.maxFPS = window.innerWidth < 900 ? 45 : 60
       next.ticker.minFPS = 20
       next.ticker.add(() => {
-        // The renderer consumes already-resolved WorldState. It deliberately does not calculate XP,
-        // weather, market state, or event semantics inside the Pixi ticker.
-        renderLevel(stateRef.current.level)
+        renderLevel(snapshotRef.current.level)
         lamp.alpha = 0.72 + Math.sin(performance.now() / 550) * 0.16
       })
 
