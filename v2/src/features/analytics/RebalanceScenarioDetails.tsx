@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
+import type { PositionSnapshot } from '../../lib/portfolioApi'
 import type { DriftResult } from './drift'
 import { calculateRebalanceScenario, type RebalanceScenarioMode } from './rebalanceScenarios'
+import { StrategyScenarioDetails } from './StrategyScenarioDetails'
 
 const rub = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 
@@ -16,7 +18,7 @@ function modeLabel(mode: RebalanceScenarioMode) {
   return 'ПЕРЕРАСПРЕДЕЛИТЬ'
 }
 
-export function RebalanceScenarioDetails({ drift }: { drift: DriftResult }) {
+export function RebalanceScenarioDetails({ drift, positions }: { drift: DriftResult; positions: PositionSnapshot[] }) {
   const [mode, setMode] = useState<RebalanceScenarioMode>('REBALANCE_EXISTING')
   const [flowInput, setFlowInput] = useState('')
 
@@ -31,7 +33,7 @@ export function RebalanceScenarioDetails({ drift }: { drift: DriftResult }) {
   return (
     <details className="rebalance-details">
       <summary>
-        <span><b>СЦЕНАРИЙ РЕБАЛАНСИРОВКИ</b><small>детерминированный drill-down</small></span>
+        <span><b>СЦЕНАРИИ СТРУКТУРЫ</b><small>ребалансировка + сравнение пользовательских стратегий</small></span>
         <i>ОТКРЫТЬ</i>
       </summary>
 
@@ -92,6 +94,7 @@ export function RebalanceScenarioDetails({ drift }: { drift: DriftResult }) {
         )}
 
         <p className="rebalance-note">Только сценарная диагностика по классам активов. Активы вне стратегии не меняются; это не персональная команда купить или продать.</p>
+        <StrategyScenarioDetails positions={positions} />
       </div>
     </details>
   )
