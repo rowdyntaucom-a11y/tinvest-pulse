@@ -22,16 +22,16 @@ function memoryStorage(initial: Record<string, string> = {}): UiPreferenceStorag
 
 const defaults = normalizeUiPreferences(null)
 assert.equal(defaults.version, UI_PREFERENCES_VERSION)
-assert.equal(defaults.version, '1.0')
+assert.equal(defaults.version, '1.1')
 assert.equal(defaults.theme, 'core')
 assert.equal(defaults.density, 'balanced')
 assert.equal(defaults.motion, 'full')
-assert.equal(defaults.defaultWorkspace, 'portfolio')
+assert.equal(defaults.defaultWorkspace, 'board')
 assert.deepEqual(defaults.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 assert.notEqual(defaults.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 
 const normalized = normalizeUiPreferences({
-  version: '0.4',
+  version: '1.0',
   theme: 'horizon',
   density: 'compact',
   motion: 'reduced',
@@ -48,7 +48,7 @@ const normalized = normalizeUiPreferences({
     'portfolio.pnl',
   ],
 })
-assert.equal(normalized.version, '1.0')
+assert.equal(normalized.version, '1.1')
 assert.equal(normalized.theme, 'horizon')
 assert.equal(normalized.density, 'compact')
 assert.equal(normalized.motion, 'reduced')
@@ -61,6 +61,10 @@ assert.deepEqual(normalized.pinnedModules, [
   'analytics.twr',
   'income.next',
 ])
+
+const board = normalizeUiPreferences({ defaultWorkspace: 'board', pinnedModules: ['portfolio.value'] })
+assert.equal(board.defaultWorkspace, 'board')
+assert.deepEqual(board.pinnedModules, ['portfolio.value'])
 
 const invalid = normalizeUiPreferences({
   theme: 'neon-random',
