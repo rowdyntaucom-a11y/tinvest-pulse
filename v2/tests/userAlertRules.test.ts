@@ -11,7 +11,7 @@ function candle(observation: number, close: number): OhlcvCandle {
 const rising39 = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) => candle(i + 1, 100 + i)))
 const rising40 = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
 
-assert.equal(USER_ALERT_RULES_VERSION, '1.1')
+assert.equal(USER_ALERT_RULES_VERSION, '1.2')
 
 const above: UserAlertRule = { id: 'rsi-high', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 }
 const aboveResult = evaluateUserAlertRule(above, rising40)
@@ -74,6 +74,21 @@ assert.equal(conflictResult.matched, false)
 const invalidThreshold = evaluateUserAlertRule({ ...above, threshold: Number.NaN }, rising40)
 assert.equal(invalidThreshold.status, 'INVALID_RULE')
 assert.equal(invalidThreshold.threshold, null)
+
+// Threshold domains must respect the mathematical range/semantics of each metric.
+assert.equal(evaluateUserAlertRule({ ...above, threshold: 100 }, rising40).status, 'NO_MATCH')
+assert.equal(evaluateUserAlertRule({ ...above, threshold: 150 }, rising40).status, 'INVALID_RULE')
+assert.equal(evaluateUserAlertRule({ id: 'stoch-negative', metric: 'stochasticK14', comparator: 'ABOVE', threshold: -0.1 }, rising40).status, 'INVALID_RULE')
+assert.equal(evaluateUserAlertRule({ id: 'atr-negative', metric: 'atr14', comparator: 'BELOW', threshold: -1 }, rising40).status, 'INVALID_RULE')
+assert.equal(evaluateUserAlertRule({ id: 'sma-zero', metric: 'sma20', comparator: 'ABOVE', threshold: 0 }, rising40).status, 'INVALID_RULE')
+assert.equal(evaluateUserAlertRule({ id: 'ema-negative', metric: 'ema20', comparator: 'BELOW', threshold: -1 }, rising40).status, 'INVALID_RULE')
+assert.equal(evaluateUserAlertRule({ id: 'boll-zero', metric: 'bollingerUpper20', comparator: 'ABOVE', threshold: 0 }, rising40).status, 'INVALID_RULE')
+
+// MACD values are signed differences, so negative and zero thresholds remain valid.
+const macdNegative = evaluateUserAlertRule({ id: 'macd-negative', metric: 'macdHistogram', comparator: 'ABOVE', threshold: -100 }, rising40)
+assert.notEqual(macdNegative.status, 'INVALID_RULE')
+const macdZero = evaluateUserAlertRule({ id: 'macd-zero', metric: 'macd12_26', comparator: 'ABOVE', threshold: 0 }, rising40)
+assert.notEqual(macdZero.status, 'INVALID_RULE')
 
 const invalidComparator = evaluateUserAlertRule({ ...above, comparator: 'BUY' as never }, rising40)
 assert.equal(invalidComparator.status, 'INVALID_RULE')
