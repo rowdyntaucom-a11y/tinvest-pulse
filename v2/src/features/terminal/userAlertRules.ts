@@ -1,6 +1,7 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.3' as const
+export const USER_ALERT_RULES_VERSION = '1.4' as const
+const REQUIRED_TECHNICAL_INDICATORS_VERSION: TechnicalSnapshot['calcVersion'] = '1.4'
 
 export type AlertMetric =
   | 'sma20'
@@ -59,6 +60,10 @@ function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
+function nonNegativeInteger(value: unknown): value is number {
+  return finite(value) && value >= 0 && Number.isInteger(value)
+}
+
 function validDate(value: unknown): value is string {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
   const parsed = new Date(`${value}T00:00:00Z`)
@@ -101,8 +106,23 @@ function validRule(rule: UserAlertRule): boolean {
     && validThreshold(rule.metric, rule.threshold)
 }
 
+function cleanSnapshotProvenance(snapshot: TechnicalSnapshot | null | undefined): snapshot is TechnicalSnapshot {
+  if (!snapshot || snapshot.integrity !== 'OK') return false
+  if (snapshot.calcVersion !== REQUIRED_TECHNICAL_INDICATORS_VERSION) return false
+  if (!nonNegativeInteger(snapshot.inputRows)
+    || !nonNegativeInteger(snapshot.invalidRowsDiscarded)
+    || !nonNegativeInteger(snapshot.observations)
+    || !nonNegativeInteger(snapshot.duplicateRowsCollapsed)
+    || !nonNegativeInteger(snapshot.conflictingDates)) return false
+  if (snapshot.invalidRowsDiscarded !== 0 || snapshot.conflictingDates !== 0) return false
+  if (snapshot.inputRows !== snapshot.observations + snapshot.duplicateRowsCollapsed) return false
+  if (snapshot.observations <= 0) return false
+  if (!validDate(snapshot.sampleFrom) || !validDate(snapshot.sampleTo)) return false
+  return snapshot.sampleFrom <= snapshot.sampleTo
+}
+
 function metricValue(snapshot: TechnicalSnapshot | null | undefined, metric: AlertMetric): number | null {
-  if (!snapshot || snapshot.integrity !== 'OK') return null
+  if (!cleanSnapshotProvenance(snapshot)) return null
   const value = snapshot[metric]
   return validMetricDomain(metric, value) ? value : null
 }
@@ -111,11 +131,8 @@ function validCrossingSequence(
   current: TechnicalSnapshot | null | undefined,
   previous: TechnicalSnapshot | null | undefined,
 ): boolean {
-  if (!current || !previous) return false
-  if (current.integrity !== 'OK' || previous.integrity !== 'OK') return false
-  if (current.calcVersion !== previous.calcVersion) return false
-  if (!validDate(current.sampleTo) || !validDate(previous.sampleTo)) return false
-  return previous.sampleTo < current.sampleTo
+  if (!cleanSnapshotProvenance(current) || !cleanSnapshotProvenance(previous)) return false
+  return previous.sampleTo! < current.sampleTo!
 }
 
 export function evaluateUserAlertRule(
@@ -148,7 +165,7 @@ export function evaluateUserAlertRule(
       currentValue: null,
       previousValue,
       threshold: rule.threshold,
-      reason: 'Текущее значение метрики недоступно, вне допустимой области или входные данные имеют конфликт.',
+      reason: 'Текущее значение метрики недоступно, вне допустимой области или история не прошла строгую проверку качества.',
     }
   }
 
@@ -162,7 +179,7 @@ export function evaluateUserAlertRule(
       currentValue,
       previousValue: null,
       threshold: rule.threshold,
-      reason: 'Для проверки пересечения нужно предыдущее валидное значение той же метрики.',
+      reason: 'Для проверки пересечения нужно предыдущее чистое валидное значение той же метрики.',
     }
   }
 
@@ -175,7 +192,7 @@ export function evaluateUserAlertRule(
       currentValue,
       previousValue,
       threshold: rule.threshold,
-      reason: 'Пересечение не вычислялось: нужен более ранний снимок той же версии расчёта.',
+      reason: 'Пересечение не вычислялось: нужны чистые снимки текущей версии в строгом временном порядке.',
     }
   }
 
