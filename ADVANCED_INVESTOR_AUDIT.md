@@ -163,6 +163,7 @@ Reference materials explicitly call out bond diversification by maturity / issue
 - Technical-analysis foundation may follow using deterministic OHLCV indicators and user-authored alerts only.
 
 ### GATED
+- VWAP until a session-aware intraday candle stream with verified volume semantics exists; do not derive a pseudo-VWAP from the current daily candles.
 - Intraday/order-book features pending market-data architecture and cost review.
 - Options/IV/Greeks pending a trustworthy option-chain source and model selection.
 - Backtesting pending isolated job architecture and look-ahead/survivorship/corporate-action controls.
