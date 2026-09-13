@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
-import { emptyWorldEventCursor, type WorldEventCursorDocument } from '../dna/worldEventQueue'
+import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
 
@@ -18,7 +18,8 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 let worldStageSequence = 0
 
 export function WorldStage({ state, cursor }: Props) {
-  const snapshot = buildWorldRenderSnapshot(state, cursor ?? emptyWorldEventCursor())
+  const queue = resolveWorldEventQueue(state, cursor ?? emptyWorldEventCursor())
+  const snapshot = buildWorldRenderSnapshot(state, queue)
   return <WorldPixiStage snapshot={snapshot} />
 }
 
