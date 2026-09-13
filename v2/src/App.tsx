@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { QvanixBoard } from './features/board/QvanixBoard'
 import { WorldStage } from './features/world/WorldStage'
 import { useWorldPhaseClock } from './features/world/useWorldPhaseClock'
 import { buildWorldRuntimeStateFromQualityInputs } from './features/dna/worldRuntimeState'
@@ -124,7 +125,7 @@ export default function App() {
   )
   const dnaWorldState = dnaRuntimeState.world
 
-  const updateUiPreferences = (patch: Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace'>>) => {
+  const updateUiPreferences = (patch: Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace' | 'pinnedModules'>>) => {
     setUiPreferences(current => normalizeUiPreferences({ ...current, ...patch }))
   }
   const resetUiPreferences = () => setUiPreferences(normalizeUiPreferences(null))
@@ -151,6 +152,7 @@ export default function App() {
         </div>
         <KeyRateWidget rate={snapshot.riskFreeRate} rateDate={snapshot.riskFreeRateDate} nextMeeting={snapshot.nextRateMeeting} />
         <nav className="topbar__nav" aria-label="Разделы">
+          <button onClick={() => setTab('board')} className={`chip ${tab === 'board' ? 'chip--active' : ''}`}>ПУЛЬТ</button>
           <button onClick={() => setTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
           <button onClick={() => setTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
           <button onClick={() => setTab('income')} className={`chip ${tab === 'income' ? 'chip--active' : ''}`}>ДОХОД</button>
@@ -159,6 +161,19 @@ export default function App() {
       </header>
 
       <section className={`app-view ${tab}-view`}>
+        {tab === 'board' && (
+          <QvanixBoard
+            snapshot={snapshot}
+            analytics={analytics}
+            xirrPercent={xirr}
+            pinnedModules={uiPreferences.pinnedModules}
+            onNavigate={({ workspace, analyticsView: boardAnalyticsView }) => {
+              if (boardAnalyticsView) setAnalyticsView(boardAnalyticsView)
+              setTab(workspace)
+            }}
+          />
+        )}
+
         {tab === 'portfolio' && <PortfolioWorkspace snapshot={snapshot} />}
 
         {tab === 'analytics' && (
