@@ -1,0 +1,3 @@
+.topbar__nav{grid-template-columns:repeat(5,auto)}.board-view{height:100%;min-height:0}
+@media(max-width:1050px){.topbar__nav{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:620px){.board-view{height:100%;overflow:hidden}.topbar__nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}.topbar__nav .chip{padding-left:2px;padding-right:2px;font-size:6.8px;letter-spacing:.015em}}
