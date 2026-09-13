@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { buildWorldState } from '../src/features/dna/worldState.ts'
 import { emptyWorldEventCursor, resolveWorldEventQueue } from '../src/features/dna/worldEventQueue.ts'
 import { WORLD_RENDER_SNAPSHOT_VERSION, buildWorldRenderSnapshot } from '../src/features/dna/worldRenderSnapshot.ts'
+import { WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_MANIFEST_VERSION, resolveWorldAssetManifest, worldAssetFromManifest } from '../src/features/world/worldAssetManifest.ts'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION, worldAssetSlot, worldAssetSlotsForLayer } from '../src/features/world/worldAssetSlots.ts'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, worldSceneLayerIndex } from '../src/features/world/worldSceneLayers.ts'
 
@@ -29,6 +30,67 @@ for (const slot of WORLD_ASSET_SLOTS) {
 assert.equal(worldAssetSlot('terrain.mine-entrance')?.layer, 'terrain')
 assert.equal(worldAssetSlot('actors.workers')?.layer, 'actors')
 assert.equal(worldAssetSlotsForLayer('logistics').map(slot => slot.id).join(','), 'logistics.rails,logistics.carts,logistics.materials')
+
+assert.equal(WORLD_ASSET_MANIFEST_VERSION, '0.1')
+assert.deepEqual(WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_SLOTS.map(slot => slot.id))
+const manifest = resolveWorldAssetManifest([
+  {
+    slotId: 'background.sky',
+    assetPath: '/assets/world/background/sky.webp',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-13T15:20:00.000Z' },
+  },
+  {
+    slotId: 'actors.workers',
+    assetPath: '/assets/world/actors/workers.png',
+    provenance: {
+      source: 'figma-export',
+      fileKey: 'AbCdEfGhIjKlMnOpQrStUv',
+      nodeId: '12:34',
+      reviewedAt: '2026-09-13T15:21:00.000Z',
+    },
+  },
+])
+assert.equal(manifest.rejectedCount, 0)
+assert.equal(manifest.entries.size, 2)
+assert.equal(worldAssetFromManifest(manifest, 'background.sky')?.assetPath, '/assets/world/background/sky.webp')
+assert.equal(worldAssetFromManifest(manifest, 'actors.workers')?.provenance.source, 'figma-export')
+
+const unsafeManifest = resolveWorldAssetManifest([
+  {
+    slotId: 'background.sky',
+    assetPath: 'https://example.com/world/sky.webp',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-13T15:20:00.000Z' },
+  },
+  {
+    slotId: 'terrain.ground',
+    assetPath: '/assets/world/../secret.png',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-13T15:20:00.000Z' },
+  },
+  {
+    slotId: 'actors.workers',
+    assetPath: '/assets/world/actors/workers.png',
+    provenance: { source: 'figma-export', fileKey: 'short', nodeId: 'bad', reviewedAt: '2026-09-13T15:20:00.000Z' },
+  },
+])
+assert.equal(unsafeManifest.entries.size, 0)
+assert.equal(unsafeManifest.rejectedCount, 3)
+
+const duplicateManifest = resolveWorldAssetManifest([
+  {
+    slotId: 'effects.crystals',
+    assetPath: '/assets/world/effects/crystals-a.webp',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-13T15:20:00.000Z' },
+  },
+  {
+    slotId: 'effects.crystals',
+    assetPath: '/assets/world/effects/crystals-b.webp',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-13T15:21:00.000Z' },
+  },
+])
+assert.equal(duplicateManifest.entries.has('effects.crystals'), false)
+assert.equal(duplicateManifest.rejectedCount, 2)
+assert.equal(resolveWorldAssetManifest(null).entries.size, 0)
+assert.equal(resolveWorldAssetManifest(null).rejectedCount, 1)
 
 const state = buildWorldState({
   level: 4,
