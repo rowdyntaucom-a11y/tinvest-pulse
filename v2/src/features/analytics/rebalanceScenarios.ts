@@ -1,6 +1,6 @@
 import type { DriftResult, StrategyAssetKey } from './drift'
 
-export const REBALANCE_SCENARIO_CALC_VERSION = '1.0' as const
+export const REBALANCE_SCENARIO_CALC_VERSION = '1.1' as const
 
 export type RebalanceScenarioMode = 'REBALANCE_EXISTING' | 'ADD_CAPITAL' | 'WITHDRAW_CAPITAL'
 
@@ -46,6 +46,30 @@ function validStrategy(drift: DriftResult) {
     && Math.abs(sum - 1) <= EPSILON
 }
 
+function validDriftRows(drift: DriftResult) {
+  if (!Number.isFinite(drift.unassignedWeight) || drift.unassignedWeight < 0 || drift.unassignedWeight > 1 + EPSILON) {
+    return false
+  }
+
+  if (drift.rows.length !== drift.strategy.targets.length) return false
+
+  const targets = new Map(drift.strategy.targets.map(target => [target.key, target.target]))
+  const rowKeys = new Set<StrategyAssetKey>()
+
+  for (const row of drift.rows) {
+    if (rowKeys.has(row.key)) return false
+    rowKeys.add(row.key)
+
+    const strategyTarget = targets.get(row.key)
+    if (strategyTarget == null) return false
+    if (!Number.isFinite(row.currentValue) || row.currentValue < 0) return false
+    if (!Number.isFinite(row.target) || row.target <= 0) return false
+    if (Math.abs(row.target - strategyTarget) > EPSILON) return false
+  }
+
+  return rowKeys.size === targets.size
+}
+
 function direction(delta: number): RebalanceScenarioRow['direction'] {
   if (Math.abs(delta) <= EPSILON) return 'NONE'
   return delta > 0 ? 'INCREASE' : 'DECREASE'
@@ -78,6 +102,10 @@ function minimumWithdrawForExact(rows: DriftResult['rows'], assignedValue: numbe
  * WITHDRAW_CAPITAL never assumes purchases. If the user-supplied flow is too
  * small to reach the target using only the requested direction, the scenario
  * stays diagnostic and reports that the exact target is not reachable.
+ *
+ * DriftResult is treated as an external calculation boundary rather than trusted
+ * blindly: row identities, current values and row targets must agree with the
+ * versioned strategy before any target delta is produced.
  */
 export function calculateRebalanceScenario(
   drift: DriftResult,
@@ -89,13 +117,17 @@ export function calculateRebalanceScenario(
     return sum + (Number.isFinite(value) && value > 0 ? value : 0)
   }, 0)
 
+  const safeUnassignedWeight = Number.isFinite(drift.unassignedWeight) && drift.unassignedWeight >= 0
+    ? drift.unassignedWeight
+    : 0
+
   const base = {
     calcVersion: REBALANCE_SCENARIO_CALC_VERSION,
     mode,
     requestedFlow: 0,
     assignedValueBefore,
     assignedValueAfter: null,
-    unassignedWeight: drift.unassignedWeight,
+    unassignedWeight: safeUnassignedWeight,
     exactTargetPossible: false,
     minimumFlowForExactTarget: null,
     rows: [] as RebalanceScenarioRow[],
@@ -125,6 +157,15 @@ export function calculateRebalanceScenario(
       ...base,
       reason: 'Strategy targets must be unique positive finite weights summing to 100%.',
       note: 'Invalid or duplicate target weights are not normalized silently.',
+    }
+  }
+
+  if (!validDriftRows(drift)) {
+    return {
+      available: false,
+      ...base,
+      reason: 'Drift rows must uniquely match the strategy and contain non-negative finite current values.',
+      note: 'Malformed or strategy-inconsistent drift rows fail closed before target deltas are calculated.',
     }
   }
 
