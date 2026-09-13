@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 import { PERSONAL_STRATEGY_V1, type StrategyConfig } from './drift'
 import { compareStrategyScenarios } from './strategyScenarioComparison'
+import './strategyScenario.css'
 
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const rub = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
