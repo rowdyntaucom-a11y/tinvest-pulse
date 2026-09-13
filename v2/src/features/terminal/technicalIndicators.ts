@@ -1,4 +1,4 @@
-export const TECHNICAL_INDICATORS_VERSION = '1.0' as const
+export const TECHNICAL_INDICATORS_VERSION = '1.1' as const
 
 export type OhlcvCandle = {
   date: string
@@ -32,6 +32,11 @@ type NormalizedResult = {
   conflictingDates: number
 }
 
+type CandleVariant = {
+  candle: OhlcvCandle
+  count: number
+}
+
 function finitePositive(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value > 0
 }
@@ -42,12 +47,14 @@ function validDate(value: string): boolean {
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
 }
 
-function sameCandle(a: OhlcvCandle, b: OhlcvCandle): boolean {
-  return a.open === b.open
-    && a.high === b.high
-    && a.low === b.low
-    && a.close === b.close
-    && (a.volume ?? null) === (b.volume ?? null)
+function candleSignature(candle: OhlcvCandle): string {
+  return JSON.stringify([
+    candle.open,
+    candle.high,
+    candle.low,
+    candle.close,
+    candle.volume ?? null,
+  ])
 }
 
 function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
@@ -60,21 +67,38 @@ function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
       && candle.high >= Math.max(candle.open, candle.close, candle.low)
       && candle.low <= Math.min(candle.open, candle.close, candle.high)
       && (candle.volume == null || (typeof candle.volume === 'number' && Number.isFinite(candle.volume) && candle.volume >= 0)))
-    .slice()
-    .sort((a, b) => a.date.localeCompare(b.date))
 
-  const byDate = new Map<string, OhlcvCandle>()
+  const variantsByDate = new Map<string, Map<string, CandleVariant>>()
+
+  for (const candle of valid) {
+    let variants = variantsByDate.get(candle.date)
+    if (!variants) {
+      variants = new Map<string, CandleVariant>()
+      variantsByDate.set(candle.date, variants)
+    }
+
+    const signature = candleSignature(candle)
+    const existing = variants.get(signature)
+    if (existing) existing.count += 1
+    else variants.set(signature, { candle, count: 1 })
+  }
+
+  const candles: OhlcvCandle[] = []
   let duplicateRowsCollapsed = 0
   let conflictingDates = 0
 
-  for (const candle of valid) {
-    const existing = byDate.get(candle.date)
-    if (!existing) {
-      byDate.set(candle.date, candle)
+  for (const [, variants] of [...variantsByDate.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    for (const variant of variants.values()) {
+      duplicateRowsCollapsed += Math.max(0, variant.count - 1)
+    }
+
+    if (variants.size > 1) {
+      conflictingDates += 1
       continue
     }
-    if (sameCandle(existing, candle)) duplicateRowsCollapsed += 1
-    else conflictingDates += 1
+
+    const only = variants.values().next().value as CandleVariant | undefined
+    if (only) candles.push(only.candle)
   }
 
   if (conflictingDates > 0) {
@@ -83,7 +107,7 @@ function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
 
   return {
     integrity: 'OK',
-    candles: [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date)),
+    candles,
     duplicateRowsCollapsed,
     conflictingDates: 0,
   }
