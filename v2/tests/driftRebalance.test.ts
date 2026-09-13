@@ -27,7 +27,9 @@ const exact = calculateAllocationDrift([
   position('SU26247RMFS5', 'bond', 50, 'ОФЗ 26247'),
 ])
 assert.equal(exact.calcVersion, DRIFT_CALC_VERSION)
-assert.equal(exact.calcVersion, '1.0')
+assert.equal(exact.calcVersion, '1.1')
+assert.equal(exact.strategyValid, true)
+assert.equal(exact.reason, null)
 assert.equal(exact.available, true)
 assert.equal(exact.withinTolerance, true)
 close(exact.unassignedWeight, 0)
@@ -82,9 +84,58 @@ const invalidPositions = calculateAllocationDrift([
   position('BAD', 'share', -10),
   position('NAN', 'bond', Number.NaN),
 ])
+assert.equal(invalidPositions.strategyValid, true)
 assert.equal(invalidPositions.available, false)
 assert.equal(invalidPositions.withinTolerance, false)
 assert.equal(invalidPositions.unassignedWeight, 0)
+
+const invalidSumStrategy: StrategyConfig = {
+  ...PERSONAL_STRATEGY_V1,
+  name: 'invalid sum',
+  targets: [
+    { key: 'equity', label: 'Equity', target: 0.60 },
+    { key: 'bond', label: 'Bond', target: 0.50 },
+  ],
+}
+const invalidSumDrift = calculateAllocationDrift([
+  position('EQ', 'share', 50),
+  position('BOND', 'bond', 50),
+], invalidSumStrategy)
+assert.equal(invalidSumDrift.strategyValid, false)
+assert.equal(invalidSumDrift.available, false)
+assert.equal(invalidSumDrift.rows.length, 0)
+assert.equal(invalidSumDrift.maxAbsoluteDrift, null)
+assert.match(invalidSumDrift.reason ?? '', /100%/)
+
+const invalidToleranceStrategy: StrategyConfig = {
+  ...PERSONAL_STRATEGY_V1,
+  name: 'invalid tolerance',
+  absoluteTolerance: -0.01,
+}
+const invalidToleranceDrift = calculateAllocationDrift([
+  position('EQ', 'share', 50),
+  position('BOND', 'bond', 50),
+], invalidToleranceStrategy)
+assert.equal(invalidToleranceDrift.strategyValid, false)
+assert.equal(invalidToleranceDrift.available, false)
+assert.equal(invalidToleranceDrift.rows.length, 0)
+assert.match(invalidToleranceDrift.reason ?? '', /tolerances/)
+
+const runtimeNaNTargetStrategy = {
+  ...PERSONAL_STRATEGY_V1,
+  name: 'runtime NaN target',
+  targets: [
+    { key: 'equity', label: 'Equity', target: Number.NaN },
+    { key: 'bond', label: 'Bond', target: 1 },
+  ],
+} as StrategyConfig
+const runtimeNaNTargetDrift = calculateAllocationDrift([
+  position('EQ', 'share', 50),
+  position('BOND', 'bond', 50),
+], runtimeNaNTargetStrategy)
+assert.equal(runtimeNaNTargetDrift.strategyValid, false)
+assert.equal(runtimeNaNTargetDrift.available, false)
+assert.equal(runtimeNaNTargetDrift.rows.length, 0)
 
 const drift6040 = calculateAllocationDrift([
   position('EQ', 'share', 60),
@@ -156,9 +207,12 @@ const duplicateDrift = calculateAllocationDrift([
   position('EQ', 'share', 50),
   position('BOND', 'bond', 50),
 ], duplicateStrategy)
+assert.equal(duplicateDrift.strategyValid, false)
+assert.equal(duplicateDrift.available, false)
+assert.equal(duplicateDrift.rows.length, 0)
+assert.match(duplicateDrift.reason ?? '', /unique/)
 const duplicateScenario = calculateRebalanceScenario(duplicateDrift, 'REBALANCE_EXISTING')
 assert.equal(duplicateScenario.available, false)
-assert.match(duplicateScenario.reason ?? '', /unique/)
 
 const malformedNegativeValue = {
   ...drift6040,
