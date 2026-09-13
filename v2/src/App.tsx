@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { WorldStage } from './features/world/WorldStage'
-import { buildWorldState } from './features/dna/worldState'
+import { buildWorldRuntimeStateFromQualityInputs } from './features/dna/worldRuntimeState'
 import { HistoryChart } from './features/portfolio/HistoryChart'
 import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
@@ -76,10 +76,23 @@ export default function App() {
     () => calculateAllocationDrift(snapshot.positionItems, PERSONAL_STRATEGY_V1),
     [snapshot.positionItems],
   )
-  const dnaWorldState = useMemo(
-    () => buildWorldState({ level: 1, xp: 0, xpToNext: null, qualityCoverage: 0, weather: 'neutral', events: [] }),
-    [],
+  const dnaRuntimeState = useMemo(
+    () => buildWorldRuntimeStateFromQualityInputs(
+      {
+        twr: analytics.twr,
+        healthScore: analytics.healthScore,
+        contributionStreakMonths: null,
+        passiveIncomeGrowth: null,
+      },
+      {
+        persistedXp: undefined,
+        progression: { level: 1, xpToNext: null },
+        weather: 'neutral',
+      },
+    ),
+    [analytics.twr, analytics.healthScore],
   )
+  const dnaWorldState = dnaRuntimeState.world
 
   const xirr = annualReturnRatioToPercent(snapshot.xirr)
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
@@ -185,7 +198,7 @@ export default function App() {
         {tab === 'dna' && (
           <div className="dna-layout">
             <section className="world-panel world-panel--view">
-              <div className="world-panel__head"><div><span className="eyebrow">QVANIX DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div><div className="dna-state"><span>УРОВЕНЬ {dnaWorldState.level}</span><strong>XP CORE</strong><small>WorldState v{dnaWorldState.version} · рублёвые пороги отключены</small></div></div>
+              <div className="world-panel__head"><div><span className="eyebrow">QVANIX DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div><div className="dna-state"><span>УРОВЕНЬ {dnaWorldState.level}</span><strong>XP CORE</strong><small>WorldState v{dnaWorldState.version} · сигналы {Math.round(dnaWorldState.qualityCoverage * 100)}%</small></div></div>
               <div className="world-frame"><WorldStage state={dnaWorldState} /></div>
               <div className="dna-next"><span>СЛЕДУЮЩИЙ ЭТАП</span><strong>XP Engine → WorldState → события мира → renderer</strong><p>Renderer получает уже разрешённое состояние мира и не считает финансовые метрики внутри Pixi. Погода, время суток и semantic events пока не меняют арт до отдельного production mapping.</p></div>
             </section>
