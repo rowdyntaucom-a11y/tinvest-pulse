@@ -1,7 +1,7 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.4' as const
-export const USER_SCREENER_VERSION = '1.0' as const
+export const USER_ALERT_RULES_VERSION = '1.5' as const
+export const USER_SCREENER_VERSION = '1.1' as const
 export const MAX_USER_SCREENER_RULES = 8 as const
 const REQUIRED_TECHNICAL_INDICATORS_VERSION: TechnicalSnapshot['calcVersion'] = '1.4'
 
@@ -78,6 +78,21 @@ const METRICS: AlertMetric[] = [
   'stochasticK14',
   'stochasticD3',
 ]
+
+const MIN_OBSERVATIONS_BY_METRIC: Record<AlertMetric, number> = {
+  sma20: 20,
+  ema20: 20,
+  rsi14: 15,
+  atr14: 15,
+  macd12_26: 26,
+  macdSignal9: 34,
+  macdHistogram: 34,
+  bollingerMiddle20: 20,
+  bollingerUpper20: 20,
+  bollingerLower20: 20,
+  stochasticK14: 14,
+  stochasticD3: 16,
+}
 
 const COMPARATORS: AlertComparator[] = ['ABOVE', 'BELOW', 'CROSSES_ABOVE', 'CROSSES_BELOW']
 const SCREENER_MODES: UserScreenerMode[] = ['ALL', 'ANY']
@@ -180,6 +195,7 @@ function cleanSnapshotProvenance(snapshot: TechnicalSnapshot | null | undefined)
 
 function metricValue(snapshot: TechnicalSnapshot | null | undefined, metric: AlertMetric): number | null {
   if (!cleanSnapshotProvenance(snapshot)) return null
+  if (snapshot.observations < MIN_OBSERVATIONS_BY_METRIC[metric]) return null
   const value = snapshot[metric]
   return validMetricDomain(metric, value) ? value : null
 }
@@ -222,7 +238,7 @@ export function evaluateUserAlertRule(
       currentValue: null,
       previousValue,
       threshold: rule.threshold,
-      reason: 'Текущее значение метрики недоступно, вне допустимой области или история не прошла строгую проверку качества.',
+      reason: 'Текущее значение метрики недоступно, вне допустимой области, выборка короче минимального окна или история не прошла строгую проверку качества.',
     }
   }
 
@@ -236,7 +252,7 @@ export function evaluateUserAlertRule(
       currentValue,
       previousValue: null,
       threshold: rule.threshold,
-      reason: 'Для проверки пересечения нужно предыдущее чистое валидное значение той же метрики.',
+      reason: 'Для проверки пересечения нужно предыдущее чистое валидное значение той же метрики с достаточной выборкой.',
     }
   }
 
