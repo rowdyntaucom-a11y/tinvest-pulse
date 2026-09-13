@@ -15,6 +15,7 @@ function candle(observation: number, close: number): OhlcvCandle {
 
 const previous = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) => candle(i + 1, 100 + i)))
 const current = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
+const partial = calculateTechnicalSnapshot(Array.from({ length: 15 }, (_, i) => candle(i + 1, 100 + i)))
 
 assert.equal(USER_SCREENER_VERSION, '1.0')
 assert.equal(MAX_USER_SCREENER_RULES, 8)
@@ -43,7 +44,7 @@ result = evaluateUserScreener({
     { id: 'false', metric: 'rsi14', comparator: 'BELOW', threshold: 30 },
     { id: 'missing', metric: 'stochasticD3', comparator: 'ABOVE', threshold: 50 },
   ],
-}, calculateTechnicalSnapshot(Array.from({ length: 15 }, (_, i) => candle(i + 1, 100 + i))))
+}, partial)
 assert.equal(result.status, 'NO_MATCH')
 
 result = evaluateUserScreener({
@@ -53,7 +54,7 @@ result = evaluateUserScreener({
     { id: 'true', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 },
     { id: 'missing', metric: 'stochasticD3', comparator: 'ABOVE', threshold: 50 },
   ],
-}, current, previous)
+}, partial)
 assert.equal(result.status, 'MATCH')
 assert.equal(result.matchedRules, 1)
 assert.deepEqual(result.matchedRuleIds, ['true'])
