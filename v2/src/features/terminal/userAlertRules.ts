@@ -1,7 +1,7 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.5' as const
-export const USER_SCREENER_VERSION = '1.1' as const
+export const USER_ALERT_RULES_VERSION = '1.6' as const
+export const USER_SCREENER_VERSION = '1.2' as const
 export const MAX_USER_SCREENER_RULES = 8 as const
 const REQUIRED_TECHNICAL_INDICATORS_VERSION: TechnicalSnapshot['calcVersion'] = '1.4'
 
@@ -105,6 +105,12 @@ function nonNegativeInteger(value: unknown): value is number {
   return finite(value) && value >= 0 && Number.isInteger(value)
 }
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value != null && typeof value === 'object'
+    ? value as Record<string, unknown>
+    : null
+}
+
 function validDate(value: unknown): value is string {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
   const parsed = new Date(`${value}T00:00:00Z`)
@@ -139,21 +145,25 @@ function validThreshold(metric: AlertMetric, threshold: number): boolean {
   return validMetricDomain(metric, threshold)
 }
 
-function validRule(rule: UserAlertRule): boolean {
-  return typeof rule.id === 'string'
-    && rule.id.trim().length > 0
-    && METRICS.includes(rule.metric)
-    && COMPARATORS.includes(rule.comparator)
-    && validThreshold(rule.metric, rule.threshold)
+function validRule(rule: unknown): rule is UserAlertRule {
+  const raw = asRecord(rule)
+  if (!raw) return false
+  if (typeof raw.id !== 'string' || !raw.id.trim()) return false
+  if (typeof raw.metric !== 'string' || !METRICS.includes(raw.metric as AlertMetric)) return false
+  if (typeof raw.comparator !== 'string' || !COMPARATORS.includes(raw.comparator as AlertComparator)) return false
+  if (!finite(raw.threshold)) return false
+  return validThreshold(raw.metric as AlertMetric, raw.threshold)
 }
 
-function validScreener(config: UserScreenerConfig): boolean {
-  if (typeof config.id !== 'string' || !config.id.trim()) return false
-  if (!SCREENER_MODES.includes(config.mode)) return false
-  if (!Array.isArray(config.rules) || config.rules.length === 0 || config.rules.length > MAX_USER_SCREENER_RULES) return false
+function validScreener(config: unknown): config is UserScreenerConfig {
+  const raw = asRecord(config)
+  if (!raw) return false
+  if (typeof raw.id !== 'string' || !raw.id.trim()) return false
+  if (typeof raw.mode !== 'string' || !SCREENER_MODES.includes(raw.mode as UserScreenerMode)) return false
+  if (!Array.isArray(raw.rules) || raw.rules.length === 0 || raw.rules.length > MAX_USER_SCREENER_RULES) return false
 
   const ids = new Set<string>()
-  for (const rule of config.rules) {
+  for (const rule of raw.rules) {
     if (!validRule(rule)) return false
     const id = rule.id.trim()
     if (ids.has(id)) return false
@@ -163,11 +173,30 @@ function validScreener(config: UserScreenerConfig): boolean {
   return true
 }
 
-function invalidScreenerResult(config: UserScreenerConfig, reason: string): UserScreenerEvaluation {
+function invalidRuleResult(rule: unknown): AlertEvaluation {
+  const raw = asRecord(rule)
+  return {
+    version: USER_ALERT_RULES_VERSION,
+    ruleId: typeof raw?.id === 'string' ? raw.id : '',
+    status: 'INVALID_RULE',
+    matched: false,
+    currentValue: null,
+    previousValue: null,
+    threshold: finite(raw?.threshold) ? raw.threshold : null,
+    reason: 'Правило или порог метрики не прошли валидацию и не вычислялись.',
+  }
+}
+
+function invalidScreenerResult(config: unknown, reason: string): UserScreenerEvaluation {
+  const raw = asRecord(config)
+  const mode = typeof raw?.mode === 'string' && SCREENER_MODES.includes(raw.mode as UserScreenerMode)
+    ? raw.mode as UserScreenerMode
+    : null
+
   return {
     version: USER_SCREENER_VERSION,
-    screenerId: typeof config.id === 'string' ? config.id : '',
-    mode: SCREENER_MODES.includes(config.mode) ? config.mode : null,
+    screenerId: typeof raw?.id === 'string' ? raw.id : '',
+    mode,
     status: 'INVALID_CONFIG',
     matched: false,
     matchedRules: 0,
@@ -213,18 +242,7 @@ export function evaluateUserAlertRule(
   current: TechnicalSnapshot | null | undefined,
   previous?: TechnicalSnapshot | null,
 ): AlertEvaluation {
-  if (!validRule(rule)) {
-    return {
-      version: USER_ALERT_RULES_VERSION,
-      ruleId: typeof rule.id === 'string' ? rule.id : '',
-      status: 'INVALID_RULE',
-      matched: false,
-      currentValue: null,
-      previousValue: null,
-      threshold: finite(rule.threshold) ? rule.threshold : null,
-      reason: 'Правило или порог метрики не прошли валидацию и не вычислялись.',
-    }
-  }
+  if (!validRule(rule)) return invalidRuleResult(rule)
 
   const currentValue = metricValue(current, rule.metric)
   const previousValue = metricValue(previous, rule.metric)
