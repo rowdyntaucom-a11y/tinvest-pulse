@@ -1,4 +1,4 @@
-export const PORTFOLIO_ANALYTICS_CALC_VERSION = '1.0' as const
+export const PORTFOLIO_ANALYTICS_CALC_VERSION = '1.1' as const
 
 export type AnalyticsPosition = {
   ticker: string
@@ -25,6 +25,11 @@ export type HealthComponent = {
 export type PortfolioAnalytics = {
   calcVersion: typeof PORTFOLIO_ANALYTICS_CALC_VERSION
   available: boolean
+  historyIntegrity: 'OK' | 'CONFLICT'
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+  sampleFrom: string | null
+  sampleTo: string | null
   historyDays: number
   historyPoints: number
   twr: number | null
@@ -51,11 +56,50 @@ const sampleStdev = (values: number[]) => {
   return Math.sqrt(Math.max(0, variance))
 }
 
-function validIndex(points: AnalyticsHistoryPoint[]) {
-  return points
-    .map(point => ({ date: point.date, value: point.portfolio }))
-    .filter((point): point is { date: string; value: number } => typeof point.value === 'number' && Number.isFinite(point.value) && point.value > 0)
+function normalizeIndex(points: AnalyticsHistoryPoint[]) {
+  const rows = points
+    .map(point => ({ date: String(point.date || '').trim(), value: point.portfolio }))
+    .filter((point): point is { date: string; value: number } => Boolean(point.date) && typeof point.value === 'number' && Number.isFinite(point.value) && point.value > 0)
     .sort((a, b) => a.date.localeCompare(b.date))
+
+  const index: Array<{ date: string; value: number }> = []
+  let duplicateRowsCollapsed = 0
+  let conflictingDates = 0
+
+  for (let cursor = 0; cursor < rows.length;) {
+    const first = rows[cursor]
+    let end = cursor + 1
+    let conflict = false
+    while (end < rows.length && rows[end].date === first.date) {
+      if (Math.abs(rows[end].value - first.value) > 1e-12) conflict = true
+      end += 1
+    }
+
+    duplicateRowsCollapsed += Math.max(0, end - cursor - 1)
+    if (conflict) conflictingDates += 1
+    else index.push(first)
+    cursor = end
+  }
+
+  if (conflictingDates > 0) {
+    return {
+      integrity: 'CONFLICT' as const,
+      index: [] as Array<{ date: string; value: number }>,
+      duplicateRowsCollapsed,
+      conflictingDates,
+      sampleFrom: null,
+      sampleTo: null,
+    }
+  }
+
+  return {
+    integrity: 'OK' as const,
+    index,
+    duplicateRowsCollapsed,
+    conflictingDates,
+    sampleFrom: index[0]?.date ?? null,
+    sampleTo: index.at(-1)?.date ?? null,
+  }
 }
 
 function dailyReturns(index: Array<{ date: string; value: number }>) {
@@ -108,7 +152,8 @@ export function calculatePortfolioAnalytics(
   positions: AnalyticsPosition[],
   riskFreeAnnualPct: number | null,
 ): PortfolioAnalytics {
-  const index = validIndex(history)
+  const normalized = normalizeIndex(history)
+  const index = normalized.index
   const returns = dailyReturns(index)
   const firstDate = index[0]?.date ? new Date(index[0].date) : null
   const lastDate = index.at(-1)?.date ? new Date(index.at(-1)!.date) : null
@@ -179,6 +224,11 @@ export function calculatePortfolioAnalytics(
   return {
     calcVersion: PORTFOLIO_ANALYTICS_CALC_VERSION,
     available: index.length >= 2 || positions.length > 0,
+    historyIntegrity: normalized.integrity,
+    duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
+    conflictingDates: normalized.conflictingDates,
+    sampleFrom: normalized.sampleFrom,
+    sampleTo: normalized.sampleTo,
     historyDays,
     historyPoints: index.length,
     twr,
