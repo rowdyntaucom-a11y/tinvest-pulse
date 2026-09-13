@@ -1,4 +1,4 @@
-export const TECHNICAL_INDICATORS_VERSION = '1.1' as const
+export const TECHNICAL_INDICATORS_VERSION = '1.2' as const
 
 export type OhlcvCandle = {
   date: string
@@ -23,6 +23,12 @@ export type TechnicalSnapshot = {
   ema20: number | null
   rsi14: number | null
   atr14: number | null
+  macd12_26: number | null
+  macdSignal9: number | null
+  macdHistogram: number | null
+  bollingerMiddle20: number | null
+  bollingerUpper20: number | null
+  bollingerLower20: number | null
 }
 
 type NormalizedResult = {
@@ -119,14 +125,23 @@ function sma(values: number[], period: number): number | null {
   return window.reduce((sum, value) => sum + value, 0) / period
 }
 
-function ema(values: number[], period: number): number | null {
-  if (values.length < period || period <= 0) return null
+function emaSeries(values: number[], period: number): Array<number | null> {
+  const out = new Array<number | null>(values.length).fill(null)
+  if (values.length < period || period <= 0) return out
+
   const multiplier = 2 / (period + 1)
   let current = values.slice(0, period).reduce((sum, value) => sum + value, 0) / period
+  out[period - 1] = current
+
   for (let i = period; i < values.length; i += 1) {
     current = (values[i] - current) * multiplier + current
+    out[i] = current
   }
-  return current
+  return out
+}
+
+function ema(values: number[], period: number): number | null {
+  return emaSeries(values, period).at(-1) ?? null
 }
 
 function rsi(values: number[], period: number): number | null {
@@ -176,6 +191,46 @@ function atr(candles: OhlcvCandle[], period: number): number | null {
   return current
 }
 
+function macd(values: number[]) {
+  const fast = emaSeries(values, 12)
+  const slow = emaSeries(values, 26)
+  const lineValues: number[] = []
+  let line: number | null = null
+
+  for (let i = 0; i < values.length; i += 1) {
+    const fastValue = fast[i]
+    const slowValue = slow[i]
+    if (fastValue == null || slowValue == null) continue
+    line = fastValue - slowValue
+    lineValues.push(line)
+  }
+
+  const signal = ema(lineValues, 9)
+  return {
+    line,
+    signal,
+    histogram: line != null && signal != null ? line - signal : null,
+  }
+}
+
+function bollinger(values: number[], period: number, deviations: number) {
+  if (values.length < period || period <= 0 || !Number.isFinite(deviations) || deviations < 0) {
+    return { middle: null, upper: null, lower: null }
+  }
+
+  const window = values.slice(-period)
+  const middle = window.reduce((sum, value) => sum + value, 0) / period
+  // Population standard deviation is used deliberately for the current
+  // observation window. This convention is versioned with the snapshot.
+  const variance = window.reduce((sum, value) => sum + ((value - middle) ** 2), 0) / period
+  const width = Math.sqrt(variance) * deviations
+  return {
+    middle,
+    upper: middle + width,
+    lower: middle - width,
+  }
+}
+
 export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnapshot {
   const normalized = normalizeCandles(input)
   if (normalized.integrity === 'CONFLICT') {
@@ -191,10 +246,19 @@ export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnaps
       ema20: null,
       rsi14: null,
       atr14: null,
+      macd12_26: null,
+      macdSignal9: null,
+      macdHistogram: null,
+      bollingerMiddle20: null,
+      bollingerUpper20: null,
+      bollingerLower20: null,
     }
   }
 
   const closes = normalized.candles.map(candle => candle.close)
+  const macdValues = macd(closes)
+  const bollingerValues = bollinger(closes, 20, 2)
+
   return {
     calcVersion: TECHNICAL_INDICATORS_VERSION,
     integrity: 'OK',
@@ -207,5 +271,11 @@ export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnaps
     ema20: ema(closes, 20),
     rsi14: rsi(closes, 14),
     atr14: atr(normalized.candles, 14),
+    macd12_26: macdValues.line,
+    macdSignal9: macdValues.signal,
+    macdHistogram: macdValues.histogram,
+    bollingerMiddle20: bollingerValues.middle,
+    bollingerUpper20: bollingerValues.upper,
+    bollingerLower20: bollingerValues.lower,
   }
 }
