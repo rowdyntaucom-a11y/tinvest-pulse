@@ -1,4 +1,4 @@
-export const STRESS_CALC_VERSION = '1.1' as const
+export const STRESS_CALC_VERSION = '1.2' as const
 
 export type StressExposure = {
   key: string
@@ -43,9 +43,8 @@ export type StressResult = {
 }
 
 function validShock(value: unknown): number | null {
-  const shock = Number(value)
-  if (!Number.isFinite(shock)) return null
-  return shock >= -1 ? shock : null
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null
+  return value >= -1 ? value : null
 }
 
 export function calculateStressScenario(exposures: StressExposure[], scenario: StressScenario): StressResult {
