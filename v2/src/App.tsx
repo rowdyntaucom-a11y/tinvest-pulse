@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { WorldStage } from './features/world/WorldStage'
+import { useWorldPhaseClock } from './features/world/useWorldPhaseClock'
 import { buildWorldRuntimeStateFromQualityInputs } from './features/dna/worldRuntimeState'
 import { HistoryChart } from './features/portfolio/HistoryChart'
 import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
@@ -46,6 +47,7 @@ export default function App() {
   const [snapshot, setSnapshot] = useState<PortfolioSnapshot>(EMPTY)
   const [tab, setTab] = useState<Tab>('portfolio')
   const [analyticsView, setAnalyticsView] = useState<AnalyticsView>('overview')
+  const worldLocalDate = useWorldPhaseClock(tab === 'dna')
 
   useEffect(() => {
     let active = true
@@ -88,9 +90,10 @@ export default function App() {
         persistedXp: undefined,
         progression: { level: 1, xpToNext: null },
         weather: 'neutral',
+        localDate: worldLocalDate,
       },
     ),
-    [analytics.twr, analytics.healthScore],
+    [analytics.twr, analytics.healthScore, worldLocalDate],
   )
   const dnaWorldState = dnaRuntimeState.world
 
