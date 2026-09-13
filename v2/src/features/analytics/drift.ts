@@ -1,6 +1,6 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
 
-export const DRIFT_CALC_VERSION = '1.0' as const
+export const DRIFT_CALC_VERSION = '1.1' as const
 
 export type StrategyAssetKey = 'equity' | 'bond'
 
@@ -29,6 +29,8 @@ export type DriftRow = StrategyTarget & {
 export type DriftResult = {
   calcVersion: typeof DRIFT_CALC_VERSION
   available: boolean
+  strategyValid: boolean
+  reason: string | null
   strategy: StrategyConfig
   rows: DriftRow[]
   unassignedWeight: number
@@ -47,6 +49,34 @@ export const PERSONAL_STRATEGY_V1: StrategyConfig = {
   relativeTolerance: 0.20,
 }
 
+const STRATEGY_EPSILON = 1e-8
+
+// Keep the drift calculation boundary fail-closed even when it is called
+// directly rather than through the strategy-scenario acceptance policy.
+// This local check deliberately has no runtime module dependency because the
+// core regression suite executes drift.ts directly with Node strip-types.
+function validStrategyConfig(strategy: StrategyConfig | null | undefined) {
+  if (!strategy || strategy.version !== '1.0' || !Array.isArray(strategy.targets) || strategy.targets.length !== 2) return false
+
+  const keys = new Set<StrategyAssetKey>()
+  let total = 0
+  for (const target of strategy.targets) {
+    if (target.key !== 'equity' && target.key !== 'bond') return false
+    if (keys.has(target.key)) return false
+    keys.add(target.key)
+    if (!Number.isFinite(target.target) || target.target <= 0) return false
+    total += target.target
+  }
+
+  if (!keys.has('equity') || !keys.has('bond')) return false
+  if (Math.abs(total - 1) > STRATEGY_EPSILON) return false
+
+  return Number.isFinite(strategy.absoluteTolerance)
+    && strategy.absoluteTolerance >= 0
+    && Number.isFinite(strategy.relativeTolerance)
+    && strategy.relativeTolerance >= 0
+}
+
 function classify(position: PositionSnapshot): StrategyAssetKey | null {
   const type = String(position.instrumentType || '').trim().toLowerCase()
   const ticker = String(position.ticker || '').trim().toUpperCase()
@@ -61,6 +91,20 @@ export function calculateAllocationDrift(
   positions: PositionSnapshot[],
   strategy: StrategyConfig = PERSONAL_STRATEGY_V1,
 ): DriftResult {
+  if (!validStrategyConfig(strategy)) {
+    return {
+      calcVersion: DRIFT_CALC_VERSION,
+      available: false,
+      strategyValid: false,
+      reason: 'Strategy config must contain unique positive equity/bond targets summing to 100% with finite non-negative tolerances.',
+      strategy,
+      rows: [],
+      unassignedWeight: 0,
+      maxAbsoluteDrift: null,
+      withinTolerance: false,
+    }
+  }
+
   const valid = positions.filter(position => Number.isFinite(position.currentValue) && position.currentValue > 0)
   const total = valid.reduce((sum, position) => sum + position.currentValue, 0)
   const sums = new Map<StrategyAssetKey, number>()
@@ -100,6 +144,8 @@ export function calculateAllocationDrift(
   return {
     calcVersion: DRIFT_CALC_VERSION,
     available,
+    strategyValid: true,
+    reason: null,
     strategy,
     rows,
     unassignedWeight,
