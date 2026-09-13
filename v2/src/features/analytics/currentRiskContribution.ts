@@ -1,6 +1,6 @@
 import type { RiskSeries } from './riskMatrix'
 
-export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.3' as const
+export const CURRENT_RISK_CONTRIBUTION_CALC_VERSION = '1.4' as const
 
 export type CurrentRiskSeriesInput = RiskSeries & {
   currentValue: number
@@ -19,6 +19,9 @@ export type CurrentRiskContributionResult = {
   calcVersion: typeof CURRENT_RISK_CONTRIBUTION_CALC_VERSION
   available: boolean
   status: 'INSUFFICIENT_HISTORY' | 'PREVIEW' | 'MATURE'
+  integrity: 'VALID' | 'CONFLICT'
+  duplicateRowsCollapsed: number
+  conflictingDates: number
   commonReturns: number
   sampleFrom: string | null
   sampleTo: string | null
@@ -47,9 +50,40 @@ const TRADING_DAYS = 252
 const EPS = 1e-12
 const INTERVAL_SEPARATOR = '\u0000'
 
-function returnIntervalMap(series: RiskSeries) {
-  const sorted = series.points
-    .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
+type SeriesIntervals = {
+  returns: Map<string, number>
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+  integrity: 'VALID' | 'CONFLICT'
+}
+
+function returnIntervalMap(series: RiskSeries): SeriesIntervals {
+  const byDate = new Map<string, number>()
+  const conflictingDates = new Set<string>()
+  let duplicateRowsCollapsed = 0
+
+  for (const point of series.points) {
+    if (!point.date || !Number.isFinite(point.value) || point.value <= 0) continue
+    const existing = byDate.get(point.date)
+    if (existing == null) {
+      byDate.set(point.date, point.value)
+      continue
+    }
+    if (Math.abs(existing - point.value) <= EPS) duplicateRowsCollapsed += 1
+    else conflictingDates.add(point.date)
+  }
+
+  if (conflictingDates.size > 0) {
+    return {
+      returns: new Map(),
+      duplicateRowsCollapsed,
+      conflictingDates: conflictingDates.size,
+      integrity: 'CONFLICT',
+    }
+  }
+
+  const sorted = [...byDate.entries()]
+    .map(([date, value]) => ({ date, value }))
     .sort((a, b) => a.date.localeCompare(b.date))
   const map = new Map<string, number>()
   for (let i = 1; i < sorted.length; i += 1) {
@@ -61,7 +95,13 @@ function returnIntervalMap(series: RiskSeries) {
       map.set(`${prior.date}${INTERVAL_SEPARATOR}${current.date}`, value)
     }
   }
-  return map
+
+  return {
+    returns: map,
+    duplicateRowsCollapsed,
+    conflictingDates: 0,
+    integrity: 'VALID',
+  }
 }
 
 function commonIntervalKeys(maps: Array<Map<string, number>>) {
@@ -126,7 +166,11 @@ export function calculateCurrentRiskContribution(
   const coveredValue = series.reduce((sum, item) => sum + item.currentValue, 0)
   const coverageRatio = total > 0 ? Math.min(1, coveredValue / total) : null
 
-  const maps = unique.size === series.length ? series.map(returnIntervalMap) : []
+  const intervalData = unique.size === series.length ? series.map(returnIntervalMap) : []
+  const duplicateRowsCollapsed = intervalData.reduce((sum, item) => sum + item.duplicateRowsCollapsed, 0)
+  const conflictingDates = intervalData.reduce((sum, item) => sum + item.conflictingDates, 0)
+  const integrity: CurrentRiskContributionResult['integrity'] = conflictingDates > 0 ? 'CONFLICT' : 'VALID'
+  const maps = integrity === 'VALID' ? intervalData.map(item => item.returns) : []
   const intervalKeys = maps.length ? commonIntervalKeys(maps) : []
   const rows = intervalKeys.map(key => maps.map(map => map.get(key)!))
   const bounds = sampleBounds(intervalKeys)
@@ -139,6 +183,9 @@ export function calculateCurrentRiskContribution(
   const base = {
     calcVersion: CURRENT_RISK_CONTRIBUTION_CALC_VERSION,
     status,
+    integrity,
+    duplicateRowsCollapsed,
+    conflictingDates,
     commonReturns: rows.length,
     sampleFrom: bounds.sampleFrom,
     sampleTo: bounds.sampleTo,
@@ -148,6 +195,19 @@ export function calculateCurrentRiskContribution(
     coveredValue,
     totalPortfolioValue: total,
     coverageRatio,
+  }
+
+  if (integrity === 'CONFLICT') {
+    return {
+      ...base,
+      available: false,
+      annualizedVolatility: null,
+      ...unavailableDepth(),
+      rows: [],
+      topAbsoluteContributor: null,
+      reason: 'Conflicting same-day market-history values make the common risk sample ambiguous.',
+      note: 'Current risk contribution fails closed when any included asset has conflicting prices for the same date.',
+    }
   }
 
   if (series.length < 2 || unique.size !== series.length || rows.length < MIN_COMMON_RETURNS || coveredValue <= 0) {
@@ -247,6 +307,6 @@ export function calculateCurrentRiskContribution(
     rows: resultRows,
     topAbsoluteContributor,
     reason: null,
-    note: `${status}: current market-value weights on ${rows.length} common daily returns matched by identical observation intervals (${bounds.sampleFrom} → ${bounds.sampleTo}). Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. Diversification ratio = weighted standalone volatility / portfolio volatility. Risk Nₑ = 1/HHI of normalized absolute contribution magnitudes. No expected-return assumption is used.`,
+    note: `${status}: current market-value weights on ${rows.length} common daily returns matched by identical observation intervals (${bounds.sampleFrom} → ${bounds.sampleTo}). Exact same-day duplicates collapsed: ${duplicateRowsCollapsed}. Signed contribution shares sum to portfolio variance; negative contribution can reflect diversification. Diversification ratio = weighted standalone volatility / portfolio volatility. Risk Nₑ = 1/HHI of normalized absolute contribution magnitudes. No expected-return assumption is used.`,
   }
 }
