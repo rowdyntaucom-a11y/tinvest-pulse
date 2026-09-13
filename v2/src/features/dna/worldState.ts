@@ -1,5 +1,5 @@
 export type WorldTimePhase = 'dawn' | 'day' | 'sunset' | 'night'
-export type WorldWeather = 'clear' | 'cloudy' | 'rain' | 'storm'
+export type WorldWeather = 'neutral' | 'clear' | 'cloudy' | 'rain' | 'storm'
 
 export type WorldEvent = {
   id: string
@@ -25,12 +25,17 @@ export type WorldStateInput = {
   xp: number
   xpToNext?: number | null
   qualityCoverage?: number | null
-  weather: WorldWeather
+  weather?: WorldWeather | null
   events?: WorldEvent[]
   localDate?: Date
 }
 
+const WORLD_WEATHERS: readonly WorldWeather[] = ['neutral', 'clear', 'cloudy', 'rain', 'storm']
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
+
+function normalizeWeather(value: unknown): WorldWeather {
+  return WORLD_WEATHERS.includes(value as WorldWeather) ? value as WorldWeather : 'neutral'
+}
 
 export function localTimePhase(date = new Date()): WorldTimePhase {
   const hour = date.getHours()
@@ -45,20 +50,23 @@ function cleanEvents(events: WorldEvent[]) {
   return events
     .filter(event => {
       const id = String(event?.id || '').trim()
+      const kind = String(event?.kind || '').trim()
       const timestamp = Date.parse(String(event?.occurredAt || ''))
-      if (!id || !Number.isFinite(timestamp) || seen.has(id)) return false
+      if (!id || !kind || !Number.isFinite(timestamp) || seen.has(id)) return false
       seen.add(id)
       return true
     })
     .map(event => ({
       ...event,
       id: String(event.id).trim(),
+      kind: String(event.kind).trim(),
       occurredAt: new Date(event.occurredAt).toISOString(),
       intensity: typeof event.intensity === 'number' && Number.isFinite(event.intensity)
         ? clamp01(event.intensity)
         : null,
+      title: event.title == null ? null : String(event.title).trim() || null,
     }))
-    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
+    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt) || a.id.localeCompare(b.id))
     .slice(0, 20)
 }
 
@@ -66,6 +74,9 @@ function cleanEvents(events: WorldEvent[]) {
  * This boundary does not calculate level thresholds or weather from money/returns.
  * Those decisions stay in versioned deterministic rule modules. PixiJS receives only a compact,
  * already-resolved state object plus local time phase.
+ *
+ * Missing or malformed weather fails closed to `neutral`; the renderer must never invent market
+ * atmosphere when no reviewed weather rule has resolved one.
  */
 export function buildWorldState(input: WorldStateInput): WorldState {
   const level = Number.isFinite(input.level) ? Math.max(1, Math.floor(input.level)) : 1
@@ -84,7 +95,7 @@ export function buildWorldState(input: WorldStateInput): WorldState {
     xpToNext,
     qualityCoverage,
     timePhase: localTimePhase(input.localDate),
-    weather: input.weather,
+    weather: normalizeWeather(input.weather),
     events: cleanEvents(Array.isArray(input.events) ? input.events : []),
   }
 }
