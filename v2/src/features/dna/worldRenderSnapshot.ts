@@ -1,4 +1,4 @@
-import { resolveWorldEventQueue, type WorldEventCursorDocument } from './worldEventQueue'
+import type { ResolvedWorldEventQueue } from './worldEventQueue'
 import type { WorldEvent, WorldState, WorldTimePhase, WorldWeather } from './worldState'
 
 export const WORLD_RENDER_SNAPSHOT_VERSION = '0.1' as const
@@ -18,13 +18,12 @@ export type WorldRenderSnapshot = {
  *
  * The renderer receives only presentation-relevant, already-resolved state. XP totals,
  * quality inputs, acknowledgement history and financial metrics stay outside the renderer.
- * Already-acknowledged semantic events are removed before this snapshot is produced.
+ * Queue resolution happens before this boundary; only still-pending events may be supplied.
  */
 export function buildWorldRenderSnapshot(
   state: WorldState,
-  cursor: WorldEventCursorDocument,
+  queue: Pick<ResolvedWorldEventQueue, 'pending'>,
 ): WorldRenderSnapshot {
-  const queue = resolveWorldEventQueue(state, cursor)
   const pendingEvents = queue.pending.map(event => ({ ...event }))
 
   return {
