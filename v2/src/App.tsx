@@ -97,7 +97,7 @@ export default function App() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand-block">
-          <div className="eyebrow">QVANIX · PORTFOLIO INTELLIGENCE</div>
+          <div className="eyebrow">QVANIX · АНАЛИТИКА ПОРТФЕЛЯ</div>
           <h1>QVANIX</h1>
           <p>{snapshot.accountName} · финансовое ядро, аналитика и живой мир без лишнего дублирования.</p>
         </div>
@@ -122,27 +122,27 @@ export default function App() {
             <nav className="subnav analytics-subnav" aria-label="Разделы аналитики">
               <button onClick={() => setAnalyticsView('overview')} className={analyticsView === 'overview' ? 'subnav--active' : ''}>ОБЗОР</button>
               <button onClick={() => setAnalyticsView('risk')} className={analyticsView === 'risk' ? 'subnav--active' : ''}>РИСК</button>
-              <button onClick={() => setAnalyticsView('health')} className={analyticsView === 'health' ? 'subnav--active' : ''}>HEALTH</button>
-              <button onClick={() => setAnalyticsView('drift')} className={analyticsView === 'drift' ? 'subnav--active' : ''}>DRIFT</button>
-              <button onClick={() => setAnalyticsView('montecarlo')} className={analyticsView === 'montecarlo' ? 'subnav--active' : ''}>MC</button>
-              <span className={analyticsMature ? 'sample-badge sample-badge--mature' : 'sample-badge'}>{analyticsMature ? '12M' : `PREVIEW · ${historyLabel}`}</span>
+              <button onClick={() => setAnalyticsView('health')} className={analyticsView === 'health' ? 'subnav--active' : ''}>ЗДОРОВЬЕ</button>
+              <button onClick={() => setAnalyticsView('drift')} className={analyticsView === 'drift' ? 'subnav--active' : ''}>ОТКЛОНЕНИЯ</button>
+              <button onClick={() => setAnalyticsView('montecarlo')} className={analyticsView === 'montecarlo' ? 'subnav--active' : ''}>СЦЕНАРИИ</button>
+              <span className={analyticsMature ? 'sample-badge sample-badge--mature' : 'sample-badge'}>{analyticsMature ? '12 МЕС.' : `ПРЕДВАРИТЕЛЬНО · ${historyLabel}`}</span>
             </nav>
 
             {analyticsView === 'overview' && (
               <div className="analytics-overview">
                 <section className="analytics-topline">
                   <article className="score-card">
-                    <span className="metric-label">HEALTH SCORE · v{analytics.healthVersion}</span>
+                    <span className="metric-label">ЗДОРОВЬЕ ПОРТФЕЛЯ · v{analytics.healthVersion}</span>
                     <strong>{analytics.healthScore == null ? '—' : Math.round(analytics.healthScore)}</strong>
                     <small>{analyticsMature ? 'Расчёт на зрелой истории' : `Предварительно · история ${historyLabel}`}</small>
                   </article>
-                  <article className="metric-card"><span className="metric-label">XIRR · ЛИЧНАЯ</span><strong>{xirr == null ? '—' : `${pctSigned.format(xirr)}%`}</strong><small>Учитывает даты денежных потоков</small></article>
-                  <article className="metric-card"><span className="metric-label">TWR · ПОРТФЕЛЬ</span><strong>{signedRatio(analytics.twr)}</strong><small>Доходность без влияния размера довнесений</small></article>
+                  <article className="metric-card"><span className="metric-label">XIRR · ЛИЧНАЯ ДОХОДНОСТЬ</span><strong>{xirr == null ? '—' : `${pctSigned.format(xirr)}%`}</strong><small>Учитывает даты денежных потоков</small></article>
+                  <article className="metric-card"><span className="metric-label">TWR · ДОХОДНОСТЬ ПОРТФЕЛЯ</span><strong>{signedRatio(analytics.twr)}</strong><small>Без влияния размера довнесений</small></article>
                 </section>
 
                 <section className="panel history-panel">
                   <div className="panel-head">
-                    <div><span className="eyebrow">TWR INDEX</span><h2>ПОРТФЕЛЬ VS IMOEX</h2></div>
+                    <div><span className="eyebrow">ИНДЕКС TWR</span><h2>ПОРТФЕЛЬ И IMOEX</h2></div>
                     <small>{analytics.historyPoints ? `${analytics.historyPoints} точек` : 'история загружается'}</small>
                   </div>
                   <HistoryChart points={snapshot.history} />
@@ -163,7 +163,7 @@ export default function App() {
 
             {analyticsView === 'health' && (
               <section className="panel health-panel">
-                <div className="panel-head"><div><span className="eyebrow">МЕТОДИКА v1.0</span><h2>HEALTH SCORE</h2></div><small>{analyticsMature ? 'полная выборка' : 'предварительно'}</small></div>
+                <div className="panel-head"><div><span className="eyebrow">МЕТОДИКА v1.0</span><h2>ЗДОРОВЬЕ ПОРТФЕЛЯ</h2></div><small>{analyticsMature ? 'полная выборка' : 'предварительно'}</small></div>
                 <div className="health-components">
                   {analytics.components.map(component => (
                     <div className="health-row" key={component.key}>
@@ -174,14 +174,14 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <p className="method-note">Скор прозрачен и версионируется. На истории короче 12 месяцев компоненты риска остаются видимыми, но весь Health помечается как предварительный.</p>
+                <p className="method-note">Итоговый балл прозрачен и версионируется. На истории короче 12 месяцев компоненты риска остаются видимыми, но итоговая оценка помечается как предварительная.</p>
               </section>
             )}
 
             {analyticsView === 'drift' && (
               <section className="panel drift-panel">
                 <div className="panel-head">
-                  <div><span className="eyebrow">СТРАТЕГИЯ v{drift.strategy.version}</span><h2>ЦЕЛЬ VS ФАКТ</h2></div>
+                  <div><span className="eyebrow">СТРАТЕГИЯ v{drift.strategy.version}</span><h2>ЦЕЛЬ И ФАКТ</h2></div>
                   <small>{drift.strategy.name}</small>
                 </div>
 
@@ -218,7 +218,7 @@ export default function App() {
 
                 <RebalanceScenarioDetails drift={drift} />
 
-                <p className="method-note">Drift v1 сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это диагностический триггер для проверки стратегии, а не команда купить или продать.</p>
+                <p className="method-note">Диагностика отклонений сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это сигнал проверить структуру стратегии, а не команда купить или продать.</p>
               </section>
             )}
 
