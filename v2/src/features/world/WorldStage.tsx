@@ -175,6 +175,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-time={presentation.timePhase}
       data-world-weather={presentation.weather}
       data-world-events={presentation.pendingEventCount}
+      data-world-primary-event={presentation.primaryEventChannel ?? 'none'}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
