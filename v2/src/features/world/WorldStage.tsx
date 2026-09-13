@@ -3,7 +3,9 @@ import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
 import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from './worldAssetLoader'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
+import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
 import { buildWorldPresentationMetadata } from './worldPresentationMetadata'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLayer } from './worldSceneLayers'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
@@ -15,6 +17,12 @@ type Props = {
 
 type PixiProps = {
   snapshot: WorldRenderSnapshot
+}
+
+type AssetRuntimeState = {
+  configured: number
+  loaded: number
+  failed: number
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
@@ -30,6 +38,11 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const ownerIdRef = useRef<string | null>(null)
   const [renderer, setRenderer] = useState('initializing')
+  const [assetRuntime, setAssetRuntime] = useState<AssetRuntimeState>({
+    configured: REVIEWED_WORLD_ASSET_MANIFEST.entries.size,
+    loaded: 0,
+    failed: 0,
+  })
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
 
@@ -60,7 +73,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     }
 
     const boot = async () => {
-      const { Application, Container, Graphics } = await import('pixi.js')
+      const { Application, Assets, Container, Graphics } = await import('pixi.js')
       if (disposed) return
 
       const resolution = clamp(window.devicePixelRatio || 1, 1, window.innerWidth < 900 ? 1.35 : 1.75)
@@ -124,6 +137,18 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       lamp.label = 'asset-slot:effects.work-lights'
       lamp.position.set(400, 560)
       layer('effects').addChild(lamp)
+
+      // Reviewed art is loaded independently from renderer boot. A missing/broken
+      // asset never removes the existing placeholder and never aborts the world.
+      void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), path => Assets.load(path))
+        .then(result => {
+          if (disposed) return
+          setAssetRuntime({
+            configured: REVIEWED_WORLD_ASSET_MANIFEST.entries.size,
+            loaded: result.loaded.size,
+            failed: result.failures.length,
+          })
+        })
 
       let lastLevel = -1
       const renderLevel = (current: number) => {
@@ -202,6 +227,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-layer-count={WORLD_SCENE_LAYER_ORDER.length}
       data-world-asset-version={WORLD_ASSET_SLOT_VERSION}
       data-world-asset-slots={WORLD_ASSET_SLOTS.length}
+      data-world-asset-loader-version={WORLD_ASSET_LOADER_VERSION}
+      data-world-assets-configured={assetRuntime.configured}
+      data-world-assets-loaded={assetRuntime.loaded}
+      data-world-assets-failed={assetRuntime.failed}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
