@@ -1,6 +1,7 @@
 import type { PositionSnapshot } from '../../lib/portfolioApi'
+import { isValidStrategyScenarioConfig } from './strategyScenarioPolicy'
 
-export const DRIFT_CALC_VERSION = '1.0' as const
+export const DRIFT_CALC_VERSION = '1.1' as const
 
 export type StrategyAssetKey = 'equity' | 'bond'
 
@@ -29,6 +30,8 @@ export type DriftRow = StrategyTarget & {
 export type DriftResult = {
   calcVersion: typeof DRIFT_CALC_VERSION
   available: boolean
+  strategyValid: boolean
+  reason: string | null
   strategy: StrategyConfig
   rows: DriftRow[]
   unassignedWeight: number
@@ -61,6 +64,20 @@ export function calculateAllocationDrift(
   positions: PositionSnapshot[],
   strategy: StrategyConfig = PERSONAL_STRATEGY_V1,
 ): DriftResult {
+  if (!isValidStrategyScenarioConfig(strategy)) {
+    return {
+      calcVersion: DRIFT_CALC_VERSION,
+      available: false,
+      strategyValid: false,
+      reason: 'Strategy config must contain unique positive equity/bond targets summing to 100% with finite non-negative tolerances.',
+      strategy,
+      rows: [],
+      unassignedWeight: 0,
+      maxAbsoluteDrift: null,
+      withinTolerance: false,
+    }
+  }
+
   const valid = positions.filter(position => Number.isFinite(position.currentValue) && position.currentValue > 0)
   const total = valid.reduce((sum, position) => sum + position.currentValue, 0)
   const sums = new Map<StrategyAssetKey, number>()
@@ -100,6 +117,8 @@ export function calculateAllocationDrift(
   return {
     calcVersion: DRIFT_CALC_VERSION,
     available,
+    strategyValid: true,
+    reason: null,
     strategy,
     rows,
     unassignedWeight,
