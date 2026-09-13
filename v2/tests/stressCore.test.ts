@@ -17,7 +17,7 @@ const partial = calculateStressScenario(exposures, {
   shocks: { equity: -0.20, ofz: -0.10 },
 })
 assert.equal(partial.calcVersion, STRESS_CALC_VERSION)
-assert.equal(partial.calcVersion, '1.1')
+assert.equal(partial.calcVersion, '1.2')
 assert.equal(partial.available, true)
 close(partial.currentValue, 200)
 close(partial.coveredValue, 150)
@@ -64,6 +64,20 @@ const upside = calculateStressScenario([
 assert.equal(upside.available, true)
 close(upside.rows[0].shockedValue, 250)
 close(upside.rows[0].pnl, 150)
+
+const malformedRuntimeShocks = calculateStressScenario(exposures, {
+  id: 'malformed-runtime-shocks', label: 'Malformed runtime shocks', source: 'test', sourceDate: null,
+  shocks: { equity: null, ofz: '', other: false } as unknown as Record<string, number>,
+})
+assert.equal(malformedRuntimeShocks.available, false)
+assert.equal(malformedRuntimeShocks.coveredValue, 0)
+assert.equal(malformedRuntimeShocks.coverageRatio, 0)
+assert.equal(malformedRuntimeShocks.shockedCoveredValue, null)
+assert.equal(malformedRuntimeShocks.pnlCovered, null)
+assert.equal(malformedRuntimeShocks.pnlCoveredPct, null)
+assert.ok(malformedRuntimeShocks.rows.every(row => row.shock == null))
+assert.ok(malformedRuntimeShocks.rows.every(row => row.shockedValue == null))
+assert.ok(malformedRuntimeShocks.rows.every(row => row.pnl == null))
 
 const invalidExposure = calculateStressScenario([
   { key: 'ZERO', label: 'Zero', classKey: 'equity', currentValue: 0 },
