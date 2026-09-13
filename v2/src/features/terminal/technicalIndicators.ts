@@ -1,4 +1,4 @@
-export const TECHNICAL_INDICATORS_VERSION = '1.3' as const
+export const TECHNICAL_INDICATORS_VERSION = '1.4' as const
 
 export type OhlcvCandle = {
   date: string
@@ -9,7 +9,7 @@ export type OhlcvCandle = {
   volume?: number | null
 }
 
-export type TechnicalIntegrity = 'OK' | 'CONFLICT'
+export type TechnicalIntegrity = 'OK' | 'INVALID' | 'CONFLICT'
 
 export type TechnicalSnapshot = {
   calcVersion: typeof TECHNICAL_INDICATORS_VERSION
@@ -19,6 +19,7 @@ export type TechnicalSnapshot = {
   sampleTo: string | null
   duplicateRowsCollapsed: number
   conflictingDates: number
+  invalidRowsRejected: number
   sma20: number | null
   ema20: number | null
   rsi14: number | null
@@ -38,6 +39,7 @@ type NormalizedResult = {
   candles: OhlcvCandle[]
   duplicateRowsCollapsed: number
   conflictingDates: number
+  invalidRowsRejected: number
 }
 
 type CandleVariant = {
@@ -49,10 +51,23 @@ function finitePositive(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value > 0
 }
 
-function validDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+function validDate(value: unknown): value is string {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
   const parsed = new Date(`${value}T00:00:00Z`)
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+}
+
+function validCandle(value: unknown): value is OhlcvCandle {
+  if (!value || typeof value !== 'object') return false
+  const candle = value as Partial<OhlcvCandle>
+  return validDate(candle.date)
+    && finitePositive(candle.open)
+    && finitePositive(candle.high)
+    && finitePositive(candle.low)
+    && finitePositive(candle.close)
+    && candle.high >= Math.max(candle.open, candle.close, candle.low)
+    && candle.low <= Math.min(candle.open, candle.close, candle.high)
+    && (candle.volume == null || (typeof candle.volume === 'number' && Number.isFinite(candle.volume) && candle.volume >= 0))
 }
 
 function candleSignature(candle: OhlcvCandle): string {
@@ -66,15 +81,22 @@ function candleSignature(candle: OhlcvCandle): string {
 }
 
 function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
-  const valid = input
-    .filter(candle => validDate(candle.date)
-      && finitePositive(candle.open)
-      && finitePositive(candle.high)
-      && finitePositive(candle.low)
-      && finitePositive(candle.close)
-      && candle.high >= Math.max(candle.open, candle.close, candle.low)
-      && candle.low <= Math.min(candle.open, candle.close, candle.high)
-      && (candle.volume == null || (typeof candle.volume === 'number' && Number.isFinite(candle.volume) && candle.volume >= 0)))
+  if (!Array.isArray(input)) {
+    return {
+      integrity: 'INVALID',
+      candles: [],
+      duplicateRowsCollapsed: 0,
+      conflictingDates: 0,
+      invalidRowsRejected: 1,
+    }
+  }
+
+  const valid: OhlcvCandle[] = []
+  let invalidRowsRejected = 0
+  for (const candidate of input as unknown[]) {
+    if (validCandle(candidate)) valid.push(candidate)
+    else invalidRowsRejected += 1
+  }
 
   const variantsByDate = new Map<string, Map<string, CandleVariant>>()
 
@@ -110,7 +132,23 @@ function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
   }
 
   if (conflictingDates > 0) {
-    return { integrity: 'CONFLICT', candles: [], duplicateRowsCollapsed, conflictingDates }
+    return {
+      integrity: 'CONFLICT',
+      candles: [],
+      duplicateRowsCollapsed,
+      conflictingDates,
+      invalidRowsRejected,
+    }
+  }
+
+  if (invalidRowsRejected > 0) {
+    return {
+      integrity: 'INVALID',
+      candles: [],
+      duplicateRowsCollapsed,
+      conflictingDates: 0,
+      invalidRowsRejected,
+    }
   }
 
   return {
@@ -118,6 +156,7 @@ function normalizeCandles(input: OhlcvCandle[]): NormalizedResult {
     candles,
     duplicateRowsCollapsed,
     conflictingDates: 0,
+    invalidRowsRejected: 0,
   }
 }
 
@@ -259,31 +298,34 @@ function stochastic(candles: OhlcvCandle[], kPeriod: number, dPeriod: number) {
   }
 }
 
+function blockedSnapshot(normalized: NormalizedResult): TechnicalSnapshot {
+  return {
+    calcVersion: TECHNICAL_INDICATORS_VERSION,
+    integrity: normalized.integrity,
+    observations: 0,
+    sampleFrom: null,
+    sampleTo: null,
+    duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
+    conflictingDates: normalized.conflictingDates,
+    invalidRowsRejected: normalized.invalidRowsRejected,
+    sma20: null,
+    ema20: null,
+    rsi14: null,
+    atr14: null,
+    macd12_26: null,
+    macdSignal9: null,
+    macdHistogram: null,
+    bollingerMiddle20: null,
+    bollingerUpper20: null,
+    bollingerLower20: null,
+    stochasticK14: null,
+    stochasticD3: null,
+  }
+}
+
 export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnapshot {
   const normalized = normalizeCandles(input)
-  if (normalized.integrity === 'CONFLICT') {
-    return {
-      calcVersion: TECHNICAL_INDICATORS_VERSION,
-      integrity: 'CONFLICT',
-      observations: 0,
-      sampleFrom: null,
-      sampleTo: null,
-      duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
-      conflictingDates: normalized.conflictingDates,
-      sma20: null,
-      ema20: null,
-      rsi14: null,
-      atr14: null,
-      macd12_26: null,
-      macdSignal9: null,
-      macdHistogram: null,
-      bollingerMiddle20: null,
-      bollingerUpper20: null,
-      bollingerLower20: null,
-      stochasticK14: null,
-      stochasticD3: null,
-    }
-  }
+  if (normalized.integrity !== 'OK') return blockedSnapshot(normalized)
 
   const closes = normalized.candles.map(candle => candle.close)
   const macdValues = macd(closes)
@@ -298,6 +340,7 @@ export function calculateTechnicalSnapshot(input: OhlcvCandle[]): TechnicalSnaps
     sampleTo: normalized.candles.at(-1)?.date ?? null,
     duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
     conflictingDates: 0,
+    invalidRowsRejected: 0,
     sma20: sma(closes, 20),
     ema20: ema(closes, 20),
     rsi14: rsi(closes, 14),
