@@ -11,7 +11,7 @@ function candle(observation: number, close: number): OhlcvCandle {
 const rising39 = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) => candle(i + 1, 100 + i)))
 const rising40 = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
 
-assert.equal(USER_ALERT_RULES_VERSION, '1.0')
+assert.equal(USER_ALERT_RULES_VERSION, '1.1')
 
 const above: UserAlertRule = { id: 'rsi-high', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 }
 const aboveResult = evaluateUserAlertRule(above, rising40)
@@ -31,6 +31,32 @@ assert.ok(crossAboveResult.currentValue != null && crossAboveResult.currentValue
 const missingPrevious = evaluateUserAlertRule(crossAbove, rising40)
 assert.equal(missingPrevious.status, 'INSUFFICIENT_DATA')
 assert.equal(missingPrevious.matched, false)
+
+// A crossing is a temporal event, so two values from the same observation date
+// must never be interpreted as a crossing even if their numeric values straddle
+// the threshold.
+const sameDatePrevious = { ...rising40, sma20: 128.5 }
+const sameDateResult = evaluateUserAlertRule(crossAbove, rising40, sameDatePrevious)
+assert.equal(sameDateResult.status, 'INSUFFICIENT_DATA')
+assert.equal(sameDateResult.matched, false)
+
+// Reversed snapshots could otherwise manufacture a false crossing direction.
+const crossBelow: UserAlertRule = { id: 'sma-cross-down', metric: 'sma20', comparator: 'CROSSES_BELOW', threshold: 129 }
+const reversedResult = evaluateUserAlertRule(crossBelow, rising39, rising40)
+assert.equal(reversedResult.status, 'INSUFFICIENT_DATA')
+assert.equal(reversedResult.matched, false)
+
+// Crossing values produced by different calculation versions are not directly
+// comparable and must fail closed.
+const mismatchedVersion = { ...rising39, calcVersion: '1.2' as never }
+const mismatchedVersionResult = evaluateUserAlertRule(crossAbove, rising40, mismatchedVersion)
+assert.equal(mismatchedVersionResult.status, 'INSUFFICIENT_DATA')
+assert.equal(mismatchedVersionResult.matched, false)
+
+const invalidPreviousDate = { ...rising39, sampleTo: 'bad-date' }
+const invalidDateResult = evaluateUserAlertRule(crossAbove, rising40, invalidPreviousDate)
+assert.equal(invalidDateResult.status, 'INSUFFICIENT_DATA')
+assert.equal(invalidDateResult.matched, false)
 
 const short = calculateTechnicalSnapshot(Array.from({ length: 5 }, (_, i) => candle(i + 1, 100 + i)))
 const unavailableMetric = evaluateUserAlertRule(above, short)
