@@ -30,16 +30,16 @@ export function getIncomeIntegrity(data: PayoutCalendar, loading: boolean): Inco
   }
 
   if (data.stale) {
-    return { state: 'stale', label: 'T-BANK · STALE', detail: 'показан последний полный снимок', coveragePct, resolvedAssets, eligibleAssets, errors }
+    return { state: 'stale', label: 'T-BANK · ПРОШЛЫЙ СНИМОК', detail: 'показан последний полный снимок', coveragePct, resolvedAssets, eligibleAssets, errors }
   }
 
   if (data.integrity.complete) {
-    return { state: 'verified', label: 'T-BANK · VERIFIED', detail: 'факт и расписание прошли проверку', coveragePct, resolvedAssets, eligibleAssets, errors }
+    return { state: 'verified', label: 'T-BANK · ПРОВЕРЕНО', detail: 'факт и расписание прошли проверку', coveragePct, resolvedAssets, eligibleAssets, errors }
   }
 
   return {
     state: 'partial',
-    label: 'T-BANK · PARTIAL',
+    label: 'T-BANK · ЧАСТИЧНО',
     detail: eligibleAssets > 0 ? `расписание ${resolvedAssets}/${eligibleAssets}` : 'неполный ответ источника',
     coveragePct,
     resolvedAssets,
