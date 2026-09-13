@@ -61,4 +61,18 @@ assert.equal(STRATEGY_SCENARIO_MAX_COUNT, 4)
 assert.equal(capped.length, STRATEGY_SCENARIO_MAX_COUNT)
 assert.deepEqual(capped.map(row => row.id), ['a', 'b', 'c', 'd'])
 
+// Invalid or duplicate rows before the cap must not consume slots that belong
+// to later valid user-authored scenarios.
+const validCap = acceptStrategyScenarioInputs([
+  { id: 'bad', strategy: strategy('invalid total', 0.7, 0.4) },
+  { id: 'a', strategy: strategy('50/50', 0.5, 0.5) },
+  { id: 'a', strategy: strategy('55/45 duplicate id', 0.55, 0.45) },
+  { id: 'b', strategy: strategy('55/45', 0.55, 0.45) },
+  { id: 'c', strategy: strategy('60/40', 0.6, 0.4) },
+  { id: 'd', strategy: strategy('65/35', 0.65, 0.35) },
+  { id: 'e', strategy: strategy('70/30', 0.7, 0.3) },
+])
+assert.equal(validCap.length, STRATEGY_SCENARIO_MAX_COUNT)
+assert.deepEqual(validCap.map(row => row.id), ['a', 'b', 'c', 'd'])
+
 console.log('strategy scenario policy regression: ok')
