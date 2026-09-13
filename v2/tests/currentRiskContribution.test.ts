@@ -39,9 +39,12 @@ const short = calculateCurrentRiskContribution([
   makeSeries('B', pattern(59), 40),
 ], 125)
 assert.equal(short.calcVersion, CURRENT_RISK_CONTRIBUTION_CALC_VERSION)
-assert.equal(short.calcVersion, '1.3')
+assert.equal(short.calcVersion, '1.4')
 assert.equal(short.available, false)
 assert.equal(short.status, 'INSUFFICIENT_HISTORY')
+assert.equal(short.integrity, 'VALID')
+assert.equal(short.duplicateRowsCollapsed, 0)
+assert.equal(short.conflictingDates, 0)
 assert.equal(short.commonReturns, 59)
 assert.equal(short.sampleFrom, '2025-01-01')
 assert.equal(short.sampleTo, '2025-03-01')
@@ -57,6 +60,7 @@ const preview = calculateCurrentRiskContribution([
 ], 125)
 assert.equal(preview.available, true)
 assert.equal(preview.status, 'PREVIEW')
+assert.equal(preview.integrity, 'VALID')
 assert.equal(preview.commonReturns, 60)
 assert.equal(preview.sampleFrom, '2025-01-01')
 assert.equal(preview.sampleTo, '2025-03-02')
@@ -79,6 +83,42 @@ close(preview.effectiveRiskContributorCount, 1 / 0.52)
 close(preview.topAbsoluteRiskShare, 0.6)
 assert.match(preview.note, /2025-01-01 → 2025-03-02/)
 
+const exactDuplicateA = makeSeries('EXACT_A', pattern(60), 60)
+exactDuplicateA.points.push({ ...exactDuplicateA.points[20] })
+const exactDuplicate = calculateCurrentRiskContribution([
+  exactDuplicateA,
+  makeSeries('EXACT_B', pattern(60), 40),
+], 100)
+assert.equal(exactDuplicate.available, true)
+assert.equal(exactDuplicate.integrity, 'VALID')
+assert.equal(exactDuplicate.duplicateRowsCollapsed, 1)
+assert.equal(exactDuplicate.conflictingDates, 0)
+assert.equal(exactDuplicate.commonReturns, 60)
+assert.equal(exactDuplicate.sampleFrom, '2025-01-01')
+assert.equal(exactDuplicate.sampleTo, '2025-03-02')
+assert.match(exactDuplicate.note, /Exact same-day duplicates collapsed: 1/)
+
+const conflictingA = makeSeries('CONFLICT_A', pattern(60), 60)
+conflictingA.points.push({
+  date: conflictingA.points[20].date,
+  value: conflictingA.points[20].value * 1.01,
+})
+const conflicting = calculateCurrentRiskContribution([
+  conflictingA,
+  makeSeries('CONFLICT_B', pattern(60), 40),
+], 100)
+assert.equal(conflicting.available, false)
+assert.equal(conflicting.integrity, 'CONFLICT')
+assert.equal(conflicting.duplicateRowsCollapsed, 0)
+assert.equal(conflicting.conflictingDates, 1)
+assert.equal(conflicting.commonReturns, 0)
+assert.equal(conflicting.sampleFrom, null)
+assert.equal(conflicting.sampleTo, null)
+assert.equal(conflicting.rows.length, 0)
+assert.equal(conflicting.annualizedVolatility, null)
+assert.equal(conflicting.diversificationRatio, null)
+assert.match(conflicting.reason ?? '', /Conflicting same-day market-history values/)
+
 // 61 nominal returns with one internal missing candle leave only 59 exact
 // shared intervals. Ending-date-only matching would incorrectly accept the
 // wider return after the gap and cross the 60-return gate.
@@ -89,6 +129,7 @@ const gapGuard = calculateCurrentRiskContribution([gapA, gapB], 100)
 assert.equal(gapGuard.commonReturns, 59)
 assert.equal(gapGuard.available, false)
 assert.equal(gapGuard.status, 'INSUFFICIENT_HISTORY')
+assert.equal(gapGuard.integrity, 'VALID')
 assert.equal(gapGuard.sampleFrom, '2025-01-01')
 assert.equal(gapGuard.sampleTo, '2025-03-03')
 assert.match(gapGuard.reason ?? '', /identical observation intervals/)
@@ -99,6 +140,7 @@ const mature = calculateCurrentRiskContribution([
 ], 100)
 assert.equal(mature.available, true)
 assert.equal(mature.status, 'MATURE')
+assert.equal(mature.integrity, 'VALID')
 assert.equal(mature.commonReturns, 252)
 assert.equal(mature.matureReturns, 252)
 assert.equal(mature.sampleFrom, '2025-01-01')
@@ -142,6 +184,7 @@ const duplicate = calculateCurrentRiskContribution([
   makeSeries('DUP', pattern(60), 50),
 ], 100)
 assert.equal(duplicate.available, false)
+assert.equal(duplicate.integrity, 'VALID')
 assert.equal(duplicate.sampleFrom, null)
 assert.equal(duplicate.sampleTo, null)
 assert.match(duplicate.reason ?? '', /Duplicate series keys/)
@@ -164,6 +207,7 @@ const invalidValues = calculateCurrentRiskContribution([
 ], 100)
 assert.equal(invalidValues.available, false)
 assert.equal(invalidValues.assetCount, 1)
+assert.equal(invalidValues.integrity, 'VALID')
 assert.equal(invalidValues.sampleFrom, '2025-01-01')
 assert.equal(invalidValues.sampleTo, '2025-03-02')
 close(invalidValues.coveredValue, 100)
