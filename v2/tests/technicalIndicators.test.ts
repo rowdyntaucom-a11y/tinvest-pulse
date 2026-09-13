@@ -7,11 +7,13 @@ function candle(observation: number, close: number): OhlcvCandle {
   return { date, open: close, high: close + 1, low: close - 1, close, volume: 1000 + observation }
 }
 
-assert.equal(TECHNICAL_INDICATORS_VERSION, '1.3')
+assert.equal(TECHNICAL_INDICATORS_VERSION, '1.4')
 
 const short = calculateTechnicalSnapshot(Array.from({ length: 10 }, (_, i) => candle(i + 1, 100 + i)))
 assert.equal(short.calcVersion, TECHNICAL_INDICATORS_VERSION)
 assert.equal(short.integrity, 'OK')
+assert.equal(short.inputRows, 10)
+assert.equal(short.invalidRowsDiscarded, 0)
 assert.equal(short.observations, 10)
 assert.equal(short.sma20, null)
 assert.equal(short.ema20, null)
@@ -29,6 +31,8 @@ assert.equal(short.stochasticD3, null)
 const matureInput = Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i))
 const mature = calculateTechnicalSnapshot(matureInput)
 assert.equal(mature.integrity, 'OK')
+assert.equal(mature.inputRows, 40)
+assert.equal(mature.invalidRowsDiscarded, 0)
 assert.equal(mature.observations, 40)
 assert.equal(mature.sampleFrom, '2026-01-01')
 assert.equal(mature.sampleTo, matureInput.at(-1)!.date)
@@ -87,6 +91,8 @@ assert.ok(macd34.macdHistogram != null)
 
 const exactDuplicate = calculateTechnicalSnapshot([...matureInput, { ...matureInput[5] }])
 assert.equal(exactDuplicate.integrity, 'OK')
+assert.equal(exactDuplicate.inputRows, 41)
+assert.equal(exactDuplicate.invalidRowsDiscarded, 0)
 assert.equal(exactDuplicate.observations, 40)
 assert.equal(exactDuplicate.duplicateRowsCollapsed, 1)
 assert.equal(exactDuplicate.conflictingDates, 0)
@@ -101,6 +107,8 @@ const conflict = calculateTechnicalSnapshot([
   conflictVariant,
 ])
 assert.equal(conflict.integrity, 'CONFLICT')
+assert.equal(conflict.inputRows, 41)
+assert.equal(conflict.invalidRowsDiscarded, 0)
 assert.equal(conflict.observations, 0)
 assert.equal(conflict.conflictingDates, 1)
 assert.equal(conflict.sma20, null)
@@ -134,6 +142,8 @@ const variantFirst = calculateTechnicalSnapshot([
 ])
 for (const result of [originalFirst, variantFirst]) {
   assert.equal(result.integrity, 'CONFLICT')
+  assert.equal(result.inputRows, 42)
+  assert.equal(result.invalidRowsDiscarded, 0)
   assert.equal(result.observations, 0)
   assert.equal(result.conflictingDates, 1)
   assert.equal(result.duplicateRowsCollapsed, 1)
@@ -144,7 +154,26 @@ const invalidGeometry = calculateTechnicalSnapshot([
   { date: 'bad-date', open: 100, high: 101, low: 99, close: 100, volume: 1 },
 ])
 assert.equal(invalidGeometry.integrity, 'OK')
+assert.equal(invalidGeometry.inputRows, 2)
+assert.equal(invalidGeometry.invalidRowsDiscarded, 2)
 assert.equal(invalidGeometry.observations, 0)
+
+const mixedQuality = calculateTechnicalSnapshot([
+  ...matureInput,
+  { date: '2026-04-30', open: 0, high: 1, low: 0.5, close: 0.8, volume: 1 },
+  { date: '2026-05-01', open: 100, high: 101, low: 99, close: 100, volume: -1 },
+  { date: '2026-02-30', open: 100, high: 101, low: 99, close: 100, volume: 1 },
+])
+assert.equal(mixedQuality.integrity, 'OK')
+assert.equal(mixedQuality.inputRows, 43)
+assert.equal(mixedQuality.invalidRowsDiscarded, 3)
+assert.equal(mixedQuality.observations, 40)
+assert.equal(mixedQuality.sampleFrom, mature.sampleFrom)
+assert.equal(mixedQuality.sampleTo, mature.sampleTo)
+assert.equal(mixedQuality.sma20, mature.sma20)
+assert.equal(mixedQuality.ema20, mature.ema20)
+assert.equal(mixedQuality.rsi14, mature.rsi14)
+assert.equal(mixedQuality.atr14, mature.atr14)
 
 const flat = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100)))
 assert.equal(flat.rsi14, 50)
