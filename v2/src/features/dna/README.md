@@ -39,6 +39,8 @@ The v2 world runtime follows two strict lifecycle invariants:
 
 `worldEventQueue.ts` stores only acknowledged semantic event ids. It does not persist Pixi objects or select a visual treatment. The cursor parser fails closed to an empty acknowledgement set when malformed, which can at worst replay a legitimate visible event but cannot silently suppress one. Acknowledgement is idempotent and deterministic, pending events preserve the ordering already resolved by `WorldState`, and newly arriving event ids remain visible without disturbing acknowledged history.
 
+Only ids that are actually present in the current resolved `pending` queue may be acknowledged. Unknown, stale or already-acknowledged ids are ignored, so a caller cannot pre-acknowledge an id and later suppress a legitimate event that happens to receive that identity. Cursor ids are strict non-empty strings; a malformed persisted id list fails closed to the empty cursor.
+
 The queue deliberately has no browser-storage adapter yet. Multi-user persistence belongs behind authenticated account scoping; do not place broker credentials, sensitive account data or mutable XP authority in frontend storage. Animation selection will be a separate versioned presentation mapping after the production asset pipeline is reviewed.
 
 This boundary exists because the legacy DNA implementation accumulated multiple scene owners and update loops that could overwrite one another. The new v2 path must never restore that pattern. Financial calculations, XP rules, semantic event identity and `WorldState` resolution stay outside the Pixi render loop.
