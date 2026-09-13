@@ -6,6 +6,7 @@ import './styles.css'
 import './features/portfolio/portfolioOverviewGrid.css'
 import './features/analytics/drift.css'
 import './features/analytics/monteCarlo.css'
+import './features/settings/boardPersonalization.css'
 import './final-shell.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
