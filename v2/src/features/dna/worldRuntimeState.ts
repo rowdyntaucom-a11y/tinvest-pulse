@@ -1,9 +1,10 @@
-import { buildQualitySnapshot, buildXpLedger, type QualityInputs, type QualitySnapshot, type XpLedger } from './xpEngine'
-import { readXpLedgerDocument, type XpLedgerDocument } from './xpPersistence'
-import { buildWorldState, type WorldState, type WorldWeather } from './worldState'
+import { buildQualitySnapshot, buildXpLedger, type QualityInputs, type QualitySnapshot, type XpEvent, type XpLedger } from './xpEngine'
+import { readXpLedgerDocument } from './xpPersistence'
+import { buildWorldState, type WorldEvent, type WorldState, type WorldWeather } from './worldState'
 import { buildXpWorldEvents } from './xpWorldEvents'
+import { composeWorldRuntimeState, WORLD_RUNTIME_STATE_VERSION } from './worldRuntimeStatePolicy'
 
-export const WORLD_RUNTIME_STATE_VERSION = '0.1' as const
+export { WORLD_RUNTIME_STATE_VERSION } from './worldRuntimeStatePolicy'
 
 export type WorldProgressionInput = {
   level: number
@@ -29,35 +30,35 @@ export type WorldRuntimeState = {
  * Composes already-reviewed deterministic DNA boundaries into the single object consumed by
  * the renderer. This bridge does not award XP, choose level thresholds, derive weather from
  * returns/capital, or select art/animation for semantic events.
- *
- * Persisted XP is parsed fail-closed. Level remains an explicit/versioned product input until
- * the long-term progression economy is reviewed; it is never inferred from RUB capital here.
  */
 export function buildWorldRuntimeState(input: WorldRuntimeStateInput): WorldRuntimeState {
-  const document: XpLedgerDocument = readXpLedgerDocument(input.persistedXp)
-  const ledger = buildXpLedger(document.events)
-  const events = buildXpWorldEvents(document.events)
-
-  return {
-    version: WORLD_RUNTIME_STATE_VERSION,
-    world: buildWorldState({
-      level: input.progression.level,
-      xp: ledger.accumulatedXp,
-      xpToNext: input.progression.xpToNext ?? null,
+  return composeWorldRuntimeState<XpEvent, XpLedger, WorldEvent, WorldState>(
+    {
       qualityCoverage: input.quality.coverage,
+      persistedXp: input.persistedXp,
+      level: input.progression.level,
+      xpToNext: input.progression.xpToNext ?? null,
       weather: input.weather ?? 'neutral',
-      events,
       localDate: input.localDate,
-    }),
-    ledger,
-    persistedXpEvents: document.events.length,
-  }
+    },
+    {
+      readXpEvents: persisted => readXpLedgerDocument(persisted).events,
+      buildLedger: events => buildXpLedger(events),
+      buildEvents: events => buildXpWorldEvents(events),
+      buildWorld: value => buildWorldState({
+        level: value.level,
+        xp: value.xp,
+        xpToNext: value.xpToNext,
+        qualityCoverage: value.qualityCoverage,
+        weather: value.weather as WorldWeather,
+        events: value.events,
+        localDate: value.localDate,
+      }),
+    },
+  )
 }
 
-/**
- * Convenience boundary for the current application shell: financial analytics may provide
- * quality inputs, but persistent progression remains separate and explicit.
- */
+/** Financial analytics may provide quality inputs, while persistent progression stays separate. */
 export function buildWorldRuntimeStateFromQualityInputs(
   qualityInputs: QualityInputs,
   input: Omit<WorldRuntimeStateInput, 'quality'>,
