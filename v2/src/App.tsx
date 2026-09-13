@@ -171,7 +171,7 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <RebalanceScenarioDetails drift={drift} />
+                <RebalanceScenarioDetails drift={drift} positions={snapshot.positionItems} />
                 <p className="method-note">Диагностика отклонений сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это сигнал проверить структуру стратегии, а не команда купить или продать.</p>
               </section>
             )}
