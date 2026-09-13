@@ -27,7 +27,9 @@ Starting main: `7a46f092f9df91411524cabfd9fdedcfc66e5641`.
 ## Validation
 
 - Existing world regression now covers deterministic load order, successful per-slot loading, isolated thrown-load failure and empty-asset failure.
-- Normal `v2 build` is required before merge.
+- Initial `v2 build` #389 correctly failed the deferred-DNA bundle budget: importing Pixi `Assets` expanded the DNA chunk to 553.9 KiB versus the accepted 525 KiB ceiling.
+- The budget was not raised. Runtime preload was changed to browser-native `Image`, preserving the same manifest/fallback semantics without pulling the Pixi Assets subsystem into the deferred chunk.
+- Repeat normal `v2 build` is required before merge.
 - Merge only while both Render queues are healthy/settled.
 
 ## Next
