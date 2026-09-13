@@ -3,7 +3,6 @@ import type { TechnicalSnapshot } from './technicalIndicators'
 export const USER_ALERT_RULES_VERSION = '1.0' as const
 
 export type AlertMetric =
-  | 'close'
   | 'sma20'
   | 'ema20'
   | 'rsi14'
@@ -39,10 +38,7 @@ export type AlertEvaluation = {
   reason: string
 }
 
-type SnapshotWithClose = TechnicalSnapshot & { close?: number | null }
-
 const METRICS: AlertMetric[] = [
-  'close',
   'sma20',
   'ema20',
   'rsi14',
@@ -71,7 +67,7 @@ function validRule(rule: UserAlertRule): boolean {
     && finite(rule.threshold)
 }
 
-function metricValue(snapshot: SnapshotWithClose | null | undefined, metric: AlertMetric): number | null {
+function metricValue(snapshot: TechnicalSnapshot | null | undefined, metric: AlertMetric): number | null {
   if (!snapshot || snapshot.integrity !== 'OK') return null
   const value = snapshot[metric]
   return finite(value) ? value : null
@@ -79,8 +75,8 @@ function metricValue(snapshot: SnapshotWithClose | null | undefined, metric: Ale
 
 export function evaluateUserAlertRule(
   rule: UserAlertRule,
-  current: SnapshotWithClose | null | undefined,
-  previous?: SnapshotWithClose | null,
+  current: TechnicalSnapshot | null | undefined,
+  previous?: TechnicalSnapshot | null,
 ): AlertEvaluation {
   if (!validRule(rule)) {
     return {
