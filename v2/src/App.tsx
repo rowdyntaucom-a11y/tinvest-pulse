@@ -6,7 +6,6 @@ import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
 import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analytics/drift'
 import { RebalanceScenarioDetails } from './features/analytics/RebalanceScenarioDetails'
-import { StrategyScenarioDetails } from './features/analytics/StrategyScenarioDetails'
 import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
 import { RiskWorkspace } from './features/analytics/RiskWorkspace'
 import { annualReturnRatioToPercent } from './features/analytics/returnUnits'
@@ -172,8 +171,7 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <RebalanceScenarioDetails drift={drift} />
-                <StrategyScenarioDetails positions={snapshot.positionItems} />
+                <RebalanceScenarioDetails drift={drift} positions={snapshot.positionItems} />
                 <p className="method-note">Диагностика отклонений сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это сигнал проверить структуру стратегии, а не команда купить или продать.</p>
               </section>
             )}
