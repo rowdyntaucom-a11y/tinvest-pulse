@@ -1,6 +1,7 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
 export const USER_ALERT_RULES_VERSION = '1.3' as const
+export const USER_SCREENER_VERSION = '0.1' as const
 
 export type AlertMetric =
   | 'sma20'
@@ -38,6 +39,28 @@ export type AlertEvaluation = {
   reason: string
 }
 
+export type UserScreenerMode = 'ALL' | 'ANY'
+
+export type UserScreener = {
+  id: string
+  mode: UserScreenerMode
+  rules: UserAlertRule[]
+}
+
+export type UserScreenerStatus = 'MATCH' | 'NO_MATCH' | 'INSUFFICIENT_DATA' | 'INVALID_CONFIG'
+
+export type UserScreenerEvaluation = {
+  version: typeof USER_SCREENER_VERSION
+  screenerId: string
+  mode: UserScreenerMode | null
+  status: UserScreenerStatus
+  matched: boolean
+  matchedRules: number
+  evaluatedRules: number
+  rules: AlertEvaluation[]
+  reason: string
+}
+
 const METRICS: AlertMetric[] = [
   'sma20',
   'ema20',
@@ -54,6 +77,8 @@ const METRICS: AlertMetric[] = [
 ]
 
 const COMPARATORS: AlertComparator[] = ['ABOVE', 'BELOW', 'CROSSES_ABOVE', 'CROSSES_BELOW']
+const SCREENER_MODES: UserScreenerMode[] = ['ALL', 'ANY']
+const MAX_SCREENER_RULES = 8
 
 function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
@@ -198,5 +223,96 @@ export function evaluateUserAlertRule(
     reason: matched
       ? 'Условие, заданное пользователем, выполнено.'
       : 'Условие, заданное пользователем, не выполнено.',
+  }
+}
+
+function validScreener(config: UserScreener): boolean {
+  if (typeof config.id !== 'string' || !config.id.trim()) return false
+  if (!SCREENER_MODES.includes(config.mode)) return false
+  if (!Array.isArray(config.rules) || config.rules.length === 0 || config.rules.length > MAX_SCREENER_RULES) return false
+
+  const ids = new Set<string>()
+  for (const rule of config.rules) {
+    if (!validRule(rule)) return false
+    const id = rule.id.trim()
+    if (ids.has(id)) return false
+    ids.add(id)
+  }
+  return true
+}
+
+/**
+ * Evaluates only conditions explicitly authored by the user. It does not rank assets,
+ * generate recommendations, infer a strategy, or create buy/sell instructions.
+ *
+ * Fail-closed semantics:
+ * - malformed config => INVALID_CONFIG;
+ * - ALL: any known false rule is enough for NO_MATCH; otherwise missing data propagates;
+ * - ANY: any known true rule is enough for MATCH; otherwise missing data propagates.
+ */
+export function evaluateUserScreener(
+  config: UserScreener,
+  current: TechnicalSnapshot | null | undefined,
+  previous?: TechnicalSnapshot | null,
+): UserScreenerEvaluation {
+  if (!validScreener(config)) {
+    return {
+      version: USER_SCREENER_VERSION,
+      screenerId: typeof config.id === 'string' ? config.id : '',
+      mode: SCREENER_MODES.includes(config.mode) ? config.mode : null,
+      status: 'INVALID_CONFIG',
+      matched: false,
+      matchedRules: 0,
+      evaluatedRules: 0,
+      rules: [],
+      reason: 'Набор условий не прошёл валидацию и не вычислялся.',
+    }
+  }
+
+  const rules = config.rules.map(rule => evaluateUserAlertRule(rule, current, previous))
+  if (rules.some(rule => rule.status === 'INVALID_RULE')) {
+    return {
+      version: USER_SCREENER_VERSION,
+      screenerId: config.id,
+      mode: config.mode,
+      status: 'INVALID_CONFIG',
+      matched: false,
+      matchedRules: 0,
+      evaluatedRules: 0,
+      rules: [],
+      reason: 'Набор условий содержит невалидное правило.',
+    }
+  }
+
+  const matchedRules = rules.filter(rule => rule.status === 'MATCH').length
+  const hasMissing = rules.some(rule => rule.status === 'INSUFFICIENT_DATA')
+  const hasNoMatch = rules.some(rule => rule.status === 'NO_MATCH')
+
+  const status: UserScreenerStatus = config.mode === 'ALL'
+    ? hasNoMatch
+      ? 'NO_MATCH'
+      : hasMissing
+        ? 'INSUFFICIENT_DATA'
+        : 'MATCH'
+    : matchedRules > 0
+      ? 'MATCH'
+      : hasMissing
+        ? 'INSUFFICIENT_DATA'
+        : 'NO_MATCH'
+
+  return {
+    version: USER_SCREENER_VERSION,
+    screenerId: config.id,
+    mode: config.mode,
+    status,
+    matched: status === 'MATCH',
+    matchedRules,
+    evaluatedRules: rules.length,
+    rules,
+    reason: status === 'MATCH'
+      ? 'Пользовательский набор условий выполнен.'
+      : status === 'NO_MATCH'
+        ? 'Пользовательский набор условий не выполнен.'
+        : 'Для однозначной проверки пользовательского набора условий недостаточно данных.',
   }
 }
