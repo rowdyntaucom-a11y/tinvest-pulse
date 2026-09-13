@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { buildWorldState } from '../src/features/dna/worldState.ts'
 import { emptyWorldEventCursor, resolveWorldEventQueue } from '../src/features/dna/worldEventQueue.ts'
 import { WORLD_RENDER_SNAPSHOT_VERSION, buildWorldRenderSnapshot } from '../src/features/dna/worldRenderSnapshot.ts'
+import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from '../src/features/world/worldAssetLoader.ts'
 import { WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_MANIFEST_VERSION, resolveWorldAssetManifest, worldAssetFromManifest } from '../src/features/world/worldAssetManifest.ts'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION, worldAssetSlot, worldAssetSlotsForLayer } from '../src/features/world/worldAssetSlots.ts'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, worldSceneLayerIndex } from '../src/features/world/worldSceneLayers.ts'
@@ -91,6 +92,40 @@ assert.equal(duplicateManifest.entries.has('effects.crystals'), false)
 assert.equal(duplicateManifest.rejectedCount, 2)
 assert.equal(resolveWorldAssetManifest(null).entries.size, 0)
 assert.equal(resolveWorldAssetManifest(null).rejectedCount, 1)
+
+assert.equal(WORLD_ASSET_LOADER_VERSION, '0.1')
+const loadCalls: string[] = []
+const loadResult = await loadWorldAssetEntries(
+  [
+    { slotId: 'terrain.ground', assetPath: '/assets/world/terrain/ground.webp' },
+    { slotId: 'background.sky', assetPath: '/assets/world/background/sky.webp' },
+    { slotId: 'effects.crystals', assetPath: '/assets/world/effects/crystals.webp' },
+  ],
+  async assetPath => {
+    loadCalls.push(assetPath)
+    if (assetPath.includes('crystals')) throw new Error('simulated load failure')
+    return { assetPath }
+  },
+)
+assert.deepEqual(loadCalls, [
+  '/assets/world/background/sky.webp',
+  '/assets/world/effects/crystals.webp',
+  '/assets/world/terrain/ground.webp',
+])
+assert.equal(loadResult.loaded.size, 2)
+assert.equal(loadResult.loaded.has('background.sky'), true)
+assert.equal(loadResult.loaded.has('terrain.ground'), true)
+assert.deepEqual(loadResult.failures, [
+  { slotId: 'effects.crystals', assetPath: '/assets/world/effects/crystals.webp', reason: 'LOAD_FAILED' },
+])
+const emptyAssetResult = await loadWorldAssetEntries(
+  [{ slotId: 'background.sky', assetPath: '/assets/world/background/sky.webp' }],
+  async () => null,
+)
+assert.equal(emptyAssetResult.loaded.size, 0)
+assert.deepEqual(emptyAssetResult.failures, [
+  { slotId: 'background.sky', assetPath: '/assets/world/background/sky.webp', reason: 'EMPTY_ASSET' },
+])
 
 const state = buildWorldState({
   level: 4,
