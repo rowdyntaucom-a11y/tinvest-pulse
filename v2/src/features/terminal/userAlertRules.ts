@@ -1,6 +1,6 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.2' as const
+export const USER_ALERT_RULES_VERSION = '1.3' as const
 
 export type AlertMetric =
   | 'sma20'
@@ -65,28 +65,32 @@ function validDate(value: unknown): value is string {
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
 }
 
-function validThreshold(metric: AlertMetric, threshold: number): boolean {
-  if (!finite(threshold)) return false
+function validMetricDomain(metric: AlertMetric, value: unknown): value is number {
+  if (!finite(value)) return false
 
   if (metric === 'rsi14' || metric === 'stochasticK14' || metric === 'stochasticD3') {
-    return threshold >= 0 && threshold <= 100
+    return value >= 0 && value <= 100
   }
 
-  if (metric === 'atr14') return threshold >= 0
+  if (metric === 'atr14') return value >= 0
 
   if (
     metric === 'sma20'
     || metric === 'ema20'
     || metric === 'bollingerMiddle20'
     || metric === 'bollingerUpper20'
-    || metric === 'bollingerLower20'
   ) {
-    return threshold > 0
+    return value > 0
   }
 
-  // MACD line, signal and histogram are signed differences and may be
-  // positive, zero or negative. No arbitrary numeric range is imposed.
+  // Bollinger lower band can legitimately be zero or negative when the
+  // trailing dispersion is large relative to its positive-price mean.
+  // MACD line, signal and histogram are signed differences by definition.
   return true
+}
+
+function validThreshold(metric: AlertMetric, threshold: number): boolean {
+  return validMetricDomain(metric, threshold)
 }
 
 function validRule(rule: UserAlertRule): boolean {
@@ -100,7 +104,7 @@ function validRule(rule: UserAlertRule): boolean {
 function metricValue(snapshot: TechnicalSnapshot | null | undefined, metric: AlertMetric): number | null {
   if (!snapshot || snapshot.integrity !== 'OK') return null
   const value = snapshot[metric]
-  return finite(value) ? value : null
+  return validMetricDomain(metric, value) ? value : null
 }
 
 function validCrossingSequence(
@@ -144,7 +148,7 @@ export function evaluateUserAlertRule(
       currentValue: null,
       previousValue,
       threshold: rule.threshold,
-      reason: 'Текущее значение метрики недоступно или входные данные имеют конфликт.',
+      reason: 'Текущее значение метрики недоступно, вне допустимой области или входные данные имеют конфликт.',
     }
   }
 

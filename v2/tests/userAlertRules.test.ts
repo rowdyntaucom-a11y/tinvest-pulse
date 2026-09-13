@@ -11,7 +11,7 @@ function candle(observation: number, close: number): OhlcvCandle {
 const rising39 = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) => candle(i + 1, 100 + i)))
 const rising40 = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
 
-assert.equal(USER_ALERT_RULES_VERSION, '1.2')
+assert.equal(USER_ALERT_RULES_VERSION, '1.3')
 
 const above: UserAlertRule = { id: 'rsi-high', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 }
 const aboveResult = evaluateUserAlertRule(above, rising40)
@@ -84,11 +84,36 @@ assert.equal(evaluateUserAlertRule({ id: 'sma-zero', metric: 'sma20', comparator
 assert.equal(evaluateUserAlertRule({ id: 'ema-negative', metric: 'ema20', comparator: 'BELOW', threshold: -1 }, rising40).status, 'INVALID_RULE')
 assert.equal(evaluateUserAlertRule({ id: 'boll-zero', metric: 'bollingerUpper20', comparator: 'ABOVE', threshold: 0 }, rising40).status, 'INVALID_RULE')
 
+// A Bollinger lower band is not itself a price: mean - 2σ can legitimately be
+// zero or negative even though every source close is positive.
+const lowerZeroThreshold = evaluateUserAlertRule({ id: 'boll-lower-zero', metric: 'bollingerLower20', comparator: 'BELOW', threshold: 0 }, rising40)
+assert.notEqual(lowerZeroThreshold.status, 'INVALID_RULE')
+const lowerNegativeThreshold = evaluateUserAlertRule({ id: 'boll-lower-negative', metric: 'bollingerLower20', comparator: 'BELOW', threshold: -100 }, rising40)
+assert.notEqual(lowerNegativeThreshold.status, 'INVALID_RULE')
+
 // MACD values are signed differences, so negative and zero thresholds remain valid.
 const macdNegative = evaluateUserAlertRule({ id: 'macd-negative', metric: 'macdHistogram', comparator: 'ABOVE', threshold: -100 }, rising40)
 assert.notEqual(macdNegative.status, 'INVALID_RULE')
 const macdZero = evaluateUserAlertRule({ id: 'macd-zero', metric: 'macd12_26', comparator: 'ABOVE', threshold: 0 }, rising40)
 assert.notEqual(macdZero.status, 'INVALID_RULE')
+
+// Runtime snapshots are validated at the alert boundary too. A forged or stale
+// OK snapshot must not make mathematically impossible values look actionable.
+const impossibleRsi = evaluateUserAlertRule(above, { ...rising40, rsi14: 150 })
+assert.equal(impossibleRsi.status, 'INSUFFICIENT_DATA')
+assert.equal(impossibleRsi.currentValue, null)
+const impossibleAtr = evaluateUserAlertRule({ id: 'atr-check', metric: 'atr14', comparator: 'ABOVE', threshold: 1 }, { ...rising40, atr14: -1 })
+assert.equal(impossibleAtr.status, 'INSUFFICIENT_DATA')
+assert.equal(impossibleAtr.currentValue, null)
+const impossibleSma = evaluateUserAlertRule({ id: 'sma-check', metric: 'sma20', comparator: 'ABOVE', threshold: 1 }, { ...rising40, sma20: 0 })
+assert.equal(impossibleSma.status, 'INSUFFICIENT_DATA')
+assert.equal(impossibleSma.currentValue, null)
+
+// Signed lower-band values remain valid at runtime as well.
+const signedLowerSnapshot = { ...rising40, bollingerLower20: -5 }
+const signedLowerResult = evaluateUserAlertRule({ id: 'lower-signed', metric: 'bollingerLower20', comparator: 'BELOW', threshold: 0 }, signedLowerSnapshot)
+assert.equal(signedLowerResult.status, 'MATCH')
+assert.equal(signedLowerResult.currentValue, -5)
 
 const invalidComparator = evaluateUserAlertRule({ ...above, comparator: 'BUY' as never }, rising40)
 assert.equal(invalidComparator.status, 'INVALID_RULE')
