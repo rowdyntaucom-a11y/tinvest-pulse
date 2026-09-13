@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { calculateTechnicalSnapshot, type OhlcvCandle } from '../src/features/terminal/technicalIndicators.ts'
-import { evaluateUserAlertRule, USER_ALERT_RULES_VERSION, type UserAlertRule } from '../src/features/terminal/userAlertRules.ts'
+import { evaluateUserAlertRule, evaluateUserAlertRuleSet, USER_ALERT_RULES_VERSION, type UserAlertRule } from '../src/features/terminal/userAlertRules.ts'
 
 function candle(observation: number, close: number): OhlcvCandle {
   const timestamp = Date.UTC(2026, 0, 1) + ((observation - 1) * 86_400_000)
@@ -11,7 +11,7 @@ function candle(observation: number, close: number): OhlcvCandle {
 const rising39 = calculateTechnicalSnapshot(Array.from({ length: 39 }, (_, i) => candle(i + 1, 100 + i)))
 const rising40 = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i)))
 
-assert.equal(USER_ALERT_RULES_VERSION, '1.1')
+assert.equal(USER_ALERT_RULES_VERSION, '1.2')
 
 const above: UserAlertRule = { id: 'rsi-high', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 }
 const aboveResult = evaluateUserAlertRule(above, rising40)
@@ -80,5 +80,34 @@ assert.equal(invalidComparator.status, 'INVALID_RULE')
 
 const invalidMetric = evaluateUserAlertRule({ ...above, metric: 'priceTarget' as never }, rising40)
 assert.equal(invalidMetric.status, 'INVALID_RULE')
+
+const validSet = evaluateUserAlertRuleSet([above, below, crossAbove], rising40, rising39)
+assert.equal(validSet.status, 'OK')
+assert.deepEqual(validSet.evaluations.map(result => result.ruleId), ['rsi-high', 'rsi-low', 'sma-cross'])
+assert.deepEqual(validSet.matchedRuleIds, ['rsi-high', 'sma-cross'])
+
+// Duplicate IDs would make later alert delivery/acknowledgement ambiguous, so
+// the collection fails closed instead of evaluating either rule.
+const duplicateIds = evaluateUserAlertRuleSet([
+  above,
+  { ...below, id: above.id },
+], rising40, rising39)
+assert.equal(duplicateIds.status, 'INVALID_RULE_SET')
+assert.deepEqual(duplicateIds.evaluations, [])
+assert.deepEqual(duplicateIds.matchedRuleIds, [])
+
+// Whitespace-only IDs are also invalid at the collection boundary even though
+// no notification transport exists yet.
+const emptyIdSet = evaluateUserAlertRuleSet([
+  { ...above, id: '   ' },
+], rising40, rising39)
+assert.equal(emptyIdSet.status, 'INVALID_RULE_SET')
+assert.deepEqual(emptyIdSet.evaluations, [])
+
+// An empty user-authored collection is valid and simply has no matches.
+const emptySet = evaluateUserAlertRuleSet([], rising40, rising39)
+assert.equal(emptySet.status, 'OK')
+assert.deepEqual(emptySet.evaluations, [])
+assert.deepEqual(emptySet.matchedRuleIds, [])
 
 console.log('user-authored alert rules regression: ok')

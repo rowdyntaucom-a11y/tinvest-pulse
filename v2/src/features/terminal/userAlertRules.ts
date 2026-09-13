@@ -1,6 +1,6 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.1' as const
+export const USER_ALERT_RULES_VERSION = '1.2' as const
 
 export type AlertMetric =
   | 'sma20'
@@ -35,6 +35,16 @@ export type AlertEvaluation = {
   currentValue: number | null
   previousValue: number | null
   threshold: number | null
+  reason: string
+}
+
+export type AlertRuleSetStatus = 'OK' | 'INVALID_RULE_SET'
+
+export type AlertRuleSetEvaluation = {
+  version: typeof USER_ALERT_RULES_VERSION
+  status: AlertRuleSetStatus
+  evaluations: AlertEvaluation[]
+  matchedRuleIds: string[]
   reason: string
 }
 
@@ -170,5 +180,35 @@ export function evaluateUserAlertRule(
     reason: matched
       ? 'Условие, заданное пользователем, выполнено.'
       : 'Условие, заданное пользователем, не выполнено.',
+  }
+}
+
+export function evaluateUserAlertRuleSet(
+  rules: UserAlertRule[],
+  current: TechnicalSnapshot | null | undefined,
+  previous?: TechnicalSnapshot | null,
+): AlertRuleSetEvaluation {
+  const ids = new Set<string>()
+  for (const rule of rules) {
+    const id = typeof rule.id === 'string' ? rule.id.trim() : ''
+    if (!id || ids.has(id)) {
+      return {
+        version: USER_ALERT_RULES_VERSION,
+        status: 'INVALID_RULE_SET',
+        evaluations: [],
+        matchedRuleIds: [],
+        reason: 'Набор правил не вычислялся: идентификаторы правил должны быть непустыми и уникальными.',
+      }
+    }
+    ids.add(id)
+  }
+
+  const evaluations = rules.map(rule => evaluateUserAlertRule(rule, current, previous))
+  return {
+    version: USER_ALERT_RULES_VERSION,
+    status: 'OK',
+    evaluations,
+    matchedRuleIds: evaluations.filter(result => result.matched).map(result => result.ruleId),
+    reason: 'Вычислены только правила, явно заданные пользователем.',
   }
 }
