@@ -1,8 +1,9 @@
 import type { AnalyticsHistoryPoint } from './metrics'
 
-export const RECOVERY_DIAGNOSTICS_CALC_VERSION = '1.1' as const
+export const RECOVERY_DIAGNOSTICS_CALC_VERSION = '1.2' as const
 
 export type DrawdownRecoveryQuality = 'SHORT' | 'DEVELOPING' | 'MATURE'
+export type RecoveryHistoryIntegrity = 'OK' | 'CONFLICT'
 
 export type DrawdownEpisode = {
   peakDate: string
@@ -28,8 +29,13 @@ export type RecoveryDiagnostics = {
   calcVersion: typeof RECOVERY_DIAGNOSTICS_CALC_VERSION
   available: boolean
   quality: DrawdownRecoveryQuality
+  integrity: RecoveryHistoryIntegrity
   returnObservations: number
   historyPoints: number
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+  sampleFrom: string | null
+  sampleTo: string | null
   completedEpisodes: DrawdownEpisode[]
   activeDrawdown: ActiveDrawdown | null
   worstCompletedEpisode: DrawdownEpisode | null
@@ -51,27 +57,35 @@ function canonicalDay(value: unknown) {
   return new Date(timestamp).toISOString().slice(0, 10) === day ? day : null
 }
 
-function validIndex(history: AnalyticsHistoryPoint[]) {
-  const byDate = new Map<string, number | null>()
+function normalizeIndex(history: AnalyticsHistoryPoint[]) {
+  const byDate = new Map<string, number>()
+  const conflicts = new Set<string>()
+  let duplicateRowsCollapsed = 0
 
   for (const point of history) {
     const date = canonicalDay(point.date)
     const value = point.portfolio
     if (!date || typeof value !== 'number' || !Number.isFinite(value) || value <= 0) continue
 
-    if (!byDate.has(date)) {
+    const existing = byDate.get(date)
+    if (existing == null) {
       byDate.set(date, value)
       continue
     }
 
-    const existing = byDate.get(date)
-    if (existing != null && existing !== value) byDate.set(date, null)
+    duplicateRowsCollapsed += 1
+    if (existing !== value) conflicts.add(date)
   }
 
-  return [...byDate.entries()]
-    .filter((entry): entry is [string, number] => entry[1] != null)
+  const index = [...byDate.entries()]
     .map(([date, value]) => ({ date, value }))
     .sort((a, b) => a.date.localeCompare(b.date))
+
+  return {
+    index,
+    duplicateRowsCollapsed,
+    conflictingDates: conflicts.size,
+  }
 }
 
 function daysBetween(start: string, end: string) {
@@ -90,21 +104,46 @@ function median(values: number[]) {
 }
 
 export function calculateRecoveryDiagnostics(history: AnalyticsHistoryPoint[]): RecoveryDiagnostics {
-  const index = validIndex(history)
+  const normalized = normalizeIndex(history)
+  const index = normalized.index
   const returnObservations = Math.max(0, index.length - 1)
   const quality: DrawdownRecoveryQuality = returnObservations >= MATURE_RETURNS
     ? 'MATURE'
     : returnObservations >= MIN_RETURNS
       ? 'DEVELOPING'
       : 'SHORT'
+  const sampleFrom = index[0]?.date ?? null
+  const sampleTo = index.at(-1)?.date ?? null
+
+  const base = {
+    calcVersion: RECOVERY_DIAGNOSTICS_CALC_VERSION,
+    quality,
+    returnObservations,
+    historyPoints: index.length,
+    duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
+    conflictingDates: normalized.conflictingDates,
+    sampleFrom,
+    sampleTo,
+  }
+
+  if (normalized.conflictingDates > 0) {
+    return {
+      ...base,
+      available: false,
+      integrity: 'CONFLICT',
+      completedEpisodes: [],
+      activeDrawdown: null,
+      worstCompletedEpisode: null,
+      medianRecoveryDays: null,
+      reason: `История неоднозначна: конфликтующих дат ${normalized.conflictingDates}.`,
+    }
+  }
 
   if (returnObservations < MIN_RETURNS) {
     return {
-      calcVersion: RECOVERY_DIAGNOSTICS_CALC_VERSION,
+      ...base,
       available: false,
-      quality,
-      returnObservations,
-      historyPoints: index.length,
+      integrity: 'OK',
       completedEpisodes: [],
       activeDrawdown: null,
       worstCompletedEpisode: null,
@@ -169,11 +208,9 @@ export function calculateRecoveryDiagnostics(history: AnalyticsHistoryPoint[]): 
     : null
 
   return {
-    calcVersion: RECOVERY_DIAGNOSTICS_CALC_VERSION,
+    ...base,
     available: true,
-    quality,
-    returnObservations,
-    historyPoints: index.length,
+    integrity: 'OK',
     completedEpisodes: episodes,
     activeDrawdown,
     worstCompletedEpisode,
