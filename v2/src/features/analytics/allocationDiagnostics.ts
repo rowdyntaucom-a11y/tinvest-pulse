@@ -1,6 +1,6 @@
 import type { RiskSeries } from './riskMatrix'
 
-export const ALLOCATION_DIAGNOSTICS_CALC_VERSION = '1.2' as const
+export const ALLOCATION_DIAGNOSTICS_CALC_VERSION = '1.3' as const
 
 export type AllocationWeight = {
   key: string
@@ -23,7 +23,10 @@ export type AllocationScenario = {
 export type AllocationDiagnosticsResult = {
   version: typeof ALLOCATION_DIAGNOSTICS_CALC_VERSION
   available: boolean
-  status: 'INSUFFICIENT_HISTORY' | 'PREVIEW' | 'MATURE'
+  status: 'INVALID_HISTORY' | 'INSUFFICIENT_HISTORY' | 'PREVIEW' | 'MATURE'
+  integrity: 'OK' | 'CONFLICT'
+  duplicateRowsCollapsed: number
+  conflictingDates: number
   commonReturns: number
   minimumReturns: number
   matureReturns: number
@@ -48,14 +51,46 @@ type ReturnObservation = {
   value: number
 }
 
-function returnIntervalMap(series: RiskSeries) {
-  const sorted = series.points
-    .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
-    .sort((a, b) => a.date.localeCompare(b.date))
+type NormalizedRiskSeries = RiskSeries & {
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+}
+
+function normalizeRiskSeries(series: RiskSeries): NormalizedRiskSeries {
+  const byDate = new Map<string, number>()
+  const conflictingDates = new Set<string>()
+  let duplicateRowsCollapsed = 0
+
+  for (const point of series.points) {
+    if (!point.date || !Number.isFinite(point.value) || point.value <= 0) continue
+    const existing = byDate.get(point.date)
+    if (existing == null) {
+      byDate.set(point.date, point.value)
+      continue
+    }
+    if (Math.abs(existing - point.value) <= EPS) {
+      duplicateRowsCollapsed += 1
+    } else {
+      conflictingDates.add(point.date)
+    }
+  }
+
+  return {
+    ...series,
+    points: [...byDate.entries()]
+      .filter(([date]) => !conflictingDates.has(date))
+      .map(([date, value]) => ({ date, value }))
+      .sort((a, b) => a.date.localeCompare(b.date)),
+    duplicateRowsCollapsed,
+    conflictingDates: conflictingDates.size,
+  }
+}
+
+function returnIntervalMap(series: NormalizedRiskSeries) {
   const map = new Map<string, ReturnObservation>()
-  for (let i = 1; i < sorted.length; i += 1) {
-    const prior = sorted[i - 1]
-    const current = sorted[i]
+  for (let i = 1; i < series.points.length; i += 1) {
+    const prior = series.points[i - 1]
+    const current = series.points[i]
     if (prior.date >= current.date) continue
     const value = current.value / prior.value - 1
     if (Number.isFinite(value) && value > -0.95 && value < 10) {
@@ -69,13 +104,18 @@ function alignSeries(series: RiskSeries[]) {
   const normalized = series
     .filter(item => item?.key && item?.label && Array.isArray(item.points))
     .slice(0, MAX_ASSETS)
+    .map(normalizeRiskSeries)
+  const duplicateRowsCollapsed = normalized.reduce((sum, item) => sum + item.duplicateRowsCollapsed, 0)
+  const conflictingDates = normalized.reduce((sum, item) => sum + item.conflictingDates, 0)
   const unique = new Set(normalized.map(item => item.key))
-  if (unique.size !== normalized.length || normalized.length < 2) {
+  if (unique.size !== normalized.length || normalized.length < 2 || conflictingDates > 0) {
     return {
       series: normalized,
       rows: [] as number[][],
       from: null as string | null,
       to: null as string | null,
+      duplicateRowsCollapsed,
+      conflictingDates,
     }
   }
 
@@ -91,6 +131,8 @@ function alignSeries(series: RiskSeries[]) {
     rows,
     from: first?.from ?? null,
     to: last?.to ?? null,
+    duplicateRowsCollapsed,
+    conflictingDates,
   }
 }
 
@@ -252,12 +294,27 @@ export function calculateAllocationDiagnostics(series: RiskSeries[]): Allocation
   const aligned = alignSeries(Array.isArray(series) ? series : [])
   const base = {
     version: ALLOCATION_DIAGNOSTICS_CALC_VERSION,
+    integrity: aligned.conflictingDates > 0 ? 'CONFLICT' as const : 'OK' as const,
+    duplicateRowsCollapsed: aligned.duplicateRowsCollapsed,
+    conflictingDates: aligned.conflictingDates,
     commonReturns: aligned.rows.length,
     minimumReturns: MIN_COMMON_RETURNS,
     matureReturns: MATURE_COMMON_RETURNS,
     assetCount: aligned.series.length,
     from: aligned.from,
     to: aligned.to,
+  }
+
+  if (aligned.conflictingDates > 0) {
+    return {
+      ...base,
+      available: false,
+      status: 'INVALID_HISTORY',
+      equalWeight: null,
+      minimumVariance: null,
+      equalRiskContribution: null,
+      note: `Allocation diagnostics скрыты: в рыночной истории обнаружены конфликтующие значения на ${aligned.conflictingDates} датах. QVANIX не строит ковариацию через неоднозначные цены одного дня.`,
+    }
   }
 
   if (aligned.series.length < 2 || aligned.rows.length < MIN_COMMON_RETURNS) {
