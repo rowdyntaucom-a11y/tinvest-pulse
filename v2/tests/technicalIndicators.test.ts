@@ -7,12 +7,13 @@ function candle(observation: number, close: number): OhlcvCandle {
   return { date, open: close, high: close + 1, low: close - 1, close, volume: 1000 + observation }
 }
 
-assert.equal(TECHNICAL_INDICATORS_VERSION, '1.3')
+assert.equal(TECHNICAL_INDICATORS_VERSION, '1.4')
 
 const short = calculateTechnicalSnapshot(Array.from({ length: 10 }, (_, i) => candle(i + 1, 100 + i)))
 assert.equal(short.calcVersion, TECHNICAL_INDICATORS_VERSION)
 assert.equal(short.integrity, 'OK')
 assert.equal(short.observations, 10)
+assert.equal(short.invalidRowsRejected, 0)
 assert.equal(short.sma20, null)
 assert.equal(short.ema20, null)
 assert.equal(short.rsi14, null)
@@ -30,6 +31,7 @@ const matureInput = Array.from({ length: 40 }, (_, i) => candle(i + 1, 100 + i))
 const mature = calculateTechnicalSnapshot(matureInput)
 assert.equal(mature.integrity, 'OK')
 assert.equal(mature.observations, 40)
+assert.equal(mature.invalidRowsRejected, 0)
 assert.equal(mature.sampleFrom, '2026-01-01')
 assert.equal(mature.sampleTo, matureInput.at(-1)!.date)
 assert.ok(mature.sma20 != null)
@@ -90,6 +92,7 @@ assert.equal(exactDuplicate.integrity, 'OK')
 assert.equal(exactDuplicate.observations, 40)
 assert.equal(exactDuplicate.duplicateRowsCollapsed, 1)
 assert.equal(exactDuplicate.conflictingDates, 0)
+assert.equal(exactDuplicate.invalidRowsRejected, 0)
 
 const conflictVariant = {
   ...matureInput[5],
@@ -103,6 +106,7 @@ const conflict = calculateTechnicalSnapshot([
 assert.equal(conflict.integrity, 'CONFLICT')
 assert.equal(conflict.observations, 0)
 assert.equal(conflict.conflictingDates, 1)
+assert.equal(conflict.invalidRowsRejected, 0)
 assert.equal(conflict.sma20, null)
 assert.equal(conflict.ema20, null)
 assert.equal(conflict.rsi14, null)
@@ -137,14 +141,48 @@ for (const result of [originalFirst, variantFirst]) {
   assert.equal(result.observations, 0)
   assert.equal(result.conflictingDates, 1)
   assert.equal(result.duplicateRowsCollapsed, 1)
+  assert.equal(result.invalidRowsRejected, 0)
 }
 
+// Malformed supplied rows must never disappear silently from a technical sample.
+// Even if enough valid observations remain, the snapshot fails closed rather than
+// computing indicators from an implicitly shortened history.
 const invalidGeometry = calculateTechnicalSnapshot([
   { date: '2026-01-01', open: 100, high: 99, low: 98, close: 100, volume: 1 },
   { date: 'bad-date', open: 100, high: 101, low: 99, close: 100, volume: 1 },
 ])
-assert.equal(invalidGeometry.integrity, 'OK')
+assert.equal(invalidGeometry.integrity, 'INVALID')
 assert.equal(invalidGeometry.observations, 0)
+assert.equal(invalidGeometry.invalidRowsRejected, 2)
+assert.equal(invalidGeometry.sma20, null)
+assert.equal(invalidGeometry.rsi14, null)
+
+const oneInvalidAmongMature = calculateTechnicalSnapshot([
+  ...matureInput,
+  { date: '2026-02-20', open: 100, high: 101, low: 99, close: 0, volume: 1 },
+])
+assert.equal(oneInvalidAmongMature.integrity, 'INVALID')
+assert.equal(oneInvalidAmongMature.observations, 0)
+assert.equal(oneInvalidAmongMature.invalidRowsRejected, 1)
+assert.equal(oneInvalidAmongMature.sma20, null)
+assert.equal(oneInvalidAmongMature.macd12_26, null)
+
+const malformedContainer = calculateTechnicalSnapshot(null as never)
+assert.equal(malformedContainer.integrity, 'INVALID')
+assert.equal(malformedContainer.invalidRowsRejected, 1)
+assert.equal(malformedContainer.observations, 0)
+
+// If valid rows contain an actual same-date conflict as well, conflict remains the
+// primary integrity state while invalid-row provenance is still retained.
+const conflictAndInvalid = calculateTechnicalSnapshot([
+  ...matureInput,
+  conflictVariant,
+  { date: 'not-a-date', open: 1, high: 1, low: 1, close: 1, volume: 1 },
+])
+assert.equal(conflictAndInvalid.integrity, 'CONFLICT')
+assert.equal(conflictAndInvalid.conflictingDates, 1)
+assert.equal(conflictAndInvalid.invalidRowsRejected, 1)
+assert.equal(conflictAndInvalid.observations, 0)
 
 const flat = calculateTechnicalSnapshot(Array.from({ length: 40 }, (_, i) => candle(i + 1, 100)))
 assert.equal(flat.rsi14, 50)
