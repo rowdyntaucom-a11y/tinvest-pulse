@@ -1,7 +1,7 @@
-import type { UiDensity, UiMotion, UiPreferences, UiTheme, UiWorkspace } from '../../lib/uiPreferences'
+import type { UiDensity, UiModuleId, UiMotion, UiPreferences, UiTheme, UiWorkspace } from '../../lib/uiPreferences'
 import './personalization.css'
 
-type PreferencePatch = Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace'>>
+type PreferencePatch = Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace' | 'pinnedModules'>>
 
 type Props = {
   preferences: UiPreferences
@@ -30,20 +30,34 @@ const MOTION: Array<{ key: UiMotion; label: string }> = [
 ]
 
 const WORKSPACES: Array<{ key: UiWorkspace; label: string }> = [
+  { key: 'board', label: 'BOARD' },
   { key: 'portfolio', label: 'PORTFOLIO' },
   { key: 'analytics', label: 'ANALYTICS' },
   { key: 'income', label: 'INCOME' },
   { key: 'dna', label: 'DNA' },
 ]
 
-function ChoiceButton({ active, label, note, onClick }: {
+const MODULES: Array<{ key: UiModuleId; label: string; group: string }> = [
+  { key: 'portfolio.value', label: 'КАПИТАЛ', group: 'PORTFOLIO' },
+  { key: 'portfolio.pnl', label: 'P/L', group: 'PORTFOLIO' },
+  { key: 'analytics.twr', label: 'TWR', group: 'ANALYTICS' },
+  { key: 'analytics.xirr', label: 'XIRR', group: 'ANALYTICS' },
+  { key: 'analytics.health', label: 'HEALTH', group: 'ANALYTICS' },
+  { key: 'analytics.risk', label: 'RISK', group: 'ANALYTICS' },
+  { key: 'income.fact', label: 'FACT', group: 'INCOME' },
+  { key: 'income.next', label: 'NEXT', group: 'INCOME' },
+  { key: 'macro.keyRate', label: 'RATE', group: 'MACRO' },
+]
+
+function ChoiceButton({ active, label, note, onClick, disabled = false }: {
   active: boolean
   label: string
   note?: string
   onClick: () => void
+  disabled?: boolean
 }) {
   return (
-    <button type="button" className={`qv-choice ${active ? 'is-active' : ''}`} onClick={onClick} aria-pressed={active}>
+    <button type="button" className={`qv-choice ${active ? 'is-active' : ''}`} onClick={onClick} aria-pressed={active} disabled={disabled}>
       <strong>{label}</strong>
       {note ? <small>{note}</small> : null}
     </button>
@@ -51,6 +65,17 @@ function ChoiceButton({ active, label, note, onClick }: {
 }
 
 export function PersonalizationControl({ preferences, onChange, onReset }: Props) {
+  const toggleModule = (id: UiModuleId) => {
+    const active = preferences.pinnedModules.includes(id)
+    if (active) {
+      const next = preferences.pinnedModules.filter(item => item !== id)
+      if (next.length) onChange({ pinnedModules: next })
+      return
+    }
+    if (preferences.pinnedModules.length >= 6) return
+    onChange({ pinnedModules: [...preferences.pinnedModules, id] })
+  }
+
   return (
     <details className="qv-personalize">
       <summary aria-label="Настроить интерфейс QVANIX" title="Персонализация QVANIX">
@@ -95,6 +120,26 @@ export function PersonalizationControl({ preferences, onChange, onReset }: Props
                 <ChoiceButton key={item.key} active={preferences.motion === item.key} label={item.label} onClick={() => onChange({ motion: item.key })} />
               ))}
             </div>
+          </div>
+        </div>
+
+        <div className="qv-personalize__section">
+          <div className="qv-personalize__label"><span>МОЯ ПАНЕЛЬ</span><small>{preferences.pinnedModules.length}/6 · нажмите для pin/unpin</small></div>
+          <div className="qv-module-grid">
+            {MODULES.map(item => {
+              const active = preferences.pinnedModules.includes(item.key)
+              const disabled = !active && preferences.pinnedModules.length >= 6
+              return (
+                <ChoiceButton
+                  key={item.key}
+                  active={active}
+                  label={item.label}
+                  note={item.group}
+                  disabled={disabled}
+                  onClick={() => toggleModule(item.key)}
+                />
+              )
+            })}
           </div>
         </div>
 
