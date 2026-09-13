@@ -94,7 +94,7 @@ assert.equal(relativeMature.matureReturns, 252)
 close(relativeMature.trackingError, 0)
 
 const rolling19 = calculateRollingRisk(dualHistory(varyingReturns.slice(0, 19)))
-assert.equal(rolling19.version, '1.0')
+assert.equal(rolling19.version, '1.1')
 assert.equal(rolling19.availableReturns, 19)
 assert.equal(rolling19.activeWindow, null)
 
@@ -115,7 +115,7 @@ const rollingMissingBenchmark = calculateRollingRisk(rollingMissingBenchmarkHist
 assert.equal(rollingMissingBenchmark.activeWindow?.tradingDays, 20)
 assert.equal(rollingMissingBenchmark.activeWindow?.benchmarkReturn, null)
 assert.equal(rollingMissingBenchmark.activeWindow?.excessReturn, null)
-assert.equal(rollingMissingBenchmark.activeWindow?.pairedBenchmarkReturns, 0)
+assert.equal(rollingMissingBenchmark.activeWindow?.pairedBenchmarkReturns, 18)
 
 const recovery59 = calculateRecoveryDiagnostics(dualHistory(varyingReturns.slice(0, 59)))
 assert.equal(recovery59.calcVersion, RECOVERY_DIAGNOSTICS_CALC_VERSION)
