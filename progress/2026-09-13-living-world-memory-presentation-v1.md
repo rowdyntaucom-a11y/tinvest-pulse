@@ -20,10 +20,12 @@ Starting main: `4d9dcfd54990a0ee5d3570d051127e29be166cfa`.
 
 ## Validation
 
-- Regression covers empty/corrupt Chronicle, deterministic chronological summary, per-channel first/last occurrence, recurrence sequence, generic fallback and recent-list limit behavior.
-- Test is registered in mandatory `test:core`.
-- Normal `v2 build` required before merge.
-- Merge only while both Render queues are healthy/settled.
+- Initial CI build passed TypeScript/Vite and bundle budgets, but direct Node `test:core` could not resolve production bundler-style extensionless imports.
+- Fixed without changing application-wide import conventions: recurrence aggregation is extracted into dependency-free `worldMemoryPresentationPolicy.ts`, while `worldMemoryPresentation.ts` remains the production Chronicle + channel adapter.
+- Policy regression covers empty history, deterministic per-channel first/last occurrence, recurrence sequence, recent-list limits and stable ordering.
+- Existing Chronicle and event-presentation regressions continue to cover corrupt-envelope fail-closed behavior, duplicate-ID immutability and unknown-kind generic fallback.
+- Test remains registered in mandatory `test:core`.
+- Merge only after the replacement `v2 build` is fully green and both Render queues remain healthy/settled.
 
 ## Next
 
