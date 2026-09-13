@@ -12,7 +12,7 @@ let status = 200
   })
 }
 
-assert.equal(ASSET_HISTORY_NORMALIZATION_VERSION, '1.0')
+assert.equal(ASSET_HISTORY_NORMALIZATION_VERSION, '1.1')
 
 payload = {
   version: ' 1.0 ',
@@ -51,27 +51,57 @@ payload = {
 }
 
 const normalized = await loadAssetHistory()
-assert.equal(normalized.normalizationVersion, '1.0')
+assert.equal(normalized.normalizationVersion, '1.1')
 assert.equal(normalized.version, '1.0')
 assert.equal(normalized.available, true)
 assert.equal(normalized.from, '2025-09-12')
 assert.equal(normalized.to, '2026-09-12')
 assert.equal(normalized.requested, 6)
-assert.equal(normalized.availableSeries, 2)
+assert.equal(normalized.availableSeries, 1)
 assert.equal(normalized.source, 'T-Bank GetCandles')
 assert.deepEqual(normalized.series.map(row => row.key), ['AAA', 'uid-d', 'ONE'])
 
 const alpha = normalized.series.find(row => row.key === 'AAA')!
 assert.equal(alpha.label, 'Alpha')
 assert.equal(alpha.instrumentId, 'uid-a')
-assert.deepEqual(alpha.points, [
-  { date: '2026-09-01', value: 100 },
-  { date: '2026-09-03', value: 103.5 },
-])
+assert.equal(alpha.integrity, 'CONFLICT')
+assert.equal(alpha.duplicateRowsCollapsed, 1)
+assert.equal(alpha.conflictingDates, 1)
+assert.deepEqual(alpha.points, [])
 
 const delta = normalized.series.find(row => row.key === 'uid-d')!
 assert.equal(delta.label, 'Delta')
+assert.equal(delta.integrity, 'VALID')
+assert.equal(delta.duplicateRowsCollapsed, 0)
+assert.equal(delta.conflictingDates, 0)
 assert.equal(delta.points.length, 2)
+
+// Exact same-day duplicates are harmless and collapse without invalidating a series.
+payload = {
+  version: '1.0',
+  available: true,
+  requested: 1,
+  series: [
+    {
+      key: 'OK',
+      points: [
+        { date: '2026-09-01T10:00:00Z', value: 100 },
+        { date: '2026-09-01T18:00:00Z', value: '100' },
+        { date: '2026-09-02', value: 101 },
+      ],
+    },
+  ],
+}
+const exactDuplicate = await loadAssetHistory()
+assert.equal(exactDuplicate.available, true)
+assert.equal(exactDuplicate.availableSeries, 1)
+assert.equal(exactDuplicate.series[0].integrity, 'VALID')
+assert.equal(exactDuplicate.series[0].duplicateRowsCollapsed, 1)
+assert.equal(exactDuplicate.series[0].conflictingDates, 0)
+assert.deepEqual(exactDuplicate.series[0].points, [
+  { date: '2026-09-01', value: 100 },
+  { date: '2026-09-02', value: 101 },
+])
 
 payload = {
   version: '1.0',
