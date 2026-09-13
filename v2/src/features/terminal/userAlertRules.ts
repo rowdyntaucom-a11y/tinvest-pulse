@@ -1,4 +1,4 @@
-import { TECHNICAL_INDICATORS_VERSION, type TechnicalSnapshot } from './technicalIndicators'
+import { TECHNICAL_INDICATORS_VERSION, type TechnicalSnapshot } from './technicalIndicators.ts'
 
 export const USER_ALERT_RULES_VERSION = '1.4' as const
 
