@@ -1,6 +1,6 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.0' as const
+export const USER_ALERT_RULES_VERSION = '1.1' as const
 
 export type AlertMetric =
   | 'sma20'
@@ -59,6 +59,12 @@ function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
+function validDate(value: unknown): value is string {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const parsed = new Date(`${value}T00:00:00Z`)
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+}
+
 function validRule(rule: UserAlertRule): boolean {
   return typeof rule.id === 'string'
     && rule.id.trim().length > 0
@@ -71,6 +77,17 @@ function metricValue(snapshot: TechnicalSnapshot | null | undefined, metric: Ale
   if (!snapshot || snapshot.integrity !== 'OK') return null
   const value = snapshot[metric]
   return finite(value) ? value : null
+}
+
+function validCrossingSequence(
+  current: TechnicalSnapshot | null | undefined,
+  previous: TechnicalSnapshot | null | undefined,
+): boolean {
+  if (!current || !previous) return false
+  if (current.integrity !== 'OK' || previous.integrity !== 'OK') return false
+  if (current.calcVersion !== previous.calcVersion) return false
+  if (!validDate(current.sampleTo) || !validDate(previous.sampleTo)) return false
+  return previous.sampleTo < current.sampleTo
 }
 
 export function evaluateUserAlertRule(
@@ -107,7 +124,8 @@ export function evaluateUserAlertRule(
     }
   }
 
-  if ((rule.comparator === 'CROSSES_ABOVE' || rule.comparator === 'CROSSES_BELOW') && previousValue == null) {
+  const crossing = rule.comparator === 'CROSSES_ABOVE' || rule.comparator === 'CROSSES_BELOW'
+  if (crossing && previousValue == null) {
     return {
       version: USER_ALERT_RULES_VERSION,
       ruleId: rule.id,
@@ -117,6 +135,19 @@ export function evaluateUserAlertRule(
       previousValue: null,
       threshold: rule.threshold,
       reason: 'Для проверки пересечения нужно предыдущее валидное значение той же метрики.',
+    }
+  }
+
+  if (crossing && !validCrossingSequence(current, previous)) {
+    return {
+      version: USER_ALERT_RULES_VERSION,
+      ruleId: rule.id,
+      status: 'INSUFFICIENT_DATA',
+      matched: false,
+      currentValue,
+      previousValue,
+      threshold: rule.threshold,
+      reason: 'Пересечение не вычислялось: нужен более ранний снимок той же версии расчёта.',
     }
   }
 
