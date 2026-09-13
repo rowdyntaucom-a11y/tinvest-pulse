@@ -58,9 +58,9 @@ Status legend: DONE = implemented in current v2 shell or accepted deterministic 
 - Risk-only allocation calculation boundary: equal weight, long-only minimum variance and equal-risk-contribution on one common real-return sample; no expected-return assumptions.
 - Compact collapsed Allocation Lab inside CORR reusing the same asset-history sample; 60-return gate, 252-return maturity state and solver convergence remain explicit. It is scenario diagnostics, not a target portfolio recommendation.
 - Deterministic strategy-scenario comparison boundary for 2–4 explicit user-authored equity/bond strategies. Invalid weights fail closed; QVANIX does not generate candidates, normalize invalid inputs, rank a winner or attach expected returns.
+- Strategy-scenario comparison is exposed inside the existing DRIFT scenario disclosure with two explicit user-authored equity/bond weight sets. The closed mobile screen does not grow; QVANIX does not prefill, normalize or rank scenarios.
 
 ### ACTIVE / next depth pass
-- Expose strategy-scenario comparison in the shell only when explicit user-authored inputs can fit the existing DRIFT information architecture without creating another default-mobile screen.
 - Compact Pro/Terminal information architecture once enough advanced modules justify a separate mode; do not overload the default mobile shell.
 - Further correlation/stress depth only from validated live coverage and versioned sourced scenarios.
 
