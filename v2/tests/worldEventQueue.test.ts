@@ -20,8 +20,16 @@ assert.deepEqual(normalizeWorldEventCursor(null), emptyWorldEventCursor())
 assert.deepEqual(normalizeWorldEventCursor({ version: '9.9', acknowledgedEventIds: ['a'] }), emptyWorldEventCursor())
 assert.deepEqual(normalizeWorldEventCursor({ version: '0.1', acknowledgedEventIds: 'a' }), emptyWorldEventCursor())
 assert.deepEqual(
-  normalizeWorldEventCursor({ version: '0.1', acknowledgedEventIds: [' b ', 'a', 'b', '', null, 7] }),
-  { version: '0.1', acknowledgedEventIds: ['7', 'a', 'b'] },
+  normalizeWorldEventCursor({ version: '0.1', acknowledgedEventIds: [' b ', 'a', 'b'] }),
+  { version: '0.1', acknowledgedEventIds: ['a', 'b'] },
+)
+assert.deepEqual(
+  normalizeWorldEventCursor({ version: '0.1', acknowledgedEventIds: ['a', 7] }),
+  emptyWorldEventCursor(),
+)
+assert.deepEqual(
+  normalizeWorldEventCursor({ version: '0.1', acknowledgedEventIds: ['a', ''] }),
+  emptyWorldEventCursor(),
 )
 
 const state = buildWorldState({
@@ -41,21 +49,21 @@ assert.equal(initialQueue.visibleEvents, 3)
 assert.equal(initialQueue.acknowledgedVisibleEvents, 0)
 assert.deepEqual(initialQueue.pending.map(event => event.id), ['new', 'mid', 'old'])
 
-const ackNew = acknowledgeWorldEvent(emptyWorldEventCursor(), ' new ')
+const ackNew = acknowledgeWorldEvent(emptyWorldEventCursor(), initialQueue, ' new ')
 assert.deepEqual(ackNew.acknowledgedEventIds, ['new'])
 const queueAfterOne = resolveWorldEventQueue(state, ackNew)
 assert.equal(queueAfterOne.visibleEvents, 3)
 assert.equal(queueAfterOne.acknowledgedVisibleEvents, 1)
 assert.deepEqual(queueAfterOne.pending.map(event => event.id), ['mid', 'old'])
 
-// Acknowledgement is idempotent and unknown ids cannot manufacture or reorder events.
-const idempotent = acknowledgeWorldEvents(ackNew, ['new', 'ghost', 'new', ''])
-assert.deepEqual(idempotent.acknowledgedEventIds, ['ghost', 'new'])
+// Repeated, already-acknowledged and unknown ids are ignored. They cannot pre-ack a future event.
+const idempotent = acknowledgeWorldEvents(ackNew, queueAfterOne, ['new', 'ghost', 'new', ''])
+assert.deepEqual(idempotent.acknowledgedEventIds, ['new'])
 const queueWithUnknownAck = resolveWorldEventQueue(state, idempotent)
 assert.deepEqual(queueWithUnknownAck.pending.map(event => event.id), ['mid', 'old'])
 
 const allVisibleAcked = acknowledgePendingWorldEvents(idempotent, queueWithUnknownAck)
-assert.deepEqual(allVisibleAcked.acknowledgedEventIds, ['ghost', 'mid', 'new', 'old'])
+assert.deepEqual(allVisibleAcked.acknowledgedEventIds, ['mid', 'new', 'old'])
 const emptyQueue = resolveWorldEventQueue(state, allVisibleAcked)
 assert.equal(emptyQueue.visibleEvents, 3)
 assert.equal(emptyQueue.acknowledgedVisibleEvents, 3)
@@ -64,7 +72,7 @@ assert.deepEqual(emptyQueue.pending, [])
 // Re-resolving the same WorldState never replays acknowledged ids.
 assert.deepEqual(resolveWorldEventQueue(state, allVisibleAcked), emptyQueue)
 
-// A newly arriving semantic event appears without disturbing acknowledged history.
+// Newly arriving semantic events, including an id previously supplied while unknown, must remain pending.
 const laterState = buildWorldState({
   level: 2,
   xp: 45,
@@ -73,10 +81,11 @@ const laterState = buildWorldState({
   events: [
     ...state.events,
     { id: 'latest', kind: 'xp:ACHIEVEMENT', occurredAt: '2026-09-14T10:00:00Z', title: 'Latest' },
+    { id: 'ghost', kind: 'xp:PLAN_ADHERENCE', occurredAt: '2026-09-15T10:00:00Z', title: 'Ghost now real' },
   ],
 })
 const laterQueue = resolveWorldEventQueue(laterState, allVisibleAcked)
-assert.deepEqual(laterQueue.pending.map(event => event.id), ['latest'])
+assert.deepEqual(laterQueue.pending.map(event => event.id), ['ghost', 'latest'])
 assert.equal(laterQueue.acknowledgedVisibleEvents, 3)
 
 console.log('worldEventQueue tests passed')
