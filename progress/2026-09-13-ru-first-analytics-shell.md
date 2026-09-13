@@ -27,10 +27,10 @@ QVANIX remains RU-first for usability. A Russian-speaking user should not need E
 GitHub `v2 build` run #322 passed, including `npm ci`, both dependency security gates, TypeScript/Vite build, `test:core`, asset-history regression and syntax checks through `production-v160.js`.
 
 ### Production
-Render queues were inspected immediately before merge and both services were settled on the previous main revision. After merge, `tinvest-pulse-v2-preview` reached `live` on `dc0244f9…`. `tinvest-pulse` was still `update_in_progress` at the time this checkpoint branch was prepared, so no further production merge is permitted until primary settles. No manual deploy was triggered.
+Render queues were inspected immediately before merge and both services were settled on the previous main revision. After merge, both `tinvest-pulse-v2-preview` and `tinvest-pulse` reached `live` on `dc0244f930b837f11e2c2f621dd60c245a10f14d`. No manual deploy was triggered and no rollback was required.
 
 ### Legal
 `LEGAL_REVIEW_2026-09-11.md` remains a hard publication blocker. No RU/EN legal draft, consent wording, operator detail or payment/legal behavior was published or changed.
 
 ### Next safe step
-After both Render services are settled, continue the RU-first terminology audit in Portfolio / Income / Monte Carlo drill-down controls, prioritizing actual unclear English UI terms and keeping Samsung/Android density unchanged. Continue Terminal calculation groundwork only through deterministic boundaries and user-authored rules; do not add personalized trading signals.
+Continue the RU-first terminology audit in Portfolio / Income / Monte Carlo drill-down controls, prioritizing actual unclear English UI terms and keeping Samsung/Android density unchanged. Continue Terminal calculation groundwork only through deterministic boundaries and user-authored rules; do not add personalized trading signals.
