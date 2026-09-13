@@ -1,4 +1,4 @@
-export const ASSET_HISTORY_NORMALIZATION_VERSION = '1.0' as const
+export const ASSET_HISTORY_NORMALIZATION_VERSION = '1.1' as const
 
 export type AssetHistoryPoint = {
   date: string
@@ -10,6 +10,9 @@ export type AssetHistorySeries = {
   label: string
   instrumentId: string | null
   points: AssetHistoryPoint[]
+  integrity: 'VALID' | 'CONFLICT'
+  duplicateRowsCollapsed: number
+  conflictingDates: number
 }
 
 export type AssetHistoryPayload = {
@@ -68,9 +71,26 @@ const dateOnly = (value: unknown) => {
   return new Date(timestamp).toISOString().slice(0, 10) === day ? day : null
 }
 
-function normalizePoints(value: unknown): AssetHistoryPoint[] {
-  if (!Array.isArray(value)) return []
-  const byDate = new Map<string, number | null>()
+type NormalizedPoints = {
+  points: AssetHistoryPoint[]
+  integrity: 'VALID' | 'CONFLICT'
+  duplicateRowsCollapsed: number
+  conflictingDates: number
+}
+
+function normalizePoints(value: unknown): NormalizedPoints {
+  if (!Array.isArray(value)) {
+    return {
+      points: [],
+      integrity: 'VALID',
+      duplicateRowsCollapsed: 0,
+      conflictingDates: 0,
+    }
+  }
+
+  const byDate = new Map<string, number>()
+  const conflictingDates = new Set<string>()
+  let duplicateRowsCollapsed = 0
 
   for (const item of value) {
     if (!item || typeof item !== 'object') continue
@@ -79,19 +99,33 @@ function normalizePoints(value: unknown): AssetHistoryPoint[] {
     const price = finiteNumber(row.value)
     if (!date || price == null || price <= 0) continue
 
-    if (!byDate.has(date)) {
+    const existing = byDate.get(date)
+    if (existing == null) {
       byDate.set(date, price)
       continue
     }
 
-    const existing = byDate.get(date)
-    if (existing != null && existing !== price) byDate.set(date, null)
+    if (existing === price) duplicateRowsCollapsed += 1
+    else conflictingDates.add(date)
   }
 
-  return [...byDate.entries()]
-    .filter((entry): entry is [string, number] => entry[1] != null)
-    .map(([date, price]) => ({ date, value: price }))
-    .sort((a, b) => a.date.localeCompare(b.date))
+  if (conflictingDates.size > 0) {
+    return {
+      points: [],
+      integrity: 'CONFLICT',
+      duplicateRowsCollapsed,
+      conflictingDates: conflictingDates.size,
+    }
+  }
+
+  return {
+    points: [...byDate.entries()]
+      .map(([date, price]) => ({ date, value: price }))
+      .sort((a, b) => a.date.localeCompare(b.date)),
+    integrity: 'VALID',
+    duplicateRowsCollapsed,
+    conflictingDates: 0,
+  }
 }
 
 function normalizeSeries(value: unknown): AssetHistorySeries | null {
@@ -101,12 +135,16 @@ function normalizeSeries(value: unknown): AssetHistorySeries | null {
   const key = text(row.key) || instrumentId
   if (!key) return null
   const label = text(row.label) || key
+  const normalized = normalizePoints(row.points)
 
   return {
     key,
     label,
     instrumentId,
-    points: normalizePoints(row.points),
+    points: normalized.points,
+    integrity: normalized.integrity,
+    duplicateRowsCollapsed: normalized.duplicateRowsCollapsed,
+    conflictingDates: normalized.conflictingDates,
   }
 }
 
@@ -126,7 +164,7 @@ export async function loadAssetHistory(signal?: AbortSignal): Promise<AssetHisto
     if (raw.available !== true) return emptyPayload()
 
     const series = normalizeSeriesList(raw.series)
-    const usableSeries = series.filter(row => row.points.length >= 2).length
+    const usableSeries = series.filter(row => row.integrity === 'VALID' && row.points.length >= 2).length
     if (usableSeries === 0) return emptyPayload()
 
     return {
