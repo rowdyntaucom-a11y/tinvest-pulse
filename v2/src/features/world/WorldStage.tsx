@@ -1,26 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Application as PixiApplication } from 'pixi.js'
+import type { WorldState } from '../dna/worldState'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
 
 type Props = {
-  level: number
+  state: WorldState
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 let worldStageSequence = 0
 
-export function WorldStage({ level }: Props) {
+export function WorldStage({ state }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const ownerIdRef = useRef<string | null>(null)
   const [renderer, setRenderer] = useState('initializing')
-  const levelRef = useRef(level)
+  const stateRef = useRef(state)
 
   if (!ownerIdRef.current) {
     worldStageSequence += 1
     ownerIdRef.current = `world-stage-${worldStageSequence}`
   }
 
-  useEffect(() => { levelRef.current = level }, [level])
+  useEffect(() => { stateRef.current = state }, [state])
 
   useEffect(() => {
     const host = hostRef.current
@@ -116,7 +117,9 @@ export function WorldStage({ level }: Props) {
       next.ticker.maxFPS = window.innerWidth < 900 ? 45 : 60
       next.ticker.minFPS = 20
       next.ticker.add(() => {
-        renderLevel(levelRef.current)
+        // The renderer consumes already-resolved WorldState. It deliberately does not calculate XP,
+        // weather, market state, or event semantics inside the Pixi ticker.
+        renderLevel(stateRef.current.level)
         lamp.alpha = 0.72 + Math.sin(performance.now() / 550) * 0.16
       })
 

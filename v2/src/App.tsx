@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { WorldStage } from './features/world/WorldStage'
+import { buildWorldState } from './features/dna/worldState'
 import { HistoryChart } from './features/portfolio/HistoryChart'
 import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
@@ -74,6 +75,17 @@ export default function App() {
   const drift = useMemo(
     () => calculateAllocationDrift(snapshot.positionItems, PERSONAL_STRATEGY_V1),
     [snapshot.positionItems],
+  )
+  const dnaWorldState = useMemo(
+    () => buildWorldState({
+      level: 1,
+      xp: 0,
+      xpToNext: null,
+      qualityCoverage: 0,
+      weather: 'neutral',
+      events: [],
+    }),
+    [],
   )
 
   const xirr = annualReturnRatioToPercent(snapshot.xirr)
@@ -230,13 +242,13 @@ export default function App() {
             <section className="world-panel world-panel--view">
               <div className="world-panel__head">
                 <div><span className="eyebrow">QVANIX DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div>
-                <div className="dna-state"><span>УРОВЕНЬ</span><strong>XP</strong><small>рублёвые пороги отключены</small></div>
+                <div className="dna-state"><span>УРОВЕНЬ {dnaWorldState.level}</span><strong>XP CORE</strong><small>WorldState v{dnaWorldState.version} · рублёвые пороги отключены</small></div>
               </div>
-              <div className="world-frame"><WorldStage level={1} /></div>
+              <div className="world-frame"><WorldStage state={dnaWorldState} /></div>
               <div className="dna-next">
                 <span>СЛЕДУЮЩИЙ ЭТАП</span>
-                <strong>Analytics → XP Engine → события мира</strong>
-                <p>Уровень будет зависеть от относительных метрик и дисциплины, а не от размера капитала. Текущий WebGL-кадр оставлен только как технический двигатель до полноценной перестройки мира.</p>
+                <strong>XP Engine → WorldState → события мира → renderer</strong>
+                <p>Renderer получает уже разрешённое состояние мира и не считает финансовые метрики внутри Pixi. Погода, время суток и semantic events пока не меняют арт до отдельного production mapping.</p>
               </div>
             </section>
           </div>
