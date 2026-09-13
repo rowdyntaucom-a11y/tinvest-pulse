@@ -77,14 +77,7 @@ export default function App() {
     [snapshot.positionItems],
   )
   const dnaWorldState = useMemo(
-    () => buildWorldState({
-      level: 1,
-      xp: 0,
-      xpToNext: null,
-      qualityCoverage: 0,
-      weather: 'neutral',
-      events: [],
-    }),
+    () => buildWorldState({ level: 1, xp: 0, xpToNext: null, qualityCoverage: 0, weather: 'neutral', events: [] }),
     [],
   )
 
@@ -101,11 +94,7 @@ export default function App() {
           <h1>QVANIX</h1>
           <p>{snapshot.accountName} · финансовое ядро, аналитика и живой мир без лишнего дублирования.</p>
         </div>
-        <KeyRateWidget
-          rate={snapshot.riskFreeRate}
-          rateDate={snapshot.riskFreeRateDate}
-          nextMeeting={snapshot.nextRateMeeting}
-        />
+        <KeyRateWidget rate={snapshot.riskFreeRate} rateDate={snapshot.riskFreeRateDate} nextMeeting={snapshot.nextRateMeeting} />
         <nav className="topbar__nav" aria-label="Разделы">
           <button onClick={() => setTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
           <button onClick={() => setTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
@@ -122,10 +111,10 @@ export default function App() {
             <nav className="subnav analytics-subnav" aria-label="Разделы аналитики">
               <button onClick={() => setAnalyticsView('overview')} className={analyticsView === 'overview' ? 'subnav--active' : ''}>ОБЗОР</button>
               <button onClick={() => setAnalyticsView('risk')} className={analyticsView === 'risk' ? 'subnav--active' : ''}>РИСК</button>
-              <button onClick={() => setAnalyticsView('health')} className={analyticsView === 'health' ? 'subnav--active' : ''}>ЗДОРОВЬЕ</button>
-              <button onClick={() => setAnalyticsView('drift')} className={analyticsView === 'drift' ? 'subnav--active' : ''}>ОТКЛОНЕНИЯ</button>
-              <button onClick={() => setAnalyticsView('montecarlo')} className={analyticsView === 'montecarlo' ? 'subnav--active' : ''}>СЦЕНАРИИ</button>
-              <span className={analyticsMature ? 'sample-badge sample-badge--mature' : 'sample-badge'}>{analyticsMature ? '12 МЕС.' : `ПРЕДВАРИТЕЛЬНО · ${historyLabel}`}</span>
+              <button onClick={() => setAnalyticsView('health')} className={analyticsView === 'health' ? 'subnav--active' : ''}>ОЦЕНКА</button>
+              <button onClick={() => setAnalyticsView('drift')} className={analyticsView === 'drift' ? 'subnav--active' : ''}>ДОЛИ</button>
+              <button onClick={() => setAnalyticsView('montecarlo')} className={analyticsView === 'montecarlo' ? 'subnav--active' : ''}>СЦЕН.</button>
+              <span className={analyticsMature ? 'sample-badge sample-badge--mature' : 'sample-badge'}>{analyticsMature ? '12 МЕС.' : `ПРЕДВ. · ${historyLabel}`}</span>
             </nav>
 
             {analyticsView === 'overview' && (
@@ -139,27 +128,14 @@ export default function App() {
                   <article className="metric-card"><span className="metric-label">XIRR · ЛИЧНАЯ ДОХОДНОСТЬ</span><strong>{xirr == null ? '—' : `${pctSigned.format(xirr)}%`}</strong><small>Учитывает даты денежных потоков</small></article>
                   <article className="metric-card"><span className="metric-label">TWR · ДОХОДНОСТЬ ПОРТФЕЛЯ</span><strong>{signedRatio(analytics.twr)}</strong><small>Без влияния размера довнесений</small></article>
                 </section>
-
                 <section className="panel history-panel">
-                  <div className="panel-head">
-                    <div><span className="eyebrow">ИНДЕКС TWR</span><h2>ПОРТФЕЛЬ И IMOEX</h2></div>
-                    <small>{analytics.historyPoints ? `${analytics.historyPoints} точек` : 'история загружается'}</small>
-                  </div>
+                  <div className="panel-head"><div><span className="eyebrow">ИНДЕКС TWR</span><h2>ПОРТФЕЛЬ И IMOEX</h2></div><small>{analytics.historyPoints ? `${analytics.historyPoints} точек` : 'история загружается'}</small></div>
                   <HistoryChart points={snapshot.history} />
                 </section>
               </div>
             )}
 
-            {analyticsView === 'risk' && (
-              <RiskWorkspace
-                analytics={analytics}
-                history={snapshot.history}
-                positions={snapshot.positionItems}
-                riskFreeRate={snapshot.riskFreeRate}
-                analyticsMature={analyticsMature}
-                historyLabel={historyLabel}
-              />
-            )}
+            {analyticsView === 'risk' && <RiskWorkspace analytics={analytics} history={snapshot.history} positions={snapshot.positionItems} riskFreeRate={snapshot.riskFreeRate} analyticsMature={analyticsMature} historyLabel={historyLabel} />}
 
             {analyticsView === 'health' && (
               <section className="panel health-panel">
@@ -180,76 +156,38 @@ export default function App() {
 
             {analyticsView === 'drift' && (
               <section className="panel drift-panel">
-                <div className="panel-head">
-                  <div><span className="eyebrow">СТРАТЕГИЯ v{drift.strategy.version}</span><h2>ЦЕЛЬ И ФАКТ</h2></div>
-                  <small>{drift.strategy.name}</small>
-                </div>
-
+                <div className="panel-head"><div><span className="eyebrow">СТРАТЕГИЯ v{drift.strategy.version}</span><h2>ЦЕЛЬ И ФАКТ</h2></div><small>{drift.strategy.name}</small></div>
                 <div className="drift-summary">
-                  <article>
-                    <span>СТАТУС</span>
-                    <strong className={drift.withinTolerance ? 'is-ok' : drift.available ? 'is-watch' : ''}>{drift.available ? drift.withinTolerance ? 'В ДОПУСКЕ' : 'ВНЕ ДОПУСКА' : 'НЕТ ДАННЫХ'}</strong>
-                    <small>контроль структуры, не торговый сигнал</small>
-                  </article>
-                  <article>
-                    <span>МАКС. ОТКЛОНЕНИЕ</span>
-                    <strong>{drift.maxAbsoluteDrift == null ? '—' : `${pctPlain.format(drift.maxAbsoluteDrift * 100)} п.п.`}</strong>
-                    <small>по целевым классам</small>
-                  </article>
-                  <article>
-                    <span>ВНЕ МОДЕЛИ</span>
-                    <strong>{pctPlain.format(drift.unassignedWeight * 100)}%</strong>
-                    <small>активы без целевого класса</small>
-                  </article>
+                  <article><span>СТАТУС</span><strong className={drift.withinTolerance ? 'is-ok' : drift.available ? 'is-watch' : ''}>{drift.available ? drift.withinTolerance ? 'В ДОПУСКЕ' : 'ВНЕ ДОПУСКА' : 'НЕТ ДАННЫХ'}</strong><small>контроль структуры, не торговый сигнал</small></article>
+                  <article><span>МАКС. ОТКЛОНЕНИЕ</span><strong>{drift.maxAbsoluteDrift == null ? '—' : `${pctPlain.format(drift.maxAbsoluteDrift * 100)} п.п.`}</strong><small>по целевым классам</small></article>
+                  <article><span>ВНЕ МОДЕЛИ</span><strong>{pctPlain.format(drift.unassignedWeight * 100)}%</strong><small>активы без целевого класса</small></article>
                 </div>
-
                 <div className="drift-rows">
                   {drift.rows.map(row => (
                     <div className={`drift-row ${row.outsideTolerance ? 'is-outside' : ''}`} key={row.key}>
                       <div className="drift-row__title"><strong>{row.label}</strong><span>цель {pctPlain.format(row.target * 100)}%</span></div>
                       <div className="drift-row__numbers"><b>{pctPlain.format(row.actual * 100)}%</b><span>{signedPoints(row.delta)}</span></div>
-                      <div className="drift-track" aria-label={`${row.label}: факт ${pctPlain.format(row.actual * 100)}%, цель ${pctPlain.format(row.target * 100)}%`}>
-                        <i style={{ width: `${Math.min(100, Math.max(0, row.actual * 100))}%` }} />
-                        <b style={{ left: `${Math.min(100, Math.max(0, row.target * 100))}%` }} />
-                      </div>
+                      <div className="drift-track" aria-label={`${row.label}: факт ${pctPlain.format(row.actual * 100)}%, цель ${pctPlain.format(row.target * 100)}%`}><i style={{ width: `${Math.min(100, Math.max(0, row.actual * 100))}%` }} /><b style={{ left: `${Math.min(100, Math.max(0, row.target * 100))}%` }} /></div>
                     </div>
                   ))}
                 </div>
-
                 <RebalanceScenarioDetails drift={drift} />
-
                 <p className="method-note">Диагностика отклонений сравнивает фактические доли с целями. Порог: абсолютное отклонение ≥ {pctPlain.format(drift.strategy.absoluteTolerance * 100)} п.п. или относительное ≥ {pctPlain.format(drift.strategy.relativeTolerance * 100)}%. Это сигнал проверить структуру стратегии, а не команда купить или продать.</p>
               </section>
             )}
 
-            {analyticsView === 'montecarlo' && (
-              <MonteCarloPanel history={snapshot.history} currentValue={snapshot.value} />
-            )}
+            {analyticsView === 'montecarlo' && <MonteCarloPanel history={snapshot.history} currentValue={snapshot.value} />}
           </div>
         )}
 
-        {tab === 'income' && (
-          <IncomeWorkspace
-            passiveIncome={snapshot.passiveIncome}
-            averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome}
-            startDate={startDate}
-            positions={snapshot.positionItems}
-          />
-        )}
+        {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} />}
 
         {tab === 'dna' && (
           <div className="dna-layout">
             <section className="world-panel world-panel--view">
-              <div className="world-panel__head">
-                <div><span className="eyebrow">QVANIX DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div>
-                <div className="dna-state"><span>УРОВЕНЬ {dnaWorldState.level}</span><strong>XP CORE</strong><small>WorldState v{dnaWorldState.version} · рублёвые пороги отключены</small></div>
-              </div>
+              <div className="world-panel__head"><div><span className="eyebrow">QVANIX DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div><div className="dna-state"><span>УРОВЕНЬ {dnaWorldState.level}</span><strong>XP CORE</strong><small>WorldState v{dnaWorldState.version} · рублёвые пороги отключены</small></div></div>
               <div className="world-frame"><WorldStage state={dnaWorldState} /></div>
-              <div className="dna-next">
-                <span>СЛЕДУЮЩИЙ ЭТАП</span>
-                <strong>XP Engine → WorldState → события мира → renderer</strong>
-                <p>Renderer получает уже разрешённое состояние мира и не считает финансовые метрики внутри Pixi. Погода, время суток и semantic events пока не меняют арт до отдельного production mapping.</p>
-              </div>
+              <div className="dna-next"><span>СЛЕДУЮЩИЙ ЭТАП</span><strong>XP Engine → WorldState → события мира → renderer</strong><p>Renderer получает уже разрешённое состояние мира и не считает финансовые метрики внутри Pixi. Погода, время суток и semantic events пока не меняют арт до отдельного production mapping.</p></div>
             </section>
           </div>
         )}
