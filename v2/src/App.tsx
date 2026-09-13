@@ -12,13 +12,22 @@ import { RiskWorkspace } from './features/analytics/RiskWorkspace'
 import { annualReturnRatioToPercent } from './features/analytics/returnUnits'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
 import { KeyRateWidget } from './features/macro/KeyRateWidget'
+import { PersonalizationControl } from './features/settings/PersonalizationControl'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
+import {
+  loadUiPreferences,
+  normalizeUiPreferences,
+  saveUiPreferences,
+  type UiPreferenceStorage,
+  type UiPreferences,
+  type UiWorkspace,
+} from './lib/uiPreferences'
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
-type Tab = 'portfolio' | 'analytics' | 'income' | 'dna'
+type Tab = UiWorkspace
 type AnalyticsView = 'overview' | 'risk' | 'health' | 'drift' | 'montecarlo'
 
 function signedRatio(value: number | null) {
@@ -36,6 +45,15 @@ function signedPoints(value: number | null) {
   return `${pctSigned.format(value * 100)} п.п.`
 }
 
+function browserStorage(): UiPreferenceStorage | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return window.localStorage
+  } catch {
+    return null
+  }
+}
+
 const EMPTY: PortfolioSnapshot = {
   accountName: 'Кряхтящий фонд', value: 0, profit: 0, profitPct: 0, passiveIncome: 0,
   averageMonthlyPassiveIncome: 0, averageAnnualPassiveIncome: 0, positions: 0, positionItems: [],
@@ -45,9 +63,18 @@ const EMPTY: PortfolioSnapshot = {
 
 export default function App() {
   const [snapshot, setSnapshot] = useState<PortfolioSnapshot>(EMPTY)
-  const [tab, setTab] = useState<Tab>('portfolio')
+  const [uiPreferences, setUiPreferences] = useState<UiPreferences>(() => loadUiPreferences(browserStorage()))
+  const [tab, setTab] = useState<Tab>(uiPreferences.defaultWorkspace)
   const [analyticsView, setAnalyticsView] = useState<AnalyticsView>('overview')
   const worldLocalDate = useWorldPhaseClock(tab === 'dna')
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.qvTheme = uiPreferences.theme
+    root.dataset.qvDensity = uiPreferences.density
+    root.dataset.qvMotion = uiPreferences.motion
+    saveUiPreferences(uiPreferences, browserStorage())
+  }, [uiPreferences])
 
   useEffect(() => {
     let active = true
@@ -97,13 +124,25 @@ export default function App() {
   )
   const dnaWorldState = dnaRuntimeState.world
 
+  const updateUiPreferences = (patch: Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace'>>) => {
+    setUiPreferences(current => normalizeUiPreferences({ ...current, ...patch }))
+  }
+  const resetUiPreferences = () => setUiPreferences(normalizeUiPreferences(null))
+
   const xirr = annualReturnRatioToPercent(snapshot.xirr)
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString('ru-RU') : '—'
   const analyticsMature = analytics.historyDays >= 365
   const historyLabel = analytics.historyDays ? `${analytics.historyDays} дней` : 'нет истории'
 
   return (
-    <main className="app-shell">
+    <main
+      className="app-shell"
+      data-qv-theme={uiPreferences.theme}
+      data-qv-density={uiPreferences.density}
+      data-qv-motion={uiPreferences.motion}
+    >
+      <div className="qv-ambient" aria-hidden="true" />
+
       <header className="topbar">
         <div className="brand-block">
           <div className="eyebrow">QVANIX · АНАЛИТИКА ПОРТФЕЛЯ</div>
@@ -208,6 +247,8 @@ export default function App() {
           </div>
         )}
       </section>
+
+      <PersonalizationControl preferences={uiPreferences} onChange={updateUiPreferences} onReset={resetUiPreferences} />
     </main>
   )
 }
