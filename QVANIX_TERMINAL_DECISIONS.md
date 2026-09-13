@@ -28,6 +28,8 @@ Core rule remains unchanged: calculations come from deterministic code and expli
 
 ### Technical analysis
 - OHLCV charts and deterministic indicators (SMA/EMA/MACD/RSI/Bollinger/ATR/Stochastic/VWAP) are accepted for Terminal mode.
+- Current daily-candle indicator groundwork may calculate only indicators whose semantics remain valid on the available daily OHLCV sample.
+- **VWAP is specifically gated until a session-aware intraday candle stream with verified volume semantics exists.** Do not synthesize a "VWAP" from daily candles or from a cross-day weighted average, because that would not represent standard session VWAP and would mislabel the calculation.
 - Custom alerts should be based on **user-authored rules**, not system-generated personalized trade recommendations.
 - Intraday/order-book features require a separate market-data architecture and a cost review before production.
 
