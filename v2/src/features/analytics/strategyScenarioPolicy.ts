@@ -43,8 +43,9 @@ export function isValidStrategyScenarioConfig(strategy: StrategyScenarioPolicyCo
 
 /**
  * Accepts only explicit user-supplied, uniquely identified two-class scenarios.
- * Invalid weights are never normalized and inputs beyond the mobile comparison
- * cap are ignored deterministically.
+ * Invalid weights are never normalized. The mobile comparison cap applies to
+ * accepted valid scenarios, so malformed earlier rows cannot consume capacity
+ * that belongs to later valid user-authored inputs.
  */
 export function acceptStrategyScenarioInputs<TStrategy extends StrategyScenarioPolicyConfig>(
   inputs: StrategyScenarioPolicyInput<TStrategy>[],
@@ -52,7 +53,8 @@ export function acceptStrategyScenarioInputs<TStrategy extends StrategyScenarioP
   const uniqueIds = new Set<string>()
   const accepted: StrategyScenarioPolicyInput<TStrategy>[] = []
 
-  for (const input of inputs.slice(0, STRATEGY_SCENARIO_MAX_COUNT)) {
+  for (const input of inputs) {
+    if (accepted.length >= STRATEGY_SCENARIO_MAX_COUNT) break
     const id = String(input?.id || '').trim()
     if (!id || uniqueIds.has(id) || !isValidStrategyScenarioConfig(input.strategy)) continue
     uniqueIds.add(id)
