@@ -35,9 +35,9 @@ function plainRatio(value: number | null) {
 }
 
 function recoverySummary(recovery: ReturnType<typeof calculateRecoveryDiagnostics>) {
-  if (!recovery.available) return recovery.reason || 'Recovery diagnostics пока недоступна.'
+  if (!recovery.available) return recovery.reason || 'Диагностика восстановления пока недоступна.'
 
-  const parts = [`RECOVERY ${recovery.quality}`, `${recovery.completedEpisodes.length} заверш. эпиз.`]
+  const parts = [`ВОССТАНОВЛЕНИЕ ${recovery.quality}`, `${recovery.completedEpisodes.length} заверш. эпиз.`]
   if (recovery.medianRecoveryDays != null) parts.push(`медиана от дна ${number.format(recovery.medianRecoveryDays)} дн.`)
   if (recovery.worstCompletedEpisode) {
     parts.push(`худшая завершённая −${pctPlain.format(recovery.worstCompletedEpisode.depth * 100)}% / ${recovery.worstCompletedEpisode.troughToRecoveryDays} дн. до возврата`)
@@ -63,11 +63,11 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
     : mode === 'benchmark'
       ? `${relative.overlapPoints} общих точек`
       : mode === 'rolling'
-        ? roll ? `${roll.tradingDays}D active` : `${rolling.availableReturns} доходностей`
+        ? roll ? `${roll.tradingDays} дн. · активное окно` : `${rolling.availableReturns} доходностей`
         : mode === 'tail'
           ? `${tail.returns} дневных доходностей`
           : mode === 'corr'
-            ? '365D · top 6 активов'
+            ? '365 дн. · топ-6 активов'
             : 'исторические шоки · v1'
 
   return (
@@ -75,26 +75,26 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
       <div className="risk-modebar" aria-label="Режим риск-аналитики">
         <span>РЕЖИМ</span>
         <button className={mode === 'portfolio' ? 'is-active' : ''} onClick={() => setMode('portfolio')}>ПОРТФЕЛЬ</button>
-        <button className={mode === 'benchmark' ? 'is-active' : ''} onClick={() => setMode('benchmark')}>VS IMOEX</button>
-        <button className={mode === 'rolling' ? 'is-active' : ''} onClick={() => setMode('rolling')}>ROLLING</button>
-        <button className={mode === 'tail' ? 'is-active' : ''} onClick={() => setMode('tail')}>TAIL</button>
-        <button className={mode === 'corr' ? 'is-active' : ''} onClick={() => setMode('corr')}>CORR</button>
-        <button className={mode === 'stress' ? 'is-active' : ''} onClick={() => setMode('stress')}>STRESS</button>
+        <button className={mode === 'benchmark' ? 'is-active' : ''} onClick={() => setMode('benchmark')}>СРАВНЕНИЕ</button>
+        <button className={mode === 'rolling' ? 'is-active' : ''} onClick={() => setMode('rolling')}>ОКНА</button>
+        <button className={mode === 'tail' ? 'is-active' : ''} onClick={() => setMode('tail')}>ХВОСТ</button>
+        <button className={mode === 'corr' ? 'is-active' : ''} onClick={() => setMode('corr')}>СВЯЗИ</button>
+        <button className={mode === 'stress' ? 'is-active' : ''} onClick={() => setMode('stress')}>СТРЕСС</button>
         <small>{modeStatus}</small>
       </div>
 
       {mode === 'portfolio' && (
         <>
           <section className="risk-grid">
-            <article className="risk-card"><span>MAX DRAWDOWN</span><strong>{signedRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
+            <article className="risk-card"><span>МАКС. ПРОСАДКА</span><strong>{signedRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
             <article className="risk-card"><span>ВОЛАТИЛЬНОСТЬ</span><strong>{plainRatio(analytics.volatility)}</strong><small>σ дневных доходностей × √252</small></article>
-            <article className="risk-card"><span>SHARPE</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Rf ${number.format(riskFreeRate)}%`}</small></article>
-            <article className="risk-card"><span>SORTINO</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Downside deviation относительно MAR (Rf)</small></article>
-            <article className="risk-card"><span>HHI</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
+            <article className="risk-card"><span>SHARPE · ДОХОД / РИСК</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Безрисковая ставка ${number.format(riskFreeRate)}%`}</small></article>
+            <article className="risk-card"><span>SORTINO · РИСК СНИЖЕНИЯ</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Негативные отклонения относительно минимальной доходности</small></article>
+            <article className="risk-card"><span>HHI · КОНЦЕНТРАЦИЯ</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
             <article className="risk-card"><span>ЭКВ. ПОЗИЦИЙ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
           </section>
           <section className="panel analytics-note">
-            <span className="eyebrow">КАЧЕСТВО ВЫБОРКИ · RECOVERY</span>
+            <span className="eyebrow">КАЧЕСТВО ВЫБОРКИ · ВОССТАНОВЛЕНИЕ</span>
             <h2>{analyticsMature ? 'ИСТОРИЯ ДОСТАТОЧНА' : 'МЕТРИКИ ПРЕДВАРИТЕЛЬНЫЕ'}</h2>
             <p>Сейчас доступно {historyLabel}. Годовая волатильность, Sharpe и Sortino до накопления 12 месяцев остаются предварительными. {recoverySummary(recovery)}</p>
           </section>
@@ -104,17 +104,17 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
       {mode === 'benchmark' && (
         <>
           <section className="risk-grid relative-risk-grid">
-            <article className="risk-card"><span>ПОРТФЕЛЬ · OVERLAP</span><strong>{signedRatio(relative.portfolioReturn)}</strong><small>{relative.periodDays ? `${relative.periodDays} дней общей выборки` : 'общая выборка не готова'}</small></article>
-            <article className="risk-card"><span>IMOEX · OVERLAP</span><strong>{signedRatio(relative.benchmarkReturn)}</strong><small>тот же диапазон дат</small></article>
-            <article className="risk-card"><span>EXCESS RETURN</span><strong>{signedRatio(relative.excessReturn)}</strong><small>портфель минус IMOEX</small></article>
-            <article className="risk-card"><span>TRACKING ERROR</span><strong>{plainRatio(relative.trackingError)}</strong><small>σ активных дневных доходностей × √252</small></article>
-            <article className="risk-card"><span>INFORMATION RATIO</span><strong>{relative.informationRatio == null ? '—' : number.format(relative.informationRatio)}</strong><small>средняя активная доходность / tracking error</small></article>
-            <article className="risk-card"><span>BETA</span><strong>{relative.beta == null ? '—' : number.format(relative.beta)}</strong><small>{relative.correlation == null ? 'корреляция скрыта до достаточной выборки' : `корреляция ${number.format(relative.correlation)}`}</small></article>
+            <article className="risk-card"><span>ПОРТФЕЛЬ · ОБЩИЙ ПЕРИОД</span><strong>{signedRatio(relative.portfolioReturn)}</strong><small>{relative.periodDays ? `${relative.periodDays} дней общей выборки` : 'общая выборка не готова'}</small></article>
+            <article className="risk-card"><span>IMOEX · ОБЩИЙ ПЕРИОД</span><strong>{signedRatio(relative.benchmarkReturn)}</strong><small>тот же диапазон дат</small></article>
+            <article className="risk-card"><span>ДОХОДНОСТЬ СВЕРХ IMOEX</span><strong>{signedRatio(relative.excessReturn)}</strong><small>портфель минус IMOEX</small></article>
+            <article className="risk-card"><span>ОТКЛОНЕНИЕ ОТ IMOEX · TE</span><strong>{plainRatio(relative.trackingError)}</strong><small>σ активных дневных доходностей × √252</small></article>
+            <article className="risk-card"><span>ЭФФЕКТИВНОСТЬ ОТКЛОНЕНИЯ · IR</span><strong>{relative.informationRatio == null ? '—' : number.format(relative.informationRatio)}</strong><small>средняя активная доходность / tracking error</small></article>
+            <article className="risk-card"><span>BETA · ЧУВСТВИТЕЛЬНОСТЬ</span><strong>{relative.beta == null ? '—' : number.format(relative.beta)}</strong><small>{relative.correlation == null ? 'корреляция скрыта до достаточной выборки' : `корреляция ${number.format(relative.correlation)}`}</small></article>
           </section>
           <section className="panel analytics-note relative-note">
-            <span className="eyebrow">BENCHMARK QUALITY</span>
+            <span className="eyebrow">КАЧЕСТВО СРАВНЕНИЯ С IMOEX</span>
             <h2>{relative.status === 'mature' ? 'ЗРЕЛАЯ СРАВНИМАЯ ВЫБОРКА' : relative.status === 'preview' ? 'ПРЕДВАРИТЕЛЬНО' : 'КОРОТКАЯ ИСТОРИЯ'}</h2>
-            <p>{relative.note} Периодная доходность показывается уже при двух общих точках; Tracking Error, Information Ratio, Beta и корреляция не рассчитываются на слишком короткой истории.</p>
+            <p>{relative.note} Периодная доходность показывается уже при двух общих точках; Tracking Error (TE), Information Ratio (IR), Beta и корреляция не рассчитываются на слишком короткой истории.</p>
           </section>
         </>
       )}
@@ -122,16 +122,16 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
       {mode === 'rolling' && (
         <>
           <section className="risk-grid relative-risk-grid">
-            <article className="risk-card"><span>ROLLING RETURN</span><strong>{signedRatio(roll?.portfolioReturn ?? null)}</strong><small>{roll ? `${roll.tradingDays} торговых дней` : 'нужно минимум 20 дневных доходностей'}</small></article>
-            <article className="risk-card"><span>ROLLING VOL</span><strong>{plainRatio(roll?.volatility ?? null)}</strong><small>σ окна × √252</small></article>
-            <article className="risk-card"><span>ROLLING MAXDD</span><strong>{roll?.maxDrawdown == null ? '—' : signedRatio(-roll.maxDrawdown)}</strong><small>просадка внутри выбранного окна</small></article>
-            <article className="risk-card"><span>WORST DAY</span><strong>{signedRatio(roll?.worstDay ?? null)}</strong><small>худшая дневная TWR-доходность окна</small></article>
-            <article className="risk-card"><span>IMOEX · WINDOW</span><strong>{signedRatio(roll?.benchmarkReturn ?? null)}</strong><small>{roll?.pairedBenchmarkReturns ? `${roll.pairedBenchmarkReturns} парных доходностей` : 'бенчмарк не покрывает всё окно'}</small></article>
-            <article className="risk-card"><span>EXCESS · WINDOW</span><strong>{signedRatio(roll?.excessReturn ?? null)}</strong><small>портфель минус IMOEX на том же окне</small></article>
+            <article className="risk-card"><span>ДОХОДНОСТЬ ОКНА</span><strong>{signedRatio(roll?.portfolioReturn ?? null)}</strong><small>{roll ? `${roll.tradingDays} торговых дней` : 'нужно минимум 20 дневных доходностей'}</small></article>
+            <article className="risk-card"><span>ВОЛАТИЛЬНОСТЬ ОКНА</span><strong>{plainRatio(roll?.volatility ?? null)}</strong><small>σ окна × √252</small></article>
+            <article className="risk-card"><span>МАКС. ПРОСАДКА ОКНА</span><strong>{roll?.maxDrawdown == null ? '—' : signedRatio(-roll.maxDrawdown)}</strong><small>просадка внутри выбранного окна</small></article>
+            <article className="risk-card"><span>ХУДШИЙ ДЕНЬ</span><strong>{signedRatio(roll?.worstDay ?? null)}</strong><small>худшая дневная TWR-доходность окна</small></article>
+            <article className="risk-card"><span>IMOEX · ТО ЖЕ ОКНО</span><strong>{signedRatio(roll?.benchmarkReturn ?? null)}</strong><small>{roll?.pairedBenchmarkReturns ? `${roll.pairedBenchmarkReturns} парных доходностей` : 'бенчмарк не покрывает всё окно'}</small></article>
+            <article className="risk-card"><span>СВЕРХ IMOEX · ОКНО</span><strong>{signedRatio(roll?.excessReturn ?? null)}</strong><small>портфель минус IMOEX на том же окне</small></article>
           </section>
           <section className="panel analytics-note relative-note">
-            <span className="eyebrow">ROLLING WINDOWS · v1</span>
-            <h2>{roll ? `${roll.tradingDays}D · ТЕКУЩЕЕ ОКНО` : 'НЕДОСТАТОЧНО ИСТОРИИ'}</h2>
+            <span className="eyebrow">СКОЛЬЗЯЩИЕ ОКНА · v1</span>
+            <h2>{roll ? `${roll.tradingDays} ДН. · ТЕКУЩЕЕ ОКНО` : 'НЕДОСТАТОЧНО ИСТОРИИ'}</h2>
             <p>{rolling.note} Стандартные горизонты: 20 / 60 / 120 / 252 торговых дня. QVANIX автоматически использует самый длинный полностью доступный горизонт и не растягивает короткую историю до года.</p>
           </section>
         </>
@@ -140,15 +140,15 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
       {mode === 'tail' && (
         <>
           <section className="risk-grid relative-risk-grid">
-            <article className="risk-card"><span>HISTORICAL VaR 95% · 1D</span><strong>{plainRatio(tail.var95Loss)}</strong><small>порог потери худших 5% дней</small></article>
-            <article className="risk-card"><span>CVaR / EXPECTED SHORTFALL</span><strong>{plainRatio(tail.cvar95Loss)}</strong><small>средняя потеря внутри худшего 5%-хвоста</small></article>
+            <article className="risk-card"><span>ИСТОРИЧЕСКИЙ VaR 95% · 1 ДЕНЬ</span><strong>{plainRatio(tail.var95Loss)}</strong><small>порог потери худших 5% дней</small></article>
+            <article className="risk-card"><span>CVaR · СРЕДНЯЯ ПОТЕРЯ ХВОСТА</span><strong>{plainRatio(tail.cvar95Loss)}</strong><small>средняя потеря внутри худшего 5%-хвоста</small></article>
             <article className="risk-card"><span>ХУДШИЙ ДЕНЬ</span><strong>{signedRatio(tail.worstDay)}</strong><small>фактическая дневная TWR-доходность</small></article>
             <article className="risk-card"><span>ДОЛЯ ОТРИЦАТЕЛЬНЫХ ДНЕЙ</span><strong>{plainRatio(tail.downsideFrequency)}</strong><small>частота дней TWR &lt; 0</small></article>
-            <article className="risk-card"><span>TAIL OBSERVATIONS</span><strong>{tail.available ? tail.tailObservations : '—'}</strong><small>наблюдений в 5%-хвосте</small></article>
-            <article className="risk-card"><span>МЕТОД</span><strong>HIST</strong><small>без нормального распределения и параметрической подгонки</small></article>
+            <article className="risk-card"><span>НАБЛЮДЕНИЙ В ХВОСТЕ</span><strong>{tail.available ? tail.tailObservations : '—'}</strong><small>наблюдений в худших 5% дней</small></article>
+            <article className="risk-card"><span>МЕТОД</span><strong>ИСТОРИЧЕСКИЙ</strong><small>без нормального распределения и параметрической подгонки</small></article>
           </section>
           <section className="panel analytics-note relative-note">
-            <span className="eyebrow">TAIL RISK · v1</span>
+            <span className="eyebrow">ХВОСТОВОЙ РИСК · v1</span>
             <h2>{tail.status === 'mature' ? 'ЗРЕЛАЯ ОЦЕНКА' : tail.status === 'preview' ? 'ПРЕДВАРИТЕЛЬНО' : 'НЕДОСТАТОЧНО ИСТОРИИ'}</h2>
             <p>{tail.note} VaR/CVaR здесь — историческая однодневная оценка риска по TWR портфеля, а не прогноз максимального будущего убытка.</p>
           </section>
