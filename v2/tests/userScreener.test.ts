@@ -24,7 +24,7 @@ const all: UserScreenerConfig = {
   mode: 'ALL',
   rules: [
     { id: 'rsi', metric: 'rsi14', comparator: 'ABOVE', threshold: 70 },
-    { id: 'macd', metric: 'macdHistogram', comparator: 'ABOVE', threshold: 0 },
+    { id: 'sma', metric: 'sma20', comparator: 'ABOVE', threshold: 120 },
   ],
 }
 
@@ -33,7 +33,7 @@ assert.equal(result.status, 'MATCH')
 assert.equal(result.matched, true)
 assert.equal(result.evaluatedRules, 2)
 assert.equal(result.matchedRules, 2)
-assert.deepEqual(result.matchedRuleIds, ['rsi', 'macd'])
+assert.deepEqual(result.matchedRuleIds, ['rsi', 'sma'])
 assert.equal(Object.prototype.hasOwnProperty.call(result, 'action'), false)
 assert.equal(Object.prototype.hasOwnProperty.call(result, 'recommendation'), false)
 
