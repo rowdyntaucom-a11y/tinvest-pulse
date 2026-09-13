@@ -3,6 +3,7 @@ import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
 import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import { buildWorldPresentationMetadata } from './worldPresentationMetadata'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
 
 type Props = {
@@ -28,6 +29,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   const ownerIdRef = useRef<string | null>(null)
   const [renderer, setRenderer] = useState('initializing')
   const snapshotRef = useRef(snapshot)
+  const presentation = buildWorldPresentationMetadata(snapshot)
 
   if (!ownerIdRef.current) {
     worldStageSequence += 1
@@ -167,8 +169,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   }, [])
 
   return (
-    <div className="world-stage" ref={hostRef}>
-      <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()}</div>
+    <div
+      className="world-stage"
+      ref={hostRef}
+      data-world-time={presentation.timePhase}
+      data-world-weather={presentation.weather}
+      data-world-events={presentation.pendingEventCount}
+    >
+      <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
   )
 }
