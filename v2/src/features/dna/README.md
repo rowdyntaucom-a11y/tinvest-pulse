@@ -20,13 +20,19 @@ The deterministic DNA core is intentionally split into four responsibilities:
 3. `xpPersistence.ts` — fail-closed persisted-document parser plus idempotent event merge. Existing event ids win, invalid payloads are ignored/countable, timestamps are normalized and event ordering is deterministic. It has no browser-storage, account-id or RUB-capital dependency, so a future encrypted backend/database adapter can persist the same document without changing progression math.
 4. `worldState.ts` — compact resolved state boundary for the renderer; it consumes progression/quality/time/weather/events and must not recalculate financial metrics inside PixiJS.
 
-## Renderer ownership rule
+`WorldState.weather = neutral` is the fail-closed default when no reviewed weather rule has resolved an atmosphere. The renderer must not silently convert missing market state into clear/rain/storm.
 
-The v2 world runtime follows one strict lifecycle invariant:
+## Renderer ownership and input rules
+
+The v2 world runtime follows two strict lifecycle invariants:
 
 **ONE WORLD → ONE RUNTIME OWNER → ONE PIXI APPLICATION → ONE TICKER.**
 
+**FINANCIAL CORE / XP RULES → RESOLVED WORLDSTATE → PIXI RENDERER.**
+
 `worldRuntimeOwnership.ts` owns the process-local lease. A second mounted world must fail closed instead of creating another Pixi application, canvas or ticker. Releasing an old/stale lease must never tear down a newer owner. `WorldStage.tsx` is responsible for acquiring the lease before Pixi is imported/initialized and releasing it on boot failure or React cleanup.
+
+`WorldStage.tsx` consumes the complete already-resolved `WorldState`; it no longer accepts a naked level as its application boundary. The current temporary scene still projects only `state.level` into its placeholder geometry. `timePhase`, `weather` and semantic events are intentionally not mapped to art until the production art/animation mapping is reviewed. This prevents the render loop from inventing market logic, XP rules or atmosphere.
 
 This boundary exists because the legacy DNA implementation accumulated multiple scene owners and update loops that could overwrite one another. The new v2 path must never restore that pattern. Financial calculations, XP rules and `WorldState` resolution stay outside the Pixi render loop.
 
@@ -40,4 +46,4 @@ This boundary exists because the legacy DNA implementation accumulated multiple 
 
 ## Still gated
 
-Final XP award weights, long-term level thresholds/economy and production persistence schema remain gated on validation. The current short portfolio history is not enough to tune a durable progression economy, and no subjective DNA art-direction changes should be inferred from this groundwork.
+Final XP award weights, long-term level thresholds/economy, production persistence schema and the mapping from resolved `timePhase` / `weather` / semantic events into final art remain gated on validation. The current short portfolio history is not enough to tune a durable progression economy, and no subjective DNA art-direction changes should be inferred from this groundwork.
