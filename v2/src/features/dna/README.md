@@ -13,13 +13,14 @@
 
 ## Current v0.1 boundary
 
-The deterministic DNA core is intentionally split into five responsibilities:
+The deterministic DNA core is intentionally split into six responsibilities:
 
 1. `buildQualitySnapshot(...)` in `xpEngine.ts` — normalized current signals and availability/coverage only. It does not award persistent XP.
 2. `xpRules.ts` — stable, versioned event factories for reviewed award rules. Contribution-habit inputs contain no deposit amount.
 3. `xpPersistence.ts` — fail-closed persisted-document parser plus idempotent event merge. Existing event ids win, invalid payloads are ignored/countable, timestamps are normalized and event ordering is deterministic. It has no browser-storage, account-id or RUB-capital dependency, so a future encrypted backend/database adapter can persist the same document without changing progression math.
-4. `worldState.ts` — compact resolved state boundary for the renderer; it consumes progression/quality/time/weather/events and must not recalculate financial metrics inside PixiJS.
+4. `worldState.ts` — compact resolved state boundary for progression/quality/time/weather/events; it must not calculate presentation effects.
 5. `worldEventQueue.ts` — renderer-neutral semantic presentation cursor. It resolves which already-valid WorldState events are still pending, acknowledges them idempotently by stable event id, and deliberately knows nothing about animation, sound, particles, camera motion or reward amounts.
+6. `worldRenderSnapshot.ts` — the final deterministic hand-off before PixiJS. It exposes only level, resolved time/weather and still-pending semantic events. XP totals, quality inputs, acknowledgement history and financial metrics are intentionally hidden from the renderer.
 
 `WorldState.weather = neutral` is the fail-closed default when no reviewed weather rule has resolved an atmosphere. The renderer must not silently convert missing market state into clear/rain/storm.
 
@@ -29,11 +30,11 @@ The v2 world runtime follows two strict lifecycle invariants:
 
 **ONE WORLD → ONE RUNTIME OWNER → ONE PIXI APPLICATION → ONE TICKER.**
 
-**FINANCIAL CORE / XP RULES → RESOLVED WORLDSTATE → SEMANTIC EVENT QUEUE → PIXI RENDERER.**
+**FINANCIAL CORE / XP RULES → RESOLVED WORLDSTATE → SEMANTIC EVENT QUEUE → WORLD RENDER SNAPSHOT → PIXI RENDERER.**
 
 `worldRuntimeOwnership.ts` owns the process-local lease. A second mounted world must fail closed instead of creating another Pixi application, canvas or ticker. Releasing an old/stale lease must never tear down a newer owner. `WorldStage.tsx` is responsible for acquiring the lease before Pixi is imported/initialized and releasing it on boot failure or React cleanup.
 
-`WorldStage.tsx` consumes the complete already-resolved `WorldState`; it no longer accepts a naked level as its application boundary. The current temporary scene still projects only `state.level` into its placeholder geometry. `timePhase`, `weather` and semantic events are intentionally not mapped to art until the production art/animation mapping is reviewed. This prevents the render loop from inventing market logic, XP rules or atmosphere.
+`WorldStage.tsx` accepts the already-resolved `WorldState` plus an optional semantic-event cursor, builds a `WorldRenderSnapshot`, and only then hands presentation-only state to the Pixi runtime. The current temporary scene still projects only `snapshot.level` into placeholder geometry. `timePhase`, `weather` and pending semantic events are intentionally not mapped to art until the production art/animation mapping is reviewed. Pixi therefore cannot see XP totals, quality inputs or acknowledgement history and cannot invent market logic, progression rules or event filtering.
 
 ### Semantic event acknowledgement
 
@@ -41,9 +42,11 @@ The v2 world runtime follows two strict lifecycle invariants:
 
 Only ids that are actually present in the current resolved `pending` queue may be acknowledged. Unknown, stale or already-acknowledged ids are ignored, so a caller cannot pre-acknowledge an id and later suppress a legitimate event that happens to receive that identity. Cursor ids are strict non-empty strings; a malformed persisted id list fails closed to the empty cursor.
 
+`worldRenderSnapshot.ts` copies only still-pending semantic events into the renderer hand-off. Already-acknowledged events never reach Pixi. The snapshot is deliberately narrower than `WorldState`: it contains no XP, `xpToNext`, quality coverage, financial metrics or acknowledgement document.
+
 The queue deliberately has no browser-storage adapter yet. Multi-user persistence belongs behind authenticated account scoping; do not place broker credentials, sensitive account data or mutable XP authority in frontend storage. Animation selection will be a separate versioned presentation mapping after the production asset pipeline is reviewed.
 
-This boundary exists because the legacy DNA implementation accumulated multiple scene owners and update loops that could overwrite one another. The new v2 path must never restore that pattern. Financial calculations, XP rules, semantic event identity and `WorldState` resolution stay outside the Pixi render loop.
+This boundary exists because the legacy DNA implementation accumulated multiple scene owners and update loops that could overwrite one another. The new v2 path must never restore that pattern. Financial calculations, XP rules, semantic event identity, acknowledgement state and `WorldState` resolution stay outside the Pixi render loop.
 
 ## Persistence rules
 
