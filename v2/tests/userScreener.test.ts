@@ -5,7 +5,7 @@ import {
   USER_SCREENER_VERSION,
   evaluateUserScreener,
   type UserScreenerConfig,
-} from '../src/features/terminal/userScreener.ts'
+} from '../src/features/terminal/userAlertRules.ts'
 
 function candle(observation: number, close: number): OhlcvCandle {
   const timestamp = Date.UTC(2026, 0, 1) + ((observation - 1) * 86_400_000)
