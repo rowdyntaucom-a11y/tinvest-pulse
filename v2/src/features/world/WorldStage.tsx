@@ -1,16 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Application as PixiApplication } from 'pixi.js'
+import { worldRuntimeRegistry } from './worldRuntimeOwnership'
 
 type Props = {
   level: number
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
+let worldStageSequence = 0
 
 export function WorldStage({ level }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
+  const ownerIdRef = useRef<string | null>(null)
   const [renderer, setRenderer] = useState('initializing')
   const levelRef = useRef(level)
+
+  if (!ownerIdRef.current) {
+    worldStageSequence += 1
+    ownerIdRef.current = `world-stage-${worldStageSequence}`
+  }
 
   useEffect(() => { levelRef.current = level }, [level])
 
@@ -18,8 +26,20 @@ export function WorldStage({ level }: Props) {
     const host = hostRef.current
     if (!host) return
 
+    const lease = worldRuntimeRegistry.acquire(ownerIdRef.current ?? 'world-stage')
+    if (!lease.acquired) {
+      setRenderer('blocked')
+      return
+    }
+
     let disposed = false
     let app: PixiApplication | null = null
+    let leaseReleased = false
+    const releaseLease = () => {
+      if (leaseReleased) return
+      leaseReleased = true
+      lease.release()
+    }
 
     const boot = async () => {
       // Pixi/WebGL is deliberately loaded only when DNA is actually mounted.
@@ -121,7 +141,13 @@ export function WorldStage({ level }: Props) {
       ;(next as PixiApplication & { __pulseVisibility?: () => void }).__pulseVisibility = onVisibility
     }
 
-    void boot()
+    void boot().catch(error => {
+      if (!disposed) {
+        console.error('QVANIX DNA renderer boot failed', error)
+        setRenderer('error')
+      }
+      releaseLease()
+    })
 
     return () => {
       disposed = true
@@ -131,6 +157,7 @@ export function WorldStage({ level }: Props) {
         if (typed.__pulseVisibility) document.removeEventListener('visibilitychange', typed.__pulseVisibility)
         app.destroy(true, { children: true })
       }
+      releaseLease()
       host.replaceChildren()
     }
   }, [])

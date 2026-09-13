@@ -20,6 +20,16 @@ The deterministic DNA core is intentionally split into four responsibilities:
 3. `xpPersistence.ts` — fail-closed persisted-document parser plus idempotent event merge. Existing event ids win, invalid payloads are ignored/countable, timestamps are normalized and event ordering is deterministic. It has no browser-storage, account-id or RUB-capital dependency, so a future encrypted backend/database adapter can persist the same document without changing progression math.
 4. `worldState.ts` — compact resolved state boundary for the renderer; it consumes progression/quality/time/weather/events and must not recalculate financial metrics inside PixiJS.
 
+## Renderer ownership rule
+
+The v2 world runtime follows one strict lifecycle invariant:
+
+**ONE WORLD → ONE RUNTIME OWNER → ONE PIXI APPLICATION → ONE TICKER.**
+
+`worldRuntimeOwnership.ts` owns the process-local lease. A second mounted world must fail closed instead of creating another Pixi application, canvas or ticker. Releasing an old/stale lease must never tear down a newer owner. `WorldStage.tsx` is responsible for acquiring the lease before Pixi is imported/initialized and releasing it on boot failure or React cleanup.
+
+This boundary exists because the legacy DNA implementation accumulated multiple scene owners and update loops that could overwrite one another. The new v2 path must never restore that pattern. Financial calculations, XP rules and `WorldState` resolution stay outside the Pixi render loop.
+
 ## Persistence rules
 
 - Persistence stores versioned XP events, not a mutable `level = capital` snapshot.
