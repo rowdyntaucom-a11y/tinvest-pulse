@@ -1,6 +1,6 @@
 import type { TechnicalSnapshot } from './technicalIndicators'
 
-export const USER_ALERT_RULES_VERSION = '1.1' as const
+export const USER_ALERT_RULES_VERSION = '1.2' as const
 
 export type AlertMetric =
   | 'sma20'
@@ -65,12 +65,36 @@ function validDate(value: unknown): value is string {
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
 }
 
+function validThreshold(metric: AlertMetric, threshold: number): boolean {
+  if (!finite(threshold)) return false
+
+  if (metric === 'rsi14' || metric === 'stochasticK14' || metric === 'stochasticD3') {
+    return threshold >= 0 && threshold <= 100
+  }
+
+  if (metric === 'atr14') return threshold >= 0
+
+  if (
+    metric === 'sma20'
+    || metric === 'ema20'
+    || metric === 'bollingerMiddle20'
+    || metric === 'bollingerUpper20'
+    || metric === 'bollingerLower20'
+  ) {
+    return threshold > 0
+  }
+
+  // MACD line, signal and histogram are signed differences and may be
+  // positive, zero or negative. No arbitrary numeric range is imposed.
+  return true
+}
+
 function validRule(rule: UserAlertRule): boolean {
   return typeof rule.id === 'string'
     && rule.id.trim().length > 0
     && METRICS.includes(rule.metric)
     && COMPARATORS.includes(rule.comparator)
-    && finite(rule.threshold)
+    && validThreshold(rule.metric, rule.threshold)
 }
 
 function metricValue(snapshot: TechnicalSnapshot | null | undefined, metric: AlertMetric): number | null {
@@ -104,7 +128,7 @@ export function evaluateUserAlertRule(
       currentValue: null,
       previousValue: null,
       threshold: finite(rule.threshold) ? rule.threshold : null,
-      reason: 'Правило не прошло валидацию и не вычислялось.',
+      reason: 'Правило или порог метрики не прошли валидацию и не вычислялись.',
     }
   }
 
