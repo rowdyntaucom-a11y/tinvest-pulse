@@ -98,10 +98,18 @@ function accountStatusLabel(value: string | null | undefined) {
 function accountAccessLabel(value: string | null | undefined) {
   const raw = String(value || '').toUpperCase()
   if (!raw) return null
-  if (raw.includes('READ_ONLY')) return 'READ ONLY'
-  if (raw.includes('FULL_ACCESS')) return 'FULL ACCESS'
-  if (raw.includes('NO_ACCESS')) return 'NO ACCESS'
+  if (raw.includes('READ_ONLY')) return 'ТОЛЬКО ЧТЕНИЕ'
+  if (raw.includes('FULL_ACCESS')) return 'ПОЛНЫЙ ДОСТУП'
+  if (raw.includes('NO_ACCESS')) return 'НЕТ ДОСТУПА'
   return enumTail(value)
+}
+
+function timestampStateLabel(value: string | null | undefined) {
+  const raw = String(value || '').toUpperCase()
+  if (raw === 'REPORTED') return 'ПОЛУЧЕН'
+  if (raw === 'INVALID') return 'ОШИБКА'
+  if (raw === 'MISSING') return 'НЕТ ВРЕМЕНИ'
+  return raw || 'НЕИЗВЕСТНО'
 }
 
 function accountDate(value: string | null | undefined) {
@@ -217,7 +225,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const snapshotAge = compactAge(dataContext.ageMinutes)
   const snapshotLabel = dataContext.timestampState === 'REPORTED'
     ? snapshotAge ?? '0 мин'
-    : dataContext.timestampState === 'INVALID' ? 'INVALID' : 'НЕТ ВРЕМЕНИ'
+    : dataContext.timestampState === 'INVALID' ? 'ОШИБКА ВРЕМЕНИ' : 'НЕТ ВРЕМЕНИ'
   const historyFrom = compactDate(dataContext.history.firstDate)
   const historyTo = compactDate(dataContext.history.lastDate)
   const historyLabel = dataContext.history.points
@@ -230,10 +238,12 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const accountOpened = account?.available ? accountDate(account.openedDate) : null
   const sourceTitle = [
     `Источник портфеля: ${dataContext.source}`,
-    `timestamp: ${dataContext.timestampState}`,
-    dataContext.reportedAt ? `reportedAt: ${new Date(dataContext.reportedAt).toLocaleString('ru-RU')}` : null,
-    account?.available ? `accounts: ${account.type ?? 'type unknown'} · ${account.status ?? 'status unknown'} · ${account.accessLevel ?? 'access unknown'}` : 'accounts: unavailable',
-    accountOpened ? `opened: ${accountOpened}` : null,
+    `Статус времени: ${timestampStateLabel(dataContext.timestampState)}`,
+    dataContext.reportedAt ? `Время снимка: ${new Date(dataContext.reportedAt).toLocaleString('ru-RU')}` : null,
+    account?.available
+      ? `Счёт: ${accountTypeLabel(account.type) ?? 'тип неизвестен'} · ${accountStatusLabel(account.status) ?? 'статус неизвестен'} · ${accountAccessLabel(account.accessLevel) ?? 'доступ неизвестен'}`
+      : 'Счёт: данные недоступны',
+    accountOpened ? `Счёт открыт: ${accountOpened}` : null,
   ].filter(Boolean).join(' · ')
 
   const chooseSort = (sort: PositionSort) => {
@@ -257,7 +267,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
           className={`sample-badge ${dataContext.source !== 'FALLBACK' ? 'sample-badge--mature' : ''}`}
           title={sourceTitle}
         >
-          {dataContext.source !== 'FALLBACK' ? 'API' : 'API WAIT'}
+          {dataContext.source !== 'FALLBACK' ? 'API' : 'ЖДЁМ API'}
         </span>
       </nav>
 
@@ -294,7 +304,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
       {view === 'positions' && (
         <section className="panel portfolio-fill-panel portfolio-positions-panel">
           <div className="panel-head panel-head--paged">
-            <div><span className="eyebrow">СОСТАВ · DRILL-DOWN</span><h2>ТЕКУЩИЕ ПОЗИЦИИ</h2></div>
+            <div><span className="eyebrow">СОСТАВ · ДЕТАЛИ</span><h2>ТЕКУЩИЕ ПОЗИЦИИ</h2></div>
             <div className="pager" aria-label="Страницы позиций">
               <button disabled={safePositionPage === 0} onClick={() => changePage(Math.max(0, safePositionPage - 1))}>‹</button>
               <span>{sortedPositions.length ? `${safePositionPage + 1}/${positionPages}` : '—'}</span>
@@ -317,7 +327,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                 <div><span>ВЫБРАНО</span><strong>{selectedPosition.ticker || selectedPosition.name}</strong></div>
                 <small>
                   {assetTypeLabel(selectedPosition.instrumentType)} · вес {pctPlain.format(selectedPosition.weight * 100)}%
-                  {selectedAttribution?.grossPnlShare == null ? '' : ` · P/L вклад ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}
+                  {selectedAttribution?.grossPnlShare == null ? '' : ` · вклад в |P/L| ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}
                 </small>
               </div>
               <div className="position-inspector__grid">
@@ -329,17 +339,17 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                 <div><span>P/L %</span><strong className={(selectedPnl.pct ?? 0) > 0 ? 'is-positive' : (selectedPnl.pct ?? 0) < 0 ? 'is-negative' : ''}>{selectedPnl.pct == null ? '—' : `${pctSigned.format(selectedPnl.pct * 100)}%`}</strong></div>
               </div>
               <p>
-                Результат позиции берётся из broker `expectedYield`; P/L-вклад = |P/L позиции| / сумма |P/L| текущих позиций
+                Результат позиции берётся из показателя expectedYield брокера; вклад в |P/L| = |P/L позиции| / сумма |P/L| текущих позиций
                 {selectedAttribution?.grossPnlShare == null ? '' : ` = ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}.
-                Это текущая нереализованная broker P/L attribution, а не TWR, alpha или исторический вклад в доходность.
+                Это текущий нереализованный вклад в P/L по данным брокера, а не TWR, альфа или исторический вклад в доходность.
                 {selectedIncomeVisible && selectedIncome ? (
                   <>
-                    <br />Доход · exact FIGI: FACT observed net {selectedIncome.factNet == null ? '—' : `${money2.format(selectedIncome.factNet)} ₽`}
-                    {selectedIncome.factShare == null ? '' : ` · ${pctPlain.format(selectedIncome.factShare * 100)}% наблюдаемых FACT`}
+                    <br />Доход · точный FIGI: получено после налога {selectedIncome.factNet == null ? '—' : `${money2.format(selectedIncome.factNet)} ₽`}
+                    {selectedIncome.factShare == null ? '' : ` · ${pctPlain.format(selectedIncome.factShare * 100)}% наблюдаемого факта`}
                     {selectedFactWindow == null ? '' : ` · окно ${selectedFactWindow}`}
-                    {' · '}12M schedule gross {selectedIncome.scheduledGross == null ? '—' : `${money2.format(selectedIncome.scheduledGross)} ₽`}
+                    {' · '}расписание 12М до налога {selectedIncome.scheduledGross == null ? '—' : `${money2.format(selectedIncome.scheduledGross)} ₽`}
                     {selectedIncome.scheduledShare == null ? '' : ` · ${pctPlain.format(selectedIncome.scheduledShare * 100)}% расписания`}.
-                    FACT и schedule имеют разные базы; сопоставление конкретной выплаты с конкретной строкой расписания не реконструируется.
+                    Полученные выплаты и расписание имеют разные базы; сопоставление конкретной выплаты с конкретной строкой расписания не реконструируется.
                   </>
                 ) : null}
               </p>
@@ -354,7 +364,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
             <div><span className="eyebrow">СТРУКТУРА</span><h2>{structureMode === 'classes' ? 'КЛАССЫ АКТИВОВ' : 'ОБЛИГАЦИИ'}</h2></div>
             <div className="structure-switch" aria-label="Режим структуры">
               <button className={structureMode === 'classes' ? 'is-active' : ''} onClick={() => setStructureMode('classes')}>КЛАССЫ</button>
-              <button className={structureMode === 'bonds' ? 'is-active' : ''} onClick={() => setStructureMode('bonds')}>BONDS</button>
+              <button className={structureMode === 'bonds' ? 'is-active' : ''} onClick={() => setStructureMode('bonds')}>ОБЛИГ.</button>
             </div>
           </div>
 
@@ -362,7 +372,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
             <>
               <div
                 className="allocation-basis"
-                title="База классов — сумма текущей стоимости positionItems. Δ = positionItems − live капитал; веса классов нормированы только внутри этой базы."
+                title="База классов — сумма текущей стоимости позиций (positionItems). Δ = позиции − капитал снимка; веса классов нормированы только внутри этой базы."
               >
                 <span>БАЗА КЛАССОВ</span>
                 <strong>{money.format(positionValue)} ₽</strong>
@@ -385,16 +395,16 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                           {pnlShare == null ? '' : ` · ${pctPlain.format(pnlShare * 100)}% |P/L|`}
                         </span>
                       </div>
-                      <b title="Доля класса внутри суммы positionItems">{pctPlain.format(item.weight * 100)}% поз.</b>
+                      <b title="Доля класса внутри суммы текущих позиций">{pctPlain.format(item.weight * 100)}% поз.</b>
                       <i><span style={{ width: `${item.weight * 100}%` }} /></i>
                     </div>
                   )
                 }) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
               </div>
               <p className="method-note">
-                Вес класса = стоимость класса / база positionItems, а не / весь live-капитал; 100% классов = {money.format(positionValue)} ₽
+                Вес класса = стоимость класса / сумма текущих позиций, а не / весь капитал снимка; 100% классов = {money.format(positionValue)} ₽
                 {allocationCoverage == null ? '' : ` · покрытие ${pctPlain.format(allocationCoverage * 100)}% капитала`}.
-                TOP 3 позиций · {topExposure.topWeight == null ? '—' : `${pctPlain.format(topExposure.topWeight * 100)}%`} live-капитала. P/L по классам — broker `expectedYield`; доля |P/L| = gross absolute P/L класса / сумма |P/L| текущих позиций. Это не TWR и не историческая return attribution.
+                3 крупнейшие позиции · {topExposure.topWeight == null ? '—' : `${pctPlain.format(topExposure.topWeight * 100)}%`} капитала снимка. P/L по классам — показатель expectedYield брокера; доля |P/L| = сумма абсолютных P/L класса / сумма |P/L| текущих позиций. Это не TWR и не историческая атрибуция доходности.
               </p>
             </>
           ) : (
