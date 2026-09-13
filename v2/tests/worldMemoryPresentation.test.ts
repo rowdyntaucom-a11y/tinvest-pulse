@@ -1,30 +1,26 @@
 import assert from 'node:assert/strict'
 import {
   WORLD_MEMORY_PRESENTATION_VERSION,
-  buildWorldMemoryPresentation,
-} from '../src/features/world/worldMemoryPresentation.ts'
+  buildWorldMemoryPresentationPolicy,
+} from '../src/features/world/worldMemoryPresentationPolicy.ts'
 
 assert.equal(WORLD_MEMORY_PRESENTATION_VERSION, '0.1')
 
-const empty = buildWorldMemoryPresentation(null)
+const empty = buildWorldMemoryPresentationPolicy([])
 assert.equal(empty.totalMoments, 0)
 assert.equal(empty.firstRecordedAt, null)
 assert.equal(empty.lastRecordedAt, null)
 assert.deepEqual(empty.channels, [])
 assert.deepEqual(empty.recentMoments, [])
 
-const chronicle = {
-  version: '0.1',
-  updatedAt: '2026-09-13T12:00:00Z',
-  entries: [
-    { id: 'xp:health-2', kind: 'xp:HEALTH_MILESTONE', occurredAt: '2026-09-13T11:00:00Z', title: 'Health 2' },
-    { id: 'xp:habit-1', kind: 'xp:CONTRIBUTION_HABIT', occurredAt: '2026-09-11T09:00:00Z', title: 'Habit 1' },
-    { id: 'xp:health-1', kind: 'xp:HEALTH_MILESTONE', occurredAt: '2026-09-12T10:00:00Z', title: 'Health 1' },
-    { id: 'future:unknown', kind: 'future:UNKNOWN_KIND', occurredAt: '2026-09-13T12:00:00Z', title: 'Future event' },
-  ],
-}
+const presented = [
+  { id: 'xp:habit-1', channel: 'discipline', label: 'ДИСЦИПЛИНА', occurredAt: '2026-09-11T09:00:00.000Z', title: 'Habit 1' },
+  { id: 'xp:health-1', channel: 'health', label: 'ЗДОРОВЬЕ', occurredAt: '2026-09-12T10:00:00.000Z', title: 'Health 1' },
+  { id: 'xp:health-2', channel: 'health', label: 'ЗДОРОВЬЕ', occurredAt: '2026-09-13T11:00:00.000Z', title: 'Health 2' },
+  { id: 'future:unknown', channel: 'generic', label: 'СОБЫТИЕ', occurredAt: '2026-09-13T12:00:00.000Z', title: 'Future event' },
+] as const
 
-const memory = buildWorldMemoryPresentation(chronicle, 3)
+const memory = buildWorldMemoryPresentationPolicy(presented, 3)
 assert.equal(memory.totalMoments, 4)
 assert.equal(memory.firstRecordedAt, '2026-09-11T09:00:00.000Z')
 assert.equal(memory.lastRecordedAt, '2026-09-13T12:00:00.000Z')
@@ -51,25 +47,18 @@ assert.equal(memory.recentMoments.find(item => item.id === 'xp:health-2')?.seque
 assert.equal(memory.recentMoments.find(item => item.id === 'xp:health-2')?.isFirstInChannel, false)
 assert.equal(memory.recentMoments.find(item => item.id === 'future:unknown')?.channel, 'generic')
 
-const noRecent = buildWorldMemoryPresentation(chronicle, 0)
+const noRecent = buildWorldMemoryPresentationPolicy(presented, 0)
 assert.equal(noRecent.totalMoments, 4)
 assert.deepEqual(noRecent.recentMoments, [])
 assert.equal(noRecent.channels.find(item => item.channel === 'health')?.count, 2)
 
-const invalidLimit = buildWorldMemoryPresentation(chronicle, Number.NaN)
+const invalidLimit = buildWorldMemoryPresentationPolicy(presented, Number.NaN)
 assert.equal(invalidLimit.recentMoments.length, 4)
 
-const dirty = buildWorldMemoryPresentation({
-  version: '0.1',
-  updatedAt: null,
-  entries: [
-    { id: 'same', kind: 'xp:ACHIEVEMENT', occurredAt: '2026-09-12T10:00:00Z', title: 'Original' },
-    { id: 'same', kind: 'xp:ACHIEVEMENT', occurredAt: '2026-09-13T10:00:00Z', title: 'Rewrite attempt' },
-    { id: '', kind: 'xp:ACHIEVEMENT', occurredAt: 'bad' },
-  ],
-})
-assert.equal(dirty.totalMoments, 1)
-assert.equal(dirty.recentMoments[0]?.title, 'Original')
-assert.equal(dirty.recentMoments[0]?.isFirstInChannel, true)
+const sameTime = buildWorldMemoryPresentationPolicy([
+  { id: 'b', channel: 'strategy', label: 'СТРАТЕГИЯ', occurredAt: '2026-09-13T12:00:00.000Z', title: null },
+  { id: 'a', channel: 'achievement', label: 'ДОСТИЖЕНИЕ', occurredAt: '2026-09-13T12:00:00.000Z', title: null },
+])
+assert.deepEqual(sameTime.channels.map(item => item.channel), ['achievement', 'strategy'])
 
-console.log('worldMemoryPresentation tests passed')
+console.log('worldMemoryPresentation policy tests passed')
