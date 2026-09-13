@@ -20,7 +20,7 @@ Starting main: `d2f283b5f99e9ad2367beca49abbda74d0451c34`.
 ### Code-quality pass
 - New React component is a thin input/presentation layer over the existing deterministic boundary.
 - No backend route, broker API, storage contract, financial data normalization or dependency is added.
-- CI result to be recorded on the PR before any production merge.
+- GitHub `v2 build` run #352 completed successfully on the PR head: `npm ci`, both dependency-security gates, TypeScript/Vite build, full `test:core`, asset-history regression and syntax checks for `payouts-core.js`, `server-core.js`, `production-v158.js`, `production-v159.js` and `production-v160.js` all passed.
 
 ### Mobile-UX pass
 - Initial implementation placed strategy comparison in a second top-level `<details>` row. Council review rejected that because it increased the default DRIFT screen height.
@@ -29,7 +29,7 @@ Starting main: `d2f283b5f99e9ad2367beca49abbda74d0451c34`.
 
 ### Release pass / blocker
 - Production merge is intentionally blocked in this automation run because the Render connector lost its previously confirmed workspace selection. Connector policy forbids selecting a workspace autonomously, so both `tinvest-pulse-v2-preview` and `tinvest-pulse` queues cannot be inspected safely in this run.
-- Keep this work on `qvanix-strategy-compare-ui-v1` / its PR until a later run can verify both Render services are settled.
+- Keep this work on `qvanix-strategy-compare-ui-v1` / PR #226 until a later run can verify both Render services are settled.
 - No manual Render deploy is permitted or attempted.
 
 ### Legal
@@ -39,4 +39,4 @@ Starting main: `d2f283b5f99e9ad2367beca49abbda74d0451c34`.
 `WEEKEND_PROGRESS.md` was re-read. Its latest canonical entry is behind the dated `progress/*.md` checkpoints. The GitHub connector only exposes full-file replacement for edits; this run does not risk rewriting the long historical log without a safe append primitive. This checkpoint preserves the current work until the canonical log can be updated with a verified append-only diff.
 
 ### Next safe step
-Run the full `v2 build` PR gate. In a later run with a confirmed Render workspace, re-check both production queues, rebase if `main` moved, inspect the final diff and merge only if both services are settled and CI remains green.
+In a later run with a confirmed Render workspace, re-check both production queues, rebase PR #226 if `main` moved, inspect the final diff and merge only if both services are settled and CI remains green. After merge, update `ADVANCED_INVESTOR_AUDIT.md` to move strategy-scenario UI integration from ACTIVE to DONE and record the production deploy result.
