@@ -52,6 +52,8 @@ jobs:
           npm audit --omit=dev --audit-level=high
       - run: npm run build
       - run: npm run test:core
+      - name: Living World runtime-state regression
+        run: node --experimental-strip-types tests/worldRuntimeState.test.ts
       - run: node --check ../asset-history-core.js
       - run: node ../tests/asset-history-core.test.js
       - run: node --check ../payouts-core.js
