@@ -1,6 +1,29 @@
-/* Final mobile shell pass before XP/DNA work. Keep this layer small and removable. */
+/* Final responsive shell. Keep this layer small and removable. */
 .analytics-subnav {
   grid-template-columns: repeat(5, auto) 1fr;
+}
+
+/* Compact landscape/tablet heights should not inherit the phone-only 100dvh lock. */
+@media (min-width: 621px) and (max-height: 760px) {
+  .app-shell {
+    padding-top: 10px;
+    padding-bottom: 16px;
+  }
+
+  .topbar {
+    gap: 8px;
+    padding-bottom: 10px;
+  }
+
+  .topbar p {
+    display: none;
+  }
+
+  .metric-card,
+  .context-card,
+  .risk-card {
+    min-height: 96px;
+  }
 }
 
 @media (max-width: 620px) {
@@ -14,22 +37,26 @@
   }
 
   .chip {
+    min-height: 32px;
     padding: 6px 3px;
   }
 
   .analytics-subnav {
-    grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 3px;
   }
 
   .analytics-subnav button {
     min-width: 0;
+    min-height: 30px;
     padding-inline: 4px;
   }
 
   .analytics-subnav .sample-badge {
+    grid-column: 1 / -1;
+    justify-self: start;
     min-width: 0;
-    padding-inline: 5px;
+    padding: 3px 6px;
   }
 
   .analytics-risk-view {
@@ -37,7 +64,7 @@
   }
 
   .risk-grid {
-    grid-template-rows: repeat(2, 112px);
+    grid-template-rows: repeat(2, minmax(82px, 1fr));
   }
 
   .risk-card {
@@ -67,7 +94,7 @@
   }
 
   .income-hero > strong {
-    font-size: 42px;
+    font-size: clamp(34px, 11vw, 42px);
   }
 
   .income-hero > small {
@@ -77,5 +104,55 @@
 
   .roadmap-panel {
     min-height: 0;
+  }
+}
+
+/* Very narrow phones: preserve readable labels instead of squeezing a sixth column. */
+@media (max-width: 359px) {
+  .app-shell {
+    width: calc(100% - 8px);
+  }
+
+  .topbar__nav {
+    gap: 2px;
+  }
+
+  .chip {
+    font-size: 7px;
+    letter-spacing: 0;
+  }
+
+  .analytics-subnav button {
+    font-size: 6.4px;
+    padding-inline: 2px;
+  }
+}
+
+/* Short phones get a little more vertical breathing room without forcing sub-6px copy. */
+@media (max-width: 620px) and (max-height: 740px) {
+  .app-shell {
+    padding-top: max(4px, env(safe-area-inset-top));
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+
+  .topbar {
+    padding-bottom: 3px;
+  }
+
+  .brand-block .eyebrow {
+    display: none;
+  }
+
+  h1 {
+    font-size: clamp(23px, 7vw, 29px);
+  }
+
+  .metric-card,
+  .score-card {
+    min-height: 62px;
+  }
+
+  .risk-grid {
+    grid-template-rows: repeat(2, minmax(72px, 1fr));
   }
 }
