@@ -201,17 +201,17 @@ export function HistoryChart({ points }: Props) {
         <small>{spanDays ? `доступно ${spanDays + 1} д.` : 'история загружается'}</small>
       </div>
       {pairedLatest && (
-        <div className={`history-narrative ${pairedLatest.spread >= 0 ? 'history-narrative--ahead' : 'history-narrative--behind'}`}>
+        <div key={`history-narrative-${period}`} className={`history-narrative ${pairedLatest.spread >= 0 ? 'history-narrative--ahead' : 'history-narrative--behind'}`}>
           <span>ПОСЛЕДНЯЯ ОБЩАЯ ТОЧКА{pairedDateLabel ? ` · ${pairedDateLabel}` : ''}</span>
           <strong>Портфель {pairedLatest.spread >= 0 ? 'выше' : 'ниже'} IMOEX на {Math.abs(pairedLatest.spread).toFixed(1)} п.</strong>
           <small>Сравнение нормализованных индексов на одной дате; это не альфа и не прогноз.</small>
         </div>
       )}
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="Доходность портфеля и IMOEX на общей шкале">
+      <svg key={`history-chart-${period}`} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="Доходность портфеля и IMOEX на общей шкале">
         {[0.2, 0.4, 0.6, 0.8].map(k => <line key={k} x1={PAD_X} x2={W - PAD_X} y1={H * k} y2={H * k} className="history-gridline" />)}
         {spreadSegments.map(segment => <polygon key={segment.id} points={segment.points} className={`history-spread history-spread--${segment.tone}`} />)}
-        {portfolioPath && <path d={portfolioPath} className="history-line history-line--portfolio" />}
-        {hasImoex && imoexPath && <path d={imoexPath} className="history-line history-line--imoex" />}
+        {portfolioPath && <path d={portfolioPath} pathLength={1} className="history-line history-line--portfolio" />}
+        {hasImoex && imoexPath && <path d={imoexPath} pathLength={1} className="history-line history-line--imoex" />}
         {markerPresentation.visibleEventDays.map(day => {
           const x = PAD_X + (day.index / eventDenom) * (W - PAD_X * 2)
           const tone = day.buys > 0 && day.sells > 0 ? 'mixed' : day.buys > 0 ? 'buy' : 'sell'
