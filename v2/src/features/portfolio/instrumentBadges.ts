@@ -14,7 +14,7 @@ export type InstrumentBadgeItem = {
   brand: InstrumentBadgeBrand | null
 }
 
-type InstrumentBadgePayload = {
+export type InstrumentBadgePayload = {
   version: '1.0'
   available: boolean
   items: InstrumentBadgeItem[]
@@ -28,7 +28,7 @@ function cleanText(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null
 }
 
-function normalizePayload(value: unknown): InstrumentBadgePayload {
+export function normalizeInstrumentBadgePayload(value: unknown): InstrumentBadgePayload {
   const root = value && typeof value === 'object' ? value as Record<string, unknown> : {}
   const rows = Array.isArray(root.items) ? root.items : []
   const items: InstrumentBadgeItem[] = []
@@ -55,15 +55,17 @@ function normalizePayload(value: unknown): InstrumentBadgePayload {
     version: '1.0',
     available: items.some(item => item.brand != null),
     items,
-    logoCdn: cleanText(root.logoCdn) ?? DEFAULT_CDN,
+    // Never allow an API payload to redirect image requests away from the
+    // reviewed T-Invest brand CDN.
+    logoCdn: DEFAULT_CDN,
   }
 }
 
 export async function loadInstrumentBadges(): Promise<InstrumentBadgePayload> {
   if (!badgePromise) {
     badgePromise = fetch('/api/instrument-badges', { cache: 'no-store' })
-      .then(async response => response.ok ? normalizePayload(await response.json()) : normalizePayload(null))
-      .catch(() => normalizePayload(null))
+      .then(async response => response.ok ? normalizeInstrumentBadgePayload(await response.json()) : normalizeInstrumentBadgePayload(null))
+      .catch(() => normalizeInstrumentBadgePayload(null))
   }
   return badgePromise
 }
@@ -83,7 +85,17 @@ export function findInstrumentBadge(payload: InstrumentBadgePayload | null, posi
 export function instrumentLogoUrl(payload: InstrumentBadgePayload | null, item: InstrumentBadgeItem | null, size: 160 | 320 = 160): string | null {
   const logoName = cleanText(item?.brand?.logoName)
   if (!logoName) return null
-  const base = cleanText(payload?.logoCdn) ?? DEFAULT_CDN
+  const base = payload?.logoCdn === DEFAULT_CDN ? payload.logoCdn : DEFAULT_CDN
   const stem = logoName.replace(/\.png$/i, '')
   return `${base}${encodeURIComponent(stem)}x${size}.png`
+}
+
+export function instrumentFallbackLabel(type: string): string {
+  const key = String(type || '').toLowerCase()
+  if (key.includes('bond')) return 'О'
+  if (key.includes('share') || key.includes('stock')) return 'А'
+  if (key.includes('etf') || key.includes('fund')) return 'Ф'
+  if (key.includes('currency')) return '₽'
+  if (key.includes('future')) return 'F'
+  return '•'
 }
