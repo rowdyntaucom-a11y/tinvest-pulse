@@ -58,6 +58,7 @@ export default function AllocationDonutView({ items }: Props) {
               transform="rotate(-90 60 60)"
               role="button"
               tabIndex={0}
+              aria-pressed={selected?.label === segment.label}
               aria-label={`${segment.label}: ${pct.format(segment.weight * 100)}%, ${money.format(segment.value)} ₽`}
               onClick={() => setSelectedLabel(segment.label)}
               onKeyDown={event => {
@@ -69,7 +70,7 @@ export default function AllocationDonutView({ items }: Props) {
             />
           ))}
         </svg>
-        <div className="allocation-donut__center" aria-live="polite">
+        <div key={selected?.label ?? 'empty'} className="allocation-donut__center" aria-live="polite">
           <span>{selected?.label}</span>
           <strong>{selected ? `${pct.format(selected.weight * 100)}%` : '—'}</strong>
           <small>{selected ? `${money.format(selected.value)} ₽` : '—'}</small>
@@ -81,6 +82,7 @@ export default function AllocationDonutView({ items }: Props) {
             type="button"
             key={segment.label}
             className={selected?.label === segment.label ? 'is-selected' : ''}
+            aria-pressed={selected?.label === segment.label}
             onClick={() => setSelectedLabel(segment.label)}
           >
             <i data-asset-class={segment.label} aria-hidden="true" />
