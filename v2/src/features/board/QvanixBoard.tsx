@@ -3,6 +3,7 @@ import type { PortfolioAnalytics } from '../analytics/metrics'
 import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import type { PortfolioSnapshot } from '../../lib/portfolioApi'
 import type { UiModuleId, UiWorkspace } from '../../lib/uiPreferences'
+import { MetricSparkline } from '../shared/MetricSparkline'
 import './qvanixBoard.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -24,6 +25,8 @@ type BoardModule = {
   note: string
   tone: 'mint' | 'amber' | 'blue' | 'neutral'
   destination: BoardDestination | null
+  sparklineValues?: Array<number | null>
+  sparklineLabel?: string
 }
 
 type Props = {
@@ -68,6 +71,8 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
     const actualAvailable = calendar?.available === true && calendar.actual?.observation?.available === true
     const actualNet = actualAvailable && Number.isFinite(calendar?.actual?.totalNet) ? calendar!.actual.totalNet : null
     const actualYear = actualAvailable && calendar?.actual?.year ? calendar.actual.year : null
+    const valueHistory = snapshot.history.map(point => point.value)
+    const twrHistory = snapshot.history.map(point => point.portfolio)
 
     const all: Record<UiModuleId, BoardModule> = {
       'portfolio.value': {
@@ -75,6 +80,8 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
         value: snapshot.value > 0 ? `${money.format(snapshot.value)} ₽` : '—',
         note: `${snapshot.positions} позиций · ${snapshot.source.toUpperCase()}`,
         tone: 'mint', destination: { workspace: 'portfolio' },
+        sparklineValues: valueHistory,
+        sparklineLabel: 'Стоимость портфеля · последние 30 доступных дневных точек',
       },
       'portfolio.pnl': {
         id: 'portfolio.pnl', eyebrow: 'BROKER P/L', label: 'ДЕНЕЖНЫЙ РЕЗУЛЬТАТ',
@@ -87,6 +94,8 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
         value: signedPercent(analytics.twr),
         note: analytics.historyPoints ? `${analytics.historyPoints} точек · без размера пополнений` : 'история не готова',
         tone: 'blue', destination: { workspace: 'analytics', analyticsView: 'overview' },
+        sparklineValues: twrHistory,
+        sparklineLabel: 'TWR-индекс · последние 30 доступных дневных точек',
       },
       'analytics.xirr': {
         id: 'analytics.xirr', eyebrow: 'XIRR', label: 'ЛИЧНАЯ ДОХОДНОСТЬ',
@@ -187,6 +196,9 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
             >
               <span>{module.eyebrow}</span>
               <strong>{module.value}</strong>
+              {module.sparklineValues && module.sparklineLabel ? (
+                <MetricSparkline values={module.sparklineValues} label={module.sparklineLabel} />
+              ) : null}
               <b>{module.label}</b>
               <small>{module.note}</small>
               {module.destination ? <i aria-hidden="true">↗</i> : null}
