@@ -1,4 +1,5 @@
-/* Mobile one-screen pass for the v2 income workspace. */
+/* Mobile density pass for the v2 income workspace. */
+.income-subnav{grid-template-columns:repeat(4,auto) 1fr}
 .income-source-badge.is-verified{color:var(--mint);border-color:var(--line-strong)}
 .income-source-badge.is-stale,.income-source-badge.is-partial{color:var(--amber);border-color:rgba(239,183,98,.34)}
 .income-source-badge.is-unavailable{color:#d98f87;border-color:rgba(217,143,135,.34)}
@@ -15,9 +16,9 @@
 
 @media(max-width:620px){
   .income-workspace{height:100%;grid-template-rows:auto minmax(0,1fr);gap:5px;overflow:hidden}
-  .income-subnav{min-height:30px;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:4px}
+  .income-subnav{min-height:30px;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
   .income-subnav button{padding:6px 4px;font-size:6.4px;letter-spacing:.03em}
-  .income-source-badge{grid-column:auto;justify-self:end;margin-top:0;padding:5px 6px;font-size:5.8px;white-space:nowrap}
+  .income-source-badge{grid-column:1/-1;justify-self:end;margin-top:0;padding:5px 6px;font-size:5.8px;white-space:nowrap}
 
   .income-overview-grid{height:100%;grid-template-rows:minmax(0,1.15fr) minmax(0,.8fr) minmax(0,.9fr);gap:5px}
   .income-fact,.income-forecast,.income-next,.income-months{min-height:0!important}
@@ -68,4 +69,9 @@
   .income-integrity strong{font-size:6.5px}
   .income-integrity-status{margin-top:4px;padding:4px 6px;font-size:5.8px}
   .income-integrity-status b{font-size:5.8px;white-space:nowrap}
+}
+
+@media(max-width:430px){
+  .income-subnav{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .income-source-badge{grid-column:1/-1}
 }
