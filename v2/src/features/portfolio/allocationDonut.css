@@ -62,24 +62,19 @@
   filter: drop-shadow(0 0 5px rgba(255,255,255,.08));
 }
 
-.allocation-donut__segment.is-equity,
-.allocation-donut__legend i.is-equity,
-.allocation-class-dot.is-equity { stroke: var(--asset-equity); background: var(--asset-equity); }
-.allocation-donut__segment.is-bond,
-.allocation-donut__legend i.is-bond,
-.allocation-class-dot.is-bond { stroke: var(--asset-bond); background: var(--asset-bond); }
-.allocation-donut__segment.is-fund,
-.allocation-donut__legend i.is-fund,
-.allocation-class-dot.is-fund { stroke: var(--asset-fund); background: var(--asset-fund); }
-.allocation-donut__segment.is-currency,
-.allocation-donut__legend i.is-currency,
-.allocation-class-dot.is-currency { stroke: var(--asset-currency); background: var(--asset-currency); }
-.allocation-donut__segment.is-future,
-.allocation-donut__legend i.is-future,
-.allocation-class-dot.is-future { stroke: var(--asset-future); background: var(--asset-future); }
-.allocation-donut__segment.is-other,
-.allocation-donut__legend i.is-other,
-.allocation-class-dot.is-other { stroke: var(--asset-other); background: var(--asset-other); }
+.allocation-donut__segment[data-asset-class="Акции"] { stroke: var(--asset-equity); }
+.allocation-donut__segment[data-asset-class="Облигации"] { stroke: var(--asset-bond); }
+.allocation-donut__segment[data-asset-class="Фонды"] { stroke: var(--asset-fund); }
+.allocation-donut__segment[data-asset-class="Валюта"] { stroke: var(--asset-currency); }
+.allocation-donut__segment[data-asset-class="Фьючерсы"] { stroke: var(--asset-future); }
+.allocation-donut__segment[data-asset-class="Прочее"] { stroke: var(--asset-other); }
+
+.allocation-donut__legend i[data-asset-class="Акции"], .allocation-class-dot.is-Акции { background: var(--asset-equity); }
+.allocation-donut__legend i[data-asset-class="Облигации"], .allocation-class-dot.is-Облигации { background: var(--asset-bond); }
+.allocation-donut__legend i[data-asset-class="Фонды"], .allocation-class-dot.is-Фонды { background: var(--asset-fund); }
+.allocation-donut__legend i[data-asset-class="Валюта"], .allocation-class-dot.is-Валюта { background: var(--asset-currency); }
+.allocation-donut__legend i[data-asset-class="Фьючерсы"], .allocation-class-dot.is-Фьючерсы { background: var(--asset-future); }
+.allocation-donut__legend i[data-asset-class="Прочее"], .allocation-class-dot.is-Прочее { background: var(--asset-other); }
 
 .allocation-donut__center {
   position: absolute;
@@ -190,21 +185,14 @@
     gap: 8px;
   }
 
-  .allocation-donut__chart {
-    width: 138px;
-  }
-
-  .allocation-donut__center strong {
-    font-size: 18px;
-  }
-
-  .allocation-donut__legend {
-    align-content: center;
-  }
+  .allocation-donut__chart { width: 138px; }
+  .allocation-donut__center strong { font-size: 18px; }
+  .allocation-donut__legend { align-content: center; }
 }
 
 @media (max-width: 620px) {
   .allocation-visual-layout {
+    min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-right: 2px;
@@ -215,34 +203,21 @@
     grid-template-columns: 128px minmax(0, 1fr);
   }
 
-  .allocation-donut__chart {
-    width: 124px;
-  }
+  .allocation-donut__chart { width: 124px; }
 
   .allocation-donut__track,
-  .allocation-donut__segment {
-    stroke-width: 11;
-  }
+  .allocation-donut__segment { stroke-width: 11; }
 
   .allocation-donut__segment:hover,
   .allocation-donut__segment:focus-visible,
-  .allocation-donut__segment.is-selected {
-    stroke-width: 14;
-  }
+  .allocation-donut__segment.is-selected { stroke-width: 14; }
 
   .allocation-donut__center span,
   .allocation-donut__legend span,
-  .allocation-donut__legend strong {
-    font-size: 7px;
-  }
+  .allocation-donut__legend strong { font-size: 7px; }
 
-  .allocation-donut__center strong {
-    font-size: 16px;
-  }
-
-  .allocation-donut__center small {
-    font-size: 6px;
-  }
+  .allocation-donut__center strong { font-size: 16px; }
+  .allocation-donut__center small { font-size: 6px; }
 
   .allocation-donut__legend button {
     min-height: 28px;
