@@ -10,6 +10,7 @@ import { buildPortfolioDataContext } from './portfolioDataContext'
 import { calculatePortfolioTopExposure } from './portfolioExposureDiagnostics'
 import { calculatePositionIncomeContribution } from './positionIncomeContribution'
 import './portfolio.css'
+import './positionInspector.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
@@ -21,6 +22,7 @@ const POSITION_PAGE_SIZE = 5
 
 type View = 'overview' | 'positions' | 'structure'
 type PositionSort = 'weight' | 'pnl' | 'pnlPct'
+type PositionInspectorView = 'position' | 'income'
 type StructureMode = 'classes' | 'bonds'
 
 type Props = { snapshot: PortfolioSnapshot }
@@ -160,6 +162,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const [positionPage, setPositionPage] = useState(0)
   const [positionSort, setPositionSort] = useState<PositionSort>('weight')
   const [selectedPositionKey, setSelectedPositionKey] = useState('')
+  const [positionInspectorView, setPositionInspectorView] = useState<PositionInspectorView>('position')
   const [structureMode, setStructureMode] = useState<StructureMode>('classes')
   const { calendar: incomeCalendar } = usePayoutSnapshot(view === 'positions')
 
@@ -337,29 +340,58 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                   {selectedAttribution?.grossPnlShare == null ? '' : ` · вклад в |P/L| ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}
                 </small>
               </div>
-              <div className="position-inspector__grid">
-                <div><span>КОЛ-ВО</span><strong>{quantityFmt.format(selectedPosition.quantity)}</strong></div>
-                <div><span>СР. ЦЕНА</span><strong>{selectedPosition.averagePrice ? money2.format(selectedPosition.averagePrice) : '—'}</strong></div>
-                <div><span>ТЕК. ЦЕНА</span><strong>{selectedPosition.currentPrice ? money2.format(selectedPosition.currentPrice) : '—'}</strong></div>
-                <div><span>СТОИМОСТЬ</span><strong>{money.format(selectedPosition.currentValue)} ₽</strong></div>
-                <div><span>P/L · API</span><strong className={selectedPnl.amount > 0 ? 'is-positive' : selectedPnl.amount < 0 ? 'is-negative' : ''}>{signedMoney(selectedPnl.amount)}</strong></div>
-                <div><span>P/L %</span><strong className={(selectedPnl.pct ?? 0) > 0 ? 'is-positive' : (selectedPnl.pct ?? 0) < 0 ? 'is-negative' : ''}>{selectedPnl.pct == null ? '—' : `${pctSigned.format(selectedPnl.pct * 100)}%`}</strong></div>
+
+              <div className="position-inspector__tabs" role="tablist" aria-label="Детали позиции">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={positionInspectorView === 'position'}
+                  className={positionInspectorView === 'position' ? 'is-active' : ''}
+                  onClick={() => setPositionInspectorView('position')}
+                >ПОЗИЦИЯ</button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={positionInspectorView === 'income'}
+                  className={positionInspectorView === 'income' ? 'is-active' : ''}
+                  onClick={() => setPositionInspectorView('income')}
+                >ДОХОД</button>
               </div>
-              <p>
-                Результат позиции берётся из показателя expectedYield брокера; вклад в |P/L| = |P/L позиции| / сумма |P/L| текущих позиций
-                {selectedAttribution?.grossPnlShare == null ? '' : ` = ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}.
-                Это текущий нереализованный вклад в P/L по данным брокера, а не TWR, альфа или исторический вклад в доходность.
-                {selectedIncomeVisible && selectedIncome ? (
-                  <>
-                    <br />Доход · точный FIGI: получено после налога {selectedIncome.factNet == null ? '—' : `${money2.format(selectedIncome.factNet)} ₽`}
-                    {selectedIncome.factShare == null ? '' : ` · ${pctPlain.format(selectedIncome.factShare * 100)}% наблюдаемого факта`}
-                    {selectedFactWindow == null ? '' : ` · окно ${selectedFactWindow}`}
-                    {' · '}расписание 12М до налога {selectedIncome.scheduledGross == null ? '—' : `${money2.format(selectedIncome.scheduledGross)} ₽`}
-                    {selectedIncome.scheduledShare == null ? '' : ` · ${pctPlain.format(selectedIncome.scheduledShare * 100)}% расписания`}.
-                    Полученные выплаты и расписание имеют разные базы; сопоставление конкретной выплаты с конкретной строкой расписания не реконструируется.
-                  </>
-                ) : null}
-              </p>
+
+              {positionInspectorView === 'position' ? (
+                <>
+                  <div className="position-inspector__grid">
+                    <div><span>КОЛ-ВО</span><strong>{quantityFmt.format(selectedPosition.quantity)}</strong></div>
+                    <div><span>СР. ЦЕНА</span><strong>{selectedPosition.averagePrice ? money2.format(selectedPosition.averagePrice) : '—'}</strong></div>
+                    <div><span>ТЕК. ЦЕНА</span><strong>{selectedPosition.currentPrice ? money2.format(selectedPosition.currentPrice) : '—'}</strong></div>
+                    <div><span>СТОИМОСТЬ</span><strong>{money.format(selectedPosition.currentValue)} ₽</strong></div>
+                    <div><span>P/L · API</span><strong className={selectedPnl.amount > 0 ? 'is-positive' : selectedPnl.amount < 0 ? 'is-negative' : ''}>{signedMoney(selectedPnl.amount)}</strong></div>
+                    <div><span>P/L %</span><strong className={(selectedPnl.pct ?? 0) > 0 ? 'is-positive' : (selectedPnl.pct ?? 0) < 0 ? 'is-negative' : ''}>{selectedPnl.pct == null ? '—' : `${pctSigned.format(selectedPnl.pct * 100)}%`}</strong></div>
+                  </div>
+                  <p>
+                    Результат позиции берётся из expectedYield брокера; вклад в |P/L| = |P/L позиции| / сумма |P/L| текущих позиций
+                    {selectedAttribution?.grossPnlShare == null ? '' : ` = ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}.
+                    Это текущий нереализованный вклад в P/L по данным брокера, а не TWR, альфа или исторический вклад в доходность.
+                  </p>
+                </>
+              ) : selectedIncomeVisible && selectedIncome ? (
+                <>
+                  <div className="position-inspector__income-grid">
+                    <div><span>ПОЛУЧЕНО</span><strong>{selectedIncome.factNet == null ? '—' : `${money2.format(selectedIncome.factNet)} ₽`}</strong><small>после налога</small></div>
+                    <div><span>ДОЛЯ ФАКТА</span><strong>{selectedIncome.factShare == null ? '—' : `${pctPlain.format(selectedIncome.factShare * 100)}%`}</strong><small>в наблюдаемом доходе</small></div>
+                    <div><span>12 МЕС.</span><strong>{selectedIncome.scheduledGross == null ? '—' : `${money2.format(selectedIncome.scheduledGross)} ₽`}</strong><small>подтверждено до налога</small></div>
+                    <div><span>ДОЛЯ 12М</span><strong>{selectedIncome.scheduledShare == null ? '—' : `${pctPlain.format(selectedIncome.scheduledShare * 100)}%`}</strong><small>в расписании выплат</small></div>
+                  </div>
+                  <p>
+                    Доход позиции связывается только по точному FIGI. {selectedFactWindow ? `Наблюдаемый факт: ${selectedFactWindow}. ` : ''}
+                    Полученные выплаты и расписание на 12 месяцев имеют разные базы и не складываются. Конкретная выплата не сопоставляется со строкой расписания без общего подтверждённого идентификатора события.
+                  </p>
+                </>
+              ) : (
+                <div className="position-inspector__empty">
+                  Для этой позиции пока нет подтверждённого дохода, который можно показать без предположений.
+                </div>
+              )}
             </div>
           )}
         </section>
