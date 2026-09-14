@@ -167,6 +167,16 @@
     left: -46vw;
     width: 34vw;
   }
+
+  /* On phones the workspace transition owns the entrance; ambient stays static. */
+  [data-qv-motion="full"] .qv-ambient::before,
+  [data-qv-motion="full"] .qv-ambient::after {
+    animation: none;
+  }
+
+  [data-qv-motion="full"] .qv-ambient::after {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

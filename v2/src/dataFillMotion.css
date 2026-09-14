@@ -47,7 +47,13 @@
   [data-qv-motion="full"] .allocation-row i span,
   [data-qv-motion="full"] .health-row i span,
   [data-qv-motion="full"] .drift-track i {
-    animation-duration: .46s;
+    animation-duration: .32s;
+    animation-delay: 0s;
+  }
+
+  [data-qv-motion="full"] .drift-track b {
+    animation-duration: .24s;
+    animation-delay: .04s;
   }
 }
 
