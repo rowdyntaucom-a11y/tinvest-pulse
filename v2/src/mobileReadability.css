@@ -12,7 +12,7 @@
   .allocation-row div span { font-size: 7.6px; line-height: 1.2; }
 
   .subnav button { font-size: 7.2px; letter-spacing: .035em; }
-  .sample-badge { font-size: 6.7px; letter-spacing: .035em; }
+  .sample-badge { font-size: 7.2px; line-height: 1.2; letter-spacing: .03em; }
   .score-card .metric-label { font-size: 7.2px; }
   .score-card small { font-size: 7.2px; line-height: 1.24; }
   .history-legend { font-size: 7.2px; }
