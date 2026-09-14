@@ -1,0 +1,52 @@
+/* Mobile readability pass: raise critical information above micro-copy without changing layout/data. */
+@media (max-width: 620px) {
+  .chip { font-size: 8px; letter-spacing: .015em; }
+  .metric-label { font-size: 7.4px; letter-spacing: .075em; }
+  .metric-card small { font-size: 7.4px; }
+  .context-card span { font-size: 6.5px; letter-spacing: .055em; }
+  .context-card strong { font-size: 8px; }
+
+  .position-main span { font-size: 6.8px; }
+  .position-weight > span,
+  .position-value { font-size: 7.4px; }
+  .allocation-row div span { font-size: 6.6px; }
+
+  .subnav button { font-size: 7.2px; letter-spacing: .035em; }
+  .sample-badge { font-size: 6.7px; letter-spacing: .035em; }
+  .score-card .metric-label { font-size: 6.8px; }
+  .score-card small { font-size: 6.8px; }
+  .history-legend { font-size: 7.2px; }
+  .risk-card > span { font-size: 6.8px; letter-spacing: .055em; }
+  .risk-card > small { font-size: 6.7px; line-height: 1.32; }
+  .analytics-note p { font-size: 7.4px; }
+  .health-row div span,
+  .health-weight,
+  .health-points { font-size: 6.7px; }
+  .method-note { font-size: 7.2px; }
+
+  .income-hero p,
+  .roadmap-panel p { font-size: 8.2px; }
+  .income-hero > small { font-size: 6.9px; }
+
+  .world-panel__head .eyebrow { font-size: 6.8px; letter-spacing: .08em; }
+  .dna-state span,
+  .dna-state small { font-size: 6.4px; }
+  .world-stage__diagnostic { font-size: 6.8px; }
+  .dna-next p { font-size: 7.2px; }
+
+  /* Recover space from decoration/gaps rather than shrinking text. */
+  .panel { padding-inline: 10px; }
+  .context-card { gap: 3px 5px; }
+  .analytics-topline,
+  .portfolio-summary,
+  .income-stats { gap: 4px; }
+  .risk-grid { gap: 4px; }
+  .health-row { gap: 2px 4px; }
+}
+
+@media (max-width: 359px) {
+  .chip { font-size: 7.6px; }
+  .subnav button { font-size: 6.9px; }
+  .metric-label { font-size: 7.1px; }
+  .context-card strong { font-size: 7.7px; }
+}
