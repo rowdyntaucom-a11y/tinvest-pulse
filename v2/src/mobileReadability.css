@@ -28,10 +28,10 @@
   .roadmap-panel p { font-size: 8.2px; }
   .income-hero > small { font-size: 6.9px; }
 
-  .world-panel__head .eyebrow { font-size: 6.8px; letter-spacing: .08em; }
+  .world-panel__head .eyebrow { font-size: 7.1px; line-height: 1.2; letter-spacing: .065em; }
   .dna-state span,
-  .dna-state small { font-size: 6.4px; }
-  .world-stage__diagnostic { font-size: 6.8px; }
+  .dna-state small { font-size: 7px; line-height: 1.2; }
+  .world-stage__diagnostic { font-size: 7.1px; line-height: 1.2; }
   .dna-next p { font-size: 7.2px; }
 
   /* Raise low-contrast supporting copy without touching semantic mint/amber states. */
