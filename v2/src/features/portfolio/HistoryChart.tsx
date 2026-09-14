@@ -6,6 +6,7 @@ import './transactionMarkers.css'
 
 type Props = { points: HistoryPoint[] }
 type HistoryPeriod = '1m' | '3m' | '6m' | '1y' | 'all'
+type HistoryView = 'portfolio' | 'compare'
 
 const W = 900
 const H = 280
@@ -103,6 +104,16 @@ const latestPairedPoint = (points: HistoryPoint[]) => {
   return null
 }
 
+const latestPortfolioPoint = (points: HistoryPoint[]) => {
+  for (let i = points.length - 1; i >= 0; i -= 1) {
+    const point = points[i]
+    if (typeof point.portfolio === 'number' && Number.isFinite(point.portfolio)) {
+      return { date: point.date, portfolio: point.portfolio }
+    }
+  }
+  return null
+}
+
 const historySpanDays = (points: HistoryPoint[]) => {
   if (points.length < 2) return 0
   const first = Date.parse(`${points[0].date}T00:00:00Z`)
@@ -125,6 +136,7 @@ const sliceHistoryPeriod = (points: HistoryPoint[], period: HistoryPeriod) => {
 export function HistoryChart({ points }: Props) {
   const [markerPayload, setMarkerPayload] = useState<TransactionMarkerPayload | null>(null)
   const [period, setPeriod] = useState<HistoryPeriod>('all')
+  const [view, setView] = useState<HistoryView>('compare')
   const allChartPoints = useMemo(
     () => points.filter(p => p.portfolio != null || p.imoex != null),
     [points],
@@ -162,20 +174,28 @@ export function HistoryChart({ points }: Props) {
 
   const portfolioValues = chartPoints.map(p => p.portfolio)
   const imoexValues = chartPoints.map(p => p.imoex)
-  const allFinite = [...portfolioValues, ...imoexValues].filter((v): v is number => typeof v === 'number' && Number.isFinite(v))
+  const portfolioCount = portfolioValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
+  const imoexCount = imoexValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
+  const hasImoex = imoexCount >= 2
+  const effectiveView: HistoryView = view === 'compare' && hasImoex ? 'compare' : 'portfolio'
+  const visibleValues = effectiveView === 'compare' ? [...portfolioValues, ...imoexValues] : portfolioValues
+  const allFinite = visibleValues.filter((v): v is number => typeof v === 'number' && Number.isFinite(v))
+
+  if (allFinite.length < 2) {
+    return <div className="history-empty">История портфеля ещё строится. Нужны минимум две дневные точки.</div>
+  }
+
   const rawMin = Math.min(...allFinite)
   const rawMax = Math.max(...allFinite)
   const padding = Math.max(1, (rawMax - rawMin) * 0.08)
   const min = rawMin - padding
   const max = rawMax + padding
   const portfolioPath = linePath(portfolioValues, min, max)
-  const imoexPath = linePath(imoexValues, min, max)
-  const portfolioCount = portfolioValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
-  const imoexCount = imoexValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
-  const hasImoex = imoexCount >= 2
-  const spreadSegments = hasImoex ? buildSpreadSegments(portfolioValues, imoexValues, min, max) : []
+  const imoexPath = effectiveView === 'compare' ? linePath(imoexValues, min, max) : ''
+  const spreadSegments = effectiveView === 'compare' ? buildSpreadSegments(portfolioValues, imoexValues, min, max) : []
   const benchmarkCoverage = portfolioCount ? Math.round((imoexCount / portfolioCount) * 100) : 0
   const pairedLatest = latestPairedPoint(chartPoints)
+  const portfolioLatest = latestPortfolioPoint(chartPoints)
   const first = chartPoints[0]?.date
   const last = chartPoints.at(-1)?.date
   const eventDenom = Math.max(1, chartPoints.length - 1)
@@ -185,33 +205,62 @@ export function HistoryChart({ points }: Props) {
 
   return (
     <div className="history-chart">
-      <div className="history-periods" aria-label="Период графика">
-        <span>ПЕРИОД</span>
-        {availablePeriods.map(item => (
+      <div className="history-controls">
+        <div className="history-view-modes" role="group" aria-label="Вид графика">
+          <span>ВИД</span>
           <button
             type="button"
-            key={item.key}
-            className={period === item.key ? 'is-active' : ''}
-            aria-pressed={period === item.key}
-            onClick={() => setPeriod(item.key)}
+            className={effectiveView === 'portfolio' ? 'is-active' : ''}
+            aria-pressed={effectiveView === 'portfolio'}
+            onClick={() => setView('portfolio')}
           >
-            {item.label}
+            ПОРТФЕЛЬ
           </button>
-        ))}
-        <small>{spanDays ? `доступно ${spanDays + 1} д.` : 'история загружается'}</small>
+          <button
+            type="button"
+            className={effectiveView === 'compare' ? 'is-active' : ''}
+            aria-pressed={effectiveView === 'compare'}
+            disabled={!hasImoex}
+            title={hasImoex ? 'Показать портфель и IMOEX на общей нормализованной шкале' : 'IMOEX ещё не готов для выбранного периода'}
+            onClick={() => setView('compare')}
+          >
+            С IMOEX
+          </button>
+        </div>
+        <div className="history-periods" aria-label="Период графика">
+          <span>ПЕРИОД</span>
+          {availablePeriods.map(item => (
+            <button
+              type="button"
+              key={item.key}
+              className={period === item.key ? 'is-active' : ''}
+              aria-pressed={period === item.key}
+              onClick={() => setPeriod(item.key)}
+            >
+              {item.label}
+            </button>
+          ))}
+          <small>{spanDays ? `доступно ${spanDays + 1} д.` : 'история загружается'}</small>
+        </div>
       </div>
-      {pairedLatest && (
+      {effectiveView === 'compare' && pairedLatest && (
         <div key={`history-narrative-${period}`} className={`history-narrative ${pairedLatest.spread >= 0 ? 'history-narrative--ahead' : 'history-narrative--behind'}`}>
           <span>ПОСЛЕДНЯЯ ОБЩАЯ ТОЧКА{pairedDateLabel ? ` · ${pairedDateLabel}` : ''}</span>
           <strong>Портфель {pairedLatest.spread >= 0 ? 'выше' : 'ниже'} IMOEX на {Math.abs(pairedLatest.spread).toFixed(1)} п.</strong>
           <small>Сравнение нормализованных индексов на одной дате; это не альфа и не прогноз.</small>
         </div>
       )}
-      <svg key={`history-chart-${period}`} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="Доходность портфеля и IMOEX на общей шкале">
+      <svg
+        key={`history-chart-${period}-${effectiveView}`}
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={effectiveView === 'compare' ? 'Доходность портфеля и IMOEX на общей шкале' : 'История нормализованного индекса портфеля'}
+      >
         {[0.2, 0.4, 0.6, 0.8].map(k => <line key={k} x1={PAD_X} x2={W - PAD_X} y1={H * k} y2={H * k} className="history-gridline" />)}
         {spreadSegments.map(segment => <polygon key={segment.id} points={segment.points} className={`history-spread history-spread--${segment.tone}`} />)}
         {portfolioPath && <path d={portfolioPath} pathLength={1} className="history-line history-line--portfolio" />}
-        {hasImoex && imoexPath && <path d={imoexPath} pathLength={1} className="history-line history-line--imoex" />}
+        {effectiveView === 'compare' && imoexPath && <path d={imoexPath} pathLength={1} className="history-line history-line--imoex" />}
         {markerPresentation.visibleEventDays.map(day => {
           const x = PAD_X + (day.index / eventDenom) * (W - PAD_X * 2)
           const tone = day.buys > 0 && day.sells > 0 ? 'mixed' : day.buys > 0 ? 'buy' : 'sell'
@@ -223,11 +272,13 @@ export function HistoryChart({ points }: Props) {
         })}
       </svg>
       <div className="history-legend">
-        <span><i className="legend-dot legend-dot--portfolio" />Портфель{pairedLatest == null ? '' : ` · ${pairedLatest.portfolio.toFixed(1)}`}</span>
-        {hasImoex
-          ? <span><i className="legend-dot legend-dot--imoex" />IMOEX{pairedLatest == null ? '' : ` · ${pairedLatest.imoex.toFixed(1)}`} · покрытие {benchmarkCoverage}%</span>
-          : <span>IMOEX: данные ещё не готовы</span>}
-        {pairedLatest != null && <span className={pairedLatest.spread >= 0 ? 'history-relative history-relative--ahead' : 'history-relative history-relative--behind'}>Δ {pairedLatest.spread >= 0 ? '+' : ''}{pairedLatest.spread.toFixed(1)} п.</span>}
+        <span><i className="legend-dot legend-dot--portfolio" />Портфель{portfolioLatest == null ? '' : ` · ${portfolioLatest.portfolio.toFixed(1)}`}</span>
+        {effectiveView === 'compare' && (
+          hasImoex
+            ? <span><i className="legend-dot legend-dot--imoex" />IMOEX{pairedLatest == null ? '' : ` · ${pairedLatest.imoex.toFixed(1)}`} · покрытие {benchmarkCoverage}%</span>
+            : <span>IMOEX: данные ещё не готовы</span>
+        )}
+        {effectiveView === 'compare' && pairedLatest != null && <span className={pairedLatest.spread >= 0 ? 'history-relative history-relative--ahead' : 'history-relative history-relative--behind'}>Δ {pairedLatest.spread >= 0 ? '+' : ''}{pairedLatest.spread.toFixed(1)} п.</span>}
         <small title={markerPresentation.eventDays.length ? 'Сделки отмечены только по дате исполнения. Цена сделки и координата доходности не реконструируются.' : undefined}>
           {first} → {last}{markerPresentation.eventDays.length ? ` · сделки ${markerPresentation.visibleEventDays.length}/${markerPresentation.eventDays.length} дн. · B${markerPresentation.totalBuys}/S${markerPresentation.totalSells}` : ''}
         </small>
