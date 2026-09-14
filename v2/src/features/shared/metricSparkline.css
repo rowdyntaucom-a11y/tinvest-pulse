@@ -1,0 +1,24 @@
+.metric-sparkline {
+  display: block;
+  width: 100%;
+  height: 28px;
+  margin: 4px 0 2px;
+  color: var(--mint);
+  opacity: .9;
+}
+
+.metric-sparkline path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+@media (max-width: 620px) {
+  .metric-sparkline {
+    height: 18px;
+    margin: 2px 0 1px;
+  }
+}
