@@ -51,7 +51,7 @@ export default function IncomeTaxPanel({ calendar }: { calendar: PayoutCalendar 
     () => Math.max(1, ...monthRows.map(row => Math.max(0, Number(row[monthMetric]) || 0))),
     [monthMetric, monthRows],
   )
-  const selectedMonth = monthRows.find(row => row.key === selectedMonthKey) ?? monthRows.findLast(row => row.count > 0) ?? null
+  const selectedMonth = monthRows.find(row => row.key === selectedMonthKey) ?? [...monthRows].reverse().find(row => row.count > 0) ?? null
 
   return (
     <div className="income-tax-layout">
