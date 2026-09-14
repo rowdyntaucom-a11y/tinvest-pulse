@@ -16,6 +16,7 @@ import './themeSurfaces.css'
 import './drilldownMotion.css'
 import './controlFeedback.css'
 import './mobileReadability.css'
+import './boardReadability.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

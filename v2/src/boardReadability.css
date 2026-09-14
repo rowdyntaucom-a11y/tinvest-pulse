@@ -1,0 +1,64 @@
+/* Board readability pass: keep the dense single-screen grid, remove sub-6px micro-copy where possible. */
+@media (max-width: 760px) {
+  .qv-board__rail span {
+    font-size: 6.4px;
+    letter-spacing: .06em;
+  }
+
+  .qv-board__rail strong { font-size: 8.4px; }
+  .qv-board__rail small { font-size: 6.2px; }
+
+  .qv-board__lens-tabs button {
+    font-size: 6.5px;
+    letter-spacing: .04em;
+  }
+
+  .qv-board__lens-copy > span {
+    font-size: 6.5px;
+    letter-spacing: .065em;
+  }
+
+  .qv-board__lens-copy > small { font-size: 7.2px; }
+  .qv-board__lens-facts span {
+    font-size: 5.8px;
+    letter-spacing: .035em;
+  }
+  .qv-board__lens-facts strong { font-size: 8.2px; }
+  .qv-board__lens-open {
+    font-size: 6.5px;
+    letter-spacing: .05em;
+  }
+
+  .qv-board__modules > header span {
+    font-size: 6.4px;
+    letter-spacing: .075em;
+  }
+  .qv-board__modules > header small { font-size: 6.4px; }
+
+  .qv-board-card > span {
+    font-size: 6.3px;
+    letter-spacing: .065em;
+  }
+  .qv-board-card > b {
+    font-size: 6.9px;
+    letter-spacing: .025em;
+  }
+  .qv-board-card > small { font-size: 6.4px; }
+  .qv-board__health small {
+    font-size: 6.4px;
+    letter-spacing: .07em;
+  }
+
+  /* Recover a little room without changing card count or grid ownership. */
+  .qv-board__rail article { padding-inline: 8px; }
+  .qv-board__lens-facts article { padding-inline: 7px; }
+  .qv-board-card { padding-inline: 11px; }
+}
+
+@media (max-width: 430px) {
+  .qv-board__rail span { font-size: 6.2px; }
+  .qv-board__rail small { font-size: 6px; }
+  .qv-board__lens-tabs button { font-size: 6.3px; }
+  .qv-board-card > span { font-size: 6.1px; }
+  .qv-board-card > small { font-size: 6.2px; }
+}
