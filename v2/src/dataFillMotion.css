@@ -1,0 +1,62 @@
+/* Presentation-only fill motion for already-calculated bar widths. */
+[data-qv-motion="full"] .position-weight i b,
+[data-qv-motion="full"] .allocation-row i span,
+[data-qv-motion="full"] .health-row i span,
+[data-qv-motion="full"] .drift-track i {
+  transform-origin: left center;
+  animation: qv-data-fill .58s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .position-row:nth-child(2) .position-weight i b,
+[data-qv-motion="full"] .allocation-row:nth-child(2) i span,
+[data-qv-motion="full"] .health-row:nth-child(2) i span,
+[data-qv-motion="full"] .drift-row:nth-child(2) .drift-track i { animation-delay: .035s; }
+
+[data-qv-motion="full"] .position-row:nth-child(3) .position-weight i b,
+[data-qv-motion="full"] .allocation-row:nth-child(3) i span,
+[data-qv-motion="full"] .health-row:nth-child(3) i span,
+[data-qv-motion="full"] .drift-row:nth-child(3) .drift-track i { animation-delay: .07s; }
+
+[data-qv-motion="full"] .position-row:nth-child(4) .position-weight i b,
+[data-qv-motion="full"] .allocation-row:nth-child(4) i span,
+[data-qv-motion="full"] .health-row:nth-child(4) i span,
+[data-qv-motion="full"] .drift-row:nth-child(4) .drift-track i { animation-delay: .105s; }
+
+[data-qv-motion="full"] .position-row:nth-child(5) .position-weight i b,
+[data-qv-motion="full"] .allocation-row:nth-child(5) i span,
+[data-qv-motion="full"] .health-row:nth-child(5) i span,
+[data-qv-motion="full"] .drift-row:nth-child(5) .drift-track i { animation-delay: .14s; }
+
+[data-qv-motion="full"] .drift-track b {
+  transform-origin: center center;
+  animation: qv-target-marker .34s .16s cubic-bezier(.2,.78,.24,1) both;
+}
+
+@keyframes qv-data-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes qv-target-marker {
+  from { opacity: 0; transform: translateX(-1px) scaleY(.55); }
+  to { opacity: 1; transform: translateX(-1px) scaleY(1); }
+}
+
+@media (max-width: 620px) {
+  [data-qv-motion="full"] .position-weight i b,
+  [data-qv-motion="full"] .allocation-row i span,
+  [data-qv-motion="full"] .health-row i span,
+  [data-qv-motion="full"] .drift-track i {
+    animation-duration: .46s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .position-weight i b,
+  .allocation-row i span,
+  .health-row i span,
+  .drift-track i,
+  .drift-track b {
+    animation: none !important;
+  }
+}
