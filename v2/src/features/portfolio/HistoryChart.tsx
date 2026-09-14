@@ -88,10 +88,20 @@ const buildSpreadSegments = (
   return segments
 }
 
-const lastFinite = (values: Array<number | null>) => {
-  for (let i = values.length - 1; i >= 0; i -= 1) {
-    const value = values[i]
-    if (typeof value === 'number' && Number.isFinite(value)) return value
+const latestPairedPoint = (points: HistoryPoint[]) => {
+  for (let i = points.length - 1; i >= 0; i -= 1) {
+    const point = points[i]
+    if (
+      typeof point.portfolio === 'number' && Number.isFinite(point.portfolio)
+      && typeof point.imoex === 'number' && Number.isFinite(point.imoex)
+    ) {
+      return {
+        date: point.date,
+        portfolio: point.portfolio,
+        imoex: point.imoex,
+        spread: point.portfolio - point.imoex,
+      }
+    }
   }
   return null
 }
@@ -135,15 +145,25 @@ export function HistoryChart({ points }: Props) {
   const hasImoex = imoexCount >= 2
   const spreadSegments = hasImoex ? buildSpreadSegments(portfolioValues, imoexValues, min, max) : []
   const benchmarkCoverage = portfolioCount ? Math.round((imoexCount / portfolioCount) * 100) : 0
-  const latestPortfolio = lastFinite(portfolioValues)
-  const latestImoex = lastFinite(imoexValues)
-  const latestSpread = latestPortfolio != null && latestImoex != null ? latestPortfolio - latestImoex : null
+  const pairedLatest = latestPairedPoint(chartPoints)
   const first = chartPoints[0]?.date
   const last = chartPoints.at(-1)?.date
   const eventDenom = Math.max(1, chartPoints.length - 1)
+  const pairedDateLabel = pairedLatest?.date
+    ? new Date(`${pairedLatest.date}T00:00:00Z`).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', timeZone: 'UTC' })
+    : null
 
   return (
     <div className="history-chart">
+      {pairedLatest && (
+        <div className={`history-narrative ${pairedLatest.spread >= 0 ? 'history-narrative--ahead' : 'history-narrative--behind'}`}>
+          <span>ПОСЛЕДНЯЯ ОБЩАЯ ТОЧКА{pairedDateLabel ? ` · ${pairedDateLabel}` : ''}</span>
+          <strong>
+            Портфель {pairedLatest.spread >= 0 ? 'выше' : 'ниже'} IMOEX на {Math.abs(pairedLatest.spread).toFixed(1)} п.
+          </strong>
+          <small>Сравнение нормализованных индексов на одной дате; это не альфа и не прогноз.</small>
+        </div>
+      )}
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="Доходность портфеля и IMOEX на общей шкале">
         {[0.2, 0.4, 0.6, 0.8].map(k => (
           <line key={k} x1={PAD_X} x2={W - PAD_X} y1={H * k} y2={H * k} className="history-gridline" />
@@ -171,11 +191,11 @@ export function HistoryChart({ points }: Props) {
         })}
       </svg>
       <div className="history-legend">
-        <span><i className="legend-dot legend-dot--portfolio" />Портфель{latestPortfolio == null ? '' : ` · ${latestPortfolio.toFixed(1)}`}</span>
+        <span><i className="legend-dot legend-dot--portfolio" />Портфель{pairedLatest == null ? '' : ` · ${pairedLatest.portfolio.toFixed(1)}`}</span>
         {hasImoex
-          ? <span><i className="legend-dot legend-dot--imoex" />IMOEX{latestImoex == null ? '' : ` · ${latestImoex.toFixed(1)}`} · покрытие {benchmarkCoverage}%</span>
+          ? <span><i className="legend-dot legend-dot--imoex" />IMOEX{pairedLatest == null ? '' : ` · ${pairedLatest.imoex.toFixed(1)}`} · покрытие {benchmarkCoverage}%</span>
           : <span>IMOEX: данные ещё не готовы</span>}
-        {latestSpread != null && <span className={latestSpread >= 0 ? 'history-relative history-relative--ahead' : 'history-relative history-relative--behind'}>Δ {latestSpread >= 0 ? '+' : ''}{latestSpread.toFixed(1)} п.</span>}
+        {pairedLatest != null && <span className={pairedLatest.spread >= 0 ? 'history-relative history-relative--ahead' : 'history-relative history-relative--behind'}>Δ {pairedLatest.spread >= 0 ? '+' : ''}{pairedLatest.spread.toFixed(1)} п.</span>}
         <small title={markerPresentation.eventDays.length ? 'Сделки отмечены только по дате исполнения. Цена сделки и координата доходности не реконструируются.' : undefined}>
           {first} → {last}{markerPresentation.eventDays.length ? ` · сделки ${markerPresentation.visibleEventDays.length}/${markerPresentation.eventDays.length} дн. · B${markerPresentation.totalBuys}/S${markerPresentation.totalSells}` : ''}
         </small>
