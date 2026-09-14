@@ -10,6 +10,7 @@ import './features/board/boardShell.css'
 import './features/settings/boardPersonalization.css'
 import './final-shell.css'
 import './ambientShell.css'
+import './dataFillMotion.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
