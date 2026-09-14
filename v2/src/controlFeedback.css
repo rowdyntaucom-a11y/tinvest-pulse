@@ -1,0 +1,104 @@
+/* Shared control affordance layer. Presentation only. */
+.app-shell button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--mint) 58%, transparent);
+  outline-offset: 2px;
+}
+
+[data-qv-motion="full"] :is(
+  .chip,
+  .subnav button,
+  .income-subnav button,
+  .portfolio-chart__modes button,
+  .portfolio-chart__periods button,
+  .position-sortbar button,
+  .pager button,
+  .income-pager button,
+  .position-inspector__tabs button,
+  .income-realized-modes button,
+  .qv-board__lens-tabs button,
+  .qv-board__lens-open,
+  .qv-choice
+) {
+  transition: transform .14s ease, border-color .16s ease, background-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+[data-qv-motion="full"] :is(
+  .chip,
+  .subnav button,
+  .income-subnav button,
+  .portfolio-chart__modes button,
+  .portfolio-chart__periods button,
+  .position-sortbar button,
+  .pager button,
+  .income-pager button,
+  .position-inspector__tabs button,
+  .income-realized-modes button,
+  .qv-board__lens-tabs button,
+  .qv-board__lens-open,
+  .qv-choice
+):not(:disabled):active {
+  transform: scale(.965);
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .app-shell :is(
+    .chip,
+    .subnav button,
+    .income-subnav button,
+    .portfolio-chart__modes button,
+    .portfolio-chart__periods button,
+    .position-sortbar button,
+    .pager button,
+    .income-pager button,
+    .position-inspector__tabs button,
+    .income-realized-modes button,
+    .qv-board__lens-tabs button,
+    .qv-board__lens-open,
+    .qv-choice
+  ):not(:disabled):not(.chip--active):not(.subnav--active):not(.is-active):hover {
+    border-color: color-mix(in srgb, var(--mint) 32%, transparent);
+    background-color: color-mix(in srgb, var(--mint) 5%, transparent);
+  }
+}
+
+[data-qv-motion="reduced"] :is(
+  .chip,
+  .subnav button,
+  .income-subnav button,
+  .portfolio-chart__modes button,
+  .portfolio-chart__periods button,
+  .position-sortbar button,
+  .pager button,
+  .income-pager button,
+  .position-inspector__tabs button,
+  .income-realized-modes button,
+  .qv-board__lens-tabs button,
+  .qv-board__lens-open,
+  .qv-choice
+) {
+  transition-duration: .08s;
+}
+
+[data-qv-motion="off"] :is(
+  .chip,
+  .subnav button,
+  .income-subnav button,
+  .portfolio-chart__modes button,
+  .portfolio-chart__periods button,
+  .position-sortbar button,
+  .pager button,
+  .income-pager button,
+  .position-inspector__tabs button,
+  .income-realized-modes button,
+  .qv-board__lens-tabs button,
+  .qv-board__lens-open,
+  .qv-choice
+) {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell button {
+    transition: none !important;
+  }
+}
