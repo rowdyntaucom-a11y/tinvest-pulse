@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi'
 import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import { PortfolioValueChart } from './PortfolioValueChart'
@@ -9,6 +9,8 @@ import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './
 import { buildPortfolioDataContext } from './portfolioDataContext'
 import { calculatePortfolioTopExposure } from './portfolioExposureDiagnostics'
 import { calculatePositionIncomeContribution } from './positionIncomeContribution'
+import { InstrumentBadge } from './InstrumentBadge'
+import { loadInstrumentBadges, type InstrumentBadgePayload } from './instrumentBadges'
 import './portfolio.css'
 import './positionInspector.css'
 
@@ -122,10 +124,11 @@ function accountDate(value: string | null | undefined) {
   return Number.isFinite(date.getTime()) ? date.toLocaleDateString('ru-RU') : null
 }
 
-function PositionList({ positions, selectedKey, onSelect }: {
+function PositionList({ positions, selectedKey, onSelect, badges }: {
   positions: PositionSnapshot[]
   selectedKey: string
   onSelect: (key: string) => void
+  badges: InstrumentBadgePayload | null
 }) {
   if (!positions.length) return <div className="empty-state">Позиции загружаются…</div>
   return (
@@ -144,7 +147,10 @@ function PositionList({ positions, selectedKey, onSelect }: {
             onClick={() => onSelect(key)}
             aria-pressed={selectedKey === key}
           >
-            <div className="position-main"><strong>{ticker}</strong><span>{subtitle}</span></div>
+            <div className="position-main position-main--badged">
+              <InstrumentBadge payload={badges} position={position} />
+              <span className="position-main__copy"><strong>{ticker}</strong><span>{subtitle}</span></span>
+            </div>
             <div className="position-weight"><span>{pctPlain.format(position.weight * 100)}%</span><i><b style={{ width: `${Math.min(100, position.weight * 100)}%` }} /></i></div>
             <div className="position-value">
               <strong>{money.format(position.currentValue)} ₽</strong>
@@ -164,7 +170,14 @@ export function PortfolioWorkspace({ snapshot }: Props) {
   const [selectedPositionKey, setSelectedPositionKey] = useState('')
   const [positionInspectorView, setPositionInspectorView] = useState<PositionInspectorView>('position')
   const [structureMode, setStructureMode] = useState<StructureMode>('classes')
+  const [instrumentBadges, setInstrumentBadges] = useState<InstrumentBadgePayload | null>(null)
   const { calendar: incomeCalendar } = usePayoutSnapshot(view === 'positions')
+
+  useEffect(() => {
+    let active = true
+    loadInstrumentBadges().then(payload => { if (active) setInstrumentBadges(payload) })
+    return () => { active = false }
+  }, [])
 
   const allocation = useMemo(() => {
     const groups = new Map<string, number>()
@@ -329,12 +342,15 @@ export function PortfolioWorkspace({ snapshot }: Props) {
             <button className={positionSort === 'pnlPct' ? 'is-active' : ''} onClick={() => chooseSort('pnlPct')}>P/L %</button>
           </div>
 
-          <PositionList positions={visiblePositions} selectedKey={selectedPosition ? positionKey(selectedPosition) : ''} onSelect={setSelectedPositionKey} />
+          <PositionList positions={visiblePositions} selectedKey={selectedPosition ? positionKey(selectedPosition) : ''} onSelect={setSelectedPositionKey} badges={instrumentBadges} />
 
           {selectedPosition && selectedPnl && (
             <div className="position-inspector">
               <div className="position-inspector__head">
-                <div><span>ВЫБРАНО</span><strong>{selectedPosition.ticker || selectedPosition.name}</strong></div>
+                <div className="position-inspector__identity">
+                  <InstrumentBadge payload={instrumentBadges} position={selectedPosition} size="detail" />
+                  <span><span>ВЫБРАНО</span><strong>{selectedPosition.ticker || selectedPosition.name}</strong></span>
+                </div>
                 <small>
                   {assetTypeLabel(selectedPosition.instrumentType)} · вес {pctPlain.format(selectedPosition.weight * 100)}%
                   {selectedAttribution?.grossPnlShare == null ? '' : ` · вклад в |P/L| ${pctPlain.format(selectedAttribution.grossPnlShare * 100)}%`}

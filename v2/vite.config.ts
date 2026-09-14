@@ -45,6 +45,8 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('/node_modules/pixi.js/')) return 'pixi-dna'
+          if (id.includes('/features/portfolio/instrumentBadge')) return 'instrument-badges'
+          if (id.includes('/features/portfolio/InstrumentBadge.tsx')) return 'instrument-badges'
         },
       },
     },

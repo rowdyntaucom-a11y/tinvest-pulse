@@ -14,6 +14,7 @@ on:
       - 'production-v159.js'
       - 'production-v160.js'
       - 'production-v161.js'
+      - 'production-v162.js'
       - '.github/workflows/v2-build.yml'
   push:
     branches: [main]
@@ -29,6 +30,7 @@ on:
       - 'production-v159.js'
       - 'production-v160.js'
       - 'production-v161.js'
+      - 'production-v162.js'
       - '.github/workflows/v2-build.yml'
 
 jobs:
@@ -64,3 +66,4 @@ jobs:
       - run: node --check ../production-v159.js
       - run: node --check ../production-v160.js
       - run: node --check ../production-v161.js
+      - run: node --check ../production-v162.js
