@@ -19,5 +19,8 @@ No financial calculation, TWR/XIRR, IMOEX arithmetic, Portfolio/Income/Health/Ri
 
 Open Board/Q-LENS PR #289 remains untouched.
 
+## Diff discipline
+The CSS file intentionally remains in its existing compact formatting, so the review diff reflects only the mobile rule change and the new <=380 px override rather than a presentation-only reformat of untouched declarations.
+
 ## Release gate
-Merge only after the full v2 CI is green and a pre-merge race-check confirms `main` has not moved from the branch base. If `main` moves, re-evaluate/rebase rather than merging blindly.
+Merge only after the full v2 CI is green for the final branch head and a pre-merge race-check confirms `main` has not moved from the branch base. If `main` moves, re-evaluate/rebase rather than merging blindly.
