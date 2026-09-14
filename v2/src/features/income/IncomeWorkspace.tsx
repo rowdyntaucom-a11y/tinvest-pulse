@@ -1,15 +1,20 @@
-import { lazy, Suspense, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
 import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
+import { InstrumentBadge } from '../portfolio/InstrumentBadge'
+import { loadInstrumentBadges, type InstrumentBadgePayload } from '../portfolio/instrumentBadges'
 import { getIncomeIntegrity } from './incomeIntegrity'
 import { buildRealizedIncomeHistory, calculateIncomeSourceConcentration, calculateIncomeStability } from './incomeHistory'
 import { calculateIncomeComparablePeriod } from './incomeComparables'
 import { buildBondIncomeLinkage } from './bondIncomeLinkage'
 import { buildIncomeSourceRows } from './incomeSourceRows'
+import { buildIncomeCalendarVisual, filterIncomeCalendarEvents } from './incomeCalendarVisual'
+import { findPayoutEventPosition, payoutEventIsConfirmed } from './incomeCalendarEventView'
 import { IncomeGoalCompact } from './IncomeGoalCompact'
 import './income.css'
 import './incomeCompact.css'
+import './incomeCalendarVisual.css'
 
 const IncomeTaxPanel = lazy(() => import('./IncomeTaxPanel'))
 
@@ -75,14 +80,41 @@ function incomeSourceIdentityNote(state: ReturnType<typeof buildIncomeSourceRows
 export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions }: Props) {
   const [view, setView] = useState<View>('overview')
   const [page, setPage] = useState(0)
+  const [calendarMonth, setCalendarMonth] = useState<string | null>(null)
+  const [badgePayload, setBadgePayload] = useState<InstrumentBadgePayload | null>(null)
   const { calendar, loading } = usePayoutSnapshot(true)
   const data = calendar ?? empty
 
-  const upcoming = data.events.slice(0, 20)
+  const calendarMonths = useMemo(
+    () => buildIncomeCalendarVisual(data.events, data.period.from, 12),
+    [data.events, data.period.from],
+  )
+  const filteredCalendarEvents = useMemo(
+    () => filterIncomeCalendarEvents(data.events, calendarMonth),
+    [data.events, calendarMonth],
+  )
+  const upcoming = filteredCalendarEvents.slice(0, 20)
   const pageSize = 5
   const pages = Math.max(1, Math.ceil(upcoming.length / pageSize))
   const safePage = Math.min(page, pages - 1)
   const visibleUpcoming = upcoming.slice(safePage * pageSize, safePage * pageSize + pageSize)
+  const selectedCalendarMonth = calendarMonth ? calendarMonths.find(month => month.key === calendarMonth) ?? null : null
+
+  useEffect(() => {
+    if (view !== 'calendar' || badgePayload) return
+    let active = true
+    loadInstrumentBadges().then(payload => {
+      if (active) setBadgePayload(payload)
+    })
+    return () => { active = false }
+  }, [view, badgePayload])
+
+  useEffect(() => {
+    if (!calendarMonth) return
+    if (calendarMonths.some(month => month.key === calendarMonth)) return
+    setCalendarMonth(null)
+    setPage(0)
+  }, [calendarMonth, calendarMonths])
 
   const integrity = useMemo(() => getIncomeIntegrity(data, loading), [data, loading])
   const bondIncomeLinkage = useMemo(
@@ -206,16 +238,67 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
               <button disabled={safePage >= pages - 1} onClick={() => setPage(p => Math.min(pages - 1, p + 1))}>›</button>
             </div>
           </div>
-          <div className="income-events">
-            {visibleUpcoming.length ? visibleUpcoming.map((event, index) => (
-              <div className="income-event" key={`${event.kind}-${event.ticker}-${event.date}-${index}`}>
-                <time>{dateFmt.format(new Date(event.date))}</time>
-                <div><strong>{event.ticker || event.name}</strong><span>{eventKind(event)}{event.confidence ? ` · ${event.confidence}` : ''}</span></div>
-                <b>{eventAmount(event) ? `${money2.format(eventAmount(event))} ₽` : '—'}</b>
-              </div>
-            )) : <div className="income-empty">{loading ? 'Получаем расписание Т-Банка…' : 'Будущие выплаты не найдены.'}</div>}
+
+          {calendarMonths.length > 0 && (
+            <div className="income-calendar-ribbon" aria-label="Фильтр выплат по месяцам">
+              <button
+                type="button"
+                className={`income-calendar-reset ${calendarMonth == null ? 'is-active' : ''}`}
+                aria-pressed={calendarMonth == null}
+                onClick={() => { setCalendarMonth(null); setPage(0) }}
+              >
+                <span>ВСЕ</span>
+              </button>
+              {calendarMonths.map(month => (
+                <button
+                  type="button"
+                  key={month.key}
+                  className={`${calendarMonth === month.key ? 'is-active' : ''} ${month.count === 0 ? 'is-empty' : ''}`}
+                  aria-pressed={calendarMonth === month.key}
+                  title={`${month.label} · ${month.count} событий${month.grossAvailable ? ` · ${money2.format(month.gross)} ₽ до налога` : ''}`}
+                  onClick={() => { setCalendarMonth(month.key); setPage(0) }}
+                >
+                  <span>{month.label}</span>
+                  <b>{month.count}</b>
+                  <small>{month.grossAvailable ? `${money.format(month.gross)} ₽` : month.count ? 'сумма —' : 'тихо'}</small>
+                  <i aria-hidden="true" style={{ transform: `scaleX(${month.intensity})` }} />
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="income-calendar-filter-summary">
+            {selectedCalendarMonth
+              ? <><b>{selectedCalendarMonth.label}</b> · {filteredCalendarEvents.length} подтверждённых событий · фильтр действует на список ниже</>
+              : <>Все подтверждённые события в текущем 12-месячном окне</>}
           </div>
-          <p className="income-method-note">Будущие суммы не смешиваются с фактом. Здесь показываются суммы до налога из официального расписания Т‑Банка для текущих позиций; дивиденды без подтверждённого события не прогнозируются.</p>
+
+          <div className="income-events">
+            {visibleUpcoming.length ? visibleUpcoming.map((event, index) => {
+              const matchedPosition = findPayoutEventPosition(event, positions)
+              const badgePosition = matchedPosition
+                ? { ...matchedPosition, instrumentUid: event.instrumentUid ?? null }
+                : null
+              const confirmed = payoutEventIsConfirmed(event)
+              return (
+                <div className="income-event" key={`${event.kind}-${event.ticker}-${event.date}-${index}`}>
+                  <time>{dateFmt.format(new Date(event.date))}</time>
+                  <div className="income-event-asset">
+                    {badgePosition && <InstrumentBadge payload={badgePayload} position={badgePosition} />}
+                    <div className="income-event-copy">
+                      <strong>{event.ticker || event.name}</strong>
+                      <span>{eventKind(event)}{!confirmed && event.confidence ? ` · ${event.confidence}` : ''}</span>
+                    </div>
+                  </div>
+                  <div className="income-event-tail">
+                    <b>{eventAmount(event) ? `${money2.format(eventAmount(event))} ₽` : '—'}</b>
+                    {confirmed && <span className="income-event-status">ПОДТВЕРЖДЕНО</span>}
+                  </div>
+                </div>
+              )
+            }) : <div className="income-empty">{loading ? 'Получаем расписание Т-Банка…' : calendarMonth ? 'В выбранном месяце подтверждённых выплат нет.' : 'Будущие выплаты не найдены.'}</div>}
+          </div>
+          <p className="income-method-note">Будущие суммы не смешиваются с фактом. Здесь показываются суммы до налога из официального расписания Т‑Банка для текущих позиций; дивиденды без подтверждённого события не прогнозируются. Метка ПОДТВЕРЖДЕНО отображается только для событий с подтверждённым HIGH-статусом источника; логотип используется только после точного FIGI-сопоставления с текущей позицией.</p>
           {data.stale && <p className="income-warning">Расписание временно не обновилось: используется последний полный снимок.</p>}
         </section>
       )}
