@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import type { AssetClassTone } from './assetClassVisuals'
 import './allocationDonut.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -9,7 +8,6 @@ type Item = {
   label: string
   value: number
   weight: number
-  tone: AssetClassTone
 }
 
 type Segment = Item & {
@@ -24,7 +22,6 @@ type Props = {
 function buildSegments(items: Item[]): Segment[] {
   let cursor = 0
   const segments: Segment[] = []
-
   for (const item of items) {
     const weightPct = Number.isFinite(item.weight) && item.weight > 0 ? item.weight * 100 : 0
     if (weightPct <= 0) continue
@@ -32,7 +29,6 @@ function buildSegments(items: Item[]): Segment[] {
     segments.push({ ...item, startPct: cursor, drawPct: Math.max(.15, weightPct - gap) })
     cursor += weightPct
   }
-
   return segments
 }
 
@@ -51,7 +47,8 @@ export default function AllocationDonutView({ items }: Props) {
           {segments.map(segment => (
             <circle
               key={segment.label}
-              className={`allocation-donut__segment is-${segment.tone} ${selected?.label === segment.label ? 'is-selected' : ''}`}
+              className={`allocation-donut__segment ${selected?.label === segment.label ? 'is-selected' : ''}`}
+              data-asset-class={segment.label}
               cx="60"
               cy="60"
               r="43"
@@ -72,13 +69,11 @@ export default function AllocationDonutView({ items }: Props) {
             />
           ))}
         </svg>
-        {selected ? (
-          <div className="allocation-donut__center" aria-live="polite">
-            <span>{selected.label}</span>
-            <strong>{pct.format(selected.weight * 100)}%</strong>
-            <small>{money.format(selected.value)} ₽</small>
-          </div>
-        ) : null}
+        <div className="allocation-donut__center" aria-live="polite">
+          <span>{selected?.label}</span>
+          <strong>{selected ? `${pct.format(selected.weight * 100)}%` : '—'}</strong>
+          <small>{selected ? `${money.format(selected.value)} ₽` : '—'}</small>
+        </div>
       </div>
       <div className="allocation-donut__legend" aria-label="Классы активов">
         {segments.map(segment => (
@@ -88,7 +83,7 @@ export default function AllocationDonutView({ items }: Props) {
             className={selected?.label === segment.label ? 'is-selected' : ''}
             onClick={() => setSelectedLabel(segment.label)}
           >
-            <i className={`is-${segment.tone}`} aria-hidden="true" />
+            <i data-asset-class={segment.label} aria-hidden="true" />
             <span>{segment.label}</span>
             <strong>{pct.format(segment.weight * 100)}%</strong>
           </button>
