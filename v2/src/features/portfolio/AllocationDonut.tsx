@@ -29,18 +29,14 @@ function buildSegments(items: Item[]): Segment[] {
     const weightPct = Number.isFinite(item.weight) && item.weight > 0 ? item.weight * 100 : 0
     if (weightPct <= 0) continue
     const gap = Math.min(.8, weightPct * .22)
-    segments.push({
-      ...item,
-      startPct: cursor,
-      drawPct: Math.max(.15, weightPct - gap),
-    })
+    segments.push({ ...item, startPct: cursor, drawPct: Math.max(.15, weightPct - gap) })
     cursor += weightPct
   }
 
   return segments
 }
 
-export function AllocationDonut({ items }: Props) {
+export default function AllocationDonut({ items }: Props) {
   const segments = useMemo(() => buildSegments(items), [items])
   const [selectedLabel, setSelectedLabel] = useState('')
   const selected = segments.find(item => item.label === selectedLabel) ?? segments[0] ?? null
