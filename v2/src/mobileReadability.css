@@ -13,15 +13,15 @@
 
   .subnav button { font-size: 7.2px; letter-spacing: .035em; }
   .sample-badge { font-size: 6.7px; letter-spacing: .035em; }
-  .score-card .metric-label { font-size: 6.8px; }
-  .score-card small { font-size: 6.8px; }
+  .score-card .metric-label { font-size: 7.2px; }
+  .score-card small { font-size: 7.2px; line-height: 1.24; }
   .history-legend { font-size: 7.2px; }
-  .risk-card > span { font-size: 6.8px; letter-spacing: .055em; }
-  .risk-card > small { font-size: 6.7px; line-height: 1.32; }
+  .risk-card > span { font-size: 7.4px; letter-spacing: .045em; }
+  .risk-card > small { font-size: 7.3px; line-height: 1.32; }
   .analytics-note p { font-size: 7.4px; }
   .health-row div span,
   .health-weight,
-  .health-points { font-size: 6.7px; }
+  .health-points { font-size: 7.3px; line-height: 1.2; }
   .method-note { font-size: 7.2px; }
 
   .income-hero p,
