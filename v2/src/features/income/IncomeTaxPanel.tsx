@@ -9,6 +9,9 @@ import {
 import './incomeTax.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
+const monthFmt = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
+
+type MonthMetric = 'gross' | 'tax' | 'net'
 
 const parseRub = (value: string) => {
   const normalized = value.replace(/\s/g, '').replace(',', '.')
@@ -21,12 +24,20 @@ function amount(value: number | null) {
   return value == null ? '—' : `${money.format(value)} ₽`
 }
 
+const metricLabel: Record<MonthMetric, string> = {
+  gross: 'ДО НАЛОГА',
+  tax: 'НАЛОГ',
+  net: 'НА РУКИ',
+}
+
 export default function IncomeTaxPanel({ calendar }: { calendar: PayoutCalendar }) {
   const bridge = useMemo(() => buildIncomeTaxBridge(calendar), [calendar])
   const [contributionText, setContributionText] = useState('')
   const [otherBaseText, setOtherBaseText] = useState('')
   const [taxPaidText, setTaxPaidText] = useState('')
   const [rate, setRate] = useState<0.13 | 0.15>(0.13)
+  const [monthMetric, setMonthMetric] = useState<MonthMetric>('net')
+  const [selectedMonthKey, setSelectedMonthKey] = useState<string | null>(null)
 
   const estimate = useMemo(() => estimateIisLongTermDeduction({
     contribution: parseRub(contributionText),
@@ -34,6 +45,13 @@ export default function IncomeTaxPanel({ calendar }: { calendar: PayoutCalendar 
     ndflRate: rate,
     refundableNdflAvailable: taxPaidText.trim() ? parseRub(taxPaidText) : null,
   }), [contributionText, otherBaseText, rate, taxPaidText])
+
+  const monthRows = useMemo(() => calendar.months.slice(0, 12), [calendar.months])
+  const monthMax = useMemo(
+    () => Math.max(1, ...monthRows.map(row => Math.max(0, Number(row[monthMetric]) || 0))),
+    [monthMetric, monthRows],
+  )
+  const selectedMonth = monthRows.find(row => row.key === selectedMonthKey) ?? [...monthRows].reverse().find(row => row.count > 0) ?? null
 
   return (
     <div className="income-tax-layout">
@@ -67,6 +85,46 @@ export default function IncomeTaxPanel({ calendar }: { calendar: PayoutCalendar 
           <strong>{amount(bridge.forecast12m.net)}</strong><em>на руки</em>
         </div>
         <p className="income-method-note">Факт строится только из выплат со статусом FACT. QVANIX не вычисляет отсутствующий gross или tax обратным счётом из net. Блок 12М использует уже нормализованные gross/tax/net официального расписания и не смешивается с полученным фактом.</p>
+      </section>
+
+      <section className="panel income-tax-chart-panel">
+        <div className="income-panel-head tax-chart-head">
+          <div><span className="eyebrow">12М · ИНТЕРАКТИВНЫЙ РАЗРЕЗ</span><h2>ВЫПЛАТЫ ПО МЕСЯЦАМ</h2></div>
+          <div className="tax-chart-modes" role="group" aria-label="Разрез выплат">
+            {(['gross', 'tax', 'net'] as MonthMetric[]).map(metric => (
+              <button key={metric} className={monthMetric === metric ? 'is-active' : ''} onClick={() => setMonthMetric(metric)}>{metricLabel[metric]}</button>
+            ))}
+          </div>
+        </div>
+
+        {monthRows.length ? (
+          <>
+            <div className="tax-month-chart" aria-label={`12 месяцев · ${metricLabel[monthMetric].toLowerCase()}`}>
+              {monthRows.map(row => {
+                const value = Math.max(0, Number(row[monthMetric]) || 0)
+                const height = value > 0 ? Math.max(7, value / monthMax * 100) : 2
+                const date = new Date(Date.UTC(row.year, row.month - 1, 1))
+                const active = selectedMonth?.key === row.key
+                return (
+                  <button key={row.key} className={active ? 'is-active' : ''} onClick={() => setSelectedMonthKey(row.key)} aria-label={`${row.key}: ${money.format(value)} ₽`}>
+                    <b>{value ? money.format(value) : '0'}</b>
+                    <i><span style={{ height: `${height}%` }} /></i>
+                    <small>{monthFmt.format(date).replace('.', '')}</small>
+                  </button>
+                )
+              })}
+            </div>
+            {selectedMonth && (
+              <div className="tax-month-detail">
+                <div><span>{selectedMonth.key}</span><strong>{selectedMonth.count} выплат</strong></div>
+                <div><span>До налога</span><strong>{money.format(selectedMonth.gross)} ₽</strong></div>
+                <div><span>Налог</span><strong>{money.format(selectedMonth.tax)} ₽</strong></div>
+                <div className="is-net"><span>На руки</span><strong>{money.format(selectedMonth.net)} ₽</strong></div>
+              </div>
+            )}
+          </>
+        ) : <div className="income-empty">Подтверждённый помесячный график пока недоступен.</div>}
+        <p className="income-method-note">Переключатель меняет только представление одного и того же подтверждённого 12-месячного расписания. Тап по месяцу раскрывает gross / tax / net без создания дополнительного прогноза.</p>
       </section>
 
       <section className="panel iis-deduction-panel">
