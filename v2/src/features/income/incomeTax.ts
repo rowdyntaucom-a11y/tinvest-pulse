@@ -79,7 +79,7 @@ export function estimateIisLongTermDeduction(input: IisDeductionInput): IisDeduc
     unusedBaseLimit,
     theoreticalRefund,
     refundableEstimate,
-    limitedByTaxPaid: taxPaid != null && refundableEstimate < theoreticalRefund,
+    limitedByTaxPaid: taxPaid != null && taxPaid < theoreticalRefund,
   }
 }
 
