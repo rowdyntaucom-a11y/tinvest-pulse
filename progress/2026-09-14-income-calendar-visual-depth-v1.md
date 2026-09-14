@@ -2,7 +2,7 @@
 
 Date: 2026-09-14
 Branch: `qvanix-income-calendar-visual-depth-v1-r2`
-Starting main: `4c501a4025747a866b8d0d5560f91a2f0c9efb93`
+Starting main: `c2e55b96e59b1045ca35baf25b2613d14de9a367`
 
 ## Scope
 Visible integration for GitHub issue #308 on top of the deterministic `incomeCalendarVisual.ts` foundation from PR #309.
@@ -27,5 +27,5 @@ Visible integration for GitHub issue #308 on top of the deterministic `incomeCal
 - Full repository CI remains the release gate before merge.
 
 ## Release discipline
-- This branch was refreshed from the latest concurrent `main` after Board/mobile readability changes landed.
+- This branch was refreshed again after concurrent mobile-motion presentation changes advanced `main`; feature files do not overlap those motion-only files.
 - Merge only after PR diff review, green CI and settled Render queues.
