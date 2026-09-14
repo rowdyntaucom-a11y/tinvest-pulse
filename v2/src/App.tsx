@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { QvanixBoard } from './features/board/QvanixBoard'
-import { WorldStage } from './features/world/WorldStage'
+import { WorldSessionStage } from './features/world/WorldSessionStage'
 import { useWorldPhaseClock } from './features/world/useWorldPhaseClock'
 import { buildWorldRuntimeStateFromQualityInputs } from './features/dna/worldRuntimeState'
 import { HistoryChart } from './features/portfolio/HistoryChart'
@@ -256,7 +256,7 @@ export default function App() {
           <div className="dna-layout">
             <section className="world-panel world-panel--view">
               <div className="world-panel__head"><div><span className="eyebrow">QVANIX DNA · PIXIJS / WEBGL</span><h2>ЖИВОЙ МИР</h2></div><div className="dna-state"><span>УРОВЕНЬ {dnaWorldState.level}</span><strong>XP CORE</strong><small>WorldState v{dnaWorldState.version} · сигналы {Math.round(dnaWorldState.qualityCoverage * 100)}%</small></div></div>
-              <div className="world-frame"><WorldStage state={dnaWorldState} /></div>
+              <div className="world-frame"><WorldSessionStage state={dnaWorldState} /></div>
               <div className="dna-next"><span>СЛЕДУЮЩИЙ ЭТАП</span><strong>XP Engine → WorldState → события мира → renderer</strong><p>Renderer получает уже разрешённое состояние мира и не считает финансовые метрики внутри Pixi. Погода, время суток и semantic events пока не меняют арт до отдельного production mapping.</p></div>
             </section>
           </div>
