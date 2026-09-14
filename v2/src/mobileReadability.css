@@ -6,10 +6,10 @@
   .context-card span { font-size: 6.5px; letter-spacing: .055em; }
   .context-card strong { font-size: 8px; }
 
-  .position-main span { font-size: 6.8px; }
+  .position-main span { font-size: 7.8px; line-height: 1.2; }
   .position-weight > span,
-  .position-value { font-size: 7.4px; }
-  .allocation-row div span { font-size: 6.6px; }
+  .position-value { font-size: 7.8px; }
+  .allocation-row div span { font-size: 7.6px; line-height: 1.2; }
 
   .subnav button { font-size: 7.2px; letter-spacing: .035em; }
   .sample-badge { font-size: 6.7px; letter-spacing: .035em; }
