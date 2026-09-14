@@ -1,0 +1,179 @@
+/* QVANIX global visual identity layer. Presentation only: no data or layout semantics. */
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.app-shell > :not(.qv-ambient) {
+  position: relative;
+  z-index: 1;
+}
+
+.qv-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: .92;
+  background:
+    radial-gradient(circle at 78% 8%, color-mix(in srgb, var(--mint) 11%, transparent), transparent 31rem),
+    radial-gradient(circle at 12% 72%, color-mix(in srgb, var(--mint) 5%, transparent), transparent 36rem);
+}
+
+.qv-ambient::before,
+.qv-ambient::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.qv-ambient::before {
+  inset: -8%;
+  opacity: .42;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--mint) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--mint) 5%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 52% 34%, #000 0 33%, transparent 76%);
+  transform: perspective(700px) rotateX(61deg) translateY(20%);
+  transform-origin: 50% 34%;
+}
+
+.qv-ambient::after {
+  top: -18%;
+  bottom: -18%;
+  left: -32vw;
+  width: min(25vw, 320px);
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--mint) 13%, transparent) 46%,
+    color-mix(in srgb, #ffffff 8%, transparent) 52%,
+    transparent
+  );
+  filter: blur(.4px);
+  transform: skewX(-13deg);
+}
+
+[data-qv-motion="full"] .qv-ambient::after {
+  animation: qv-shell-scan 1.15s .14s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .qv-ambient::before {
+  animation: qv-shell-grid-arrive .72s ease-out both;
+}
+
+:root[data-qv-theme="horizon"] .qv-ambient {
+  background:
+    radial-gradient(circle at 76% 4%, rgba(118,164,255,.18), transparent 29rem),
+    radial-gradient(circle at 8% 66%, rgba(95,215,255,.08), transparent 32rem),
+    linear-gradient(180deg, rgba(24,41,82,.16), transparent 58%);
+}
+
+:root[data-qv-theme="horizon"] .qv-ambient::before {
+  opacity: .5;
+  background-image:
+    linear-gradient(rgba(124,164,255,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,164,255,.055) 1px, transparent 1px);
+}
+
+:root[data-qv-theme="horizon"] .qv-ambient::after {
+  background: linear-gradient(90deg, transparent, rgba(124,164,255,.16), rgba(224,241,255,.08), transparent);
+}
+
+:root[data-qv-theme="carbon"] .qv-ambient {
+  opacity: .58;
+  background:
+    radial-gradient(circle at 68% 8%, rgba(255,255,255,.035), transparent 24rem),
+    linear-gradient(180deg, rgba(255,255,255,.018), transparent 45%);
+}
+
+:root[data-qv-theme="carbon"] .qv-ambient::before {
+  opacity: .28;
+  background-image:
+    linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+}
+
+:root[data-qv-theme="carbon"] .qv-ambient::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.055), transparent);
+}
+
+:root[data-qv-theme="aurora"] .qv-ambient {
+  background:
+    radial-gradient(circle at 78% 9%, rgba(111,118,255,.17), transparent 29rem),
+    radial-gradient(circle at 16% 72%, rgba(186,83,255,.12), transparent 34rem),
+    radial-gradient(circle at 54% 48%, rgba(89,240,209,.05), transparent 30rem);
+}
+
+:root[data-qv-theme="aurora"] .qv-ambient::before {
+  opacity: .31;
+  background-image:
+    linear-gradient(rgba(162,128,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(89,240,209,.04) 1px, transparent 1px);
+}
+
+:root[data-qv-theme="aurora"] .qv-ambient::after {
+  background: linear-gradient(90deg, transparent, rgba(142,112,255,.14), rgba(89,240,209,.08), transparent);
+}
+
+:root[data-qv-theme="minimal"] .qv-ambient {
+  opacity: .18;
+  background: radial-gradient(circle at 72% 8%, rgba(255,255,255,.025), transparent 24rem);
+}
+
+:root[data-qv-theme="minimal"] .qv-ambient::before,
+:root[data-qv-theme="minimal"] .qv-ambient::after {
+  display: none;
+}
+
+[data-qv-motion="reduced"] .qv-ambient::after,
+[data-qv-motion="off"] .qv-ambient::after {
+  animation: none;
+  opacity: 0;
+}
+
+[data-qv-motion="reduced"] .qv-ambient::before,
+[data-qv-motion="off"] .qv-ambient::before {
+  animation: none;
+}
+
+[data-qv-motion="off"] .qv-ambient {
+  opacity: .62;
+}
+
+@keyframes qv-shell-scan {
+  0% { opacity: 0; transform: translateX(0) skewX(-13deg); }
+  18% { opacity: .38; }
+  68% { opacity: .16; }
+  100% { opacity: 0; transform: translateX(165vw) skewX(-13deg); }
+}
+
+@keyframes qv-shell-grid-arrive {
+  from { opacity: 0; transform: perspective(700px) rotateX(61deg) translateY(23%) scale(1.025); }
+  to { opacity: .42; transform: perspective(700px) rotateX(61deg) translateY(20%) scale(1); }
+}
+
+@media (max-width: 620px) {
+  .qv-ambient::before {
+    background-size: 30px 30px;
+    opacity: .32;
+    mask-image: radial-gradient(ellipse at 50% 26%, #000 0 28%, transparent 72%);
+  }
+
+  .qv-ambient::after {
+    left: -46vw;
+    width: 34vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qv-ambient::before,
+  .qv-ambient::after {
+    animation: none !important;
+  }
+
+  .qv-ambient::after { opacity: 0; }
+}
