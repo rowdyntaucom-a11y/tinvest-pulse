@@ -1,0 +1,51 @@
+import { useMemo } from 'react'
+import type { HistoryPoint } from '../../lib/portfolioApi'
+import { calculateMonteCarlo } from './monteCarlo'
+
+const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
+const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
+
+function formatReturn(value: number | null | undefined) {
+  if (value == null || !Number.isFinite(value)) return '—'
+  return `${pctSigned.format(value * 100)}%`
+}
+
+function formatValue(value: number | null | undefined) {
+  if (value == null || !Number.isFinite(value)) return '—'
+  return `${money.format(value)} ₽`
+}
+
+export default function MonteCarloPanelView({ history, currentValue }: { history: HistoryPoint[]; currentValue: number }) {
+  const result = useMemo(() => calculateMonteCarlo(history, currentValue), [history, currentValue])
+  const progress = Math.min(100, result.minimumReturns ? result.historyReturns / result.minimumReturns * 100 : 0)
+
+  return (
+    <section className="panel mc-panel">
+      <div className="panel-head">
+        <div><span className="eyebrow">ИСТОРИЧЕСКИЕ БЛОКИ v2 · 12 МЕС.</span><h2>СЦЕНАРИИ МОНТЕ-КАРЛО</h2></div>
+        <small>{result.available ? `${result.simulations} траекторий · блок ${result.blockTradingDays} дн.` : `${result.historyReturns}/${result.minimumReturns} дневных доходностей`}</small>
+      </div>
+      {!result.available ? (
+        <div className="mc-gate">
+          <div className="mc-gate__status"><span>СТАТУС МОДЕЛИ</span><strong>ЖДЁМ ИСТОРИЮ</strong><small>QVANIX не экстраполирует слишком короткую выборку.</small></div>
+          <div className="mc-progress" aria-label={`Накоплено ${result.historyReturns} из ${result.minimumReturns} дневных доходностей`}><i><b style={{ width: `${progress}%` }} /></i><span>{result.historyReturns}</span><small>минимум {result.minimumReturns}</small></div>
+          <p>{result.note}</p>
+        </div>
+      ) : (
+        <>
+          <div className="mc-grid">
+            <article className="mc-card mc-card--p10"><span>P10 · НИЖНИЙ СЦЕНАРИЙ</span><strong>{formatReturn(result.terminalReturn?.p10)}</strong><b>{formatValue(result.terminalValue?.p10)}</b><small>10-й перцентиль результата через {result.horizonTradingDays} торговых дней</small></article>
+            <article className="mc-card mc-card--median"><span>МЕДИАНА · P50</span><strong>{formatReturn(result.terminalReturn?.median)}</strong><b>{formatValue(result.terminalValue?.median)}</b><small>середина распределения, не обещанная доходность</small></article>
+            <article className="mc-card mc-card--p90"><span>P90 · ВЕРХНИЙ СЦЕНАРИЙ</span><strong>{formatReturn(result.terminalReturn?.p90)}</strong><b>{formatValue(result.terminalValue?.p90)}</b><small>90-й перцентиль результата через {result.horizonTradingDays} торговых дней</small></article>
+          </div>
+          <div className="mc-integrity">
+            <span className={result.status === 'mature' ? 'is-mature' : 'is-preview'}>{result.status === 'mature' ? 'ЗРЕЛАЯ ВЫБОРКА' : 'ПРЕДВАРИТЕЛЬНО'}</span>
+            <b>{result.historyReturns} дневных доходностей · блок {result.blockTradingDays} дн.{result.excludedReturns ? ` · исключено ${result.excludedReturns}` : ''}</b>
+            <small>{result.note}</small>
+          </div>
+        </>
+      )}
+      <p className="method-note">Метод: историческая блочная выборка фактических дневных TWR-доходностей непрерывными {result.blockTradingDays}-дневными блоками. P10 / P50 / P90 — перцентили сценарного распределения, а не прогноз или гарантия. Модель не добавляет будущие пополнения, снятия, комиссии, налоги или выдуманные ожидания рынка.</p>
+    </section>
+  )
+}
