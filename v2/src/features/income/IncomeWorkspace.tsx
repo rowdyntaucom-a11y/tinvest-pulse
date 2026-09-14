@@ -18,7 +18,6 @@ const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const pct1 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
-const monthFmt = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
 const dateFmt = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' })
 
 type View = 'overview' | 'calendar' | 'sources' | 'taxes'
@@ -145,8 +144,6 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
     ? `те же ${comparableIncome.monthCount} мес. · ${comparableIncome.currentYear}/${comparableIncome.previousYear} · после налога`
     : null
 
-  const monthRows = data.months.slice(0, 6)
-  const monthMax = Math.max(1, ...monthRows.map(row => Number(row.gross) || 0))
   const coverage = integrity.coveragePct
   const next = data.next
   const bondLinkCoveragePct = bondIncomeLinkage.eligibleBondCount
@@ -177,7 +174,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           </section>
 
           <section className="income-forecast panel">
-            <span className="eyebrow">12М · ПОДТВЕРЖДЁННЫЙ ГРАФИК</span>
+            <span className="eyebrow">12М · ПОДТВЕРЖДЁННЫЕ ВЫПЛАТЫ</span>
             <strong>{data.available && data.forecast.gross ? `${money.format(data.forecast.gross)} ₽` : '—'}</strong>
             <small>до налога · только выплаты из расписания текущих позиций</small>
             <div className="forecast-meta">
@@ -195,23 +192,6 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
                 <small>{eventAmount(next) ? `${money2.format(eventAmount(next))} ₽ · до налога` : 'сумма уточняется'}{typeof next.days === 'number' ? ` · через ${next.days} дн.` : ''}</small>
               </>
             ) : <div className="income-empty">Подтверждённых будущих выплат пока нет.</div>}
-          </section>
-
-          <section className="income-months panel">
-            <div className="income-panel-head"><span className="eyebrow">БЛИЖАЙШИЕ 6 МЕСЯЦЕВ</span><small>до налога</small></div>
-            <div className="income-month-bars">
-              {monthRows.length ? monthRows.map(row => {
-                const d = new Date(Date.UTC(row.year, row.month - 1, 1))
-                const h = Math.max(4, (Number(row.gross) || 0) / monthMax * 100)
-                return (
-                  <div className="month-bar" key={row.key}>
-                    <b>{row.gross ? money.format(row.gross) : '0'}</b>
-                    <i><span style={{ height: `${h}%` }} /></i>
-                    <small>{monthFmt.format(d).replace('.', '')}</small>
-                  </div>
-                )
-              }) : <div className="income-empty">Календарь загружается…</div>}
-            </div>
           </section>
         </div>
       )}
