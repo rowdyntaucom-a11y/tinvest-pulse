@@ -11,20 +11,81 @@ const H = 280
 const PAD_X = 34
 const PAD_Y = 24
 
+const pointXY = (value: number, index: number, count: number, min: number, max: number) => {
+  const span = Math.max(1e-9, max - min)
+  const denom = Math.max(1, count - 1)
+  return {
+    x: PAD_X + (index / denom) * (W - PAD_X * 2),
+    y: PAD_Y + (1 - (value - min) / span) * (H - PAD_Y * 2),
+  }
+}
+
 const linePath = (values: Array<number | null>, min: number, max: number) => {
   const finite = values.filter((v): v is number => typeof v === 'number' && Number.isFinite(v))
   if (finite.length < 2) return ''
-  const span = Math.max(1e-9, max - min)
-  const denom = Math.max(1, values.length - 1)
   let open = false
   return values.map((v, i) => {
     if (v == null || !Number.isFinite(v)) { open = false; return '' }
-    const x = PAD_X + (i / denom) * (W - PAD_X * 2)
-    const y = PAD_Y + (1 - (v - min) / span) * (H - PAD_Y * 2)
+    const { x, y } = pointXY(v, i, values.length, min, max)
     const cmd = open ? 'L' : 'M'
     open = true
     return `${cmd}${x.toFixed(1)},${y.toFixed(1)}`
   }).filter(Boolean).join(' ')
+}
+
+type SpreadSegment = { id: string; tone: 'ahead' | 'behind'; points: string }
+
+const buildSpreadSegments = (
+  portfolio: Array<number | null>,
+  benchmark: Array<number | null>,
+  min: number,
+  max: number,
+): SpreadSegment[] => {
+  const count = Math.min(portfolio.length, benchmark.length)
+  const segments: SpreadSegment[] = []
+  for (let i = 0; i < count - 1; i += 1) {
+    const p0 = portfolio[i]
+    const p1 = portfolio[i + 1]
+    const b0 = benchmark[i]
+    const b1 = benchmark[i + 1]
+    if (![p0, p1, b0, b1].every(v => typeof v === 'number' && Number.isFinite(v))) continue
+
+    const pp0 = pointXY(p0 as number, i, count, min, max)
+    const pp1 = pointXY(p1 as number, i + 1, count, min, max)
+    const bb0 = pointXY(b0 as number, i, count, min, max)
+    const bb1 = pointXY(b1 as number, i + 1, count, min, max)
+    const d0 = (p0 as number) - (b0 as number)
+    const d1 = (p1 as number) - (b1 as number)
+
+    if (d0 === 0 || d1 === 0 || Math.sign(d0) === Math.sign(d1)) {
+      const tone = (d0 + d1) >= 0 ? 'ahead' : 'behind'
+      segments.push({
+        id: `${i}-${tone}`,
+        tone,
+        points: `${pp0.x},${pp0.y} ${pp1.x},${pp1.y} ${bb1.x},${bb1.y} ${bb0.x},${bb0.y}`,
+      })
+      continue
+    }
+
+    const t = Math.abs(d0) / (Math.abs(d0) + Math.abs(d1))
+    const cross = {
+      x: pp0.x + (pp1.x - pp0.x) * t,
+      y: pp0.y + (pp1.y - pp0.y) * t,
+    }
+    const firstTone = d0 > 0 ? 'ahead' : 'behind'
+    const secondTone = d1 > 0 ? 'ahead' : 'behind'
+    segments.push({
+      id: `${i}-${firstTone}-a`,
+      tone: firstTone,
+      points: `${pp0.x},${pp0.y} ${cross.x},${cross.y} ${bb0.x},${bb0.y}`,
+    })
+    segments.push({
+      id: `${i}-${secondTone}-b`,
+      tone: secondTone,
+      points: `${cross.x},${cross.y} ${pp1.x},${pp1.y} ${bb1.x},${bb1.y}`,
+    })
+  }
+  return segments
 }
 
 const lastFinite = (values: Array<number | null>) => {
@@ -72,9 +133,11 @@ export function HistoryChart({ points }: Props) {
   const portfolioCount = portfolioValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
   const imoexCount = imoexValues.filter(v => typeof v === 'number' && Number.isFinite(v)).length
   const hasImoex = imoexCount >= 2
+  const spreadSegments = hasImoex ? buildSpreadSegments(portfolioValues, imoexValues, min, max) : []
   const benchmarkCoverage = portfolioCount ? Math.round((imoexCount / portfolioCount) * 100) : 0
   const latestPortfolio = lastFinite(portfolioValues)
   const latestImoex = lastFinite(imoexValues)
+  const latestSpread = latestPortfolio != null && latestImoex != null ? latestPortfolio - latestImoex : null
   const first = chartPoints[0]?.date
   const last = chartPoints.at(-1)?.date
   const eventDenom = Math.max(1, chartPoints.length - 1)
@@ -84,6 +147,9 @@ export function HistoryChart({ points }: Props) {
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="Доходность портфеля и IMOEX на общей шкале">
         {[0.2, 0.4, 0.6, 0.8].map(k => (
           <line key={k} x1={PAD_X} x2={W - PAD_X} y1={H * k} y2={H * k} className="history-gridline" />
+        ))}
+        {spreadSegments.map(segment => (
+          <polygon key={segment.id} points={segment.points} className={`history-spread history-spread--${segment.tone}`} />
         ))}
         {portfolioPath && <path d={portfolioPath} className="history-line history-line--portfolio" />}
         {hasImoex && imoexPath && <path d={imoexPath} className="history-line history-line--imoex" />}
@@ -109,6 +175,7 @@ export function HistoryChart({ points }: Props) {
         {hasImoex
           ? <span><i className="legend-dot legend-dot--imoex" />IMOEX{latestImoex == null ? '' : ` · ${latestImoex.toFixed(1)}`} · покрытие {benchmarkCoverage}%</span>
           : <span>IMOEX: данные ещё не готовы</span>}
+        {latestSpread != null && <span className={latestSpread >= 0 ? 'history-relative history-relative--ahead' : 'history-relative history-relative--behind'}>Δ {latestSpread >= 0 ? '+' : ''}{latestSpread.toFixed(1)} п.</span>}
         <small title={markerPresentation.eventDays.length ? 'Сделки отмечены только по дате исполнения. Цена сделки и координата доходности не реконструируются.' : undefined}>
           {first} → {last}{markerPresentation.eventDays.length ? ` · сделки ${markerPresentation.visibleEventDays.length}/${markerPresentation.eventDays.length} дн. · B${markerPresentation.totalBuys}/S${markerPresentation.totalSells}` : ''}
         </small>

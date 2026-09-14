@@ -3,6 +3,26 @@
   grid-template-columns: repeat(5, auto) 1fr;
 }
 
+/* Relative-performance color has meaning: mint = portfolio ahead, warm = benchmark ahead. */
+.history-spread {
+  pointer-events: none;
+}
+.history-spread--ahead { fill: rgba(89, 240, 209, .12); }
+.history-spread--behind { fill: rgba(239, 183, 98, .11); }
+.history-relative {
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.history-relative--ahead {
+  color: var(--mint);
+  background: rgba(89, 240, 209, .08);
+}
+.history-relative--behind {
+  color: var(--amber);
+  background: rgba(239, 183, 98, .08);
+}
+
 /* Compact landscape/tablet heights should not inherit the phone-only 100dvh lock. */
 @media (min-width: 621px) and (max-height: 760px) {
   .app-shell {
@@ -104,6 +124,15 @@
 
   .roadmap-panel {
     min-height: 0;
+  }
+
+  .history-legend {
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .history-legend small {
+    width: 100%;
+    margin-left: 0;
   }
 }
 
