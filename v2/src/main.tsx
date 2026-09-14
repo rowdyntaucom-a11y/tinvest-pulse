@@ -11,6 +11,7 @@ import './features/settings/boardPersonalization.css'
 import './final-shell.css'
 import './ambientShell.css'
 import './dataFillMotion.css'
+import './workspaceMotion.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
