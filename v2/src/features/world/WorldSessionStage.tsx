@@ -4,31 +4,12 @@ import {
   mergeWorldChronicleEntries,
   type WorldChronicleDocument,
 } from '../dna/worldChronicle'
-import type { WorldEvent, WorldState } from '../dna/worldState'
+import type { WorldState } from '../dna/worldState'
 import { buildFirstSunriseWorldEvent } from './worldLifecycleEvents'
+import { mergeWorldSessionEvents } from './worldSessionEventPolicy'
 import { WorldStage } from './WorldStage'
 
 export const WORLD_SESSION_STAGE_VERSION = '0.1' as const
-
-function mergeSessionEvents(base: WorldEvent[], chronicle: WorldChronicleDocument): WorldEvent[] {
-  const merged: WorldEvent[] = []
-  const seen = new Set<string>()
-
-  for (const event of [...base, ...chronicle.entries]) {
-    const id = String(event.id || '').trim()
-    if (!id || seen.has(id)) continue
-    seen.add(id)
-    merged.push({
-      id,
-      kind: String(event.kind || '').trim(),
-      occurredAt: event.occurredAt,
-      intensity: 'intensity' in event && typeof event.intensity === 'number' ? event.intensity : null,
-      title: event.title ?? null,
-    })
-  }
-
-  return merged
-}
 
 /**
  * Session-only lifecycle composition around the canonical Chronicle.
@@ -57,7 +38,7 @@ export function WorldSessionStage({ state }: { state: WorldState }) {
 
   const rendererState = useMemo<WorldState>(() => ({
     ...state,
-    events: mergeSessionEvents(state.events, chronicle),
+    events: mergeWorldSessionEvents(state.events, chronicle.entries),
   }), [state, chronicle])
 
   return (
