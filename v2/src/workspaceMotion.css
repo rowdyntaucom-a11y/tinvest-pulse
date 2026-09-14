@@ -1,0 +1,87 @@
+/* Top-level workspace transition language. Presentation only. */
+.chip {
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+[data-qv-motion="full"] .chip:active {
+  transform: scale(.96);
+}
+
+[data-qv-motion="full"] .chip--active {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mint) 22%, transparent), 0 0 18px color-mix(in srgb, var(--mint) 8%, transparent);
+}
+
+[data-qv-motion="full"] .app-view.board-view {
+  animation: qv-workspace-board-enter .3s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .app-view.portfolio-view {
+  animation: qv-workspace-portfolio-enter .3s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .app-view.analytics-view {
+  animation: qv-workspace-analytics-enter .3s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .app-view.income-view {
+  animation: qv-workspace-income-enter .3s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .app-view.dna-view {
+  animation: qv-workspace-dna-enter .24s ease-out both;
+}
+
+@keyframes qv-workspace-board-enter {
+  from { opacity: .2; transform: translateY(6px) scale(.997); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes qv-workspace-portfolio-enter {
+  from { opacity: .2; transform: translateY(6px) scale(.997); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes qv-workspace-analytics-enter {
+  from { opacity: .2; transform: translateY(6px) scale(.997); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes qv-workspace-income-enter {
+  from { opacity: .2; transform: translateY(6px) scale(.997); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes qv-workspace-dna-enter {
+  from { opacity: .18; }
+  to { opacity: 1; }
+}
+
+[data-qv-motion="reduced"] .chip {
+  transition-duration: .08s;
+}
+
+[data-qv-motion="off"] .chip {
+  transition: none;
+}
+
+@media (max-width: 620px) {
+  [data-qv-motion="full"] .app-view.board-view,
+  [data-qv-motion="full"] .app-view.portfolio-view,
+  [data-qv-motion="full"] .app-view.analytics-view,
+  [data-qv-motion="full"] .app-view.income-view {
+    animation-duration: .24s;
+  }
+
+  [data-qv-motion="full"] .app-view.dna-view {
+    animation-duration: .2s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .app-view {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
