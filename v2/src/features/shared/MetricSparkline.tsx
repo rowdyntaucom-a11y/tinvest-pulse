@@ -46,7 +46,8 @@ export function MetricSparkline({ values, label, maxPoints = 30 }: Props) {
       role="img"
       aria-label={label}
     >
-      <path d={path} />
+      <path className="metric-sparkline__glow" d={path} pathLength={1} aria-hidden="true" />
+      <path className="metric-sparkline__line" d={path} pathLength={1} />
     </svg>
   )
 }
