@@ -5,6 +5,7 @@ import { useWorldPhaseClock } from './features/world/useWorldPhaseClock'
 import { buildWorldRuntimeStateFromQualityInputs } from './features/dna/worldRuntimeState'
 import { HistoryChart } from './features/portfolio/HistoryChart'
 import { PortfolioWorkspace } from './features/portfolio/PortfolioWorkspace'
+import { MetricSparkline } from './features/shared/MetricSparkline'
 import { calculatePortfolioAnalytics } from './features/analytics/metrics'
 import { calculateAllocationDrift, PERSONAL_STRATEGY_V1 } from './features/analytics/drift'
 import { RebalanceScenarioDetails } from './features/analytics/RebalanceScenarioDetails'
@@ -196,7 +197,15 @@ export default function App() {
                     <small>{analyticsMature ? 'Расчёт на зрелой истории' : `Предварительно · история ${historyLabel}`}</small>
                   </article>
                   <article className="metric-card"><span className="metric-label">XIRR · ЛИЧНАЯ ДОХОДНОСТЬ</span><strong>{xirr == null ? '—' : `${pctSigned.format(xirr)}%`}</strong><small>Учитывает даты денежных потоков</small></article>
-                  <article className="metric-card"><span className="metric-label">TWR · ДОХОДНОСТЬ ПОРТФЕЛЯ</span><strong>{signedRatio(analytics.twr)}</strong><small>Без влияния размера довнесений</small></article>
+                  <article className="metric-card">
+                    <span className="metric-label">TWR · ДОХОДНОСТЬ ПОРТФЕЛЯ</span>
+                    <strong>{signedRatio(analytics.twr)}</strong>
+                    <MetricSparkline
+                      values={snapshot.history.map(point => point.portfolio)}
+                      label="TWR-индекс · последние 30 доступных дневных точек"
+                    />
+                    <small>Без влияния размера довнесений</small>
+                  </article>
                 </section>
                 <section className="panel history-panel">
                   <div className="panel-head"><div><span className="eyebrow">ИНДЕКС TWR</span><h2>ПОРТФЕЛЬ И IMOEX</h2></div><small>{analytics.historyPoints ? `${analytics.historyPoints} точек` : 'история загружается'}</small></div>
