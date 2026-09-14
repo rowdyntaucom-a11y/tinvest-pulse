@@ -9,6 +9,7 @@ import './features/analytics/monteCarlo.css'
 import './features/board/boardShell.css'
 import './features/settings/boardPersonalization.css'
 import './final-shell.css'
+import './ambientShell.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
