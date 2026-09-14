@@ -13,6 +13,7 @@ import './ambientShell.css'
 import './dataFillMotion.css'
 import './workspaceMotion.css'
 import './themeSurfaces.css'
+import './drilldownMotion.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -1,0 +1,77 @@
+/* Presentation-only motion for existing drill-down surfaces. */
+[data-qv-motion="full"] .position-inspector__tabs button,
+[data-qv-motion="full"] .income-realized-modes button {
+  transition: transform .14s ease, border-color .16s ease, background-color .16s ease, color .16s ease;
+}
+
+[data-qv-motion="full"] .position-inspector__tabs button:active,
+[data-qv-motion="full"] .income-realized-modes button:active {
+  transform: scale(.96);
+}
+
+[data-qv-motion="full"] .position-inspector__grid,
+[data-qv-motion="full"] .position-inspector__income-grid,
+[data-qv-motion="full"] .position-inspector__empty {
+  animation: qv-inspector-pane-in .26s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .income-realized-bar > i > span {
+  transform-origin: bottom center;
+  animation: qv-income-bar-rise .42s cubic-bezier(.2,.78,.24,1) both;
+}
+
+[data-qv-motion="full"] .income-realized-bar:nth-child(2) > i > span { animation-delay: .025s; }
+[data-qv-motion="full"] .income-realized-bar:nth-child(3) > i > span { animation-delay: .05s; }
+[data-qv-motion="full"] .income-realized-bar:nth-child(4) > i > span { animation-delay: .075s; }
+[data-qv-motion="full"] .income-realized-bar:nth-child(5) > i > span { animation-delay: .1s; }
+[data-qv-motion="full"] .income-realized-bar:nth-child(6) > i > span { animation-delay: .125s; }
+
+[data-qv-motion="full"] .position-inspector__tabs button:focus-visible,
+[data-qv-motion="full"] .income-realized-modes button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--mint) 48%, transparent);
+  outline-offset: 2px;
+}
+
+[data-qv-motion="reduced"] .position-inspector__tabs button,
+[data-qv-motion="reduced"] .income-realized-modes button {
+  transition-duration: .08s;
+}
+
+[data-qv-motion="off"] .position-inspector__tabs button,
+[data-qv-motion="off"] .income-realized-modes button {
+  transition: none;
+}
+
+@keyframes qv-inspector-pane-in {
+  from { opacity: .68; transform: translateY(3px) scale(.995); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes qv-income-bar-rise {
+  from { opacity: .42; transform: scaleY(0); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+@media(max-width:620px) {
+  [data-qv-motion="full"] .position-inspector__grid,
+  [data-qv-motion="full"] .position-inspector__income-grid,
+  [data-qv-motion="full"] .position-inspector__empty {
+    animation-duration: .2s;
+  }
+
+  [data-qv-motion="full"] .income-realized-bar > i > span {
+    animation-duration: .34s;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .position-inspector__tabs button,
+  .income-realized-modes button,
+  .position-inspector__grid,
+  .position-inspector__income-grid,
+  .position-inspector__empty,
+  .income-realized-bar > i > span {
+    animation: none !important;
+    transition: none !important;
+  }
+}
