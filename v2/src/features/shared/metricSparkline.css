@@ -16,9 +16,18 @@
   vector-effect: non-scaling-stroke;
 }
 
+.qv-board-card.is-blue .metric-sparkline { color: #7ca4ff; }
+.qv-board-card.is-amber .metric-sparkline { color: var(--amber); }
+.qv-board-card.is-neutral .metric-sparkline { color: var(--muted); }
+
 @media (max-width: 620px) {
   .metric-sparkline {
     height: 18px;
     margin: 2px 0 1px;
+  }
+
+  .qv-board-card .metric-sparkline {
+    height: 12px;
+    margin-block: 1px;
   }
 }
