@@ -9,15 +9,13 @@ import { buildFirstSunriseWorldEvent } from './worldLifecycleEvents'
 import { mergeWorldSessionEvents } from './worldSessionEventPolicy'
 import { WorldStage } from './WorldStage'
 
-export const WORLD_SESSION_STAGE_VERSION = '0.1' as const
-
 /**
  * Session-only lifecycle composition around the canonical Chronicle.
  *
  * This component deliberately does not persist Chronicle to localStorage or invent a
  * second permanent history owner. It observes the already-resolved WorldState phase,
  * records an idempotent first-sunrise semantic event for the current app session, and
- * passes one merged renderer-ready state into Pixi.
+ * passes one merged renderer-ready state into Pixi without adding a layout wrapper.
  */
 export function WorldSessionStage({ state }: { state: WorldState }) {
   const [chronicle, setChronicle] = useState<WorldChronicleDocument>(() => createEmptyWorldChronicle())
@@ -41,12 +39,5 @@ export function WorldSessionStage({ state }: { state: WorldState }) {
     events: mergeWorldSessionEvents(state.events, chronicle.entries),
   }), [state, chronicle])
 
-  return (
-    <div
-      data-world-session-stage={WORLD_SESSION_STAGE_VERSION}
-      data-world-session-chronicle={chronicle.entries.length}
-    >
-      <WorldStage state={rendererState} />
-    </div>
-  )
+  return <WorldStage state={rendererState} />
 }
