@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { type PayoutCalendar, type PayoutEvent } from '../../lib/payoutsApi'
 import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import type { PositionSnapshot } from '../../lib/portfolioApi'
@@ -11,6 +11,8 @@ import { IncomeGoalCompact } from './IncomeGoalCompact'
 import './income.css'
 import './incomeCompact.css'
 
+const IncomeTaxPanel = lazy(() => import('./IncomeTaxPanel'))
+
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -19,7 +21,7 @@ const number2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const monthFmt = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
 const dateFmt = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' })
 
-type View = 'overview' | 'calendar' | 'sources'
+type View = 'overview' | 'calendar' | 'sources' | 'taxes'
 
 type Props = {
   passiveIncome: number
@@ -157,6 +159,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
         <button className={view === 'overview' ? 'is-active' : ''} onClick={() => setView('overview')}>ОБЗОР</button>
         <button className={view === 'calendar' ? 'is-active' : ''} onClick={() => setView('calendar')}>КАЛЕНДАРЬ</button>
         <button className={view === 'sources' ? 'is-active' : ''} onClick={() => setView('sources')}>ИСТОЧНИКИ</button>
+        <button className={view === 'taxes' ? 'is-active' : ''} onClick={() => setView('taxes')}>НАЛОГИ</button>
         <span className={`income-source-badge is-${integrity.state}`} title={integrity.detail}>
           {integrity.label}
         </span>
@@ -291,6 +294,12 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <p className="income-method-note">НАБЛЮДЕНИЕ считает нулём только полностью наблюдавшийся календарный месяц. Частичные и отсутствующие месяцы не подменяются нулём; стабильность открывается после 3 полных месяцев, зрелая — после 12. Сравнение периодов появляется только при ≥3 точных парах одинаковых полных месяцев текущего и предыдущего года; 12 пар — зрелое сравнение. Короткая история не пересчитывается в годовой темп.</p>
           {data.warning && <p className="income-warning">{data.warning}</p>}
         </section>
+      )}
+
+      {view === 'taxes' && (
+        <Suspense fallback={<section className="panel"><div className="income-empty">Налоговая аналитика загружается…</div></section>}>
+          <IncomeTaxPanel calendar={data} />
+        </Suspense>
       )}
     </div>
   )
