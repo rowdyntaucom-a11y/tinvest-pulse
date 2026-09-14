@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { PortfolioAnalytics } from '../analytics/metrics'
 import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import type { PortfolioSnapshot } from '../../lib/portfolioApi'
@@ -27,6 +27,17 @@ type BoardModule = {
   destination: BoardDestination | null
   sparklineValues?: Array<number | null>
   sparklineLabel?: string
+}
+
+type BoardLens = 'capital' | 'return' | 'income' | 'risk'
+
+type BoardLensState = {
+  label: string
+  eyebrow: string
+  value: string
+  note: string
+  destination: BoardDestination
+  facts: Array<{ label: string; value: string }>
 }
 
 type Props = {
@@ -63,6 +74,7 @@ function snapshotStamp(value: string | null) {
 
 export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, onNavigate }: Props) {
   const { calendar, loading: incomeLoading } = usePayoutSnapshot(true)
+  const [lens, setLens] = useState<BoardLens>('capital')
 
   const modules = useMemo(() => {
     const next = calendar?.next ?? null
@@ -138,12 +150,75 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
     return pinnedModules.map(id => all[id]).filter((item): item is BoardModule => Boolean(item))
   }, [analytics, calendar, incomeLoading, pinnedModules, snapshot, xirrPercent])
 
+  const lensState = useMemo<Record<BoardLens, BoardLensState>>(() => {
+    const next = calendar?.next ?? null
+    const nextDate = safeDate(next?.date)
+    const actualAvailable = calendar?.available === true && calendar.actual?.observation?.available === true
+    const actualNet = actualAvailable && Number.isFinite(calendar?.actual?.totalNet) ? calendar!.actual.totalNet : null
+    const forecastNet = calendar?.available && Number.isFinite(calendar.forecast.net) ? calendar.forecast.net : null
+    const payoutCoverage = calendar?.coverage?.coverageRatio != null && Number.isFinite(calendar.coverage.coverageRatio)
+      ? `${pct.format(calendar.coverage.coverageRatio * 100)}%`
+      : '—'
+
+    return {
+      capital: {
+        label: 'КАПИТАЛ',
+        eyebrow: 'Q-LENS · СОСТОЯНИЕ СЕЙЧАС',
+        value: snapshot.value > 0 ? `${money.format(snapshot.value)} ₽` : '—',
+        note: 'Текущая стоимость и брокерский денежный результат — без подмены доходностью.',
+        destination: { workspace: 'portfolio' },
+        facts: [
+          { label: 'P/L', value: signedMoney(snapshot.profit) },
+          { label: 'P/L %', value: signedPercent(snapshot.profitPct, false) },
+          { label: 'ПОЗИЦИЙ', value: `${snapshot.positions}` },
+        ],
+      },
+      return: {
+        label: 'ДОХОДНОСТЬ',
+        eyebrow: `Q-LENS · TWR v${analytics.calcVersion}`,
+        value: signedPercent(analytics.twr),
+        note: 'TWR показывает поведение стратегии без влияния размера пополнений; XIRR остаётся личной доходностью.',
+        destination: { workspace: 'analytics', analyticsView: 'overview' },
+        facts: [
+          { label: 'XIRR', value: xirrPercent == null ? '—' : signedPercent(xirrPercent, false) },
+          { label: 'ИСТОРИЯ', value: analytics.historyDays ? `${analytics.historyDays} д.` : '—' },
+          { label: 'ТОЧЕК', value: `${analytics.historyPoints || 0}` },
+        ],
+      },
+      income: {
+        label: 'ДОХОД',
+        eyebrow: 'Q-LENS · ФАКТ + РАСПИСАНИЕ',
+        value: actualNet == null ? '—' : `${money.format(actualNet)} ₽`,
+        note: actualAvailable ? 'Полученный net-факт отдельно от будущего подтверждённого расписания.' : 'Факт ждёт подтверждённого окна наблюдения.',
+        destination: { workspace: 'income' },
+        facts: [
+          { label: '12М НА РУКИ', value: forecastNet == null ? '—' : `${money.format(forecastNet)} ₽` },
+          { label: 'СЛЕДУЮЩАЯ', value: nextDate ? dateFmt.format(nextDate) : '—' },
+          { label: 'ПОКРЫТИЕ', value: payoutCoverage },
+        ],
+      },
+      risk: {
+        label: 'РИСК',
+        eyebrow: `Q-LENS · HEALTH v${analytics.healthVersion}`,
+        value: analytics.healthScore == null ? '—' : `${Math.round(analytics.healthScore)}/100`,
+        note: analytics.historyDays >= 365 ? 'Зрелая история: риск-метрики можно читать без preview-ограничения.' : `Предварительно: история ${analytics.historyDays || 0} дней.`,
+        destination: { workspace: 'analytics', analyticsView: 'risk' },
+        facts: [
+          { label: 'MAX DD', value: analytics.maxDrawdown == null ? '—' : `−${pct.format(analytics.maxDrawdown * 100)}%` },
+          { label: 'VOL', value: analytics.volatility == null ? '—' : `${pct.format(analytics.volatility * 100)}%` },
+          { label: 'HEALTH', value: analytics.healthScore == null ? '—' : `${Math.round(analytics.healthScore)}` },
+        ],
+      },
+    }
+  }, [analytics, calendar, snapshot, xirrPercent])
+
   const health = analytics.healthScore == null ? 0 : Math.max(0, Math.min(100, analytics.healthScore))
   const sourceLabel = snapshot.source === 'dashboard' ? 'DASHBOARD API' : snapshot.source === 'portfolio' ? 'PORTFOLIO API' : 'FALLBACK'
   const historyState = analytics.historyPoints > 0 ? `${analytics.historyPoints} точек / ${analytics.historyDays} д.` : 'нет истории'
   const payoutCoverage = calendar?.coverage?.coverageRatio != null && Number.isFinite(calendar.coverage.coverageRatio)
     ? `${pct.format(calendar.coverage.coverageRatio * 100)}%`
     : '—'
+  const activeLens = lensState[lens]
 
   return (
     <div className="qv-board">
@@ -177,6 +252,34 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
         <article><span>HISTORY</span><strong>{historyState}</strong><small>{analytics.historyIntegrity === 'OK' ? 'integrity OK' : 'CONFLICT'}</small></article>
         <article><span>PAYOUT COVERAGE</span><strong>{payoutCoverage}</strong><small>{calendar?.integrity?.complete ? 'schedule complete' : 'coverage explicit'}</small></article>
         <article><span>KEY RATE</span><strong>{snapshot.riskFreeRate == null ? '—' : `${number.format(snapshot.riskFreeRate)}%`}</strong><small>{snapshot.nextRateMeeting ? `review ${snapshot.nextRateMeeting}` : 'next review —'}</small></article>
+      </section>
+
+      <section className="qv-board__lens" aria-label="Q-LENS">
+        <div className="qv-board__lens-tabs" role="tablist" aria-label="Фокус панели">
+          {(Object.keys(lensState) as BoardLens[]).map(key => (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={lens === key}
+              className={lens === key ? 'is-active' : ''}
+              onClick={() => setLens(key)}
+              key={key}
+            >
+              {lensState[key].label}
+            </button>
+          ))}
+        </div>
+        <div className="qv-board__lens-body">
+          <div className="qv-board__lens-copy">
+            <span>{activeLens.eyebrow}</span>
+            <strong>{activeLens.value}</strong>
+            <small>{activeLens.note}</small>
+          </div>
+          <div className="qv-board__lens-facts">
+            {activeLens.facts.map(item => <article key={item.label}><span>{item.label}</span><strong>{item.value}</strong></article>)}
+          </div>
+          <button type="button" className="qv-board__lens-open" onClick={() => onNavigate(activeLens.destination)}>ОТКРЫТЬ ↗</button>
+        </div>
       </section>
 
       <section className="qv-board__modules">
