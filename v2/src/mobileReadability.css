@@ -3,7 +3,7 @@
   .chip { font-size: 8px; letter-spacing: .015em; }
   .metric-label { font-size: 7.4px; letter-spacing: .075em; }
   .metric-card small { font-size: 7.4px; }
-  .context-card span { font-size: 6.5px; letter-spacing: .055em; }
+  .context-card span { font-size: 7.2px; line-height: 1.2; letter-spacing: .045em; }
   .context-card strong { font-size: 8px; }
 
   .position-main span { font-size: 7.8px; line-height: 1.2; }
