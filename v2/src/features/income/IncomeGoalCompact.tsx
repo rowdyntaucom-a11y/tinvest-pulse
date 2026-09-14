@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { buildRealizedIncomeHistory, calculateIncomeGoalProgress } from './incomeHistory'
+import { IncomeRealizedHistoryChart } from './IncomeRealizedHistoryChart'
 import './incomeGoal.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -26,31 +27,34 @@ export function IncomeGoalCompact({ history }: { history: IncomeHistory }) {
       : 'ЖДЁМ 12 ПОЛНЫХ МЕС.'
 
   return (
-    <details className="income-goal-details">
-      <summary>
-        <span>ЦЕЛЬ ПАССИВНОГО ДОХОДА · ПОСЛЕ НАЛОГА / ГОД</span>
-        <b>{status}</b>
-      </summary>
-      <div className="income-goal-body">
-        <label>
-          <span>ЦЕЛЬ, ₽</span>
-          <input
-            inputMode="decimal"
-            value={targetInput}
-            onChange={event => setTargetInput(event.target.value)}
-            placeholder="например 120000"
-            aria-label="Годовая цель пассивного дохода после налога в рублях"
-          />
-        </label>
-        <div className="income-goal-progress">
-          <div>
-            <span>{goal.realizedAnnualNet == null ? 'ПОЛУЧЕНО —' : `ПОЛУЧЕНО ${money.format(goal.realizedAnnualNet)} ₽`}</span>
-            <b>{target > 0 ? `ЦЕЛЬ ${money.format(target)} ₽` : 'введите цель'}</b>
+    <>
+      <IncomeRealizedHistoryChart history={history} />
+      <details className="income-goal-details">
+        <summary>
+          <span>ЦЕЛЬ ПАССИВНОГО ДОХОДА · ПОСЛЕ НАЛОГА / ГОД</span>
+          <b>{status}</b>
+        </summary>
+        <div className="income-goal-body">
+          <label>
+            <span>ЦЕЛЬ, ₽</span>
+            <input
+              inputMode="decimal"
+              value={targetInput}
+              onChange={event => setTargetInput(event.target.value)}
+              placeholder="например 120000"
+              aria-label="Годовая цель пассивного дохода после налога в рублях"
+            />
+          </label>
+          <div className="income-goal-progress">
+            <div>
+              <span>{goal.realizedAnnualNet == null ? 'ПОЛУЧЕНО —' : `ПОЛУЧЕНО ${money.format(goal.realizedAnnualNet)} ₽`}</span>
+              <b>{target > 0 ? `ЦЕЛЬ ${money.format(target)} ₽` : 'введите цель'}</b>
+            </div>
+            <i><b style={{ width: `${barWidth}%` }} /></i>
           </div>
-          <i><b style={{ width: `${barWidth}%` }} /></i>
         </div>
-      </div>
-      <p>{goal.note} QVANIX не рассчитывает дату достижения и не пересчитывает короткую историю в годовой темп.</p>
-    </details>
+        <p>{goal.note} QVANIX не рассчитывает дату достижения и не пересчитывает короткую историю в годовой темп.</p>
+      </details>
+    </>
   )
 }
