@@ -49,6 +49,19 @@
     letter-spacing: .07em;
   }
 
+  /* Lift only supporting text; primary values and semantic accents stay untouched. */
+  .qv-board__rail span,
+  .qv-board__rail small,
+  .qv-board__lens-copy > span,
+  .qv-board__lens-copy > small,
+  .qv-board__lens-facts span,
+  .qv-board__modules > header span,
+  .qv-board__modules > header small,
+  .qv-board-card > span,
+  .qv-board-card > small {
+    color: color-mix(in srgb, var(--muted) 84%, #dff4ee 16%);
+  }
+
   /* Recover a little room without changing card count or grid ownership. */
   .qv-board__rail article { padding-inline: 8px; }
   .qv-board__lens-facts article { padding-inline: 7px; }

@@ -34,6 +34,26 @@
   .world-stage__diagnostic { font-size: 6.8px; }
   .dna-next p { font-size: 7.2px; }
 
+  /* Raise low-contrast supporting copy without touching semantic mint/amber states. */
+  .metric-card small,
+  .context-card span,
+  .position-main span,
+  .allocation-row div span,
+  .score-card small,
+  .risk-card > small,
+  .analytics-note p,
+  .health-row div span,
+  .health-weight,
+  .method-note,
+  .income-hero p,
+  .roadmap-panel p,
+  .income-hero > small,
+  .dna-state span,
+  .dna-state small,
+  .dna-next p {
+    color: color-mix(in srgb, var(--muted) 86%, #dff4ee 14%);
+  }
+
   /* Recover space from decoration/gaps rather than shrinking text. */
   .panel { padding-inline: 10px; }
   .context-card { gap: 3px 5px; }
