@@ -3,6 +3,8 @@ import type { PortfolioSnapshot, PositionSnapshot } from '../../lib/portfolioApi
 import { usePayoutSnapshot } from '../../lib/payoutSnapshot'
 import { PortfolioValueChart } from './PortfolioValueChart'
 import { BondAnalytics } from './BondAnalytics'
+import { AllocationDonut } from './AllocationDonut'
+import { assetClassVisualForLabel } from './assetClassVisuals'
 import { calculatePortfolioPnlAttribution, findPositionPnlAttribution } from './portfolioAttribution'
 import { buildPortfolioDataContext } from './portfolioDataContext'
 import { calculatePortfolioTopExposure } from './portfolioExposureDiagnostics'
@@ -169,7 +171,12 @@ export function PortfolioWorkspace({ snapshot }: Props) {
     }
     const total = [...groups.values()].reduce((sum, value) => sum + value, 0)
     return [...groups.entries()]
-      .map(([label, value]) => ({ label, value, weight: total > 0 ? value / total : 0 }))
+      .map(([label, value]) => ({
+        label,
+        value,
+        weight: total > 0 ? value / total : 0,
+        tone: assetClassVisualForLabel(label).tone,
+      }))
       .sort((a, b) => b.value - a.value)
   }, [snapshot.positionItems])
 
@@ -381,25 +388,28 @@ export function PortfolioWorkspace({ snapshot }: Props) {
                   {allocationDelta == null || Math.abs(allocationDelta) < 0.5 ? '' : ` · Δ ${signedMoney(allocationDelta)}`}
                 </small>
               </div>
-              <div className="allocation-list portfolio-allocation-list">
-                {allocation.length ? allocation.map(item => {
-                  const classAttribution = pnlAttribution.assetClasses.find(row => row.assetClass === item.label)
-                  const pnlShare = classAttribution?.grossPnlShare
-                  return (
-                    <div className="allocation-row" key={item.label}>
-                      <div>
-                        <strong>{item.label}</strong>
-                        <span>
-                          {money.format(item.value)} ₽
-                          {classAttribution ? ` · P/L ${signedMoney(classAttribution.pnl)}` : ''}
-                          {pnlShare == null ? '' : ` · ${pctPlain.format(pnlShare * 100)}% |P/L|`}
-                        </span>
+              <div className="allocation-visual-layout">
+                <AllocationDonut items={allocation} />
+                <div className="allocation-list portfolio-allocation-list">
+                  {allocation.length ? allocation.map(item => {
+                    const classAttribution = pnlAttribution.assetClasses.find(row => row.assetClass === item.label)
+                    const pnlShare = classAttribution?.grossPnlShare
+                    return (
+                      <div className="allocation-row" key={item.label}>
+                        <div>
+                          <strong><span className={`allocation-class-dot is-${item.tone}`} aria-hidden="true" />{item.label}</strong>
+                          <span>
+                            {money.format(item.value)} ₽
+                            {classAttribution ? ` · P/L ${signedMoney(classAttribution.pnl)}` : ''}
+                            {pnlShare == null ? '' : ` · ${pctPlain.format(pnlShare * 100)}% |P/L|`}
+                          </span>
+                        </div>
+                        <b title="Доля класса внутри суммы текущих позиций">{pctPlain.format(item.weight * 100)}% поз.</b>
+                        <i><span style={{ width: `${item.weight * 100}%` }} /></i>
                       </div>
-                      <b title="Доля класса внутри суммы текущих позиций">{pctPlain.format(item.weight * 100)}% поз.</b>
-                      <i><span style={{ width: `${item.weight * 100}%` }} /></i>
-                    </div>
-                  )
-                }) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
+                    )
+                  }) : <div className="empty-state">Структура появится после загрузки позиций.</div>}
+                </div>
               </div>
               <p className="method-note">
                 Вес класса = стоимость класса / сумма текущих позиций, а не / весь капитал снимка; 100% классов = {money.format(positionValue)} ₽

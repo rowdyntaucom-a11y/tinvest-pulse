@@ -1,0 +1,230 @@
+:root {
+  --asset-equity: #63c8ff;
+  --asset-bond: #f2c96d;
+  --asset-fund: #a991ff;
+  --asset-currency: #61d8a2;
+  --asset-future: #ff8c9b;
+  --asset-other: #8aa19b;
+}
+
+.allocation-visual-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+}
+
+.allocation-donut {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.allocation-donut__chart {
+  position: relative;
+  width: min(100%, 190px);
+  aspect-ratio: 1;
+}
+
+.allocation-donut__chart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.allocation-donut__track,
+.allocation-donut__segment {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.allocation-donut__track {
+  stroke: rgba(255,255,255,.055);
+  stroke-width: 13;
+}
+
+.allocation-donut__segment {
+  stroke-width: 13;
+  stroke-linecap: round;
+  opacity: .72;
+  cursor: pointer;
+  transition: opacity .16s ease, stroke-width .16s ease, filter .16s ease;
+}
+
+.allocation-donut__segment:hover,
+.allocation-donut__segment:focus-visible,
+.allocation-donut__segment.is-selected {
+  opacity: 1;
+  stroke-width: 16;
+  outline: none;
+  filter: drop-shadow(0 0 5px rgba(255,255,255,.08));
+}
+
+.allocation-donut__segment[data-asset-class="Акции"] { stroke: var(--asset-equity); }
+.allocation-donut__segment[data-asset-class="Облигации"] { stroke: var(--asset-bond); }
+.allocation-donut__segment[data-asset-class="Фонды"] { stroke: var(--asset-fund); }
+.allocation-donut__segment[data-asset-class="Валюта"] { stroke: var(--asset-currency); }
+.allocation-donut__segment[data-asset-class="Фьючерсы"] { stroke: var(--asset-future); }
+.allocation-donut__segment[data-asset-class="Прочее"] { stroke: var(--asset-other); }
+
+.allocation-donut__legend i[data-asset-class="Акции"], .allocation-class-dot.is-Акции { background: var(--asset-equity); }
+.allocation-donut__legend i[data-asset-class="Облигации"], .allocation-class-dot.is-Облигации { background: var(--asset-bond); }
+.allocation-donut__legend i[data-asset-class="Фонды"], .allocation-class-dot.is-Фонды { background: var(--asset-fund); }
+.allocation-donut__legend i[data-asset-class="Валюта"], .allocation-class-dot.is-Валюта { background: var(--asset-currency); }
+.allocation-donut__legend i[data-asset-class="Фьючерсы"], .allocation-class-dot.is-Фьючерсы { background: var(--asset-future); }
+.allocation-donut__legend i[data-asset-class="Прочее"], .allocation-class-dot.is-Прочее { background: var(--asset-other); }
+
+.allocation-donut__center {
+  position: absolute;
+  inset: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.allocation-donut__center span {
+  max-width: 100%;
+  overflow: hidden;
+  color: #8ca79f;
+  font-size: 8px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.allocation-donut__center strong {
+  color: #effdf9;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.allocation-donut__center small {
+  color: #6d8982;
+  font-size: 7px;
+}
+
+.allocation-donut__legend {
+  display: grid;
+  gap: 5px;
+}
+
+.allocation-donut__legend button {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #91aba4;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.allocation-donut__legend button:hover,
+.allocation-donut__legend button.is-selected {
+  border-color: var(--line);
+  background: rgba(255,255,255,.018);
+}
+
+.allocation-donut__legend i,
+.allocation-class-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.allocation-donut__legend span {
+  overflow: hidden;
+  font-size: 8px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.allocation-donut__legend strong {
+  color: #dff4ee;
+  font-size: 8px;
+}
+
+.portfolio-allocation-list .allocation-row > div:first-child > strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.allocation-class-dot {
+  flex: 0 0 auto;
+  display: inline-block;
+}
+
+.allocation-donut--empty {
+  min-height: 150px;
+  place-items: center;
+  color: #6f8f87;
+  font-size: 10px;
+}
+
+@media (max-width: 760px) {
+  .allocation-visual-layout {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .allocation-donut {
+    grid-template-columns: minmax(122px, 145px) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .allocation-donut__chart { width: 138px; }
+  .allocation-donut__center strong { font-size: 18px; }
+  .allocation-donut__legend { align-content: center; }
+}
+
+@media (max-width: 620px) {
+  .allocation-visual-layout {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 2px;
+  }
+
+  .allocation-donut {
+    flex: 0 0 auto;
+    grid-template-columns: 128px minmax(0, 1fr);
+  }
+
+  .allocation-donut__chart { width: 124px; }
+
+  .allocation-donut__track,
+  .allocation-donut__segment { stroke-width: 11; }
+
+  .allocation-donut__segment:hover,
+  .allocation-donut__segment:focus-visible,
+  .allocation-donut__segment.is-selected { stroke-width: 14; }
+
+  .allocation-donut__center span,
+  .allocation-donut__legend span,
+  .allocation-donut__legend strong { font-size: 7px; }
+
+  .allocation-donut__center strong { font-size: 16px; }
+  .allocation-donut__center small { font-size: 6px; }
+
+  .allocation-donut__legend button {
+    min-height: 28px;
+    padding: 4px 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .allocation-donut__segment { transition: none; }
+}
