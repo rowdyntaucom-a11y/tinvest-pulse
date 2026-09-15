@@ -21,8 +21,11 @@ export function AssetWorkspace({ position, portfolioValue, onBack }: { position:
   const [fundamentals,setFundamentals]=useState<AssetFundamentalsSnapshot>(()=>unavailableAssetFundamentals())
   const [history,setHistory]=useState<AssetHistorySeries|null>(null); const [badges,setBadges]=useState<InstrumentBadgePayload|null>(null)
   const { calendar }=usePayoutSnapshot(true)
-  useEffect(()=>{const c=new AbortController(); void Promise.all([position.instrumentUid?loadAssetFundamentals(position.instrumentUid,c.signal):Promise.resolve(unavailableAssetFundamentals()),loadAssetHistory(c.signal),loadInstrumentBadges()]).then(([f,h,b])=>{setFundamentals(f);setHistory(matchSeries(position,h.series));setBadges(b)}); return()=>c.abort()},[position])
-  const income=useMemo(()=>calendar?buildIncomeSourceRows(calendar.actual.items,calendar.events,[position],Number.MAX_SAFE_INTEGER).find(row=>row.figi?.toUpperCase()===position.figi?.toUpperCase())??null:null,[calendar,position])
+  const instrumentUid=position.instrumentUid
+  const figi=position.figi
+  useEffect(()=>{const c=new AbortController(); void Promise.all([instrumentUid?loadAssetFundamentals(instrumentUid,c.signal):Promise.resolve(unavailableAssetFundamentals()),loadAssetHistory(c.signal),loadInstrumentBadges()]).then(([f,h,b])=>{setFundamentals(f);setHistory(matchSeries(position,h.series));setBadges(b)}); return()=>c.abort()},[instrumentUid,figi])
+  const normalizedFigi=figi?.trim().toUpperCase()||null
+  const income=useMemo(()=>{if(!calendar||!normalizedFigi)return null;return buildIncomeSourceRows(calendar.actual.items,calendar.events,[position],Number.MAX_SAFE_INTEGER).find(row=>{const rowFigi=row.figi?.trim().toUpperCase();return Boolean(rowFigi)&&rowFigi===normalizedFigi})??null},[calendar,normalizedFigi,position])
   const interpretation=deriveQvanixFundamentalInterpretation(fundamentals); const basis=position.currentValue-position.expectedYield; const pnlPct=basis>0?position.expectedYield/basis:null
   const groups=[['ОЦЕНКА',['marketCap','peRatioTtm','priceToSalesTtm','priceToBookTtm','evToEbitdaTtm']],['РЕНТАБЕЛЬНОСТЬ',['roeTtm','roaTtm','roicTtm']],['ФИНАНСЫ',['revenueTtm','ebitdaTtm','netIncomeTtm','netDebtToEbitda']],['ДЕНЕЖНЫЙ ПОТОК И ДИВИДЕНДЫ',['freeCashFlowTtm','dividendYield']]] as const
   return <div className="asset-workspace">
