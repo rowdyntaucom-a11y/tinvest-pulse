@@ -15,7 +15,7 @@ const assetHistoryMarker="\napp.get('*', (req, res) => {";
 if(!core.includes(assetHistoryMarker))throw new Error('QVANIX v2: asset history route marker changed');
 const assetHistoryCode=[
  "const {assetHistoryPositionMarketValue,ASSET_HISTORY_VALUATION_VERSION}=require('./asset-history-core.js');",
- "const qvanixAssetHistoryCache={expiresAt:0,payload:null};",
+ "const qvanixAssetHistoryCache=new Map();",
  "async function qvanixGetDailyCandles(instrumentId,from,to){",
  "  const data=await tbankRequest('tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles',{from,to,interval:'CANDLE_INTERVAL_DAY',instrumentId});",
  "  const rows=Array.isArray(data?.candles)?data.candles:[];",
@@ -30,7 +30,8 @@ const assetHistoryCode=[
  "app.get('/api/asset-history',async(req,res)=>{",
  "  try{",
  "    const now=Date.now();",
- "    if(qvanixAssetHistoryCache.payload&&qvanixAssetHistoryCache.expiresAt>now)return res.json(qvanixAssetHistoryCache.payload);",
+ "    const requestedInstrumentUid=typeof req.query?.instrumentUid==='string'&&/^[A-Za-z0-9._:-]{1,128}$/.test(req.query.instrumentUid)?req.query.instrumentUid:null;",
+ "    const historyCacheKey=requestedInstrumentUid||'TOP';const cached=qvanixAssetHistoryCache.get(historyCacheKey);if(cached&&cached.expiresAt>now)return res.json(cached.payload);",
  "    const accountsResponse=await getAccounts();",
  "    const account=selectAccount(accountsResponse);",
  "    if(!account?.id)return res.status(404).json({version:'1.1',available:false,series:[],error:'No open account'});",
@@ -50,7 +51,8 @@ const assetHistoryCode=[
  "      valued.push(...rows);",
  "    }",
  "    const valuationRejected=valued.filter(x=>!(Number.isFinite(x.value)&&x.value>0)).length;",
- "    const ranked=valued.filter(x=>Number.isFinite(x.value)&&x.value>0).sort((a,b)=>b.value-a.value).slice(0,6);",
+ "    const eligible=valued.filter(x=>Number.isFinite(x.value)&&x.value>0);",
+ "    const ranked=requestedInstrumentUid?eligible.filter(x=>x.instrumentId===requestedInstrumentUid):eligible.sort((a,b)=>b.value-a.value).slice(0,6);",
  "    const to=new Date();",
  "    const from=new Date(to.getTime()-365*24*60*60*1000);",
  "    const fromIso=from.toISOString();",
@@ -73,8 +75,7 @@ const assetHistoryCode=[
  "      series.push(...rows);",
  "    }",
  "    const payload={version:'1.1',available:series.filter(x=>x.points.length>=2).length>0,from:fromIso.slice(0,10),to:toIso.slice(0,10),requested:ranked.length,availableSeries:series.filter(x=>x.points.length>=2).length,series,source:'T-Bank GetCandles',cacheSeconds:900,rankingBasis:'verified_current_market_value',valuationVersion:ASSET_HISTORY_VALUATION_VERSION,candidatePositions:candidates.length,valuationRejected};",
- "    qvanixAssetHistoryCache.payload=payload;",
- "    qvanixAssetHistoryCache.expiresAt=now+900000;",
+ "    qvanixAssetHistoryCache.set(historyCacheKey,{payload,expiresAt:now+900000});",
  "    res.setHeader('Cache-Control','private, max-age=300');",
  "    return res.json(payload);",
  "  }catch(error){",
@@ -199,6 +200,7 @@ const assetFundamentalsCode=[
  "    res.setHeader('Cache-Control','private, max-age=3600');return res.json(payload);",
  "  }catch(error){console.warn('QVANIX fundamentals failed:',error?.message||error);return res.status(502).json({source:'UNAVAILABLE',available:false,error:'fundamentals unavailable'});}",
  "});",
+ "require('./api-route-policy.js').registerApiNotFound(app);",
  ""
 ].join('\n');
 core=core.replace(assetFundamentalsMarker,'\n'+assetFundamentalsCode+assetFundamentalsMarker);

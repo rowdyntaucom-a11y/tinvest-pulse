@@ -59,5 +59,7 @@ assert.equal(emptyVerified.reason, 'NO_USABLE_METRICS')
 assert.equal(deriveQvanixFundamentalInterpretation(emptyVerified).reason, 'NO_VERIFIED_METRICS')
 
 assert.equal(normalizeAssetFundamentals(null).reason, 'INVALID_PAYLOAD')
+assert.equal(unavailableAssetFundamentals('UNSUPPORTED_INSTRUMENT').reason, 'UNSUPPORTED_INSTRUMENT')
+assert.equal(unavailableAssetFundamentals('API_ERROR').reason, 'API_ERROR')
 
 console.log('asset fundamentals tests: ok')
