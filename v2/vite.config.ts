@@ -45,9 +45,9 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('/node_modules/pixi.js/')) return 'pixi-dna'
-          // Living World atmosphere policy is isolated from the already-tight
-          // application chunk; it remains dependency-free and does not pull Pixi
-          // into the initial app bundle.
+          // Keep presentation-only Living World code out of the already-tight
+          // application chunk without changing the deferred Pixi boundary.
+          if (id.includes('/features/world/WorldStage.tsx')) return 'dna-stage'
           if (id.includes('/features/world/worldAtmospherePresentation')) return 'dna-atmosphere'
           if (id.includes('/features/portfolio/instrumentBadge')) return 'instrument-badges'
           if (id.includes('/features/portfolio/InstrumentBadge.tsx')) return 'instrument-badges'
