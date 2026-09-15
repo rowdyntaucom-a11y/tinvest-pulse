@@ -1,7 +1,7 @@
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 import type { WorldEventPresentationChannel } from './worldEventPresentation'
 
-export const WORLD_LIVING_PRESENTATION_VERSION = '0.1' as const
+export const WORLD_LIVING_PRESENTATION_VERSION = '0.2' as const
 
 export type WorldActorRole = 'miner' | 'hauler' | 'builder' | 'keeper' | 'resident'
 export type WorldActorRoute = 'mine-loop' | 'haul-loop' | 'build-loop' | 'yard-loop' | 'resident-loop'
@@ -36,10 +36,19 @@ export type WorldLivingPresentation = {
   eventAccent: WorldEventPresentationChannel | null
 }
 
+/**
+ * The primary miner → hauler → builder trio shares one pace and uses deliberate
+ * phase offsets. Their routes already overlap spatially near the mine stockpile
+ * and construction yard, so the stagger creates a readable visual hand-off:
+ * extraction → delivery → construction. This is presentation choreography only;
+ * it is not an inventory, production, capital or reward model.
+ */
+const PRIMARY_WORK_CHAIN_PACE = 0.72
+
 const ACTOR_SLOTS: readonly WorldActorPlan[] = [
-  { id: 'miner-a', role: 'miner', route: 'mine-loop', phaseOffset: 0.03, pace: 0.92, scale: 1, minLevel: 1 },
-  { id: 'hauler-a', role: 'hauler', route: 'haul-loop', phaseOffset: 0.42, pace: 0.78, scale: 0.98, minLevel: 1 },
-  { id: 'builder-a', role: 'builder', route: 'build-loop', phaseOffset: 0.17, pace: 0.7, scale: 1.03, minLevel: 2 },
+  { id: 'miner-a', role: 'miner', route: 'mine-loop', phaseOffset: 0.5, pace: PRIMARY_WORK_CHAIN_PACE, scale: 1, minLevel: 1 },
+  { id: 'hauler-a', role: 'hauler', route: 'haul-loop', phaseOffset: 0.06, pace: PRIMARY_WORK_CHAIN_PACE, scale: 0.98, minLevel: 1 },
+  { id: 'builder-a', role: 'builder', route: 'build-loop', phaseOffset: 0.62, pace: PRIMARY_WORK_CHAIN_PACE, scale: 1.03, minLevel: 2 },
   { id: 'keeper-a', role: 'keeper', route: 'yard-loop', phaseOffset: 0.66, pace: 0.48, scale: 0.96, minLevel: 3 },
   { id: 'resident-a', role: 'resident', route: 'resident-loop', phaseOffset: 0.29, pace: 0.38, scale: 0.94, minLevel: 4 },
   { id: 'miner-b', role: 'miner', route: 'mine-loop', phaseOffset: 0.71, pace: 0.86, scale: 0.96, minLevel: 5 },
