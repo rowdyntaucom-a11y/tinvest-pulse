@@ -1,5 +1,5 @@
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
-import { buildWorldEventPresentation, type WorldEventPresentationChannel } from './worldEventPresentation'
+import type { WorldEventPresentationChannel } from './worldEventPresentation'
 
 export const WORLD_LIVING_PRESENTATION_VERSION = '0.1' as const
 
@@ -67,8 +67,23 @@ const WEATHER_POLICY = {
   storm: { hazeAlpha: 0.38, rainAlpha: 0.62, rainSpeed: 1.5, lightning: true },
 } as const satisfies Record<WorldRenderSnapshot['weather'], WorldWeatherPresentation>
 
+const EVENT_KIND_TO_CHANNEL: Readonly<Record<string, WorldEventPresentationChannel>> = {
+  'xp:CONTRIBUTION_HABIT': 'discipline',
+  'xp:HEALTH_MILESTONE': 'health',
+  'xp:PERFORMANCE_PERIOD': 'performance',
+  'xp:PASSIVE_INCOME_GROWTH': 'income',
+  'xp:PLAN_ADHERENCE': 'strategy',
+  'xp:ACHIEVEMENT': 'achievement',
+}
+
 function clampLevel(level: number) {
   return Number.isFinite(level) ? Math.max(1, Math.min(99, Math.floor(level))) : 1
+}
+
+function primaryEventAccent(snapshot: WorldRenderSnapshot): WorldEventPresentationChannel | null {
+  const event = snapshot.pendingEvents[0]
+  if (!event) return null
+  return EVENT_KIND_TO_CHANNEL[event.kind] ?? 'generic'
 }
 
 /**
@@ -82,7 +97,6 @@ function clampLevel(level: number) {
 export function buildWorldLivingPresentation(snapshot: WorldRenderSnapshot): WorldLivingPresentation {
   const level = clampLevel(snapshot.level)
   const phase = PHASE_POLICY[snapshot.timePhase]
-  const eventAccent = buildWorldEventPresentation(snapshot.pendingEvents)[0]?.channel ?? null
   const actors = ACTOR_SLOTS.filter(actor => actor.minLevel <= level).map(actor => ({ ...actor }))
 
   return {
@@ -95,6 +109,6 @@ export function buildWorldLivingPresentation(snapshot: WorldRenderSnapshot): Wor
     actors,
     cartCount: level >= 7 ? 2 : level >= 2 ? 1 : 0,
     constructionActivity: level >= 9 ? 1 : level >= 5 ? 0.8 : level >= 2 ? 0.55 : 0.28,
-    eventAccent,
+    eventAccent: primaryEventAccent(snapshot),
   }
 }
