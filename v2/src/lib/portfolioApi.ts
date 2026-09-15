@@ -319,7 +319,8 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
   const passive = (raw.passiveIncome ?? raw.income ?? {}) as Record<string, unknown>
   const account = (raw.account ?? {}) as Record<string, unknown>
   const cbr = (raw.cbr ?? {}) as Record<string, unknown>
-  const value = n(portfolio.value ?? raw.totalValue ?? raw.portfolioValue)
+  const value = finiteNumber(portfolio.value ?? raw.totalValue ?? raw.portfolioValue)
+  if (value == null || value < 0) throw new Error('dashboard portfolio value missing')
   const positionsRaw = portfolio.positions ?? portfolio.assets ?? raw.assets
   const positionItems = normalisePositions(positionsRaw, value)
   const accountId = nullableString(account.id)
@@ -353,7 +354,8 @@ async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
   if (!response.ok) throw new Error(`portfolio ${response.status}`)
   const raw = await response.json() as Record<string, unknown>
   const portfolio = (raw.portfolio ?? raw) as Record<string, unknown>
-  const value = n(raw.totalValue ?? raw.portfolioValue ?? portfolio.totalAmountPortfolio)
+  const value = finiteNumber(raw.totalValue ?? raw.portfolioValue ?? portfolio.totalAmountPortfolio)
+  if (value == null || value < 0) throw new Error('portfolio value missing')
   const profit = n(raw.profit ?? raw.expectedYield ?? portfolio.expectedYield)
   const positionItems = normalisePositions(raw.positions ?? portfolio.positions, value)
   const invested = value - profit

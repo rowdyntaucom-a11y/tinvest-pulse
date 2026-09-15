@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   WORLD_ATMOSPHERE_PRESENTATION_VERSION,
   buildWorldAtmospherePresentation,
@@ -60,5 +61,20 @@ for (const presentation of [neutralDay, clearDay, cloudyDay, rainyDay, stormDay,
   assert.equal(Object.prototype.hasOwnProperty.call(presentation, 'expectedYield'), false)
   assert.equal(Object.prototype.hasOwnProperty.call(presentation, 'xp'), false)
 }
+
+const gradeCss = readFileSync(new URL('../src/features/world/worldCinematicGrade.css', import.meta.url), 'utf8')
+const mainSource = readFileSync(new URL('../src/main.tsx', import.meta.url), 'utf8')
+assert.match(gradeCss, /\.world-stage\[data-world-time='dawn'\]/)
+assert.match(gradeCss, /\.world-stage\[data-world-time='day'\]/)
+assert.match(gradeCss, /\.world-stage\[data-world-time='sunset'\]/)
+assert.match(gradeCss, /\.world-stage\[data-world-time='night'\]/)
+assert.match(gradeCss, /\.world-stage\[data-world-weather='clear'\]/)
+assert.match(gradeCss, /\.world-stage\[data-world-weather='cloudy'\]/)
+assert.match(gradeCss, /\.world-stage\[data-world-weather='rain'\]/)
+assert.match(gradeCss, /\.world-stage\[data-world-weather='storm'\]/)
+assert.doesNotMatch(gradeCss, /\.world-stage\[data-world-weather='neutral'\]/, 'neutral weather must stay fail-closed with no extra grade')
+assert.match(gradeCss, /filter:\s*[\s\S]*brightness\(var\(--world-phase-brightness\)\)[\s\S]*brightness\(var\(--world-weather-brightness\)\)/)
+assert.match(gradeCss, /@media \(prefers-reduced-motion: reduce\)[\s\S]*transition:\s*none/)
+assert.match(mainSource, /import '\.\/features\/world\/worldCinematicGrade\.css'/)
 
 console.log('world atmosphere presentation tests passed')

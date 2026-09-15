@@ -1,0 +1,74 @@
+.world-stage {
+  --world-phase-brightness: 1;
+  --world-phase-saturation: 1;
+  --world-phase-sepia: 0;
+  --world-weather-brightness: 1;
+  --world-weather-saturation: 1;
+  --world-weather-contrast: 1;
+}
+
+.world-stage[data-world-time='dawn'] {
+  --world-phase-brightness: .98;
+  --world-phase-saturation: 1.04;
+  --world-phase-sepia: .08;
+}
+
+.world-stage[data-world-time='day'] {
+  --world-phase-brightness: 1;
+  --world-phase-saturation: 1.02;
+  --world-phase-sepia: 0;
+}
+
+.world-stage[data-world-time='sunset'] {
+  --world-phase-brightness: .95;
+  --world-phase-saturation: 1.08;
+  --world-phase-sepia: .12;
+}
+
+.world-stage[data-world-time='night'] {
+  --world-phase-brightness: .8;
+  --world-phase-saturation: .82;
+  --world-phase-sepia: .02;
+}
+
+/* Neutral is deliberately the fail-closed weather state: no extra grading. */
+.world-stage[data-world-weather='clear'] {
+  --world-weather-brightness: 1.03;
+  --world-weather-saturation: 1.04;
+}
+
+.world-stage[data-world-weather='cloudy'] {
+  --world-weather-brightness: .91;
+  --world-weather-saturation: .82;
+  --world-weather-contrast: 1.03;
+}
+
+.world-stage[data-world-weather='rain'] {
+  --world-weather-brightness: .83;
+  --world-weather-saturation: .72;
+  --world-weather-contrast: 1.06;
+}
+
+.world-stage[data-world-weather='storm'] {
+  --world-weather-brightness: .72;
+  --world-weather-saturation: .62;
+  --world-weather-contrast: 1.12;
+}
+
+.world-stage canvas {
+  filter:
+    brightness(var(--world-phase-brightness))
+    saturate(var(--world-phase-saturation))
+    sepia(var(--world-phase-sepia))
+    brightness(var(--world-weather-brightness))
+    saturate(var(--world-weather-saturation))
+    contrast(var(--world-weather-contrast));
+  transition: filter 700ms ease;
+  will-change: filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-stage canvas {
+    transition: none;
+  }
+}

@@ -249,3 +249,11 @@ assert.equal(conflictGuard.history[2].value, null)
 assert.equal(conflictGuard.history[2].invested, null)
 
 console.log('portfolio API normalization regression: ok')
+
+// A successful HTTP response without portfolio value is not a verified zero.
+// The legacy endpoint is unavailable in this fixture, so the boundary fails
+// closed to FALLBACK rather than presenting a LIVE empty/zero portfolio.
+dashboardPayload = { portfolio: { positions: [] }, account: { name: 'Missing value' } }
+const missingValue = await loadPortfolio()
+assert.equal(missingValue.source, 'fallback')
+assert.equal(missingValue.value, 0) // inert fallback storage; presentation is explicitly non-live
