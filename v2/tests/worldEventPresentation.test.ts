@@ -3,6 +3,10 @@ import {
   WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION,
   buildWorldEventArrivalPresentation,
 } from '../src/features/world/worldEventArrivalPresentation.ts'
+import {
+  WORLD_EVENT_ARRIVAL_MOTION_VERSION,
+  resolveWorldEventArrivalMotion,
+} from '../src/features/world/worldEventArrivalMotion.ts'
 import { buildWorldEventPresentation } from '../src/features/world/worldEventPresentation.ts'
 import {
   WORLD_EVENT_CARAVAN_LIMIT,
@@ -96,5 +100,54 @@ for (const arrival of arrivalByDestination.values()) {
   assert.equal(Object.prototype.hasOwnProperty.call(arrival, 'reward'), false)
   assert.equal(Object.prototype.hasOwnProperty.call(arrival, 'xp'), false)
 }
+
+assert.equal(WORLD_EVENT_ARRIVAL_MOTION_VERSION, '0.1')
+const hiddenMotion = resolveWorldEventArrivalMotion({
+  arrived: false,
+  reducedMotion: false,
+  motionSeconds: 10,
+  index: 0,
+  emphasis: 0.8,
+})
+assert.deepEqual(hiddenMotion, {
+  version: WORLD_EVENT_ARRIVAL_MOTION_VERSION,
+  visible: false,
+  glowAlpha: 0,
+  sceneAlpha: 0,
+  scale: 1,
+  offsetY: 0,
+  rotation: 0,
+})
+const reducedMotion = resolveWorldEventArrivalMotion({
+  arrived: true,
+  reducedMotion: true,
+  motionSeconds: 10,
+  index: 1,
+  emphasis: 0.72,
+})
+assert.equal(reducedMotion.visible, true)
+assert.equal(reducedMotion.offsetY, 0)
+assert.equal(reducedMotion.rotation, 0)
+assert.equal(reducedMotion.scale, 1)
+const animatedMotion = resolveWorldEventArrivalMotion({
+  arrived: true,
+  reducedMotion: false,
+  motionSeconds: 3.25,
+  index: 1,
+  emphasis: 0.86,
+})
+assert.deepEqual(animatedMotion, resolveWorldEventArrivalMotion({
+  arrived: true,
+  reducedMotion: false,
+  motionSeconds: 3.25,
+  index: 1,
+  emphasis: 0.86,
+}))
+assert.equal(animatedMotion.visible, true)
+assert.equal(animatedMotion.glowAlpha > 0 && animatedMotion.glowAlpha <= 0.3, true)
+assert.equal(animatedMotion.sceneAlpha > 0 && animatedMotion.sceneAlpha <= 1, true)
+assert.equal(animatedMotion.scale >= 0.98 && animatedMotion.scale <= 1.02, true)
+assert.equal(Math.abs(animatedMotion.rotation) <= 0.012, true)
+assert.equal(animatedMotion.offsetY <= 0 && animatedMotion.offsetY >= -2.4, true)
 
 console.log('worldEventPresentation tests passed')

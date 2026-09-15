@@ -34,6 +34,7 @@ type Props = {
   snapshot: PortfolioSnapshot
   analytics: PortfolioAnalytics
   xirrPercent: number | null
+  metricEligibility: { twr: boolean; xirr: boolean; health: boolean }
   pinnedModules: UiModuleId[]
   onNavigate: (destination: BoardDestination) => void
 }
@@ -70,7 +71,7 @@ function workspaceLabel(workspace: BoardDestination['workspace']) {
   return 'раздел'
 }
 
-export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, onNavigate }: Props) {
+export function QvanixBoard({ snapshot, analytics, xirrPercent, metricEligibility, pinnedModules, onNavigate }: Props) {
   const { calendar, loading: incomeLoading } = usePayoutSnapshot(true)
 
   const modules = useMemo(() => {
@@ -100,22 +101,22 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
       },
       'analytics.twr': {
         id: 'analytics.twr', eyebrow: `TWR · v${analytics.calcVersion}`, label: 'СТРАТЕГИЯ',
-        value: signedPercent(analytics.twr),
-        note: analytics.historyPoints ? `${analytics.historyPoints} точек · без влияния размера пополнений` : 'история ещё не готова',
+        value: metricEligibility.twr ? signedPercent(analytics.twr) : '—',
+        note: metricEligibility.twr ? `${analytics.historyPoints} точек · без влияния размера пополнений` : 'метрика недоступна: история не подтверждена',
         tone: 'blue', destination: { workspace: 'analytics', analyticsView: 'overview' },
         sparklineValues: twrHistory,
         sparklineLabel: 'TWR-индекс · последние 30 доступных дневных точек',
       },
       'analytics.xirr': {
         id: 'analytics.xirr', eyebrow: 'XIRR', label: 'ЛИЧНАЯ ДОХОДНОСТЬ',
-        value: xirrPercent == null ? '—' : signedPercent(xirrPercent, false),
-        note: 'годовая · с учётом дат денежных потоков',
+        value: metricEligibility.xirr && xirrPercent != null ? signedPercent(xirrPercent, false) : '—',
+        note: metricEligibility.xirr ? 'годовая · подтверждённые датированные потоки' : 'нет подтверждённого контракта датированных потоков',
         tone: 'blue', destination: { workspace: 'analytics', analyticsView: 'overview' },
       },
       'analytics.health': {
         id: 'analytics.health', eyebrow: `СОСТОЯНИЕ · v${analytics.healthVersion}`, label: 'ЗДОРОВЬЕ ПОРТФЕЛЯ',
-        value: analytics.healthScore == null ? '—' : `${Math.round(analytics.healthScore)}/100`,
-        note: analytics.historyDays >= 365 ? 'история достаточной длины' : `${analytics.historyDays || 0} дней · предварительная оценка`,
+        value: metricEligibility.health && analytics.healthScore != null ? `${Math.round(analytics.healthScore)}/100` : '—',
+        note: metricEligibility.health ? 'подтверждённая история достаточной длины' : `${analytics.historyDays || 0} дней · не подтверждено`,
         tone: 'mint', destination: { workspace: 'analytics', analyticsView: 'health' },
       },
       'analytics.risk': {
@@ -145,7 +146,7 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
     }
 
     return pinnedModules.map(id => all[id]).filter((item): item is BoardModule => Boolean(item))
-  }, [analytics, calendar, incomeLoading, pinnedModules, snapshot, xirrPercent])
+  }, [analytics, calendar, incomeLoading, metricEligibility, pinnedModules, snapshot, xirrPercent])
 
   const sourceLabel = snapshot.source === 'dashboard' ? 'ДАННЫЕ СЧЁТА' : snapshot.source === 'portfolio' ? 'ПОРТФЕЛЬ' : 'РЕЗЕРВНЫЙ ИСТОЧНИК'
   const historyState = analytics.historyPoints > 0 ? `${analytics.historyPoints} точек / ${analytics.historyDays} д.` : 'истории пока нет'
