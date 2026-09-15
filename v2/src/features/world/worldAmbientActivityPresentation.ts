@@ -1,7 +1,7 @@
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 import {
   resolveWorldPrimaryWorkChainTiming,
-} from './worldAmbientActorChoreography'
+} from './worldAmbientActorChoreography.ts'
 
 export const WORLD_AMBIENT_ACTIVITY_VERSION = '0.1' as const
 
