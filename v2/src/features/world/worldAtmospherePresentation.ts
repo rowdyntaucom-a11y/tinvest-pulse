@@ -1,6 +1,6 @@
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 
-export const WORLD_ATMOSPHERE_PRESENTATION_VERSION = '0.2' as const
+export const WORLD_ATMOSPHERE_PRESENTATION_VERSION = '0.1' as const
 
 export type WorldAtmospherePresentation = {
   version: typeof WORLD_ATMOSPHERE_PRESENTATION_VERSION
@@ -105,8 +105,6 @@ const WEATHER_PRESENTATION: Record<WorldRenderSnapshot['weather'], {
   hazeBoost: number
   shade: number
 }> = {
-  // `neutral` means no reviewed weather signal. Keep time-of-day atmosphere only and
-  // deliberately render no weather-specific clouds, rain, shade or storm effects.
   neutral: { cloudAlpha: 0, rainAlpha: 0, stormFlashAlpha: 0, celestialVisibility: 1, hazeBoost: 0, shade: 0 },
   clear: { cloudAlpha: 0.04, rainAlpha: 0, stormFlashAlpha: 0, celestialVisibility: 1, hazeBoost: 0, shade: 0 },
   cloudy: { cloudAlpha: 0.44, rainAlpha: 0, stormFlashAlpha: 0, celestialVisibility: 0.66, hazeBoost: 0.045, shade: 0.08 },
