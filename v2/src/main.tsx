@@ -17,6 +17,7 @@ import './drilldownMotion.css'
 import './controlFeedback.css'
 import './mobileReadability.css'
 import './boardReadability.css'
+import './mobileControlLayer.css'
 
 const ContextHelp = lazy(() => import('./features/help/ContextHelp').then(module => ({ default: module.ContextHelp })))
 
