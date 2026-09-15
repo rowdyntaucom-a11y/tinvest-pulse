@@ -16,6 +16,7 @@ type MountWorldPixiRuntimeOptions = {
   getSnapshot: () => WorldRenderSnapshot
   onRenderer: (renderer: string) => void
   onAssetRuntime: (state: WorldAssetRuntimeState) => void
+  signal: AbortSignal
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
@@ -70,8 +71,8 @@ export async function mountWorldPixiRuntime({
   getSnapshot,
   onRenderer,
   onAssetRuntime,
+  signal,
 }: MountWorldPixiRuntimeOptions) {
-  let disposed = false
   const resolution = clamp(window.devicePixelRatio || 1, 1, window.innerWidth < 900 ? 1.35 : 1.75)
   const app = new Application()
   await app.init({
@@ -84,7 +85,7 @@ export async function mountWorldPixiRuntime({
     powerPreference: 'high-performance',
   })
 
-  if (disposed) {
+  if (signal.aborted) {
     app.destroy(true)
     return () => undefined
   }
@@ -240,7 +241,7 @@ export async function mountWorldPixiRuntime({
 
   void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), preloadBrowserImage)
     .then(result => {
-      if (disposed) return
+      if (signal.aborted) return
       onAssetRuntime({
         configured: REVIEWED_WORLD_ASSET_MANIFEST.entries.size,
         loaded: result.loaded.size,
@@ -265,11 +266,20 @@ export async function mountWorldPixiRuntime({
     if (current >= 11) development.circle(1360, 250, 95).fill({ color: 0x26b9ac, alpha: 0.18 })
   }
 
+  let lastSnapshot: WorldRenderSnapshot | null = null
+  let currentLiving = buildWorldLivingPresentation(getSnapshot())
+  let activeActorIds = new Set(currentLiving.actors.map(actor => actor.id))
+
   app.ticker.maxFPS = window.innerWidth < 900 ? 45 : 60
   app.ticker.minFPS = 20
   app.ticker.add(() => {
+    if (signal.aborted) return
     const currentSnapshot = getSnapshot()
-    const currentLiving = buildWorldLivingPresentation(currentSnapshot)
+    if (currentSnapshot !== lastSnapshot) {
+      lastSnapshot = currentSnapshot
+      currentLiving = buildWorldLivingPresentation(currentSnapshot)
+      activeActorIds = new Set(currentLiving.actors.map(actor => actor.id))
+    }
     renderLevel(currentSnapshot.level)
 
     const now = performance.now()
@@ -307,7 +317,6 @@ export async function mountWorldPixiRuntime({
       puff.scale.set(scale)
     })
 
-    const activeIds = new Set(currentLiving.actors.map(actor => actor.id))
     for (const plan of currentLiving.actors) {
       const actor = actorViews.get(plan.id) ?? createActorView(plan)
       const phase = (seconds * 0.045 * plan.pace * currentLiving.activityScale + plan.phaseOffset) % 1
@@ -317,7 +326,7 @@ export async function mountWorldPixiRuntime({
       actor.scale.set(plan.scale * point.direction, plan.scale)
       actor.rotation = Math.sin(seconds * 4.2 * plan.pace + plan.phaseOffset * 10) * 0.015
     }
-    for (const [id, actor] of actorViews) if (!activeIds.has(id)) actor.visible = false
+    for (const [id, actor] of actorViews) if (!activeActorIds.has(id)) actor.visible = false
 
     cartViews.forEach((cart, index) => {
       cart.visible = index < currentLiving.cartCount
@@ -341,13 +350,13 @@ export async function mountWorldPixiRuntime({
   ro.observe(host)
 
   const onVisibility = () => {
+    if (signal.aborted) return
     if (document.hidden) app.stop()
     else app.start()
   }
   document.addEventListener('visibilitychange', onVisibility)
 
   return () => {
-    disposed = true
     ro.disconnect()
     document.removeEventListener('visibilitychange', onVisibility)
     app.destroy(true, { children: true })
