@@ -1,27 +1,55 @@
 import { Container, Graphics } from 'pixi.js'
-import type { WorldEventCaravanPlan } from './worldEventCaravanPresentation'
+import {
+  resolveWorldEventCaravanJourney,
+  type WorldEventCaravanPlan,
+} from './worldEventCaravanPresentation'
 
-export const WORLD_EVENT_CARAVAN_RUNTIME_VERSION = '0.1' as const
+export const WORLD_EVENT_CARAVAN_RUNTIME_VERSION = '0.2' as const
 
 type CaravanView = {
   root: Container
   body: Container
+  cargo: Graphics
+  arrivalPulse: Graphics
 }
 
-function routePoint(plan: WorldEventCaravanPlan, phase: number) {
-  const bounded = Math.max(0, Math.min(1, phase))
-  const arc = Math.sin(bounded * Math.PI)
-
-  if (plan.route === 'upper-road') {
-    return {
-      x: -90 + bounded * 1500,
-      y: 621 - arc * 12,
-    }
+function destinationX(plan: WorldEventCaravanPlan) {
+  switch (plan.destination) {
+    case 'mine-yard': return 390
+    case 'workshop': return 720
+    case 'construction-yard': return 930
+    case 'storehouse': return 1080
+    case 'settlement-gate': return 1260
+    case 'town-square': return 1380
   }
+}
 
+function routeY(plan: WorldEventCaravanPlan) {
+  return plan.route === 'upper-road' ? 621 : 738
+}
+
+function interpolate(from: number, to: number, progress: number) {
+  return from + (to - from) * Math.max(0, Math.min(1, progress))
+}
+
+function routePoint(
+  plan: WorldEventCaravanPlan,
+  journey: ReturnType<typeof resolveWorldEventCaravanJourney>,
+) {
+  const destination = destinationX(plan)
+  const start = plan.direction === 'eastbound' ? -110 : 1710
+  const exit = plan.direction === 'eastbound' ? 1710 : -110
+  const y = routeY(plan)
+
+  if (journey.segment === 'dwell') return { x: destination, y }
+
+  const from = journey.segment === 'approach' ? start : destination
+  const to = journey.segment === 'approach' ? destination : exit
+  const arc = Math.sin(journey.progress * Math.PI)
+  const lift = plan.route === 'upper-road' ? 12 : 9
   return {
-    x: -110 + bounded * 1780,
-    y: 738 - arc * 9,
+    x: interpolate(from, to, journey.progress),
+    y: y - arc * lift,
   }
 }
 
@@ -64,6 +92,11 @@ function createView(plan: WorldEventCaravanPlan, parent: Container): CaravanView
   root.label = `world-event-caravan:${plan.id}`
 
   const shadow = new Graphics().ellipse(0, 11, 34, 7).fill({ color: 0x000000, alpha: 0.22 })
+  const arrivalPulse = new Graphics()
+    .circle(0, 4, 30)
+    .stroke({ color: plan.accentColor, width: 3, alpha: 0.72 })
+  arrivalPulse.visible = false
+
   const body = new Container()
   const wagon = new Graphics()
     .rect(-28, -18, 56, 25)
@@ -78,20 +111,22 @@ function createView(plan: WorldEventCaravanPlan, parent: Container): CaravanView
   const cargo = drawCargo(plan)
 
   body.addChild(wagon, cargo, wheels)
-  root.addChild(shadow, body)
+  root.addChild(shadow, arrivalPulse, body)
   root.scale.set(plan.scale)
   parent.addChild(root)
 
-  return { root, body }
+  return { root, body, cargo, arrivalPulse }
 }
 
 /**
  * Renderer-only runtime for already-semantic pending events.
  *
+ * Caravans enter the world, pause at a semantic destination and then leave.
+ * The pause is deliberately readable so an event looks like something happening
+ * in the settlement instead of a decorative object crossing the screen.
+ *
  * It never acknowledges events, changes WorldState, awards XP or inspects any
- * financial value. It only animates plans produced by
- * `buildWorldEventCaravanPresentation` and keeps a hard cap inherited from that
- * pure boundary. Reduced-motion keeps caravans visible but stationary.
+ * financial value. Reduced-motion keeps caravans visible at their destination.
  */
 export function createWorldEventCaravanRuntime(parent: Container) {
   const views = new Map<string, CaravanView>()
@@ -110,18 +145,35 @@ export function createWorldEventCaravanRuntime(parent: Container) {
         return next
       })()
 
-      const phase = reducedMotion
-        ? (0.2 + index * 0.26) % 1
-        : (motionSeconds * 0.055 * plan.pace + plan.phaseOffset) % 1
-      const point = routePoint(plan, phase)
-      const edgeFade = Math.min(1, phase * 8, (1 - phase) * 8)
+      const phase = (motionSeconds * 0.055 * plan.pace + plan.phaseOffset) % 1
+      const journey = resolveWorldEventCaravanJourney(phase, reducedMotion)
+      const point = routePoint(plan, journey)
+      const edgeFade = journey.segment === 'approach'
+        ? Math.min(1, journey.progress * 8)
+        : journey.segment === 'depart'
+          ? Math.min(1, (1 - journey.progress) * 8)
+          : 1
+      const direction = plan.direction === 'eastbound' ? 1 : -1
 
       view.root.visible = true
       view.root.position.set(point.x, point.y)
       view.root.alpha = Math.max(0, edgeFade)
-      view.root.scale.set(plan.scale)
-      view.body.position.y = reducedMotion ? 0 : Math.sin(motionSeconds * 7.2 + index) * 1.4
-      view.body.rotation = reducedMotion ? 0 : Math.sin(motionSeconds * 4.1 + index * 0.7) * 0.008
+      view.root.scale.set(plan.scale * direction, plan.scale)
+
+      view.arrivalPulse.visible = journey.arrived
+      if (journey.arrived) {
+        const arrivalWave = reducedMotion ? 0 : Math.sin(motionSeconds * 5.2 + index * 0.8)
+        view.arrivalPulse.alpha = reducedMotion ? 0.2 : 0.16 + (arrivalWave + 1) * 0.06
+        view.arrivalPulse.scale.set(reducedMotion ? 0.92 : 0.9 + (arrivalWave + 1) * 0.05)
+      }
+
+      const bob = reducedMotion ? 0 : Math.sin(motionSeconds * 7.2 + index)
+      view.body.position.y = journey.arrived ? bob * 0.55 : bob * 1.4
+      view.body.rotation = reducedMotion ? 0 : Math.sin(motionSeconds * 4.1 + index * 0.7) * (journey.arrived ? 0.004 : 0.008)
+      view.cargo.alpha = journey.arrived ? 0.82 : 1
+      view.cargo.position.y = journey.arrived && !reducedMotion
+        ? Math.max(0, Math.sin(motionSeconds * 4.8 + index)) * 3
+        : 0
     })
 
     for (const [id, view] of views) {
