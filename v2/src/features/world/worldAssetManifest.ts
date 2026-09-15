@@ -8,6 +8,7 @@ export const WORLD_ASSET_MANIFEST_SLOT_IDS = [
   'atmosphere.depth',
   'terrain.ground',
   'terrain.mine-entrance',
+  'terrain.foreground-depth',
   'structures.workshop',
   'structures.storage',
   'structures.construction',
