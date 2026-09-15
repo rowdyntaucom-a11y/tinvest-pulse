@@ -1,5 +1,4 @@
-import type { WorldEvent } from '../dna/worldState'
-import { buildWorldEventPresentation, type WorldEventPresentationChannel } from './worldEventPresentation'
+import type { WorldEventPresentation, WorldEventPresentationChannel } from './worldEventPresentation'
 
 export const WORLD_EVENT_CARAVAN_VERSION = '0.1' as const
 export const WORLD_EVENT_CARAVAN_LIMIT = 2 as const
@@ -69,12 +68,15 @@ function normalizedSegment(value: number, start: number, end: number) {
 }
 
 /**
- * Builds a tiny, deterministic visual procession from already-semantic pending events.
- * It reuses the canonical WorldEvent presentation channel mapping and never inspects
- * transaction amounts, portfolio value, returns, XP totals or broker fields.
+ * Builds a tiny, deterministic visual procession from already-semantic presentation
+ * events. The caller must use the canonical `buildWorldEventPresentation(...)`
+ * boundary first, so this module never owns or duplicates event-kind classification.
+ * It never inspects transaction amounts, portfolio value, returns, XP totals or broker fields.
  */
-export function buildWorldEventCaravanPresentation(events: readonly WorldEvent[]): WorldEventCaravanPlan[] {
-  return buildWorldEventPresentation(events)
+export function buildWorldEventCaravanPresentation(
+  events: readonly WorldEventPresentation[],
+): WorldEventCaravanPlan[] {
+  return events
     .slice(0, WORLD_EVENT_CARAVAN_LIMIT)
     .map((event, index) => {
       const style = CHANNEL_STYLE[event.channel]
