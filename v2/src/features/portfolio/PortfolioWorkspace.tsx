@@ -12,6 +12,8 @@ import { calculatePositionIncomeContribution } from './positionIncomeContributio
 import { InstrumentBadge } from './InstrumentBadge'
 import { loadInstrumentBadges, type InstrumentBadgePayload } from './instrumentBadges'
 import './portfolio.css'
+import { SectionSelector } from '../navigation/SectionSelector'
+import { PORTFOLIO_SECTIONS } from '../navigation/navigationModel'
 import './positionInspector.css'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
@@ -282,17 +284,7 @@ export function PortfolioWorkspace({ snapshot, onOpenAsset }: Props) {
 
   return (
     <div className="portfolio-workspace">
-      <nav className="subnav" aria-label="Разделы портфеля">
-        <button onClick={() => setView('overview')} className={view === 'overview' ? 'subnav--active' : ''}>ОБЗОР</button>
-        <button onClick={() => setView('positions')} className={view === 'positions' ? 'subnav--active' : ''}>ПОЗИЦИИ</button>
-        <button onClick={() => setView('structure')} className={view === 'structure' ? 'subnav--active' : ''}>СТРУКТУРА</button>
-        <span
-          className={`sample-badge ${dataContext.source !== 'FALLBACK' ? 'sample-badge--mature' : ''}`}
-          title={sourceTitle}
-        >
-          {dataContext.source !== 'FALLBACK' ? 'API' : 'ЖДЁМ API'}
-        </span>
-      </nav>
+      <SectionSelector workspace="Портфель" value={view} groups={PORTFOLIO_SECTIONS} onChange={setView} aside={<span className={`sample-badge ${dataContext.source !== 'FALLBACK' ? 'sample-badge--mature' : ''}`} title={sourceTitle}>{dataContext.source !== 'FALLBACK' ? 'API' : 'ЖДЁМ API'}</span>} />
 
       {view === 'overview' && (
         <div className="portfolio-overview">

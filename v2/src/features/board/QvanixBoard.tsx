@@ -156,10 +156,12 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
     <div className="qv-board">
       <section className="qv-board__hero">
         <div className="qv-board__hero-copy">
-          <span className="qv-board__kicker">QVANIX · ПУЛЬТ</span>
-          <h2>{snapshot.accountName || 'ПОРТФЕЛЬ'}</h2>
-          <p>Краткий обзор выбранных показателей. Полная аналитика остаётся в профильных разделах.</p>
+          <span className="qv-board__kicker">КАПИТАЛ · {snapshot.accountName || 'ПОРТФЕЛЬ'}</span>
+          <div className="qv-board__capital"><strong>{snapshot.value > 0 ? money.format(snapshot.value) : '—'}</strong><span>₽</span></div>
+          <div className="qv-board__pnl"><b className={snapshot.profit > 0 ? 'is-positive' : snapshot.profit < 0 ? 'is-negative' : ''}>{signedMoney(snapshot.profit)}</b><small>накопленный P/L по данным брокера · не изменение за день</small></div>
+          <p>{sourceLabel} · {snapshotStamp(snapshot.updatedAt)}</p>
         </div>
+        <div className="qv-board__health" style={{ '--qv-health': `${Math.max(0, Math.min(100, analytics.healthScore ?? 0)) * 3.6}deg` } as React.CSSProperties}><div><span>ЗДОРОВЬЕ</span><strong>{analytics.healthScore == null ? '—' : Math.round(analytics.healthScore)}</strong><small>{analytics.historyDays >= 365 ? 'ПОЛНАЯ ОЦЕНКА' : 'ПРЕДВАРИТЕЛЬНО'}</small></div></div>
         <div className="qv-board__trace" aria-hidden="true"><i /><i /><i /></div>
       </section>
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './contextHelp.css'
+import { GLOSSARY } from './glossary'
 
 type HelpTopic = {
   title: string
@@ -255,32 +256,34 @@ function activeText(selector: string) {
   return normalize(document.querySelector<HTMLElement>(selector)?.textContent)
 }
 
+function selectedValue(selector: string) {
+  return document.querySelector<HTMLSelectElement>(selector)?.value || ''
+}
+
 function resolveTopicKey() {
-  const section = activeText('.topbar__nav .chip--active') || 'ПОРТФЕЛЬ'
-
+  const activePrimary = document.querySelector<HTMLElement>('.mobile-primary-nav [aria-current="page"], .desktop-primary-nav [aria-current="page"]')
+  const section = normalize(activePrimary?.querySelector('b')?.textContent || activePrimary?.textContent) || 'ПОРТФЕЛЬ'
+  if (section === 'ГЛАВНАЯ') return 'ПОРТФЕЛЬ'
   if (section === 'ПОРТФЕЛЬ') {
-    const view = activeText('.portfolio-workspace .subnav .subnav--active') || 'ОБЗОР'
-    if (view === 'СТРУКТУРА') {
-      const structureMode = activeText('.structure-switch .is-active') || 'КЛАССЫ'
-      return `ПОРТФЕЛЬ|СТРУКТУРА|${structureMode}`
-    }
-    return `ПОРТФЕЛЬ|${view}`
+    const view = selectedValue('.portfolio-workspace .section-selector select') || 'overview'
+    if (view === 'structure') return 'ПОРТФЕЛЬ|СТРУКТУРА|КЛАССЫ'
+    return `ПОРТФЕЛЬ|${view === 'positions' ? 'ПОЗИЦИИ' : 'ОБЗОР'}`
   }
-
   if (section === 'АНАЛИТИКА') {
-    const view = activeText('.analytics-subnav .subnav--active') || 'ОБЗОР'
-    if (view === 'РИСК') {
-      const riskMode = activeText('.risk-modebar button.is-active')
-      return riskMode ? `АНАЛИТИКА|РИСК|${riskMode}` : 'АНАЛИТИКА|РИСК'
+    const view = selectedValue('.analytics-layout > .section-selector select') || 'overview'
+    if (view === 'risk') {
+      const risk = selectedValue('.analytics-risk-view .section-selector select')
+      const names: Record<string,string> = { portfolio: 'ПОРТФЕЛЬ', benchmark: 'VS IMOEX', rolling: 'ROLLING', tail: 'TAIL', corr: 'CORR', stress: 'STRESS' }
+      return risk ? `АНАЛИТИКА|РИСК|${names[risk]}` : 'АНАЛИТИКА|РИСК'
     }
-    return `АНАЛИТИКА|${view}`
+    const names: Record<string,string> = { overview: 'ОБЗОР', health: 'HEALTH', drift: 'DRIFT', montecarlo: 'MC' }
+    return `АНАЛИТИКА|${names[view] || 'ОБЗОР'}`
   }
-
   if (section === 'ДОХОД') {
-    const view = activeText('.income-subnav button.is-active') || 'ОБЗОР'
-    return `ДОХОД|${view}`
+    const view = selectedValue('.income-workspace .section-selector select') || 'overview'
+    const names: Record<string,string> = { overview: 'ОБЗОР', calendar: 'КАЛЕНДАРЬ', sources: 'ИСТОЧНИКИ' }
+    return `ДОХОД|${names[view] || 'ОБЗОР'}`
   }
-
   if (section === 'DNA') return 'DNA'
   return section
 }
@@ -332,6 +335,7 @@ export function ContextHelp() {
           ))}
         </dl>
         {currentTopic.note && <small>{currentTopic.note}</small>}
+        <details className="context-help__glossary"><summary>Словарь сложных терминов</summary><dl>{Object.values(GLOSSARY).map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.simple}</dd></div>)}</dl></details>
       </div>
     </details>
   )

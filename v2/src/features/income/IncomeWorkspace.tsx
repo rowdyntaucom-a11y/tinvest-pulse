@@ -13,6 +13,8 @@ import { buildIncomeCalendarVisual, filterIncomeCalendarEvents } from './incomeC
 import { findPayoutEventPosition, payoutEventIsConfirmed } from './incomeCalendarEventView'
 import { IncomeGoalCompact } from './IncomeGoalCompact'
 import './income.css'
+import { SectionSelector } from '../navigation/SectionSelector'
+import { INCOME_SECTIONS } from '../navigation/navigationModel'
 import './incomeCompact.css'
 import './incomeCalendarVisual.css'
 
@@ -185,15 +187,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
   return (
     <div className="income-workspace">
-      <nav className="income-subnav" aria-label="Доход">
-        <button className={view === 'overview' ? 'is-active' : ''} onClick={() => setView('overview')}>ОБЗОР</button>
-        <button className={view === 'calendar' ? 'is-active' : ''} onClick={() => setView('calendar')}>КАЛЕНДАРЬ</button>
-        <button className={view === 'sources' ? 'is-active' : ''} onClick={() => setView('sources')}>ИСТОЧНИКИ</button>
-        <button className={view === 'taxes' ? 'is-active' : ''} onClick={() => setView('taxes')}>НАЛОГИ</button>
-        <span className={`income-source-badge is-${integrity.state}`} title={integrity.detail}>
-          {integrity.label}
-        </span>
-      </nav>
+      <SectionSelector workspace="Доход" value={view} groups={INCOME_SECTIONS} onChange={setView} aside={<span className={`income-source-badge is-${integrity.state}`} title={integrity.detail}>{integrity.label}</span>} />
 
       {view === 'overview' && (
         <div className="income-overview-grid">
@@ -327,7 +321,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className="income-source-table">
             <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М / YoC</span></div>
             {sourceRows.length ? sourceRows.map(row => (
-              <button type="button" className="income-source-row income-source-row--action" key={row.key} disabled={row.identityState !== 'EXACT_FIGI'} onClick={() => { const position=positions.find(item=>item.figi?.toUpperCase()===row.figi); if(position) onOpenAsset(position) }}>
+              <button type="button" className="income-source-row income-source-row--action" key={row.key} disabled={!row.matchBasis} onClick={() => { const position=positions.find(item=>item.figi?.toUpperCase()===row.figi); if(position) onOpenAsset(position) }}>
                 <div><strong>{row.ticker}</strong><small>{row.name !== row.ticker ? row.name : `${row.factCount + row.forecastCount} событий`}</small></div>
                 <b>{row.fact ? `${money2.format(row.fact)} ₽` : '—'}</b>
                 <div className="income-source-forecast">
