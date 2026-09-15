@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { ANALYTICS_SECTIONS, INCOME_SECTIONS, PORTFOLIO_SECTIONS, PRIMARY_NAVIGATION, RISK_SECTIONS, sectionLabel } from '../src/features/navigation/navigationModel.ts'
 import { GLOSSARY } from '../src/features/help/glossary.ts'
 
@@ -13,4 +14,14 @@ for (const groups of [ANALYTICS_SECTIONS, RISK_SECTIONS, PORTFOLIO_SECTIONS, INC
 }
 assert.deepEqual(Object.keys(GLOSSARY), ['twr', 'xirr', 'health', 'tailRisk', 'stress', 'rebalanceTolerance', 'payoutCoverage', 'outsideModel', 'iisTaxReturn'])
 for (const item of Object.values(GLOSSARY)) { assert.ok(item.label.trim()); assert.ok(item.simple.length > 40) }
+
+const interactionCss = readFileSync(new URL('../src/mobileControlLayer.css', import.meta.url), 'utf8')
+const mainSource = readFileSync(new URL('../src/main.tsx', import.meta.url), 'utf8')
+assert.match(interactionCss, /\.app-shell \.topbar\s*\{[^}]*z-index:\s*30/s)
+assert.match(interactionCss, /\.mobile-primary-nav\s*\{[^}]*z-index:\s*40\s*!important[^}]*pointer-events:\s*auto[^}]*touch-action:\s*manipulation/s)
+assert.match(interactionCss, /\.mobile-primary-nav button\s*\{[^}]*pointer-events:\s*auto[^}]*touch-action:\s*manipulation/s)
+assert.match(interactionCss, /\.qv-personalize\s*\{[^}]*bottom:\s*calc\(74px \+ env\(safe-area-inset-bottom\)\)\s*!important/s)
+assert.match(interactionCss, /\.context-help\s*\{[^}]*right:\s*84px\s*!important[^}]*bottom:\s*calc\(74px \+ env\(safe-area-inset-bottom\)\)\s*!important/s)
+assert.ok(mainSource.lastIndexOf("import './mobileControlLayer.css'") > mainSource.lastIndexOf("import './boardReadability.css'"), 'mobile interaction layer must load after other shell/readability CSS')
+
 console.log('UX navigation and glossary regression: ok')
