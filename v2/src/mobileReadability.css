@@ -26,7 +26,7 @@
 
   .income-hero p,
   .roadmap-panel p { font-size: 8.2px; }
-  .income-hero > small { font-size: 6.9px; }
+  .income-hero > small { font-size: 7.2px; line-height: 1.2; }
 
   .world-panel__head .eyebrow { font-size: 7.1px; line-height: 1.2; letter-spacing: .065em; }
   .dna-state span,
