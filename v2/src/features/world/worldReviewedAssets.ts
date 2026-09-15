@@ -22,6 +22,14 @@ export const REVIEWED_WORLD_ASSET_ENTRIES: readonly WorldAssetManifestEntry[] = 
       reviewedAt: '2026-09-15T18:20:00.000Z',
     },
   },
+  {
+    slotId: 'terrain.foreground-depth',
+    assetPath: '/assets/world/foreground-depth-v1.svg',
+    provenance: {
+      source: 'reviewed-local',
+      reviewedAt: '2026-09-15T23:03:00.000Z',
+    },
+  },
 ]
 
 export const REVIEWED_WORLD_ASSET_MANIFEST = resolveWorldAssetManifest(REVIEWED_WORLD_ASSET_ENTRIES)

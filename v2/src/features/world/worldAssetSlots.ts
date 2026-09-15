@@ -21,6 +21,7 @@ export const WORLD_ASSET_SLOTS = [
   { id: 'atmosphere.depth', layer: 'atmosphere', labelRu: 'АТМОСФЕРНАЯ ГЛУБИНА' },
   { id: 'terrain.ground', layer: 'terrain', labelRu: 'РЕЛЬЕФ' },
   { id: 'terrain.mine-entrance', layer: 'terrain', labelRu: 'ВХОД В ШАХТУ' },
+  { id: 'terrain.foreground-depth', layer: 'terrain', labelRu: 'ПЕРЕДНИЙ ПЛАН' },
   { id: 'structures.workshop', layer: 'structures', labelRu: 'МАСТЕРСКАЯ' },
   { id: 'structures.storage', layer: 'structures', labelRu: 'СКЛАД' },
   { id: 'structures.construction', layer: 'structures', labelRu: 'СТРОЙКА' },
