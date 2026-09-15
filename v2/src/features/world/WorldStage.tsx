@@ -177,6 +177,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     failed: 0,
   })
   const [reviewedSettlementMounted, setReviewedSettlementMounted] = useState(false)
+  const [reviewedTerrainMounted, setReviewedTerrainMounted] = useState(false)
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
@@ -304,6 +305,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       ground.label = 'asset-slot:terrain.ground'
       layer('terrain').addChild(ground)
 
+      const reviewedTerrainLayer = new Container()
+      reviewedTerrainLayer.label = 'world:reviewed-terrain-ground'
+      layer('terrain').addChild(reviewedTerrainLayer)
+
       const development = new Graphics()
       development.label = 'asset-slot:structures.construction'
       layer('structures').addChild(development)
@@ -380,10 +385,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         REVIEWED_WORLD_ASSET_MANIFEST,
         ['background.distant-settlement'],
       )
+      const reviewedTerrainReadiness = resolveWorldAssetReadiness(
+        REVIEWED_WORLD_ASSET_MANIFEST,
+        ['terrain.ground'],
+      )
 
       // Browser-native loading keeps the deferred Pixi chunk below its strict budget.
-      // The reviewed binding consumes the same fail-closed load result and creates a
-      // Sprite only after canonical readiness + mount policy approve the exact slot.
+      // Reviewed bindings consume the same fail-closed load result and create Sprites
+      // only after canonical readiness + mount policy approve each exact slot.
       void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), preloadBrowserImage)
         .then(result => {
           if (disposed) return
@@ -393,28 +402,49 @@ function WorldPixiStage({ snapshot }: PixiProps) {
             failed: result.failures.length,
           })
 
-          const binding = bindReviewedAssetSprite(
+          const settlementBinding = bindReviewedAssetSprite(
             { createSprite: source => Sprite.from(source as Parameters<typeof Sprite.from>[0]) },
             REVIEWED_WORLD_ASSET_MANIFEST,
             reviewedSettlementReadiness,
             result,
             'background.distant-settlement',
           )
-          if (binding.mode !== 'reviewed-asset' || !binding.sprite) {
+          if (settlementBinding.mode === 'reviewed-asset' && settlementBinding.sprite) {
+            const sprite = settlementBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(0, 0)
+            sprite.width = WORLD_WIDTH
+            sprite.height = WORLD_HEIGHT
+            sprite.alpha = 0.92
+            reviewedSettlementLayer.addChild(sprite)
+            setReviewedSettlementMounted(true)
+          } else {
             setReviewedSettlementMounted(false)
-            return
           }
 
-          const sprite = binding.sprite as ReturnType<typeof Sprite.from>
-          sprite.position.set(0, 0)
-          sprite.width = WORLD_WIDTH
-          sprite.height = WORLD_HEIGHT
-          sprite.alpha = 0.92
-          reviewedSettlementLayer.addChild(sprite)
-          setReviewedSettlementMounted(true)
+          const terrainBinding = bindReviewedAssetSprite(
+            { createSprite: source => Sprite.from(source as Parameters<typeof Sprite.from>[0]) },
+            REVIEWED_WORLD_ASSET_MANIFEST,
+            reviewedTerrainReadiness,
+            result,
+            'terrain.ground',
+          )
+          if (terrainBinding.mode === 'reviewed-asset' && terrainBinding.sprite) {
+            const sprite = terrainBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(0, 0)
+            sprite.width = WORLD_WIDTH
+            sprite.height = WORLD_HEIGHT
+            sprite.alpha = 0.94
+            reviewedTerrainLayer.addChild(sprite)
+            setReviewedTerrainMounted(true)
+          } else {
+            setReviewedTerrainMounted(false)
+          }
         })
         .catch(() => {
-          if (!disposed) setReviewedSettlementMounted(false)
+          if (!disposed) {
+            setReviewedSettlementMounted(false)
+            setReviewedTerrainMounted(false)
+          }
         })
 
       let atmosphereSignature = ''
@@ -809,6 +839,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-assets-loaded={assetRuntime.loaded}
       data-world-assets-failed={assetRuntime.failed}
       data-world-reviewed-settlement-mounted={reviewedSettlementMounted ? 'true' : 'false'}
+      data-world-reviewed-terrain-mounted={reviewedTerrainMounted ? 'true' : 'false'}
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
