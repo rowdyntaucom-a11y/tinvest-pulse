@@ -47,6 +47,22 @@ function sendFile(res, filePath) {
   })
 }
 
+function upstreamRequest(target, method = 'GET', accept = 'application/json') {
+  return https.request({
+    protocol: target.protocol,
+    hostname: target.hostname,
+    port: target.port || 443,
+    path: `${target.pathname}${target.search}`,
+    method,
+    headers: {
+      Accept: accept,
+      'Accept-Encoding': 'identity',
+      'User-Agent': 'TInvest-Pulse-v2-preview/1.1',
+    },
+    timeout: 25000,
+  })
+}
+
 function proxyApi(req, res) {
   if (!['GET', 'HEAD'].includes(req.method || 'GET')) {
     securityHeaders(res)
@@ -57,35 +73,61 @@ function proxyApi(req, res) {
   }
 
   const target = new URL(req.url, API_ORIGIN)
-  const upstream = https.request({
-    protocol: target.protocol,
-    hostname: target.hostname,
-    port: target.port || 443,
-    path: `${target.pathname}${target.search}`,
-    method: req.method,
-    headers: {
-      Accept: req.headers.accept || 'application/json',
-      'User-Agent': 'TInvest-Pulse-v2-preview/1.0',
-    },
-    timeout: 25000,
-  }, upstreamRes => {
+  const upstream = upstreamRequest(target, req.method, req.headers.accept || 'application/json')
+
+  upstream.on('response', upstreamRes => {
     securityHeaders(res)
     res.statusCode = upstreamRes.statusCode || 502
     const contentType = upstreamRes.headers['content-type']
+    const contentEncoding = upstreamRes.headers['content-encoding']
     if (contentType) res.setHeader('Content-Type', contentType)
+    if (contentEncoding && contentEncoding !== 'identity') res.setHeader('Content-Encoding', contentEncoding)
     res.setHeader('Cache-Control', 'no-store')
+    if ((upstreamRes.statusCode || 500) >= 400) {
+      console.warn(`[preview-api] ${req.method || 'GET'} ${target.pathname} -> ${upstreamRes.statusCode || 502} ${contentType || 'unknown'}`)
+    }
     upstreamRes.pipe(res)
   })
 
   upstream.on('timeout', () => upstream.destroy(new Error('API timeout')))
   upstream.on('error', err => {
+    console.warn(`[preview-api] ${req.method || 'GET'} ${target.pathname} failed: ${err.message}`)
     if (res.headersSent) return res.end()
     securityHeaders(res)
     res.statusCode = 502
     res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.setHeader('Cache-Control', 'no-store')
     res.end(JSON.stringify({ ok: false, error: `Preview API proxy failed: ${err.message}` }))
   })
   upstream.end()
+}
+
+function probeApiOrigin(pathname) {
+  return new Promise(resolve => {
+    const target = new URL(pathname, API_ORIGIN)
+    const upstream = upstreamRequest(target)
+    let bytes = 0
+    upstream.on('response', upstreamRes => {
+      upstreamRes.on('data', chunk => { bytes += chunk.length })
+      upstreamRes.on('end', () => {
+        console.log(`[preview-api-probe] ${pathname} -> ${upstreamRes.statusCode || 0} ${upstreamRes.headers['content-type'] || 'unknown'} ${bytes}B`)
+        resolve()
+      })
+      upstreamRes.resume()
+    })
+    upstream.on('timeout', () => upstream.destroy(new Error('API probe timeout')))
+    upstream.on('error', err => {
+      console.warn(`[preview-api-probe] ${pathname} failed: ${err.message}`)
+      resolve()
+    })
+    upstream.end()
+  })
+}
+
+async function probeApiOriginOnce() {
+  for (const pathname of ['/api/health', '/api/dashboard', '/api/portfolio']) {
+    await probeApiOrigin(pathname)
+  }
 }
 
 const server = http.createServer((req, res) => {
@@ -117,4 +159,5 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`TInvest Pulse 2.0 preview listening on ${PORT}`)
   console.log(`Read-only API proxy -> ${API_ORIGIN.origin}`)
+  setTimeout(() => { void probeApiOriginOnce() }, 500)
 })
