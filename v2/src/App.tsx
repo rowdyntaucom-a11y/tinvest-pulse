@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { QvanixBoard } from './features/board/QvanixBoard'
 import { WorldSessionStage } from './features/world/WorldSessionStage'
 import { useWorldPhaseClock } from './features/world/useWorldPhaseClock'
@@ -24,6 +24,8 @@ import {
   type UiPreferences,
   type UiWorkspace,
 } from './lib/uiPreferences'
+
+const GoalWorkspace = lazy(() => import('./features/goals/GoalWorkspace').then(module => ({ default: module.GoalWorkspace })))
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
@@ -157,6 +159,7 @@ export default function App() {
           <button onClick={() => setTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
           <button onClick={() => setTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
           <button onClick={() => setTab('income')} className={`chip ${tab === 'income' ? 'chip--active' : ''}`}>ДОХОД</button>
+          <button onClick={() => setTab('goals')} className={`chip ${tab === 'goals' ? 'chip--active' : ''}`}>ЦЕЛЬ</button>
           <button onClick={() => setTab('dna')} className={`chip ${tab === 'dna' ? 'chip--active' : ''}`}>DNA</button>
         </nav>
       </header>
@@ -260,6 +263,16 @@ export default function App() {
         )}
 
         {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} />}
+
+        {tab === 'goals' && (
+          <Suspense fallback={(
+            <section className="panel">
+              <div className="panel-head"><div><span className="eyebrow">QVANIX GOAL</span><h2>ЦЕЛЬ</h2></div><small>загрузка сценария</small></div>
+            </section>
+          )}>
+            <GoalWorkspace currentCapital={snapshot.value} />
+          </Suspense>
+        )}
 
         {tab === 'dna' && (
           <div className="dna-layout">
