@@ -15,7 +15,7 @@ const dawn = buildWorldAtmospherePresentation({ timePhase: 'dawn', weather: 'neu
 const sunset = buildWorldAtmospherePresentation({ timePhase: 'sunset', weather: 'neutral' })
 const night = buildWorldAtmospherePresentation({ timePhase: 'night', weather: 'neutral' })
 
-assert.equal(WORLD_ATMOSPHERE_PRESENTATION_VERSION, '0.2')
+assert.equal(WORLD_ATMOSPHERE_PRESENTATION_VERSION, '0.1')
 assert.deepEqual(neutralDay, buildWorldAtmospherePresentation({ timePhase: 'day', weather: 'neutral' }))
 
 assert.equal(neutralDay.cloudAlpha, 0)
