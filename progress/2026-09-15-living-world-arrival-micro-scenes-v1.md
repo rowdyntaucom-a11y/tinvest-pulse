@@ -63,6 +63,10 @@ Code-bearing head `664b1216f0f963c40b0613e4f69dce0ad3a7d2e3` passed **v2 build C
 
 No compiler flag, bundle/security threshold, financial formula, API contract, credential behavior or XP methodology was weakened.
 
+## Hygiene note
+
+A temporary `README.tmp` file was accidentally created while preparing metadata and was immediately deleted on the same Living World branch. It is not present in the branch diff and never touched `main`.
+
 ## Still intentionally gated
 
 - final reviewed actor/environment/event art;
