@@ -22,6 +22,14 @@ export const REVIEWED_WORLD_ASSET_ENTRIES: readonly WorldAssetManifestEntry[] = 
       reviewedAt: '2026-09-15T18:20:00.000Z',
     },
   },
+  {
+    slotId: 'terrain.mine-entrance',
+    assetPath: '/assets/world/mine-entrance-v1.svg',
+    provenance: {
+      source: 'reviewed-local',
+      reviewedAt: '2026-09-15T21:58:00.000Z',
+    },
+  },
 ]
 
 export const REVIEWED_WORLD_ASSET_MANIFEST = resolveWorldAssetManifest(REVIEWED_WORLD_ASSET_ENTRIES)
