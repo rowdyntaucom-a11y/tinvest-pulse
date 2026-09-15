@@ -15,6 +15,7 @@ on:
       - 'production-v160.js'
       - 'production-v161.js'
       - 'production-v162.js'
+      - 'api-route-policy.js'
       - '.github/workflows/v2-build.yml'
   push:
     branches: [main]
@@ -31,6 +32,7 @@ on:
       - 'production-v160.js'
       - 'production-v161.js'
       - 'production-v162.js'
+      - 'api-route-policy.js'
       - '.github/workflows/v2-build.yml'
 
 jobs:
@@ -67,6 +69,6 @@ jobs:
       - run: node --check ../production-v160.js
       - run: node --check ../production-v161.js
       - run: node --check ../production-v162.js
-      - name: Fundamentals runtime injection regression
+      - name: Production runtime and API route regressions
         working-directory: .
-        run: node tests/production-v162-fundamentals-injection.test.js
+        run: npm run test:api

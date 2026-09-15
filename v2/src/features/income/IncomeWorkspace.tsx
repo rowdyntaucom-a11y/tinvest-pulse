@@ -327,7 +327,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className="income-source-table">
             <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М / YoC</span></div>
             {sourceRows.length ? sourceRows.map(row => (
-              <button type="button" className="income-source-row income-source-row--action" key={row.key} disabled={row.identityState !== 'EXACT_FIGI'} onClick={() => { const position=positions.find(item=>item.figi?.toUpperCase()===row.figi); if(position) onOpenAsset(position) }}>
+              <button type="button" className="income-source-row income-source-row--action" key={row.key} disabled={!row.matchBasis} onClick={() => { const position=positions.find(item=>item.figi?.toUpperCase()===row.figi); if(position) onOpenAsset(position) }}>
                 <div><strong>{row.ticker}</strong><small>{row.name !== row.ticker ? row.name : `${row.factCount + row.forecastCount} событий`}</small></div>
                 <b>{row.fact ? `${money2.format(row.fact)} ₽` : '—'}</b>
                 <div className="income-source-forecast">

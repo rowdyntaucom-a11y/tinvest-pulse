@@ -32,7 +32,7 @@ export type AssetFundamentalsSnapshot = {
   assetUid: string | null
   updatedAt: string | null
   metrics: AssetFundamentalMetric[]
-  reason: 'OK' | 'NO_VERIFIED_SOURCE' | 'INVALID_PAYLOAD' | 'NO_USABLE_METRICS'
+  reason: 'OK' | 'NO_VERIFIED_SOURCE' | 'INVALID_PAYLOAD' | 'NO_USABLE_METRICS' | 'UNSUPPORTED_INSTRUMENT' | 'API_ERROR'
   note: string
 }
 
@@ -75,8 +75,9 @@ export async function loadAssetFundamentals(instrumentUid: string, signal?: Abor
     const raw = await response.json() as unknown
     if (!raw || typeof raw !== 'object' || cleanText((raw as Record<string, unknown>).instrumentUid) !== uid) return unavailableAssetFundamentals('INVALID_PAYLOAD')
     return normalizeAssetFundamentals(raw)
-  } catch {
-    return unavailableAssetFundamentals('NO_VERIFIED_SOURCE')
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    return unavailableAssetFundamentals('API_ERROR')
   }
 }
 
