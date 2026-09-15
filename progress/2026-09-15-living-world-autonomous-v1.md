@@ -15,7 +15,7 @@ Draft PR: #342.
 - Pixi receives only `WorldRenderSnapshot`; it cannot read XP totals, portfolio metrics, broker data or financial calculations.
 - `neutral` weather remains fail-closed and does not create invented rain/storm/market atmosphere.
 - Semantic events are already resolved before presentation mapping; renderer effects cannot create XP or financial meaning.
-- The current procedural art is an integration/runtime fallback, not the final visual-quality target. Final production art must still pass visual review and enter through `REVIEWED_WORLD_ASSET_MANIFEST`.
+- The current procedural art is an integration/runtime fallback, not the final visual-quality target. Final production art must still pass visual review and enter through reviewed manifests.
 - Do not restore the legacy multi-renderer/multi-loop architecture.
 
 ## Implemented in this pass
@@ -65,6 +65,22 @@ Role behavior is restrained and readable:
 
 The choreography is deliberately pure and sprite-agnostic so final character atlases can replace the procedural fallback later without replacing route semantics.
 
+### Reviewed actor-atlas contract
+
+Added `worldActorAtlasManifest.ts`, `worldReviewedActorAtlases.ts` and a separate animation-selection boundary.
+
+The reviewed character pipeline now fails closed before any production sprite can replace fallback art:
+- only local `/assets/world/...` PNG/WebP + JSON atlas paths are allowed;
+- each reviewed role pack must provide all four choreography states: `idle`, `walk`, `carry`, `work`;
+- frame dimensions/count/FPS are bounded and validated;
+- duplicate role packs invalidate that role instead of picking an arbitrary winner;
+- malformed provenance, remote URLs, traversal/query/hash paths and incomplete animation sets are rejected;
+- Figma provenance must contain valid file/node identifiers;
+- reduced-motion playback freezes reviewed animation rather than creating a separate behavioral meaning;
+- when a reviewed atlas is absent, selection explicitly returns `procedural-fallback` rather than pretending temporary geometry is final art.
+
+The production registry intentionally remains empty until visual review approves real art. This gives future asset work a concrete, tested contract without prematurely blessing placeholder graphics.
+
 ### Deferred renderer boundary
 
 The first implementation placed too much renderer code in `WorldStage.tsx`. CI #573 correctly caught a main-bundle regression above the existing 450 KiB hard guard. The budget was **not raised**.
@@ -86,7 +102,12 @@ The runtime now:
 
 ### Regression
 
-Added `v2/tests/worldLivingPresentation.test.ts` and `v2/tests/worldActorChoreography.test.ts`, both registered in `test:core`.
+Registered Living World regressions in `test:core` for:
+- presentation/weather/level semantics;
+- actor choreography work/travel/return phases;
+- role-specific cargo behavior;
+- actor atlas manifest validation and duplicate/fail-closed behavior;
+- reviewed-animation selection and reduced-motion freezing.
 
 The regression locks:
 - neutral weather has no invented rain/lightning;
@@ -97,30 +118,26 @@ The regression locks:
 - actor work/travel/return phases remain deterministic;
 - cargo is limited to intended outbound worker roles;
 - resident/keeper behavior does not invent cargo work;
-- malformed choreography phase fails closed deterministically.
+- incomplete or unsafe production actor packs cannot replace fallback art.
 
 ## CI history / verification
 
 - CI #573: failed the hard main-bundle gate after the first monolithic renderer implementation. Fixed by code splitting; budget not weakened.
 - CI #575: build/bundle gate passed; `test:core` exposed a Node strip-types runtime import-resolution issue in the new presentation module. Fixed by keeping the external event-presentation dependency type-only and mapping already-resolved event kinds locally.
 - CI #578 on head `d91d166041217a8d323e162a803e19b0ed6bc69b`: fully green after the initial runtime split and lifecycle fixes.
-- CI #583 on head `8c896b6b21596d880c09b749039e388f3cd64998`: **fully green** after actor choreography and power-aware runtime work.
-  - dependency security gates: success;
-  - TypeScript + Vite production build: success;
-  - full `test:core`: success, including `worldLivingPresentation` and `worldActorChoreography`;
-  - Living World runtime-state regression: success;
-  - asset-history, payout/server/production syntax checks: success;
-  - production runtime/API regression suite: success.
+- CI #583 on head `8c896b6b21596d880c09b749039e388f3cd64998`: fully green after actor choreography and power-aware runtime work.
+- The actor-atlas contract/selection pass is now included in the same draft branch and is gated by the next full PR CI before any merge decision.
 
 No financial methodology, broker/API contracts, credential handling or bundle thresholds were changed.
 
 ## Still intentionally gated
 
 - reviewed production sprite/environment asset pack;
-- final character animation atlas and frame timing;
+- actual approved character atlas files and frame timing;
+- runtime replacement of procedural actors with those reviewed atlases;
 - long-term XP thresholds/economy;
 - persistent multi-user world storage;
 - sound design;
 - any visual rule that would require new financial interpretation.
 
-The next safe autonomous step is the reviewed-asset application bridge plus richer sprite-ready animation states, while keeping the procedural fallback until production art has actually passed review.
+The next safe autonomous step is to wire the reviewed-atlas contract into the deferred Pixi runtime only when a validated role pack exists, while retaining procedural fallback per role and keeping art approval outside renderer logic.
