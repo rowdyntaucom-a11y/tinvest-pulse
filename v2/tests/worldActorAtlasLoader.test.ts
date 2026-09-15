@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { resolveWorldActorAtlasDocument } from '../src/features/world/worldActorAtlasDocument.ts'
 import { loadWorldActorAtlases } from '../src/features/world/worldActorAtlasLoader.ts'
 import { resolveWorldActorAtlasManifest, WORLD_ACTOR_ACTIONS } from '../src/features/world/worldActorAtlasManifest.ts'
 
@@ -42,6 +43,7 @@ const loaded = await loadWorldActorAtlases(
   manifest,
   async path => ({ path }),
   async () => document(),
+  resolveWorldActorAtlasDocument,
 )
 assert.equal(loaded.loaded.size, 2)
 assert.equal(loaded.failures.length, 0)
@@ -51,6 +53,7 @@ const partial = await loadWorldActorAtlases(
   manifest,
   async path => path.includes('builder') ? null : ({ path }),
   async () => document(),
+  resolveWorldActorAtlasDocument,
 )
 assert.equal(partial.loaded.size, 1)
 assert.equal(partial.failures.length, 1)
@@ -61,6 +64,7 @@ const atlasTransportFailure = await loadWorldActorAtlases(
   resolveWorldActorAtlasManifest([reviewed('miner')]),
   async path => ({ path }),
   async () => { throw new Error('offline') },
+  resolveWorldActorAtlasDocument,
 )
 assert.equal(atlasTransportFailure.loaded.size, 0)
 assert.equal(atlasTransportFailure.failures[0]?.reason, 'ATLAS_LOAD_FAILED')
@@ -69,6 +73,7 @@ const invalidDocument = await loadWorldActorAtlases(
   resolveWorldActorAtlasManifest([reviewed('miner')]),
   async path => ({ path }),
   async () => ({ version: '0.1', imageWidth: 64, imageHeight: 64, animations: {} }),
+  resolveWorldActorAtlasDocument,
 )
 assert.equal(invalidDocument.loaded.size, 0)
 assert.equal(invalidDocument.failures[0]?.reason, 'ATLAS_DOCUMENT_INVALID')
