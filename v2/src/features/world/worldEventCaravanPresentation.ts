@@ -1,8 +1,5 @@
 import type { WorldEvent } from '../dna/worldState'
-import {
-  buildWorldEventPresentation,
-  type WorldEventPresentationChannel,
-} from './worldEventPresentation.ts'
+import type { WorldEventPresentationChannel } from './worldEventPresentation'
 
 export const WORLD_EVENT_CARAVAN_PRESENTATION_VERSION = '0.1' as const
 export const WORLD_EVENT_CARAVAN_LIMIT = 3 as const
@@ -27,6 +24,15 @@ export type WorldEventCaravanPlan = {
   phaseOffset: number
   pace: number
   scale: number
+}
+
+const EVENT_KIND_TO_CHANNEL: Readonly<Record<string, WorldEventPresentationChannel>> = {
+  'xp:CONTRIBUTION_HABIT': 'discipline',
+  'xp:HEALTH_MILESTONE': 'health',
+  'xp:PERFORMANCE_PERIOD': 'performance',
+  'xp:PASSIVE_INCOME_GROWTH': 'income',
+  'xp:PLAN_ADHERENCE': 'strategy',
+  'xp:ACHIEVEMENT': 'achievement',
 }
 
 const CHANNEL_STYLE: Readonly<Record<WorldEventPresentationChannel, {
@@ -54,25 +60,28 @@ function stableUnitFromId(id: string) {
 
 /**
  * Converts already-semantic pending WorldEvents into a tiny renderer-only
- * procession plan. It does not inspect transaction amounts, portfolio value,
- * returns, XP totals or broker data. Unknown future event kinds have already
- * failed safely to the generic presentation channel before arriving here.
+ * procession plan. The channel mapping mirrors the stable semantic presentation
+ * contract but is kept runtime-local so Node strip-types tests do not pull a
+ * browser/bundler import chain into this pure boundary.
  *
- * The visible roster is intentionally capped so repeated/replayed pending events
- * can never turn the world into a noisy particle system.
+ * It does not inspect transaction amounts, portfolio value, returns, XP totals
+ * or broker data. Unknown future event kinds fail safely to `generic`.
+ * The visible roster is capped so replayed pending events cannot turn the world
+ * into a noisy particle system.
  */
 export function buildWorldEventCaravanPresentation(
   events: readonly WorldEvent[],
 ): WorldEventCaravanPlan[] {
-  return buildWorldEventPresentation(events)
+  return events
     .slice(0, WORLD_EVENT_CARAVAN_LIMIT)
     .map((event, index) => {
-      const style = CHANNEL_STYLE[event.channel]
+      const channel = EVENT_KIND_TO_CHANNEL[event.kind] ?? 'generic'
+      const style = CHANNEL_STYLE[channel]
       const stable = stableUnitFromId(event.id)
       return {
         version: WORLD_EVENT_CARAVAN_PRESENTATION_VERSION,
         id: event.id,
-        channel: event.channel,
+        channel,
         kind: style.kind,
         route: index % 2 === 0 ? 'lower-road' : 'upper-road',
         accentColor: style.accentColor,
