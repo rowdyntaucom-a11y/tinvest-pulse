@@ -15,7 +15,7 @@ function snapshot(overrides: Partial<WorldRenderSnapshot> = {}): WorldRenderSnap
   }
 }
 
-assert.equal(WORLD_LIVING_PRESENTATION_VERSION, '0.1')
+assert.equal(WORLD_LIVING_PRESENTATION_VERSION, '0.2')
 
 const base = buildWorldLivingPresentation(snapshot())
 assert.equal(base.actors.length, 2)
@@ -36,6 +36,13 @@ assert.deepEqual(growing.actors.map(actor => actor.id), [
 ])
 assert.equal(growing.cartCount, 1)
 assert.ok(growing.activityScale > base.activityScale)
+
+const primaryChain = growing.actors.filter(actor => ['miner-a', 'hauler-a', 'builder-a'].includes(actor.id))
+assert.deepEqual(primaryChain.map(actor => actor.role), ['miner', 'hauler', 'builder'])
+assert.deepEqual(primaryChain.map(actor => actor.route), ['mine-loop', 'haul-loop', 'build-loop'])
+assert.deepEqual(primaryChain.map(actor => actor.phaseOffset), [0.5, 0.06, 0.62])
+assert.equal(new Set(primaryChain.map(actor => actor.pace)).size, 1)
+assert.equal(primaryChain[0]?.pace, 0.72)
 
 const mature = buildWorldLivingPresentation(snapshot({ level: 9 }))
 assert.equal(mature.actors.length, 8)
