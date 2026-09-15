@@ -13,6 +13,14 @@ import { buildWorldAtmospherePresentation } from './worldAtmospherePresentation'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from './worldAssetLoader'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
 import {
+  WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION,
+  buildWorldEventArrivalPresentation,
+} from './worldEventArrivalPresentation'
+import {
+  WORLD_EVENT_ARRIVAL_MOTION_VERSION,
+  resolveWorldEventArrivalMotion,
+} from './worldEventArrivalMotion'
+import {
   WORLD_EVENT_CARAVAN_LIMIT,
   WORLD_EVENT_CARAVAN_VERSION,
   buildWorldEventCaravanPresentation,
@@ -336,7 +344,16 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         glow.label = `world:event-arrival:${index + 1}`
         glow.visible = false
         layer('effects').addChild(glow)
-        return { caravan, shape, glow }
+
+        const arrivalScene = new Container()
+        arrivalScene.label = `world:event-arrival-scene:${index + 1}`
+        arrivalScene.visible = false
+        const responder = new Graphics()
+        const arrivalCue = new Graphics()
+        arrivalScene.addChild(arrivalCue, responder)
+        layer('effects').addChild(arrivalScene)
+
+        return { caravan, shape, glow, arrivalScene, arrivalCue, responder, arrivalEmphasis: 0 }
       })
 
       const lampGlow = new Graphics().circle(0, 0, 34).fill({ color: 0x66ffe2, alpha: 0.08 })
@@ -500,6 +517,55 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         cartViews.forEach((view, index) => { view.visible = index < activeActivity.cartCount })
       }
 
+      const drawArrivalScene = (
+        view: (typeof caravanViews)[number],
+        plan: WorldEventCaravanPlan,
+      ) => {
+        const arrival = buildWorldEventArrivalPresentation(plan)
+        const destination = EVENT_CARAVAN_DESTINATIONS[plan.destination]
+        view.arrivalEmphasis = arrival.emphasis
+        view.arrivalScene.position.set(destination[0], destination[1] - 12)
+        view.arrivalScene.visible = false
+        view.arrivalCue.clear()
+        view.responder.clear()
+
+        view.responder.circle(44, -13, 5.5).fill({ color: 0xd0a27d, alpha: 0.96 })
+        view.responder.rect(39, -7, 10, 18).fill({ color: arrival.accentColor, alpha: 0.82 })
+
+        switch (arrival.activity) {
+          case 'stockpile-drop':
+            view.arrivalCue.rect(10, 1, 14, 11).fill({ color: 0x8f7657, alpha: 0.94 })
+            view.arrivalCue.rect(27, -4, 14, 16).fill({ color: arrival.accentColor, alpha: 0.82 })
+            break
+          case 'repair-bench':
+            view.arrivalCue.rect(10, 5, 32, 5).fill({ color: 0x8f7657, alpha: 0.92 })
+            view.arrivalCue.circle(26, -4, 8).stroke({ color: arrival.accentColor, width: 3, alpha: 0.92 })
+            view.arrivalCue.moveTo(26, -12).lineTo(26, 4).stroke({ color: 0xdff5eb, width: 2, alpha: 0.82 })
+            break
+          case 'construction-drop':
+            view.arrivalCue.rect(9, 4, 36, 5).fill({ color: 0xa9825c, alpha: 0.96 })
+            view.arrivalCue.rect(15, -5, 30, 5).fill({ color: arrival.accentColor, alpha: 0.82 })
+            view.arrivalCue.rect(20, -14, 25, 5).fill({ color: 0xa9825c, alpha: 0.9 })
+            break
+          case 'treasury-unload':
+            view.arrivalCue.circle(17, 4, 6).fill({ color: 0xf0cf72, alpha: 0.96 })
+            view.arrivalCue.circle(28, 0, 6).fill({ color: arrival.accentColor, alpha: 0.92 })
+            view.arrivalCue.circle(39, 4, 6).fill({ color: 0xf0cf72, alpha: 0.92 })
+            break
+          case 'message-handoff':
+            view.arrivalCue.poly([12, -8, 31, -8, 35, 4, 16, 4]).fill({ color: arrival.accentColor, alpha: 0.9 })
+            view.arrivalCue.moveTo(12, -8).lineTo(24, 1).lineTo(31, -8).stroke({ color: 0xdff5eb, width: 1.5, alpha: 0.76 })
+            break
+          case 'celebration-gathering':
+            view.arrivalCue.moveTo(27, 8).lineTo(27, -26).stroke({ color: 0xc9b07c, width: 2, alpha: 0.92 })
+            view.arrivalCue.poly([28, -26, 45, -20, 28, -13]).fill({ color: arrival.accentColor, alpha: 0.92 })
+            view.arrivalCue.circle(13, -6, 3.5).fill({ color: arrival.accentColor, alpha: 0.94 })
+            view.arrivalCue.circle(22, -14, 3).fill({ color: 0xf0cf72, alpha: 0.94 })
+            view.arrivalCue.circle(39, -3, 3.5).fill({ color: 0xdff5eb, alpha: 0.88 })
+            break
+        }
+      }
+
       let caravanSignature = ''
       let activeCaravans: WorldEventCaravanPlan[] = []
       const renderCaravanState = (current: WorldRenderSnapshot) => {
@@ -513,6 +579,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           if (!plan) {
             view.caravan.visible = false
             view.glow.visible = false
+            view.arrivalScene.visible = false
             return
           }
 
@@ -527,9 +594,35 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           const destination = EVENT_CARAVAN_DESTINATIONS[plan.destination]
           view.glow.clear().circle(0, 0, 34).fill({ color: plan.accentColor, alpha: 0.16 })
           view.glow.position.set(destination[0], destination[1])
-          view.glow.visible = true
+          view.glow.visible = false
           view.glow.alpha = 0
+          drawArrivalScene(view, plan)
         })
+      }
+
+      const applyArrivalMotion = (
+        view: (typeof caravanViews)[number],
+        plan: WorldEventCaravanPlan,
+        arrived: boolean,
+        reduced: boolean,
+        motionSeconds: number,
+        index: number,
+      ) => {
+        const motion = resolveWorldEventArrivalMotion({
+          arrived,
+          reducedMotion: reduced,
+          motionSeconds,
+          index,
+          emphasis: view.arrivalEmphasis,
+        })
+        const destination = EVENT_CARAVAN_DESTINATIONS[plan.destination]
+        view.glow.visible = motion.visible
+        view.glow.alpha = motion.glowAlpha
+        view.arrivalScene.visible = motion.visible
+        view.arrivalScene.alpha = motion.sceneAlpha
+        view.arrivalScene.position.set(destination[0], destination[1] - 12 + motion.offsetY)
+        view.arrivalScene.scale.set(motion.scale)
+        view.arrivalScene.rotation = motion.rotation
       }
 
       next.ticker.maxFPS = reduceMotion ? 30 : window.innerWidth < 900 ? 45 : 60
@@ -569,7 +662,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
             view.caravan.position.set(point.x, point.y)
             view.caravan.scale.set(plan.direction === 'eastbound' ? 1 : -1, 1)
             view.caravan.alpha = 0.94
-            view.glow.alpha = 0.22
+            applyArrivalMotion(view, plan, point.arrived, true, 0, index)
           })
           return
         }
@@ -606,7 +699,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           view.caravan.position.set(point.x, point.y + bob)
           view.caravan.scale.set(plan.direction === 'eastbound' ? 1 : -1, 1)
           view.caravan.alpha = 0.9
-          view.glow.alpha = point.arrived ? 0.16 + Math.sin(now / 680 + index) * 0.05 : 0
+          applyArrivalMotion(view, plan, point.arrived, false, now / 1000, index)
         })
 
         if (activeAtmosphere.stormFlashAlpha > 0) {
@@ -681,6 +774,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-carts={ambientPresentation.cartCount}
       data-world-event-caravan-version={WORLD_EVENT_CARAVAN_VERSION}
       data-world-event-caravans={caravanPresentation.length}
+      data-world-event-arrival-version={WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION}
+      data-world-event-arrival-motion-version={WORLD_EVENT_ARRIVAL_MOTION_VERSION}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
