@@ -8,6 +8,9 @@ import { calculateRelativePerformance } from './relativePerformance'
 import { calculateRollingRisk } from './rollingRisk'
 import { calculateTailRisk } from './tailRisk'
 import './relativePerformance.css'
+import { SectionSelector } from '../navigation/SectionSelector'
+import { RISK_SECTIONS } from '../navigation/navigationModel'
+import { ContextHelpTerm } from '../help/ContextHelpTerm'
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
@@ -72,16 +75,7 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
 
   return (
     <div className="analytics-risk-view">
-      <div className="risk-modebar" aria-label="Режим риск-аналитики">
-        <span>РЕЖИМ</span>
-        <button className={mode === 'portfolio' ? 'is-active' : ''} onClick={() => setMode('portfolio')}>ПОРТФЕЛЬ</button>
-        <button className={mode === 'benchmark' ? 'is-active' : ''} onClick={() => setMode('benchmark')}>СРАВНЕНИЕ</button>
-        <button className={mode === 'rolling' ? 'is-active' : ''} onClick={() => setMode('rolling')}>ОКНА</button>
-        <button className={mode === 'tail' ? 'is-active' : ''} onClick={() => setMode('tail')}>ХВОСТ</button>
-        <button className={mode === 'corr' ? 'is-active' : ''} onClick={() => setMode('corr')}>СВЯЗИ</button>
-        <button className={mode === 'stress' ? 'is-active' : ''} onClick={() => setMode('stress')}>СТРЕСС</button>
-        <small>{modeStatus}</small>
-      </div>
+      <SectionSelector workspace="Риски" value={mode} groups={RISK_SECTIONS} onChange={setMode} aside={<small className="risk-mode-status">{modeStatus}</small>} />
 
       {mode === 'portfolio' && (
         <>
@@ -148,7 +142,7 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
             <article className="risk-card"><span>МЕТОД</span><strong>ИСТОРИЧЕСКИЙ</strong><small>без нормального распределения и параметрической подгонки</small></article>
           </section>
           <section className="panel analytics-note relative-note">
-            <span className="eyebrow">ХВОСТОВОЙ РИСК · v1</span>
+            <span className="eyebrow">ХВОСТОВОЙ РИСК · v1 <ContextHelpTerm topic="tailRisk" /></span>
             <h2>{tail.status === 'mature' ? 'ЗРЕЛАЯ ОЦЕНКА' : tail.status === 'preview' ? 'ПРЕДВАРИТЕЛЬНО' : 'НЕДОСТАТОЧНО ИСТОРИИ'}</h2>
             <p>{tail.note} VaR/CVaR здесь — историческая однодневная оценка риска по TWR портфеля, а не прогноз максимального будущего убытка.</p>
           </section>

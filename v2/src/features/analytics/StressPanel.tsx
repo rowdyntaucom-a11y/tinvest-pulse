@@ -7,6 +7,7 @@ import {
   HISTORICAL_STRESS_SCENARIOS,
 } from './historicalStress'
 import './stress.css'
+import { ContextHelpTerm } from '../help/ContextHelpTerm'
 
 const rub = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 })
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
@@ -82,7 +83,7 @@ export function StressPanel({ positions }: Props) {
       <div className="panel-head stress-headline">
         <div>
           <span className="eyebrow">HISTORICAL STRESS · CATALOG v{HISTORICAL_STRESS_CATALOG_VERSION}</span>
-          <h2>ИСТОРИЧЕСКИЕ ШОКИ</h2>
+          <h2>ИСТОРИЧЕСКИЕ ШОКИ <ContextHelpTerm topic="stress" /></h2>
         </div>
         <small>{compareMode ? `${comparison.length} сценария · одна текущая структура` : `${scenario.period.label} · verified ${scenario.verifiedAt}`}</small>
       </div>

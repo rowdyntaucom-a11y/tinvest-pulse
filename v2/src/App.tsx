@@ -17,6 +17,10 @@ import { RiskWorkspace } from "./features/analytics/RiskWorkspace";
 import { annualReturnRatioToPercent } from "./features/analytics/returnUnits";
 import { IncomeWorkspace } from "./features/income/IncomeWorkspace";
 import { KeyRateWidget } from "./features/macro/KeyRateWidget";
+import { PrimaryNavigation } from "./features/navigation/PrimaryNavigation";
+import { SectionSelector } from "./features/navigation/SectionSelector";
+import { ANALYTICS_SECTIONS } from "./features/navigation/navigationModel";
+import { ContextHelpTerm } from "./features/help/ContextHelpTerm";
 import { PersonalizationControl } from "./features/settings/PersonalizationControl";
 import {
   loadPortfolio,
@@ -119,7 +123,7 @@ export default function App() {
   >(null);
   const [assetReturnTab, setAssetReturnTab] = useState<Tab>("portfolio");
   const [portfolioStatus, setPortfolioStatus] = useState<
-    "LOADING" | "LIVE" | "FALLBACK"
+    "LOADING" | "LIVE" | "FALLBACK" | "ERROR"
   >("LOADING");
   const [pulseMode, setPulseMode] = useState(false);
   const worldLocalDate = useWorldPhaseClock(tab === "dna");
@@ -135,13 +139,17 @@ export default function App() {
   useEffect(() => {
     let active = true;
     const refresh = async () => {
-      const next = await loadPortfolio();
-      if (active) {
+      try {
+        const next = await loadPortfolio();
+        if (active) {
         setSnapshot((current) => ({
           ...next,
           history: current.history.length ? current.history : next.history,
         }));
-        setPortfolioStatus(next.source === "fallback" ? "FALLBACK" : "LIVE");
+          setPortfolioStatus(next.source === "fallback" ? "FALLBACK" : "LIVE");
+        }
+      } catch {
+        if (active) setPortfolioStatus("ERROR");
       }
     };
     void refresh();
@@ -275,50 +283,7 @@ export default function App() {
           rateDate={snapshot.riskFreeRateDate}
           nextMeeting={snapshot.nextRateMeeting}
         />
-        <nav className="topbar__nav" aria-label="Разделы">
-          <button
-            onClick={() => navigateToTab("board")}
-            className={`chip ${tab === "board" ? "chip--active" : ""}`}
-          >
-            ПУЛЬТ
-          </button>
-          <button
-            onClick={() => navigateToTab("portfolio")}
-            className={`chip ${tab === "portfolio" ? "chip--active" : ""}`}
-          >
-            ПОРТФЕЛЬ
-          </button>
-          <button
-            onClick={() => navigateToTab("analytics")}
-            className={`chip ${tab === "analytics" ? "chip--active" : ""}`}
-          >
-            АНАЛИТИКА
-          </button>
-          <button
-            onClick={() => navigateToTab("income")}
-            className={`chip ${tab === "income" ? "chip--active" : ""}`}
-          >
-            ДОХОД
-          </button>
-          <button
-            onClick={() => navigateToTab("goals")}
-            className={`chip ${tab === "goals" ? "chip--active" : ""}`}
-          >
-            ЦЕЛЬ
-          </button>
-          <button
-            onClick={() => navigateToTab("dna")}
-            className={`chip ${tab === "dna" ? "chip--active" : ""}`}
-          >
-            DNA
-          </button>
-          <button
-            onClick={() => setPulseMode(true)}
-            className="chip chip--pulse"
-          >
-            ПУЛЬС ↗
-          </button>
-        </nav>
+        <PrimaryNavigation active={tab} onNavigate={navigateToTab} onPulse={() => setPulseMode(true)} />
       </header>
 
       <section
@@ -335,6 +300,18 @@ export default function App() {
             <div className="loading-panel" />
             <strong>ЗАГРУЖАЕМ ПОРТФЕЛЬ</strong>
             <span>Значения появятся после ответа брокера</span>
+          </section>
+        ) : portfolioStatus === "FALLBACK" || portfolioStatus === "ERROR" ? (
+          <section className="portfolio-empty panel" role="status" aria-live="polite">
+            <span className="eyebrow">ДАННЫЕ НЕ ПОДТВЕРЖДЕНЫ</span>
+            <h2>{portfolioStatus === "ERROR" ? "Не удалось загрузить портфель" : "Актуальные данные брокера недоступны"}</h2>
+            <p>QVANIX не показывает резервные или отсутствующие значения как реальный пустой портфель. Повторная загрузка произойдёт автоматически.</p>
+          </section>
+        ) : portfolioStatus === "LIVE" && snapshot.positions === 0 ? (
+          <section className="portfolio-empty panel" role="status">
+            <span className="eyebrow">LIVE · ДАННЫЕ ПОДТВЕРЖДЕНЫ</span>
+            <h2>Портфель пока пуст</h2>
+            <p>Брокер подтвердил актуальное состояние счёта: открытых позиций сейчас нет.</p>
           </section>
         ) : selectedAsset ? (
           <Suspense
@@ -385,65 +362,20 @@ export default function App() {
 
             {tab === "analytics" && (
               <div className="analytics-layout">
-                <nav
-                  className="subnav analytics-subnav"
-                  aria-label="Разделы аналитики"
-                >
-                  <button
-                    onClick={() => setAnalyticsView("overview")}
-                    className={
-                      analyticsView === "overview" ? "subnav--active" : ""
-                    }
-                  >
-                    ОБЗОР
-                  </button>
-                  <button
-                    onClick={() => setAnalyticsView("risk")}
-                    className={analyticsView === "risk" ? "subnav--active" : ""}
-                  >
-                    РИСК
-                  </button>
-                  <button
-                    onClick={() => setAnalyticsView("health")}
-                    className={
-                      analyticsView === "health" ? "subnav--active" : ""
-                    }
-                  >
-                    ОЦЕНКА
-                  </button>
-                  <button
-                    onClick={() => setAnalyticsView("drift")}
-                    className={
-                      analyticsView === "drift" ? "subnav--active" : ""
-                    }
-                  >
-                    ДОЛИ
-                  </button>
-                  <button
-                    onClick={() => setAnalyticsView("montecarlo")}
-                    className={
-                      analyticsView === "montecarlo" ? "subnav--active" : ""
-                    }
-                  >
-                    СЦЕН.
-                  </button>
-                  <span
-                    className={
-                      analyticsMature
-                        ? "sample-badge sample-badge--mature"
-                        : "sample-badge"
-                    }
-                  >
-                    {analyticsMature ? "12 МЕС." : `ПРЕДВ. · ${historyLabel}`}
-                  </span>
-                </nav>
+                <SectionSelector
+                  workspace="Аналитика"
+                  value={analyticsView}
+                  groups={ANALYTICS_SECTIONS}
+                  onChange={setAnalyticsView}
+                  aside={<span className={analyticsMature ? "sample-badge sample-badge--mature" : "sample-badge"}>{analyticsMature ? "12 МЕС." : `ПРЕДВ. · ${historyLabel}`}</span>}
+                />
 
                 {analyticsView === "overview" && (
                   <div className="analytics-overview">
                     <section className="analytics-topline">
                       <article className="score-card">
                         <span className="metric-label">
-                          ЗДОРОВЬЕ ПОРТФЕЛЯ · v{analytics.healthVersion}
+                          ЗДОРОВЬЕ ПОРТФЕЛЯ · v{analytics.healthVersion} <ContextHelpTerm topic="health" />
                         </span>
                         <strong>
                           {analytics.healthScore == null
@@ -458,7 +390,7 @@ export default function App() {
                       </article>
                       <article className="metric-card">
                         <span className="metric-label">
-                          XIRR · ЛИЧНАЯ ДОХОДНОСТЬ
+                          XIRR · ЛИЧНАЯ ДОХОДНОСТЬ <ContextHelpTerm topic="xirr" />
                         </span>
                         <strong>
                           {xirr == null ? "—" : `${pctSigned.format(xirr)}%`}
@@ -467,7 +399,7 @@ export default function App() {
                       </article>
                       <article className="metric-card">
                         <span className="metric-label">
-                          TWR · ДОХОДНОСТЬ ПОРТФЕЛЯ
+                          TWR · ДОХОДНОСТЬ ПОРТФЕЛЯ <ContextHelpTerm topic="twr" />
                         </span>
                         <strong>{signedRatio(analytics.twr)}</strong>
                         <MetricSparkline
@@ -518,7 +450,7 @@ export default function App() {
                     <div className="panel-head">
                       <div>
                         <span className="eyebrow">МЕТОДИКА v1.0</span>
-                        <h2>ЗДОРОВЬЕ ПОРТФЕЛЯ</h2>
+                        <h2>ЗДОРОВЬЕ ПОРТФЕЛЯ <ContextHelpTerm topic="health" /></h2>
                       </div>
                       <small>
                         {analyticsMature ? "полная выборка" : "предварительно"}
@@ -564,7 +496,7 @@ export default function App() {
                         <span className="eyebrow">
                           СТРАТЕГИЯ v{drift.strategy.version}
                         </span>
-                        <h2>ЦЕЛЬ И ФАКТ</h2>
+                        <h2>ЦЕЛЬ И ФАКТ <ContextHelpTerm topic="rebalanceTolerance" /></h2>
                       </div>
                       <small>{drift.strategy.name}</small>
                     </div>

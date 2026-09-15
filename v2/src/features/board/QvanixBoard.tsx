@@ -5,6 +5,7 @@ import type { PortfolioSnapshot } from '../../lib/portfolioApi'
 import type { UiModuleId, UiWorkspace } from '../../lib/uiPreferences'
 import { MetricSparkline } from '../shared/MetricSparkline'
 import './qvanixBoard.css'
+import { ContextHelpTerm } from '../help/ContextHelpTerm'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
@@ -156,9 +157,10 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
     <div className="qv-board">
       <section className="qv-board__hero">
         <div className="qv-board__hero-copy">
-          <span className="qv-board__kicker">QVANIX · ПУЛЬТ</span>
-          <h2>{snapshot.accountName || 'ПОРТФЕЛЬ'}</h2>
-          <p>Краткий обзор выбранных показателей. Полная аналитика остаётся в профильных разделах.</p>
+          <span className="qv-board__kicker">КАПИТАЛ · {snapshot.accountName || 'ПОРТФЕЛЬ'}</span>
+          <div className="qv-board__capital"><strong>{money.format(snapshot.value)}</strong><span>₽</span></div>
+          <div className="qv-board__pnl"><b className={snapshot.profit > 0 ? 'is-positive' : snapshot.profit < 0 ? 'is-negative' : ''}>{signedMoney(snapshot.profit)}</b><small>накопленный P/L брокера · не изменение за день</small></div>
+          <p>{sourceLabel} · {snapshotStamp(snapshot.updatedAt)}</p>
         </div>
         <div className="qv-board__trace" aria-hidden="true"><i /><i /><i /></div>
       </section>
@@ -166,7 +168,7 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
       <section className="qv-board__rail" aria-label="Контекст данных">
         <article><span>ИСТОЧНИК</span><strong>{sourceLabel}</strong><small>{snapshotStamp(snapshot.updatedAt)}</small></article>
         <article><span>ИСТОРИЯ</span><strong>{historyState}</strong><small>{analytics.historyIntegrity === 'OK' ? 'данные согласованы' : 'есть расхождения'}</small></article>
-        <article><span>ПОКРЫТИЕ ВЫПЛАТ</span><strong>{payoutCoverage}</strong><small>{calendar?.integrity?.complete ? 'календарь полный' : 'покрытие рассчитано явно'}</small></article>
+        <article><span>ПОКРЫТИЕ ВЫПЛАТ <ContextHelpTerm topic="payoutCoverage" /></span><strong>{payoutCoverage}</strong><small>{calendar?.integrity?.complete ? 'календарь полный' : 'покрытие рассчитано явно'}</small></article>
         <article><span>КЛЮЧЕВАЯ СТАВКА</span><strong>{snapshot.riskFreeRate == null ? '—' : `${number.format(snapshot.riskFreeRate)}%`}</strong><small>{snapshot.nextRateMeeting ? `заседание ${snapshot.nextRateMeeting}` : 'дата следующего заседания —'}</small></article>
       </section>
 
