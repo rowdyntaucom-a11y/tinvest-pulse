@@ -45,7 +45,7 @@ const loadedSettlement = {
   loaded: new Map([['background.distant-settlement', { kind: 'image' }]]),
   failures: [],
 }
-const mountReviewed = resolveWorldAssetMountDecision(manifest, loadedSettlement, 'background.distant-settlement')
+const mountReviewed = resolveWorldAssetMountDecision(manifest, complete, loadedSettlement, 'background.distant-settlement')
 assert.deepEqual(mountReviewed, {
   version: '0.1',
   slotId: 'background.distant-settlement',
@@ -56,6 +56,7 @@ assert.deepEqual(mountReviewed, {
 
 const notLoaded = resolveWorldAssetMountDecision(
   manifest,
+  complete,
   { version: '0.1' as const, loaded: new Map(), failures: [] },
   'background.distant-settlement',
 )
@@ -64,6 +65,7 @@ assert.equal(notLoaded.reason, 'ASSET_NOT_LOADED')
 
 const failedLoad = resolveWorldAssetMountDecision(
   manifest,
+  complete,
   {
     version: '0.1' as const,
     loaded: new Map(),
@@ -94,12 +96,20 @@ const taintedManifest = resolveWorldAssetManifest([
 ])
 assert.equal(taintedManifest.entries.has('background.distant-settlement'), true)
 assert.equal(taintedManifest.rejectedCount, 1)
-const taintedDecision = resolveWorldAssetMountDecision(taintedManifest, loadedSettlement, 'background.distant-settlement')
+const taintedReadiness = resolveWorldAssetReadiness(taintedManifest, ['background.distant-settlement'])
+const taintedDecision = resolveWorldAssetMountDecision(
+  taintedManifest,
+  taintedReadiness,
+  loadedSettlement,
+  'background.distant-settlement',
+)
 assert.equal(taintedDecision.mode, 'procedural-fallback')
 assert.equal(taintedDecision.reason, 'MANIFEST_NOT_READY')
 
+const terrainReadiness = resolveWorldAssetReadiness(manifest, ['terrain.ground'])
 const spoofedUnreviewed = resolveWorldAssetMountDecision(
   manifest,
+  terrainReadiness,
   {
     version: '0.1' as const,
     loaded: new Map([['terrain.ground', { kind: 'image' }]]),
