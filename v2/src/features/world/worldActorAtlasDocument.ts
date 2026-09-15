@@ -1,10 +1,9 @@
 import type { WorldActorAction } from './worldActorChoreography'
-import {
-  WORLD_ACTOR_ACTIONS,
-  type WorldActorAtlasManifestEntry,
-} from './worldActorAtlasManifest'
+import type { WorldActorAtlasManifestEntry } from './worldActorAtlasManifest'
 
 export const WORLD_ACTOR_ATLAS_DOCUMENT_VERSION = '0.1' as const
+
+const DOCUMENT_ACTIONS: readonly WorldActorAction[] = ['idle', 'walk', 'carry', 'work'] as const
 
 export type WorldActorAtlasFrame = {
   x: number
@@ -72,7 +71,7 @@ export function resolveWorldActorAtlasDocument(
   const sourceAnimations = candidate.animations as Record<string, unknown>
   const normalized = {} as Record<WorldActorAction, readonly WorldActorAtlasFrame[]>
 
-  for (const action of WORLD_ACTOR_ACTIONS) {
+  for (const action of DOCUMENT_ACTIONS) {
     const clipSpec = manifestEntry.animations.find(clip => clip.action === action)
     if (!clipSpec) return null
     const frames = sourceAnimations[action]
@@ -92,9 +91,7 @@ export function resolveWorldActorAtlasDocument(
     normalized[action] = normalizedFrames
   }
 
-  // Unknown extra animation names are rejected rather than silently accepted,
-  // keeping the reviewed art contract deterministic.
-  if (Object.keys(sourceAnimations).some(action => !WORLD_ACTOR_ACTIONS.includes(action as WorldActorAction))) return null
+  if (Object.keys(sourceAnimations).some(action => !DOCUMENT_ACTIONS.includes(action as WorldActorAction))) return null
 
   return {
     version: WORLD_ACTOR_ATLAS_DOCUMENT_VERSION,
