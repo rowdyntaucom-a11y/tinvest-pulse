@@ -12,6 +12,15 @@ import {
 import { buildWorldAtmospherePresentation } from './worldAtmospherePresentation'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from './worldAssetLoader'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
+import {
+  WORLD_EVENT_CARAVAN_LIMIT,
+  WORLD_EVENT_CARAVAN_VERSION,
+  buildWorldEventCaravanPresentation,
+  resolveWorldEventCaravanJourney,
+  type WorldEventCaravanDestination,
+  type WorldEventCaravanPlan,
+} from './worldEventCaravanPresentation'
+import { buildWorldEventPresentation } from './worldEventPresentation'
 import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
 import { buildWorldPresentationMetadata } from './worldPresentationMetadata'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLayer } from './worldSceneLayers'
@@ -68,6 +77,15 @@ const AMBIENT_ROUTES: Record<WorldAmbientActorRoute, AmbientRoute> = {
   'resident-loop': { from: [1080, 654], to: [1450, 628] },
 }
 
+const EVENT_CARAVAN_DESTINATIONS: Record<WorldEventCaravanDestination, readonly [number, number]> = {
+  'mine-yard': [280, 632],
+  workshop: [610, 618],
+  'construction-yard': [905, 598],
+  storehouse: [1175, 606],
+  'settlement-gate': [1470, 632],
+  'town-square': [1090, 566],
+}
+
 const ACTOR_ROLE_COLORS: Record<WorldAmbientActorRole, number> = {
   miner: 0xd7bd73,
   hauler: 0x9db6bd,
@@ -91,6 +109,33 @@ function ambientRoutePoint(routeName: WorldAmbientActorRoute, progress: number) 
     y: route.from[1] + (route.to[1] - route.from[1]) * travel.t,
     direction: travel.direction,
   }
+}
+
+function lerp(from: number, to: number, progress: number) {
+  return from + (to - from) * clamp(progress, 0, 1)
+}
+
+function caravanRoutePoint(plan: WorldEventCaravanPlan, phaseInput: number, reducedMotion: boolean) {
+  const journey = resolveWorldEventCaravanJourney(phaseInput, reducedMotion)
+  const destination = EVENT_CARAVAN_DESTINATIONS[plan.destination]
+  const start: readonly [number, number] = plan.direction === 'eastbound' ? [-70, 690] : [1670, 690]
+  const exit: readonly [number, number] = plan.direction === 'eastbound' ? [1670, 690] : [-70, 690]
+
+  if (journey.segment === 'approach') {
+    return {
+      x: lerp(start[0], destination[0], journey.progress),
+      y: lerp(start[1], destination[1], journey.progress),
+      arrived: false,
+    }
+  }
+  if (journey.segment === 'depart') {
+    return {
+      x: lerp(destination[0], exit[0], journey.progress),
+      y: lerp(destination[1], exit[1], journey.progress),
+      arrived: false,
+    }
+  }
+  return { x: destination[0], y: destination[1], arrived: true }
 }
 
 function preloadBrowserImage(assetPath: string) {
@@ -121,6 +166,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
+  const caravanPresentation = buildWorldEventCaravanPresentation(buildWorldEventPresentation(snapshot.pendingEvents))
 
   if (!ownerIdRef.current) {
     worldStageSequence += 1
@@ -276,6 +322,21 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         cart.addChild(cartShape)
         layer('logistics').addChild(cart)
         return cart
+      })
+
+      const caravanViews = Array.from({ length: WORLD_EVENT_CARAVAN_LIMIT }, (_, index) => {
+        const caravan = new Container()
+        caravan.label = `world:event-caravan:${index + 1}`
+        caravan.visible = false
+        const shape = new Graphics()
+        caravan.addChild(shape)
+        layer('logistics').addChild(caravan)
+
+        const glow = new Graphics()
+        glow.label = `world:event-arrival:${index + 1}`
+        glow.visible = false
+        layer('effects').addChild(glow)
+        return { caravan, shape, glow }
       })
 
       const lampGlow = new Graphics().circle(0, 0, 34).fill({ color: 0x66ffe2, alpha: 0.08 })
@@ -439,6 +500,38 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         cartViews.forEach((view, index) => { view.visible = index < activeActivity.cartCount })
       }
 
+      let caravanSignature = ''
+      let activeCaravans: WorldEventCaravanPlan[] = []
+      const renderCaravanState = (current: WorldRenderSnapshot) => {
+        const signature = current.pendingEvents.map(event => `${event.id}:${event.kind}`).join('|')
+        if (signature === caravanSignature) return
+        caravanSignature = signature
+        activeCaravans = buildWorldEventCaravanPresentation(buildWorldEventPresentation(current.pendingEvents))
+
+        caravanViews.forEach((view, index) => {
+          const plan = activeCaravans[index]
+          if (!plan) {
+            view.caravan.visible = false
+            view.glow.visible = false
+            return
+          }
+
+          view.caravan.visible = true
+          view.shape.clear()
+          view.shape.poly([-22, -13, 18, -13, 14, 8, -17, 8]).fill({ color: plan.accentColor, alpha: 0.94 })
+          view.shape.circle(-11, 12, 4.5).fill({ color: 0x182521, alpha: 1 })
+          view.shape.circle(9, 12, 4.5).fill({ color: 0x182521, alpha: 1 })
+          view.shape.rect(-2, -31, 3, 18).fill({ color: 0xb9cec8, alpha: 0.72 })
+          view.shape.poly([1, -31, 14, -26, 1, -21]).fill({ color: plan.accentColor, alpha: 0.86 })
+
+          const destination = EVENT_CARAVAN_DESTINATIONS[plan.destination]
+          view.glow.clear().circle(0, 0, 34).fill({ color: plan.accentColor, alpha: 0.16 })
+          view.glow.position.set(destination[0], destination[1])
+          view.glow.visible = true
+          view.glow.alpha = 0
+        })
+      }
+
       next.ticker.maxFPS = reduceMotion ? 30 : window.innerWidth < 900 ? 45 : 60
       next.ticker.minFPS = 20
       next.ticker.add(() => {
@@ -446,6 +539,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         renderAtmosphere(current)
         renderDevelopment(current)
         renderActivityState(current)
+        renderCaravanState(current)
 
         const now = performance.now()
         if (reduceMotion) {
@@ -467,6 +561,15 @@ function WorldPixiStage({ snapshot }: PixiProps) {
             if (!view.visible) return
             view.position.set(460 + index * 620, 696)
             view.scale.set(1, 1)
+          })
+          activeCaravans.forEach((plan, index) => {
+            const view = caravanViews[index]
+            if (!view) return
+            const point = caravanRoutePoint(plan, plan.phaseOffset, true)
+            view.caravan.position.set(point.x, point.y)
+            view.caravan.scale.set(plan.direction === 'eastbound' ? 1 : -1, 1)
+            view.caravan.alpha = 0.94
+            view.glow.alpha = 0.22
           })
           return
         }
@@ -492,6 +595,18 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           const travel = loopTravel(index * 0.5 + (now / 18500) * (0.7 + activeActivity.activityScale * 0.45))
           view.position.set(280 + 1120 * travel.t, 696)
           view.scale.set(travel.direction, 1)
+        })
+
+        activeCaravans.forEach((plan, index) => {
+          const view = caravanViews[index]
+          if (!view) return
+          const phase = plan.phaseOffset + (now / 26000) * plan.pace
+          const point = caravanRoutePoint(plan, phase, false)
+          const bob = Math.sin(now / 420 + plan.phaseOffset * 8) * 1.3
+          view.caravan.position.set(point.x, point.y + bob)
+          view.caravan.scale.set(plan.direction === 'eastbound' ? 1 : -1, 1)
+          view.caravan.alpha = 0.9
+          view.glow.alpha = point.arrived ? 0.16 + Math.sin(now / 680 + index) * 0.05 : 0
         })
 
         if (activeAtmosphere.stormFlashAlpha > 0) {
@@ -564,6 +679,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
+      data-world-event-caravan-version={WORLD_EVENT_CARAVAN_VERSION}
+      data-world-event-caravans={caravanPresentation.length}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
