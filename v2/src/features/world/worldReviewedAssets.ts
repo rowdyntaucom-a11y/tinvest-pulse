@@ -2,9 +2,18 @@ import { resolveWorldAssetManifest, type WorldAssetManifestEntry } from './world
 
 /**
  * Production registry for reviewed Living World art.
- * Keep this empty until an asset has passed visual review and is packaged under
- * v2/public/assets/world. Legacy v1/Figma-era SVGs are not promoted implicitly.
+ * Assets enter here only after visual review and local packaging under
+ * v2/public/assets/world. Legacy v1/Figma-era assets are never promoted implicitly.
  */
-export const REVIEWED_WORLD_ASSET_ENTRIES: readonly WorldAssetManifestEntry[] = []
+export const REVIEWED_WORLD_ASSET_ENTRIES: readonly WorldAssetManifestEntry[] = [
+  {
+    slotId: 'background.distant-settlement',
+    assetPath: '/assets/world/distant-settlement-v1.svg',
+    provenance: {
+      source: 'reviewed-local',
+      reviewedAt: '2026-09-15T15:00:00.000Z',
+    },
+  },
+]
 
 export const REVIEWED_WORLD_ASSET_MANIFEST = resolveWorldAssetManifest(REVIEWED_WORLD_ASSET_ENTRIES)
