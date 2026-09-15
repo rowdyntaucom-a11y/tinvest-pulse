@@ -1,8 +1,14 @@
-import { Application, Container, Graphics } from 'pixi.js'
+import { Application, Container, Graphics, Rectangle, Sprite, Texture } from 'pixi.js'
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import { resolveWorldActorAnimationSelection } from './worldActorAnimationSelection'
+import { resolveWorldActorAtlasDocument } from './worldActorAtlasDocument'
+import { loadWorldActorAtlases, type LoadedWorldActorAtlas } from './worldActorAtlasLoader'
+import { WORLD_ACTOR_ACTIONS, type WorldActorAction } from './worldActorAtlasManifest'
 import { resolveWorldActorChoreography } from './worldActorChoreography'
+import { resolveWorldActorFramePlayback } from './worldActorFramePlayback'
 import { loadWorldAssetEntries } from './worldAssetLoader'
-import { buildWorldLivingPresentation, type WorldActorPlan } from './worldLivingPresentation'
+import { buildWorldLivingPresentation, type WorldActorPlan, type WorldActorRole } from './worldLivingPresentation'
+import { REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST } from './worldReviewedActorAtlases'
 import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
 import { WORLD_SCENE_LAYER_ORDER, type WorldSceneLayer } from './worldSceneLayers'
 
@@ -10,6 +16,9 @@ export type WorldAssetRuntimeState = {
   configured: number
   loaded: number
   failed: number
+  actorConfigured: number
+  actorLoaded: number
+  actorFailed: number
 }
 
 type MountWorldPixiRuntimeOptions = {
@@ -25,18 +34,83 @@ type ActorView = {
   figure: Container
   load: Graphics
   workSpark: Graphics
+  reviewedSprite: Sprite | null
+}
+
+type ReviewedActorTexturePack = {
+  baseTexture: Texture
+  frames: ReadonlyMap<WorldActorAction, readonly Texture[]>
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
-function preloadBrowserImage(assetPath: string) {
+function preloadBrowserImage(assetPath: string, signal?: AbortSignal) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image()
     image.decoding = 'async'
-    image.onload = () => resolve(image)
-    image.onerror = () => reject(new Error('Living World asset preload failed'))
+
+    const cleanup = () => {
+      signal?.removeEventListener('abort', onAbort)
+      image.onload = null
+      image.onerror = null
+    }
+    const onAbort = () => {
+      cleanup()
+      image.src = ''
+      reject(new DOMException('Living World asset preload aborted', 'AbortError'))
+    }
+
+    if (signal?.aborted) {
+      onAbort()
+      return
+    }
+
+    image.onload = () => {
+      cleanup()
+      resolve(image)
+    }
+    image.onerror = () => {
+      cleanup()
+      reject(new Error('Living World asset preload failed'))
+    }
+    signal?.addEventListener('abort', onAbort, { once: true })
     image.src = assetPath
   })
+}
+
+async function loadLocalJsonAsset(assetPath: string, signal: AbortSignal) {
+  const response = await fetch(assetPath, {
+    signal,
+    credentials: 'same-origin',
+    cache: 'force-cache',
+  })
+  if (!response.ok) throw new Error(`Living World atlas request failed: ${response.status}`)
+  return response.json() as Promise<unknown>
+}
+
+function buildReviewedActorTexturePack(
+  loaded: LoadedWorldActorAtlas<HTMLImageElement>,
+): ReviewedActorTexturePack {
+  const baseTexture = Texture.from(loaded.image)
+  const frames = new Map<WorldActorAction, readonly Texture[]>()
+
+  for (const action of WORLD_ACTOR_ACTIONS) {
+    const actionTextures = loaded.document.animations[action].map((frame, index) => new Texture({
+      source: baseTexture.source,
+      frame: new Rectangle(frame.x, frame.y, frame.width, frame.height),
+      label: `world-actor:${loaded.entry.role}:${action}:${index}`,
+    }))
+    frames.set(action, actionTextures)
+  }
+
+  return { baseTexture, frames }
+}
+
+function destroyReviewedActorTexturePack(pack: ReviewedActorTexturePack) {
+  for (const textures of pack.frames.values()) {
+    for (const texture of textures) texture.destroy(false)
+  }
+  pack.baseTexture.destroy(true)
 }
 
 function actorColor(role: WorldActorPlan['role']) {
@@ -235,9 +309,21 @@ export async function mountWorldPixiRuntime({
     root.addChild(shadow, figure)
     root.scale.set(plan.scale)
     layer('actors').addChild(root)
-    const view = { root, figure, load, workSpark }
+    const view: ActorView = { root, figure, load, workSpark, reviewedSprite: null }
     actorViews.set(plan.id, view)
     return view
+  }
+
+  const ensureReviewedSprite = (actor: ActorView) => {
+    if (actor.reviewedSprite) return actor.reviewedSprite
+    const sprite = new Sprite(Texture.EMPTY)
+    sprite.visible = false
+    sprite.anchor.set(0.5, 1)
+    sprite.position.set(0, 14)
+    sprite.height = 52
+    actor.root.addChild(sprite)
+    actor.reviewedSprite = sprite
+    return sprite
   }
 
   const cartViews = [0, 1].map(index => {
@@ -254,15 +340,73 @@ export async function mountWorldPixiRuntime({
     return cart
   })
 
+  let environmentAssetState = {
+    configured: REVIEWED_WORLD_ASSET_MANIFEST.entries.size,
+    loaded: 0,
+    failed: 0,
+  }
+  let actorAssetState = {
+    configured: REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST.entries.size,
+    loaded: 0,
+    failed: 0,
+  }
+  const emitAssetRuntime = () => onAssetRuntime({
+    configured: environmentAssetState.configured,
+    loaded: environmentAssetState.loaded,
+    failed: environmentAssetState.failed,
+    actorConfigured: actorAssetState.configured,
+    actorLoaded: actorAssetState.loaded,
+    actorFailed: actorAssetState.failed,
+  })
+  emitAssetRuntime()
+
+  const reviewedActorTexturePacks = new Map<WorldActorRole, ReviewedActorTexturePack>()
+
   void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), preloadBrowserImage)
     .then(result => {
       if (signal.aborted) return
-      onAssetRuntime({
+      environmentAssetState = {
         configured: REVIEWED_WORLD_ASSET_MANIFEST.entries.size,
         loaded: result.loaded.size,
         failed: result.failures.length,
-      })
+      }
+      emitAssetRuntime()
     })
+
+  void loadWorldActorAtlases(
+    REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST,
+    assetPath => preloadBrowserImage(assetPath, signal),
+    assetPath => loadLocalJsonAsset(assetPath, signal),
+    resolveWorldActorAtlasDocument,
+  ).then(result => {
+    if (signal.aborted) return
+
+    let textureFailures = 0
+    for (const [role, loaded] of result.loaded) {
+      try {
+        reviewedActorTexturePacks.set(role, buildReviewedActorTexturePack(loaded))
+      } catch (error) {
+        textureFailures += 1
+        console.error(`QVANIX DNA reviewed actor texture build failed for ${role}`, error)
+      }
+    }
+
+    actorAssetState = {
+      configured: REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST.entries.size,
+      loaded: reviewedActorTexturePacks.size,
+      failed: result.failures.length + textureFailures,
+    }
+    emitAssetRuntime()
+  }).catch(error => {
+    if (signal.aborted) return
+    console.error('QVANIX DNA reviewed actor atlas loading failed', error)
+    actorAssetState = {
+      configured: REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST.entries.size,
+      loaded: 0,
+      failed: REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST.entries.size,
+    }
+    emitAssetRuntime()
+  })
 
   let lastLevel = -1
   const renderLevel = (current: number) => {
@@ -359,11 +503,45 @@ export async function mountWorldPixiRuntime({
       actor.root.visible = true
       actor.root.position.set(point.x, point.y)
       actor.root.scale.set(plan.scale * point.direction, plan.scale)
-      actor.figure.position.y = moving ? movementWave * 1.7 : working ? Math.abs(workWave) * 0.7 : 0
-      actor.figure.rotation = working ? workWave * 0.11 : moving ? movementWave * 0.018 : 0
-      actor.load.visible = choreography.carryLoad
-      actor.workSpark.visible = working && !reducedMotion && workWave > 0.45
-      actor.workSpark.alpha = working ? 0.62 + Math.max(0, workWave) * 0.3 : 0
+
+      let reviewedFrameApplied = false
+      const texturePack = reviewedActorTexturePacks.get(plan.role)
+      if (texturePack) {
+        const selection = resolveWorldActorAnimationSelection(
+          REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST,
+          plan.role,
+          choreography.action,
+          reducedMotion,
+        )
+        if (selection.renderer === 'reviewed-atlas') {
+          const playback = resolveWorldActorFramePlayback(
+            selection.clip,
+            choreography.actionProgress,
+            selection.freezeFrame,
+          )
+          const texture = texturePack.frames.get(choreography.action)?.[playback.frameIndex]
+          if (texture) {
+            const sprite = ensureReviewedSprite(actor)
+            sprite.texture = texture
+            sprite.visible = true
+            actor.figure.visible = false
+            reviewedFrameApplied = true
+          }
+        }
+      }
+
+      if (!reviewedFrameApplied) {
+        if (actor.reviewedSprite) actor.reviewedSprite.visible = false
+        actor.figure.visible = true
+        actor.figure.position.y = moving ? movementWave * 1.7 : working ? Math.abs(workWave) * 0.7 : 0
+        actor.figure.rotation = working ? workWave * 0.11 : moving ? movementWave * 0.018 : 0
+        actor.load.visible = choreography.carryLoad
+        actor.workSpark.visible = working && !reducedMotion && workWave > 0.45
+        actor.workSpark.alpha = working ? 0.62 + Math.max(0, workWave) * 0.3 : 0
+      } else {
+        actor.load.visible = false
+        actor.workSpark.visible = false
+      }
     }
     for (const [id, actor] of actorViews) if (!activeActorIds.has(id)) actor.root.visible = false
 
@@ -412,6 +590,8 @@ export async function mountWorldPixiRuntime({
     reducedMotionQuery?.removeEventListener('change', onReducedMotion)
     document.removeEventListener('visibilitychange', onVisibility)
     app.destroy(true, { children: true })
+    for (const pack of reviewedActorTexturePacks.values()) destroyReviewedActorTexturePack(pack)
+    reviewedActorTexturePacks.clear()
     host.replaceChildren()
   }
 }
