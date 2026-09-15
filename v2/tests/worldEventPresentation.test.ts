@@ -35,11 +35,11 @@ assert.equal(Object.prototype.hasOwnProperty.call(result[6], 'animation'), false
 
 assert.equal(WORLD_EVENT_CARAVAN_VERSION, '0.1')
 assert.equal(WORLD_EVENT_CARAVAN_LIMIT, 2)
-const caravans = buildWorldEventCaravanPresentation(events)
+const caravans = buildWorldEventCaravanPresentation(result)
 assert.equal(caravans.length, WORLD_EVENT_CARAVAN_LIMIT)
 assert.deepEqual(caravans.map(item => item.channel), ['discipline', 'health'])
 assert.deepEqual(caravans.map(item => item.destination), ['mine-yard', 'workshop'])
-assert.deepEqual(buildWorldEventCaravanPresentation(events), caravans)
+assert.deepEqual(buildWorldEventCaravanPresentation(result), caravans)
 assert.equal(caravans.every(item => item.phaseOffset >= 0 && item.phaseOffset < 1), true)
 assert.equal(caravans.every(item => item.pace > 0), true)
 for (const caravan of caravans) {
@@ -49,12 +49,12 @@ for (const caravan of caravans) {
   assert.equal(Object.prototype.hasOwnProperty.call(caravan, 'xp'), false)
 }
 
-const semanticDestinations = buildWorldEventCaravanPresentation([
+const semanticDestinations = buildWorldEventCaravanPresentation(buildWorldEventPresentation([
   events[3],
   events[5],
-])
+]))
 assert.deepEqual(semanticDestinations.map(item => item.destination), ['storehouse', 'town-square'])
-const unknownCaravan = buildWorldEventCaravanPresentation([events[6]])[0]
+const unknownCaravan = buildWorldEventCaravanPresentation(buildWorldEventPresentation([events[6]]))[0]
 assert.equal(unknownCaravan.channel, 'generic')
 assert.equal(unknownCaravan.destination, 'settlement-gate')
 
