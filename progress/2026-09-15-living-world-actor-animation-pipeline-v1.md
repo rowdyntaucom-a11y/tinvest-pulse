@@ -30,7 +30,7 @@ It maps a reviewed animation clip plus choreography-local `actionProgress` to a 
 - reduced motion freezes on frame zero;
 - no wall-clock or financial input is used.
 
-### Reviewed actor art path
+### Reviewed actor art path already in the branch
 
 The animation pipeline is now explicitly staged as:
 
@@ -38,24 +38,21 @@ The animation pipeline is now explicitly staged as:
 
 The reviewed registry is intentionally empty. No temporary geometry has been promoted to production art.
 
-### Deferred Pixi sprite binding v1
+### Runtime binding
 
-`worldPixiRuntime.ts` now consumes the reviewed actor pipeline directly inside the already-deferred DNA runtime.
+The deferred Pixi runtime now consumes only successfully loaded reviewed role packs:
+- atlas image + JSON are loaded with the existing fail-closed per-role loader;
+- validated atlas frames become Pixi sub-textures only inside the lazy DNA runtime;
+- `idle / walk / carry / work` selection is driven by already-resolved choreography and `actionProgress`;
+- one missing or invalid role never disables the other roles;
+- missing/invalid/unavailable packs keep the procedural actor visible for that role;
+- reduced-motion selection freezes the reviewed sprite deterministically;
+- actor atlas requests are aborted with the world runtime;
+- created sub-textures are destroyed during runtime cleanup.
 
-Behavior:
-- local reviewed image + atlas JSON are loaded only from the validated actor registry;
-- atlas transport and document validation remain fail-closed per role;
-- successful packs are converted into shared Pixi texture frames;
-- each actor keeps the procedural figure as its fallback;
-- a reviewed sprite is created lazily only when a successfully loaded pack exists for that role;
-- choreography still decides `idle / walk / carry / work` and route position;
-- `actionProgress` plus the deterministic frame-playback boundary selects the atlas frame;
-- if a role pack is absent, fails loading, fails validation or cannot produce a frame, the procedural actor remains visible;
-- reduced motion freezes reviewed sprite playback on frame zero rather than changing world semantics;
-- loaded actor textures are destroyed on runtime teardown;
-- actor-atlas configured/loaded/failed counts are exposed as DOM diagnostics on `WorldStage`.
+`WorldStage` now exposes separate actor-asset diagnostics (`configured / loaded / failed`) in addition to environment-asset diagnostics. These are runtime diagnostics only and have no financial or XP meaning.
 
-Current visual behavior is intentionally unchanged because `REVIEWED_WORLD_ACTOR_ATLAS_ENTRIES` is still empty. The runtime path is production-ready for reviewed packs without silently approving placeholder art.
+Because `REVIEWED_WORLD_ACTOR_ATLAS_ENTRIES` remains intentionally empty, this infrastructure does not silently change current production visuals. A real visual replacement still requires a reviewed role pack.
 
 ## Regression
 
@@ -66,44 +63,29 @@ Updated/added tests lock:
 - looping/non-looping frame selection;
 - terminal one-shot frame behavior;
 - reduced-motion freezing;
-- malformed frame-count fallback;
-- strict actor manifest/document loading contracts already present in the branch.
+- malformed frame-count fallback.
 
 The tests are registered in `test:core`.
 
 ## Verification
 
-CI **#610** on head `b9b2f4c80910bd98041bcea501f76d37b984404f`: fully green for the choreography/frame-playback pass.
+CI **#610** on head `b9b2f4c80910bd98041bcea501f76d37b984404f`: **fully green** for the pure frame-playback layer.
 
-CI **#613** exposed one TypeScript-only integration defect: the Pixi runtime imported the actor action type from the atlas manifest although that type originated in choreography. The contract now explicitly re-exports the type; no runtime semantics changed.
+Runtime binding then exposed one TypeScript import-contract mismatch during CI #613. The fix re-exported the shared actor action type through the atlas manifest boundary rather than weakening compiler settings.
 
-CI **#614** on head `74cacc434c02d366bd97dbde13ead86c7dc1018e`: **fully green** after the reviewed-sprite runtime binding.
+CI **#614** on head `74cacc434c02d366bd97dbde13ead86c7dc1018e`: **fully green** with reviewed-sprite runtime binding enabled.
 
 Passed:
 - dependency security gates;
 - TypeScript + Vite production build;
-- full `test:core`, including all Living World actor/atlas/frame regressions;
+- full `test:core`, including actor animation/atlas regressions;
 - Living World runtime-state regression;
 - asset-history regression;
 - payout/server/production syntax checks;
 - production API regressions.
 
-Bundle observation from #614:
-- normal app chunk: ~456.26 KiB raw / 138.31 KiB gzip;
-- deferred `worldPixiRuntime`: ~20.88 KiB raw / 7.70 KiB gzip;
-- deferred Pixi vendor chunk: ~497.56 KiB raw / 142.13 KiB gzip.
-
-The Living World growth stays behind the deferred DNA boundary. No bundle/security/test threshold was changed.
-
-## Still intentionally gated
-
-- actual reviewed production character images/atlases;
-- final visual frame timing and per-role anchor/scale polish;
-- environment production art replacement;
-- long-term XP/economy thresholds;
-- persistent multi-user world storage;
-- sound design.
+No bundle/security/test threshold was weakened. Reviewed art remains gated.
 
 ## Next safe step
 
-The code path from reviewed role pack to live Pixi sprite now exists. The next meaningful visual step is to produce and visually review the first real production actor pack (one role first, preferably miner/hauler), package it under `/assets/world`, add it to the reviewed registry, and validate the result on Samsung before expanding to the remaining roles.
+Add only visually approved role atlases to `REVIEWED_WORLD_ACTOR_ATLAS_ENTRIES`, one role at a time, then perform Samsung visual/performance QA. Procedural fallback must remain per-role until every pack is explicitly reviewed.
