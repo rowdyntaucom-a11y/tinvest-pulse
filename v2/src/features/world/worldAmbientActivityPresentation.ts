@@ -55,6 +55,13 @@ const PHASE_ACTIVITY: Record<WorldRenderSnapshot['timePhase'], number> = {
   night: 0.54,
 }
 
+const PHASE_ROLE_PACE: Record<WorldRenderSnapshot['timePhase'], Record<WorldAmbientActorRole, number>> = {
+  dawn: { miner: 0.9, hauler: 0.9, builder: 0.9, keeper: 0.96, resident: 0.76 },
+  day: { miner: 1, hauler: 1, builder: 1, keeper: 0.94, resident: 0.88 },
+  sunset: { miner: 0.8, hauler: 0.8, builder: 0.8, keeper: 1.02, resident: 1.14 },
+  night: { miner: 0.58, hauler: 0.58, builder: 0.58, keeper: 0.92, resident: 0.74 },
+}
+
 const WEATHER_ACTIVITY: Record<WorldRenderSnapshot['weather'], number> = {
   neutral: 1,
   clear: 1,
@@ -68,11 +75,31 @@ function safeLevel(level: number) {
   return Math.max(1, Math.min(99, Math.floor(level)))
 }
 
+function phaseAdjustedActor(actor: WorldAmbientActorPlan, timePhase: WorldRenderSnapshot['timePhase']): WorldAmbientActorPlan {
+  const roleMultiplier = PHASE_ROLE_PACE[timePhase][actor.role]
+  return {
+    ...actor,
+    pace: actor.pace * roleMultiplier,
+  }
+}
+
+function visibleCartCount(level: number, timePhase: WorldRenderSnapshot['timePhase'], weather: WorldRenderSnapshot['weather']) {
+  const baseCount = level >= 7 ? 2 : level >= 2 ? 1 : 0
+  if (baseCount === 0) return 0
+  if (timePhase === 'night' || weather === 'storm') return Math.min(1, baseCount)
+  return baseCount
+}
+
 /**
  * Converts only already-resolved Living World state into restrained ambient motion.
  * `neutral` is deliberately equivalent to ordinary activity: it does not imply clear
  * weather or any other invented condition. Explicit rain/storm may slow movement,
  * but they never change portfolio/DNA progression or create financial meaning.
+ *
+ * Time-of-day rhythm is presentation-only. It changes the cadence of existing actor
+ * loops so the settlement feels different at dawn/day/sunset/night while preserving
+ * the same inhabitants, routes and semantic work-chain. It does not model working
+ * hours, production capacity, inventory or any financial outcome.
  */
 export function buildWorldAmbientActivityPresentation(
   snapshot: Pick<WorldRenderSnapshot, 'level' | 'timePhase' | 'weather'>,
@@ -85,7 +112,7 @@ export function buildWorldAmbientActivityPresentation(
     activityScale,
     actors: WORLD_AMBIENT_ACTOR_SLOTS
       .filter(actor => actor.minLevel <= level)
-      .map(actor => ({ ...actor })),
-    cartCount: level >= 7 ? 2 : level >= 2 ? 1 : 0,
+      .map(actor => phaseAdjustedActor(actor, snapshot.timePhase)),
+    cartCount: visibleCartCount(level, snapshot.timePhase, snapshot.weather),
   }
 }
