@@ -1,6 +1,12 @@
-import type { WorldAmbientActorPlan } from './worldAmbientActivityPresentation'
+import type { WorldAmbientActorPlan, WorldAmbientActorRole } from './worldAmbientActivityPresentation'
 
 export const WORLD_AMBIENT_ACTOR_CHOREOGRAPHY_VERSION = '0.1' as const
+export const WORLD_PRIMARY_WORK_CHAIN_PACE = 0.62 as const
+export const WORLD_PRIMARY_WORK_CHAIN_PHASE: Readonly<Record<'miner' | 'hauler' | 'builder', number>> = {
+  miner: 0.04,
+  hauler: 0.18,
+  builder: 0.5,
+}
 
 export type WorldAmbientActorAction = 'idle' | 'walk' | 'carry' | 'work'
 
@@ -21,6 +27,14 @@ const wrap01 = (value: number) => {
 const segmentProgress = (value: number, start: number, end: number) => {
   if (end <= start) return 0
   return Math.max(0, Math.min(1, (value - start) / (end - start)))
+}
+
+export function resolveWorldPrimaryWorkChainTiming(role: WorldAmbientActorRole) {
+  if (role !== 'miner' && role !== 'hauler' && role !== 'builder') return null
+  return {
+    phaseOffset: WORLD_PRIMARY_WORK_CHAIN_PHASE[role],
+    pace: WORLD_PRIMARY_WORK_CHAIN_PACE,
+  }
 }
 
 /**
