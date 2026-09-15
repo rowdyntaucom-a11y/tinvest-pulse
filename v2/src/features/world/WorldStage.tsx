@@ -3,6 +3,12 @@ import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
 import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import {
+  WORLD_AMBIENT_ACTOR_SLOTS,
+  buildWorldAmbientActivityPresentation,
+  type WorldAmbientActorRole,
+  type WorldAmbientActorRoute,
+} from './worldAmbientActivityPresentation'
 import { buildWorldAtmospherePresentation } from './worldAtmospherePresentation'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from './worldAssetLoader'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
@@ -24,6 +30,11 @@ type AssetRuntimeState = {
   configured: number
   loaded: number
   failed: number
+}
+
+type AmbientRoute = {
+  from: readonly [number, number]
+  to: readonly [number, number]
 }
 
 const WORLD_WIDTH = 1600
@@ -48,6 +59,39 @@ const RAIN_COLUMNS = [
   [625, 205], [700, 115], [780, 280], [855, 175], [930, 345], [1010, 235], [1085, 145], [1160, 300],
   [1240, 195], [1320, 115], [1395, 265], [1470, 170], [1540, 315],
 ] as const
+
+const AMBIENT_ROUTES: Record<WorldAmbientActorRoute, AmbientRoute> = {
+  'mine-loop': { from: [125, 662], to: [356, 646] },
+  'haul-loop': { from: [330, 677], to: [1115, 668] },
+  'build-loop': { from: [720, 650], to: [1040, 620] },
+  'yard-loop': { from: [500, 660], to: [770, 642] },
+  'resident-loop': { from: [1080, 654], to: [1450, 628] },
+}
+
+const ACTOR_ROLE_COLORS: Record<WorldAmbientActorRole, number> = {
+  miner: 0xd7bd73,
+  hauler: 0x9db6bd,
+  builder: 0xc98d66,
+  keeper: 0x7ca58f,
+  resident: 0x9b8db5,
+}
+
+function loopTravel(progress: number) {
+  const wrapped = ((progress % 1) + 1) % 1
+  const forward = wrapped < 0.5
+  const t = forward ? wrapped * 2 : (1 - wrapped) * 2
+  return { t, direction: forward ? 1 : -1 }
+}
+
+function ambientRoutePoint(routeName: WorldAmbientActorRoute, progress: number) {
+  const route = AMBIENT_ROUTES[routeName]
+  const travel = loopTravel(progress)
+  return {
+    x: route.from[0] + (route.to[0] - route.from[0]) * travel.t,
+    y: route.from[1] + (route.to[1] - route.from[1]) * travel.t,
+    direction: travel.direction,
+  }
+}
 
 function preloadBrowserImage(assetPath: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -76,6 +120,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   })
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
+  const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
 
   if (!ownerIdRef.current) {
     worldStageSequence += 1
@@ -199,9 +244,39 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       development.label = 'asset-slot:structures.construction'
       layer('structures').addChild(development)
 
+      const actorViews = new Map<string, InstanceType<typeof Container>>()
+      for (const plan of WORLD_AMBIENT_ACTOR_SLOTS) {
+        const actor = new Container()
+        actor.label = `world:fallback-actor:${plan.id}`
+        actor.visible = false
+
+        const silhouette = new Graphics()
+        const tone = ACTOR_ROLE_COLORS[plan.role]
+        silhouette.circle(0, -19, 5.5).fill({ color: tone, alpha: 0.96 })
+        silhouette.rect(-5.5, -13, 11, 16).fill({ color: tone, alpha: 0.9 })
+        silhouette.rect(-5.5, 3, 3.6, 10).fill({ color: tone, alpha: 0.82 })
+        silhouette.rect(1.9, 3, 3.6, 10).fill({ color: tone, alpha: 0.82 })
+        actor.addChild(silhouette)
+        layer('actors').addChild(actor)
+        actorViews.set(plan.id, actor)
+      }
+
       const rails = new Graphics()
       rails.label = 'asset-slot:logistics.rails'
       layer('logistics').addChild(rails)
+
+      const cartViews = [0, 1].map(index => {
+        const cart = new Container()
+        cart.label = `world:fallback-cart:${index + 1}`
+        cart.visible = false
+        const cartShape = new Graphics()
+        cartShape.poly([-18, -10, 18, -10, 13, 7, -13, 7]).fill({ color: 0x62736f, alpha: 0.94 })
+        cartShape.circle(-10, 11, 4).fill({ color: 0x1f2b28, alpha: 1 })
+        cartShape.circle(10, 11, 4).fill({ color: 0x1f2b28, alpha: 1 })
+        cart.addChild(cartShape)
+        layer('logistics').addChild(cart)
+        return cart
+      })
 
       const lampGlow = new Graphics().circle(0, 0, 34).fill({ color: 0x66ffe2, alpha: 0.08 })
       lampGlow.label = 'world:work-light-glow'
@@ -349,12 +424,28 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         }
       }
 
+      let activitySignature = ''
+      let activeActivity = buildWorldAmbientActivityPresentation(snapshotRef.current)
+      const renderActivityState = (current: WorldRenderSnapshot) => {
+        const signature = `${current.level}:${current.timePhase}:${current.weather}`
+        if (signature === activitySignature) return
+        activitySignature = signature
+        activeActivity = buildWorldAmbientActivityPresentation(current)
+        const activeIds = new Set(activeActivity.actors.map(actor => actor.id))
+        for (const slot of WORLD_AMBIENT_ACTOR_SLOTS) {
+          const view = actorViews.get(slot.id)
+          if (view) view.visible = activeIds.has(slot.id)
+        }
+        cartViews.forEach((view, index) => { view.visible = index < activeActivity.cartCount })
+      }
+
       next.ticker.maxFPS = reduceMotion ? 30 : window.innerWidth < 900 ? 45 : 60
       next.ticker.minFPS = 20
       next.ticker.add(() => {
         const current = snapshotRef.current
         renderAtmosphere(current)
         renderDevelopment(current)
+        renderActivityState(current)
 
         const now = performance.now()
         if (reduceMotion) {
@@ -363,6 +454,20 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           clouds.position.x = 0
           rain.position.y = 0
           stormFlash.alpha = 0
+
+          for (const plan of activeActivity.actors) {
+            const view = actorViews.get(plan.id)
+            if (!view) continue
+            const point = ambientRoutePoint(plan.route, plan.phaseOffset)
+            view.position.set(point.x, point.y)
+            view.scale.set(plan.scale, plan.scale)
+            view.alpha = 0.9
+          }
+          cartViews.forEach((view, index) => {
+            if (!view.visible) return
+            view.position.set(460 + index * 620, 696)
+            view.scale.set(1, 1)
+          })
           return
         }
 
@@ -370,6 +475,24 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         lampGlow.alpha = 0.65 + Math.sin(now / 720) * 0.18
         clouds.position.x = Math.sin(now / 9000) * 9
         rain.position.y = activeAtmosphere.rainAlpha > 0 ? (now / 22) % 24 : 0
+
+        for (const plan of activeActivity.actors) {
+          const view = actorViews.get(plan.id)
+          if (!view) continue
+          const progress = plan.phaseOffset + (now / 12000) * plan.pace * activeActivity.activityScale
+          const point = ambientRoutePoint(plan.route, progress)
+          const bob = Math.sin(now / 260 + plan.phaseOffset * Math.PI * 2) * 1.8
+          view.position.set(point.x, point.y + bob)
+          view.scale.set(plan.scale * point.direction, plan.scale)
+          view.alpha = 0.82 + Math.sin(now / 900 + plan.phaseOffset * 5) * 0.08
+        }
+
+        cartViews.forEach((view, index) => {
+          if (!view.visible) return
+          const travel = loopTravel(index * 0.5 + (now / 18500) * (0.7 + activeActivity.activityScale * 0.45))
+          view.position.set(280 + 1120 * travel.t, 696)
+          view.scale.set(travel.direction, 1)
+        })
 
         if (activeAtmosphere.stormFlashAlpha > 0) {
           const flashCycle = now % 7600
@@ -438,6 +561,9 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-assets-configured={assetRuntime.configured}
       data-world-assets-loaded={assetRuntime.loaded}
       data-world-assets-failed={assetRuntime.failed}
+      data-world-activity-version={ambientPresentation.version}
+      data-world-actors={ambientPresentation.actors.length}
+      data-world-carts={ambientPresentation.cartCount}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
