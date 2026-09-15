@@ -1,11 +1,10 @@
 import assert from 'node:assert/strict'
+import { resolveWorldAmbientActorChoreography } from '../src/features/world/worldAmbientActorChoreography.ts'
 import {
   WORLD_PRIMARY_WORK_CHAIN_PACE,
   WORLD_PRIMARY_WORK_CHAIN_PHASE,
-  resolveWorldAmbientActorChoreography,
-  resolveWorldPrimaryWorkChainTiming,
-} from '../src/features/world/worldAmbientActorChoreography.ts'
-import { buildWorldAmbientActivityPresentation } from '../src/features/world/worldAmbientActivityPresentation.ts'
+  buildWorldAmbientActivityPresentation,
+} from '../src/features/world/worldAmbientActivityPresentation.ts'
 
 const snapshot = {
   level: 2,
@@ -27,12 +26,6 @@ assert.equal(builder.pace, WORLD_PRIMARY_WORK_CHAIN_PACE)
 assert.equal(miner.phaseOffset, WORLD_PRIMARY_WORK_CHAIN_PHASE.miner)
 assert.equal(hauler.phaseOffset, WORLD_PRIMARY_WORK_CHAIN_PHASE.hauler)
 assert.equal(builder.phaseOffset, WORLD_PRIMARY_WORK_CHAIN_PHASE.builder)
-
-assert.deepEqual(resolveWorldPrimaryWorkChainTiming('miner'), {
-  phaseOffset: WORLD_PRIMARY_WORK_CHAIN_PHASE.miner,
-  pace: WORLD_PRIMARY_WORK_CHAIN_PACE,
-})
-assert.equal(resolveWorldPrimaryWorkChainTiming('resident'), null)
 
 const minerPose = resolveWorldAmbientActorChoreography({ actor: miner, phase: miner.phaseOffset })
 const haulerPose = resolveWorldAmbientActorChoreography({ actor: hauler, phase: hauler.phaseOffset })
