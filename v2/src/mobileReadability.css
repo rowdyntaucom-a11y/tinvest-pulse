@@ -34,6 +34,12 @@
   .world-stage__diagnostic { font-size: 7.1px; line-height: 1.2; }
   .dna-next p { font-size: 7.2px; }
 
+  /* Device-QA: Board context rail must expose status text instead of clipping it into fragments. */
+  .qv-board__rail article { padding: 7px 8px; }
+  .qv-board__rail span { font-size: 6.4px; line-height: 1.15; letter-spacing: .055em; }
+  .qv-board__rail strong { font-size: 7.6px; line-height: 1.15; white-space: normal; overflow: visible; text-overflow: clip; }
+  .qv-board__rail small { font-size: 6.4px; line-height: 1.18; white-space: normal; overflow: visible; text-overflow: clip; }
+
   /* Raise low-contrast supporting copy without touching semantic mint/amber states. */
   .metric-card small,
   .context-card span,
