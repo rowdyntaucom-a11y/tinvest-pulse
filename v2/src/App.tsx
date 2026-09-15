@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { QvanixBoard } from './features/board/QvanixBoard'
 import { WorldSessionStage } from './features/world/WorldSessionStage'
 import { useWorldPhaseClock } from './features/world/useWorldPhaseClock'
@@ -13,7 +13,6 @@ import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
 import { RiskWorkspace } from './features/analytics/RiskWorkspace'
 import { annualReturnRatioToPercent } from './features/analytics/returnUnits'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
-import { GoalWorkspace } from './features/goals/GoalWorkspace'
 import { KeyRateWidget } from './features/macro/KeyRateWidget'
 import { PersonalizationControl } from './features/settings/PersonalizationControl'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
@@ -25,6 +24,8 @@ import {
   type UiPreferences,
   type UiWorkspace,
 } from './lib/uiPreferences'
+
+const GoalWorkspace = lazy(() => import('./features/goals/GoalWorkspace').then(module => ({ default: module.GoalWorkspace })))
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
@@ -263,7 +264,15 @@ export default function App() {
 
         {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} />}
 
-        {tab === 'goals' && <GoalWorkspace currentCapital={snapshot.value} />}
+        {tab === 'goals' && (
+          <Suspense fallback={(
+            <section className="panel">
+              <div className="panel-head"><div><span className="eyebrow">QVANIX GOAL</span><h2>ЦЕЛЬ</h2></div><small>загрузка сценария</small></div>
+            </section>
+          )}>
+            <GoalWorkspace currentCapital={snapshot.value} />
+          </Suspense>
+        )}
 
         {tab === 'dna' && (
           <div className="dna-layout">
