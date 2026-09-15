@@ -52,12 +52,12 @@ function isIsoTimestamp(value: string) {
   return Number.isFinite(parsed) && new Date(parsed).toISOString() === value
 }
 
-function positiveInteger(value: unknown, max: number) {
-  return typeof value === 'number' && Number.isInteger(value) && value > 0 && value <= max
+function positiveInteger(value: number, max: number) {
+  return Number.isInteger(value) && value > 0 && value <= max
 }
 
-function positiveFinite(value: unknown, max: number) {
-  return typeof value === 'number' && Number.isFinite(value) && value > 0 && value <= max
+function positiveFinite(value: number, max: number) {
+  return Number.isFinite(value) && value > 0 && value <= max
 }
 
 function normalizeAnimations(value: unknown): readonly WorldActorAnimationClipSpec[] | null {
@@ -68,7 +68,10 @@ function normalizeAnimations(value: unknown): readonly WorldActorAnimationClipSp
     if (!candidate || typeof candidate !== 'object') return null
     const clip = candidate as Partial<WorldActorAnimationClipSpec>
     if (typeof clip.action !== 'string' || !ACTION_SET.has(clip.action) || clips.has(clip.action as WorldActorAction)) return null
-    if (!positiveInteger(clip.frameCount, 48) || !positiveFinite(clip.fps, 30) || typeof clip.loop !== 'boolean') return null
+    if (typeof clip.frameCount !== 'number' || !positiveInteger(clip.frameCount, 48)) return null
+    if (typeof clip.fps !== 'number' || !positiveFinite(clip.fps, 30)) return null
+    if (typeof clip.loop !== 'boolean') return null
+
     clips.set(clip.action as WorldActorAction, {
       action: clip.action as WorldActorAction,
       frameCount: clip.frameCount,
@@ -90,7 +93,8 @@ function normalizeEntry(value: unknown): WorldActorAtlasManifestEntry | null {
   if (typeof candidate.role !== 'string' || !ROLE_SET.has(candidate.role)) return null
   if (typeof candidate.imagePath !== 'string' || hasUnsafePathSegment(candidate.imagePath) || !LOCAL_WORLD_IMAGE.test(candidate.imagePath)) return null
   if (typeof candidate.atlasPath !== 'string' || hasUnsafePathSegment(candidate.atlasPath) || !LOCAL_WORLD_ATLAS.test(candidate.atlasPath)) return null
-  if (!positiveInteger(candidate.frameWidth, 1024) || !positiveInteger(candidate.frameHeight, 1024)) return null
+  if (typeof candidate.frameWidth !== 'number' || !positiveInteger(candidate.frameWidth, 1024)) return null
+  if (typeof candidate.frameHeight !== 'number' || !positiveInteger(candidate.frameHeight, 1024)) return null
 
   const animations = normalizeAnimations(candidate.animations)
   if (!animations) return null
