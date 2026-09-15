@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { buildWorldState } from '../src/features/dna/worldState.ts'
 import { emptyWorldEventCursor, resolveWorldEventQueue } from '../src/features/dna/worldEventQueue.ts'
 import { WORLD_RENDER_SNAPSHOT_VERSION, buildWorldRenderSnapshot } from '../src/features/dna/worldRenderSnapshot.ts'
+import { WORLD_ATMOSPHERE_PRESENTATION_VERSION, buildWorldAtmospherePresentation } from '../src/features/world/worldAtmospherePresentation.ts'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from '../src/features/world/worldAssetLoader.ts'
 import { WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_MANIFEST_VERSION, resolveWorldAssetManifest, worldAssetFromManifest } from '../src/features/world/worldAssetManifest.ts'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION, worldAssetSlot, worldAssetSlotsForLayer } from '../src/features/world/worldAssetSlots.ts'
@@ -21,6 +22,39 @@ assert.deepEqual(WORLD_SCENE_LAYER_ORDER, [
 assert.equal(new Set(WORLD_SCENE_LAYER_ORDER).size, WORLD_SCENE_LAYER_ORDER.length)
 assert.equal(worldSceneLayerIndex('background'), 0)
 assert.equal(worldSceneLayerIndex('effects'), WORLD_SCENE_LAYER_ORDER.length - 1)
+
+assert.equal(WORLD_ATMOSPHERE_PRESENTATION_VERSION, '0.1')
+const neutralNight = buildWorldAtmospherePresentation({ timePhase: 'night', weather: 'neutral' })
+const clearDay = buildWorldAtmospherePresentation({ timePhase: 'day', weather: 'clear' })
+const rainDay = buildWorldAtmospherePresentation({ timePhase: 'day', weather: 'rain' })
+const stormNight = buildWorldAtmospherePresentation({ timePhase: 'night', weather: 'storm' })
+assert.equal(neutralNight.cloudAlpha, 0)
+assert.equal(neutralNight.rainAlpha, 0)
+assert.equal(neutralNight.stormFlashAlpha, 0)
+assert.equal(clearDay.rainAlpha, 0)
+assert.equal(clearDay.stormFlashAlpha, 0)
+assert.equal(clearDay.starAlpha, 0)
+assert.equal(neutralNight.starAlpha > clearDay.starAlpha, true)
+assert.equal(rainDay.rainAlpha > 0, true)
+assert.equal(rainDay.stormFlashAlpha, 0)
+assert.equal(stormNight.rainAlpha > rainDay.rainAlpha, true)
+assert.equal(stormNight.stormFlashAlpha > 0, true)
+assert.equal(stormNight.celestialAlpha < neutralNight.celestialAlpha, true)
+for (const phase of ['dawn', 'day', 'sunset', 'night'] as const) {
+  for (const weather of ['neutral', 'clear', 'cloudy', 'rain', 'storm'] as const) {
+    const atmosphere = buildWorldAtmospherePresentation({ timePhase: phase, weather })
+    for (const alpha of [
+      atmosphere.celestialAlpha,
+      atmosphere.starAlpha,
+      atmosphere.hazeAlpha,
+      atmosphere.cloudAlpha,
+      atmosphere.rainAlpha,
+      atmosphere.stormFlashAlpha,
+    ]) {
+      assert.equal(alpha >= 0 && alpha <= 1, true)
+    }
+  }
+}
 
 assert.equal(WORLD_ASSET_SLOT_VERSION, '0.1')
 assert.equal(new Set(WORLD_ASSET_SLOTS.map(slot => slot.id)).size, WORLD_ASSET_SLOTS.length)
