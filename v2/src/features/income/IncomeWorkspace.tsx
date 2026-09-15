@@ -13,6 +13,9 @@ import { buildIncomeCalendarVisual, filterIncomeCalendarEvents } from './incomeC
 import { findPayoutEventPosition, payoutEventIsConfirmed } from './incomeCalendarEventView'
 import { IncomeGoalCompact } from './IncomeGoalCompact'
 import './income.css'
+import { SectionSelector } from '../navigation/SectionSelector'
+import { INCOME_SECTIONS } from '../navigation/navigationModel'
+import { ContextHelpTerm } from '../help/ContextHelpTerm'
 import './incomeCompact.css'
 import './incomeCalendarVisual.css'
 
@@ -185,15 +188,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
   return (
     <div className="income-workspace">
-      <nav className="income-subnav" aria-label="Доход">
-        <button className={view === 'overview' ? 'is-active' : ''} onClick={() => setView('overview')}>ОБЗОР</button>
-        <button className={view === 'calendar' ? 'is-active' : ''} onClick={() => setView('calendar')}>КАЛЕНДАРЬ</button>
-        <button className={view === 'sources' ? 'is-active' : ''} onClick={() => setView('sources')}>ИСТОЧНИКИ</button>
-        <button className={view === 'taxes' ? 'is-active' : ''} onClick={() => setView('taxes')}>НАЛОГИ</button>
-        <span className={`income-source-badge is-${integrity.state}`} title={integrity.detail}>
-          {integrity.label}
-        </span>
-      </nav>
+      <SectionSelector workspace="Доход" value={view} groups={INCOME_SECTIONS} onChange={setView} aside={<span className={`income-source-badge is-${integrity.state}`} title={integrity.detail}>{integrity.label}</span>} />
 
       {view === 'overview' && (
         <div className="income-overview-grid">
@@ -212,7 +207,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             <small>до налога · только выплаты из расписания текущих позиций</small>
             <div className="forecast-meta">
               <span>{data.forecast.count || 0} выплат</span>
-              <span>покрытие {coverage == null ? '—' : `${pct.format(coverage)}%`}</span>
+              <span>покрытие выплат <ContextHelpTerm topic="payoutCoverage" /> {coverage == null ? '—' : `${pct.format(coverage)}%`}</span>
             </div>
           </section>
 
