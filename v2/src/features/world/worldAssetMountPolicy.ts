@@ -1,6 +1,6 @@
 import type { WorldAssetLoadFailure, WorldAssetLoadResult } from './worldAssetLoader.ts'
 import type { ResolvedWorldAssetManifest, WorldAssetSlotId } from './worldAssetManifest.ts'
-import { resolveWorldAssetReadiness } from './worldAssetReadiness.ts'
+import type { WorldAssetReadiness } from './worldAssetReadiness.ts'
 
 export const WORLD_ASSET_MOUNT_POLICY_VERSION = '0.1' as const
 
@@ -19,20 +19,21 @@ function loadFailureForSlot(failures: readonly WorldAssetLoadFailure[], slotId: 
 /**
  * Pure fail-closed activation policy for one Living World asset slot.
  *
- * The renderer is not allowed to infer trust from a path or from a successful
- * browser image load alone. The canonical manifest must accept the requested
- * slot with zero rejections, and the loader must have produced a value for the
- * exact same slot. Otherwise the existing procedural scene remains owner.
+ * Readiness is resolved by the canonical readiness boundary and passed in as a
+ * typed value so this policy remains runtime-import free under both Vite/tsc
+ * and Node strip-types regression execution.
  */
 export function resolveWorldAssetMountDecision<T>(
   manifest: ResolvedWorldAssetManifest,
+  readiness: WorldAssetReadiness,
   loadResult: WorldAssetLoadResult<T>,
   slotId: WorldAssetSlotId,
 ): WorldAssetMountDecision {
-  const readiness = resolveWorldAssetReadiness(manifest, [slotId])
   const entry = manifest.entries.get(slotId) ?? null
+  const reviewedForSlot = readiness.reviewedSlots.includes(slotId)
+  const fallbackForSlot = readiness.proceduralFallbackSlots.includes(slotId)
 
-  if (!readiness.productionArtReady || !entry) {
+  if (!readiness.productionArtReady || !reviewedForSlot || fallbackForSlot || !entry) {
     return {
       version: WORLD_ASSET_MOUNT_POLICY_VERSION,
       slotId,
