@@ -1,16 +1,25 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { REVIEWED_WORLD_ASSET_MANIFEST } from '../src/features/world/worldReviewedAssets.ts'
+import { resolveWorldAssetManifest } from '../src/features/world/worldAssetManifest.ts'
 import { resolveWorldAssetReadiness } from '../src/features/world/worldAssetReadiness.ts'
 
-const entry = REVIEWED_WORLD_ASSET_MANIFEST.entries.get('terrain.ground')
-assert.ok(entry)
-assert.equal(entry.assetPath, '/assets/world/terrain-ground-v1.svg')
-assert.equal(entry.provenance.source, 'reviewed-local')
-assert.equal(entry.provenance.reviewedAt, '2026-09-15T18:20:00.000Z')
-assert.equal(REVIEWED_WORLD_ASSET_MANIFEST.rejectedCount, 0)
+const reviewedSource = readFileSync(new URL('../src/features/world/worldReviewedAssets.ts', import.meta.url), 'utf8')
+assert.match(reviewedSource, /slotId:\s*'terrain\.ground'/)
+assert.match(reviewedSource, /assetPath:\s*'\/assets\/world\/terrain-ground-v1\.svg'/)
+assert.match(reviewedSource, /source:\s*'reviewed-local'/)
+assert.match(reviewedSource, /reviewedAt:\s*'2026-09-15T18:20:00\.000Z'/)
 
-const readiness = resolveWorldAssetReadiness(REVIEWED_WORLD_ASSET_MANIFEST, ['terrain.ground'])
+const manifest = resolveWorldAssetManifest([
+  {
+    slotId: 'terrain.ground',
+    assetPath: '/assets/world/terrain-ground-v1.svg',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-15T18:20:00.000Z' },
+  },
+])
+assert.equal(manifest.rejectedCount, 0)
+assert.equal(manifest.entries.get('terrain.ground')?.assetPath, '/assets/world/terrain-ground-v1.svg')
+
+const readiness = resolveWorldAssetReadiness(manifest, ['terrain.ground'])
 assert.deepEqual(readiness.reviewedSlots, ['terrain.ground'])
 assert.deepEqual(readiness.proceduralFallbackSlots, [])
 assert.equal(readiness.productionArtReady, true)
