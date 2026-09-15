@@ -3,6 +3,8 @@ import type { HistoryPoint } from '../../lib/portfolioApi'
 import { loadTransactionMarkers, type TransactionMarkerPayload } from './transactionMarkerApi'
 import { buildTransactionMarkerPresentation } from './transactionMarkerPresentation'
 import './transactionMarkers.css'
+import { MetricDetailButton, MetricDrilldown } from '../metrics/MetricDrilldown'
+import type { MetricDetailModel } from '../metrics/metricRegistry'
 
 type Props = { points: HistoryPoint[] }
 type HistoryPeriod = '1m' | '3m' | '6m' | '1y' | 'all'
@@ -137,6 +139,7 @@ export function HistoryChart({ points }: Props) {
   const [markerPayload, setMarkerPayload] = useState<TransactionMarkerPayload | null>(null)
   const [period, setPeriod] = useState<HistoryPeriod>('all')
   const [view, setView] = useState<HistoryView>('compare')
+  const [metricDetail, setMetricDetail] = useState<MetricDetailModel | null>(null)
   const allChartPoints = useMemo(
     () => points.filter(p => p.portfolio != null || p.imoex != null),
     [points],
@@ -195,6 +198,7 @@ export function HistoryChart({ points }: Props) {
   const spreadSegments = effectiveView === 'compare' ? buildSpreadSegments(portfolioValues, imoexValues, min, max) : []
   const benchmarkCoverage = portfolioCount ? Math.round((imoexCount / portfolioCount) * 100) : 0
   const pairedLatest = latestPairedPoint(chartPoints)
+  const pairedCount = chartPoints.filter(point => typeof point.portfolio === 'number' && Number.isFinite(point.portfolio) && typeof point.imoex === 'number' && Number.isFinite(point.imoex)).length
   const portfolioLatest = latestPortfolioPoint(chartPoints)
   const first = chartPoints[0]?.date
   const last = chartPoints.at(-1)?.date
@@ -250,6 +254,7 @@ export function HistoryChart({ points }: Props) {
           <small>Сравнение нормализованных индексов на одной дате; это не альфа и не прогноз.</small>
         </div>
       )}
+      <MetricDetailButton label="Сравнение портфеля с IMOEX" onClick={() => void import('../metrics/metricRegistry').then(({ buildImoexDetail }) => setMetricDetail(buildImoexDetail({ spread: pairedLatest?.spread ?? null, paired: pairedCount, portfolioPoints: portfolioCount, lastDate: pairedLatest?.date ?? null, period: `${first} → ${last}` })))} />
       <svg
         key={`history-chart-${period}-${effectiveView}`}
         viewBox={`0 0 ${W} ${H}`}
@@ -283,6 +288,7 @@ export function HistoryChart({ points }: Props) {
           {first} → {last}{markerPresentation.eventDays.length ? ` · сделки ${markerPresentation.visibleEventDays.length}/${markerPresentation.eventDays.length} дн. · B${markerPresentation.totalBuys}/S${markerPresentation.totalSells}` : ''}
         </small>
       </div>
+      <MetricDrilldown model={metricDetail} onClose={() => setMetricDetail(null)} />
     </div>
   )
 }

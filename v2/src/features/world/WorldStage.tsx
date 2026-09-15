@@ -3,6 +3,7 @@ import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../dna/worldState'
 import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDocument } from '../dna/worldEventQueue'
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import { buildWorldAtmospherePresentation } from './worldAtmospherePresentation'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from './worldAssetLoader'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
 import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
@@ -25,8 +26,28 @@ type AssetRuntimeState = {
   failed: number
 }
 
+const WORLD_WIDTH = 1600
+const WORLD_HEIGHT = 900
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 let worldStageSequence = 0
+
+const STAR_POINTS = [
+  [92, 104, 1.4], [156, 174, 1.1], [232, 86, 1.7], [318, 151, 1.2], [392, 70, 1.1],
+  [474, 202, 1.5], [548, 121, 1.1], [636, 73, 1.6], [705, 164, 1.2], [782, 96, 1.1],
+  [864, 184, 1.5], [936, 65, 1.1], [1012, 136, 1.7], [1094, 91, 1.2], [1172, 154, 1.1],
+  [1352, 111, 1.6], [1438, 184, 1.1], [1510, 76, 1.4], [128, 272, 1.1], [356, 252, 1.3],
+  [612, 286, 1.1], [842, 246, 1.2], [1075, 262, 1.1], [1450, 286, 1.3],
+] as const
+
+const CLOUD_CLUSTERS = [
+  [170, 205, 72], [260, 192, 58], [620, 158, 82], [720, 177, 66], [1010, 220, 92], [1120, 198, 70], [1390, 150, 82],
+] as const
+
+const RAIN_COLUMNS = [
+  [90, 110], [145, 220], [205, 150], [270, 310], [335, 185], [405, 255], [480, 125], [550, 330],
+  [625, 205], [700, 115], [780, 280], [855, 175], [930, 345], [1010, 235], [1085, 145], [1160, 300],
+  [1240, 195], [1320, 115], [1395, 265], [1470, 170], [1540, 315],
+] as const
 
 function preloadBrowserImage(assetPath: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -87,6 +108,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       if (disposed) return
 
       const resolution = clamp(window.devicePixelRatio || 1, 1, window.innerWidth < 900 ? 1.35 : 1.75)
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
       const next = new Application()
       await next.init({
         resizeTo: host,
@@ -125,17 +147,51 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         return resolved
       }
 
-      const sky = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0x081d2a })
+      const sky = new Graphics()
       sky.label = 'asset-slot:background.sky'
       layer('background').addChild(sky)
 
-      const horizon = new Graphics()
-        .poly([0, 520, 180, 390, 330, 470, 520, 330, 740, 470, 940, 350, 1180, 500, 1380, 380, 1600, 510, 1600, 900, 0, 900])
-        .fill({ color: 0x0c3034 })
-      horizon.label = 'asset-slot:background.mountains'
-      layer('background').addChild(horizon)
+      const stars = new Graphics()
+      stars.label = 'world:stars'
+      layer('background').addChild(stars)
 
-      const ground = new Graphics().rect(0, 585, 1600, 315).fill({ color: 0x07130f })
+      const celestialHalo = new Graphics()
+      celestialHalo.label = 'world:celestial-halo'
+      layer('background').addChild(celestialHalo)
+
+      const celestial = new Graphics()
+      celestial.label = 'world:celestial'
+      layer('background').addChild(celestial)
+
+      const mountainsFar = new Graphics()
+      mountainsFar.label = 'asset-slot:background.mountains'
+      layer('background').addChild(mountainsFar)
+
+      const mountainsNear = new Graphics()
+      mountainsNear.label = 'world:mountains-near'
+      layer('background').addChild(mountainsNear)
+
+      const forest = new Graphics()
+      forest.label = 'asset-slot:background.forest'
+      layer('background').addChild(forest)
+
+      const haze = new Graphics()
+      haze.label = 'asset-slot:atmosphere.depth'
+      layer('atmosphere').addChild(haze)
+
+      const clouds = new Graphics()
+      clouds.label = 'world:weather-clouds'
+      layer('atmosphere').addChild(clouds)
+
+      const rain = new Graphics()
+      rain.label = 'world:weather-rain'
+      layer('atmosphere').addChild(rain)
+
+      const stormFlash = new Graphics()
+      stormFlash.label = 'world:weather-storm-flash'
+      layer('atmosphere').addChild(stormFlash)
+
+      const ground = new Graphics()
       ground.label = 'asset-slot:terrain.ground'
       layer('terrain').addChild(ground)
 
@@ -143,14 +199,23 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       development.label = 'asset-slot:structures.construction'
       layer('structures').addChild(development)
 
-      const lamp = new Graphics().circle(0, 0, 13).fill({ color: 0x66ffe2, alpha: 0.9 })
+      const rails = new Graphics()
+      rails.label = 'asset-slot:logistics.rails'
+      layer('logistics').addChild(rails)
+
+      const lampGlow = new Graphics().circle(0, 0, 34).fill({ color: 0x66ffe2, alpha: 0.08 })
+      lampGlow.label = 'world:work-light-glow'
+      lampGlow.position.set(400, 560)
+      layer('effects').addChild(lampGlow)
+
+      const lamp = new Graphics().circle(0, 0, 11).fill({ color: 0x66ffe2, alpha: 0.9 })
       lamp.label = 'asset-slot:effects.work-lights'
       lamp.position.set(400, 560)
       layer('effects').addChild(lamp)
 
       // Reviewed art is preloaded independently from renderer boot. Browser-native
       // image loading preserves the deferred Pixi bundle budget. A missing/broken
-      // asset never removes the existing placeholder and never aborts the world.
+      // asset never removes the existing procedural fallback and never aborts the world.
       void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), preloadBrowserImage)
         .then(result => {
           if (disposed) return
@@ -161,35 +226,166 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           })
         })
 
-      let lastLevel = -1
-      const renderLevel = (current: number) => {
-        if (current === lastLevel) return
-        lastLevel = current
-        development.clear()
-        development.rect(80, 500, 210, 85).fill({ color: 0x3b2b20 })
-        development.rect(105, 455, 160, 45).fill({ color: 0x8f5d38 })
-        if (current >= 2) development.rect(360, 515, 150, 70).fill({ color: 0x4b3225 })
-        if (current >= 3) development.rect(540, 485, 180, 100).fill({ color: 0x62402b })
-        if (current >= 4) development.rect(750, 450, 210, 135).fill({ color: 0x2b3834 })
-        if (current >= 5) development.rect(1010, 410, 230, 175).fill({ color: 0x36433a })
-        if (current >= 7) development.rect(1280, 345, 210, 240).fill({ color: 0x4d382a })
-        if (current >= 9) development.rect(930, 270, 42, 180).fill({ color: 0x605244 })
-        if (current >= 11) development.circle(1360, 250, 95).fill({ color: 0x26b9ac, alpha: 0.18 })
+      let atmosphereSignature = ''
+      let activeAtmosphere = buildWorldAtmospherePresentation(snapshotRef.current)
+
+      const renderAtmosphere = (current: WorldRenderSnapshot) => {
+        const signature = `${current.timePhase}:${current.weather}`
+        if (signature === atmosphereSignature) return
+        atmosphereSignature = signature
+        activeAtmosphere = buildWorldAtmospherePresentation(current)
+        const atmosphere = activeAtmosphere
+
+        sky.clear()
+        sky.rect(0, 0, WORLD_WIDTH, 330).fill({ color: atmosphere.skyTop })
+        sky.rect(0, 330, WORLD_WIDTH, 270).fill({ color: atmosphere.skyHorizon })
+
+        stars.clear()
+        if (atmosphere.starAlpha > 0) {
+          for (const [x, y, radius] of STAR_POINTS) {
+            stars.circle(x, y, radius).fill({ color: 0xe9fff9, alpha: atmosphere.starAlpha })
+          }
+        }
+
+        celestialHalo.clear()
+        celestialHalo
+          .circle(atmosphere.celestialX, atmosphere.celestialY, 76)
+          .fill({ color: atmosphere.celestial, alpha: atmosphere.celestialAlpha * 0.08 })
+        celestial.clear()
+        celestial
+          .circle(atmosphere.celestialX, atmosphere.celestialY, current.timePhase === 'night' ? 28 : 34)
+          .fill({ color: atmosphere.celestial, alpha: atmosphere.celestialAlpha })
+
+        mountainsFar.clear()
+        mountainsFar
+          .poly([0, 535, 120, 420, 240, 492, 370, 360, 520, 480, 690, 338, 850, 470, 1030, 350, 1220, 500, 1390, 390, 1600, 520, 1600, 650, 0, 650])
+          .fill({ color: atmosphere.mountainFar })
+
+        mountainsNear.clear()
+        mountainsNear
+          .poly([0, 590, 185, 455, 330, 550, 505, 430, 675, 555, 880, 418, 1090, 560, 1275, 448, 1450, 545, 1600, 475, 1600, 690, 0, 690])
+          .fill({ color: atmosphere.mountainNear })
+
+        forest.clear()
+        for (let i = 0; i < 30; i += 1) {
+          const x = 18 + i * 55
+          const height = 38 + (i % 5) * 7
+          const baseY = 606 + (i % 3) * 5
+          forest
+            .poly([x, baseY, x + 18, baseY - height, x + 36, baseY])
+            .fill({ color: atmosphere.terrain, alpha: 0.82 })
+        }
+
+        haze.clear()
+        haze.rect(0, 430, WORLD_WIDTH, 190).fill({ color: atmosphere.skyHorizon, alpha: atmosphere.hazeAlpha })
+        haze.rect(0, 535, WORLD_WIDTH, 90).fill({ color: atmosphere.celestial, alpha: atmosphere.hazeAlpha * 0.16 })
+
+        clouds.clear()
+        if (atmosphere.cloudAlpha > 0) {
+          for (const [x, y, radius] of CLOUD_CLUSTERS) {
+            clouds.circle(x, y, radius).fill({ color: 0xcbd8d5, alpha: atmosphere.cloudAlpha * 0.42 })
+            clouds.circle(x + radius * 0.58, y + 8, radius * 0.76).fill({ color: 0xcbd8d5, alpha: atmosphere.cloudAlpha * 0.34 })
+            clouds.circle(x - radius * 0.48, y + 12, radius * 0.62).fill({ color: 0xcbd8d5, alpha: atmosphere.cloudAlpha * 0.28 })
+          }
+        }
+
+        rain.clear()
+        if (atmosphere.rainAlpha > 0) {
+          for (let row = 0; row < 3; row += 1) {
+            for (const [x, y] of RAIN_COLUMNS) {
+              rain.rect(x + row * 17, y + row * 205, 2, 24).fill({ color: 0x9bc9d2, alpha: atmosphere.rainAlpha })
+            }
+          }
+        }
+
+        stormFlash.clear()
+        stormFlash.rect(0, 0, WORLD_WIDTH, 600).fill({ color: 0xdff8ff, alpha: 1 })
+        stormFlash.alpha = 0
+
+        ground.clear()
+        ground.rect(0, 585, WORLD_WIDTH, 315).fill({ color: atmosphere.terrain })
+        ground.rect(0, 615, WORLD_WIDTH, 285).fill({ color: 0x06100d, alpha: 0.42 })
+
+        rails.clear()
+        rails.rect(240, 710, 1180, 5).fill({ color: 0x4b625c, alpha: 0.52 })
+        rails.rect(240, 747, 1180, 5).fill({ color: 0x4b625c, alpha: 0.4 })
+        for (let x = 255; x < 1415; x += 52) {
+          rails.rect(x, 704, 7, 54).fill({ color: 0x513d2b, alpha: 0.46 })
+        }
+
+        lamp.clear().circle(0, 0, 11).fill({ color: atmosphere.lamp, alpha: 0.92 })
+        lampGlow.clear().circle(0, 0, 34).fill({ color: atmosphere.lamp, alpha: 0.1 })
       }
 
-      next.ticker.maxFPS = window.innerWidth < 900 ? 45 : 60
+      let developmentSignature = ''
+      const renderDevelopment = (current: WorldRenderSnapshot) => {
+        const signature = `${current.level}:${current.timePhase}:${current.weather}`
+        if (signature === developmentSignature) return
+        developmentSignature = signature
+        const atmosphere = buildWorldAtmospherePresentation(current)
+        development.clear()
+
+        const building = (x: number, y: number, width: number, height: number, roofHeight: number) => {
+          development.rect(x, y, width, height).fill({ color: atmosphere.structureBase })
+          development
+            .poly([x - 8, y, x + width / 2, y - roofHeight, x + width + 8, y])
+            .fill({ color: atmosphere.structureAccent })
+          development.rect(x + width * 0.18, y + height * 0.35, 18, 18).fill({ color: atmosphere.lamp, alpha: 0.42 })
+        }
+
+        building(80, 500, 210, 85, 40)
+        if (current.level >= 2) building(360, 515, 150, 70, 32)
+        if (current.level >= 3) building(540, 485, 180, 100, 38)
+        if (current.level >= 4) building(750, 450, 210, 135, 44)
+        if (current.level >= 5) building(1010, 410, 230, 175, 50)
+        if (current.level >= 7) building(1280, 345, 210, 240, 56)
+        if (current.level >= 9) {
+          development.rect(930, 270, 42, 180).fill({ color: atmosphere.structureBase })
+          development.rect(936, 252, 30, 22).fill({ color: atmosphere.structureAccent })
+        }
+        if (current.level >= 11) {
+          development.circle(1360, 250, 95).fill({ color: atmosphere.lamp, alpha: 0.09 })
+          development.circle(1360, 250, 62).fill({ color: atmosphere.lamp, alpha: 0.06 })
+        }
+      }
+
+      next.ticker.maxFPS = reduceMotion ? 30 : window.innerWidth < 900 ? 45 : 60
       next.ticker.minFPS = 20
       next.ticker.add(() => {
-        renderLevel(snapshotRef.current.level)
-        lamp.alpha = 0.72 + Math.sin(performance.now() / 550) * 0.16
+        const current = snapshotRef.current
+        renderAtmosphere(current)
+        renderDevelopment(current)
+
+        const now = performance.now()
+        if (reduceMotion) {
+          lamp.alpha = 0.88
+          lampGlow.alpha = 0.75
+          clouds.position.x = 0
+          rain.position.y = 0
+          stormFlash.alpha = 0
+          return
+        }
+
+        lamp.alpha = 0.76 + Math.sin(now / 550) * 0.14
+        lampGlow.alpha = 0.65 + Math.sin(now / 720) * 0.18
+        clouds.position.x = Math.sin(now / 9000) * 9
+        rain.position.y = activeAtmosphere.rainAlpha > 0 ? (now / 22) % 24 : 0
+
+        if (activeAtmosphere.stormFlashAlpha > 0) {
+          const flashCycle = now % 7600
+          const pulse = flashCycle > 7140 ? Math.sin(((flashCycle - 7140) / 460) * Math.PI) : 0
+          stormFlash.alpha = Math.max(0, pulse) * activeAtmosphere.stormFlashAlpha
+        } else {
+          stormFlash.alpha = 0
+        }
       })
 
       const fit = () => {
         const w = Math.max(1, host.clientWidth)
         const h = Math.max(1, host.clientHeight)
-        const scale = Math.min(w / 1600, h / 900)
+        const scale = Math.min(w / WORLD_WIDTH, h / WORLD_HEIGHT)
         world.scale.set(scale)
-        world.position.set((w - 1600 * scale) / 2, (h - 900 * scale) / 2)
+        world.position.set((w - WORLD_WIDTH * scale) / 2, (h - WORLD_HEIGHT * scale) / 2)
       }
       fit()
       const ro = new ResizeObserver(fit)

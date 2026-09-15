@@ -21,6 +21,8 @@ import { PrimaryNavigation } from "./features/navigation/PrimaryNavigation";
 import { SectionSelector } from "./features/navigation/SectionSelector";
 import { ANALYTICS_SECTIONS } from "./features/navigation/navigationModel";
 import { ContextHelpTerm } from "./features/help/ContextHelpTerm";
+import { MetricDetailButton, MetricDrilldown } from "./features/metrics/MetricDrilldown";
+import type { MetricDetailModel } from "./features/metrics/metricRegistry";
 import { PersonalizationControl } from "./features/settings/PersonalizationControl";
 import {
   loadPortfolio,
@@ -112,6 +114,7 @@ const EMPTY: PortfolioSnapshot = {
 };
 
 export default function App() {
+  const [metricDetail, setMetricDetail] = useState<MetricDetailModel | null>(null);
   const [snapshot, setSnapshot] = useState<PortfolioSnapshot>(EMPTY);
   const [uiPreferences, setUiPreferences] = useState<UiPreferences>(() =>
     loadUiPreferences(browserStorage()),
@@ -252,6 +255,7 @@ export default function App() {
     setUiPreferences(normalizeUiPreferences(null));
 
   const xirr = annualReturnRatioToPercent(snapshot.xirr);
+  const metricBase = { from: analytics.sampleFrom, to: analytics.sampleTo, points: analytics.historyPoints, source: 'T‑Bank portfolio snapshot', freshness: snapshot.updatedAt ?? 'Время снимка не подтверждено' };
   const startDate = snapshot.startDate
     ? new Date(snapshot.startDate).toLocaleDateString("ru-RU")
     : "—";
@@ -261,6 +265,7 @@ export default function App() {
     : "нет истории";
 
   return (
+    <>
     <main
       className="app-shell"
       data-qv-theme={uiPreferences.theme}
@@ -387,6 +392,7 @@ export default function App() {
                             ? "Расчёт на зрелой истории"
                             : `Предварительно · история ${historyLabel}`}
                         </small>
+                        <MetricDetailButton label="Здоровье портфеля" onClick={() => void import('./features/metrics/metricRegistry').then(({ buildHealthDetail }) => setMetricDetail(buildHealthDetail({ ...metricBase, value: analytics.healthScore, displayedValue: analytics.healthScore == null ? 'Недоступно' : `${Math.round(analytics.healthScore)} / 100`, version: analytics.healthVersion, components: analytics.components.map(component => ({ label: component.label, value: component.points == null ? 'Недоступно' : `${component.points.toFixed(1)} б. · вес ${Math.round(component.weight * 100)}%`, note: component.note })) })))} />
                       </article>
                       <article className="metric-card">
                         <span className="metric-label">
@@ -396,6 +402,7 @@ export default function App() {
                           {xirr == null ? "—" : `${pctSigned.format(xirr)}%`}
                         </strong>
                         <small>Учитывает даты денежных потоков</small>
+                        <MetricDetailButton label="XIRR" onClick={() => void import('./features/metrics/metricRegistry').then(({ buildXirrDetail }) => setMetricDetail(buildXirrDetail({ ...metricBase, value: xirr, displayedValue: xirr == null ? 'Недоступно' : `${pctSigned.format(xirr)}%` })))} />
                       </article>
                       <article className="metric-card">
                         <span className="metric-label">
@@ -409,6 +416,7 @@ export default function App() {
                           label="TWR-индекс · последние 30 доступных дневных точек"
                         />
                         <small>Без влияния размера довнесений</small>
+                        <MetricDetailButton label="TWR" onClick={() => void import('./features/metrics/metricRegistry').then(({ buildTwrDetail }) => setMetricDetail(buildTwrDetail({ ...metricBase, value: analytics.twr, displayedValue: signedRatio(analytics.twr) })))} />
                       </article>
                     </section>
                     <section className="panel history-panel">
@@ -681,6 +689,8 @@ export default function App() {
         onChange={updateUiPreferences}
         onReset={resetUiPreferences}
       />
-    </main>
+      </main>
+      <MetricDrilldown model={metricDetail} onClose={() => setMetricDetail(null)} />
+    </>
   );
 }

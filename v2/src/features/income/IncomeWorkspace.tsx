@@ -16,6 +16,8 @@ import './income.css'
 import { SectionSelector } from '../navigation/SectionSelector'
 import { INCOME_SECTIONS } from '../navigation/navigationModel'
 import { ContextHelpTerm } from '../help/ContextHelpTerm'
+import { MetricDetailButton, MetricDrilldown } from '../metrics/MetricDrilldown'
+import type { MetricDetailModel } from '../metrics/metricRegistry'
 import './incomeCompact.css'
 import './incomeCalendarVisual.css'
 
@@ -82,6 +84,7 @@ function incomeSourceIdentityNote(state: ReturnType<typeof buildIncomeSourceRows
 }
 
 export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions, onOpenAsset }: Props) {
+  const [metricDetail, setMetricDetail] = useState<MetricDetailModel | null>(null)
   const [view, setView] = useState<View>('overview')
   const [page, setPage] = useState(0)
   const [calendarMonth, setCalendarMonth] = useState<string | null>(null)
@@ -343,6 +346,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
             <span>Покрытие расписания · {integrity.resolvedAssets}/{integrity.eligibleAssets || '—'}</span>
             <i><b style={{ width: `${coverage == null ? 0 : Math.min(100, coverage)}%` }} /></i>
             <strong>{coverage == null ? '—' : `${pct.format(coverage)}%`}</strong>
+            <MetricDetailButton label="Покрытие выплат" onClick={() => void import('../metrics/metricRegistry').then(({ buildPayoutCoverageDetail }) => setMetricDetail(buildPayoutCoverageDetail({ coverage, resolved: integrity.resolvedAssets, eligible: integrity.eligibleAssets, complete: data.integrity.complete, source: integrity.label, freshness: integrity.detail })))} />
           </div>
           <div className={`income-integrity-status is-${integrity.state}`}>
             <b>{integrity.label}</b><span>{integrity.detail}{integrity.errors ? ` · ошибок ${integrity.errors}` : ''}</span>
@@ -360,6 +364,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <IncomeTaxPanel calendar={data} />
         </Suspense>
       )}
+      <MetricDrilldown model={metricDetail} onClose={() => setMetricDetail(null)} />
     </div>
   )
 }
