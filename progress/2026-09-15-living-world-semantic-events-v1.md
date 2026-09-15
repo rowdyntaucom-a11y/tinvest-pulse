@@ -59,7 +59,7 @@ The current runtime values match this policy; future runtime cleanup should cons
 
 ## Regression / CI lessons
 
-Two useful gates caught integration mistakes during this pass:
+Useful gates caught integration mistakes during this pass:
 
 - CI #622: `worldRenderSnapshot.test.ts` still expected scene-layer contract `0.1`; updated to `0.2` and explicitly verifies the `events` layer is before `effects` and owns no persistent asset slots.
 - CI #623: Node strip-types caught an extensionless runtime import from the new caravan presentation boundary.
