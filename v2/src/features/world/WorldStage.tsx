@@ -5,6 +5,7 @@ import { emptyWorldEventCursor, resolveWorldEventQueue, type WorldEventCursorDoc
 import { buildWorldRenderSnapshot, type WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from './worldAssetLoader'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
+import { buildWorldLivingPresentation, WORLD_LIVING_PRESENTATION_VERSION, type WorldActorPlan } from './worldLivingPresentation'
 import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
 import { buildWorldPresentationMetadata } from './worldPresentationMetadata'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLayer } from './worldSceneLayers'
@@ -38,6 +39,41 @@ function preloadBrowserImage(assetPath: string) {
   })
 }
 
+function actorColor(role: WorldActorPlan['role']) {
+  switch (role) {
+    case 'miner': return 0xd7b16a
+    case 'hauler': return 0x70c8b7
+    case 'builder': return 0xc98563
+    case 'keeper': return 0x7ca3a8
+    case 'resident': return 0x8e8bb7
+  }
+}
+
+function eventAccentColor(channel: ReturnType<typeof buildWorldLivingPresentation>['eventAccent']) {
+  switch (channel) {
+    case 'discipline': return 0x75d3c2
+    case 'health': return 0x62d48c
+    case 'performance': return 0xf0c36d
+    case 'income': return 0x6ce5dd
+    case 'strategy': return 0xa7c97f
+    case 'achievement': return 0xe5cb78
+    case 'generic': return 0xa9bdba
+    default: return 0x66ffe2
+  }
+}
+
+function routePoint(route: WorldActorPlan['route'], phase: number) {
+  const ping = phase < 0.5 ? phase * 2 : (1 - phase) * 2
+  const direction = phase < 0.5 ? 1 : -1
+  switch (route) {
+    case 'mine-loop': return { x: 210 + ping * 235, y: 603 - Math.sin(ping * Math.PI) * 10, direction }
+    case 'haul-loop': return { x: 365 + ping * 545, y: 657 - Math.sin(ping * Math.PI) * 14, direction }
+    case 'build-loop': return { x: 845 + ping * 355, y: 595 - Math.sin(ping * Math.PI) * 9, direction }
+    case 'yard-loop': return { x: 600 + ping * 250, y: 626 - Math.sin(ping * Math.PI) * 7, direction }
+    case 'resident-loop': return { x: 1060 + ping * 310, y: 642 - Math.sin(ping * Math.PI) * 5, direction }
+  }
+}
+
 export function WorldStage({ state, cursor }: Props) {
   const queue = resolveWorldEventQueue(state, cursor ?? emptyWorldEventCursor())
   const snapshot = buildWorldRenderSnapshot(state, queue)
@@ -54,14 +90,19 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     failed: 0,
   })
   const snapshotRef = useRef(snapshot)
+  const livingRef = useRef(buildWorldLivingPresentation(snapshot))
   const presentation = buildWorldPresentationMetadata(snapshot)
+  const living = buildWorldLivingPresentation(snapshot)
 
   if (!ownerIdRef.current) {
     worldStageSequence += 1
     ownerIdRef.current = `world-stage-${worldStageSequence}`
   }
 
-  useEffect(() => { snapshotRef.current = snapshot }, [snapshot])
+  useEffect(() => {
+    snapshotRef.current = snapshot
+    livingRef.current = buildWorldLivingPresentation(snapshot)
+  }, [snapshot])
 
   useEffect(() => {
     const host = hostRef.current
@@ -113,10 +154,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
       const layerContainers = new Map<WorldSceneLayer, InstanceType<typeof Container>>()
       for (const layerName of WORLD_SCENE_LAYER_ORDER) {
-        const layer = new Container()
-        layer.label = `world:${layerName}`
-        layerContainers.set(layerName, layer)
-        world.addChild(layer)
+        const sceneLayer = new Container()
+        sceneLayer.label = `world:${layerName}`
+        layerContainers.set(layerName, sceneLayer)
+        world.addChild(sceneLayer)
       }
 
       const layer = (name: WorldSceneLayer) => {
@@ -125,9 +166,18 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         return resolved
       }
 
-      const sky = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0x081d2a })
+      const sky = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0xffffff })
       sky.label = 'asset-slot:background.sky'
       layer('background').addChild(sky)
+
+      const stars = new Graphics()
+      for (let index = 0; index < 26; index += 1) {
+        const x = 42 + ((index * 191) % 1510)
+        const y = 34 + ((index * 97) % 315)
+        stars.circle(x, y, index % 5 === 0 ? 2.2 : 1.2).fill({ color: 0xd9f5f0, alpha: 0.78 })
+      }
+      stars.label = 'world:stars'
+      layer('background').addChild(stars)
 
       const horizon = new Graphics()
         .poly([0, 520, 180, 390, 330, 470, 520, 330, 740, 470, 940, 350, 1180, 500, 1380, 380, 1600, 510, 1600, 900, 0, 900])
@@ -135,22 +185,118 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       horizon.label = 'asset-slot:background.mountains'
       layer('background').addChild(horizon)
 
+      const forest = new Graphics()
+      for (let index = 0; index < 22; index += 1) {
+        const x = 30 + index * 76
+        const height = 54 + (index % 4) * 18
+        forest.poly([x, 590, x + 20, 590 - height, x + 42, 590]).fill({ color: 0x0b2825, alpha: 0.95 })
+      }
+      forest.label = 'asset-slot:background.forest'
+      layer('background').addChild(forest)
+
+      const settlement = new Graphics()
+      settlement.rect(1230, 500, 235, 88).fill({ color: 0x102b28, alpha: 0.95 })
+      settlement.rect(1260, 458, 44, 42).fill({ color: 0x173a33, alpha: 0.95 })
+      settlement.rect(1360, 440, 58, 60).fill({ color: 0x173a33, alpha: 0.95 })
+      for (let index = 0; index < 6; index += 1) {
+        settlement.rect(1252 + index * 34, 528 + (index % 2) * 18, 10, 8).fill({ color: 0xe5b65d, alpha: 0.75 })
+      }
+      settlement.label = 'asset-slot:background.distant-settlement'
+      layer('background').addChild(settlement)
+
+      const atmosphere = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0xffffff, alpha: 1 })
+      atmosphere.label = 'asset-slot:atmosphere.depth'
+      layer('atmosphere').addChild(atmosphere)
+
       const ground = new Graphics().rect(0, 585, 1600, 315).fill({ color: 0x07130f })
       ground.label = 'asset-slot:terrain.ground'
       layer('terrain').addChild(ground)
 
+      const mine = new Graphics()
+      mine.rect(82, 515, 205, 78).fill({ color: 0x201b17 })
+      mine.circle(184, 515, 76).fill({ color: 0x201b17 })
+      mine.rect(123, 500, 125, 95).fill({ color: 0x050908 })
+      mine.rect(132, 487, 12, 108).fill({ color: 0x5f4631 })
+      mine.rect(228, 487, 12, 108).fill({ color: 0x5f4631 })
+      mine.label = 'asset-slot:terrain.mine-entrance'
+      layer('terrain').addChild(mine)
+
       const development = new Graphics()
       development.label = 'asset-slot:structures.construction'
       layer('structures').addChild(development)
+
+      const rails = new Graphics()
+      rails.moveTo(270, 687).lineTo(1220, 687)
+      rails.moveTo(270, 706).lineTo(1220, 706)
+      for (let x = 285; x < 1220; x += 42) rails.moveTo(x, 677).lineTo(x, 716)
+      rails.stroke({ color: 0x665b4b, width: 4, alpha: 0.88 })
+      rails.label = 'asset-slot:logistics.rails'
+      layer('logistics').addChild(rails)
 
       const lamp = new Graphics().circle(0, 0, 13).fill({ color: 0x66ffe2, alpha: 0.9 })
       lamp.label = 'asset-slot:effects.work-lights'
       lamp.position.set(400, 560)
       layer('effects').addChild(lamp)
 
+      const eventBeacon = new Graphics().circle(0, 0, 25).fill({ color: 0x66ffe2, alpha: 0.24 })
+      eventBeacon.position.set(1070, 475)
+      eventBeacon.visible = false
+      layer('effects').addChild(eventBeacon)
+
+      const smokePuffs = [0, 1, 2].map(index => {
+        const puff = new Graphics().circle(0, 0, 18 + index * 5).fill({ color: 0xb7c5bd, alpha: 0.16 })
+        puff.position.set(805 + index * 8, 455 - index * 18)
+        layer('effects').addChild(puff)
+        return puff
+      })
+
+      const rain = new Graphics()
+      for (let index = 0; index < 46; index += 1) {
+        const x = (index * 137) % 1640
+        const y = (index * 83) % 940
+        rain.moveTo(x, y).lineTo(x - 12, y + 32)
+      }
+      rain.stroke({ color: 0x9cc7c8, width: 2, alpha: 0.78 })
+      rain.alpha = 0
+      layer('effects').addChild(rain)
+
+      const lightning = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0xdff9ff, alpha: 1 })
+      lightning.alpha = 0
+      layer('effects').addChild(lightning)
+
+      const actorViews = new Map<string, InstanceType<typeof Container>>()
+      const createActorView = (plan: WorldActorPlan) => {
+        const actor = new Container()
+        actor.label = `actor:${plan.id}`
+        const color = actorColor(plan.role)
+        const shadow = new Graphics().ellipse(0, 13, 16, 5).fill({ color: 0x000000, alpha: 0.22 })
+        const body = new Graphics().rect(-7, -10, 14, 24).fill({ color })
+        const head = new Graphics().circle(0, -18, 7).fill({ color: 0xd0a27d })
+        const helmet = new Graphics().rect(-9, -25, 18, 6).fill({ color: 0xd4a74e })
+        actor.addChild(shadow, body, head, helmet)
+        actor.scale.set(plan.scale)
+        layer('actors').addChild(actor)
+        actorViews.set(plan.id, actor)
+        return actor
+      }
+
+      const cartViews = [0, 1].map(index => {
+        const cart = new Container()
+        cart.label = `cart:${index}`
+        const body = new Graphics().rect(-28, -18, 56, 28).fill({ color: 0x564638 })
+        const crystal = new Graphics().poly([-15, -18, 0, -38, 15, -18]).fill({ color: 0x63ddd5, alpha: 0.88 })
+        const wheels = new Graphics()
+          .circle(-18, 14, 7).fill({ color: 0x171a18 })
+          .circle(18, 14, 7).fill({ color: 0x171a18 })
+        cart.addChild(body, crystal, wheels)
+        cart.visible = false
+        layer('logistics').addChild(cart)
+        return cart
+      })
+
       // Reviewed art is preloaded independently from renderer boot. Browser-native
       // image loading preserves the deferred Pixi bundle budget. A missing/broken
-      // asset never removes the existing placeholder and never aborts the world.
+      // asset never removes the procedural fallback and never aborts the world.
       void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), preloadBrowserImage)
         .then(result => {
           if (disposed) return
@@ -166,22 +312,80 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         if (current === lastLevel) return
         lastLevel = current
         development.clear()
-        development.rect(80, 500, 210, 85).fill({ color: 0x3b2b20 })
-        development.rect(105, 455, 160, 45).fill({ color: 0x8f5d38 })
-        if (current >= 2) development.rect(360, 515, 150, 70).fill({ color: 0x4b3225 })
-        if (current >= 3) development.rect(540, 485, 180, 100).fill({ color: 0x62402b })
-        if (current >= 4) development.rect(750, 450, 210, 135).fill({ color: 0x2b3834 })
-        if (current >= 5) development.rect(1010, 410, 230, 175).fill({ color: 0x36433a })
-        if (current >= 7) development.rect(1280, 345, 210, 240).fill({ color: 0x4d382a })
-        if (current >= 9) development.rect(930, 270, 42, 180).fill({ color: 0x605244 })
+        development.rect(365, 520, 160, 68).fill({ color: 0x403126 })
+        development.poly([355, 520, 445, 465, 535, 520]).fill({ color: 0x795139 })
+        if (current >= 2) development.rect(560, 505, 185, 83).fill({ color: 0x513729 })
+        if (current >= 3) development.rect(785, 472, 205, 116).fill({ color: 0x68442d })
+        if (current >= 4) development.rect(1020, 442, 218, 146).fill({ color: 0x2c3e38 })
+        if (current >= 5) development.rect(1260, 410, 205, 178).fill({ color: 0x36483e })
+        if (current >= 7) development.rect(1145, 325, 22, 118).fill({ color: 0x75634b })
+        if (current >= 7) development.rect(1145, 325, 155, 16).fill({ color: 0x75634b })
+        if (current >= 9) development.rect(1300, 300, 24, 110).fill({ color: 0x7b6750 })
         if (current >= 11) development.circle(1360, 250, 95).fill({ color: 0x26b9ac, alpha: 0.18 })
       }
 
       next.ticker.maxFPS = window.innerWidth < 900 ? 45 : 60
       next.ticker.minFPS = 20
       next.ticker.add(() => {
-        renderLevel(snapshotRef.current.level)
-        lamp.alpha = 0.72 + Math.sin(performance.now() / 550) * 0.16
+        const currentSnapshot = snapshotRef.current
+        const currentLiving = livingRef.current
+        renderLevel(currentSnapshot.level)
+
+        const now = performance.now()
+        const seconds = now / 1000
+        sky.tint = currentLiving.skyTint
+        horizon.tint = currentLiving.atmosphereTint
+        atmosphere.tint = currentLiving.atmosphereTint
+        atmosphere.alpha = currentLiving.weather.hazeAlpha
+        stars.alpha = currentSnapshot.timePhase === 'night' ? 0.9 : currentSnapshot.timePhase === 'dawn' ? 0.34 : 0
+
+        lamp.alpha = clamp((0.58 + Math.sin(now / 550) * 0.14) * currentLiving.lightScale, 0.12, 0.96)
+        settlement.alpha = clamp(0.55 + currentLiving.lightScale * 0.45, 0.55, 1)
+
+        const eventAccent = currentLiving.eventAccent
+        eventBeacon.visible = eventAccent !== null
+        if (eventAccent) {
+          eventBeacon.tint = eventAccentColor(eventAccent)
+          eventBeacon.alpha = 0.16 + (Math.sin(now / 280) + 1) * 0.08
+          const pulse = 0.82 + (Math.sin(now / 360) + 1) * 0.08
+          eventBeacon.scale.set(pulse)
+        }
+
+        rain.alpha = currentLiving.weather.rainAlpha
+        rain.position.y = currentLiving.weather.rainSpeed > 0
+          ? ((seconds * 120 * currentLiving.weather.rainSpeed) % 64) - 64
+          : 0
+        lightning.alpha = currentLiving.weather.lightning && Math.sin(seconds * 1.75) > 0.985 ? 0.18 : 0
+
+        smokePuffs.forEach((puff, index) => {
+          const cycle = (seconds * (0.08 + index * 0.012) + index * 0.31) % 1
+          puff.position.y = 485 - cycle * 95
+          puff.position.x = 805 + index * 8 + Math.sin(seconds * 0.45 + index) * 14
+          puff.alpha = (1 - cycle) * 0.16 * currentLiving.constructionActivity
+          const scale = 0.75 + cycle * 0.75
+          puff.scale.set(scale)
+        })
+
+        const activeIds = new Set(currentLiving.actors.map(actor => actor.id))
+        for (const plan of currentLiving.actors) {
+          const actor = actorViews.get(plan.id) ?? createActorView(plan)
+          const phase = (seconds * 0.045 * plan.pace * currentLiving.activityScale + plan.phaseOffset) % 1
+          const point = routePoint(plan.route, phase)
+          actor.visible = true
+          actor.position.set(point.x, point.y)
+          actor.scale.set(plan.scale * point.direction, plan.scale)
+          actor.rotation = Math.sin(seconds * 4.2 * plan.pace + plan.phaseOffset * 10) * 0.015
+        }
+        for (const [id, actor] of actorViews) if (!activeIds.has(id)) actor.visible = false
+
+        cartViews.forEach((cart, index) => {
+          cart.visible = index < currentLiving.cartCount
+          if (!cart.visible) return
+          const phase = (seconds * 0.035 * currentLiving.activityScale + index * 0.48) % 1
+          const ping = phase < 0.5 ? phase * 2 : (1 - phase) * 2
+          cart.position.set(315 + ping * 820, 679)
+          cart.scale.x = phase < 0.5 ? 1 : -1
+        })
       })
 
       const fit = () => {
@@ -242,6 +446,9 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-assets-configured={assetRuntime.configured}
       data-world-assets-loaded={assetRuntime.loaded}
       data-world-assets-failed={assetRuntime.failed}
+      data-world-living-version={WORLD_LIVING_PRESENTATION_VERSION}
+      data-world-actors={living.actors.length}
+      data-world-carts={living.cartCount}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
