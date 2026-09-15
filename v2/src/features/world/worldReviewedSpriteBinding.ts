@@ -56,7 +56,12 @@ export async function bindReviewedAssetSprite(
   try {
     const texture = await pixi.Assets.load<unknown>(entry.assetPath)
     const loaded = new Map<WorldAssetSlotId, unknown>([[slotId, texture]])
-    const decision = resolveWorldAssetMountDecision(manifest, readiness, { loaded, failures: [] }, slotId)
+    const decision = resolveWorldAssetMountDecision(
+      manifest,
+      readiness,
+      { version: '0.1', loaded, failures: [] },
+      slotId,
+    )
     if (decision.mode !== 'reviewed-asset') {
       return {
         version: WORLD_REVIEWED_SPRITE_BINDING_VERSION,
@@ -81,6 +86,7 @@ export async function bindReviewedAssetSprite(
       manifest,
       readiness,
       {
+        version: '0.1',
         loaded: new Map(),
         failures: [{ slotId, assetPath: entry.assetPath, reason: 'LOAD_FAILED' }],
       },
