@@ -65,9 +65,14 @@ Role behavior is restrained and readable:
 
 The choreography is deliberately pure and sprite-agnostic so final character atlases can replace the procedural fallback later without replacing route semantics.
 
-### Reviewed actor-atlas contract
+### Reviewed actor-atlas contract and loading pipeline
 
-Added `worldActorAtlasManifest.ts`, `worldReviewedActorAtlases.ts` and a separate animation-selection boundary.
+Added:
+- `worldActorAtlasManifest.ts`;
+- `worldReviewedActorAtlases.ts`;
+- `worldActorAnimationSelection.ts`;
+- `worldActorAtlasDocument.ts`;
+- `worldActorAtlasLoader.ts`.
 
 The reviewed character pipeline now fails closed before any production sprite can replace fallback art:
 - only local `/assets/world/...` PNG/WebP + JSON atlas paths are allowed;
@@ -76,10 +81,13 @@ The reviewed character pipeline now fails closed before any production sprite ca
 - duplicate role packs invalidate that role instead of picking an arbitrary winner;
 - malformed provenance, remote URLs, traversal/query/hash paths and incomplete animation sets are rejected;
 - Figma provenance must contain valid file/node identifiers;
+- atlas JSON must match the reviewed image bounds, exact frame size and exact per-action frame counts;
+- unknown extra animation names are rejected instead of being silently accepted;
+- actor packs load independently, so one broken role cannot abort every other reviewed role;
 - reduced-motion playback freezes reviewed animation rather than creating a separate behavioral meaning;
-- when a reviewed atlas is absent, selection explicitly returns `procedural-fallback` rather than pretending temporary geometry is final art.
+- when a reviewed atlas is absent or invalid, selection explicitly returns `procedural-fallback` rather than pretending temporary geometry is final art.
 
-The production registry intentionally remains empty until visual review approves real art. This gives future asset work a concrete, tested contract without prematurely blessing placeholder graphics.
+The production registry intentionally remains empty until visual review approves real art. This gives future asset work a concrete, tested path from reviewed local files → validated atlas document → role-level load → choreography animation selection without prematurely blessing placeholder graphics.
 
 ### Deferred renderer boundary
 
@@ -107,7 +115,9 @@ Registered Living World regressions in `test:core` for:
 - actor choreography work/travel/return phases;
 - role-specific cargo behavior;
 - actor atlas manifest validation and duplicate/fail-closed behavior;
-- reviewed-animation selection and reduced-motion freezing.
+- reviewed-animation selection and reduced-motion freezing;
+- atlas-document image/frame/count bounds;
+- role-isolated actor-atlas loading and transport/document failures.
 
 The regression locks:
 - neutral weather has no invented rain/lightning;
@@ -118,7 +128,7 @@ The regression locks:
 - actor work/travel/return phases remain deterministic;
 - cargo is limited to intended outbound worker roles;
 - resident/keeper behavior does not invent cargo work;
-- incomplete or unsafe production actor packs cannot replace fallback art.
+- incomplete, unsafe or internally inconsistent production actor packs cannot replace fallback art.
 
 ## CI history / verification
 
@@ -126,18 +136,26 @@ The regression locks:
 - CI #575: build/bundle gate passed; `test:core` exposed a Node strip-types runtime import-resolution issue in the new presentation module. Fixed by keeping the external event-presentation dependency type-only and mapping already-resolved event kinds locally.
 - CI #578 on head `d91d166041217a8d323e162a803e19b0ed6bc69b`: fully green after the initial runtime split and lifecycle fixes.
 - CI #583 on head `8c896b6b21596d880c09b749039e388f3cd64998`: fully green after actor choreography and power-aware runtime work.
-- The actor-atlas contract/selection pass is now included in the same draft branch and is gated by the next full PR CI before any merge decision.
+- CI #592: TypeScript correctly rejected optional numeric atlas fields that helper validation had not narrowed. Fixed with explicit numeric guards/type predicates; no compiler setting was weakened.
+- CI #600: build passed, then Node strip-types caught a runtime extensionless import in the new atlas document boundary. Fixed by making document/loader cross-boundaries type-only/injected at runtime rather than changing Node/test flags.
+- CI #604 on head `2b2478bdc26e3e48a4b0968f142f0311d497908f`: **fully green**.
+  - dependency security gates: success;
+  - TypeScript + Vite production build: success;
+  - full `test:core`: success, including all new Living World atlas/choreography regressions;
+  - Living World runtime-state regression: success;
+  - asset-history, payout/server/production syntax checks: success;
+  - production runtime/API regression suite: success.
 
 No financial methodology, broker/API contracts, credential handling or bundle thresholds were changed.
 
 ## Still intentionally gated
 
 - reviewed production sprite/environment asset pack;
-- actual approved character atlas files and frame timing;
+- actual approved character atlas files and visual frame timing;
 - runtime replacement of procedural actors with those reviewed atlases;
 - long-term XP thresholds/economy;
 - persistent multi-user world storage;
 - sound design;
 - any visual rule that would require new financial interpretation.
 
-The next safe autonomous step is to wire the reviewed-atlas contract into the deferred Pixi runtime only when a validated role pack exists, while retaining procedural fallback per role and keeping art approval outside renderer logic.
+The next safe autonomous step is to connect only successfully loaded reviewed role atlases to the deferred Pixi renderer while retaining procedural fallback per role. Because the reviewed registry is still empty, no temporary art may be silently promoted; visual approval remains a separate gate.
