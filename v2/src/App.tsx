@@ -13,6 +13,7 @@ import { MonteCarloPanel } from './features/analytics/MonteCarloPanel'
 import { RiskWorkspace } from './features/analytics/RiskWorkspace'
 import { annualReturnRatioToPercent } from './features/analytics/returnUnits'
 import { IncomeWorkspace } from './features/income/IncomeWorkspace'
+import { GoalWorkspace } from './features/goals/GoalWorkspace'
 import { KeyRateWidget } from './features/macro/KeyRateWidget'
 import { PersonalizationControl } from './features/settings/PersonalizationControl'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
@@ -157,6 +158,7 @@ export default function App() {
           <button onClick={() => setTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
           <button onClick={() => setTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
           <button onClick={() => setTab('income')} className={`chip ${tab === 'income' ? 'chip--active' : ''}`}>ДОХОД</button>
+          <button onClick={() => setTab('goals')} className={`chip ${tab === 'goals' ? 'chip--active' : ''}`}>ЦЕЛЬ</button>
           <button onClick={() => setTab('dna')} className={`chip ${tab === 'dna' ? 'chip--active' : ''}`}>DNA</button>
         </nav>
       </header>
@@ -260,6 +262,8 @@ export default function App() {
         )}
 
         {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} />}
+
+        {tab === 'goals' && <GoalWorkspace currentCapital={snapshot.value} />}
 
         {tab === 'dna' && (
           <div className="dna-layout">
