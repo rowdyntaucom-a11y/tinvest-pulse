@@ -20,7 +20,7 @@ export type WorldActorAtlasDocument = {
   animations: Readonly<Record<WorldActorAction, readonly WorldActorAtlasFrame[]>>
 }
 
-function boundedInteger(value: unknown, min: number, max: number) {
+function boundedInteger(value: unknown, min: number, max: number): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max
 }
 
