@@ -35,6 +35,9 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     configured: 0,
     loaded: 0,
     failed: 0,
+    actorConfigured: 0,
+    actorLoaded: 0,
+    actorFailed: 0,
   })
   const presentation = buildWorldPresentationMetadata(snapshot)
 
@@ -117,6 +120,9 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-assets-configured={assetRuntime.configured}
       data-world-assets-loaded={assetRuntime.loaded}
       data-world-assets-failed={assetRuntime.failed}
+      data-world-actor-atlases-configured={assetRuntime.actorConfigured}
+      data-world-actor-atlases-loaded={assetRuntime.actorLoaded}
+      data-world-actor-atlases-failed={assetRuntime.actorFailed}
     >
       <div className="world-stage__diagnostic">DNA ENGINE · {renderer.toUpperCase()} · {presentation.timeLabel}</div>
     </div>
