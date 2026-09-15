@@ -27,7 +27,7 @@ type PositionSort = 'weight' | 'pnl' | 'pnlPct'
 type PositionInspectorView = 'position' | 'income'
 type StructureMode = 'classes' | 'bonds'
 
-type Props = { snapshot: PortfolioSnapshot }
+type Props = { snapshot: PortfolioSnapshot; onOpenAsset: (position: PositionSnapshot) => void }
 
 function assetTypeLabel(type: string) {
   const key = String(type || '').toLowerCase()
@@ -163,7 +163,7 @@ function PositionList({ positions, selectedKey, onSelect, badges }: {
   )
 }
 
-export function PortfolioWorkspace({ snapshot }: Props) {
+export function PortfolioWorkspace({ snapshot, onOpenAsset }: Props) {
   const [view, setView] = useState<View>('overview')
   const [positionPage, setPositionPage] = useState(0)
   const [positionSort, setPositionSort] = useState<PositionSort>('weight')
@@ -358,6 +358,7 @@ export function PortfolioWorkspace({ snapshot }: Props) {
               </div>
 
               <div className="position-inspector__tabs" role="tablist" aria-label="Детали позиции">
+                <button type="button" onClick={() => onOpenAsset(selectedPosition)}>ОТКРЫТЬ АКТИВ ↗</button>
                 <button
                   type="button"
                   role="tab"

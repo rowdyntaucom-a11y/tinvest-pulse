@@ -26,6 +26,8 @@ import {
 } from './lib/uiPreferences'
 
 const GoalWorkspace = lazy(() => import('./features/goals/GoalWorkspace').then(module => ({ default: module.GoalWorkspace })))
+const HoldingsExplorer = lazy(() => import('./features/analytics/HoldingsExplorer').then(module => ({ default: module.HoldingsExplorer })))
+const AssetWorkspace = lazy(() => import('./features/asset/AssetWorkspace').then(module => ({ default: module.AssetWorkspace })))
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
@@ -70,6 +72,8 @@ export default function App() {
   const [uiPreferences, setUiPreferences] = useState<UiPreferences>(() => loadUiPreferences(browserStorage()))
   const [tab, setTab] = useState<Tab>(uiPreferences.defaultWorkspace)
   const [analyticsView, setAnalyticsView] = useState<AnalyticsView>('overview')
+  const [selectedAsset, setSelectedAsset] = useState<PortfolioSnapshot['positionItems'][number] | null>(null)
+  const [assetReturnTab, setAssetReturnTab] = useState<Tab>('portfolio')
   const worldLocalDate = useWorldPhaseClock(tab === 'dna')
 
   useEffect(() => {
@@ -127,6 +131,7 @@ export default function App() {
     [analytics.twr, analytics.healthScore, worldLocalDate],
   )
   const dnaWorldState = dnaRuntimeState.world
+  const openAsset = (position: PortfolioSnapshot['positionItems'][number]) => { setAssetReturnTab(tab); setSelectedAsset(position) }
 
   const updateUiPreferences = (patch: Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace' | 'pinnedModules'>>) => {
     setUiPreferences(current => normalizeUiPreferences({ ...current, ...patch }))
@@ -164,7 +169,8 @@ export default function App() {
         </nav>
       </header>
 
-      <section className={`app-view ${tab}-view`}>
+      <section className={`app-view ${selectedAsset ? 'asset-view' : `${tab}-view`}`}>
+        {selectedAsset ? <Suspense fallback={<section className="panel">Загрузка инструмента…</section>}><AssetWorkspace position={selectedAsset} portfolioValue={snapshot.value} onBack={() => { setSelectedAsset(null); setTab(assetReturnTab) }} /></Suspense> : <>
         {tab === 'board' && (
           <QvanixBoard
             snapshot={snapshot}
@@ -178,7 +184,7 @@ export default function App() {
           />
         )}
 
-        {tab === 'portfolio' && <PortfolioWorkspace snapshot={snapshot} />}
+        {tab === 'portfolio' && <PortfolioWorkspace snapshot={snapshot} onOpenAsset={openAsset} />}
 
         {tab === 'analytics' && (
           <div className="analytics-layout">
@@ -214,6 +220,7 @@ export default function App() {
                   <div className="panel-head"><div><span className="eyebrow">ИНДЕКС TWR</span><h2>ПОРТФЕЛЬ И IMOEX</h2></div><small>{analytics.historyPoints ? `${analytics.historyPoints} точек` : 'история загружается'}</small></div>
                   <HistoryChart points={snapshot.history} />
                 </section>
+                <Suspense fallback={null}><HoldingsExplorer positions={snapshot.positionItems} onOpenAsset={openAsset} /></Suspense>
               </div>
             )}
 
@@ -262,7 +269,7 @@ export default function App() {
           </div>
         )}
 
-        {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} />}
+        {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} onOpenAsset={openAsset} />}
 
         {tab === 'goals' && (
           <Suspense fallback={(
@@ -283,6 +290,7 @@ export default function App() {
             </section>
           </div>
         )}
+        </>}
       </section>
 
       <PersonalizationControl preferences={uiPreferences} onChange={updateUiPreferences} onReset={resetUiPreferences} />

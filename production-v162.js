@@ -174,10 +174,40 @@ const instrumentBadgesCode=[
 core=core.replace(instrumentBadgesMarker,'\n'+instrumentBadgesCode+instrumentBadgesMarker);
 `;
 
-const bridges=`const assetHistoryBridge=${JSON.stringify(assetHistoryInjectedCode)};\nconst transactionMarkersBridge=${JSON.stringify(transactionMarkersInjectedCode)};\nconst instrumentBadgesBridge=${JSON.stringify(instrumentBadgesInjectedCode)};\n`;
+const assetFundamentalsInjectedCode=String.raw`
+const assetFundamentalsMarker="\napp.get('*', (req, res) => {";
+if(!core.includes(assetFundamentalsMarker))throw new Error('QVANIX v2: fundamentals route marker changed');
+const assetFundamentalsCode=[
+ "const qvanixFundamentalsCache=new Map();",
+ "function qvanixFundamentalText(value){const text=typeof value==='string'?value.trim():'';return text||null;}",
+ "app.get('/api/asset-fundamentals',async(req,res)=>{",
+ "  const instrumentUid=qvanixFundamentalText(req.query?.instrumentUid);",
+ "  if(!instrumentUid||instrumentUid.length>128||!/^[A-Za-z0-9._:-]+$/.test(instrumentUid))return res.status(400).json({source:'UNAVAILABLE',available:false,error:'invalid instrument UID'});",
+ "  try{",
+ "    const now=Date.now();const cached=qvanixFundamentalsCache.get(instrumentUid);if(cached&&cached.expiresAt>now)return res.json(cached.payload);",
+ "    const accountsResponse=await getAccounts();const account=selectAccount(accountsResponse);if(!account?.id)return res.status(404).json({source:'UNAVAILABLE',available:false,error:'No open account'});",
+ "    const portfolio=await getPortfolio(account.id);const positions=Array.isArray(portfolio?.positions)?portfolio.positions:[];",
+ "    const matches=positions.filter(position=>qvanixFundamentalText(position?.instrumentUid)===instrumentUid);",
+ "    if(matches.length!==1)return res.status(404).json({source:'UNAVAILABLE',available:false,error:'unsupported instrument identity'});",
+ "    const meta=matches[0]?.figi?await getInstrumentMeta(matches[0].figi,matches[0].instrumentType):{};const assetUid=qvanixFundamentalText(meta?.assetUid||meta?.asset_uid);",
+ "    if(!assetUid)return res.status(404).json({source:'UNAVAILABLE',available:false,error:'asset UID unavailable'});",
+ "    const data=await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/GetAssetFundamentals',{assets:[assetUid]});",
+ "    const rows=Array.isArray(data?.fundamentals)?data.fundamentals:Array.isArray(data?.items)?data.items:[];",
+ "    const exact=rows.filter(row=>qvanixFundamentalText(row?.assetUid||row?.asset_uid||row?.assetId||row?.asset_id)===assetUid);",
+ "    if(exact.length!==1)return res.status(404).json({source:'T_INVEST',assetUid,available:false,fundamentals:{},error:'no exact fundamentals'});",
+ "    const payload={source:'T_INVEST',instrumentUid,assetUid,updatedAt:new Date().toISOString(),fundamentals:exact[0]};qvanixFundamentalsCache.set(instrumentUid,{expiresAt:now+21600000,payload});",
+ "    res.setHeader('Cache-Control','private, max-age=3600');return res.json(payload);",
+ "  }catch(error){console.warn('QVANIX fundamentals failed:',error?.message||error);return res.status(502).json({source:'UNAVAILABLE',available:false,error:'fundamentals unavailable'});}",
+ "});",
+ ""
+].join('\\n');
+core=core.replace(assetFundamentalsMarker,'\\n'+assetFundamentalsCode+assetFundamentalsMarker);
+`;
+
+const bridges=`const assetHistoryBridge=${JSON.stringify(assetHistoryInjectedCode)};\nconst transactionMarkersBridge=${JSON.stringify(transactionMarkersInjectedCode)};\nconst instrumentBadgesBridge=${JSON.stringify(instrumentBadgesInjectedCode)};\nconst assetFundamentalsBridge=${JSON.stringify(assetFundamentalsInjectedCode)};\n`;
 src=src.replace(marker,bridges+marker);
 const oldCompose='src=src.replace(coreCompile,benchmarkBridge+bondMetaBridge+v2Bridge+coreCompile);';
-const newCompose='src=src.replace(coreCompile,benchmarkBridge+bondMetaBridge+assetHistoryBridge+transactionMarkersBridge+instrumentBadgesBridge+v2Bridge+coreCompile);';
+const newCompose='src=src.replace(coreCompile,benchmarkBridge+bondMetaBridge+assetHistoryBridge+transactionMarkersBridge+instrumentBadgesBridge+assetFundamentalsBridge+v2Bridge+coreCompile);';
 if(!src.includes(oldCompose))throw new Error('v16.2: v15.8 bridge composition changed');
 src=src.replace(oldCompose,newCompose);
 
