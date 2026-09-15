@@ -1,3 +1,4 @@
+import type { WorldAssetLoadResult } from './worldAssetLoader'
 import type { WorldAssetReadiness } from './worldAssetReadiness'
 import { resolveWorldAssetMountDecision } from './worldAssetMountPolicy'
 import type { ResolvedWorldAssetManifest, WorldAssetSlotId } from './worldAssetManifest'
@@ -12,10 +13,7 @@ type PixiSpriteLike = {
 }
 
 type PixiReviewedAssetRuntime = {
-  Assets: {
-    load<T>(assetPath: string): Promise<T>
-  }
-  Sprite: new (texture: unknown) => PixiSpriteLike
+  createSprite(source: unknown): PixiSpriteLike
 }
 
 export type ReviewedSpriteBindingResult = {
@@ -23,56 +21,49 @@ export type ReviewedSpriteBindingResult = {
   slotId: WorldAssetSlotId
   mode: 'reviewed-asset' | 'procedural-fallback'
   sprite: PixiSpriteLike | null
-  reason: 'REVIEWED_ASSET_LOADED' | 'MANIFEST_NOT_READY' | 'ASSET_LOAD_FAILED'
+  reason: 'REVIEWED_ASSET_LOADED' | 'MANIFEST_NOT_READY' | 'ASSET_NOT_LOADED' | 'ASSET_LOAD_FAILED' | 'SPRITE_CREATE_FAILED'
 }
 
 /**
  * Renderer-side adapter for one reviewed Living World image slot.
  *
- * This helper deliberately receives the already deferred Pixi module instead
- * of importing pixi.js itself. That keeps Pixi out of the initial bundle and
- * guarantees the caller's existing Application/ticker remains the only runtime.
- * A browser/Pixi load failure is converted into the canonical fail-closed mount
- * decision; no sprite is created unless the reviewed manifest is ready and the
- * exact slot loaded successfully.
+ * Loading remains owned by the lightweight browser-native world asset loader.
+ * This adapter receives that already-resolved result plus a caller-owned Pixi
+ * sprite factory, so the heavier Pixi Assets loader never enters the deferred
+ * DNA chunk. The canonical readiness + mount decision remains authoritative:
+ * no sprite is created unless the exact reviewed slot loaded successfully.
  */
-export async function bindReviewedAssetSprite(
+export function bindReviewedAssetSprite<T>(
   pixi: PixiReviewedAssetRuntime,
   manifest: ResolvedWorldAssetManifest,
   readiness: WorldAssetReadiness,
+  loadResult: WorldAssetLoadResult<T>,
   slotId: WorldAssetSlotId,
-): Promise<ReviewedSpriteBindingResult> {
-  const entry = manifest.entries.get(slotId) ?? null
-  if (!entry || !readiness.productionArtReady || !readiness.reviewedSlots.includes(slotId)) {
+): ReviewedSpriteBindingResult {
+  const decision = resolveWorldAssetMountDecision(manifest, readiness, loadResult, slotId)
+  if (decision.mode !== 'reviewed-asset') {
     return {
       version: WORLD_REVIEWED_SPRITE_BINDING_VERSION,
       slotId,
       mode: 'procedural-fallback',
       sprite: null,
-      reason: 'MANIFEST_NOT_READY',
+      reason: decision.reason,
+    }
+  }
+
+  const source = loadResult.loaded.get(slotId)
+  if (source == null) {
+    return {
+      version: WORLD_REVIEWED_SPRITE_BINDING_VERSION,
+      slotId,
+      mode: 'procedural-fallback',
+      sprite: null,
+      reason: 'ASSET_NOT_LOADED',
     }
   }
 
   try {
-    const texture = await pixi.Assets.load<unknown>(entry.assetPath)
-    const loaded = new Map<WorldAssetSlotId, unknown>([[slotId, texture]])
-    const decision = resolveWorldAssetMountDecision(
-      manifest,
-      readiness,
-      { version: '0.1', loaded, failures: [] },
-      slotId,
-    )
-    if (decision.mode !== 'reviewed-asset') {
-      return {
-        version: WORLD_REVIEWED_SPRITE_BINDING_VERSION,
-        slotId,
-        mode: 'procedural-fallback',
-        sprite: null,
-        reason: 'MANIFEST_NOT_READY',
-      }
-    }
-
-    const sprite = new pixi.Sprite(texture)
+    const sprite = pixi.createSprite(source)
     sprite.label = `reviewed-asset:${slotId}`
     return {
       version: WORLD_REVIEWED_SPRITE_BINDING_VERSION,
@@ -82,22 +73,12 @@ export async function bindReviewedAssetSprite(
       reason: 'REVIEWED_ASSET_LOADED',
     }
   } catch {
-    const decision = resolveWorldAssetMountDecision(
-      manifest,
-      readiness,
-      {
-        version: '0.1',
-        loaded: new Map(),
-        failures: [{ slotId, assetPath: entry.assetPath, reason: 'LOAD_FAILED' }],
-      },
-      slotId,
-    )
     return {
       version: WORLD_REVIEWED_SPRITE_BINDING_VERSION,
       slotId,
       mode: 'procedural-fallback',
       sprite: null,
-      reason: decision.reason === 'ASSET_LOAD_FAILED' ? 'ASSET_LOAD_FAILED' : 'MANIFEST_NOT_READY',
+      reason: 'SPRITE_CREATE_FAILED',
     }
   }
 }

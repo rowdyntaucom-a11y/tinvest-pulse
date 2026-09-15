@@ -11,6 +11,7 @@ import {
 } from './worldAmbientActivityPresentation'
 import { buildWorldAtmospherePresentation } from './worldAtmospherePresentation'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from './worldAssetLoader'
+import { resolveWorldAssetReadiness } from './worldAssetReadiness'
 import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION } from './worldAssetSlots'
 import {
   WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION,
@@ -30,6 +31,10 @@ import {
 } from './worldEventCaravanPresentation'
 import { buildWorldEventPresentation } from './worldEventPresentation'
 import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
+import {
+  WORLD_REVIEWED_SPRITE_BINDING_VERSION,
+  bindReviewedAssetSprite,
+} from './worldReviewedSpriteBinding'
 import { buildWorldPresentationMetadata } from './worldPresentationMetadata'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLayer } from './worldSceneLayers'
 import { worldRuntimeRegistry } from './worldRuntimeOwnership'
@@ -171,6 +176,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     loaded: 0,
     failed: 0,
   })
+  const [reviewedSettlementMounted, setReviewedSettlementMounted] = useState(false)
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
@@ -203,7 +209,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     }
 
     const boot = async () => {
-      const { Application, Container, Graphics } = await import('pixi.js')
+      const { Application, Container, Graphics, Sprite } = await import('pixi.js')
       if (disposed) return
 
       const resolution = clamp(window.devicePixelRatio || 1, 1, window.innerWidth < 900 ? 1.35 : 1.75)
@@ -269,6 +275,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       const mountainsNear = new Graphics()
       mountainsNear.label = 'world:mountains-near'
       layer('background').addChild(mountainsNear)
+
+      const reviewedSettlementLayer = new Container()
+      reviewedSettlementLayer.label = 'asset-slot:background.distant-settlement'
+      layer('background').addChild(reviewedSettlementLayer)
 
       const forest = new Graphics()
       forest.label = 'asset-slot:background.forest'
@@ -366,9 +376,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       lamp.position.set(400, 560)
       layer('effects').addChild(lamp)
 
-      // Reviewed art is preloaded independently from renderer boot. Browser-native
-      // image loading preserves the deferred Pixi bundle budget. A missing/broken
-      // asset never removes the existing procedural fallback and never aborts the world.
+      const reviewedSettlementReadiness = resolveWorldAssetReadiness(
+        REVIEWED_WORLD_ASSET_MANIFEST,
+        ['background.distant-settlement'],
+      )
+
+      // Browser-native loading keeps the deferred Pixi chunk below its strict budget.
+      // The reviewed binding consumes the same fail-closed load result and creates a
+      // Sprite only after canonical readiness + mount policy approve the exact slot.
       void loadWorldAssetEntries(REVIEWED_WORLD_ASSET_MANIFEST.entries.values(), preloadBrowserImage)
         .then(result => {
           if (disposed) return
@@ -377,6 +392,29 @@ function WorldPixiStage({ snapshot }: PixiProps) {
             loaded: result.loaded.size,
             failed: result.failures.length,
           })
+
+          const binding = bindReviewedAssetSprite(
+            { createSprite: source => Sprite.from(source as Parameters<typeof Sprite.from>[0]) },
+            REVIEWED_WORLD_ASSET_MANIFEST,
+            reviewedSettlementReadiness,
+            result,
+            'background.distant-settlement',
+          )
+          if (binding.mode !== 'reviewed-asset' || !binding.sprite) {
+            setReviewedSettlementMounted(false)
+            return
+          }
+
+          const sprite = binding.sprite as ReturnType<typeof Sprite.from>
+          sprite.position.set(0, 0)
+          sprite.width = WORLD_WIDTH
+          sprite.height = WORLD_HEIGHT
+          sprite.alpha = 0.92
+          reviewedSettlementLayer.addChild(sprite)
+          setReviewedSettlementMounted(true)
+        })
+        .catch(() => {
+          if (!disposed) setReviewedSettlementMounted(false)
         })
 
       let atmosphereSignature = ''
@@ -766,9 +804,11 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-asset-version={WORLD_ASSET_SLOT_VERSION}
       data-world-asset-slots={WORLD_ASSET_SLOTS.length}
       data-world-asset-loader-version={WORLD_ASSET_LOADER_VERSION}
+      data-world-reviewed-sprite-binding-version={WORLD_REVIEWED_SPRITE_BINDING_VERSION}
       data-world-assets-configured={assetRuntime.configured}
       data-world-assets-loaded={assetRuntime.loaded}
       data-world-assets-failed={assetRuntime.failed}
+      data-world-reviewed-settlement-mounted={reviewedSettlementMounted ? 'true' : 'false'}
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
