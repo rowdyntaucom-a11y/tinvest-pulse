@@ -67,3 +67,6 @@ jobs:
       - run: node --check ../production-v160.js
       - run: node --check ../production-v161.js
       - run: node --check ../production-v162.js
+      - name: Fundamentals runtime injection regression
+        working-directory: .
+        run: node tests/production-v162-fundamentals-injection.test.js
