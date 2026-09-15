@@ -227,6 +227,21 @@
   .goal-chart__svg { min-height: 150px; }
 }
 
+@media (max-width: 620px) {
+  .goals-view {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    scrollbar-width: thin;
+  }
+  .goals-view .goal-workspace {
+    min-height: max-content;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+}
+
 @media (max-width: 420px) {
   .goal-hero__copy p { font-size: 11px; }
   .goal-hero__state strong { font-size: 25px; }
