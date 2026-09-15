@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolveWorldAssetManifest } from '../src/features/world/worldAssetManifest.ts'
 import { resolveWorldAssetReadiness } from '../src/features/world/worldAssetReadiness.ts'
+import { resolveWorldAssetMountDecision } from '../src/features/world/worldAssetMountPolicy.ts'
 
 const reviewedSource = readFileSync(new URL('../src/features/world/worldReviewedAssets.ts', import.meta.url), 'utf8')
 assert.match(reviewedSource, /slotId:\s*'background\.distant-settlement'/)
@@ -39,6 +40,76 @@ const rejected = resolveWorldAssetManifest([
 ])
 assert.equal(resolveWorldAssetReadiness(rejected, []).productionArtReady, false)
 
+const loadedSettlement = {
+  version: '0.1' as const,
+  loaded: new Map([['background.distant-settlement', { kind: 'image' }]]),
+  failures: [],
+}
+const mountReviewed = resolveWorldAssetMountDecision(manifest, loadedSettlement, 'background.distant-settlement')
+assert.deepEqual(mountReviewed, {
+  version: '0.1',
+  slotId: 'background.distant-settlement',
+  assetPath: '/assets/world/distant-settlement-v1.svg',
+  mode: 'reviewed-asset',
+  reason: 'REVIEWED_ASSET_LOADED',
+})
+
+const notLoaded = resolveWorldAssetMountDecision(
+  manifest,
+  { version: '0.1' as const, loaded: new Map(), failures: [] },
+  'background.distant-settlement',
+)
+assert.equal(notLoaded.mode, 'procedural-fallback')
+assert.equal(notLoaded.reason, 'ASSET_NOT_LOADED')
+
+const failedLoad = resolveWorldAssetMountDecision(
+  manifest,
+  {
+    version: '0.1' as const,
+    loaded: new Map(),
+    failures: [
+      {
+        slotId: 'background.distant-settlement',
+        assetPath: '/assets/world/distant-settlement-v1.svg',
+        reason: 'LOAD_FAILED' as const,
+      },
+    ],
+  },
+  'background.distant-settlement',
+)
+assert.equal(failedLoad.mode, 'procedural-fallback')
+assert.equal(failedLoad.reason, 'ASSET_LOAD_FAILED')
+
+const taintedManifest = resolveWorldAssetManifest([
+  {
+    slotId: 'background.distant-settlement',
+    assetPath: '/assets/world/distant-settlement-v1.svg',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-15T15:00:00.000Z' },
+  },
+  {
+    slotId: 'background.sky',
+    assetPath: 'https://example.com/not-local.svg',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-15T15:00:00.000Z' },
+  },
+])
+assert.equal(taintedManifest.entries.has('background.distant-settlement'), true)
+assert.equal(taintedManifest.rejectedCount, 1)
+const taintedDecision = resolveWorldAssetMountDecision(taintedManifest, loadedSettlement, 'background.distant-settlement')
+assert.equal(taintedDecision.mode, 'procedural-fallback')
+assert.equal(taintedDecision.reason, 'MANIFEST_NOT_READY')
+
+const spoofedUnreviewed = resolveWorldAssetMountDecision(
+  manifest,
+  {
+    version: '0.1' as const,
+    loaded: new Map([['terrain.ground', { kind: 'image' }]]),
+    failures: [],
+  },
+  'terrain.ground',
+)
+assert.equal(spoofedUnreviewed.mode, 'procedural-fallback')
+assert.equal(spoofedUnreviewed.reason, 'MANIFEST_NOT_READY')
+
 const svg = readFileSync(new URL('../public/assets/world/distant-settlement-v1.svg', import.meta.url), 'utf8')
 assert.match(svg, /^<svg\b/)
 assert.match(svg, /viewBox="0 0 1600 900"/)
@@ -47,4 +118,4 @@ assert.doesNotMatch(svg, /<foreignObject\b/i)
 assert.doesNotMatch(svg, /(?:href|src)\s*=\s*["']https?:/i)
 assert.doesNotMatch(svg, /url\(\s*https?:/i)
 
-console.log('Living World reviewed asset registry/readiness regression: ok')
+console.log('Living World reviewed asset registry/readiness/mount-policy regression: ok')
