@@ -2,7 +2,7 @@ import type { WorldEvent } from '../dna/worldState'
 import {
   buildWorldEventPresentation,
   type WorldEventPresentationChannel,
-} from './worldEventPresentation'
+} from './worldEventPresentation.ts'
 
 export const WORLD_EVENT_CARAVAN_PRESENTATION_VERSION = '0.1' as const
 export const WORLD_EVENT_CARAVAN_LIMIT = 3 as const
