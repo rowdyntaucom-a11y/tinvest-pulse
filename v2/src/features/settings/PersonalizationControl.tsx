@@ -34,6 +34,7 @@ const WORKSPACES: Array<{ key: UiWorkspace; label: string }> = [
   { key: 'portfolio', label: 'PORTFOLIO' },
   { key: 'analytics', label: 'ANALYTICS' },
   { key: 'income', label: 'INCOME' },
+  { key: 'goals', label: 'GOAL' },
   { key: 'dna', label: 'DNA' },
 ]
 
