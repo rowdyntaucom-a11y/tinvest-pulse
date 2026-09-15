@@ -19,6 +19,8 @@ import {
   type AssetFundamentalsSnapshot,
 } from "../portfolio/assetFundamentals";
 import "./assetWorkspace.css";
+import { evaluateAssetHistoryTrust, evaluateFundamentalsTrust } from "../../lib/dataTrust";
+import { DataTrustIndicator } from "../shared/DataTrustIndicator";
 
 type View =
   | "overview"
@@ -107,6 +109,7 @@ export function AssetWorkspace({
   const [fundamentalsLoading, setFundamentalsLoading] = useState(true);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [history, setHistory] = useState<AssetHistorySeries | null>(null);
+  const [historyTrustInput, setHistoryTrustInput] = useState({ available: false, source: null as string | null, to: null as string | null, requested: 0, availableSeries: 0, points: 0 });
   const [badges, setBadges] = useState<InstrumentBadgePayload | null>(null);
   const { calendar } = usePayoutSnapshot(true);
   useEffect(() => {
@@ -132,7 +135,11 @@ export function AssetWorkspace({
       position.instrumentUid ?? position.figi ?? undefined,
     )
       .then((value) => {
-        if (active) setHistory(matchSeries(position, value.series));
+        if (active) {
+          const matched = matchSeries(position, value.series);
+          setHistory(matched);
+          setHistoryTrustInput({ available: value.available, source: value.source, to: value.to, requested: value.requested, availableSeries: value.availableSeries, points: matched?.points.length ?? 0 });
+        }
       })
       .finally(() => {
         if (active) setHistoryLoading(false);
@@ -160,6 +167,8 @@ export function AssetWorkspace({
     [calendar, position],
   );
   const interpretation = deriveQvanixFundamentalInterpretation(fundamentals);
+  const fundamentalsTrust = evaluateFundamentalsTrust({ loading: fundamentalsLoading, ...fundamentals }, Date.now());
+  const historyTrust = evaluateAssetHistoryTrust(historyTrustInput, Date.now());
   const unavailableCopy = fundamentalsUnavailableCopy(fundamentals.reason);
   const basis = position.currentValue - position.expectedYield;
   const pnlPct = basis > 0 ? position.expectedYield / basis : null;
@@ -326,6 +335,7 @@ export function AssetWorkspace({
               : ""}
             .
           </p>
+          <DataTrustIndicator trust={fundamentalsTrust} />
         </section>
       )}
       {view === "history" && (
@@ -373,6 +383,7 @@ export function AssetWorkspace({
           <p className="method-note">
             Точки: официальный T‑Invest GetCandles. Пропуски не интерполируются.
           </p>
+          {!historyLoading && <DataTrustIndicator trust={historyTrust} />}
         </section>
       )}
       {view === "income" && (
