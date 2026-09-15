@@ -1,25 +1,30 @@
 # Living World — reviewed distant settlement renderer mount v1
 
-Date: 2026-09-15
+Date: `2026-09-15`
 Base: `6969ecbfac9f52ec332e9628fd39397a831acbe4`
 
 ## Why
 
-The Living World already had the first reviewed local SVG (`background.distant-settlement`), canonical manifest/readiness, fail-closed mount policy, and a Pixi-v8 sprite binding adapter. The remaining gap was visible: the reviewed art was still not mounted into the actual world canvas.
+The Living World already had the first reviewed local SVG (`background.distant-settlement`), canonical manifest/readiness, fail-closed mount policy, and a reviewed sprite binding adapter. The remaining gap was visible: the reviewed art was still not mounted into the actual world canvas.
 
 ## Change
 
 `WorldStage` now executes the reviewed sprite binding inside the existing deferred Pixi boot:
 
-- the dynamic Pixi import supplies `Assets` + `Sprite` to the existing binding adapter;
 - canonical `resolveWorldAssetReadiness(...)` must approve `background.distant-settlement`;
-- `bindReviewedAssetSprite(...)` must return `reviewed-asset` before any display object is mounted;
-- the sprite is mounted into a dedicated background container between near mountains and procedural forest;
+- the existing browser-native `loadWorldAssetEntries(...)` result remains the only image-loading path;
+- `bindReviewedAssetSprite(...)` consumes that exact fail-closed load result and may create a Pixi Sprite only after the canonical mount decision returns `reviewed-asset`;
+- the Sprite is created with caller-owned `Sprite.from(...)` inside the already deferred Pixi runtime;
+- the sprite mounts into a dedicated background container between near mountains and procedural forest;
 - the reviewed SVG is fitted to the existing 1600×900 logical world;
 - the existing procedural mountains/forest/development remain present underneath/around it as fail-closed fallback;
-- load/binding failure does not fail renderer boot and leaves `reviewedSettlementMounted=false`.
+- load/binding/sprite creation failure does not fail renderer boot and leaves `reviewedSettlementMounted=false`.
 
-The existing browser-native preload diagnostics remain in place for now; Pixi binding uses `Assets.load(...)` through the reviewed adapter. A later cleanup can consolidate duplicate warm-up paths only if it preserves the same fail-closed diagnostics and bundle behavior.
+## Bundle-gate correction
+
+The first renderer attempt used Pixi `Assets.load(...)`. Production build itself compiled, but the mandatory bundle gate correctly rejected it because deferred `pixi-dna` increased to **554.1 KiB**, above the unchanged **525 KiB** ceiling.
+
+The ceiling was not raised and chunking was not manipulated to hide the cost. Instead the reviewed binding was redesigned to consume the existing lightweight browser preload and use only `Sprite.from(...)`. This keeps trust/mount semantics unchanged while avoiding the heavy Pixi Assets loader path.
 
 ## Runtime invariants
 
@@ -33,14 +38,15 @@ The existing browser-native preload diagnostics remain in place for now; Pixi bi
 
 ## Regression
 
-`worldReviewedAssets.test.ts` now verifies that `WorldStage`:
+`worldReviewedAssets.test.ts` now verifies that:
 
-- imports Pixi dynamically with `Assets` and `Sprite`;
-- creates the dedicated `background.distant-settlement` slot container;
-- uses canonical readiness and `bindReviewedAssetSprite(...)`;
-- mounts only the returned sprite;
-- exposes binding/mount diagnostics;
-- still contains exactly one `new Application()` and one `next.ticker.add(...)`.
+- the binding uses canonical readiness + mount decision;
+- the binding does **not** import/use Pixi `Assets`;
+- `WorldStage` uses its existing browser-native loader and caller-owned `Sprite.from(...)`;
+- the dedicated `background.distant-settlement` slot exists;
+- the returned sprite is mounted into that slot;
+- binding/mount diagnostics remain exposed;
+- there is still exactly one `new Application()` and one `next.ticker.add(...)`.
 
 ## Boundaries
 
