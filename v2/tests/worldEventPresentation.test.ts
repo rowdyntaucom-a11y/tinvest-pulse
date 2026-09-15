@@ -1,4 +1,8 @@
 import assert from 'node:assert/strict'
+import {
+  WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION,
+  buildWorldEventArrivalPresentation,
+} from '../src/features/world/worldEventArrivalPresentation.ts'
 import { buildWorldEventPresentation } from '../src/features/world/worldEventPresentation.ts'
 import {
   WORLD_EVENT_CARAVAN_LIMIT,
@@ -69,5 +73,28 @@ assert.equal(dwell.arrived, true)
 assert.equal(depart.segment, 'depart')
 assert.equal(depart.arrived, false)
 assert.deepEqual(reduced, { segment: 'dwell', progress: 0.5, arrived: true })
+
+assert.equal(WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION, '0.1')
+const arrivalByDestination = new Map(
+  result.slice(0, 6).map(item => {
+    const plan = buildWorldEventCaravanPresentation([item])[0]
+    return [plan.destination, buildWorldEventArrivalPresentation(plan)] as const
+  }),
+)
+assert.equal(arrivalByDestination.get('mine-yard')?.activity, 'stockpile-drop')
+assert.equal(arrivalByDestination.get('workshop')?.activity, 'repair-bench')
+assert.equal(arrivalByDestination.get('settlement-gate')?.activity, 'message-handoff')
+assert.equal(arrivalByDestination.get('storehouse')?.activity, 'treasury-unload')
+assert.equal(arrivalByDestination.get('construction-yard')?.activity, 'construction-drop')
+assert.equal(arrivalByDestination.get('town-square')?.activity, 'celebration-gathering')
+assert.equal(arrivalByDestination.get('construction-yard')?.responder, 'builder')
+assert.equal(arrivalByDestination.get('town-square')?.responder, 'resident')
+for (const arrival of arrivalByDestination.values()) {
+  assert.equal(arrival.version, WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION)
+  assert.equal(arrival.emphasis > 0 && arrival.emphasis <= 1, true)
+  assert.equal(Object.prototype.hasOwnProperty.call(arrival, 'amount'), false)
+  assert.equal(Object.prototype.hasOwnProperty.call(arrival, 'reward'), false)
+  assert.equal(Object.prototype.hasOwnProperty.call(arrival, 'xp'), false)
+}
 
 console.log('worldEventPresentation tests passed')
