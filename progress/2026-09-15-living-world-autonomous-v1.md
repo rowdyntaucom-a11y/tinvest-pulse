@@ -72,7 +72,8 @@ Added:
 - `worldReviewedActorAtlases.ts`;
 - `worldActorAnimationSelection.ts`;
 - `worldActorAtlasDocument.ts`;
-- `worldActorAtlasLoader.ts`.
+- `worldActorAtlasLoader.ts`;
+- `worldActorFramePlayback.ts`.
 
 The reviewed character pipeline now fails closed before any production sprite can replace fallback art:
 - only local `/assets/world/...` PNG/WebP + JSON atlas paths are allowed;
@@ -81,32 +82,48 @@ The reviewed character pipeline now fails closed before any production sprite ca
 - duplicate role packs invalidate that role instead of picking an arbitrary winner;
 - malformed provenance, remote URLs, traversal/query/hash paths and incomplete animation sets are rejected;
 - Figma provenance must contain valid file/node identifiers;
-- atlas JSON must match the reviewed image bounds, exact frame size and exact per-action frame counts;
+- atlas JSON must match reviewed image bounds, exact frame size and exact per-action frame counts;
 - unknown extra animation names are rejected instead of being silently accepted;
 - actor packs load independently, so one broken role cannot abort every other reviewed role;
 - reduced-motion playback freezes reviewed animation rather than creating a separate behavioral meaning;
 - when a reviewed atlas is absent or invalid, selection explicitly returns `procedural-fallback` rather than pretending temporary geometry is final art.
 
-The production registry intentionally remains empty until visual review approves real art. This gives future asset work a concrete, tested path from reviewed local files → validated atlas document → role-level load → choreography animation selection without prematurely blessing placeholder graphics.
+The deferred Pixi runtime can now bind validated reviewed role packs into sprites per role. The production registry remains intentionally empty until visual review approves real art, so current visuals remain procedural fallback rather than silently promoting temporary graphics.
+
+### Semantic event caravans
+
+Added a dedicated `events` scene layer plus `worldEventCaravanPresentation.ts` and `worldEventCaravanRuntime.ts`.
+
+Already-semantic pending world events can now appear as restrained visible processions:
+- discipline → supplies;
+- health → repair;
+- performance → courier;
+- passive-income semantic event → treasury;
+- strategy → builders;
+- achievement → celebration;
+- unknown future semantic kind → generic courier.
+
+The visible event roster is hard-capped at three. The event renderer does not inspect transaction values, portfolio capital, returns, raw broker operations or XP totals; it does not acknowledge events or mutate WorldState. See `progress/2026-09-15-living-world-semantic-events-v1.md` for the detailed boundary.
 
 ### Deferred renderer boundary
 
-The first implementation placed too much renderer code in `WorldStage.tsx`. CI #573 correctly caught a main-bundle regression above the existing 450 KiB hard guard. The budget was **not raised**.
+The first implementation placed too much renderer code in `WorldStage.tsx`. CI #573 correctly caught a main-bundle regression above the existing hard guard. The budget was **not raised**.
 
-The renderer was split into the dynamically loaded `worldPixiRuntime.ts`. `WorldStage.tsx` remains a small ownership/lifecycle boundary and imports the renderer only when DNA is mounted. The verified build keeps Living World implementation in its own async chunk while Pixi remains deferred in its existing separate chunk.
-
-This is now a permanent implementation lesson: Living World richness must grow behind the deferred DNA boundary rather than inflate the normal financial-app startup path.
+The renderer was split into the dynamically loaded `worldPixiRuntime.ts`. `WorldStage.tsx` remains a small ownership/lifecycle boundary and imports the renderer only when DNA is mounted. Living World richness stays behind the deferred DNA boundary while Pixi remains separately deferred.
 
 ### Mobile/runtime lifecycle hardening
 
 The runtime now:
-- receives an `AbortSignal` so a slow Pixi initialization cannot attach a canvas after React unmount;
+- receives an `AbortSignal` so slow Pixi/asset initialization cannot attach after React unmount;
 - releases the single runtime lease safely;
 - pauses/resumes on document visibility;
-- pauses the Pixi application when the Living World is outside the viewport through `IntersectionObserver`;
-- respects `prefers-reduced-motion` by freezing decorative movement/lightning and lowering ticker pressure while preserving the static world state;
-- avoids rebuilding the deterministic presentation plan every ticker frame by caching it until the renderer snapshot object changes;
-- caps mobile DPR/FPS through the existing renderer policy.
+- stops when Living World is outside the viewport through `IntersectionObserver`;
+- respects `prefers-reduced-motion` by freezing decorative motion/lightning and lowering ticker pressure;
+- avoids rebuilding deterministic presentation plans every ticker frame when the snapshot did not change;
+- caps mobile DPR;
+- uses the approved visible mobile target of 30 FPS and a 15 FPS reduced-motion ceiling.
+
+A pure `worldRuntimePerformance.ts` regression boundary now codifies the mobile/desktop/reduced-motion envelope for future runtime cleanup.
 
 ### Regression
 
@@ -114,16 +131,18 @@ Registered Living World regressions in `test:core` for:
 - presentation/weather/level semantics;
 - actor choreography work/travel/return phases;
 - role-specific cargo behavior;
-- actor atlas manifest validation and duplicate/fail-closed behavior;
-- reviewed-animation selection and reduced-motion freezing;
-- atlas-document image/frame/count bounds;
-- role-isolated actor-atlas loading and transport/document failures.
+- actor atlas manifest/document/loading/selection/frame playback;
+- semantic event caravan mapping/cap/determinism;
+- dedicated event scene-layer ordering;
+- mobile/desktop/reduced-motion performance policy.
 
 The regression locks:
 - neutral weather has no invented rain/lightning;
 - actor/cart density grows only from resolved level;
 - time phase changes presentation pace only;
 - semantic income event maps to the existing `income` channel;
+- unknown semantic event kinds fail to generic;
+- event processions are capped at three;
 - malformed level fails closed to level-one presentation density;
 - actor work/travel/return phases remain deterministic;
 - cargo is limited to intended outbound worker roles;
@@ -133,29 +152,34 @@ The regression locks:
 ## CI history / verification
 
 - CI #573: failed the hard main-bundle gate after the first monolithic renderer implementation. Fixed by code splitting; budget not weakened.
-- CI #575: build/bundle gate passed; `test:core` exposed a Node strip-types runtime import-resolution issue in the new presentation module. Fixed by keeping the external event-presentation dependency type-only and mapping already-resolved event kinds locally.
-- CI #578 on head `d91d166041217a8d323e162a803e19b0ed6bc69b`: fully green after the initial runtime split and lifecycle fixes.
-- CI #583 on head `8c896b6b21596d880c09b749039e388f3cd64998`: fully green after actor choreography and power-aware runtime work.
-- CI #592: TypeScript correctly rejected optional numeric atlas fields that helper validation had not narrowed. Fixed with explicit numeric guards/type predicates; no compiler setting was weakened.
-- CI #600: build passed, then Node strip-types caught a runtime extensionless import in the new atlas document boundary. Fixed by making document/loader cross-boundaries type-only/injected at runtime rather than changing Node/test flags.
-- CI #604 on head `2b2478bdc26e3e48a4b0968f142f0311d497908f`: **fully green**.
+- CI #575: build/bundle gate passed; `test:core` exposed a Node strip-types runtime import-resolution issue. Fixed without changing test/compiler flags.
+- CI #578: fully green after initial runtime split and lifecycle fixes.
+- CI #583: fully green after actor choreography and power-aware runtime work.
+- CI #592 / #600: atlas contract/type/runtime-import issues caught and corrected without weakening compiler/test settings.
+- CI #604: fully green after atlas/choreography pipeline stabilization.
+- CI #610: fully green after deterministic frame playback.
+- CI #613: caught one actor action type import mismatch; fixed by re-exporting the shared type at the atlas boundary.
+- CI #614: fully green with reviewed-sprite runtime binding.
+- CI #622 / #623 / #624: event-layer regression expectation plus Node/TypeScript import-boundary mistakes caught and corrected; no settings weakened.
+- CI #625 on head `7bfce3988f1241cfbadf5d5028509faa5d93b690`: fully green after semantic event caravans.
+- CI #628 on code-bearing head `21f12d38643eb278f470ecebc1532ab9502a2625`: **fully green** after performance-policy regression.
   - dependency security gates: success;
   - TypeScript + Vite production build: success;
-  - full `test:core`: success, including all new Living World atlas/choreography regressions;
+  - full `test:core`: success;
   - Living World runtime-state regression: success;
   - asset-history, payout/server/production syntax checks: success;
   - production runtime/API regression suite: success.
 
-No financial methodology, broker/API contracts, credential handling or bundle thresholds were changed.
+No financial methodology, broker/API contracts, credential handling or bundle/security/test thresholds were changed.
 
 ## Still intentionally gated
 
 - reviewed production sprite/environment asset pack;
 - actual approved character atlas files and visual frame timing;
-- runtime replacement of procedural actors with those reviewed atlases;
 - long-term XP thresholds/economy;
 - persistent multi-user world storage;
 - sound design;
-- any visual rule that would require new financial interpretation.
+- raw broker-operation → world-event interpretation beyond the approved semantic event boundary;
+- weather/biome rules requiring new financial interpretation.
 
-The next safe autonomous step is to connect only successfully loaded reviewed role atlases to the deferred Pixi renderer while retaining procedural fallback per role. Because the reviewed registry is still empty, no temporary art may be silently promoted; visual approval remains a separate gate.
+The next safe autonomous visual step remains approved art: add reviewed role/environment packs one at a time and perform Samsung visual/performance QA. Until that review exists, procedural geometry remains explicit fallback.
