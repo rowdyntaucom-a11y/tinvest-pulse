@@ -24,6 +24,7 @@ const normalized = normalizeAssetFundamentals({
   updatedAt: '2026-09-14T10:00:00+03:00',
   metrics: {
     market_cap: '1250000000000',
+    market_capitalization: '1250000000000',
     pe_ratio_ttm: '7,25',
     price_to_sales_ttm: 0,
     roe_ttm: 18.4,
@@ -37,6 +38,7 @@ assert.equal(normalized.source, 'T_INVEST')
 assert.equal(normalized.assetUid, 'asset-1')
 assert.equal(normalized.updatedAt, '2026-09-14T07:00:00.000Z')
 assert.equal(normalized.metrics.find(metric => metric.key === 'peRatioTtm')?.value, 7.25)
+assert.equal(normalized.metrics.find(metric => metric.key === 'marketCap')?.value, 1_250_000_000_000)
 assert.equal(normalized.metrics.find(metric => metric.key === 'priceToSalesTtm')?.value, null)
 assert.equal(normalized.metrics.find(metric => metric.key === 'roeTtm')?.value, 18.4)
 assert.equal(normalized.metrics.find(metric => metric.key === 'netDebtToEbitda')?.value, 1.35)
@@ -57,5 +59,7 @@ assert.equal(emptyVerified.reason, 'NO_USABLE_METRICS')
 assert.equal(deriveQvanixFundamentalInterpretation(emptyVerified).reason, 'NO_VERIFIED_METRICS')
 
 assert.equal(normalizeAssetFundamentals(null).reason, 'INVALID_PAYLOAD')
+assert.equal(unavailableAssetFundamentals('UNSUPPORTED_INSTRUMENT').reason, 'UNSUPPORTED_INSTRUMENT')
+assert.equal(unavailableAssetFundamentals('API_ERROR').reason, 'API_ERROR')
 
 console.log('asset fundamentals tests: ok')

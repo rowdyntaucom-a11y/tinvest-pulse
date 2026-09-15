@@ -16,6 +16,7 @@ import { IncomeWorkspace } from './features/income/IncomeWorkspace'
 import { KeyRateWidget } from './features/macro/KeyRateWidget'
 import { PersonalizationControl } from './features/settings/PersonalizationControl'
 import { loadPortfolio, loadPortfolioHistory, type PortfolioSnapshot } from './lib/portfolioApi'
+import { resolveCanonicalAsset } from './features/asset/assetIdentity'
 import {
   loadUiPreferences,
   normalizeUiPreferences,
@@ -25,7 +26,12 @@ import {
   type UiWorkspace,
 } from './lib/uiPreferences'
 
-const GoalWorkspace = lazy(() => import('./features/goals/GoalWorkspace').then(module => ({ default: module.GoalWorkspace })))
+const loadGoalWorkspace = () => import('./features/goals/GoalWorkspace')
+const loadAssetWorkspace = () => import('./features/asset/AssetWorkspace')
+const GoalWorkspace = lazy(() => loadGoalWorkspace().then(module => ({ default: module.GoalWorkspace })))
+const HoldingsExplorer = lazy(() => import('./features/analytics/HoldingsExplorer').then(module => ({ default: module.HoldingsExplorer })))
+const AssetWorkspace = lazy(() => loadAssetWorkspace().then(module => ({ default: module.AssetWorkspace })))
+const PulseMode = lazy(() => import('./features/pulse/PulseMode').then(module => ({ default: module.PulseMode })))
 
 const pctSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' })
 const pctPlain = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
@@ -70,6 +76,10 @@ export default function App() {
   const [uiPreferences, setUiPreferences] = useState<UiPreferences>(() => loadUiPreferences(browserStorage()))
   const [tab, setTab] = useState<Tab>(uiPreferences.defaultWorkspace)
   const [analyticsView, setAnalyticsView] = useState<AnalyticsView>('overview')
+  const [selectedAsset, setSelectedAsset] = useState<PortfolioSnapshot['positionItems'][number] | null>(null)
+  const [assetReturnTab, setAssetReturnTab] = useState<Tab>('portfolio')
+  const [portfolioStatus, setPortfolioStatus] = useState<'LOADING' | 'LIVE' | 'FALLBACK'>('LOADING')
+  const [pulseMode, setPulseMode] = useState(false)
   const worldLocalDate = useWorldPhaseClock(tab === 'dna')
 
   useEffect(() => {
@@ -84,11 +94,26 @@ export default function App() {
     let active = true
     const refresh = async () => {
       const next = await loadPortfolio()
-      if (active) setSnapshot(current => ({ ...next, history: current.history.length ? current.history : next.history }))
+      if (active) {
+        setSnapshot(current => ({ ...next, history: current.history.length ? current.history : next.history }))
+        setPortfolioStatus(next.source === 'fallback' ? 'FALLBACK' : 'LIVE')
+      }
     }
     void refresh()
     const timer = window.setInterval(refresh, 60_000)
     return () => { active = false; window.clearInterval(timer) }
+  }, [])
+
+  useEffect(() => {
+    if (!selectedAsset || portfolioStatus === 'LOADING') return
+    setSelectedAsset(current => resolveCanonicalAsset(current, snapshot.positionItems))
+  }, [snapshot.positionItems, portfolioStatus])
+
+  useEffect(() => {
+    const preload = () => { void loadGoalWorkspace(); void loadAssetWorkspace() }
+    const idle = window.requestIdleCallback?.(preload, { timeout: 2500 })
+    const timer = idle == null ? window.setTimeout(preload, 1200) : null
+    return () => { if (idle != null) window.cancelIdleCallback?.(idle); if (timer != null) window.clearTimeout(timer) }
   }, [])
 
   useEffect(() => {
@@ -127,6 +152,7 @@ export default function App() {
     [analytics.twr, analytics.healthScore, worldLocalDate],
   )
   const dnaWorldState = dnaRuntimeState.world
+  const openAsset = (position: PortfolioSnapshot['positionItems'][number]) => { setAssetReturnTab(tab); setSelectedAsset(position) }
 
   const updateUiPreferences = (patch: Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace' | 'pinnedModules'>>) => {
     setUiPreferences(current => normalizeUiPreferences({ ...current, ...patch }))
@@ -161,10 +187,13 @@ export default function App() {
           <button onClick={() => setTab('income')} className={`chip ${tab === 'income' ? 'chip--active' : ''}`}>ДОХОД</button>
           <button onClick={() => setTab('goals')} className={`chip ${tab === 'goals' ? 'chip--active' : ''}`}>ЦЕЛЬ</button>
           <button onClick={() => setTab('dna')} className={`chip ${tab === 'dna' ? 'chip--active' : ''}`}>DNA</button>
+          <button onClick={() => setPulseMode(true)} className="chip chip--pulse">ПУЛЬС ↗</button>
         </nav>
       </header>
 
-      <section className={`app-view ${tab}-view`}>
+      <section className={`app-view ${selectedAsset ? 'asset-view' : `${tab}-view`}`}>
+        {portfolioStatus === 'LOADING' ? <section className="workspace-loading" aria-live="polite" aria-busy="true"><div className="loading-line loading-line--hero"/><div className="loading-line"/><div className="loading-panel"/><strong>ЗАГРУЖАЕМ ПОРТФЕЛЬ</strong><span>Значения появятся после ответа брокера</span></section> :
+        selectedAsset ? <Suspense fallback={<section className="asset-shell-loading panel"><strong>{selectedAsset.ticker}</strong><span>{selectedAsset.name}</span><b>{new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(selectedAsset.currentValue)} ₽</b><small>Загружаем подробности…</small></section>}><AssetWorkspace position={selectedAsset} portfolioValue={snapshot.value} onBack={() => { setSelectedAsset(null); setTab(assetReturnTab) }} /></Suspense> : <>
         {tab === 'board' && (
           <QvanixBoard
             snapshot={snapshot}
@@ -178,7 +207,7 @@ export default function App() {
           />
         )}
 
-        {tab === 'portfolio' && <PortfolioWorkspace snapshot={snapshot} />}
+        {tab === 'portfolio' && <PortfolioWorkspace snapshot={snapshot} onOpenAsset={openAsset} />}
 
         {tab === 'analytics' && (
           <div className="analytics-layout">
@@ -214,6 +243,7 @@ export default function App() {
                   <div className="panel-head"><div><span className="eyebrow">ИНДЕКС TWR</span><h2>ПОРТФЕЛЬ И IMOEX</h2></div><small>{analytics.historyPoints ? `${analytics.historyPoints} точек` : 'история загружается'}</small></div>
                   <HistoryChart points={snapshot.history} />
                 </section>
+                <Suspense fallback={null}><HoldingsExplorer positions={snapshot.positionItems} onOpenAsset={openAsset} /></Suspense>
               </div>
             )}
 
@@ -262,7 +292,7 @@ export default function App() {
           </div>
         )}
 
-        {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} />}
+        {tab === 'income' && <IncomeWorkspace passiveIncome={snapshot.passiveIncome} averageMonthlyPassiveIncome={snapshot.averageMonthlyPassiveIncome} startDate={startDate} positions={snapshot.positionItems} onOpenAsset={openAsset} />}
 
         {tab === 'goals' && (
           <Suspense fallback={(
@@ -283,7 +313,9 @@ export default function App() {
             </section>
           </div>
         )}
+        </>}
       </section>
+      {pulseMode && <Suspense fallback={null}><PulseMode snapshot={snapshot} live={portfolioStatus === 'LIVE'} onClose={() => setPulseMode(false)} /></Suspense>}
 
       <PersonalizationControl preferences={uiPreferences} onChange={updateUiPreferences} onReset={resetUiPreferences} />
     </main>

@@ -32,6 +32,7 @@ type Props = {
   averageMonthlyPassiveIncome: number
   startDate: string
   positions: PositionSnapshot[]
+  onOpenAsset: (position: PositionSnapshot) => void
 }
 
 const empty: PayoutCalendar = {
@@ -77,7 +78,7 @@ function incomeSourceIdentityNote(state: ReturnType<typeof buildIncomeSourceRows
   return 'база недоступна'
 }
 
-export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions }: Props) {
+export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions, onOpenAsset }: Props) {
   const [view, setView] = useState<View>('overview')
   const [page, setPage] = useState(0)
   const [calendarMonth, setCalendarMonth] = useState<string | null>(null)
@@ -326,14 +327,14 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
           <div className="income-source-table">
             <div className="income-source-row income-source-row--head"><span>Актив</span><span>Получено</span><span>12М / YoC</span></div>
             {sourceRows.length ? sourceRows.map(row => (
-              <div className="income-source-row" key={row.key}>
+              <button type="button" className="income-source-row income-source-row--action" key={row.key} disabled={row.identityState !== 'EXACT_FIGI'} onClick={() => { const position=positions.find(item=>item.figi?.toUpperCase()===row.figi); if(position) onOpenAsset(position) }}>
                 <div><strong>{row.ticker}</strong><small>{row.name !== row.ticker ? row.name : `${row.factCount + row.forecastCount} событий`}</small></div>
                 <b>{row.fact ? `${money2.format(row.fact)} ₽` : '—'}</b>
                 <div className="income-source-forecast">
                   <b>{row.forecast ? `${money2.format(row.forecast)} ₽` : '—'}</b>
                   <small>{row.yoc12m == null ? `YoC — · ${incomeSourceIdentityNote(row.identityState)}` : `YoC ${pct1.format(row.yoc12m * 100)}% · FIGI`}</small>
                 </div>
-              </div>
+              </button>
             )) : <div className="income-empty">Нет данных для разбивки.</div>}
           </div>
           {bondIncomeLinkage.eligibleBondCount > 0 && (

@@ -3,9 +3,10 @@ import { ASSET_HISTORY_NORMALIZATION_VERSION, loadAssetHistory } from '../src/li
 
 let payload: Record<string, unknown> = {}
 let status = 200
+let expectedInput = '/api/asset-history'
 
 ;(globalThis as { fetch: typeof fetch }).fetch = async input => {
-  assert.equal(String(input), '/api/asset-history')
+  assert.equal(String(input), expectedInput)
   return new Response(JSON.stringify(payload), {
     status,
     headers: { 'content-type': 'application/json' },
@@ -137,5 +138,11 @@ const failed = await loadAssetHistory()
 assert.equal(failed.available, false)
 assert.equal(failed.availableSeries, 0)
 assert.deepEqual(failed.series, [])
+
+status = 200
+expectedInput = '/api/asset-history?instrumentUid=uid%2Fwith%20space'
+payload = { version: '1.1', available: true, requested: 1, series: [{ key: 'ONE', instrumentId: 'uid/with space', points: [{ date: '2026-09-01', value: 10 }, { date: '2026-09-02', value: 11 }] }] }
+const targeted = await loadAssetHistory(undefined, 'uid/with space')
+assert.equal(targeted.series[0].instrumentId, 'uid/with space')
 
 console.log('asset history API normalization regression: ok')

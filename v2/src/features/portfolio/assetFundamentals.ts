@@ -1,4 +1,4 @@
-export const ASSET_FUNDAMENTALS_VERSION = '1.0' as const
+export const ASSET_FUNDAMENTALS_VERSION = '1.1' as const
 
 export type AssetFundamentalSource = 'T_INVEST' | 'UNAVAILABLE'
 
@@ -32,7 +32,7 @@ export type AssetFundamentalsSnapshot = {
   assetUid: string | null
   updatedAt: string | null
   metrics: AssetFundamentalMetric[]
-  reason: 'OK' | 'NO_VERIFIED_SOURCE' | 'INVALID_PAYLOAD' | 'NO_USABLE_METRICS'
+  reason: 'OK' | 'NO_VERIFIED_SOURCE' | 'INVALID_PAYLOAD' | 'NO_USABLE_METRICS' | 'UNSUPPORTED_INSTRUMENT' | 'API_ERROR'
   note: string
 }
 
@@ -42,18 +42,18 @@ const METRIC_DEFS: Array<{
   label: string
   unit: AssetFundamentalMetric['unit']
 }> = [
-  { key: 'marketCap', aliases: ['marketCap', 'market_cap'], label: 'Капитализация', unit: 'RUB' },
+  { key: 'marketCap', aliases: ['marketCap', 'market_cap', 'marketCapitalization', 'market_capitalization'], label: 'Капитализация', unit: 'RUB' },
   { key: 'peRatioTtm', aliases: ['peRatioTtm', 'pe_ratio_ttm'], label: 'P/E TTM', unit: 'RATIO' },
-  { key: 'priceToSalesTtm', aliases: ['priceToSalesTtm', 'price_to_sales_ttm'], label: 'P/S TTM', unit: 'RATIO' },
-  { key: 'priceToBookTtm', aliases: ['priceToBookTtm', 'price_to_book_ttm'], label: 'P/BV TTM', unit: 'RATIO' },
+  { key: 'priceToSalesTtm', aliases: ['priceToSalesTtm', 'price_to_sales_ttm', 'psRatioTtm', 'ps_ratio_ttm'], label: 'P/S TTM', unit: 'RATIO' },
+  { key: 'priceToBookTtm', aliases: ['priceToBookTtm', 'price_to_book_ttm', 'pbRatioTtm', 'pb_ratio_ttm'], label: 'P/BV TTM', unit: 'RATIO' },
   { key: 'evToEbitdaTtm', aliases: ['evToEbitdaTtm', 'ev_to_ebitda_ttm'], label: 'EV/EBITDA TTM', unit: 'RATIO' },
-  { key: 'roeTtm', aliases: ['roeTtm', 'roe_ttm'], label: 'ROE TTM', unit: 'PERCENT' },
-  { key: 'roaTtm', aliases: ['roaTtm', 'roa_ttm'], label: 'ROA TTM', unit: 'PERCENT' },
-  { key: 'roicTtm', aliases: ['roicTtm', 'roic_ttm'], label: 'ROIC TTM', unit: 'PERCENT' },
-  { key: 'revenueTtm', aliases: ['revenueTtm', 'revenue_ttm'], label: 'Выручка TTM', unit: 'RUB' },
-  { key: 'ebitdaTtm', aliases: ['ebitdaTtm', 'ebitda_ttm'], label: 'EBITDA TTM', unit: 'RUB' },
-  { key: 'netIncomeTtm', aliases: ['netIncomeTtm', 'net_income_ttm'], label: 'Чистая прибыль TTM', unit: 'RUB' },
-  { key: 'freeCashFlowTtm', aliases: ['freeCashFlowTtm', 'free_cash_flow_ttm'], label: 'FCF TTM', unit: 'RUB' },
+  { key: 'roeTtm', aliases: ['roeTtm', 'roe_ttm', 'roe'], label: 'ROE TTM', unit: 'PERCENT' },
+  { key: 'roaTtm', aliases: ['roaTtm', 'roa_ttm', 'roa'], label: 'ROA TTM', unit: 'PERCENT' },
+  { key: 'roicTtm', aliases: ['roicTtm', 'roic_ttm', 'roic'], label: 'ROIC TTM', unit: 'PERCENT' },
+  { key: 'revenueTtm', aliases: ['revenueTtm', 'revenue_ttm', 'totalRevenue', 'total_revenue'], label: 'Выручка TTM', unit: 'RUB' },
+  { key: 'ebitdaTtm', aliases: ['ebitdaTtm', 'ebitda_ttm', 'ebitda'], label: 'EBITDA TTM', unit: 'RUB' },
+  { key: 'netIncomeTtm', aliases: ['netIncomeTtm', 'net_income_ttm', 'netIncome', 'net_income'], label: 'Чистая прибыль TTM', unit: 'RUB' },
+  { key: 'freeCashFlowTtm', aliases: ['freeCashFlowTtm', 'free_cash_flow_ttm', 'freeCashFlow', 'free_cash_flow'], label: 'FCF TTM', unit: 'RUB' },
   { key: 'netDebtToEbitda', aliases: ['netDebtToEbitda', 'net_debt_to_ebitda'], label: 'Net Debt / EBITDA', unit: 'RATIO' },
   { key: 'dividendYield', aliases: ['dividendYield', 'dividend_yield'], label: 'Dividend Yield', unit: 'PERCENT' },
 ]
@@ -64,6 +64,23 @@ function cleanText(value: unknown): string | null {
   if (value == null) return null
   const text = String(value).trim()
   return text || null
+}
+
+export async function loadAssetFundamentals(instrumentUid: string, signal?: AbortSignal): Promise<AssetFundamentalsSnapshot> {
+  const uid = cleanText(instrumentUid)
+  if (!uid || uid.length > 128) return unavailableAssetFundamentals('INVALID_PAYLOAD')
+  try {
+    const response = await fetch(`/api/asset-fundamentals?instrumentUid=${encodeURIComponent(uid)}`, { cache: 'no-store', signal })
+    const raw = await response.json() as unknown
+    if (!response.ok) {
+      if (response.status === 404 && raw && typeof raw === 'object' && String((raw as Record<string, unknown>).source).toUpperCase() === 'T_INVEST') return normalizeAssetFundamentals(raw)
+      return unavailableAssetFundamentals(response.status === 404 ? 'UNSUPPORTED_INSTRUMENT' : 'API_ERROR')
+    }
+    if (!raw || typeof raw !== 'object' || cleanText((raw as Record<string, unknown>).instrumentUid) !== uid) return unavailableAssetFundamentals('INVALID_PAYLOAD')
+    return normalizeAssetFundamentals(raw)
+  } catch {
+    return unavailableAssetFundamentals('API_ERROR')
+  }
 }
 
 function finiteNonZero(value: unknown): number | null {

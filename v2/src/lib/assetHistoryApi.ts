@@ -156,9 +156,10 @@ function normalizeSeriesList(value: unknown) {
   return rows.filter(row => counts.get(row.key) === 1)
 }
 
-export async function loadAssetHistory(signal?: AbortSignal): Promise<AssetHistoryPayload> {
+export async function loadAssetHistory(signal?: AbortSignal, instrumentUid?: string): Promise<AssetHistoryPayload> {
   try {
-    const response = await fetch('/api/asset-history', { cache: 'no-store', signal })
+    const query = instrumentUid ? `?instrumentUid=${encodeURIComponent(instrumentUid)}` : ''
+    const response = await fetch(`/api/asset-history${query}`, { cache: 'no-store', signal })
     if (!response.ok) return emptyPayload()
     const raw = await response.json() as Record<string, unknown>
     if (raw.available !== true) return emptyPayload()
