@@ -46,19 +46,38 @@ assert.deepEqual(
     ['hauler-b', 0.16, 0.7],
     ['builder-b', 0.81, 0.62],
   ],
-  'secondary ambient actors retain independent timing',
+  'secondary ambient actors retain independent day timing',
 )
 
+const sunset = buildWorldAmbientActivityPresentation({ level: 8, timePhase: 'sunset', weather: 'neutral' })
+const night = buildWorldAmbientActivityPresentation({ level: 8, timePhase: 'night', weather: 'neutral' })
+const sunsetWorkerPaces = ['miner-a', 'hauler-a', 'builder-a'].map(id => sunset.actors.find(actor => actor.id === id)?.pace)
+assert.ok(sunsetWorkerPaces.every(pace => pace === WORLD_PRIMARY_WORK_CHAIN_PACE * 0.8), 'primary work-chain remains phase-locked at sunset')
+const dayResident = buildWorldAmbientActivityPresentation({ level: 8, timePhase: 'day', weather: 'neutral' }).actors.find(actor => actor.id === 'resident-a')
+const sunsetResident = sunset.actors.find(actor => actor.id === 'resident-a')
+const nightResident = night.actors.find(actor => actor.id === 'resident-a')
+assert.ok(dayResident && sunsetResident && nightResident)
+assert.ok(sunsetResident.pace > dayResident.pace, 'resident cadence is more visible at sunset')
+assert.ok(nightResident.pace < sunsetResident.pace, 'night cadence is restrained')
+assert.equal(night.cartCount, 1, 'night logistics remains visible but restrained')
+
 const rainy = buildWorldAmbientActivityPresentation({ level: 2, timePhase: 'day', weather: 'rain' })
-const storm = buildWorldAmbientActivityPresentation({ level: 2, timePhase: 'day', weather: 'storm' })
+const storm = buildWorldAmbientActivityPresentation({ level: 8, timePhase: 'day', weather: 'storm' })
 assert.ok(rainy.activityScale < presentation.activityScale)
 assert.ok(storm.activityScale < rainy.activityScale)
+assert.equal(storm.cartCount, 1, 'storm reduces visible cart density without inventing production state')
+assert.equal(buildWorldAmbientActivityPresentation({ level: 8, timePhase: 'day', weather: 'neutral' }).cartCount, 2)
 
-for (const actor of presentation.actors) {
-  assert.equal(Object.prototype.hasOwnProperty.call(actor, 'amount'), false)
-  assert.equal(Object.prototype.hasOwnProperty.call(actor, 'inventory'), false)
-  assert.equal(Object.prototype.hasOwnProperty.call(actor, 'portfolioValue'), false)
-  assert.equal(Object.prototype.hasOwnProperty.call(actor, 'reward'), false)
+for (const phase of ['dawn', 'day', 'sunset', 'night'] as const) {
+  const state = buildWorldAmbientActivityPresentation({ level: 8, timePhase: phase, weather: 'neutral' })
+  assert.equal(state.actors.length, 8, 'time-of-day rhythm changes cadence, not inhabitant availability')
+  for (const actor of state.actors) {
+    assert.ok(actor.pace > 0)
+    assert.equal(Object.prototype.hasOwnProperty.call(actor, 'amount'), false)
+    assert.equal(Object.prototype.hasOwnProperty.call(actor, 'inventory'), false)
+    assert.equal(Object.prototype.hasOwnProperty.call(actor, 'portfolioValue'), false)
+    assert.equal(Object.prototype.hasOwnProperty.call(actor, 'reward'), false)
+  }
 }
 
 console.log('world ambient activity tests passed')
