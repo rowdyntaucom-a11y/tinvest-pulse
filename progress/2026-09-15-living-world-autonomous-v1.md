@@ -45,14 +45,31 @@ The Living World now has a first real deterministic activity loop inside the exi
 
 All motion is renderer-only. It does not mutate `WorldState`, XP or financial state.
 
+### Actor choreography pass
+
+Added `v2/src/features/world/worldActorChoreography.ts` as a pure deterministic presentation boundary.
+
+Workers no longer move continuously like conveyor-belt markers. Each route is resolved into a small work loop:
+- pause/work at the origin;
+- outbound travel;
+- pause/work at the destination;
+- return travel;
+- repeat.
+
+Role behavior is restrained and readable:
+- miners, haulers and builders can visibly carry a small material load on the outbound leg;
+- keeper travels without cargo and inspects endpoints;
+- residents pause rather than pretending to perform industrial work;
+- work phases receive a small local spark/action cue;
+- no choreography result changes XP, world state, event semantics or finance state.
+
+The choreography is deliberately pure and sprite-agnostic so final character atlases can replace the procedural fallback later without replacing route semantics.
+
 ### Deferred renderer boundary
 
 The first implementation placed too much renderer code in `WorldStage.tsx`. CI #573 correctly caught a main-bundle regression above the existing 450 KiB hard guard. The budget was **not raised**.
 
-The renderer was split into the dynamically loaded `worldPixiRuntime.ts`. `WorldStage.tsx` remains a small ownership/lifecycle boundary and imports the renderer only when DNA is mounted. The final verified build keeps the new Living World implementation in its own async chunk:
-- `worldPixiRuntime-*.js`: ~11.80 kB raw / ~4.81 kB gzip;
-- Vite-reported main `index-*.js`: ~456.06 kB decimal (~445.4 KiB binary), therefore still below the existing 450 KiB binary budget;
-- Pixi remains deferred in its existing separate chunk.
+The renderer was split into the dynamically loaded `worldPixiRuntime.ts`. `WorldStage.tsx` remains a small ownership/lifecycle boundary and imports the renderer only when DNA is mounted. The verified build keeps Living World implementation in its own async chunk while Pixi remains deferred in its existing separate chunk.
 
 This is now a permanent implementation lesson: Living World richness must grow behind the deferred DNA boundary rather than inflate the normal financial-app startup path.
 
@@ -62,29 +79,36 @@ The runtime now:
 - receives an `AbortSignal` so a slow Pixi initialization cannot attach a canvas after React unmount;
 - releases the single runtime lease safely;
 - pauses/resumes on document visibility;
+- pauses the Pixi application when the Living World is outside the viewport through `IntersectionObserver`;
+- respects `prefers-reduced-motion` by freezing decorative movement/lightning and lowering ticker pressure while preserving the static world state;
 - avoids rebuilding the deterministic presentation plan every ticker frame by caching it until the renderer snapshot object changes;
 - caps mobile DPR/FPS through the existing renderer policy.
 
 ### Regression
 
-Added `v2/tests/worldLivingPresentation.test.ts` and registered it in `test:core`.
+Added `v2/tests/worldLivingPresentation.test.ts` and `v2/tests/worldActorChoreography.test.ts`, both registered in `test:core`.
 
 The regression locks:
 - neutral weather has no invented rain/lightning;
 - actor/cart density grows only from resolved level;
 - time phase changes presentation pace only;
 - semantic income event maps to the existing `income` channel;
-- malformed level fails closed to level-one presentation density.
+- malformed level fails closed to level-one presentation density;
+- actor work/travel/return phases remain deterministic;
+- cargo is limited to intended outbound worker roles;
+- resident/keeper behavior does not invent cargo work;
+- malformed choreography phase fails closed deterministically.
 
 ## CI history / verification
 
 - CI #573: failed the hard main-bundle gate after the first monolithic renderer implementation. Fixed by code splitting; budget not weakened.
 - CI #575: build/bundle gate passed; `test:core` exposed a Node strip-types runtime import-resolution issue in the new presentation module. Fixed by keeping the external event-presentation dependency type-only and mapping already-resolved event kinds locally.
-- CI #578 on head `d91d166041217a8d323e162a803e19b0ed6bc69b`: **fully green**.
-  - dependency security gates: success, 0 reported vulnerabilities at configured threshold;
+- CI #578 on head `d91d166041217a8d323e162a803e19b0ed6bc69b`: fully green after the initial runtime split and lifecycle fixes.
+- CI #583 on head `8c896b6b21596d880c09b749039e388f3cd64998`: **fully green** after actor choreography and power-aware runtime work.
+  - dependency security gates: success;
   - TypeScript + Vite production build: success;
-  - full `test:core`: success, including `worldLivingPresentation`;
-  - existing Living World runtime-state regression: success;
+  - full `test:core`: success, including `worldLivingPresentation` and `worldActorChoreography`;
+  - Living World runtime-state regression: success;
   - asset-history, payout/server/production syntax checks: success;
   - production runtime/API regression suite: success.
 
@@ -99,4 +123,4 @@ No financial methodology, broker/API contracts, credential handling or bundle th
 - sound design;
 - any visual rule that would require new financial interpretation.
 
-The next visual step should replace procedural fallback pieces through the reviewed asset manifest without changing runtime ownership or financial boundaries. Runtime/choreography can continue autonomously; final production art remains subject to visual review.
+The next safe autonomous step is the reviewed-asset application bridge plus richer sprite-ready animation states, while keeping the procedural fallback until production art has actually passed review.
