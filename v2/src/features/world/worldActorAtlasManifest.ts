@@ -1,6 +1,8 @@
 import type { WorldActorAction } from './worldActorChoreography'
 import type { WorldActorRole } from './worldLivingPresentation'
 
+export type { WorldActorAction } from './worldActorChoreography'
+
 export const WORLD_ACTOR_ATLAS_MANIFEST_VERSION = '0.1' as const
 
 export const WORLD_ACTOR_ACTIONS: readonly WorldActorAction[] = ['idle', 'walk', 'carry', 'work'] as const
