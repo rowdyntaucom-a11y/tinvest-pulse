@@ -20,6 +20,7 @@ This pass increases visual depth without introducing unreviewed binary assets, w
 - Added responsive decorative motion for work light/cloud/rain layers.
 - Added `prefers-reduced-motion` handling: decorative movement and storm flash are disabled, while the scene and data-driven state remain visible.
 - Added regression coverage to the existing `worldRenderSnapshot` test gate.
+- Kept the hard bundle gate unchanged. CI caught initial main-chunk growth; presentation-only `WorldStage` and atmosphere policy were isolated into small non-Pixi chunks while `pixi-dna` stayed dynamically imported and deferred.
 
 ## Data honesty
 
@@ -39,7 +40,7 @@ No TWR/XIRR/IMOEX/risk/bond/income methodology changed. No daily metrics, movers
 
 ## Parallel-development boundary
 
-The Codex clean-recovery epic is working on navigation, progressive disclosure, Pult hierarchy, comprehension/help and responsive UX. This Living World pass intentionally does not touch those surfaces.
+The Codex clean-recovery epic changed navigation, progressive disclosure, Pult hierarchy, comprehension/help and responsive UX. This Living World pass intentionally does not touch those surfaces.
 
 Not changed here:
 
@@ -53,16 +54,22 @@ Not changed here:
 - legacy/public DNA renderer chain;
 - binary assets.
 
-## Verification target
+PR #344 was reviewed separately and merged to `main` as `ac77cb1024b948890ca90d06c60723cf5ab3c57c` after this branch was created. A fresh PR-triggered CI run is therefore required on the updated merge ref before this Living World PR can merge; passing only against the old base is not sufficient.
 
-Required before merge:
+## Verification
 
-- TypeScript/Vite build;
-- full `test:core`;
-- security/dependency gates required by repository CI;
-- bundle budget with no limit increase;
-- confirm Pixi remains deferred;
-- clean diff against current `main`;
+CI #657 on the pre-#344 base passed completely:
+
+- dependency/security gates: passed, 0 high vulnerabilities;
+- TypeScript/Vite production build: passed;
+- `test:core`: passed;
+- Living World runtime-state regression: passed;
+- production/API regression gates: passed;
+- bundle budget was not raised;
+- build output: app chunk 450.94 kB as reported by Vite (under the plugin's 450 KiB byte budget), `dna-stage` 23.61 kB, `dna-atmosphere` 1.84 kB, deferred `pixi-dna` 505.94 kB / 525 KiB budget.
+
+Required final gate before merge:
+
+- PR CI must pass again against latest `main` containing PR #344;
+- clean diff against latest `main` must still contain only Living World presentation/test/build-isolation changes;
 - no binary artifacts.
-
-This branch should be reviewed/merged independently from the Codex UX clean-recovery PR to keep conflict risk low.
