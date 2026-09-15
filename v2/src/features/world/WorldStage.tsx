@@ -57,6 +57,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       return
     }
 
+    const controller = new AbortController()
     let disposed = false
     let cleanupRuntime: (() => void) | null = null
     let leaseReleased = false
@@ -74,6 +75,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         getSnapshot: () => snapshotRef.current,
         onRenderer: setRenderer,
         onAssetRuntime: setAssetRuntime,
+        signal: controller.signal,
       })
       if (disposed) {
         cleanupRuntime()
@@ -91,6 +93,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
     return () => {
       disposed = true
+      controller.abort()
       cleanupRuntime?.()
       cleanupRuntime = null
       releaseLease()
