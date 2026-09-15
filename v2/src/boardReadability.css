@@ -68,10 +68,28 @@
   .qv-board-card { padding-inline: 11px; }
 }
 
+/* Real-device Board pass: preserve all four context cells, but stop clipping their useful text. */
+@media (max-width: 620px) {
+  .qv-board__rail strong,
+  .qv-board__rail small {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: clip;
+    line-height: 1.16;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  /* The base mobile Board reserves 300px here; two compact rows do not need that much height. */
+  .qv-board__modules { min-height: 228px; }
+}
+
 @media (max-width: 430px) {
   .qv-board__rail span { font-size: 6.2px; }
   .qv-board__rail small { font-size: 6px; }
   .qv-board__lens-tabs button { font-size: 6.3px; }
   .qv-board-card > span { font-size: 6.1px; }
   .qv-board-card > small { font-size: 6.2px; }
+  .qv-board__modules { min-height: 216px; }
 }
