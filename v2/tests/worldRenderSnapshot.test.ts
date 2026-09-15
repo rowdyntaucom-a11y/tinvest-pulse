@@ -2,6 +2,11 @@ import assert from 'node:assert/strict'
 import { buildWorldState } from '../src/features/dna/worldState.ts'
 import { emptyWorldEventCursor, resolveWorldEventQueue } from '../src/features/dna/worldEventQueue.ts'
 import { WORLD_RENDER_SNAPSHOT_VERSION, buildWorldRenderSnapshot } from '../src/features/dna/worldRenderSnapshot.ts'
+import {
+  WORLD_AMBIENT_ACTIVITY_VERSION,
+  WORLD_AMBIENT_ACTOR_SLOTS,
+  buildWorldAmbientActivityPresentation,
+} from '../src/features/world/worldAmbientActivityPresentation.ts'
 import { WORLD_ATMOSPHERE_PRESENTATION_VERSION, buildWorldAtmospherePresentation } from '../src/features/world/worldAtmospherePresentation.ts'
 import { WORLD_ASSET_LOADER_VERSION, loadWorldAssetEntries } from '../src/features/world/worldAssetLoader.ts'
 import { WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_MANIFEST_VERSION, resolveWorldAssetManifest, worldAssetFromManifest } from '../src/features/world/worldAssetManifest.ts'
@@ -55,6 +60,32 @@ for (const phase of ['dawn', 'day', 'sunset', 'night'] as const) {
     }
   }
 }
+
+assert.equal(WORLD_AMBIENT_ACTIVITY_VERSION, '0.1')
+assert.equal(new Set(WORLD_AMBIENT_ACTOR_SLOTS.map(actor => actor.id)).size, WORLD_AMBIENT_ACTOR_SLOTS.length)
+for (const actor of WORLD_AMBIENT_ACTOR_SLOTS) {
+  assert.equal(actor.phaseOffset >= 0 && actor.phaseOffset < 1, true)
+  assert.equal(actor.pace > 0, true)
+  assert.equal(actor.scale > 0, true)
+  assert.equal(actor.minLevel >= 1, true)
+}
+const levelOneDay = buildWorldAmbientActivityPresentation({ level: 1, timePhase: 'day', weather: 'neutral' })
+const levelFourDay = buildWorldAmbientActivityPresentation({ level: 4, timePhase: 'day', weather: 'clear' })
+const levelEightDay = buildWorldAmbientActivityPresentation({ level: 8, timePhase: 'day', weather: 'clear' })
+const levelFourNight = buildWorldAmbientActivityPresentation({ level: 4, timePhase: 'night', weather: 'clear' })
+const levelFourStorm = buildWorldAmbientActivityPresentation({ level: 4, timePhase: 'day', weather: 'storm' })
+assert.deepEqual(levelOneDay.actors.map(actor => actor.role), ['miner', 'hauler'])
+assert.equal(levelOneDay.cartCount, 0)
+assert.equal(levelFourDay.actors.length, 5)
+assert.equal(levelFourDay.cartCount, 1)
+assert.equal(levelEightDay.actors.length, WORLD_AMBIENT_ACTOR_SLOTS.length)
+assert.equal(levelEightDay.cartCount, 2)
+assert.equal(levelFourNight.activityScale < levelFourDay.activityScale, true)
+assert.equal(levelFourStorm.activityScale < levelFourDay.activityScale, true)
+assert.equal(levelOneDay.activityScale, buildWorldAmbientActivityPresentation({ level: 1, timePhase: 'day', weather: 'clear' }).activityScale)
+assert.equal(Object.prototype.hasOwnProperty.call(levelFourDay, 'xp'), false)
+assert.equal(Object.prototype.hasOwnProperty.call(levelFourDay, 'portfolioValue'), false)
+assert.equal(Object.prototype.hasOwnProperty.call(levelFourDay, 'expectedYield'), false)
 
 assert.equal(WORLD_ASSET_SLOT_VERSION, '0.1')
 assert.equal(new Set(WORLD_ASSET_SLOTS.map(slot => slot.id)).size, WORLD_ASSET_SLOTS.length)
