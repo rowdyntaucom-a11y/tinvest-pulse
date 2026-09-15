@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict'
 import {
+  WORLD_AMBIENT_ACTOR_CHOREOGRAPHY_VERSION,
+  resolveWorldAmbientActorChoreography,
+} from '../src/features/world/worldAmbientActorChoreography.ts'
+import {
   WORLD_EVENT_ARRIVAL_PRESENTATION_VERSION,
   buildWorldEventArrivalPresentation,
 } from '../src/features/world/worldEventArrivalPresentation.ts'
@@ -149,5 +153,67 @@ assert.equal(animatedMotion.sceneAlpha > 0 && animatedMotion.sceneAlpha <= 1, tr
 assert.equal(animatedMotion.scale >= 0.98 && animatedMotion.scale <= 1.02, true)
 assert.equal(Math.abs(animatedMotion.rotation) <= 0.012, true)
 assert.equal(animatedMotion.offsetY <= 0 && animatedMotion.offsetY >= -2.4, true)
+
+assert.equal(WORLD_AMBIENT_ACTOR_CHOREOGRAPHY_VERSION, '0.1')
+const minerWork = resolveWorldAmbientActorChoreography({
+  actor: { role: 'miner', route: 'mine-loop' },
+  phase: 0.04,
+})
+assert.equal(minerWork.action, 'work')
+assert.equal(minerWork.showWorkCue, true)
+assert.equal(minerWork.showLoad, false)
+assert.equal(minerWork.motionScale, 0)
+
+const minerWalk = resolveWorldAmbientActorChoreography({
+  actor: { role: 'miner', route: 'mine-loop' },
+  phase: 0.26,
+})
+assert.equal(minerWalk.action, 'walk')
+assert.equal(minerWalk.motionScale, 1)
+
+const haulerCarry = resolveWorldAmbientActorChoreography({
+  actor: { role: 'hauler', route: 'haul-loop' },
+  phase: 0.25,
+})
+assert.equal(haulerCarry.action, 'carry')
+assert.equal(haulerCarry.showLoad, true)
+assert.equal(haulerCarry.showWorkCue, false)
+assert.equal(haulerCarry.motionScale, 1)
+
+const haulerReturn = resolveWorldAmbientActorChoreography({
+  actor: { role: 'hauler', route: 'haul-loop' },
+  phase: 0.72,
+})
+assert.equal(haulerReturn.action, 'walk')
+assert.equal(haulerReturn.showLoad, false)
+
+const builderWork = resolveWorldAmbientActorChoreography({
+  actor: { role: 'builder', route: 'build-loop' },
+  phase: 0.5,
+})
+assert.equal(builderWork.action, 'work')
+assert.equal(builderWork.showWorkCue, true)
+
+const reducedCarry = resolveWorldAmbientActorChoreography({
+  actor: { role: 'hauler', route: 'haul-loop' },
+  phase: 0.25,
+  reducedMotion: true,
+})
+assert.equal(reducedCarry.action, 'carry')
+assert.equal(reducedCarry.showLoad, true)
+assert.equal(reducedCarry.motionScale, 0)
+
+const deterministicChoreography = resolveWorldAmbientActorChoreography({
+  actor: { role: 'builder', route: 'build-loop' },
+  phase: 0.5,
+})
+assert.deepEqual(deterministicChoreography, builderWork)
+for (const choreography of [minerWork, minerWalk, haulerCarry, haulerReturn, builderWork, reducedCarry]) {
+  assert.equal(choreography.actionProgress >= 0 && choreography.actionProgress <= 1, true)
+  assert.equal(Object.prototype.hasOwnProperty.call(choreography, 'amount'), false)
+  assert.equal(Object.prototype.hasOwnProperty.call(choreography, 'inventory'), false)
+  assert.equal(Object.prototype.hasOwnProperty.call(choreography, 'reward'), false)
+  assert.equal(Object.prototype.hasOwnProperty.call(choreography, 'xp'), false)
+}
 
 console.log('worldEventPresentation tests passed')
