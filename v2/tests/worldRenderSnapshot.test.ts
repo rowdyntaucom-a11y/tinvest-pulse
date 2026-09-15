@@ -8,7 +8,7 @@ import { WORLD_ASSET_SLOTS, WORLD_ASSET_SLOT_VERSION, worldAssetSlot, worldAsset
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, worldSceneLayerIndex } from '../src/features/world/worldSceneLayers.ts'
 
 assert.equal(WORLD_RENDER_SNAPSHOT_VERSION, '0.1')
-assert.equal(WORLD_SCENE_LAYER_VERSION, '0.1')
+assert.equal(WORLD_SCENE_LAYER_VERSION, '0.2')
 assert.deepEqual(WORLD_SCENE_LAYER_ORDER, [
   'background',
   'atmosphere',
@@ -16,10 +16,12 @@ assert.deepEqual(WORLD_SCENE_LAYER_ORDER, [
   'structures',
   'actors',
   'logistics',
+  'events',
   'effects',
 ])
 assert.equal(new Set(WORLD_SCENE_LAYER_ORDER).size, WORLD_SCENE_LAYER_ORDER.length)
 assert.equal(worldSceneLayerIndex('background'), 0)
+assert.equal(worldSceneLayerIndex('events'), WORLD_SCENE_LAYER_ORDER.length - 2)
 assert.equal(worldSceneLayerIndex('effects'), WORLD_SCENE_LAYER_ORDER.length - 1)
 
 assert.equal(WORLD_ASSET_SLOT_VERSION, '0.1')
@@ -31,6 +33,7 @@ for (const slot of WORLD_ASSET_SLOTS) {
 assert.equal(worldAssetSlot('terrain.mine-entrance')?.layer, 'terrain')
 assert.equal(worldAssetSlot('actors.workers')?.layer, 'actors')
 assert.equal(worldAssetSlotsForLayer('logistics').map(slot => slot.id).join(','), 'logistics.rails,logistics.carts,logistics.materials')
+assert.deepEqual(worldAssetSlotsForLayer('events'), [])
 
 assert.equal(WORLD_ASSET_MANIFEST_VERSION, '0.1')
 assert.deepEqual(WORLD_ASSET_MANIFEST_SLOT_IDS, WORLD_ASSET_SLOTS.map(slot => slot.id))
