@@ -1,5 +1,6 @@
 import { Application, Container, Graphics } from 'pixi.js'
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import { resolveWorldActorChoreography } from './worldActorChoreography'
 import { loadWorldAssetEntries } from './worldAssetLoader'
 import { buildWorldLivingPresentation, type WorldActorPlan } from './worldLivingPresentation'
 import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
@@ -17,6 +18,13 @@ type MountWorldPixiRuntimeOptions = {
   onRenderer: (renderer: string) => void
   onAssetRuntime: (state: WorldAssetRuntimeState) => void
   signal: AbortSignal
+}
+
+type ActorView = {
+  root: Container
+  figure: Container
+  load: Graphics
+  workSpark: Graphics
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
@@ -209,20 +217,27 @@ export async function mountWorldPixiRuntime({
   lightning.alpha = 0
   layer('effects').addChild(lightning)
 
-  const actorViews = new Map<string, Container>()
+  const actorViews = new Map<string, ActorView>()
   const createActorView = (plan: WorldActorPlan) => {
-    const actor = new Container()
-    actor.label = `actor:${plan.id}`
+    const root = new Container()
+    root.label = `actor:${plan.id}`
+    const figure = new Container()
     const color = actorColor(plan.role)
     const shadow = new Graphics().ellipse(0, 13, 16, 5).fill({ color: 0x000000, alpha: 0.22 })
     const body = new Graphics().rect(-7, -10, 14, 24).fill({ color })
     const head = new Graphics().circle(0, -18, 7).fill({ color: 0xd0a27d })
     const helmet = new Graphics().rect(-9, -25, 18, 6).fill({ color: 0xd4a74e })
-    actor.addChild(shadow, body, head, helmet)
-    actor.scale.set(plan.scale)
-    layer('actors').addChild(actor)
-    actorViews.set(plan.id, actor)
-    return actor
+    const load = new Graphics().poly([8, -12, 15, -18, 22, -12, 15, -4]).fill({ color: 0x63ddd5, alpha: 0.92 })
+    const workSpark = new Graphics().circle(13, -24, 3.5).fill({ color: 0xf1cf72, alpha: 0.9 })
+    load.visible = false
+    workSpark.visible = false
+    figure.addChild(body, head, helmet, load, workSpark)
+    root.addChild(shadow, figure)
+    root.scale.set(plan.scale)
+    layer('actors').addChild(root)
+    const view = { root, figure, load, workSpark }
+    actorViews.set(plan.id, view)
+    return view
   }
 
   const cartViews = [0, 1].map(index => {
@@ -269,9 +284,21 @@ export async function mountWorldPixiRuntime({
   let lastSnapshot: WorldRenderSnapshot | null = null
   let currentLiving = buildWorldLivingPresentation(getSnapshot())
   let activeActorIds = new Set(currentLiving.actors.map(actor => actor.id))
+  const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null
+  let reducedMotion = reducedMotionQuery?.matches ?? false
 
-  app.ticker.maxFPS = window.innerWidth < 900 ? 45 : 60
-  app.ticker.minFPS = 20
+  const applyFrameRate = () => {
+    app.ticker.maxFPS = reducedMotion ? 20 : window.innerWidth < 900 ? 45 : 60
+    app.ticker.minFPS = reducedMotion ? 10 : 20
+  }
+  applyFrameRate()
+
+  const onReducedMotion = (event: MediaQueryListEvent) => {
+    reducedMotion = event.matches
+    applyFrameRate()
+  }
+  reducedMotionQuery?.addEventListener('change', onReducedMotion)
+
   app.ticker.add(() => {
     if (signal.aborted) return
     const currentSnapshot = getSnapshot()
@@ -284,34 +311,36 @@ export async function mountWorldPixiRuntime({
 
     const now = performance.now()
     const seconds = now / 1000
+    const motionNow = reducedMotion ? 0 : now
+    const motionSeconds = reducedMotion ? 0 : seconds
     sky.tint = currentLiving.skyTint
     horizon.tint = currentLiving.atmosphereTint
     atmosphere.tint = currentLiving.atmosphereTint
     atmosphere.alpha = currentLiving.weather.hazeAlpha
     stars.alpha = currentSnapshot.timePhase === 'night' ? 0.9 : currentSnapshot.timePhase === 'dawn' ? 0.34 : 0
 
-    lamp.alpha = clamp((0.58 + Math.sin(now / 550) * 0.14) * currentLiving.lightScale, 0.12, 0.96)
+    lamp.alpha = clamp((0.58 + Math.sin(motionNow / 550) * 0.14) * currentLiving.lightScale, 0.12, 0.96)
     settlement.alpha = clamp(0.55 + currentLiving.lightScale * 0.45, 0.55, 1)
 
     const eventAccent = currentLiving.eventAccent
     eventBeacon.visible = eventAccent !== null
     if (eventAccent) {
       eventBeacon.tint = eventAccentColor(eventAccent)
-      eventBeacon.alpha = 0.16 + (Math.sin(now / 280) + 1) * 0.08
-      const pulse = 0.82 + (Math.sin(now / 360) + 1) * 0.08
+      eventBeacon.alpha = 0.16 + (Math.sin(motionNow / 280) + 1) * 0.08
+      const pulse = 0.82 + (Math.sin(motionNow / 360) + 1) * 0.08
       eventBeacon.scale.set(pulse)
     }
 
     rain.alpha = currentLiving.weather.rainAlpha
     rain.position.y = currentLiving.weather.rainSpeed > 0
-      ? ((seconds * 120 * currentLiving.weather.rainSpeed) % 64) - 64
+      ? ((motionSeconds * 120 * currentLiving.weather.rainSpeed) % 64) - 64
       : 0
-    lightning.alpha = currentLiving.weather.lightning && Math.sin(seconds * 1.75) > 0.985 ? 0.18 : 0
+    lightning.alpha = !reducedMotion && currentLiving.weather.lightning && Math.sin(seconds * 1.75) > 0.985 ? 0.18 : 0
 
     smokePuffs.forEach((puff, index) => {
-      const cycle = (seconds * (0.08 + index * 0.012) + index * 0.31) % 1
+      const cycle = (motionSeconds * (0.08 + index * 0.012) + index * 0.31) % 1
       puff.position.y = 485 - cycle * 95
-      puff.position.x = 805 + index * 8 + Math.sin(seconds * 0.45 + index) * 14
+      puff.position.x = 805 + index * 8 + Math.sin(motionSeconds * 0.45 + index) * 14
       puff.alpha = (1 - cycle) * 0.16 * currentLiving.constructionActivity
       const scale = 0.75 + cycle * 0.75
       puff.scale.set(scale)
@@ -319,19 +348,29 @@ export async function mountWorldPixiRuntime({
 
     for (const plan of currentLiving.actors) {
       const actor = actorViews.get(plan.id) ?? createActorView(plan)
-      const phase = (seconds * 0.045 * plan.pace * currentLiving.activityScale + plan.phaseOffset) % 1
-      const point = routePoint(plan.route, phase)
-      actor.visible = true
-      actor.position.set(point.x, point.y)
-      actor.scale.set(plan.scale * point.direction, plan.scale)
-      actor.rotation = Math.sin(seconds * 4.2 * plan.pace + plan.phaseOffset * 10) * 0.015
+      const cycle = (motionSeconds * 0.045 * plan.pace * currentLiving.activityScale + plan.phaseOffset) % 1
+      const choreography = resolveWorldActorChoreography(plan, cycle)
+      const point = routePoint(plan.route, choreography.routePhase)
+      const moving = choreography.action === 'walk' || choreography.action === 'carry'
+      const working = choreography.action === 'work'
+      const movementWave = Math.sin(motionSeconds * 8.4 * plan.pace + plan.phaseOffset * 10)
+      const workWave = Math.sin(motionSeconds * 10.2 * plan.pace + plan.phaseOffset * 8)
+
+      actor.root.visible = true
+      actor.root.position.set(point.x, point.y)
+      actor.root.scale.set(plan.scale * point.direction, plan.scale)
+      actor.figure.position.y = moving ? movementWave * 1.7 : working ? Math.abs(workWave) * 0.7 : 0
+      actor.figure.rotation = working ? workWave * 0.11 : moving ? movementWave * 0.018 : 0
+      actor.load.visible = choreography.carryLoad
+      actor.workSpark.visible = working && !reducedMotion && workWave > 0.45
+      actor.workSpark.alpha = working ? 0.62 + Math.max(0, workWave) * 0.3 : 0
     }
-    for (const [id, actor] of actorViews) if (!activeActorIds.has(id)) actor.visible = false
+    for (const [id, actor] of actorViews) if (!activeActorIds.has(id)) actor.root.visible = false
 
     cartViews.forEach((cart, index) => {
       cart.visible = index < currentLiving.cartCount
       if (!cart.visible) return
-      const phase = (seconds * 0.035 * currentLiving.activityScale + index * 0.48) % 1
+      const phase = (motionSeconds * 0.035 * currentLiving.activityScale + index * 0.48) % 1
       const ping = phase < 0.5 ? phase * 2 : (1 - phase) * 2
       cart.position.set(315 + ping * 820, 679)
       cart.scale.x = phase < 0.5 ? 1 : -1
@@ -349,15 +388,28 @@ export async function mountWorldPixiRuntime({
   const ro = new ResizeObserver(fit)
   ro.observe(host)
 
-  const onVisibility = () => {
+  let inViewport = true
+  const syncTicker = () => {
     if (signal.aborted) return
-    if (document.hidden) app.stop()
+    if (document.hidden || !inViewport) app.stop()
     else app.start()
   }
+
+  const onVisibility = () => syncTicker()
   document.addEventListener('visibilitychange', onVisibility)
+
+  const intersectionObserver = typeof IntersectionObserver === 'undefined'
+    ? null
+    : new IntersectionObserver(entries => {
+      inViewport = entries[0]?.isIntersecting ?? true
+      syncTicker()
+    }, { threshold: 0.01 })
+  intersectionObserver?.observe(host)
 
   return () => {
     ro.disconnect()
+    intersectionObserver?.disconnect()
+    reducedMotionQuery?.removeEventListener('change', onReducedMotion)
     document.removeEventListener('visibilitychange', onVisibility)
     app.destroy(true, { children: true })
     host.replaceChildren()
