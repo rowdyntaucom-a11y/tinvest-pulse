@@ -1,9 +1,12 @@
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
-import {
-  resolveWorldPrimaryWorkChainTiming,
-} from './worldAmbientActorChoreography.ts'
 
 export const WORLD_AMBIENT_ACTIVITY_VERSION = '0.1' as const
+export const WORLD_PRIMARY_WORK_CHAIN_PACE = 0.62 as const
+export const WORLD_PRIMARY_WORK_CHAIN_PHASE = {
+  miner: 0.04,
+  hauler: 0.18,
+  builder: 0.5,
+} as const
 
 export type WorldAmbientActorRole = 'miner' | 'hauler' | 'builder' | 'keeper' | 'resident'
 export type WorldAmbientActorRoute = 'mine-loop' | 'haul-loop' | 'build-loop' | 'yard-loop' | 'resident-loop'
@@ -30,11 +33,14 @@ export type WorldAmbientActivityPresentation = {
  * no actor carries inventory, money, production output, rewards or broker data.
  * Reviewed sprite art can later replace these silhouettes without changing the
  * WorldRenderSnapshot contract.
+ *
+ * The primary `*-a` trio is intentionally phase-locked so the current fallback
+ * renderer reads as extraction → delivery → construction on one visual clock.
  */
 export const WORLD_AMBIENT_ACTOR_SLOTS: readonly WorldAmbientActorPlan[] = [
-  { id: 'miner-a', role: 'miner', route: 'mine-loop', phaseOffset: 0.08, pace: 0.72, scale: 1, minLevel: 1 },
-  { id: 'hauler-a', role: 'hauler', route: 'haul-loop', phaseOffset: 0.54, pace: 0.66, scale: 0.98, minLevel: 1 },
-  { id: 'builder-a', role: 'builder', route: 'build-loop', phaseOffset: 0.26, pace: 0.58, scale: 1.03, minLevel: 2 },
+  { id: 'miner-a', role: 'miner', route: 'mine-loop', phaseOffset: WORLD_PRIMARY_WORK_CHAIN_PHASE.miner, pace: WORLD_PRIMARY_WORK_CHAIN_PACE, scale: 1, minLevel: 1 },
+  { id: 'hauler-a', role: 'hauler', route: 'haul-loop', phaseOffset: WORLD_PRIMARY_WORK_CHAIN_PHASE.hauler, pace: WORLD_PRIMARY_WORK_CHAIN_PACE, scale: 0.98, minLevel: 1 },
+  { id: 'builder-a', role: 'builder', route: 'build-loop', phaseOffset: WORLD_PRIMARY_WORK_CHAIN_PHASE.builder, pace: WORLD_PRIMARY_WORK_CHAIN_PACE, scale: 1.03, minLevel: 2 },
   { id: 'keeper-a', role: 'keeper', route: 'yard-loop', phaseOffset: 0.72, pace: 0.44, scale: 0.96, minLevel: 3 },
   { id: 'resident-a', role: 'resident', route: 'resident-loop', phaseOffset: 0.37, pace: 0.36, scale: 0.94, minLevel: 4 },
   { id: 'miner-b', role: 'miner', route: 'mine-loop', phaseOffset: 0.63, pace: 0.82, scale: 0.95, minLevel: 5 },
@@ -62,26 +68,11 @@ function safeLevel(level: number) {
   return Math.max(1, Math.min(99, Math.floor(level)))
 }
 
-function synchronizedActorPlan(actor: WorldAmbientActorPlan): WorldAmbientActorPlan {
-  if (!actor.id.endsWith('-a')) return { ...actor }
-  const timing = resolveWorldPrimaryWorkChainTiming(actor.role)
-  if (!timing) return { ...actor }
-  return {
-    ...actor,
-    phaseOffset: timing.phaseOffset,
-    pace: timing.pace,
-  }
-}
-
 /**
  * Converts only already-resolved Living World state into restrained ambient motion.
  * `neutral` is deliberately equivalent to ordinary activity: it does not imply clear
  * weather or any other invented condition. Explicit rain/storm may slow movement,
  * but they never change portfolio/DNA progression or create financial meaning.
- *
- * The primary miner/hauler/builder trio shares one visual clock with staggered phases.
- * This makes extraction → delivery → construction legible without creating inventory,
- * throughput or any simulation of portfolio economics.
  */
 export function buildWorldAmbientActivityPresentation(
   snapshot: Pick<WorldRenderSnapshot, 'level' | 'timePhase' | 'weather'>,
@@ -94,7 +85,7 @@ export function buildWorldAmbientActivityPresentation(
     activityScale,
     actors: WORLD_AMBIENT_ACTOR_SLOTS
       .filter(actor => actor.minLevel <= level)
-      .map(synchronizedActorPlan),
+      .map(actor => ({ ...actor })),
     cartCount: level >= 7 ? 2 : level >= 2 ? 1 : 0,
   }
 }
