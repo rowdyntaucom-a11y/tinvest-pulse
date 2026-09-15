@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Reviewed storage structure layer">
+  <g id="storage" transform="translate(930 410)">
+    <ellipse cx="140" cy="225" rx="185" ry="26" fill="#07120f" opacity=".42"/>
+    <rect x="0" y="82" width="280" height="142" rx="6" fill="#55483a"/>
+    <path d="M-18 92 L140 12 L300 92 Z" fill="#243a32"/>
+    <rect x="28" y="112" width="224" height="112" fill="#66533f"/>
+    <path d="M28 145 H252 M28 182 H252" stroke="#8a6b49" stroke-width="9" opacity=".72"/>
+    <path d="M72 112 V224 M140 112 V224 M208 112 V224" stroke="#382d25" stroke-width="12"/>
+    <rect x="103" y="148" width="74" height="76" fill="#1c211d"/>
+    <path d="M112 154 H168 V224 H112 Z" fill="#2b312b"/>
+    <circle cx="160" cy="190" r="4" fill="#c5a36d"/>
+    <g transform="translate(300 155)">
+      <rect x="0" y="18" width="105" height="66" rx="4" fill="#74583d"/>
+      <path d="M-8 20 L52 -14 L114 20 Z" fill="#30483e"/>
+      <path d="M16 38 H90 M16 58 H90" stroke="#a27b50" stroke-width="7"/>
+      <rect x="46" y="45" width="22" height="39" fill="#24241f"/>
+    </g>
+    <g transform="translate(-65 185)" fill="#7f633f">
+      <rect width="54" height="40" rx="3"/>
+      <rect x="58" y="8" width="48" height="32" rx="3"/>
+      <path d="M8 0 L28 -18 L48 0 Z" fill="#9a794d"/>
+    </g>
+    <g transform="translate(32 236)" fill="#796044">
+      <ellipse cx="36" cy="0" rx="36" ry="8"/>
+      <ellipse cx="104" cy="0" rx="36" ry="8"/>
+      <ellipse cx="172" cy="0" rx="36" ry="8"/>
+    </g>
+  </g>
+</svg>
