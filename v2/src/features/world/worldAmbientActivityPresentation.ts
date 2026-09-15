@@ -1,4 +1,7 @@
 import type { WorldRenderSnapshot } from '../dna/worldRenderSnapshot'
+import {
+  resolveWorldPrimaryWorkChainTiming,
+} from './worldAmbientActorChoreography'
 
 export const WORLD_AMBIENT_ACTIVITY_VERSION = '0.1' as const
 
@@ -59,11 +62,26 @@ function safeLevel(level: number) {
   return Math.max(1, Math.min(99, Math.floor(level)))
 }
 
+function synchronizedActorPlan(actor: WorldAmbientActorPlan): WorldAmbientActorPlan {
+  if (!actor.id.endsWith('-a')) return { ...actor }
+  const timing = resolveWorldPrimaryWorkChainTiming(actor.role)
+  if (!timing) return { ...actor }
+  return {
+    ...actor,
+    phaseOffset: timing.phaseOffset,
+    pace: timing.pace,
+  }
+}
+
 /**
  * Converts only already-resolved Living World state into restrained ambient motion.
  * `neutral` is deliberately equivalent to ordinary activity: it does not imply clear
  * weather or any other invented condition. Explicit rain/storm may slow movement,
  * but they never change portfolio/DNA progression or create financial meaning.
+ *
+ * The primary miner/hauler/builder trio shares one visual clock with staggered phases.
+ * This makes extraction → delivery → construction legible without creating inventory,
+ * throughput or any simulation of portfolio economics.
  */
 export function buildWorldAmbientActivityPresentation(
   snapshot: Pick<WorldRenderSnapshot, 'level' | 'timePhase' | 'weather'>,
@@ -76,7 +94,7 @@ export function buildWorldAmbientActivityPresentation(
     activityScale,
     actors: WORLD_AMBIENT_ACTOR_SLOTS
       .filter(actor => actor.minLevel <= level)
-      .map(actor => ({ ...actor })),
+      .map(synchronizedActorPlan),
     cartCount: level >= 7 ? 2 : level >= 2 ? 1 : 0,
   }
 }
