@@ -1,7 +1,4 @@
-import {
-  resolveWorldActorAtlasDocument,
-  type WorldActorAtlasDocument,
-} from './worldActorAtlasDocument'
+import type { WorldActorAtlasDocument } from './worldActorAtlasDocument'
 import type {
   ResolvedWorldActorAtlasManifest,
   WorldActorAtlasManifestEntry,
@@ -34,17 +31,24 @@ export type WorldActorAtlasLoadResult<TImage> = {
   failures: readonly WorldActorAtlasLoadFailure[]
 }
 
+export type WorldActorAtlasDocumentResolver = (
+  input: unknown,
+  entry: WorldActorAtlasManifestEntry,
+) => WorldActorAtlasDocument | null
+
 /**
  * Loads reviewed actor packs independently and fail-closed per role.
  *
- * The caller owns transport/decoding. This boundary only coordinates already
- * reviewed local manifest entries with the strict atlas-document validator.
- * One broken role can never abort every other reviewed actor pack.
+ * Transport/decoding and document validation are injected deliberately so this
+ * orchestration boundary remains testable under Node strip-types and does not
+ * pull browser/Pixi runtime concerns into the contract. One broken role can
+ * never abort every other reviewed actor pack.
  */
 export async function loadWorldActorAtlases<TImage>(
   manifest: ResolvedWorldActorAtlasManifest,
   loadImage: (assetPath: string) => Promise<TImage | null | undefined>,
   loadAtlasDocument: (assetPath: string) => Promise<unknown>,
+  resolveDocument: WorldActorAtlasDocumentResolver,
 ): Promise<WorldActorAtlasLoadResult<TImage>> {
   const loaded = new Map<WorldActorRole, LoadedWorldActorAtlas<TImage>>()
   const failures: WorldActorAtlasLoadFailure[] = []
@@ -86,7 +90,7 @@ export async function loadWorldActorAtlases<TImage>(
       continue
     }
 
-    const document = resolveWorldActorAtlasDocument(atlasInput, entry)
+    const document = resolveDocument(atlasInput, entry)
     if (!document) {
       failures.push({
         role: entry.role,
