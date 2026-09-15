@@ -35,6 +35,7 @@ const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
 type Tab = UiWorkspace
 type AnalyticsView = 'overview' | 'risk' | 'health' | 'drift' | 'montecarlo'
+type SelectedAssetIdentity = { instrumentUid: string | null; figi: string | null }
 
 function signedRatio(value: number | null) {
   if (value == null || !Number.isFinite(value)) return '—'
@@ -60,6 +61,11 @@ function browserStorage(): UiPreferenceStorage | null {
   }
 }
 
+function cleanIdentity(value: string | null | undefined) {
+  const text = value?.trim()
+  return text || null
+}
+
 const EMPTY: PortfolioSnapshot = {
   accountName: 'Кряхтящий фонд', value: 0, profit: 0, profitPct: 0, passiveIncome: 0,
   averageMonthlyPassiveIncome: 0, averageAnnualPassiveIncome: 0, positions: 0, positionItems: [],
@@ -72,7 +78,7 @@ export default function App() {
   const [uiPreferences, setUiPreferences] = useState<UiPreferences>(() => loadUiPreferences(browserStorage()))
   const [tab, setTab] = useState<Tab>(uiPreferences.defaultWorkspace)
   const [analyticsView, setAnalyticsView] = useState<AnalyticsView>('overview')
-  const [selectedAsset, setSelectedAsset] = useState<PortfolioSnapshot['positionItems'][number] | null>(null)
+  const [selectedAssetIdentity, setSelectedAssetIdentity] = useState<SelectedAssetIdentity | null>(null)
   const [assetReturnTab, setAssetReturnTab] = useState<Tab>('portfolio')
   const worldLocalDate = useWorldPhaseClock(tab === 'dna')
 
@@ -131,7 +137,34 @@ export default function App() {
     [analytics.twr, analytics.healthScore, worldLocalDate],
   )
   const dnaWorldState = dnaRuntimeState.world
-  const openAsset = (position: PortfolioSnapshot['positionItems'][number]) => { setAssetReturnTab(tab); setSelectedAsset(position) }
+  const selectedAsset = useMemo(() => {
+    if (!selectedAssetIdentity) return null
+    const matches = snapshot.positionItems.filter(position => {
+      const instrumentUid = cleanIdentity(position.instrumentUid)
+      if (selectedAssetIdentity.instrumentUid) return instrumentUid === selectedAssetIdentity.instrumentUid
+      const figi = cleanIdentity(position.figi)
+      return Boolean(selectedAssetIdentity.figi) && figi === selectedAssetIdentity.figi
+    })
+    return matches.length === 1 ? matches[0] : null
+  }, [selectedAssetIdentity, snapshot.positionItems])
+
+  useEffect(() => {
+    if (!selectedAssetIdentity || selectedAsset) return
+    setSelectedAssetIdentity(null)
+    setTab(assetReturnTab)
+  }, [selectedAssetIdentity, selectedAsset, assetReturnTab])
+
+  const openAsset = (position: PortfolioSnapshot['positionItems'][number]) => {
+    const instrumentUid = cleanIdentity(position.instrumentUid)
+    const figi = cleanIdentity(position.figi)
+    if (!instrumentUid && !figi) return
+    setAssetReturnTab(tab)
+    setSelectedAssetIdentity({ instrumentUid, figi })
+  }
+  const navigateToTab = (nextTab: Tab) => {
+    setSelectedAssetIdentity(null)
+    setTab(nextTab)
+  }
 
   const updateUiPreferences = (patch: Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace' | 'pinnedModules'>>) => {
     setUiPreferences(current => normalizeUiPreferences({ ...current, ...patch }))
@@ -160,17 +193,17 @@ export default function App() {
         </div>
         <KeyRateWidget rate={snapshot.riskFreeRate} rateDate={snapshot.riskFreeRateDate} nextMeeting={snapshot.nextRateMeeting} />
         <nav className="topbar__nav" aria-label="Разделы">
-          <button onClick={() => setTab('board')} className={`chip ${tab === 'board' ? 'chip--active' : ''}`}>ПУЛЬТ</button>
-          <button onClick={() => setTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
-          <button onClick={() => setTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
-          <button onClick={() => setTab('income')} className={`chip ${tab === 'income' ? 'chip--active' : ''}`}>ДОХОД</button>
-          <button onClick={() => setTab('goals')} className={`chip ${tab === 'goals' ? 'chip--active' : ''}`}>ЦЕЛЬ</button>
-          <button onClick={() => setTab('dna')} className={`chip ${tab === 'dna' ? 'chip--active' : ''}`}>DNA</button>
+          <button onClick={() => navigateToTab('board')} className={`chip ${tab === 'board' ? 'chip--active' : ''}`}>ПУЛЬТ</button>
+          <button onClick={() => navigateToTab('portfolio')} className={`chip ${tab === 'portfolio' ? 'chip--active' : ''}`}>ПОРТФЕЛЬ</button>
+          <button onClick={() => navigateToTab('analytics')} className={`chip ${tab === 'analytics' ? 'chip--active' : ''}`}>АНАЛИТИКА</button>
+          <button onClick={() => navigateToTab('income')} className={`chip ${tab === 'income' ? 'chip--active' : ''}`}>ДОХОД</button>
+          <button onClick={() => navigateToTab('goals')} className={`chip ${tab === 'goals' ? 'chip--active' : ''}`}>ЦЕЛЬ</button>
+          <button onClick={() => navigateToTab('dna')} className={`chip ${tab === 'dna' ? 'chip--active' : ''}`}>DNA</button>
         </nav>
       </header>
 
       <section className={`app-view ${selectedAsset ? 'asset-view' : `${tab}-view`}`}>
-        {selectedAsset ? <Suspense fallback={<section className="panel">Загрузка инструмента…</section>}><AssetWorkspace position={selectedAsset} portfolioValue={snapshot.value} onBack={() => { setSelectedAsset(null); setTab(assetReturnTab) }} /></Suspense> : <>
+        {selectedAsset ? <Suspense fallback={<section className="panel">Загрузка инструмента…</section>}><AssetWorkspace position={selectedAsset} portfolioValue={snapshot.value} onBack={() => { setSelectedAssetIdentity(null); setTab(assetReturnTab) }} /></Suspense> : <>
         {tab === 'board' && (
           <QvanixBoard
             snapshot={snapshot}
@@ -179,7 +212,7 @@ export default function App() {
             pinnedModules={uiPreferences.pinnedModules}
             onNavigate={({ workspace, analyticsView: boardAnalyticsView }) => {
               if (boardAnalyticsView) setAnalyticsView(boardAnalyticsView)
-              setTab(workspace)
+              navigateToTab(workspace)
             }}
           />
         )}
