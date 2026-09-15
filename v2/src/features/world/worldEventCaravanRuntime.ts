@@ -1,16 +1,18 @@
 import { Container, Graphics } from 'pixi.js'
+import { buildWorldEventArrivalPresentation } from './worldEventArrivalPresentation'
 import {
   resolveWorldEventCaravanJourney,
   type WorldEventCaravanPlan,
 } from './worldEventCaravanPresentation'
 
-export const WORLD_EVENT_CARAVAN_RUNTIME_VERSION = '0.2' as const
+export const WORLD_EVENT_CARAVAN_RUNTIME_VERSION = '0.3' as const
 
 type CaravanView = {
   root: Container
   body: Container
   cargo: Graphics
   arrivalPulse: Graphics
+  arrivalActivity: Container
 }
 
 function destinationX(plan: WorldEventCaravanPlan) {
@@ -87,6 +89,56 @@ function drawCargo(plan: WorldEventCaravanPlan) {
   return cargo
 }
 
+function drawArrivalActivity(plan: WorldEventCaravanPlan) {
+  const arrival = buildWorldEventArrivalPresentation(plan)
+  const activity = new Container()
+  activity.label = `world-event-arrival:${plan.id}:${arrival.activity}`
+  activity.visible = false
+  activity.position.set(0, -6)
+
+  const responder = new Graphics()
+  responder.circle(44, -13, 5.5).fill({ color: 0xd0a27d, alpha: 0.95 })
+  responder.rect(39, -7, 10, 18).fill({ color: arrival.accentColor, alpha: 0.8 })
+  activity.addChild(responder)
+
+  const cue = new Graphics()
+  switch (arrival.activity) {
+    case 'stockpile-drop':
+      cue.rect(25, -2, 12, 10).fill({ color: 0x8f7657, alpha: 0.94 })
+      cue.rect(11, 2, 12, 10).fill({ color: arrival.accentColor, alpha: 0.82 })
+      break
+    case 'repair-bench':
+      cue.rect(13, 2, 26, 5).fill({ color: 0x8f7657, alpha: 0.9 })
+      cue.circle(26, -5, 8).stroke({ color: arrival.accentColor, width: 3, alpha: 0.9 })
+      cue.moveTo(26, -13).lineTo(26, 3).stroke({ color: 0xdff5eb, width: 2, alpha: 0.82 })
+      break
+    case 'construction-drop':
+      cue.rect(10, 1, 34, 5).fill({ color: 0xa9825c, alpha: 0.96 })
+      cue.rect(15, -7, 28, 5).fill({ color: arrival.accentColor, alpha: 0.78 })
+      break
+    case 'treasury-unload':
+      cue.circle(18, 2, 6).fill({ color: 0xf0cf72, alpha: 0.96 })
+      cue.circle(28, -1, 6).fill({ color: arrival.accentColor, alpha: 0.92 })
+      cue.circle(38, 2, 6).fill({ color: 0xf0cf72, alpha: 0.92 })
+      break
+    case 'message-handoff':
+      cue.poly([13, -8, 29, -8, 33, 1, 17, 1]).fill({ color: arrival.accentColor, alpha: 0.9 })
+      cue.moveTo(13, -8).lineTo(23, -1).lineTo(29, -8).stroke({ color: 0xdff5eb, width: 1.5, alpha: 0.72 })
+      break
+    case 'celebration-gathering':
+      cue.circle(16, -5, 3.5).fill({ color: arrival.accentColor, alpha: 0.94 })
+      cue.circle(28, -12, 3).fill({ color: 0xf0cf72, alpha: 0.94 })
+      cue.circle(39, -3, 3.5).fill({ color: 0xdff5eb, alpha: 0.88 })
+      cue.moveTo(27, 4).lineTo(27, -23).stroke({ color: 0xc9b07c, width: 2, alpha: 0.9 })
+      cue.poly([28, -23, 43, -18, 28, -12]).fill({ color: arrival.accentColor, alpha: 0.9 })
+      break
+  }
+  activity.addChild(cue)
+  activity.alpha = arrival.intensity
+
+  return activity
+}
+
 function createView(plan: WorldEventCaravanPlan, parent: Container): CaravanView {
   const root = new Container()
   root.label = `world-event-caravan:${plan.id}`
@@ -109,24 +161,27 @@ function createView(plan: WorldEventCaravanPlan, parent: Container): CaravanView
     .circle(-18, 11, 2.5).fill({ color: 0x80715c })
     .circle(18, 11, 2.5).fill({ color: 0x80715c })
   const cargo = drawCargo(plan)
+  const arrivalActivity = drawArrivalActivity(plan)
 
   body.addChild(wagon, cargo, wheels)
-  root.addChild(shadow, arrivalPulse, body)
+  root.addChild(shadow, arrivalPulse, arrivalActivity, body)
   root.scale.set(plan.scale)
   parent.addChild(root)
 
-  return { root, body, cargo, arrivalPulse }
+  return { root, body, cargo, arrivalPulse, arrivalActivity }
 }
 
 /**
  * Renderer-only runtime for already-semantic pending events.
  *
- * Caravans enter the world, pause at a semantic destination and then leave.
- * The pause is deliberately readable so an event looks like something happening
- * in the settlement instead of a decorative object crossing the screen.
+ * Caravans enter the world, pause at a semantic destination, perform a tiny
+ * destination-specific micro-scene and then leave. The pause is deliberately
+ * readable so an event looks like something happening in the settlement instead
+ * of a decorative object crossing the screen.
  *
  * It never acknowledges events, changes WorldState, awards XP or inspects any
- * financial value. Reduced-motion keeps caravans visible at their destination.
+ * financial value. Reduced-motion keeps caravans and the semantic arrival scene
+ * visible at their destination without continuous animation.
  */
 export function createWorldEventCaravanRuntime(parent: Container) {
   const views = new Map<string, CaravanView>()
@@ -161,10 +216,13 @@ export function createWorldEventCaravanRuntime(parent: Container) {
       view.root.scale.set(plan.scale * direction, plan.scale)
 
       view.arrivalPulse.visible = journey.arrived
+      view.arrivalActivity.visible = journey.arrived
       if (journey.arrived) {
         const arrivalWave = reducedMotion ? 0 : Math.sin(motionSeconds * 5.2 + index * 0.8)
         view.arrivalPulse.alpha = reducedMotion ? 0.2 : 0.16 + (arrivalWave + 1) * 0.06
         view.arrivalPulse.scale.set(reducedMotion ? 0.92 : 0.9 + (arrivalWave + 1) * 0.05)
+        view.arrivalActivity.position.y = reducedMotion ? -6 : -6 - Math.max(0, arrivalWave) * 2.2
+        view.arrivalActivity.rotation = reducedMotion ? 0 : arrivalWave * 0.012
       }
 
       const bob = reducedMotion ? 0 : Math.sin(motionSeconds * 7.2 + index)
