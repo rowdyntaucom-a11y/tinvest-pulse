@@ -7,6 +7,8 @@ import { WORLD_ACTOR_ACTIONS, type WorldActorAction } from './worldActorAtlasMan
 import { resolveWorldActorChoreography } from './worldActorChoreography'
 import { resolveWorldActorFramePlayback } from './worldActorFramePlayback'
 import { loadWorldAssetEntries } from './worldAssetLoader'
+import { buildWorldEventCaravanPresentation } from './worldEventCaravanPresentation'
+import { createWorldEventCaravanRuntime } from './worldEventCaravanRuntime'
 import { buildWorldLivingPresentation, type WorldActorPlan, type WorldActorRole } from './worldLivingPresentation'
 import { REVIEWED_WORLD_ACTOR_ATLAS_MANIFEST } from './worldReviewedActorAtlases'
 import { REVIEWED_WORLD_ASSET_MANIFEST } from './worldReviewedAssets'
@@ -193,6 +195,8 @@ export async function mountWorldPixiRuntime({
     return resolved
   }
 
+  const eventCaravanRuntime = createWorldEventCaravanRuntime(layer('events'))
+
   const sky = new Graphics().rect(0, 0, 1600, 900).fill({ color: 0xffffff })
   sky.label = 'asset-slot:background.sky'
   layer('background').addChild(sky)
@@ -268,7 +272,7 @@ export async function mountWorldPixiRuntime({
   const eventBeacon = new Graphics().circle(0, 0, 25).fill({ color: 0x66ffe2, alpha: 0.24 })
   eventBeacon.position.set(1070, 475)
   eventBeacon.visible = false
-  layer('effects').addChild(eventBeacon)
+  layer('events').addChild(eventBeacon)
 
   const smokePuffs = [0, 1, 2].map(index => {
     const puff = new Graphics().circle(0, 0, 18 + index * 5).fill({ color: 0xb7c5bd, alpha: 0.16 })
@@ -427,13 +431,14 @@ export async function mountWorldPixiRuntime({
 
   let lastSnapshot: WorldRenderSnapshot | null = null
   let currentLiving = buildWorldLivingPresentation(getSnapshot())
+  let currentEventCaravans = buildWorldEventCaravanPresentation(getSnapshot().pendingEvents)
   let activeActorIds = new Set(currentLiving.actors.map(actor => actor.id))
   const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null
   let reducedMotion = reducedMotionQuery?.matches ?? false
 
   const applyFrameRate = () => {
-    app.ticker.maxFPS = reducedMotion ? 20 : window.innerWidth < 900 ? 45 : 60
-    app.ticker.minFPS = reducedMotion ? 10 : 20
+    app.ticker.maxFPS = reducedMotion ? 15 : window.innerWidth < 900 ? 30 : 60
+    app.ticker.minFPS = reducedMotion ? 8 : 15
   }
   applyFrameRate()
 
@@ -449,6 +454,7 @@ export async function mountWorldPixiRuntime({
     if (currentSnapshot !== lastSnapshot) {
       lastSnapshot = currentSnapshot
       currentLiving = buildWorldLivingPresentation(currentSnapshot)
+      currentEventCaravans = buildWorldEventCaravanPresentation(currentSnapshot.pendingEvents)
       activeActorIds = new Set(currentLiving.actors.map(actor => actor.id))
     }
     renderLevel(currentSnapshot.level)
@@ -474,6 +480,7 @@ export async function mountWorldPixiRuntime({
       const pulse = 0.82 + (Math.sin(motionNow / 360) + 1) * 0.08
       eventBeacon.scale.set(pulse)
     }
+    eventCaravanRuntime.render(currentEventCaravans, motionSeconds, reducedMotion)
 
     rain.alpha = currentLiving.weather.rainAlpha
     rain.position.y = currentLiving.weather.rainSpeed > 0
@@ -589,6 +596,7 @@ export async function mountWorldPixiRuntime({
     intersectionObserver?.disconnect()
     reducedMotionQuery?.removeEventListener('change', onReducedMotion)
     document.removeEventListener('visibilitychange', onVisibility)
+    eventCaravanRuntime.destroy()
     app.destroy(true, { children: true })
     for (const pack of reviewedActorTexturePacks.values()) destroyReviewedActorTexturePack(pack)
     reviewedActorTexturePacks.clear()
