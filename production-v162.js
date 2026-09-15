@@ -200,8 +200,8 @@ const assetFundamentalsCode=[
  "  }catch(error){console.warn('QVANIX fundamentals failed:',error?.message||error);return res.status(502).json({source:'UNAVAILABLE',available:false,error:'fundamentals unavailable'});}",
  "});",
  ""
-].join('\\n');
-core=core.replace(assetFundamentalsMarker,'\\n'+assetFundamentalsCode+assetFundamentalsMarker);
+].join('\n');
+core=core.replace(assetFundamentalsMarker,'\n'+assetFundamentalsCode+assetFundamentalsMarker);
 `;
 
 const bridges=`const assetHistoryBridge=${JSON.stringify(assetHistoryInjectedCode)};\nconst transactionMarkersBridge=${JSON.stringify(transactionMarkersInjectedCode)};\nconst instrumentBadgesBridge=${JSON.stringify(instrumentBadgesInjectedCode)};\nconst assetFundamentalsBridge=${JSON.stringify(assetFundamentalsInjectedCode)};\n`;
