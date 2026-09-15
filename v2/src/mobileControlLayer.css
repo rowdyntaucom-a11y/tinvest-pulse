@@ -1,0 +1,68 @@
+/*
+ * Mobile interaction layer.
+ *
+ * Loaded last on purpose so fixed controls cannot be visually present while a
+ * later workspace stacking context steals their taps. Keep this presentation-
+ * only: navigation state continues to be owned by React in App/PrimaryNavigation.
+ */
+@media (max-width: 620px) {
+  /*
+   * `.topbar` and `.app-view` are sibling stacking contexts. The fixed mobile
+   * nav lives inside `.topbar`, so the parent context itself must sit above the
+   * scroll owner; a large workspace must never intercept taps intended for nav.
+   */
+  .app-shell .topbar {
+    z-index: 30;
+  }
+
+  .mobile-primary-nav {
+    z-index: 40 !important;
+    pointer-events: auto;
+    touch-action: manipulation;
+    isolation: isolate;
+  }
+
+  .mobile-primary-nav button {
+    pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(89, 240, 209, .12);
+  }
+
+  /*
+   * Floating utilities must not cover the five primary flow targets. DNA keeps
+   * its existing distinct raised action on the right; personalization and help
+   * sit above the bar in separate horizontal lanes.
+   */
+  .qv-personalize {
+    left: 10px !important;
+    bottom: calc(74px + env(safe-area-inset-bottom)) !important;
+    z-index: 45 !important;
+  }
+
+  .context-help {
+    right: 84px !important;
+    bottom: calc(74px + env(safe-area-inset-bottom)) !important;
+    z-index: 45 !important;
+  }
+}
+
+@media (max-width: 620px) and (orientation: landscape) {
+  .app-shell .topbar {
+    z-index: 30;
+  }
+
+  .mobile-primary-nav {
+    z-index: 40 !important;
+  }
+
+  .qv-personalize {
+    left: auto !important;
+    right: 92px !important;
+    bottom: 10px !important;
+  }
+
+  .context-help {
+    right: 10px !important;
+    bottom: 10px !important;
+  }
+}
