@@ -120,6 +120,16 @@ const spoofedUnreviewed = resolveWorldAssetMountDecision(
 assert.equal(spoofedUnreviewed.mode, 'procedural-fallback')
 assert.equal(spoofedUnreviewed.reason, 'MANIFEST_NOT_READY')
 
+const bindingSource = readFileSync(new URL('../src/features/world/worldReviewedSpriteBinding.ts', import.meta.url), 'utf8')
+assert.match(bindingSource, /pixi\.Assets\.load<unknown>\(entry\.assetPath\)/)
+assert.match(bindingSource, /new pixi\.Sprite\(texture\)/)
+assert.match(bindingSource, /resolveWorldAssetMountDecision\([\s\S]*?manifest,[\s\S]*?readiness,/)
+assert.match(bindingSource, /mode:\s*'procedural-fallback'/)
+assert.match(bindingSource, /sprite:\s*null/)
+assert.doesNotMatch(bindingSource, /from\s+['"]pixi\.js['"]/)
+assert.doesNotMatch(bindingSource, /new\s+Application\s*\(/)
+assert.doesNotMatch(bindingSource, /ticker\.(?:add|update|start)/)
+
 const svg = readFileSync(new URL('../public/assets/world/distant-settlement-v1.svg', import.meta.url), 'utf8')
 assert.match(svg, /^<svg\b/)
 assert.match(svg, /viewBox="0 0 1600 900"/)
@@ -128,4 +138,4 @@ assert.doesNotMatch(svg, /<foreignObject\b/i)
 assert.doesNotMatch(svg, /(?:href|src)\s*=\s*["']https?:/i)
 assert.doesNotMatch(svg, /url\(\s*https?:/i)
 
-console.log('Living World reviewed asset registry/readiness/mount-policy regression: ok')
+console.log('Living World reviewed asset registry/readiness/mount-policy/sprite-binding regression: ok')
