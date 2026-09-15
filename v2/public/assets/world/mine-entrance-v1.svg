@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Reviewed mine entrance depth layer">
+  <!-- Reviewed mine entrance depth layer -->
+  <defs>
+    <linearGradient id="rock" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#47505a"/><stop offset="1" stop-color="#222932"/></linearGradient>
+    <linearGradient id="timber" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#563d2b"/><stop offset=".5" stop-color="#8a6847"/><stop offset="1" stop-color="#4b3527"/></linearGradient>
+  </defs>
+  <path d="M130 660 C170 565 250 515 365 520 C470 525 535 575 575 665 L575 790 L125 790 Z" fill="url(#rock)" opacity=".98"/>
+  <path d="M230 700 C238 610 290 570 350 570 C412 570 464 612 472 700 L472 790 L230 790 Z" fill="#10161c"/>
+  <path d="M206 705 L230 705 C238 610 290 570 350 570 C412 570 464 612 472 705 L496 705 C486 590 425 540 350 540 C275 540 216 590 206 705 Z" fill="url(#timber)"/>
+  <rect x="220" y="682" width="260" height="24" rx="6" fill="url(#timber)"/>
+  <rect x="248" y="616" width="22" height="174" rx="5" fill="#6c4e35"/>
+  <rect x="430" y="616" width="22" height="174" rx="5" fill="#6c4e35"/>
+  <path d="M280 790 L322 706 L340 706 L315 790 Z M385 790 L360 706 L378 706 L420 790 Z" fill="#59616a" opacity=".8"/>
+  <path d="M270 790 H430" stroke="#aab0b5" stroke-width="8" stroke-linecap="round" opacity=".75"/>
+  <circle cx="210" cy="736" r="10" fill="#c99a53" opacity=".72"/><circle cx="492" cy="736" r="10" fill="#c99a53" opacity=".72"/>
+  <path d="M150 760 L105 790 L195 790 Z M520 748 L585 790 L490 790 Z" fill="#303943"/>
+</svg>
