@@ -9,6 +9,14 @@ assert.match(app, /ДАННЫЕ НЕ ПОДТВЕРЖДЕНЫ/)
 assert.doesNotMatch(app, /expectedYield[^\n]*(day|daily|день|днев)/i)
 console.log('Portfolio data-state UX regression: ok')
 
+// DNA is a workspace, not a broker-data view. Broker LOADING/FALLBACK/ERROR must not
+// prevent the Living World branch from being selected. Financial signals inside DNA
+// remain fail-closed through the existing quality-input/runtime boundary.
+assert.match(app, /tab === "dna"[\s\S]*?ЖИВОЙ МИР/)
+assert.match(app, /tab !== "dna" && portfolioStatus === "LOADING"/)
+assert.match(app, /tab !== "dna" && \(portfolioStatus === "FALLBACK" \|\| portfolioStatus === "ERROR"\)/)
+assert.match(app, /tab !== "dna" && snapshot\.positions === 0/)
+
 assert.match(app, /twrEligibility\.allowed \? signedRatio/)
 assert.match(app, /!xirrEligibility\.allowed/)
 assert.match(app, /!healthEligibility\.allowed/)
