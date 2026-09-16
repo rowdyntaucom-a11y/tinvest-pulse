@@ -18,6 +18,9 @@ import { INCOME_SECTIONS } from '../navigation/navigationModel'
 import { ContextHelpTerm } from '../help/ContextHelpTerm'
 import './incomeCompact.css'
 import './incomeCalendarVisual.css'
+import { evaluatePayoutTrust } from '../../lib/dataTrust'
+import { DataTrustIndicator } from '../shared/DataTrustIndicator'
+import { separateTrustedIncomeData } from './incomeDataTrust'
 
 const IncomeTaxPanel = lazy(() => import('./IncomeTaxPanel'))
 
@@ -88,14 +91,18 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const [badgePayload, setBadgePayload] = useState<InstrumentBadgePayload | null>(null)
   const { calendar, loading } = usePayoutSnapshot(true)
   const data = calendar ?? empty
+  const payoutTrust = evaluatePayoutTrust({ loading, available: data.available, stale: data.stale, generatedAt: data.generatedAt, eligibleAssets: data.coverage.eligibleAssets, resolvedAssets: data.coverage.resolvedAssets, scheduleComplete: data.integrity.complete }, Date.now())
+  // Source quality is metadata, not permission to erase the independent actual ledger.
+  // Only schedule-dependent surfaces fail closed when future eligibility is unproven.
+  const trustedIncome = useMemo(() => separateTrustedIncomeData(data, payoutTrust.safeToCalculate), [data, payoutTrust.safeToCalculate])
 
   const calendarMonths = useMemo(
-    () => buildIncomeCalendarVisual(data.events, data.period.from, 12),
-    [data.events, data.period.from],
+    () => buildIncomeCalendarVisual(trustedIncome.futureEvents, data.period.from, 12),
+    [trustedIncome.futureEvents, data.period.from],
   )
   const filteredCalendarEvents = useMemo(
-    () => filterIncomeCalendarEvents(data.events, calendarMonth),
-    [data.events, calendarMonth],
+    () => filterIncomeCalendarEvents(trustedIncome.futureEvents, calendarMonth),
+    [trustedIncome.futureEvents, calendarMonth],
   )
   const upcoming = filteredCalendarEvents.slice(0, 20)
   const pageSize = 5
@@ -122,13 +129,13 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
   const integrity = useMemo(() => getIncomeIntegrity(data, loading), [data, loading])
   const bondIncomeLinkage = useMemo(
-    () => buildBondIncomeLinkage(positions, data.events),
-    [positions, data.events],
+    () => buildBondIncomeLinkage(positions, trustedIncome.futureEvents),
+    [positions, trustedIncome.futureEvents],
   )
 
   const allSourceRows = useMemo(
-    () => buildIncomeSourceRows(data.actual.items, data.events, positions, Number.MAX_SAFE_INTEGER),
-    [data.actual.items, data.events, positions],
+    () => buildIncomeSourceRows(trustedIncome.actualEvents, trustedIncome.futureEvents, positions, Number.MAX_SAFE_INTEGER),
+    [trustedIncome.actualEvents, trustedIncome.futureEvents, positions],
   )
   const sourceRows = allSourceRows.slice(0, 6)
 
@@ -136,7 +143,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
     let actualCoupons = 0
     let actualDividends = 0
 
-    for (const event of data.actual.items) {
+    for (const event of trustedIncome.actualEvents) {
       const amount = Math.max(0, eventAmount(event, true))
       const kind = String(event.kind || '').toUpperCase()
       if (kind === 'COUPON') actualCoupons += amount
@@ -144,13 +151,13 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
     }
 
     return { actualCoupons, actualDividends }
-  }, [data.actual.items])
+  }, [trustedIncome.actualEvents])
 
   const realizedHistory = useMemo(
-    () => buildRealizedIncomeHistory(data.actual.items, data.actual.observation),
-    [data.actual.items, data.actual.observation],
+    () => buildRealizedIncomeHistory(trustedIncome.actualEvents, data.actual.observation),
+    [trustedIncome.actualEvents, data.actual.observation],
   )
-  const realizedConcentration = useMemo(() => calculateIncomeSourceConcentration(data.actual.items), [data.actual.items])
+  const realizedConcentration = useMemo(() => calculateIncomeSourceConcentration(trustedIncome.actualEvents), [trustedIncome.actualEvents])
   const realizedStability = useMemo(() => calculateIncomeStability(realizedHistory), [realizedHistory])
   const comparableIncome = useMemo(() => calculateIncomeComparablePeriod(realizedHistory.months), [realizedHistory.months])
   const realizedTopSource = useMemo(
@@ -188,7 +195,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
   return (
     <div className="income-workspace">
-      <SectionSelector workspace="Доход" value={view} groups={INCOME_SECTIONS} onChange={setView} aside={<span className={`income-source-badge is-${integrity.state}`} title={integrity.detail}>{integrity.label}</span>} />
+      <SectionSelector workspace="Доход" value={view} groups={INCOME_SECTIONS} onChange={setView} aside={<DataTrustIndicator trust={payoutTrust} compact />} />
 
       {view === 'overview' && (
         <div className="income-overview-grid">
@@ -203,23 +210,23 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
           <section className="income-forecast panel">
             <span className="eyebrow">12М · ПОДТВЕРЖДЁННЫЕ ВЫПЛАТЫ</span>
-            <strong>{data.available && data.forecast.gross ? `${money.format(data.forecast.gross)} ₽` : '—'}</strong>
+            <strong>{payoutTrust.safeToCalculate && data.forecast.gross ? `${money.format(data.forecast.gross)} ₽` : '—'}</strong>
             <small>до налога · только выплаты из расписания текущих позиций</small>
             <div className="forecast-meta">
-              <span>{data.forecast.count || 0} выплат</span>
+              <span>{payoutTrust.safeToCalculate ? `${data.forecast.count} выплат` : 'прогноз закрыт'}</span>
               <span>покрытие выплат <ContextHelpTerm topic="payoutCoverage" /> {coverage == null ? '—' : `${pct.format(coverage)}%`}</span>
             </div>
           </section>
 
           <section className="income-next panel">
             <span className="eyebrow">СЛЕДУЮЩАЯ ВЫПЛАТА</span>
-            {next ? (
+            {payoutTrust.safeToCalculate && next ? (
               <>
                 <strong>{next.ticker || next.name}</strong>
                 <div><b>{eventKind(next)}</b><span>{dateFmt.format(new Date(next.date))}</span></div>
                 <small>{eventAmount(next) ? `${money2.format(eventAmount(next))} ₽ · до налога` : 'сумма уточняется'}{typeof next.days === 'number' ? ` · через ${next.days} дн.` : ''}</small>
               </>
-            ) : <div className="income-empty">Подтверждённых будущих выплат пока нет.</div>}
+            ) : <div className="income-empty">Будущие выплаты недоступны до полного подтверждения покрытия.</div>}
           </section>
         </div>
       )}
@@ -357,7 +364,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
 
       {view === 'taxes' && (
         <Suspense fallback={<section className="panel"><div className="income-empty">Налоговая аналитика загружается…</div></section>}>
-          <IncomeTaxPanel calendar={data} />
+          <IncomeTaxPanel calendar={trustedIncome.taxCalendar} />
         </Suspense>
       )}
     </div>
