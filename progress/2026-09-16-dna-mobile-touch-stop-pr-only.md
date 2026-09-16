@@ -1,0 +1,3 @@
+# Stop PR only
+
+Open.
