@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { QvanixBoard } from "./features/board/QvanixBoard";
 import { WorldSessionStage } from "./features/world/WorldSessionStage";
 import { useWorldPhaseClock } from "./features/world/useWorldPhaseClock";
@@ -21,6 +21,8 @@ import { PrimaryNavigation } from "./features/navigation/PrimaryNavigation";
 import { SectionSelector } from "./features/navigation/SectionSelector";
 import { ANALYTICS_SECTIONS } from "./features/navigation/navigationModel";
 import { ContextHelpTerm } from "./features/help/ContextHelpTerm";
+import { DataTrustIndicator } from "./features/shared/DataTrustIndicator";
+import { allowsConfirmedEmptyPortfolio, evaluateDataTrust, evaluateHistoryTrust, ownsLatestRequest, resolveMetricEligibility, type DataTrustStatus } from "./lib/dataTrust";
 import { PersonalizationControl } from "./features/settings/PersonalizationControl";
 import {
   loadPortfolio,
@@ -122,11 +124,17 @@ export default function App() {
     PortfolioSnapshot["positionItems"][number] | null
   >(null);
   const [assetReturnTab, setAssetReturnTab] = useState<Tab>("portfolio");
-  const [portfolioStatus, setPortfolioStatus] = useState<
-    "LOADING" | "LIVE" | "FALLBACK" | "ERROR"
-  >("LOADING");
+  const [portfolioStatus, setPortfolioStatus] = useState<DataTrustStatus>("LOADING");
+  const [trustNow, setTrustNow] = useState(() => Date.now());
+  const requestSequence = useRef(0);
+  const lastSuccessfulLiveAt = useRef<string | null>(null);
   const [pulseMode, setPulseMode] = useState(false);
   const worldLocalDate = useWorldPhaseClock(tab === "dna");
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setTrustNow(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -139,9 +147,11 @@ export default function App() {
   useEffect(() => {
     let active = true;
     const refresh = async () => {
+      const sequence = ++requestSequence.current;
       try {
         const next = await loadPortfolio();
-        if (active) {
+        if (ownsLatestRequest(sequence, requestSequence.current, active)) {
+          if (next.source !== "fallback") lastSuccessfulLiveAt.current = new Date().toISOString();
         setSnapshot((current) => ({
           ...next,
           history: current.history.length ? current.history : next.history,
@@ -149,7 +159,7 @@ export default function App() {
           setPortfolioStatus(next.source === "fallback" ? "FALLBACK" : "LIVE");
         }
       } catch {
-        if (active) setPortfolioStatus("ERROR");
+        if (ownsLatestRequest(sequence, requestSequence.current, active)) setPortfolioStatus("ERROR");
       }
     };
     void refresh();
@@ -203,6 +213,18 @@ export default function App() {
       ),
     [snapshot.history, snapshot.positionItems, snapshot.riskFreeRate],
   );
+  const portfolioTrust = useMemo(() => evaluateDataTrust({
+    sourceId: snapshot.source === "fallback" ? "LOCAL_FALLBACK" : snapshot.source.toUpperCase(), sourceType: snapshot.source === "fallback" ? "CACHE" : "BROKER",
+    sourceState: portfolioStatus === "LOADING" ? "LOADING" : portfolioStatus === "ERROR" ? "ERROR" : snapshot.source === "fallback" ? "FALLBACK" : "LIVE",
+    sourceTimestamp: snapshot.updatedAt, lastSuccessfulLiveAt: lastSuccessfulLiveAt.current, staleAfterMs: 5 * 60_000,
+    coverage: snapshot.source === "fallback" ? "UNKNOWN" : "COMPLETE", hasData: snapshot.source !== "fallback", nowMs: trustNow,
+  }), [portfolioStatus, snapshot.source, snapshot.updatedAt, trustNow]);
+  const historyTrust = useMemo(() => evaluateHistoryTrust(snapshot.history, trustNow), [snapshot.history, trustNow]);
+  const twrEligibility = resolveMetricEligibility(historyTrust.portfolioTrust, ['LIVE_SOURCE', 'COMPLETE_COVERAGE', 'MATURE_HISTORY'], { historyPoints: historyTrust.portfolioPoints, minimumHistoryPoints: 2 });
+  // The current portfolio contract exposes an XIRR value, but not the dated cashflows needed to verify it.
+  const xirrEligibility = resolveMetricEligibility(portfolioTrust, ['LIVE_SOURCE', 'COMPLETE_COVERAGE', 'DATED_CASHFLOWS'], { datedCashflows: 0 });
+  const healthEligibility = resolveMetricEligibility(historyTrust.portfolioTrust, ['LIVE_SOURCE', 'COMPLETE_COVERAGE', 'MATURE_HISTORY'], { historyPoints: analytics.historyDays, minimumHistoryPoints: 365 });
+  const relativeEligibility = resolveMetricEligibility(historyTrust.trust, ['LIVE_SOURCE', 'COMPLETE_COVERAGE', 'PAIRED_BENCHMARK'], { pairedPoints: historyTrust.pairedPoints, minimumPairedPoints: 2 });
   const drift = useMemo(
     () =>
       calculateAllocationDrift(snapshot.positionItems, PERSONAL_STRATEGY_V1),
@@ -278,6 +300,7 @@ export default function App() {
             лишнего дублирования.
           </p>
         </div>
+        <DataTrustIndicator trust={tab === "analytics" ? historyTrust.trust : portfolioTrust} />
         <KeyRateWidget
           rate={snapshot.riskFreeRate}
           rateDate={snapshot.riskFreeRateDate}
@@ -307,7 +330,13 @@ export default function App() {
             <h2>{portfolioStatus === "ERROR" ? "Не удалось загрузить портфель" : "Актуальные данные брокера недоступны"}</h2>
             <p>QVANIX не показывает резервные или отсутствующие значения как реальный пустой портфель. Повторная загрузка произойдёт автоматически.</p>
           </section>
-        ) : portfolioStatus === "LIVE" && snapshot.positions === 0 ? (
+        ) : snapshot.positions === 0 && !allowsConfirmedEmptyPortfolio(portfolioTrust, snapshot.positions) ? (
+          <section className="portfolio-empty panel" role="status">
+            <span className="eyebrow">ТЕКУЩЕЕ СОСТОЯНИЕ НЕ ПОДТВЕРЖДЕНО</span>
+            <h2>Состав портфеля временно недоступен</h2>
+            <p>Нулевая позиция не считается пустым портфелем, пока canonical Data Trust не подтвердит LIVE-снимок с полным покрытием.</p>
+          </section>
+        ) : allowsConfirmedEmptyPortfolio(portfolioTrust, snapshot.positions) ? (
           <section className="portfolio-empty panel" role="status">
             <span className="eyebrow">LIVE · ДАННЫЕ ПОДТВЕРЖДЕНЫ</span>
             <h2>Портфель пока пуст</h2>
@@ -332,6 +361,7 @@ export default function App() {
             <AssetWorkspace
               position={selectedAsset}
               portfolioValue={snapshot.value}
+              trustNow={trustNow}
               onBack={() => {
                 setSelectedAsset(null);
                 setTab(assetReturnTab);
@@ -345,6 +375,8 @@ export default function App() {
                 snapshot={snapshot}
                 analytics={analytics}
                 xirrPercent={xirr}
+                metricEligibility={{ twr: twrEligibility.allowed, xirr: xirrEligibility.allowed, health: healthEligibility.allowed }}
+                trustNow={trustNow}
                 pinnedModules={uiPreferences.pinnedModules}
                 onNavigate={({
                   workspace,
@@ -378,14 +410,14 @@ export default function App() {
                           ЗДОРОВЬЕ ПОРТФЕЛЯ · v{analytics.healthVersion} <ContextHelpTerm topic="health" />
                         </span>
                         <strong>
-                          {analytics.healthScore == null
+                          {!healthEligibility.allowed || analytics.healthScore == null
                             ? "—"
                             : Math.round(analytics.healthScore)}
                         </strong>
                         <small>
                           {analyticsMature
-                            ? "Расчёт на зрелой истории"
-                            : `Предварительно · история ${historyLabel}`}
+                            ? "Расчёт на подтверждённой зрелой истории"
+                            : `Недоступно · история не подтверждена (${historyLabel})`}
                         </small>
                       </article>
                       <article className="metric-card">
@@ -393,22 +425,22 @@ export default function App() {
                           XIRR · ЛИЧНАЯ ДОХОДНОСТЬ <ContextHelpTerm topic="xirr" />
                         </span>
                         <strong>
-                          {xirr == null ? "—" : `${pctSigned.format(xirr)}%`}
+                          {!xirrEligibility.allowed || xirr == null ? "—" : `${pctSigned.format(xirr)}%`}
                         </strong>
-                        <small>Учитывает даты денежных потоков</small>
+                        <small>{xirrEligibility.allowed ? "Датированные денежные потоки подтверждены" : "Недоступно без подтверждённых датированных денежных потоков"}</small>
                       </article>
                       <article className="metric-card">
                         <span className="metric-label">
                           TWR · ДОХОДНОСТЬ ПОРТФЕЛЯ <ContextHelpTerm topic="twr" />
                         </span>
-                        <strong>{signedRatio(analytics.twr)}</strong>
-                        <MetricSparkline
+                        <strong>{twrEligibility.allowed ? signedRatio(analytics.twr) : "—"}</strong>
+                        {twrEligibility.allowed && <MetricSparkline
                           values={snapshot.history.map(
                             (point) => point.portfolio,
                           )}
                           label="TWR-индекс · последние 30 доступных дневных точек"
-                        />
-                        <small>Без влияния размера довнесений</small>
+                        />}
+                        <small>{twrEligibility.allowed ? "Без влияния размера довнесений" : "Недоступно без подтверждённой полной истории"}</small>
                       </article>
                     </section>
                     <section className="panel history-panel">
@@ -423,7 +455,7 @@ export default function App() {
                             : "история загружается"}
                         </small>
                       </div>
-                      <HistoryChart points={snapshot.history} />
+                      {relativeEligibility.allowed ? <HistoryChart points={snapshot.history} /> : <div className="income-empty">Сравнение с IMOEX недоступно: нужны минимум две подтверждённые парные точки без пропусков.</div>}
                     </section>
                     <Suspense fallback={null}>
                       <HoldingsExplorer
@@ -467,7 +499,7 @@ export default function App() {
                             {Math.round(component.weight * 100)}%
                           </div>
                           <div className="health-points">
-                            {component.points == null
+                            {!healthEligibility.allowed || component.points == null
                               ? "—"
                               : `${number.format(component.points)} п.`}
                           </div>
@@ -598,6 +630,7 @@ export default function App() {
 
             {tab === "income" && (
               <IncomeWorkspace
+                trustNow={trustNow}
                 passiveIncome={snapshot.passiveIncome}
                 averageMonthlyPassiveIncome={
                   snapshot.averageMonthlyPassiveIncome
@@ -670,7 +703,7 @@ export default function App() {
         <Suspense fallback={null}>
           <PulseMode
             snapshot={snapshot}
-            live={portfolioStatus === "LIVE"}
+            live={portfolioTrust.status === "LIVE"}
             onClose={() => setPulseMode(false)}
           />
         </Suspense>

@@ -6,6 +6,7 @@ import type { UiModuleId, UiWorkspace } from '../../lib/uiPreferences'
 import { MetricSparkline } from '../shared/MetricSparkline'
 import './qvanixBoard.css'
 import { ContextHelpTerm } from '../help/ContextHelpTerm'
+import { evaluatePayoutTrust } from '../../lib/dataTrust'
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
@@ -34,6 +35,8 @@ type Props = {
   snapshot: PortfolioSnapshot
   analytics: PortfolioAnalytics
   xirrPercent: number | null
+  metricEligibility: { twr: boolean; xirr: boolean; health: boolean }
+  trustNow: number
   pinnedModules: UiModuleId[]
   onNavigate: (destination: BoardDestination) => void
 }
@@ -70,14 +73,24 @@ function workspaceLabel(workspace: BoardDestination['workspace']) {
   return 'раздел'
 }
 
-export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, onNavigate }: Props) {
+export function QvanixBoard({ snapshot, analytics, xirrPercent, metricEligibility, trustNow, pinnedModules, onNavigate }: Props) {
   const { calendar, loading: incomeLoading } = usePayoutSnapshot(true)
+  const payoutTrust = evaluatePayoutTrust({
+    loading: incomeLoading,
+    available: calendar?.available === true,
+    stale: calendar?.stale === true,
+    generatedAt: calendar?.generatedAt ?? null,
+    eligibleAssets: calendar?.coverage.eligibleAssets ?? 0,
+    resolvedAssets: calendar?.coverage.resolvedAssets ?? 0,
+    scheduleComplete: calendar?.integrity.complete === true,
+  }, trustNow)
 
   const modules = useMemo(() => {
-    const next = calendar?.next ?? null
+    const next = payoutTrust.safeToCalculate ? calendar?.next ?? null : null
     const nextDate = safeDate(next?.date)
     const nextAmount = next?.gross != null && Number.isFinite(next.gross) ? next.gross : null
-    const actualAvailable = calendar?.available === true && calendar.actual?.observation?.available === true
+    // Realized payouts have their own observation contract and are not future-calendar projections.
+    const actualAvailable = calendar?.actual?.observation?.available === true
     const actualNet = actualAvailable && Number.isFinite(calendar?.actual?.totalNet) ? calendar!.actual.totalNet : null
     const actualYear = actualAvailable && calendar?.actual?.year ? calendar.actual.year : null
     const valueHistory = snapshot.history.map(point => point.value)
@@ -100,22 +113,22 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
       },
       'analytics.twr': {
         id: 'analytics.twr', eyebrow: `TWR · v${analytics.calcVersion}`, label: 'СТРАТЕГИЯ',
-        value: signedPercent(analytics.twr),
-        note: analytics.historyPoints ? `${analytics.historyPoints} точек · без влияния размера пополнений` : 'история ещё не готова',
+        value: metricEligibility.twr ? signedPercent(analytics.twr) : '—',
+        note: metricEligibility.twr ? `${analytics.historyPoints} точек · без влияния размера пополнений` : 'метрика недоступна: история не подтверждена',
         tone: 'blue', destination: { workspace: 'analytics', analyticsView: 'overview' },
-        sparklineValues: twrHistory,
+        sparklineValues: metricEligibility.twr ? twrHistory : undefined,
         sparklineLabel: 'TWR-индекс · последние 30 доступных дневных точек',
       },
       'analytics.xirr': {
         id: 'analytics.xirr', eyebrow: 'XIRR', label: 'ЛИЧНАЯ ДОХОДНОСТЬ',
-        value: xirrPercent == null ? '—' : signedPercent(xirrPercent, false),
-        note: 'годовая · с учётом дат денежных потоков',
+        value: metricEligibility.xirr && xirrPercent != null ? signedPercent(xirrPercent, false) : '—',
+        note: metricEligibility.xirr ? 'годовая · подтверждённые датированные потоки' : 'нет подтверждённого контракта датированных потоков',
         tone: 'blue', destination: { workspace: 'analytics', analyticsView: 'overview' },
       },
       'analytics.health': {
         id: 'analytics.health', eyebrow: `СОСТОЯНИЕ · v${analytics.healthVersion}`, label: 'ЗДОРОВЬЕ ПОРТФЕЛЯ',
-        value: analytics.healthScore == null ? '—' : `${Math.round(analytics.healthScore)}/100`,
-        note: analytics.historyDays >= 365 ? 'история достаточной длины' : `${analytics.historyDays || 0} дней · предварительная оценка`,
+        value: metricEligibility.health && analytics.healthScore != null ? `${Math.round(analytics.healthScore)}/100` : '—',
+        note: metricEligibility.health ? 'подтверждённая история достаточной длины' : `${analytics.historyDays || 0} дней · не подтверждено`,
         tone: 'mint', destination: { workspace: 'analytics', analyticsView: 'health' },
       },
       'analytics.risk': {
@@ -133,7 +146,9 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
       'income.next': {
         id: 'income.next', eyebrow: 'ДОХОД · 12 МЕСЯЦЕВ', label: 'БЛИЖАЙШАЯ ВЫПЛАТА',
         value: nextAmount == null ? '—' : `${money2.format(nextAmount)} ₽`,
-        note: nextDate ? `${next?.ticker || next?.name || '—'} · ${dateFmt.format(nextDate)} · до налога, подтверждённый календарь` : 'подтверждённое событие не найдено',
+        note: payoutTrust.safeToCalculate
+          ? nextDate ? `${next?.ticker || next?.name || '—'} · ${dateFmt.format(nextDate)} · до налога, подтверждённый календарь` : 'подтверждённое событие не найдено'
+          : payoutTrust.status === 'PARTIAL' ? 'будущие выплаты не подтверждены: покрытие календаря неполное' : 'будущие выплаты не подтверждены',
         tone: 'blue', destination: { workspace: 'income' },
       },
       'macro.keyRate': {
@@ -145,11 +160,11 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
     }
 
     return pinnedModules.map(id => all[id]).filter((item): item is BoardModule => Boolean(item))
-  }, [analytics, calendar, incomeLoading, pinnedModules, snapshot, xirrPercent])
+  }, [analytics, calendar, incomeLoading, metricEligibility, payoutTrust.safeToCalculate, payoutTrust.status, pinnedModules, snapshot, xirrPercent])
 
   const sourceLabel = snapshot.source === 'dashboard' ? 'ДАННЫЕ СЧЁТА' : snapshot.source === 'portfolio' ? 'ПОРТФЕЛЬ' : 'РЕЗЕРВНЫЙ ИСТОЧНИК'
   const historyState = analytics.historyPoints > 0 ? `${analytics.historyPoints} точек / ${analytics.historyDays} д.` : 'истории пока нет'
-  const payoutCoverage = calendar?.coverage?.coverageRatio != null && Number.isFinite(calendar.coverage.coverageRatio)
+  const payoutCoverage = calendar?.available === true && calendar?.coverage?.coverageRatio != null && Number.isFinite(calendar.coverage.coverageRatio)
     ? `${pct.format(calendar.coverage.coverageRatio * 100)}%`
     : '—'
 
@@ -168,7 +183,7 @@ export function QvanixBoard({ snapshot, analytics, xirrPercent, pinnedModules, o
       <section className="qv-board__rail" aria-label="Контекст данных">
         <article><span>ИСТОЧНИК</span><strong>{sourceLabel}</strong><small>{snapshotStamp(snapshot.updatedAt)}</small></article>
         <article><span>ИСТОРИЯ</span><strong>{historyState}</strong><small>{analytics.historyIntegrity === 'OK' ? 'данные согласованы' : 'есть расхождения'}</small></article>
-        <article><span>ПОКРЫТИЕ ВЫПЛАТ <ContextHelpTerm topic="payoutCoverage" /></span><strong>{payoutCoverage}</strong><small>{calendar?.integrity?.complete ? 'календарь полный' : 'покрытие рассчитано явно'}</small></article>
+        <article><span>ПОКРЫТИЕ ВЫПЛАТ <ContextHelpTerm topic="payoutCoverage" /></span><strong>{payoutCoverage}</strong><small>{payoutTrust.safeToCalculate ? 'календарь подтверждён' : payoutTrust.status === 'PARTIAL' ? 'покрытие неполное' : 'будущие выплаты не подтверждены'}</small></article>
         <article><span>КЛЮЧЕВАЯ СТАВКА</span><strong>{snapshot.riskFreeRate == null ? '—' : `${number.format(snapshot.riskFreeRate)}%`}</strong><small>{snapshot.nextRateMeeting ? `заседание ${snapshot.nextRateMeeting}` : 'дата следующего заседания —'}</small></article>
       </section>
 
