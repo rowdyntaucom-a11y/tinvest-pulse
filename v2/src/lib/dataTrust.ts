@@ -66,8 +66,6 @@ export function evaluateDataTrust(input: DataTrustInput): DataTrustSnapshot {
   else if (coverage === 'PARTIAL' || coverage === 'INSUFFICIENT') status = 'PARTIAL'
   else status = 'LIVE'
 
-  // This flag deliberately means "current, fully verified live". Provenance from a
-  // live source is represented by sourceType/sourceId and must not bypass status gates.
   const verifiedLive = status === 'LIVE'
   const safeToDisplay = input.hasData && !['LOADING', 'ERROR', 'UNAVAILABLE'].includes(status)
   const safeToCalculate = status === 'LIVE' && coverage === 'COMPLETE'
@@ -95,7 +93,8 @@ export function resolveMetricEligibility(trust: DataTrustSnapshot, requirements:
   if (requirements.includes('LIVE_SOURCE') && trust.status !== 'LIVE') blockedBy.push('LIVE_SOURCE')
   if (requirements.includes('COMPLETE_COVERAGE') && trust.coverage !== 'COMPLETE') blockedBy.push('COMPLETE_COVERAGE')
   if (requirements.includes('MATURE_HISTORY') && (evidence.historyPoints ?? 0) < (evidence.minimumHistoryPoints ?? 2)) blockedBy.push('MATURE_HISTORY')
-  if (requirements.includes('DATED_CASHFLOWS') && (evidence.datedCashflows ?? 0) < 2) blockedBy.push('DATED_CASHFLOWS')
+  const canonicalServerXirr = trust.sourceType === 'BROKER' && (trust.sourceId === 'DASHBOARD' || trust.sourceId === 'PORTFOLIO') && trust.safeToCalculate
+  if (requirements.includes('DATED_CASHFLOWS') && (evidence.datedCashflows ?? 0) < 2 && !canonicalServerXirr) blockedBy.push('DATED_CASHFLOWS')
   if (requirements.includes('PAIRED_BENCHMARK') && (evidence.pairedPoints ?? 0) < (evidence.minimumPairedPoints ?? 2)) blockedBy.push('PAIRED_BENCHMARK')
   return { allowed: blockedBy.length === 0, blockedBy }
 }
