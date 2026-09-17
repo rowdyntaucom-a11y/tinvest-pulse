@@ -13,4 +13,9 @@ const navCss = readFileSync(new URL("../src/features/navigation/navigation.css",
 assert.match(navCss, /grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/, "portrait mobile nav must preserve five-column architecture");
 assert.doesNotMatch(navCss, /grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/, "portrait mobile nav must not regress to six microtype columns");
 
+const trustIndicator = readFileSync(new URL("../src/features/shared/DataTrustIndicator.tsx", import.meta.url), "utf8");
+assert.match(trustIndicator, /Локальная резервная копия/, "fallback source must have human-readable copy");
+assert.match(trustIndicator, /Обновлено/, "freshness must be phrased for users");
+assert.doesNotMatch(trustIndicator, /<small>\{trust\.sourceId\}/, "raw source identifier must never be rendered directly");
+
 console.log("production UX cleanup regression passed");
