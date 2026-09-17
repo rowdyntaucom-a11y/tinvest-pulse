@@ -20,8 +20,11 @@ const mainSource = readFileSync(new URL('../src/main.tsx', import.meta.url), 'ut
 assert.match(interactionCss, /\.app-shell \.topbar\s*\{[^}]*z-index:\s*30/s)
 assert.match(interactionCss, /\.mobile-primary-nav\s*\{[^}]*z-index:\s*40\s*!important[^}]*pointer-events:\s*auto[^}]*touch-action:\s*manipulation/s)
 assert.match(interactionCss, /\.mobile-primary-nav button\s*\{[^}]*pointer-events:\s*auto[^}]*touch-action:\s*manipulation/s)
-assert.match(interactionCss, /\.qv-personalize\s*\{[^}]*bottom:\s*calc\(74px \+ env\(safe-area-inset-bottom\)\)\s*!important/s)
-assert.match(interactionCss, /\.context-help\s*\{[^}]*right:\s*84px\s*!important[^}]*bottom:\s*calc\(74px \+ env\(safe-area-inset-bottom\)\)\s*!important/s)
+assert.match(interactionCss, /\.context-help,\s*\.qv-personalize\s*\{[^}]*left:\s*10px\s*!important[^}]*right:\s*auto\s*!important[^}]*z-index:\s*45\s*!important/s)
+assert.match(interactionCss, /\.context-help\s*\{[^}]*bottom:\s*calc\(74px \+ env\(safe-area-inset-bottom\)\)\s*!important/s)
+assert.match(interactionCss, /\.qv-personalize\s*\{[^}]*bottom:\s*calc\(122px \+ env\(safe-area-inset-bottom\)\)\s*!important/s)
+assert.match(interactionCss, /\.context-help > summary,\s*\.qv-personalize > summary\s*\{[^}]*min-width:\s*44px[^}]*min-height:\s*44px[^}]*touch-action:\s*manipulation/s)
+assert.doesNotMatch(interactionCss, /grid-template-columns:\s*repeat\(6\s*,/)
 assert.ok(mainSource.lastIndexOf("import './mobileControlLayer.css'") > mainSource.lastIndexOf("import './boardReadability.css'"), 'mobile interaction layer must load after other shell/readability CSS')
 
 console.log('UX navigation and glossary regression: ok')

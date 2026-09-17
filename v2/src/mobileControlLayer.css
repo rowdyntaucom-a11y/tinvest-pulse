@@ -6,14 +6,8 @@
  * only: navigation state continues to be owned by React in App/PrimaryNavigation.
  */
 @media (max-width: 620px) {
-  /*
-   * `.topbar` and `.app-view` are sibling stacking contexts. The fixed mobile
-   * nav lives inside `.topbar`, so the parent context itself must sit above the
-   * scroll owner; a large workspace must never intercept taps intended for nav.
-   */
-  .app-shell .topbar {
-    z-index: 30;
-  }
+  /* The fixed primary nav stays above every workspace stacking context. */
+  .app-shell .topbar { z-index: 30; }
 
   .mobile-primary-nav {
     z-index: 40 !important;
@@ -29,40 +23,44 @@
   }
 
   /*
-   * Floating utilities must not cover the five primary flow targets. DNA keeps
-   * its existing distinct raised action on the right; personalization and help
-   * sit above the bar in separate horizontal lanes.
+   * Secondary utilities share one predictable rail instead of competing on
+   * opposite sides of the viewport. The five primary flow targets and raised
+   * DNA action remain untouched. 48px pitch keeps both touch targets distinct.
    */
+  .context-help,
   .qv-personalize {
     left: 10px !important;
-    bottom: calc(74px + env(safe-area-inset-bottom)) !important;
+    right: auto !important;
     z-index: 45 !important;
   }
 
   .context-help {
-    right: 84px !important;
     bottom: calc(74px + env(safe-area-inset-bottom)) !important;
-    z-index: 45 !important;
+  }
+
+  .qv-personalize {
+    bottom: calc(122px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .context-help > summary,
+  .qv-personalize > summary {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
   }
 }
 
 @media (max-width: 620px) and (orientation: landscape) {
-  .app-shell .topbar {
-    z-index: 30;
-  }
+  .app-shell .topbar { z-index: 30; }
+  .mobile-primary-nav { z-index: 40 !important; }
 
-  .mobile-primary-nav {
-    z-index: 40 !important;
-  }
-
+  /* Keep the same single utility rail in landscape, clear of primary nav. */
+  .context-help,
   .qv-personalize {
     left: auto !important;
-    right: 92px !important;
-    bottom: 10px !important;
+    right: 10px !important;
   }
 
-  .context-help {
-    right: 10px !important;
-    bottom: 10px !important;
-  }
+  .context-help { bottom: 10px !important; }
+  .qv-personalize { bottom: 58px !important; }
 }
