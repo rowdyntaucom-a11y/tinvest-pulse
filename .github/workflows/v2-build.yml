@@ -1,6 +1,7 @@
 name: v2 build
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - 'package.json'
