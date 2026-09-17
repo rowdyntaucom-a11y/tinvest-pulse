@@ -3,11 +3,15 @@
 :root[data-qv-theme="carbon"]{--qv-theme-surface-bg:linear-gradient(145deg,#111211,#090a09);--qv-theme-surface-border:rgba(255,255,255,.105);--qv-theme-surface-shadow:inset 0 1px 0 rgba(255,255,255,.018),0 12px 28px rgba(0,0,0,.18);--qv-theme-soft-bg:rgba(255,255,255,.018)}
 :root[data-qv-theme="aurora"]{--qv-theme-surface-bg:linear-gradient(138deg,rgba(14,21,45,.96),rgba(31,17,57,.90));--qv-theme-surface-border:rgba(151,128,255,.22);--qv-theme-surface-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 18px 48px rgba(15,7,36,.23);--qv-theme-soft-bg:linear-gradient(135deg,rgba(137,107,255,.045),rgba(89,240,209,.018))}
 :root[data-qv-theme="minimal"]{--qv-theme-surface-bg:#0b0f0e;--qv-theme-surface-border:rgba(210,231,225,.10);--qv-theme-surface-shadow:none;--qv-theme-soft-bg:rgba(255,255,255,.012)}
+:root[data-qv-theme="amoled"]{--qv-theme-surface-bg:#000;--qv-theme-surface-border:rgba(150,255,222,.18);--qv-theme-surface-shadow:none;--qv-theme-soft-bg:#050807;background:#000;color-scheme:dark}
 
 :root[data-qv-theme]:not([data-qv-theme="core"]) .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.world-panel){border-color:var(--qv-theme-surface-border);background:var(--qv-theme-surface-bg);box-shadow:var(--qv-theme-surface-shadow)}
 :root[data-qv-theme]:not([data-qv-theme="core"]) .portfolio-view :is(.position-inspector,.allocation-basis,.position-inspector__income-grid>div,.position-inspector__empty),
 :root[data-qv-theme]:not([data-qv-theme="core"]) .analytics-view :is(.drift-summary article,.drift-row,.rebalance-deltas article),
 :root[data-qv-theme]:not([data-qv-theme="core"]) .income-view :is(.income-fact,.income-forecast,.income-next,.income-realized-chart){border-color:var(--qv-theme-surface-border);background:var(--qv-theme-soft-bg)}
+:root[data-qv-theme="amoled"] body,:root[data-qv-theme="amoled"] #root,:root[data-qv-theme="amoled"] .app-shell,:root[data-qv-theme="amoled"] .app-view{background:#000}
+:root[data-qv-theme="amoled"] :is(.app-header,.primary-nav,.subnav,.income-subnav){background:#020403;border-color:rgba(150,255,222,.14);box-shadow:none}
+:root[data-qv-theme="amoled"] :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.income-fact,.income-forecast,.income-next,.income-realized-chart){box-shadow:none!important}
 
 :root[data-qv-theme]:not([data-qv-theme="core"]) .income-view .income-realized-bar>i{border-color:var(--qv-theme-surface-border);background:color-mix(in srgb,var(--qv-theme-soft-bg) 82%,transparent)}
 
@@ -15,15 +19,11 @@
 :root[data-qv-theme="carbon"] .app-view:not(.board-view) :is(.subnav button,.income-subnav button,.income-realized-modes button,.position-inspector__tabs button,.portfolio-chart__modes button,.portfolio-chart__periods button,.position-sortbar button,.pager button,.income-pager button):not(.subnav--active):not(.is-active){border-color:rgba(255,255,255,.09);background:#101110}
 :root[data-qv-theme="aurora"] .app-view:not(.board-view) :is(.subnav button,.income-subnav button,.income-realized-modes button,.position-inspector__tabs button,.portfolio-chart__modes button,.portfolio-chart__periods button,.position-sortbar button,.pager button,.income-pager button):not(.subnav--active):not(.is-active){border-color:rgba(151,128,255,.18);background:rgba(25,17,50,.54)}
 :root[data-qv-theme="minimal"] .app-view:not(.board-view) :is(.subnav button,.income-subnav button,.income-realized-modes button,.position-inspector__tabs button,.portfolio-chart__modes button,.portfolio-chart__periods button,.position-sortbar button,.pager button,.income-pager button):not(.subnav--active):not(.is-active){border-color:rgba(210,231,225,.09);background:#0d1110;box-shadow:none}
+:root[data-qv-theme="amoled"] .app-view:not(.board-view) :is(.subnav button,.income-subnav button,.income-realized-modes button,.position-inspector__tabs button,.portfolio-chart__modes button,.portfolio-chart__periods button,.position-sortbar button,.pager button,.income-pager button):not(.subnav--active):not(.is-active){border-color:rgba(150,255,222,.13);background:#030504;box-shadow:none}
 
-:root[data-qv-theme="horizon"] .dna-view .world-frame{border-color:rgba(124,164,255,.18);background:#071126}
-:root[data-qv-theme="carbon"] .dna-view .world-frame{border-color:rgba(255,255,255,.09);background:#080908}
-:root[data-qv-theme="aurora"] .dna-view .world-frame{border-color:rgba(151,128,255,.18);background:#0d1028}
-:root[data-qv-theme="minimal"] .dna-view .world-frame{border-color:rgba(210,231,225,.08);background:#090d0c}
+[data-qv-motion="full"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.income-realized-chart){transition:border-color .22s ease,box-shadow .22s ease,background-color .22s ease}
+[data-qv-motion="reduced"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.income-realized-chart){transition-duration:.08s}
+[data-qv-motion="off"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.income-realized-chart){transition:none}
 
-[data-qv-motion="full"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.world-panel,.income-realized-chart){transition:border-color .22s ease,box-shadow .22s ease,background-color .22s ease}
-[data-qv-motion="reduced"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.world-panel,.income-realized-chart){transition-duration:.08s}
-[data-qv-motion="off"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.world-panel,.income-realized-chart){transition:none}
-
-@media(max-width:620px){:root[data-qv-theme]:not([data-qv-theme="core"]) .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.world-panel){box-shadow:inset 0 1px 0 rgba(255,255,255,.018),0 8px 20px rgba(0,0,0,.12)}:root[data-qv-theme="minimal"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.world-panel){box-shadow:none}}
-@media(prefers-reduced-motion:reduce){.app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.world-panel,.income-realized-chart){transition:none!important}}
+@media(max-width:620px){:root[data-qv-theme]:not([data-qv-theme="core"]) .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card){box-shadow:inset 0 1px 0 rgba(255,255,255,.018),0 8px 20px rgba(0,0,0,.12)}:root[data-qv-theme="minimal"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card),:root[data-qv-theme="amoled"] .app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card){box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.app-view:not(.board-view) :is(.panel,.metric-card,.context-card,.score-card,.risk-card,.income-realized-chart){transition:none!important}}
