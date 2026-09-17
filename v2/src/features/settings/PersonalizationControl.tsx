@@ -3,13 +3,12 @@ import type { UiDensity, UiModuleId, UiMotion, UiPreferences, UiTheme, UiWorkspa
 import './personalization.css'
 
 type PreferencePatch = Partial<Pick<UiPreferences, 'theme' | 'density' | 'motion' | 'defaultWorkspace' | 'pinnedModules'>>
-
 type Props = { preferences: UiPreferences; onChange: (patch: PreferencePatch) => void; onReset: () => void }
 
 const THEMES: Array<{ key: UiTheme; label: string; note: string }> = [
   { key: 'core', label: 'CORE', note: 'mint terminal' }, { key: 'horizon', label: 'HORIZON', note: 'glass / console' },
   { key: 'carbon', label: 'CARBON', note: 'graphite pro' }, { key: 'aurora', label: 'AURORA', note: 'atmospheric' },
-  { key: 'minimal', label: 'MINIMAL', note: 'data first' },
+  { key: 'minimal', label: 'MINIMAL', note: 'data first' }, { key: 'amoled', label: 'AMOLED', note: 'true black / high contrast' },
 ]
 const DENSITY: Array<{ key: UiDensity; label: string }> = [{ key:'compact',label:'COMPACT'},{key:'balanced',label:'BALANCED'},{key:'focus',label:'FOCUS'}]
 const MOTION: Array<{ key: UiMotion; label: string }> = [{key:'full',label:'FULL'},{key:'reduced',label:'REDUCED'},{key:'off',label:'OFF'}]
