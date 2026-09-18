@@ -161,5 +161,12 @@ const holdingsCssSource=readFileSync(new URL('../src/features/analytics/holdings
 assert.ok(holdingsCssSource.includes('min-height:44px'), 'mobile holdings controls must keep 44px targets')
 const corrCssSource=readFileSync(new URL('../src/features/analytics/correlation.css',import.meta.url),'utf8')
 assert.ok(corrCssSource.includes('min-width:420px'), 'mobile correlation matrix must preserve readable cell width')
+const driftCssSource=readFileSync(new URL('../src/features/analytics/drift.css',import.meta.url),'utf8')
+assert.ok(driftCssSource.includes('min-height:44px'), 'mobile rebalance controls must keep 44px targets')
+const relativeCssSource=readFileSync(new URL('../src/features/analytics/relativePerformance.css',import.meta.url),'utf8')
+assert.ok(relativeCssSource.includes('overflow-x:auto'), 'mobile risk modes must remain horizontally reachable')
+assert.ok(relativeCssSource.includes('min-height:44px'), 'mobile risk modes must keep 44px targets')
+const strategyCssSource=readFileSync(new URL('../src/features/analytics/strategyScenario.css',import.meta.url),'utf8')
+assert.ok(strategyCssSource.includes('min-height:44px'), 'mobile strategy scenario inputs must keep 44px targets')
 console.log('risk core regression: ok')
 
