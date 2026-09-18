@@ -57,8 +57,8 @@
   }
 
   .chip {
-    min-height: 32px;
-    padding: 6px 3px;
+    min-height: 44px;
+    padding: 8px 7px;
   }
 
   .analytics-subnav {
@@ -158,8 +158,8 @@
   }
 
   .analytics-subnav button {
-    font-size: 6.4px;
-    padding-inline: 2px;
+    font-size: 8px;
+    padding-inline: 8px;
   }
 }
 

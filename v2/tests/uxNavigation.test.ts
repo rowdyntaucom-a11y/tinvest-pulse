@@ -40,6 +40,8 @@ const finalShellCss=readFileSync(new URL('../src/final-shell.css', import.meta.u
 assert.match(finalShellCss, /\.analytics-subnav\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto/s)
 assert.match(finalShellCss, /\.analytics-subnav button\s*\{[^}]*min-height:\s*44px/s)
 assert.match(finalShellCss, /\.analytics-subnav \.sample-badge\s*\{[^}]*min-height:\s*44px/s)
+assert.doesNotMatch(finalShellCss,/\.analytics-subnav button\s*\{[^}]*font-size:\s*6\.4px/s,'narrow analytics nav must not fall back to microtype')
+assert.match(finalShellCss,/@media \(max-width: 359px\)[\s\S]*?\.analytics-subnav button\s*\{[^}]*font-size:\s*8px[^}]*padding-inline:\s*8px/s,'very narrow phones must preserve readable analytics labels')
 const iaCss=readFileSync(new URL('../src/informationArchitecture.css', import.meta.url), 'utf8')
 assert.match(iaCss, /\.topbar__nav \.chip\{[^}]*min-height:44px/s)
 assert.match(iaCss, /\.subnav\{[^}]*overflow-x:auto/s)
