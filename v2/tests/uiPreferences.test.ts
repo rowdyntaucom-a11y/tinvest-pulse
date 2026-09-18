@@ -31,48 +31,21 @@ assert.deepEqual(defaults.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 assert.notEqual(defaults.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 
 const normalized = normalizeUiPreferences({
-  version: '1.0',
-  theme: 'horizon',
-  density: 'compact',
-  motion: 'reduced',
-  defaultWorkspace: 'analytics',
-  pinnedModules: [
-    'analytics.risk',
-    'analytics.risk',
-    'income.fact',
-    'unknown.module',
-    'portfolio.value',
-    'macro.keyRate',
-    'analytics.twr',
-    'income.next',
-    'portfolio.pnl',
-  ],
+  version: '1.0', theme: 'horizon', density: 'compact', motion: 'reduced', defaultWorkspace: 'analytics',
+  pinnedModules: ['analytics.risk','analytics.risk','income.fact','unknown.module','portfolio.value','macro.keyRate','analytics.twr','income.next','portfolio.pnl'],
 })
 assert.equal(normalized.version, '1.1')
 assert.equal(normalized.theme, 'horizon')
 assert.equal(normalized.density, 'compact')
 assert.equal(normalized.motion, 'reduced')
 assert.equal(normalized.defaultWorkspace, 'analytics')
-assert.deepEqual(normalized.pinnedModules, [
-  'analytics.risk',
-  'income.fact',
-  'portfolio.value',
-  'macro.keyRate',
-  'analytics.twr',
-  'income.next',
-])
+assert.deepEqual(normalized.pinnedModules, ['analytics.risk','income.fact','portfolio.value','macro.keyRate','analytics.twr','income.next'])
 
 const board = normalizeUiPreferences({ defaultWorkspace: 'board', pinnedModules: ['portfolio.value'] })
 assert.equal(board.defaultWorkspace, 'board')
 assert.deepEqual(board.pinnedModules, ['portfolio.value'])
 
-const invalid = normalizeUiPreferences({
-  theme: 'neon-random',
-  density: 'ultra',
-  motion: 'warp',
-  defaultWorkspace: 'terminal',
-  pinnedModules: ['wrong'],
-})
+const invalid = normalizeUiPreferences({ theme: 'neon-random', density: 'ultra', motion: 'warp', defaultWorkspace: 'terminal', pinnedModules: ['wrong'] })
 assert.equal(invalid.theme, DEFAULT_UI_PREFERENCES.theme)
 assert.equal(invalid.density, DEFAULT_UI_PREFERENCES.density)
 assert.equal(invalid.motion, DEFAULT_UI_PREFERENCES.motion)
@@ -80,42 +53,25 @@ assert.equal(invalid.defaultWorkspace, DEFAULT_UI_PREFERENCES.defaultWorkspace)
 assert.deepEqual(invalid.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 
 const storage = memoryStorage()
-const saved = saveUiPreferences({
-  version: UI_PREFERENCES_VERSION,
-  theme: 'carbon',
-  density: 'focus',
-  motion: 'off',
-  defaultWorkspace: 'income',
-  pinnedModules: ['income.fact', 'income.next'],
-}, storage)
+const saved = saveUiPreferences({ version: UI_PREFERENCES_VERSION, theme: 'carbon', density: 'focus', motion: 'off', defaultWorkspace: 'income', pinnedModules: ['income.fact', 'income.next'] }, storage)
 assert.equal(saved.theme, 'carbon')
 assert.ok(storage.data.has(UI_PREFERENCES_STORAGE_KEY))
-const loaded = loadUiPreferences(storage)
-assert.deepEqual(loaded, saved)
+assert.deepEqual(loadUiPreferences(storage), saved)
+
+const amoled = saveUiPreferences({ ...saved, theme: 'amoled' }, storage)
+assert.equal(amoled.theme, 'amoled')
+assert.equal(loadUiPreferences(storage).theme, 'amoled')
 
 storage.data.set(UI_PREFERENCES_STORAGE_KEY, '{not-json')
 assert.deepEqual(loadUiPreferences(storage), defaults)
-
-storage.data.set(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({
-  theme: 'aurora',
-  density: 'balanced',
-  motion: 'full',
-  defaultWorkspace: 'dna',
-  pinnedModules: ['portfolio.value'],
-}))
+storage.data.set(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({ theme: 'aurora', density: 'balanced', motion: 'full', defaultWorkspace: 'dna', pinnedModules: ['portfolio.value'] }))
 assert.equal(loadUiPreferences(storage).theme, 'aurora')
 assert.equal(loadUiPreferences(storage).defaultWorkspace, 'dna')
 
 clearUiPreferences(storage)
 assert.equal(storage.data.has(UI_PREFERENCES_STORAGE_KEY), false)
-
-const throwingStorage: UiPreferenceStorage = {
-  getItem() { throw new Error('blocked') },
-  setItem() { throw new Error('blocked') },
-  removeItem() { throw new Error('blocked') },
-}
+const throwingStorage: UiPreferenceStorage = { getItem() { throw new Error('blocked') }, setItem() { throw new Error('blocked') }, removeItem() { throw new Error('blocked') } }
 assert.deepEqual(loadUiPreferences(throwingStorage), defaults)
 assert.equal(saveUiPreferences(defaults, throwingStorage).theme, 'core')
 clearUiPreferences(throwingStorage)
-
 console.log('ui preferences regression: ok')
