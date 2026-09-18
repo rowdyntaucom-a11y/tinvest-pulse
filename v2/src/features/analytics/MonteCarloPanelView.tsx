@@ -22,7 +22,7 @@ export default function MonteCarloPanelView({ history, currentValue }: { history
   return (
     <section className="panel mc-panel">
       <div className="panel-head">
-        <div><span className="eyebrow">ИСТОРИЧЕСКИЕ БЛОКИ v2 · 12 МЕС.</span><h2>СЦЕНАРИИ МОНТЕ-КАРЛО</h2></div>
+        <div><span className="eyebrow">ВОЗМОЖНЫЕ ТРАЕКТОРИИ · 12 МЕС.</span><h2>СЦЕНАРИИ</h2></div>
         <small>{result.available ? `${result.simulations} траекторий · блок ${result.blockTradingDays} дн.` : `${result.historyReturns}/${result.minimumReturns} дневных доходностей`}</small>
       </div>
       {!result.available ? (
@@ -34,9 +34,9 @@ export default function MonteCarloPanelView({ history, currentValue }: { history
       ) : (
         <>
           <div className="mc-grid">
-            <article className="mc-card mc-card--p10"><span>P10 · НИЖНИЙ СЦЕНАРИЙ</span><strong>{formatReturn(result.terminalReturn?.p10)}</strong><b>{formatValue(result.terminalValue?.p10)}</b><small>10-й перцентиль результата через {result.horizonTradingDays} торговых дней</small></article>
+            <article className="mc-card mc-card--p10"><span>ОСТОРОЖНЫЙ · P10</span><strong>{formatReturn(result.terminalReturn?.p10)}</strong><b>{formatValue(result.terminalValue?.p10)}</b><small>10-й перцентиль результата через {result.horizonTradingDays} торговых дней</small></article>
             <article className="mc-card mc-card--median"><span>МЕДИАНА · P50</span><strong>{formatReturn(result.terminalReturn?.median)}</strong><b>{formatValue(result.terminalValue?.median)}</b><small>середина распределения, не обещанная доходность</small></article>
-            <article className="mc-card mc-card--p90"><span>P90 · ВЕРХНИЙ СЦЕНАРИЙ</span><strong>{formatReturn(result.terminalReturn?.p90)}</strong><b>{formatValue(result.terminalValue?.p90)}</b><small>90-й перцентиль результата через {result.horizonTradingDays} торговых дней</small></article>
+            <article className="mc-card mc-card--p90"><span>БЛАГОПРИЯТНЫЙ · P90</span><strong>{formatReturn(result.terminalReturn?.p90)}</strong><b>{formatValue(result.terminalValue?.p90)}</b><small>90-й перцентиль результата через {result.horizonTradingDays} торговых дней</small></article>
           </div>
           <div className="mc-integrity">
             <span className={result.status === 'mature' ? 'is-mature' : 'is-preview'}>{result.status === 'mature' ? 'ЗРЕЛАЯ ВЫБОРКА' : 'ПРЕДВАРИТЕЛЬНО'}</span>
