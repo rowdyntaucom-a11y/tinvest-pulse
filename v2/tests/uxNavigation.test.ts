@@ -36,6 +36,10 @@ assert.ok(helpCss.includes('bottom:calc(138px + env(safe-area-inset-bottom))'))
 assert.doesNotMatch(interactionCss, /grid-template-columns:\s*repeat\(6\s*,/)
 assert.ok(mainSource.lastIndexOf("import './mobileControlLayer.css'") > mainSource.lastIndexOf("import './boardReadability.css'"), 'mobile interaction layer must load after other shell/readability CSS')
 
+const finalShellCss=readFileSync(new URL('../src/final-shell.css', import.meta.url), 'utf8')
+assert.match(finalShellCss, /\.analytics-subnav\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto/s)
+assert.match(finalShellCss, /\.analytics-subnav button\s*\{[^}]*min-height:\s*44px/s)
+assert.match(finalShellCss, /\.analytics-subnav \.sample-badge\s*\{[^}]*min-height:\s*44px/s)
 console.log('UX navigation and glossary regression: ok')
 
 // Analytics selector uses concise user-facing labels while keeping stable view ids.
