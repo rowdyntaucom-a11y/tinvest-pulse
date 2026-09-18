@@ -37,8 +37,6 @@
 @media(max-width:620px){
 .qv-board__health span{font-size:7px}.qv-board__health small{font-size:6.5px}
 .qv-board__rail article{min-height:58px;padding:7px 8px}.qv-board__rail span,.qv-board__rail small{font-size:7px;line-height:1.3}.qv-board__rail strong{font-size:9px}
-.qv-board__lens-tabs{display:flex;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none}.qv-board__lens-tabs::-webkit-scrollbar{display:none}.qv-board__lens-tabs button{flex:0 0 auto;min-width:max-content;min-height:44px;padding:8px 10px;font-size:7px}
-.qv-board__lens-copy>span{font-size:7px}.qv-board__lens-copy>small{font-size:8px;line-height:1.4}.qv-board__lens-facts span{font-size:7px}.qv-board__lens-facts strong{font-size:8px}.qv-board__lens-open{min-height:44px;font-size:7px}
 .qv-board__modules>header span,.qv-board__modules>header small{font-size:7px}.qv-board__modules>header strong{font-size:10px}
 .qv-board-card{min-height:132px;padding:10px 11px}.qv-board-card>span{font-size:7px}.qv-board-card>b{font-size:8px}.qv-board-card>small{display:block;font-size:7px;line-height:1.35}.qv-board-card>i{font-size:8px}
 }
