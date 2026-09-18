@@ -40,6 +40,10 @@ const finalShellCss=readFileSync(new URL('../src/final-shell.css', import.meta.u
 assert.match(finalShellCss, /\.analytics-subnav\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto/s)
 assert.match(finalShellCss, /\.analytics-subnav button\s*\{[^}]*min-height:\s*44px/s)
 assert.match(finalShellCss, /\.analytics-subnav \.sample-badge\s*\{[^}]*min-height:\s*44px/s)
+const iaCss=readFileSync(new URL('../src/informationArchitecture.css', import.meta.url), 'utf8')
+assert.match(iaCss, /\.topbar__nav \.chip\{[^}]*min-height:44px/s)
+assert.match(iaCss, /\.subnav\{[^}]*overflow-x:auto/s)
+assert.match(iaCss, /\.subnav button\{[^}]*min-height:44px/s)
 console.log('UX navigation and glossary regression: ok')
 
 // Analytics selector uses concise user-facing labels while keeping stable view ids.
