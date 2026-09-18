@@ -156,7 +156,7 @@ const corrViewSource=readFileSync(new URL('../src/features/analytics/Correlation
 for(const label of ['ПАРЫ С ДАННЫМИ','СЛАБЕЕ ВСЕГО СВЯЗАНЫ','СИЛЬНЕЕ ВСЕГО СВЯЗАНЫ','ВАРИАНТЫ РАСПРЕДЕЛЕНИЯ ПО РИСКУ']) assert.ok(corrViewSource.includes(label), `missing correlation label: ${label}`)
 const stressCssSource=readFileSync(new URL('../src/features/analytics/stress.css',import.meta.url),'utf8')
 assert.ok(stressCssSource.includes('overflow-x:auto'), 'stress selector must remain horizontally reachable on mobile')
-assert.ok(stressCssSource.includes('min-height:36px'), 'stress scenario controls need a usable mobile target')
+assert.ok(stressCssSource.includes('min-height:44px'), 'stress scenario controls must keep a 44px mobile target')
 const holdingsCssSource=readFileSync(new URL('../src/features/analytics/holdingsExplorer.css',import.meta.url),'utf8')
 assert.ok(holdingsCssSource.includes('min-height:44px'), 'mobile holdings controls must keep 44px targets')
 const corrCssSource=readFileSync(new URL('../src/features/analytics/correlation.css',import.meta.url),'utf8')
