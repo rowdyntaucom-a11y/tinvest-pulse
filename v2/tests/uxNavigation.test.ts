@@ -6,9 +6,10 @@ import { GLOSSARY } from '../src/features/help/glossary.ts'
 assert.deepEqual(PRIMARY_NAVIGATION.map(item => item.id), ['board', 'portfolio', 'analytics', 'income', 'goals', 'dna'])
 assert.equal(new Set(PRIMARY_NAVIGATION.map(item => item.id)).size, PRIMARY_NAVIGATION.length)
 assert.equal(sectionLabel(ANALYTICS_SECTIONS, 'montecarlo'), 'Сценарии')
-assert.equal(sectionLabel(RISK_SECTIONS, 'tail'), 'Хвостовые риски')
+assert.equal(sectionLabel(RISK_SECTIONS, 'tail'), 'Редкие потери')
 assert.equal(sectionLabel(RISK_SECTIONS, 'corr'), 'Связи активов')
 assert.deepEqual(RISK_SECTIONS.flatMap(group => group.options.map(option => option.id)), ['portfolio', 'benchmark', 'rolling', 'stress', 'tail', 'corr'])
+assert.deepEqual(RISK_SECTIONS.flatMap(group => group.options.map(option => option.label)), ['Портфель','Сравнение с IMOEX','История риска','Стресс-тесты','Редкие потери','Связи активов'])
 for (const groups of [ANALYTICS_SECTIONS, RISK_SECTIONS, PORTFOLIO_SECTIONS, INCOME_SECTIONS]) {
   for (const option of groups.flatMap(group => group.options)) assert.doesNotMatch(option.label, /Сцен\.|Хвост$/i)
 }

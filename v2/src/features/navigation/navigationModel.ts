@@ -19,9 +19,9 @@ export const ANALYTICS_SECTIONS = [{ label: 'Аналитика', options: [
 ]}] as const
 
 export const RISK_SECTIONS = [
-  { label: 'Основное', options: [{ id: 'portfolio', label: 'Риск портфеля' }, { id: 'benchmark', label: 'Сравнение с IMOEX' }] },
-  { label: 'Историческое', options: [{ id: 'rolling', label: 'Исторические окна' }, { id: 'stress', label: 'Стресс-тесты' }] },
-  { label: 'Статистическое', options: [{ id: 'tail', label: 'Хвостовые риски' }, { id: 'corr', label: 'Связи активов' }] },
+  { label: 'Основное', options: [{ id: 'portfolio', label: 'Портфель', description: 'Просадка, волатильность и концентрация' }, { id: 'benchmark', label: 'Сравнение с IMOEX', description: 'Доходность и отклонение относительно индекса' }] },
+  { label: 'Историческое', options: [{ id: 'rolling', label: 'История риска', description: 'Как риск менялся на исторических окнах' }, { id: 'stress', label: 'Стресс-тесты', description: 'Поведение портфеля в исторических шоках' }] },
+  { label: 'Статистическое', options: [{ id: 'tail', label: 'Редкие потери', description: 'Неблагоприятные дни и хвост распределения' }, { id: 'corr', label: 'Связи активов', description: 'Какие активы двигались вместе' }] },
 ] as const
 
 export const PORTFOLIO_SECTIONS = [{ label: 'Портфель', options: [{ id: 'overview', label: 'Обзор' }, { id: 'positions', label: 'Позиции' }, { id: 'structure', label: 'Структура' }] }] as const
