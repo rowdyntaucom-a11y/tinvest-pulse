@@ -324,7 +324,7 @@ export function ContextHelp() {
     <details className="context-help" ref={detailsRef} key={topicKey}>
       <summary aria-label={`Подсказка: ${currentTopic.title}`} title="Что здесь находится?">?</summary>
       <div className="context-help__card" role="note">
-        <div className="context-help__head"><span>ЧТО ЗДЕСЬ?</span><strong>{currentTopic.title}</strong></div>
+        <div className="context-help__head"><span>ЧТО ЗДЕСЬ?</span><strong>{currentTopic.title}</strong><button type="button" className="context-help__close" aria-label="Закрыть подсказку" onClick={() => { if (detailsRef.current) detailsRef.current.open = false }}>×</button></div>
         <p>{currentTopic.intro}</p>
         <dl>
           {currentTopic.items.map(([term, description]) => (
