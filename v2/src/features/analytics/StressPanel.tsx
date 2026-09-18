@@ -82,10 +82,10 @@ export function StressPanel({ positions }: Props) {
     <section className="panel stress-panel">
       <div className="panel-head stress-headline">
         <div>
-          <span className="eyebrow">HISTORICAL STRESS · CATALOG v{HISTORICAL_STRESS_CATALOG_VERSION}</span>
-          <h2>ИСТОРИЧЕСКИЕ ШОКИ <ContextHelpTerm topic="stress" /></h2>
+          <span className="eyebrow">ИСТОРИЧЕСКИЕ ДАННЫЕ · КАТАЛОГ v{HISTORICAL_STRESS_CATALOG_VERSION}</span>
+          <h2>СТРЕСС-ТЕСТЫ <ContextHelpTerm topic="stress" /></h2>
         </div>
-        <small>{compareMode ? `${comparison.length} сценария · одна текущая структура` : `${scenario.period.label} · verified ${scenario.verifiedAt}`}</small>
+        <small>{compareMode ? `${comparison.length} сценария · одна текущая структура` : `${scenario.period.label} · проверено ${scenario.verifiedAt}`}</small>
       </div>
 
       <div className="stress-selector" aria-label="Исторический стресс-сценарий">
@@ -113,8 +113,8 @@ export function StressPanel({ positions }: Props) {
               <span role="columnheader">СЦЕНАРИЙ</span>
               <span role="columnheader">АКЦИИ</span>
               <span role="columnheader">ОФЗ</span>
-              <span role="columnheader">Δ ПОКР.</span>
-              <span role="columnheader">COV</span>
+              <span role="columnheader">РЕЗУЛЬТАТ</span>
+              <span role="columnheader">ПОКРЫТИЕ</span>
             </div>
             {comparison.map(item => (
               <button
@@ -136,8 +136,8 @@ export function StressPanel({ positions }: Props) {
 
           <div className="stress-source stress-source--compare">
             <div>
-              <span>МЕТОД СРАВНЕНИЯ</span>
-              <strong>MCFTR proxy + RGBITR · текущая структура портфеля</strong>
+              <span>КАК СРАВНИВАЕМ</span>
+              <strong>Индексы акций и ОФЗ · текущая структура портфеля</strong>
               <small>Во всех строках используется один и тот же текущий набор позиций. Меняется только исторический class-level shock за указанный период; непокрытые активы не получают выдуманный return.</small>
             </div>
           </div>
@@ -148,7 +148,7 @@ export function StressPanel({ positions }: Props) {
         <>
           <div className="stress-summary">
             <article>
-              <span>Δ ПОКРЫТОЙ ЧАСТИ</span>
+              <span>РЕЗУЛЬТАТ ПОКРЫТОЙ ЧАСТИ</span>
               <strong>{signedRub(result.pnlCovered)}</strong>
               <small>{signedPct(result.pnlCoveredPct)} от покрытых активов</small>
             </article>
@@ -159,8 +159,8 @@ export function StressPanel({ positions }: Props) {
             </article>
             <article>
               <span>МЕТОД</span>
-              <strong>HIST</strong>
-              <small>MCFTR + RGBITR · total return</small>
+              <strong>ИСТОРИЯ</strong>
+              <small>индексы полной доходности акций и ОФЗ</small>
             </article>
           </div>
 
