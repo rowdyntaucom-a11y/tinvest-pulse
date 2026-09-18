@@ -84,4 +84,7 @@ const personalizationCss=readFileSync(new URL('../src/features/settings/personal
 assert.ok(personalizationCss.includes('.qv-module-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}'),'mobile module picker must retain readable two-column layout')
 assert.ok(personalizationCss.includes('.qv-workspace-grid{display:flex;gap:6px;overflow-x:auto'),'workspace picker must remain horizontally reachable')
 assert.ok(personalizationCss.includes('min-height:48px'),'personalization choices must keep generous mobile targets')
+const boardPersonalizationCss=readFileSync(new URL('../src/features/settings/boardPersonalization.css',import.meta.url),'utf8')
+assert.ok(!boardPersonalizationCss.includes('font-size:4.8px'),'legacy workspace microtype must not return')
+assert.ok(boardPersonalizationCss.includes('min-height:48px'),'board personalization overrides must retain mobile target floor')
 console.log('ui preferences regression: ok')
