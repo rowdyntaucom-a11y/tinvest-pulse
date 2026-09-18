@@ -166,5 +166,7 @@ assert.ok(driftCssSource.includes('min-height:44px'), 'mobile rebalance controls
 const relativeCssSource=readFileSync(new URL('../src/features/analytics/relativePerformance.css',import.meta.url),'utf8')
 assert.ok(relativeCssSource.includes('overflow-x:auto'), 'mobile risk modes must remain horizontally reachable')
 assert.ok(relativeCssSource.includes('min-height:44px'), 'mobile risk modes must keep 44px targets')
+const strategyCssSource=readFileSync(new URL('../src/features/analytics/strategyScenario.css',import.meta.url),'utf8')
+assert.ok(strategyCssSource.includes('min-height:44px'), 'mobile strategy scenario inputs must keep 44px targets')
 console.log('risk core regression: ok')
 
