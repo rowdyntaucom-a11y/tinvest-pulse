@@ -9,6 +9,15 @@
     "test": "node --experimental-strip-types tests/foundation.test.ts && node --experimental-strip-types tests/liveDataBridge.test.ts && node --experimental-strip-types tests/homeRealContent.test.ts && node --experimental-strip-types tests/assets.test.ts && node --experimental-strip-types tests/analysis.test.ts && node --experimental-strip-types tests/income.test.ts && node --experimental-strip-types tests/goal.test.ts && node --experimental-strip-types tests/shells.test.ts && node --experimental-strip-types tests/homeCommandCenter.test.ts && node --experimental-strip-types tests/preferences.test.ts && node --experimental-strip-types tests/atmosphere.test.ts && node --experimental-strip-types tests/navigationIdentity.test.ts && node --experimental-strip-types tests/goalCommandCenter.test.ts && node --experimental-strip-types tests/assetsCommandCenter.test.ts && node --experimental-strip-types tests/analysisCommandCenter.test.ts && node --experimental-strip-types tests/incomeCommandCenter.test.ts && node --experimental-strip-types tests/productShellPolish.test.ts && node --experimental-strip-types tests/historyChart.test.ts && node --experimental-strip-types tests/dataState.test.ts && node --experimental-strip-types tests/homeMetricSemantics.test.ts && node --experimental-strip-types tests/benchmarkAnalysis.test.ts && node --experimental-strip-types tests/assetClassAnalysis.test.ts && node --experimental-strip-types tests/bondLens.test.ts && node --experimental-strip-types tests/resultBreadth.test.ts && node --experimental-strip-types tests/marketContext.test.ts && node --experimental-strip-types tests/analysisLayers.test.ts && node --experimental-strip-types tests/assetsExplorer.test.ts && node --experimental-strip-types tests/goalMilestones.test.ts && node --experimental-strip-types tests/incomeContext.test.ts && node --experimental-strip-types tests/homeCommandRoutes.test.ts && node --experimental-strip-types tests/contextHeader.test.ts && node --experimental-strip-types tests/dataStateRecovery.test.ts && node --experimental-strip-types tests/shellMaterialWorlds.test.ts && node --experimental-strip-types tests/allocationDonut.test.ts && node --experimental-strip-types tests/assetInspector.test.ts && node --experimental-strip-types tests/incomeStory.test.ts",
     "start": "node preview-server.cjs"
   },
-  "dependencies": {"react":"^19.1.1","react-dom":"^19.1.1"},
-  "devDependencies": {"@types/react":"^19.1.10","@types/react-dom":"^19.1.7","@vitejs/plugin-react":"^5.0.2","typescript":"^5.9.2","vite":"^7.3.2"}
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.2",
+    "typescript": "^5.9.2",
+    "vite": "^7.3.2"
+  }
 }
