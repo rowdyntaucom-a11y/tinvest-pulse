@@ -1,0 +1,20 @@
+/*
+ * Information mode is presentation-only. It never changes values, calculations,
+ * eligibility, Data Trust, routing, or API behavior.
+ */
+.qv-detail-mode{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+
+:root[data-qv-detail="simple"] .brand-block>p,
+:root[data-qv-detail="simple"] .analytics-topline .metric-card>small,
+:root[data-qv-detail="simple"] .analytics-topline .score-card>small{
+  display:none;
+}
+
+:root[data-qv-detail="simple"] .analytics-topline .metric-card,
+:root[data-qv-detail="simple"] .analytics-topline .score-card{
+  min-height:0;
+}
+
+@media(max-width:620px){
+  .qv-detail-mode{gap:8px}
+}
