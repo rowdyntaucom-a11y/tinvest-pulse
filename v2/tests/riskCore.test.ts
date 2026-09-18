@@ -157,5 +157,9 @@ for(const label of ['ПАРЫ С ДАННЫМИ','СЛАБЕЕ ВСЕГО СВЯ
 const stressCssSource=readFileSync(new URL('../src/features/analytics/stress.css',import.meta.url),'utf8')
 assert.ok(stressCssSource.includes('overflow-x:auto'), 'stress selector must remain horizontally reachable on mobile')
 assert.ok(stressCssSource.includes('min-height:36px'), 'stress scenario controls need a usable mobile target')
+const holdingsCssSource=readFileSync(new URL('../src/features/analytics/holdingsExplorer.css',import.meta.url),'utf8')
+assert.ok(holdingsCssSource.includes('min-height:44px'), 'mobile holdings controls must keep 44px targets')
+const corrCssSource=readFileSync(new URL('../src/features/analytics/correlation.css',import.meta.url),'utf8')
+assert.ok(corrCssSource.includes('min-width:420px'), 'mobile correlation matrix must preserve readable cell width')
 console.log('risk core regression: ok')
 
