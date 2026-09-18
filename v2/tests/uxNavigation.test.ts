@@ -38,6 +38,5 @@ assert.ok(mainSource.lastIndexOf("import './mobileControlLayer.css'") > mainSour
 console.log('UX navigation and glossary regression: ok')
 
 // Analytics selector uses concise user-facing labels while keeping stable view ids.
-for (const label of ['Доходность','Риски','Здоровье','Доли и цель','Сценарии']) assert.match(navigationModelSource, new RegExp(`label: ['"]${label}['"]`))
-assert.match(navigationModelSource, /id: ['"]montecarlo['"], label: ['"]Сценарии['"]/)
-assert.doesNotMatch(navigationModelSource, /label: ['"]Сценарии Монте-Карло['"]/)
+assert.deepEqual(ANALYTICS_SECTIONS.flatMap(group => group.options.map(option => option.label)), ['Доходность','Риски','Здоровье','Доли и цель','Сценарии'])
+assert.equal(sectionLabel(ANALYTICS_SECTIONS, 'montecarlo'), 'Сценарии')
