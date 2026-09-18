@@ -36,3 +36,8 @@ assert.doesNotMatch(interactionCss, /grid-template-columns:\s*repeat\(6\s*,/)
 assert.ok(mainSource.lastIndexOf("import './mobileControlLayer.css'") > mainSource.lastIndexOf("import './boardReadability.css'"), 'mobile interaction layer must load after other shell/readability CSS')
 
 console.log('UX navigation and glossary regression: ok')
+
+// Analytics selector uses concise user-facing labels while keeping stable view ids.
+for (const label of ['Доходность','Риски','Здоровье','Доли и цель','Сценарии']) assert.match(navigationModelSource, new RegExp(`label: ['"]${label}['"]`))
+assert.match(navigationModelSource, /id: ['"]montecarlo['"], label: ['"]Сценарии['"]/)
+assert.doesNotMatch(navigationModelSource, /label: ['"]Сценарии Монте-Карло['"]/)
