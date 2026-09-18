@@ -46,6 +46,7 @@ assert.match(iaCss, /\.subnav\{[^}]*overflow-x:auto/s)
 assert.match(iaCss, /\.subnav button\{[^}]*min-height:44px/s)
 for(const file of ['portfolio/portfolio.css','portfolio/positionInspector.css','portfolio/bondAnalytics.css']) { const source=readFileSync(new URL(`../src/features/${file}`, import.meta.url),'utf8'); assert.ok(source.includes('min-height:44px'), `${file} must retain 44px mobile controls`) }
 for(const file of ['income/incomeCompact.css','income/incomeRealizedHistory.css','income/incomeTax.css']) { const source=readFileSync(new URL(`../src/features/${file}`, import.meta.url),'utf8'); assert.ok(source.includes('min-height:44px'), `${file} must retain 44px mobile controls`) }
+const goalCss=readFileSync(new URL('../src/features/goals/goalWorkspace.css', import.meta.url),'utf8'); assert.match(goalCss, /\.goal-chart__years button \{ min-width:44px; min-height:44px/)
 console.log('UX navigation and glossary regression: ok')
 
 // Analytics selector uses concise user-facing labels while keeping stable view ids.
