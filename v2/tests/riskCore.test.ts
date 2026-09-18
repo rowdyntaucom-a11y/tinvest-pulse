@@ -152,5 +152,10 @@ const stressViewSource=readFileSync(new URL('../src/features/analytics/StressPan
 for(const label of ['СТРЕСС-ТЕСТЫ','РЕЗУЛЬТАТ','ПОКРЫТИЕ','КАК СРАВНИВАЕМ','ИСТОРИЯ']) assert.ok(stressViewSource.includes(label), `missing stress label: ${label}`)
 const scenarioViewSource=readFileSync(new URL('../src/features/analytics/MonteCarloPanelView.tsx',import.meta.url),'utf8')
 for(const label of ['ДАННЫЕ ДЛЯ СЦЕНАРИЕВ','НУЖНО БОЛЬШЕ ИСТОРИИ','ДАННЫХ ДОСТАТОЧНО','ДАННЫХ ПОКА МАЛО']) assert.ok(scenarioViewSource.includes(label), `missing scenario label: ${label}`)
+const corrViewSource=readFileSync(new URL('../src/features/analytics/CorrelationPanel.tsx',import.meta.url),'utf8')
+for(const label of ['ПАРЫ С ДАННЫМИ','СЛАБЕЕ ВСЕГО СВЯЗАНЫ','СИЛЬНЕЕ ВСЕГО СВЯЗАНЫ','ВАРИАНТЫ РАСПРЕДЕЛЕНИЯ ПО РИСКУ']) assert.ok(corrViewSource.includes(label), `missing correlation label: ${label}`)
+const stressCssSource=readFileSync(new URL('../src/features/analytics/stress.css',import.meta.url),'utf8')
+assert.ok(stressCssSource.includes('overflow-x:auto'), 'stress selector must remain horizontally reachable on mobile')
+assert.ok(stressCssSource.includes('min-height:36px'), 'stress scenario controls need a usable mobile target')
 console.log('risk core regression: ok')
 
