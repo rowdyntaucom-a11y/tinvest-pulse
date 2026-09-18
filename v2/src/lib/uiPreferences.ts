@@ -4,6 +4,7 @@ export const UI_PREFERENCES_STORAGE_KEY = 'qvanix.ui.preferences.v1' as const
 export type UiTheme = 'core' | 'horizon' | 'carbon' | 'aurora' | 'minimal' | 'amoled'
 export type UiDensity = 'compact' | 'balanced' | 'focus'
 export type UiMotion = 'full' | 'reduced' | 'off'
+export type UiDetailMode = 'simple' | 'detailed'
 export type UiDetail = 'simple' | 'detailed'
 export type UiWorkspace = 'board' | 'portfolio' | 'analytics' | 'income' | 'goals' | 'dna'
 
@@ -23,6 +24,7 @@ export type UiPreferences = {
   theme: UiTheme
   density: UiDensity
   motion: UiMotion
+  detailMode: UiDetailMode
   detail: UiDetail
   defaultWorkspace: UiWorkspace
   pinnedModules: UiModuleId[]
@@ -33,6 +35,7 @@ export type UiPreferenceStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeI
 const THEMES = new Set<UiTheme>(['core', 'horizon', 'carbon', 'aurora', 'minimal', 'amoled'])
 const DENSITIES = new Set<UiDensity>(['compact', 'balanced', 'focus'])
 const MOTION = new Set<UiMotion>(['full', 'reduced', 'off'])
+const DETAIL_MODES = new Set<UiDetailMode>(['simple', 'detailed'])
 const DETAILS = new Set<UiDetail>(['simple', 'detailed'])
 const WORKSPACES = new Set<UiWorkspace>(['board', 'portfolio', 'analytics', 'income', 'goals', 'dna'])
 const MODULES = new Set<UiModuleId>([
@@ -44,6 +47,7 @@ export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   theme: 'core',
   density: 'balanced',
   motion: 'full',
+  detailMode: 'detailed',
   detail: 'detailed',
   defaultWorkspace: 'board',
   pinnedModules: ['portfolio.value', 'portfolio.pnl', 'analytics.twr', 'analytics.health', 'income.fact', 'macro.keyRate'],
@@ -73,6 +77,7 @@ export function normalizeUiPreferences(value: unknown): UiPreferences {
     theme: enumValue(row.theme, THEMES, DEFAULT_UI_PREFERENCES.theme),
     density: enumValue(row.density, DENSITIES, DEFAULT_UI_PREFERENCES.density),
     motion: enumValue(row.motion, MOTION, DEFAULT_UI_PREFERENCES.motion),
+    detailMode: enumValue(row.detailMode, DETAIL_MODES, DEFAULT_UI_PREFERENCES.detailMode),
     detail: enumValue(row.detail, DETAILS, DEFAULT_UI_PREFERENCES.detail),
     defaultWorkspace: enumValue(row.defaultWorkspace, WORKSPACES, DEFAULT_UI_PREFERENCES.defaultWorkspace),
     pinnedModules: normalizeModules(row.pinnedModules),
