@@ -39,9 +39,9 @@ function cellTone(value: number | null) {
 }
 
 function scenarioLabel(method: AllocationScenario['method']) {
-  if (method === 'EQUAL_WEIGHT') return 'EQUAL WEIGHT'
-  if (method === 'MIN_VARIANCE_LONG_ONLY') return 'MIN VAR · LONG ONLY'
-  return 'EQUAL RISK'
+  if (method === 'EQUAL_WEIGHT') return 'РАВНЫЕ ДОЛИ'
+  if (method === 'MIN_VARIANCE_LONG_ONLY') return 'МИНИМУМ РИСКА'
+  return 'РАВНЫЙ ВКЛАД В РИСК'
 }
 
 function AllocationScenarioRow({ scenario }: { scenario: AllocationScenario }) {
@@ -54,7 +54,7 @@ function AllocationScenarioRow({ scenario }: { scenario: AllocationScenario }) {
     <article className={`allocation-scenario ${scenario.available ? '' : 'is-unavailable'}`}>
       <div>
         <span>{scenarioLabel(scenario.method)}</span>
-        <strong>{scenario.available && scenario.annualizedVolatility != null ? `${pct.format(scenario.annualizedVolatility * 100)}% vol` : '—'}</strong>
+        <strong>{scenario.available && scenario.annualizedVolatility != null ? `${pct.format(scenario.annualizedVolatility * 100)}% волатильность` : '—'}</strong>
       </div>
       <small title={weightLine}>{scenario.available ? weightLine : scenario.note}</small>
     </article>
@@ -165,7 +165,7 @@ export function CorrelationPanel({ positions }: Props) {
   if (series.length < 2) {
     return (
       <section className="panel corr-panel">
-        <div className="panel-head"><div><span className="eyebrow">CORRELATION MATRIX · v{matrix.version}</span><h2>ИСТОРИЯ ЕЩЁ НЕ ГОТОВА</h2></div><small>fail-closed</small></div>
+        <div className="panel-head"><div><span className="eyebrow">КОРРЕЛЯЦИЯ · v{matrix.version}</span><h2>ИСТОРИЯ ЕЩЁ НЕ ГОТОВА</h2></div><small>без подстановок</small></div>
         <p className="corr-note">Нужно минимум два актива с рыночной историей. QVANIX не подставляет искусственные коэффициенты, если T‑Bank не вернул достаточный ряд.</p>
       </section>
     )
@@ -174,7 +174,7 @@ export function CorrelationPanel({ positions }: Props) {
   return (
     <section className="panel corr-panel">
       <div className="panel-head corr-headline">
-        <div><span className="eyebrow">CORRELATION MATRIX · v{matrix.version}</span><h2>СВЯЗЬ АКТИВОВ</h2></div>
+        <div><span className="eyebrow">КОРРЕЛЯЦИЯ · v{matrix.version}</span><h2>СВЯЗЬ АКТИВОВ</h2></div>
         <small>
           {payload?.from && payload?.to ? `${payload.from} → ${payload.to}` : '365 дней'}
           {requestedSeries ? ` · серии ${availableSeries}/${requestedSeries}` : ` · top ${series.length}`}
@@ -182,7 +182,7 @@ export function CorrelationPanel({ positions }: Props) {
       </div>
 
       <div className="corr-summary">
-        <article><span>ГОТОВЫЕ ПАРЫ</span><strong>{readyPairs.length}/{pairs.length}</strong><small>mature {maturePairs.length} · gate {matrix.minimumPairedReturns}/{matrix.maturePairedReturns}</small></article>
+        <article><span>ГОТОВЫЕ ПАРЫ</span><strong>{readyPairs.length}/{pairs.length}</strong><small>надёжных {maturePairs.length} · минимум {matrix.minimumPairedReturns}/{matrix.maturePairedReturns}</small></article>
         <article><span>САМАЯ НИЗКАЯ ρ</span><strong>{lowest?.correlation == null ? '—' : number.format(lowest.correlation)}</strong><small>{lowest ? `${labelByKey.get(lowest.a)} ↔ ${labelByKey.get(lowest.b)}` : 'пока нет готовой пары'}</small></article>
         <article><span>САМАЯ ВЫСОКАЯ ρ</span><strong>{highest?.correlation == null ? '—' : number.format(highest.correlation)}</strong><small>{highest ? `${labelByKey.get(highest.a)} ↔ ${labelByKey.get(highest.b)}` : 'пока нет готовой пары'}</small></article>
       </div>
@@ -195,7 +195,7 @@ export function CorrelationPanel({ positions }: Props) {
             const cellsForRow = series.map(column => {
               const cell = cells.get(`${row.key}|${column.key}`)
               const value = cell?.available && cell.correlation != null ? cell.correlation : null
-              const maturity = cell?.mature ? 'MATURE' : cell?.available ? 'PREVIEW' : 'INSUFFICIENT'
+              const maturity = cell?.mature ? 'ДОСТАТОЧНО' : cell?.available ? 'ПРЕДВАРИТЕЛЬНО' : 'МАЛО ДАННЫХ'
               return (
                 <span
                   className={`corr-cell ${cellTone(value)}`}
@@ -211,25 +211,25 @@ export function CorrelationPanel({ positions }: Props) {
         </div>
       </div>
 
-      <p className="corr-note">Pearson ρ считается только по доходностям с одинаковыми границами интервала наблюдения, а не по ценам. Пропущенная промежуточная свеча разрывает обе соседние пары; до {matrix.minimumPairedReturns} общих интервалов пара скрыта, {matrix.minimumPairedReturns}–{matrix.maturePairedReturns - 1} = preview, {matrix.maturePairedReturns}+ = mature. Это диагностика структуры портфеля, не торговый сигнал.</p>
+      <p className="corr-note">Pearson ρ считается только по доходностям с одинаковыми границами интервала наблюдения, а не по ценам. Пропущенная промежуточная свеча разрывает обе соседние пары; до {matrix.minimumPairedReturns} общих интервалов пара скрыта, {matrix.minimumPairedReturns}–{matrix.maturePairedReturns - 1} = предварительно, {matrix.maturePairedReturns}+ = достаточно. Это диагностика структуры портфеля, не торговый сигнал.</p>
 
       <details className="allocation-diagnostics">
         <summary>
-          <span>ALLOCATION LAB · RISK ONLY</span>
+          <span>СЦЕНАРИИ РАСПРЕДЕЛЕНИЯ · ТОЛЬКО РИСК</span>
           <strong>{allocation.status}</strong>
           <small>{allocation.commonReturns} общих интервалов{allocationSample ? ` · ${allocationSample}` : ''}</small>
         </summary>
         {currentRisk.available ? (
           <article className="current-risk-diagnostic">
             <div>
-              <span>ТЕКУЩИЕ ВЕСА · RISK CONTRIBUTION</span>
-              <strong>{currentRisk.annualizedVolatility == null ? '—' : `${pct.format(currentRisk.annualizedVolatility * 100)}% vol`}</strong>
+              <span>ТЕКУЩИЕ ВЕСА · ВКЛАД В РИСК</span>
+              <strong>{currentRisk.annualizedVolatility == null ? '—' : `${pct.format(currentRisk.annualizedVolatility * 100)}% волатильность`}</strong>
               <b>{riskDepthBadge}</b>
             </div>
             <small title={currentRisk.note}>{topRiskLine ?? currentRisk.note}</small>
           </article>
         ) : (
-          <p className="current-risk-unavailable">CURRENT RISK: {currentRisk.reason ?? currentRisk.note}</p>
+          <p className="current-risk-unavailable">ТЕКУЩИЙ РИСК: {currentRisk.reason ?? currentRisk.note}</p>
         )}
         {allocation.available ? (
           <>

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { calculateRelativePerformance, RELATIVE_PERFORMANCE_CALC_VERSION } from '../src/features/analytics/relativePerformance.ts'
 import { calculateRollingRisk } from '../src/features/analytics/rollingRisk.ts'
 import { calculateRecoveryDiagnostics, RECOVERY_DIAGNOSTICS_CALC_VERSION } from '../src/features/analytics/recoveryDiagnostics.ts'
@@ -145,4 +146,7 @@ assert.equal(recoveryMature.available, true)
 assert.equal(recoveryMature.quality, 'MATURE')
 assert.equal(recoveryMature.returnObservations, 252)
 
+const riskViewSource=readFileSync(new URL('../src/features/analytics/RiskWorkspace.tsx',import.meta.url),'utf8')
+for(const label of ['SHARPE','SORTINO','КОНЦЕНТРАЦИЯ · HHI','TRACKING ERROR · TE','ЧУВСТВИТЕЛЬНОСТЬ · BETA','ПОРОГ ПОТЕРЬ · VaR 95%','СРЕДНЯЯ ПОТЕРЯ ХУДШИХ ДНЕЙ · CVaR']) assert.ok(riskViewSource.includes(label), `missing risk label: ${label}`)
 console.log('risk core regression: ok')
+

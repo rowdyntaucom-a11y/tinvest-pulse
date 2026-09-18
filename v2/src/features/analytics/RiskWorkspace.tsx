@@ -82,10 +82,10 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
           <section className="risk-grid">
             <article className="risk-card"><span>МАКС. ПРОСАДКА</span><strong>{signedRatio(analytics.maxDrawdown == null ? null : -analytics.maxDrawdown)}</strong><small>От локального пика</small></article>
             <article className="risk-card"><span>ВОЛАТИЛЬНОСТЬ</span><strong>{plainRatio(analytics.volatility)}</strong><small>σ дневных доходностей × √252</small></article>
-            <article className="risk-card"><span>SHARPE · ДОХОД / РИСК</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Безрисковая ставка ${number.format(riskFreeRate)}%`}</small></article>
-            <article className="risk-card"><span>SORTINO · РИСК СНИЖЕНИЯ</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Негативные отклонения относительно минимальной доходности</small></article>
-            <article className="risk-card"><span>HHI · КОНЦЕНТРАЦИЯ</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
-            <article className="risk-card"><span>ЭКВ. ПОЗИЦИЙ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
+            <article className="risk-card"><span>SHARPE</span><strong>{analytics.sharpe == null ? '—' : number.format(analytics.sharpe)}</strong><small>{riskFreeRate == null ? 'Нет ставки ЦБ — не считаем' : `Безрисковая ставка ${number.format(riskFreeRate)}%`}</small></article>
+            <article className="risk-card"><span>SORTINO</span><strong>{analytics.sortino == null ? '—' : number.format(analytics.sortino)}</strong><small>Негативные отклонения относительно минимальной доходности</small></article>
+            <article className="risk-card"><span>КОНЦЕНТРАЦИЯ · HHI</span><strong>{analytics.hhi == null ? '—' : number.format(analytics.hhi)}</strong><small>Σ доля²; меньше = равномернее</small></article>
+            <article className="risk-card"><span>ЭФФЕКТИВНЫЕ ПОЗИЦИИ</span><strong>{analytics.effectivePositions == null ? '—' : number.format(analytics.effectivePositions)}</strong><small>1 / HHI</small></article>
           </section>
           <section className="panel analytics-note">
             <span className="eyebrow">КАЧЕСТВО ВЫБОРКИ · ВОССТАНОВЛЕНИЕ</span>
@@ -101,9 +101,9 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
             <article className="risk-card"><span>ПОРТФЕЛЬ · ОБЩИЙ ПЕРИОД</span><strong>{signedRatio(relative.portfolioReturn)}</strong><small>{relative.periodDays ? `${relative.periodDays} дней общей выборки` : 'общая выборка не готова'}</small></article>
             <article className="risk-card"><span>IMOEX · ОБЩИЙ ПЕРИОД</span><strong>{signedRatio(relative.benchmarkReturn)}</strong><small>тот же диапазон дат</small></article>
             <article className="risk-card"><span>ДОХОДНОСТЬ СВЕРХ IMOEX</span><strong>{signedRatio(relative.excessReturn)}</strong><small>портфель минус IMOEX</small></article>
-            <article className="risk-card"><span>ОТКЛОНЕНИЕ ОТ IMOEX · TE</span><strong>{plainRatio(relative.trackingError)}</strong><small>σ активных дневных доходностей × √252</small></article>
-            <article className="risk-card"><span>ЭФФЕКТИВНОСТЬ ОТКЛОНЕНИЯ · IR</span><strong>{relative.informationRatio == null ? '—' : number.format(relative.informationRatio)}</strong><small>средняя активная доходность / tracking error</small></article>
-            <article className="risk-card"><span>BETA · ЧУВСТВИТЕЛЬНОСТЬ</span><strong>{relative.beta == null ? '—' : number.format(relative.beta)}</strong><small>{relative.correlation == null ? 'корреляция скрыта до достаточной выборки' : `корреляция ${number.format(relative.correlation)}`}</small></article>
+            <article className="risk-card"><span>TRACKING ERROR · TE</span><strong>{plainRatio(relative.trackingError)}</strong><small>σ активных дневных доходностей × √252</small></article>
+            <article className="risk-card"><span>INFORMATION RATIO · IR</span><strong>{relative.informationRatio == null ? '—' : number.format(relative.informationRatio)}</strong><small>средняя активная доходность / tracking error</small></article>
+            <article className="risk-card"><span>ЧУВСТВИТЕЛЬНОСТЬ · BETA</span><strong>{relative.beta == null ? '—' : number.format(relative.beta)}</strong><small>{relative.correlation == null ? 'корреляция скрыта до достаточной выборки' : `корреляция ${number.format(relative.correlation)}`}</small></article>
           </section>
           <section className="panel analytics-note relative-note">
             <span className="eyebrow">КАЧЕСТВО СРАВНЕНИЯ С IMOEX</span>
@@ -134,11 +134,11 @@ export function RiskWorkspace({ analytics, history, positions, riskFreeRate, ana
       {mode === 'tail' && (
         <>
           <section className="risk-grid relative-risk-grid">
-            <article className="risk-card"><span>ИСТОРИЧЕСКИЙ VaR 95% · 1 ДЕНЬ</span><strong>{plainRatio(tail.var95Loss)}</strong><small>порог потери худших 5% дней</small></article>
-            <article className="risk-card"><span>CVaR · СРЕДНЯЯ ПОТЕРЯ ХВОСТА</span><strong>{plainRatio(tail.cvar95Loss)}</strong><small>средняя потеря внутри худшего 5%-хвоста</small></article>
+            <article className="risk-card"><span>ПОРОГ ПОТЕРЬ · VaR 95%</span><strong>{plainRatio(tail.var95Loss)}</strong><small>порог потери худших 5% дней</small></article>
+            <article className="risk-card"><span>СРЕДНЯЯ ПОТЕРЯ ХУДШИХ ДНЕЙ · CVaR</span><strong>{plainRatio(tail.cvar95Loss)}</strong><small>средняя потеря внутри худшего 5%-хвоста</small></article>
             <article className="risk-card"><span>ХУДШИЙ ДЕНЬ</span><strong>{signedRatio(tail.worstDay)}</strong><small>фактическая дневная TWR-доходность</small></article>
             <article className="risk-card"><span>ДОЛЯ ОТРИЦАТЕЛЬНЫХ ДНЕЙ</span><strong>{plainRatio(tail.downsideFrequency)}</strong><small>частота дней TWR &lt; 0</small></article>
-            <article className="risk-card"><span>НАБЛЮДЕНИЙ В ХВОСТЕ</span><strong>{tail.available ? tail.tailObservations : '—'}</strong><small>наблюдений в худших 5% дней</small></article>
+            <article className="risk-card"><span>ХУДШИХ ДНЕЙ В ВЫБОРКЕ</span><strong>{tail.available ? tail.tailObservations : '—'}</strong><small>наблюдений в худших 5% дней</small></article>
             <article className="risk-card"><span>МЕТОД</span><strong>ИСТОРИЧЕСКИЙ</strong><small>без нормального распределения и параметрической подгонки</small></article>
           </section>
           <section className="panel analytics-note relative-note">
