@@ -19,6 +19,7 @@ import './controlFeedback.css'
 import './mobileReadability.css'
 import './boardReadability.css'
 import './mobileControlLayer.css'
+import './boardMobileReadingFloor.css'
 import './features/world/worldCinematicGrade.css'
 
 const ContextHelp = lazy(() => import('./features/help/ContextHelp').then(module => ({ default: module.ContextHelp })))
