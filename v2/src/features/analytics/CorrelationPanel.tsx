@@ -39,9 +39,9 @@ function cellTone(value: number | null) {
 }
 
 function scenarioLabel(method: AllocationScenario['method']) {
-  if (method === 'EQUAL_WEIGHT') return 'EQUAL WEIGHT'
-  if (method === 'MIN_VARIANCE_LONG_ONLY') return 'MIN VAR · LONG ONLY'
-  return 'EQUAL RISK'
+  if (method === 'EQUAL_WEIGHT') return 'РАВНЫЕ ДОЛИ'
+  if (method === 'MIN_VARIANCE_LONG_ONLY') return 'МИНИМУМ РИСКА'
+  return 'РАВНЫЙ ВКЛАД В РИСК'
 }
 
 function AllocationScenarioRow({ scenario }: { scenario: AllocationScenario }) {
@@ -54,7 +54,7 @@ function AllocationScenarioRow({ scenario }: { scenario: AllocationScenario }) {
     <article className={`allocation-scenario ${scenario.available ? '' : 'is-unavailable'}`}>
       <div>
         <span>{scenarioLabel(scenario.method)}</span>
-        <strong>{scenario.available && scenario.annualizedVolatility != null ? `${pct.format(scenario.annualizedVolatility * 100)}% vol` : '—'}</strong>
+        <strong>{scenario.available && scenario.annualizedVolatility != null ? `${pct.format(scenario.annualizedVolatility * 100)}% волатильность` : '—'}</strong>
       </div>
       <small title={weightLine}>{scenario.available ? weightLine : scenario.note}</small>
     </article>
