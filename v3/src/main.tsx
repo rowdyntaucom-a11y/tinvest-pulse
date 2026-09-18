@@ -1,3 +1,3 @@
-import React from"react";import ReactDOM from"react-dom/client";import{V3Home}from"./home/V3Home";import{buildV3HomeViewModel}from"./home/homeViewModel";import"./styles/v3.css";import type{PortfolioSnapshot}from"../../v2/src/lib/portfolioApi";
+import React from"react";import ReactDOM from"react-dom/client";import{V3App}from"./app/V3App";import{buildV3HomeViewModel}from"./home/homeViewModel";import"./styles/v3.css";import type{PortfolioSnapshot}from"../../v2/src/lib/portfolioApi";
 const EMPTY={accountName:"Кряхтящий фонд",value:0,profit:0,profitPct:0,passiveIncome:0,averageMonthlyPassiveIncome:0,averageAnnualPassiveIncome:0,positions:0,positionItems:[],xirr:null,cagr:null,riskFreeRate:null,riskFreeRateDate:null,nextRateMeeting:null,startDate:null,updatedAt:null,history:[],source:"fallback"} satisfies PortfolioSnapshot;
-ReactDOM.createRoot(document.getElementById("root")!).render(<React.StrictMode><V3Home model={buildV3HomeViewModel(EMPTY,false)} shell="core" mode="simple"/></React.StrictMode>);
+ReactDOM.createRoot(document.getElementById("root")!).render(<React.StrictMode><V3App home={buildV3HomeViewModel(EMPTY,false)}/></React.StrictMode>);
