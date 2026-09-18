@@ -16,9 +16,9 @@
 
 @media(max-width:620px){
   .income-workspace{height:100%;grid-template-rows:auto minmax(0,1fr);gap:5px;overflow:hidden}
-  .income-subnav{min-height:30px;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
-  .income-subnav button{padding:6px 4px;font-size:6.4px;letter-spacing:.03em}
-  .income-source-badge{grid-column:1/-1;justify-self:end;margin-top:0;padding:5px 6px;font-size:5.8px;white-space:nowrap}
+  .income-subnav{display:flex;min-height:44px;gap:4px;overflow-x:auto;scrollbar-width:none}.income-subnav::-webkit-scrollbar{display:none}
+  .income-subnav button{flex:0 0 auto;min-width:max-content;min-height:44px;padding:7px 10px;font-size:7px;letter-spacing:.03em}
+  .income-source-badge{flex:0 0 auto;min-height:44px;margin-top:0;padding:7px 9px;font-size:6.5px;white-space:nowrap}
 
   .income-overview-grid{height:100%;grid-template-rows:minmax(0,1.15fr) minmax(0,.8fr) minmax(0,.9fr);gap:5px}
   .income-fact,.income-forecast,.income-next,.income-months{min-height:0!important}
@@ -71,7 +71,4 @@
   .income-integrity-status b{font-size:5.8px;white-space:nowrap}
 }
 
-@media(max-width:430px){
-  .income-subnav{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .income-source-badge{grid-column:1/-1}
-}
+@media(max-width:430px){.income-subnav{overflow-x:auto}}
