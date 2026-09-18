@@ -478,6 +478,10 @@
     padding: 9px 10px;
   }
 
+  .position-sortbar { min-height:44px; overflow-x:auto; scrollbar-width:none; }
+  .position-sortbar::-webkit-scrollbar { display:none; }
+  .position-sortbar button { flex:0 0 auto; min-height:44px; padding:7px 10px; font-size:7px; }
+
   .portfolio-positions-panel .panel-head {
     margin-bottom: 3px;
   }
