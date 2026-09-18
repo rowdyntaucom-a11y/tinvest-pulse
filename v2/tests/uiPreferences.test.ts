@@ -26,18 +26,20 @@ assert.equal(defaults.version, '1.1')
 assert.equal(defaults.theme, 'core')
 assert.equal(defaults.density, 'balanced')
 assert.equal(defaults.motion, 'full')
+assert.equal(defaults.detailMode, 'detailed')
 assert.equal(defaults.defaultWorkspace, 'board')
 assert.deepEqual(defaults.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 assert.notEqual(defaults.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 
 const normalized = normalizeUiPreferences({
-  version: '1.0', theme: 'horizon', density: 'compact', motion: 'reduced', defaultWorkspace: 'analytics',
+  version: '1.0', theme: 'horizon', density: 'compact', motion: 'reduced', detailMode: 'simple', defaultWorkspace: 'analytics',
   pinnedModules: ['analytics.risk','analytics.risk','income.fact','unknown.module','portfolio.value','macro.keyRate','analytics.twr','income.next','portfolio.pnl'],
 })
 assert.equal(normalized.version, '1.1')
 assert.equal(normalized.theme, 'horizon')
 assert.equal(normalized.density, 'compact')
 assert.equal(normalized.motion, 'reduced')
+assert.equal(normalized.detailMode, 'simple')
 assert.equal(normalized.defaultWorkspace, 'analytics')
 assert.deepEqual(normalized.pinnedModules, ['analytics.risk','income.fact','portfolio.value','macro.keyRate','analytics.twr','income.next'])
 
@@ -45,16 +47,18 @@ const board = normalizeUiPreferences({ defaultWorkspace: 'board', pinnedModules:
 assert.equal(board.defaultWorkspace, 'board')
 assert.deepEqual(board.pinnedModules, ['portfolio.value'])
 
-const invalid = normalizeUiPreferences({ theme: 'neon-random', density: 'ultra', motion: 'warp', defaultWorkspace: 'terminal', pinnedModules: ['wrong'] })
+const invalid = normalizeUiPreferences({ theme: 'neon-random', density: 'ultra', motion: 'warp', detailMode: 'noisy', defaultWorkspace: 'terminal', pinnedModules: ['wrong'] })
 assert.equal(invalid.theme, DEFAULT_UI_PREFERENCES.theme)
 assert.equal(invalid.density, DEFAULT_UI_PREFERENCES.density)
 assert.equal(invalid.motion, DEFAULT_UI_PREFERENCES.motion)
+assert.equal(invalid.detailMode, DEFAULT_UI_PREFERENCES.detailMode)
 assert.equal(invalid.defaultWorkspace, DEFAULT_UI_PREFERENCES.defaultWorkspace)
 assert.deepEqual(invalid.pinnedModules, DEFAULT_UI_PREFERENCES.pinnedModules)
 
 const storage = memoryStorage()
-const saved = saveUiPreferences({ version: UI_PREFERENCES_VERSION, theme: 'carbon', density: 'focus', motion: 'off', defaultWorkspace: 'income', pinnedModules: ['income.fact', 'income.next'] }, storage)
+const saved = saveUiPreferences({ version: UI_PREFERENCES_VERSION, theme: 'carbon', density: 'focus', motion: 'off', detailMode: 'simple', defaultWorkspace: 'income', pinnedModules: ['income.fact', 'income.next'] }, storage)
 assert.equal(saved.theme, 'carbon')
+assert.equal(saved.detailMode, 'simple')
 assert.ok(storage.data.has(UI_PREFERENCES_STORAGE_KEY))
 assert.deepEqual(loadUiPreferences(storage), saved)
 
