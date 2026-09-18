@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "node --experimental-strip-types tests/foundation.test.ts && node --experimental-strip-types tests/liveDataBridge.test.ts"
+    "test": "node --experimental-strip-types tests/foundation.test.ts && node --experimental-strip-types tests/liveDataBridge.test.ts && node --experimental-strip-types tests/homeRealContent.test.ts"
   },
   "dependencies": {
     "react": "^19.1.1",
