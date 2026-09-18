@@ -5,7 +5,7 @@ import { GLOSSARY } from '../src/features/help/glossary.ts'
 
 assert.deepEqual(PRIMARY_NAVIGATION.map(item => item.id), ['board', 'portfolio', 'analytics', 'income', 'goals', 'dna'])
 assert.equal(new Set(PRIMARY_NAVIGATION.map(item => item.id)).size, PRIMARY_NAVIGATION.length)
-assert.equal(sectionLabel(ANALYTICS_SECTIONS, 'montecarlo'), 'Сценарии Монте-Карло')
+assert.equal(sectionLabel(ANALYTICS_SECTIONS, 'montecarlo'), 'Сценарии')
 assert.equal(sectionLabel(RISK_SECTIONS, 'tail'), 'Хвостовые риски')
 assert.equal(sectionLabel(RISK_SECTIONS, 'corr'), 'Связи активов')
 assert.deepEqual(RISK_SECTIONS.flatMap(group => group.options.map(option => option.id)), ['portfolio', 'benchmark', 'rolling', 'stress', 'tail', 'corr'])
@@ -36,3 +36,7 @@ assert.doesNotMatch(interactionCss, /grid-template-columns:\s*repeat\(6\s*,/)
 assert.ok(mainSource.lastIndexOf("import './mobileControlLayer.css'") > mainSource.lastIndexOf("import './boardReadability.css'"), 'mobile interaction layer must load after other shell/readability CSS')
 
 console.log('UX navigation and glossary regression: ok')
+
+// Analytics selector uses concise user-facing labels while keeping stable view ids.
+assert.deepEqual(ANALYTICS_SECTIONS.flatMap(group => group.options.map(option => option.label)), ['Доходность','Риски','Здоровье','Доли и цель','Сценарии'])
+assert.equal(sectionLabel(ANALYTICS_SECTIONS, 'montecarlo'), 'Сценарии')
