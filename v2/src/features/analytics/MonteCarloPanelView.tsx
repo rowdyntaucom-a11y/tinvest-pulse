@@ -27,7 +27,7 @@ export default function MonteCarloPanelView({ history, currentValue }: { history
       </div>
       {!result.available ? (
         <div className="mc-gate">
-          <div className="mc-gate__status"><span>СТАТУС МОДЕЛИ</span><strong>ЖДЁМ ИСТОРИЮ</strong><small>QVANIX не экстраполирует слишком короткую выборку.</small></div>
+          <div className="mc-gate__status"><span>ДАННЫЕ ДЛЯ СЦЕНАРИЕВ</span><strong>НУЖНО БОЛЬШЕ ИСТОРИИ</strong><small>Сценарии появятся после накопления достаточной выборки.</small></div>
           <div className="mc-progress" aria-label={`Накоплено ${result.historyReturns} из ${result.minimumReturns} дневных доходностей`}><i><b style={{ width: `${progress}%` }} /></i><span>{result.historyReturns}</span><small>минимум {result.minimumReturns}</small></div>
           <p>{result.note}</p>
         </div>
@@ -39,7 +39,7 @@ export default function MonteCarloPanelView({ history, currentValue }: { history
             <article className="mc-card mc-card--p90"><span>БЛАГОПРИЯТНЫЙ · P90</span><strong>{formatReturn(result.terminalReturn?.p90)}</strong><b>{formatValue(result.terminalValue?.p90)}</b><small>90-й перцентиль результата через {result.horizonTradingDays} торговых дней</small></article>
           </div>
           <div className="mc-integrity">
-            <span className={result.status === 'mature' ? 'is-mature' : 'is-preview'}>{result.status === 'mature' ? 'ЗРЕЛАЯ ВЫБОРКА' : 'ПРЕДВАРИТЕЛЬНО'}</span>
+            <span className={result.status === 'mature' ? 'is-mature' : 'is-preview'}>{result.status === 'mature' ? 'ДАННЫХ ДОСТАТОЧНО' : 'ДАННЫХ ПОКА МАЛО'}</span>
             <b>{result.historyReturns} дневных доходностей · блок {result.blockTradingDays} дн.{result.excludedReturns ? ` · исключено ${result.excludedReturns}` : ''}</b>
             <small>{result.note}</small>
           </div>
