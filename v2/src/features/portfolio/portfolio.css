@@ -478,6 +478,10 @@
     padding: 9px 10px;
   }
 
+  .position-sortbar { min-height:44px; overflow-x:auto; scrollbar-width:none; }
+  .position-sortbar::-webkit-scrollbar { display:none; }
+  .position-sortbar button { flex:0 0 auto; min-height:44px; padding:7px 10px; font-size:7px; }
+
   .portfolio-positions-panel .panel-head {
     margin-bottom: 3px;
   }
@@ -487,7 +491,9 @@
   }
 
   .position-sortbar {
-    min-height: 25px;
+    min-height: 44px;
+    overflow-x: auto;
+    scrollbar-width: none;
     margin: 0 0 2px;
   }
 
@@ -496,8 +502,10 @@
   }
 
   .position-sortbar button {
-    padding: 4px 6px;
-    font-size: 6px;
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 7px 10px;
+    font-size: 7px;
   }
 
   .portfolio-positions-panel .position-row {

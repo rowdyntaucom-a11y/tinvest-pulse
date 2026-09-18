@@ -36,6 +36,18 @@ assert.ok(helpCss.includes('bottom:calc(138px + env(safe-area-inset-bottom))'))
 assert.doesNotMatch(interactionCss, /grid-template-columns:\s*repeat\(6\s*,/)
 assert.ok(mainSource.lastIndexOf("import './mobileControlLayer.css'") > mainSource.lastIndexOf("import './boardReadability.css'"), 'mobile interaction layer must load after other shell/readability CSS')
 
+const finalShellCss=readFileSync(new URL('../src/final-shell.css', import.meta.url), 'utf8')
+assert.match(finalShellCss, /\.analytics-subnav\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto/s)
+assert.match(finalShellCss, /\.analytics-subnav button\s*\{[^}]*min-height:\s*44px/s)
+assert.match(finalShellCss, /\.analytics-subnav \.sample-badge\s*\{[^}]*min-height:\s*44px/s)
+const iaCss=readFileSync(new URL('../src/informationArchitecture.css', import.meta.url), 'utf8')
+assert.match(iaCss, /\.topbar__nav \.chip\{[^}]*min-height:44px/s)
+assert.match(iaCss, /\.subnav\{[^}]*overflow-x:auto/s)
+assert.match(iaCss, /\.subnav button\{[^}]*min-height:44px/s)
+for(const file of ['portfolio/portfolio.css','portfolio/positionInspector.css','portfolio/bondAnalytics.css']) { const source=readFileSync(new URL(`../src/features/${file}`, import.meta.url),'utf8'); assert.ok(source.includes('min-height:44px'), `${file} must retain 44px mobile controls`) }
+for(const file of ['income/incomeCompact.css','income/incomeRealizedHistory.css','income/incomeTax.css']) { const source=readFileSync(new URL(`../src/features/${file}`, import.meta.url),'utf8'); assert.ok(source.includes('min-height:44px'), `${file} must retain 44px mobile controls`) }
+const goalCss=readFileSync(new URL('../src/features/goals/goalWorkspace.css', import.meta.url),'utf8'); assert.match(goalCss, /\.goal-chart__years button \{ min-width:44px; min-height:44px/)
+const assetCss=readFileSync(new URL('../src/features/asset/assetWorkspace.css', import.meta.url),'utf8'); assert.match(assetCss, /\.asset-back,\.asset-nav button,\.asset-dual button,\.asset-unavailable button\{min-height:44px\}/)
 console.log('UX navigation and glossary regression: ok')
 
 // Analytics selector uses concise user-facing labels while keeping stable view ids.
