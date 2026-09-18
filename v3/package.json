@@ -6,18 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "node --experimental-strip-types tests/foundation.test.ts && node --experimental-strip-types tests/liveDataBridge.test.ts && node --experimental-strip-types tests/homeRealContent.test.ts && node --experimental-strip-types tests/assets.test.ts && node --experimental-strip-types tests/analysis.test.ts && node --experimental-strip-types tests/income.test.ts && node --experimental-strip-types tests/goal.test.ts && node --experimental-strip-types tests/shells.test.ts && node --experimental-strip-types tests/homeCommandCenter.test.ts && node --experimental-strip-types tests/preferences.test.ts && node --experimental-strip-types tests/atmosphere.test.ts && node --experimental-strip-types tests/navigationIdentity.test.ts",
+    "test": "node --experimental-strip-types tests/foundation.test.ts && node --experimental-strip-types tests/liveDataBridge.test.ts && node --experimental-strip-types tests/homeRealContent.test.ts && node --experimental-strip-types tests/assets.test.ts && node --experimental-strip-types tests/analysis.test.ts && node --experimental-strip-types tests/income.test.ts && node --experimental-strip-types tests/goal.test.ts && node --experimental-strip-types tests/shells.test.ts && node --experimental-strip-types tests/homeCommandCenter.test.ts && node --experimental-strip-types tests/preferences.test.ts && node --experimental-strip-types tests/atmosphere.test.ts && node --experimental-strip-types tests/navigationIdentity.test.ts && node --experimental-strip-types tests/goalCommandCenter.test.ts",
     "start": "node preview-server.cjs"
   },
-  "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
-  },
-  "devDependencies": {
-    "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^5.0.2",
-    "typescript": "^5.9.2",
-    "vite": "^7.3.2"
-  }
+  "dependencies": {"react": "^19.1.1","react-dom": "^19.1.1"},
+  "devDependencies": {"@types/react": "^19.1.10","@types/react-dom": "^19.1.7","@vitejs/plugin-react": "^5.0.2","typescript": "^5.9.2","vite": "^7.3.2"}
 }
