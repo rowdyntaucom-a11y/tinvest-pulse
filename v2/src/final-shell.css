@@ -62,21 +62,27 @@
   }
 
   .analytics-subnav {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 3px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
   }
 
+  .analytics-subnav::-webkit-scrollbar { display: none; }
+
   .analytics-subnav button {
-    min-width: 0;
-    min-height: 30px;
-    padding-inline: 4px;
+    flex: 0 0 auto;
+    min-width: max-content;
+    min-height: 44px;
+    padding-inline: 10px;
   }
 
   .analytics-subnav .sample-badge {
-    grid-column: 1 / -1;
-    justify-self: start;
-    min-width: 0;
-    padding: 3px 6px;
+    flex: 0 0 auto;
+    min-width: max-content;
+    min-height: 44px;
+    padding: 6px 9px;
   }
 
   .analytics-risk-view {
