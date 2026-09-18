@@ -13,9 +13,9 @@ export type SectionOption<T extends string> = { id: T; label: string; descriptio
 export type SectionGroup<T extends string> = { label: string; options: ReadonlyArray<SectionOption<T>> }
 
 export const ANALYTICS_SECTIONS = [{ label: 'Аналитика', options: [
-  { id: 'overview', label: 'Обзор доходности' }, { id: 'risk', label: 'Риски' },
-  { id: 'health', label: 'Здоровье портфеля' }, { id: 'drift', label: 'Цель и фактические доли' },
-  { id: 'montecarlo', label: 'Сценарии Монте-Карло' },
+  { id: 'overview', label: 'Доходность', description: 'Результат портфеля и сравнение с IMOEX' }, { id: 'risk', label: 'Риски', description: 'Риск портфеля, стресс-тесты и связи активов' },
+  { id: 'health', label: 'Здоровье', description: 'Сводная диагностика качества портфеля' }, { id: 'drift', label: 'Доли и цель', description: 'Фактическая структура относительно целевой' },
+  { id: 'montecarlo', label: 'Сценарии', description: 'Диапазон возможных траекторий Монте-Карло' },
 ]}] as const
 
 export const RISK_SECTIONS = [
