@@ -48,6 +48,12 @@ for(const file of ['portfolio/portfolio.css','portfolio/positionInspector.css','
 for(const file of ['income/incomeCompact.css','income/incomeRealizedHistory.css','income/incomeTax.css']) { const source=readFileSync(new URL(`../src/features/${file}`, import.meta.url),'utf8'); assert.ok(source.includes('min-height:44px'), `${file} must retain 44px mobile controls`) }
 const goalCss=readFileSync(new URL('../src/features/goals/goalWorkspace.css', import.meta.url),'utf8'); assert.match(goalCss, /\.goal-chart__years button \{ min-width:44px; min-height:44px/)
 const assetCss=readFileSync(new URL('../src/features/asset/assetWorkspace.css', import.meta.url),'utf8'); assert.match(assetCss, /\.asset-back,\.asset-nav button,\.asset-dual button,\.asset-unavailable button\{min-height:44px\}/)
+const boardCss=readFileSync(new URL('../src/features/board/qvanixBoard.css',import.meta.url),'utf8')
+assert.match(boardCss,/\.qv-board__lens-tabs button\{flex:0 0 auto;min-width:max-content;min-height:44px/,'Board lens tabs must retain mobile touch floor')
+assert.match(boardCss,/\.qv-board__lens-open\{min-height:44px;font-size:7px/,'Board lens action must retain mobile touch floor')
+assert.match(boardCss,/\.qv-board-card>small\{display:block;font-size:7px/,'Board supporting copy must remain readable on narrow phones')
+const boardShellCss=readFileSync(new URL('../src/features/board/boardShell.css',import.meta.url),'utf8')
+assert.match(boardShellCss,/\.topbar__nav \.chip\{min-height:44px[^}]*font-size:7\.5px/,'Board shell nav must retain mobile target and reading floor')
 console.log('UX navigation and glossary regression: ok')
 
 // Analytics selector uses concise user-facing labels while keeping stable view ids.
