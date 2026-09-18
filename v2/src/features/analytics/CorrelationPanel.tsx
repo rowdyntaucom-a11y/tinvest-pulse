@@ -182,9 +182,9 @@ export function CorrelationPanel({ positions }: Props) {
       </div>
 
       <div className="corr-summary">
-        <article><span>ГОТОВЫЕ ПАРЫ</span><strong>{readyPairs.length}/{pairs.length}</strong><small>надёжных {maturePairs.length} · минимум {matrix.minimumPairedReturns}/{matrix.maturePairedReturns}</small></article>
-        <article><span>САМАЯ НИЗКАЯ ρ</span><strong>{lowest?.correlation == null ? '—' : number.format(lowest.correlation)}</strong><small>{lowest ? `${labelByKey.get(lowest.a)} ↔ ${labelByKey.get(lowest.b)}` : 'пока нет готовой пары'}</small></article>
-        <article><span>САМАЯ ВЫСОКАЯ ρ</span><strong>{highest?.correlation == null ? '—' : number.format(highest.correlation)}</strong><small>{highest ? `${labelByKey.get(highest.a)} ↔ ${labelByKey.get(highest.b)}` : 'пока нет готовой пары'}</small></article>
+        <article><span>ПАРЫ С ДАННЫМИ</span><strong>{readyPairs.length}/{pairs.length}</strong><small>надёжных {maturePairs.length} · минимум {matrix.minimumPairedReturns}/{matrix.maturePairedReturns}</small></article>
+        <article><span>СЛАБЕЕ ВСЕГО СВЯЗАНЫ</span><strong>{lowest?.correlation == null ? '—' : number.format(lowest.correlation)}</strong><small>{lowest ? `${labelByKey.get(lowest.a)} ↔ ${labelByKey.get(lowest.b)}` : 'пока нет готовой пары'}</small></article>
+        <article><span>СИЛЬНЕЕ ВСЕГО СВЯЗАНЫ</span><strong>{highest?.correlation == null ? '—' : number.format(highest.correlation)}</strong><small>{highest ? `${labelByKey.get(highest.a)} ↔ ${labelByKey.get(highest.b)}` : 'пока нет готовой пары'}</small></article>
       </div>
 
       <div className="corr-scroll">
@@ -215,21 +215,21 @@ export function CorrelationPanel({ positions }: Props) {
 
       <details className="allocation-diagnostics">
         <summary>
-          <span>СЦЕНАРИИ РАСПРЕДЕЛЕНИЯ · ТОЛЬКО РИСК</span>
+          <span>ВАРИАНТЫ РАСПРЕДЕЛЕНИЯ ПО РИСКУ</span>
           <strong>{allocation.status}</strong>
           <small>{allocation.commonReturns} общих интервалов{allocationSample ? ` · ${allocationSample}` : ''}</small>
         </summary>
         {currentRisk.available ? (
           <article className="current-risk-diagnostic">
             <div>
-              <span>ТЕКУЩИЕ ВЕСА · ВКЛАД В РИСК</span>
+              <span>ТЕКУЩИЙ ПОРТФЕЛЬ · ВКЛАД В РИСК</span>
               <strong>{currentRisk.annualizedVolatility == null ? '—' : `${pct.format(currentRisk.annualizedVolatility * 100)}% волатильность`}</strong>
               <b>{riskDepthBadge}</b>
             </div>
             <small title={currentRisk.note}>{topRiskLine ?? currentRisk.note}</small>
           </article>
         ) : (
-          <p className="current-risk-unavailable">ТЕКУЩИЙ РИСК: {currentRisk.reason ?? currentRisk.note}</p>
+          <p className="current-risk-unavailable">НЕДОСТАТОЧНО ДАННЫХ О РИСКЕ: {currentRisk.reason ?? currentRisk.note}</p>
         )}
         {allocation.available ? (
           <>
