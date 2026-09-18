@@ -165,7 +165,7 @@ export function CorrelationPanel({ positions }: Props) {
   if (series.length < 2) {
     return (
       <section className="panel corr-panel">
-        <div className="panel-head"><div><span className="eyebrow">КОРРЕЛЯЦИЯ · v{matrix.version}</span><h2>ИСТОРИЯ ЕЩЁ НЕ ГОТОВА</h2></div><small>fail-closed</small></div>
+        <div className="panel-head"><div><span className="eyebrow">КОРРЕЛЯЦИЯ · v{matrix.version}</span><h2>ИСТОРИЯ ЕЩЁ НЕ ГОТОВА</h2></div><small>без подстановок</small></div>
         <p className="corr-note">Нужно минимум два актива с рыночной историей. QVANIX не подставляет искусственные коэффициенты, если T‑Bank не вернул достаточный ряд.</p>
       </section>
     )
@@ -195,7 +195,7 @@ export function CorrelationPanel({ positions }: Props) {
             const cellsForRow = series.map(column => {
               const cell = cells.get(`${row.key}|${column.key}`)
               const value = cell?.available && cell.correlation != null ? cell.correlation : null
-              const maturity = cell?.mature ? 'MATURE' : cell?.available ? 'PREVIEW' : 'INSUFFICIENT'
+              const maturity = cell?.mature ? 'ДОСТАТОЧНО' : cell?.available ? 'ПРЕДВАРИТЕЛЬНО' : 'МАЛО ДАННЫХ'
               return (
                 <span
                   className={`corr-cell ${cellTone(value)}`}
@@ -211,7 +211,7 @@ export function CorrelationPanel({ positions }: Props) {
         </div>
       </div>
 
-      <p className="corr-note">Pearson ρ считается только по доходностям с одинаковыми границами интервала наблюдения, а не по ценам. Пропущенная промежуточная свеча разрывает обе соседние пары; до {matrix.minimumPairedReturns} общих интервалов пара скрыта, {matrix.minimumPairedReturns}–{matrix.maturePairedReturns - 1} = preview, {matrix.maturePairedReturns}+ = mature. Это диагностика структуры портфеля, не торговый сигнал.</p>
+      <p className="corr-note">Pearson ρ считается только по доходностям с одинаковыми границами интервала наблюдения, а не по ценам. Пропущенная промежуточная свеча разрывает обе соседние пары; до {matrix.minimumPairedReturns} общих интервалов пара скрыта, {matrix.minimumPairedReturns}–{matrix.maturePairedReturns - 1} = предварительно, {matrix.maturePairedReturns}+ = достаточно. Это диагностика структуры портфеля, не торговый сигнал.</p>
 
       <details className="allocation-diagnostics">
         <summary>
