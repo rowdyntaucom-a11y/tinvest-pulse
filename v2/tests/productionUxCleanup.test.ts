@@ -16,7 +16,7 @@ assert.doesNotMatch(navCss, /grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/,
 const mobileControls = readFileSync(new URL("../src/mobileControlLayer.css", import.meta.url), "utf8");
 assert.match(mobileControls, /\.context-help,\s*\.qv-personalize\s*\{[\s\S]*left:\s*10px !important;[\s\S]*right:\s*auto !important;/, "portrait secondary utilities must share one rail");
 assert.match(mobileControls, /\.context-help\s*\{\s*bottom:\s*calc\(74px \+ env\(safe-area-inset-bottom\)\) !important;/, "help target must clear primary navigation");
-assert.match(mobileControls, /\.qv-personalize\s*\{\s*bottom:\s*calc\(122px \+ env\(safe-area-inset-bottom\)\) !important;/, "personalization target must stack above help");
+assert.match(mobileControls, /\.qv-personalize\s*\{\s*bottom:\s*calc\(124px \+ env\(safe-area-inset-bottom\)\) !important;/, "personalization target must stack above help");
 assert.match(mobileControls, /min-width:\s*44px;[\s\S]*min-height:\s*44px;/, "mobile utility targets must preserve 44px minimum touch size");
 assert.doesNotMatch(mobileControls, /\.context-help\s*\{[\s\S]{0,100}right:\s*84px/, "help must not return to a competing right-side portrait lane");
 
