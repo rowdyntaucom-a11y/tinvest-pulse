@@ -487,7 +487,9 @@
   }
 
   .position-sortbar {
-    min-height: 25px;
+    min-height: 44px;
+    overflow-x: auto;
+    scrollbar-width: none;
     margin: 0 0 2px;
   }
 
@@ -496,8 +498,10 @@
   }
 
   .position-sortbar button {
-    padding: 4px 6px;
-    font-size: 6px;
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 7px 10px;
+    font-size: 7px;
   }
 
   .portfolio-positions-panel .position-row {
