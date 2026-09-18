@@ -22,7 +22,7 @@ function memoryStorage(initial: Record<string, string> = {}): UiPreferenceStorag
 
 const defaults = normalizeUiPreferences(null)
 assert.equal(defaults.version, UI_PREFERENCES_VERSION)
-assert.equal(defaults.version, '1.1')
+assert.equal(defaults.version, '1.2')
 assert.equal(defaults.theme, 'core')
 assert.equal(defaults.density, 'balanced')
 assert.equal(defaults.motion, 'full')
@@ -35,7 +35,7 @@ const normalized = normalizeUiPreferences({
   version: '1.0', theme: 'horizon', density: 'compact', motion: 'reduced', detailMode: 'simple', defaultWorkspace: 'analytics',
   pinnedModules: ['analytics.risk','analytics.risk','income.fact','unknown.module','portfolio.value','macro.keyRate','analytics.twr','income.next','portfolio.pnl'],
 })
-assert.equal(normalized.version, '1.1')
+assert.equal(normalized.version, '1.2')
 assert.equal(normalized.theme, 'horizon')
 assert.equal(normalized.density, 'compact')
 assert.equal(normalized.motion, 'reduced')
