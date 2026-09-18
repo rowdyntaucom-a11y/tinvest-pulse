@@ -52,7 +52,6 @@ const boardCss=readFileSync(new URL('../src/features/board/qvanixBoard.css',impo
 assert.match(boardCss,/\.qv-board-card>small\{display:block;font-size:7px/,'Board supporting copy must remain readable on narrow phones')
 const boardShellCss=readFileSync(new URL('../src/features/board/boardShell.css',import.meta.url),'utf8')
 assert.match(boardShellCss,/\.topbar__nav \.chip\{min-height:44px[^}]*font-size:7\.5px/,'Board shell nav must retain mobile target and reading floor')
-const helpCss=readFileSync(new URL('../src/features/help/contextHelp.css',import.meta.url),'utf8')
 assert.match(helpCss,/\.context-help>summary\{width:44px;height:44px/,'mobile Help launcher must retain 44px target')
 assert.match(helpCss,/\.context-help__close\{width:44px;height:44px/,'mobile Help close must retain 44px target')
 assert.match(helpCss,/\.context-help__card>p\{font-size:11px/,'mobile Help body copy must remain readable')
