@@ -58,7 +58,7 @@ export default function App() {
   const [pulseMode, setPulseMode] = useState(false);
   const worldLocalDate = useWorldPhaseClock(tab === "dna");
 
-  useEffect(() => { const root = document.documentElement; root.dataset.qvTheme = uiPreferences.theme; root.dataset.qvDensity = uiPreferences.density; root.dataset.qvMotion = uiPreferences.motion; saveUiPreferences(uiPreferences, browserStorage()); }, [uiPreferences]);
+  useEffect(() => { const root = document.documentElement; root.dataset.qvTheme = uiPreferences.theme; root.dataset.qvDensity = uiPreferences.density; root.dataset.qvMotion = uiPreferences.motion; root.dataset.qvDetail = uiPreferences.detailMode; saveUiPreferences(uiPreferences, browserStorage()); }, [uiPreferences]);
   useEffect(() => { let active = true; const refresh = async () => { const sequence = ++requestSequence.current; try { const next = await loadPortfolio(); if (ownsLatestRequest(sequence, requestSequence.current, active)) { if (next.source !== "fallback") lastSuccessfulLiveAt.current = new Date().toISOString(); setSnapshot((current) => ({ ...next, history: current.history.length ? current.history : next.history })); setPortfolioStatus(next.source === "fallback" ? "FALLBACK" : "LIVE"); } } catch { if (ownsLatestRequest(sequence, requestSequence.current, active)) setPortfolioStatus("ERROR"); } }; void refresh(); const timer = window.setInterval(refresh, 60_000); return () => { active = false; window.clearInterval(timer); }; }, []);
   useEffect(() => { if (!selectedAsset || portfolioStatus === "LOADING") return; setSelectedAsset((current) => resolveCanonicalAsset(current, snapshot.positionItems)); }, [snapshot.positionItems, portfolioStatus]);
   useEffect(() => { const preload = () => { void loadGoalWorkspace(); void loadAssetWorkspace(); }; const idle = window.requestIdleCallback?.(preload, { timeout: 2500 }); const timer = idle == null ? window.setTimeout(preload, 1200) : null; return () => { if (idle != null) window.cancelIdleCallback?.(idle); if (timer != null) window.clearTimeout(timer); }; }, []);
@@ -78,14 +78,14 @@ export default function App() {
   const workspaceGate = resolveWorkspaceGate(tab, portfolioStatus);
   const openAsset = (position: PortfolioSnapshot["positionItems"][number]) => { setAssetReturnTab(tab); setSelectedAsset(position); };
   const navigateToTab = (nextTab: Tab) => { setSelectedAsset(null); setTab(nextTab); };
-  const updateUiPreferences = (patch: Partial<Pick<UiPreferences, "theme" | "density" | "motion" | "defaultWorkspace" | "pinnedModules">>) => setUiPreferences((current) => normalizeUiPreferences({ ...current, ...patch }));
+  const updateUiPreferences = (patch: Partial<Pick<UiPreferences, "theme" | "density" | "motion" | "detailMode" | "defaultWorkspace" | "pinnedModules">>) => setUiPreferences((current) => normalizeUiPreferences({ ...current, ...patch }));
   const resetUiPreferences = () => setUiPreferences(normalizeUiPreferences(null));
   const xirr = annualReturnRatioToPercent(snapshot.xirr);
   const startDate = snapshot.startDate ? new Date(snapshot.startDate).toLocaleDateString("ru-RU") : "—";
   const analyticsMature = analytics.historyDays >= 365;
   const historyLabel = analytics.historyDays ? `${analytics.historyDays} дней` : "нет истории";
 
-  return <main className="app-shell" data-qv-theme={uiPreferences.theme} data-qv-density={uiPreferences.density} data-qv-motion={uiPreferences.motion}>
+  return <main className="app-shell" data-qv-theme={uiPreferences.theme} data-qv-density={uiPreferences.density} data-qv-motion={uiPreferences.motion} data-qv-detail={uiPreferences.detailMode}>
     <div className="qv-ambient" aria-hidden="true" />
     <header className="topbar">
       <div className="brand-block"><div className="eyebrow">QVANIX · АНАЛИТИКА ПОРТФЕЛЯ</div><h1>QVANIX</h1><p>{snapshot.accountName} · финансовое ядро, аналитика и живой мир без лишнего дублирования.</p></div>
