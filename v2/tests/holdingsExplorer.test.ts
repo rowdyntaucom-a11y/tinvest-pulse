@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { aggregateHoldings, classifyPosition, filterAndSortHoldings, holdingDimension } from '../src/features/analytics/holdingsExplorer.ts'
 import type { PositionSnapshot } from '../src/lib/portfolioApi.ts'
 const base=(ticker:string,type:string,value:number,extra:Partial<PositionSnapshot>={}):PositionSnapshot=>({figi:ticker,instrumentUid:`uid-${ticker}`,ticker,name:ticker,instrumentType:type,quantity:1,averagePrice:value,costBasis:value,currentPrice:value,currentValue:value,expectedYield:value/10,weight:value/1000,bond:null,...extra})
@@ -10,4 +11,8 @@ assert.equal(holdingDimension(rows[2],'sector'),null)
 const sectors=aggregateHoldings(rows,'sector')
 assert.deepEqual(sectors.rows,[{label:'Государственные',value:300}])
 assert.equal(sectors.unclassified,700)
+const viewSource=readFileSync(new URL('../src/features/analytics/HoldingsExplorer.tsx',import.meta.url),'utf8')
+for(const label of ['АКТИВЫ','ПОКАЗАТЬ ПО','РЕЗУЛЬТАТ','КОНЦЕНТРАЦИЯ','ПОКАЗАТЕЛИ']) assert.match(viewSource,new RegExp(label))
+assert.match(viewSource,/aria-label="Фильтры активов"/)
+assert.match(viewSource,/aria-label="Группировка активов"/)
 console.log('holdings explorer tests passed')
