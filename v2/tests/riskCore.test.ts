@@ -148,5 +148,9 @@ assert.equal(recoveryMature.returnObservations, 252)
 
 const riskViewSource=readFileSync(new URL('../src/features/analytics/RiskWorkspace.tsx',import.meta.url),'utf8')
 for(const label of ['SHARPE','SORTINO','КОНЦЕНТРАЦИЯ · HHI','TRACKING ERROR · TE','ЧУВСТВИТЕЛЬНОСТЬ · BETA','ПОРОГ ПОТЕРЬ · VaR 95%','СРЕДНЯЯ ПОТЕРЯ ХУДШИХ ДНЕЙ · CVaR']) assert.ok(riskViewSource.includes(label), `missing risk label: ${label}`)
+const stressViewSource=readFileSync(new URL('../src/features/analytics/StressPanel.tsx',import.meta.url),'utf8')
+for(const label of ['СТРЕСС-ТЕСТЫ','РЕЗУЛЬТАТ','ПОКРЫТИЕ','КАК СРАВНИВАЕМ','ИСТОРИЯ']) assert.ok(stressViewSource.includes(label), `missing stress label: ${label}`)
+const scenarioViewSource=readFileSync(new URL('../src/features/analytics/MonteCarloPanelView.tsx',import.meta.url),'utf8')
+for(const label of ['ДАННЫЕ ДЛЯ СЦЕНАРИЕВ','НУЖНО БОЛЬШЕ ИСТОРИИ','ДАННЫХ ДОСТАТОЧНО','ДАННЫХ ПОКА МАЛО']) assert.ok(scenarioViewSource.includes(label), `missing scenario label: ${label}`)
 console.log('risk core regression: ok')
 
