@@ -10,7 +10,7 @@ const n=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 const lossPct=(value:number|null)=>value==null?"—":"-"+p.format(value*100)+"%";
 const pct=(value:number|null)=>value==null?"—":p.format(value*100)+"%";
 
-export function V3RiskLayer({portfolio,tail,positions,totalPortfolioValue}:{portfolio:PortfolioAnalytics;tail:TailRiskResult;positions:PositionSnapshot[];totalPortfolioValue:number}){
+export function V3RiskLayer({portfolio,tail,positions,totalPortfolioValue,onOpenAsset}:{portfolio:PortfolioAnalytics;tail:TailRiskResult;positions:PositionSnapshot[];totalPortfolioValue:number;onOpenAsset?:(position:PositionSnapshot)=>void}){
   const maxDd=portfolio.maxDrawdown;
   return <section className="v3-analysis-layer" aria-label="Риск портфеля">
     <div className="v3-analysis-layer-head"><div><span>Риск портфеля</span><h2>Просадка, разброс и концентрация</h2></div><b>{tail.status==="mature"?"Зрелая":tail.status==="preview"?"Preview":"Gate"}</b></div>
@@ -31,6 +31,6 @@ export function V3RiskLayer({portfolio,tail,positions,totalPortfolioValue}:{port
       {!tail.available&&<div className={"v3-analysis-gate"+(tail.status==="invalid_history"?" is-danger":"")}>{tail.note}</div>}
       {tail.available&&<small className="v3-analysis-method-note">{tail.note} VaR/CVaR описывают прошлую выборку и не являются пределом будущего убытка.</small>}
     </section>
-    <V3RiskContributionPanel positions={positions} totalPortfolioValue={totalPortfolioValue}/>
+    <V3RiskContributionPanel positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/>
   </section>
 }
