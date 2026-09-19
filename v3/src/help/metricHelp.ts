@@ -1,6 +1,6 @@
 import{GLOSSARY}from"../../../v2/src/features/help/glossary";
 
-export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"goalProgress";
+export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"twr"|"volatility"|"sharpe"|"sortino"|"rollingRisk"|"effectivePositions"|"tailRisk"|"trackingError"|"beta"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"goalProgress";
 
 export type V3MetricHelpEntry={
   title:string;
@@ -25,6 +25,53 @@ export const V3_METRIC_HELP:Record<V3MetricHelpTopic,V3MetricHelpEntry>={
     title:GLOSSARY.xirr.label,
     simple:GLOSSARY.xirr.simple,
     detail:"XIRR использует реальные даты денежных потоков, поэтому отвечает на вопрос о личном результате инвестора, а не о чистой доходности стратегии.",
+  },
+  twr:{
+    title:GLOSSARY.twr.label,
+    simple:GLOSSARY.twr.simple,
+    detail:"В QVANIX TWR строится по подтверждённому индексу стратегии и отделяет эффект внешних денежных потоков от результата портфеля.",
+    note:"TWR и XIRR отвечают на разные вопросы и могут заметно отличаться.",
+  },
+  volatility:{
+    title:"Волатильность",
+    simple:"Годовая оценка разброса дневных TWR-доходностей на доступной подтверждённой выборке.",
+    detail:"Более высокая волатильность означает более широкий разброс наблюдавшихся дневных результатов, но сама по себе не говорит, хорош или плох портфель.",
+  },
+  sharpe:{
+    title:"Sharpe",
+    simple:"Избыточная доходность относительно безрисковой ставки на единицу общего наблюдаемого риска.",
+    detail:"Расчёт требует подтверждённую TWR-историю и безрисковую ставку. На короткой выборке коэффициент нестабилен.",
+  },
+  sortino:{
+    title:"Sortino",
+    simple:"Риск-скорректированный показатель, который учитывает только неблагоприятные отклонения относительно безрисковой ставки.",
+    detail:"Как и Sharpe, он зависит от длины и качества истории и не является прогнозом будущего результата.",
+  },
+  rollingRisk:{
+    title:"Rolling-окно",
+    simple:"Последний полностью доступный стандартный горизонт из 20, 60, 120 или 252 торговых дней.",
+    detail:"QVANIX выбирает самое длинное доступное окно целиком и не растягивает короткую историю искусственно до года.",
+  },
+  effectivePositions:{
+    title:"Эквивалент позиций",
+    simple:"Величина 1 / HHI: сколько равновзвешенных позиций дали бы похожую концентрацию капитала.",
+    detail:"Это описание концентрации текущего капитала, а не число независимых источников риска.",
+  },
+  tailRisk:{
+    title:GLOSSARY.tailRisk.label,
+    simple:GLOSSARY.tailRisk.simple,
+    detail:"Исторические VaR/CVaR 95% рассчитываются только после минимальной дневной TWR-выборки; до этого QVANIX показывает gate вместо ложной точности.",
+    note:"Исторический хвост не ограничивает возможный будущий убыток.",
+  },
+  trackingError:{
+    title:"Tracking Error",
+    simple:"Годовая нестабильность разницы дневной доходности портфеля и IMOEX на общей выборке.",
+    detail:"Метрика доступна только когда достаточно парных дневных доходностей портфеля и индекса.",
+  },
+  beta:{
+    title:"Beta",
+    simple:"Чувствительность дневной доходности портфеля к изменениям IMOEX на общей выборке.",
+    detail:"Beta описывает историческую линейную связь с индексом и не является прогнозом будущей реакции.",
   },
   maxDrawdown:{
     title:"Максимальная просадка",
