@@ -1,0 +1,10 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const e=readFileSync(new URL("../src/assets/V3HoldingsExplorer.tsx",import.meta.url),"utf8"),a=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/holdingsExplorer.css",import.meta.url),"utf8");
+for(const helper of["aggregateHoldings","classifyPosition","filterAndSortHoldings"])assert.match(e,new RegExp(helper));
+for(const label of["Инструменты","Классы","Эмитенты","Отрасли","Валюты","Акции","Облигации","Фонды","Валюта","Фьючерсы","Другое"])assert.match(e,new RegExp(label));
+assert.match(e,/type="search"/);assert.match(e,/Тикер, название, эмитент, отрасль/);assert.match(e,/По доле/);assert.match(e,/По стоимости/);assert.match(e,/По P\/L/);assert.match(e,/По названию/);
+assert.match(e,/Без подтверждённой классификации/);assert.match(e,/не угадывает отсутствующий эмитент, отрасль или валюту/);assert.match(e,/Broker P\/L — накопленный контекст позиции, а не дневное изменение/);assert.match(e,/YTM и duration здесь не рассчитываются/);
+assert.match(a,/V3HoldingsExplorer=lazy/);assert.match(a,/mode==="detailed"&&trusted/);assert.match(a,/Открываем глубокую структуру портфеля/);
+assert.match(css,/overflow-x:auto/);assert.match(css,/max-width:430px/);assert.match(css,/max-width:359px/);assert.match(css,/focus-visible/);
+assert.doesNotMatch(e,/Math\.random|mock|demo|84848/i);
+console.log("v3 holdings explorer UI contracts: ok");
