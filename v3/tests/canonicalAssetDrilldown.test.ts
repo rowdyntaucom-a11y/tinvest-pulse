@@ -8,7 +8,7 @@ const css=readFileSync(new URL("../src/styles/analysisDepth.css",import.meta.url
 assert.match(app,/V3Analysis[^>]+onOpenAsset={setSelectedAsset}/);assert.match(app,/backLabel={active\.label}/);
 assert.match(analysis,/onOpenAsset\?\:\(position:PositionSnapshot\)=>void/);assert.match(analysis,/onClick=\{\(\)=>onOpenAsset\?\.\(item\)\}/);assert.match(analysis,/V3RiskLayer[^>]+onOpenAsset={onOpenAsset}/);
 assert.match(risk,/resolvePositionByKey\(positions,row\.key\)/);assert.match(risk,/resolvePositionByKey\(positions,pair\.aKey\)/);assert.match(risk,/resolvePositionByKey\(positions,pair\.bKey\)/);assert.match(risk,/идентичность не подтверждена/);
-assert.match(adapter,/aKey:cell\.a/);assert.match(adapter,/bKey:cell\.b/);assert.match(adapter,/positionIdentityKey/);
+assert.match(adapter,/aKey:cell\.a/);assert.match(adapter,/bKey:cell\.b/);assert.match(adapter,/clean\(position\.instrumentUid\)\|\|clean\(position\.figi\)\|\|position\.ticker/);
 assert.match(asset,/backLabel\|\|"Активы"/);assert.match(asset,/V3SectionSelector label="Раздел актива"/);
 assert.match(css,/v3-analysis-detail\.is-drillable/);assert.match(css,/v3-risk-asset-link/);assert.match(css,/v3-correlation-assets/);assert.match(css,/focus-visible/);
 assert.doesNotMatch(risk,/ticker\)===|name\)===|find\([^)]*ticker/i);
