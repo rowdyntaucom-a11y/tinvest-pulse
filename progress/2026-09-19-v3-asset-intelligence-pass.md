@@ -25,7 +25,7 @@ The new v3 Asset Workspace had the right navigation boundary and verified price 
    - only non-null verified metrics are rendered;
    - no QVANIX score is produced until a reviewed methodology exists.
 4. Added grouped fundamentals for valuation, profitability, financials and cash-flow/dividend metrics.
-5. Asset Income reuses the shared payout snapshot and the canonical Income source-row identity logic.
+5. Asset Income reuses the canonical payout normalizer and the canonical Income source-row identity logic.
 6. Income is shown only when payout events map through exact FIGI identity to exactly one current position.
 7. Fact and future schedule stay separate. YoC is displayed only when exact FIGI identity and verified cost basis support it.
 8. Explicit stale payout warning is surfaced when the source snapshot marks itself stale.
