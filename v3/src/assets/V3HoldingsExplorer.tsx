@@ -11,6 +11,7 @@ import{
 }from"../../../v2/src/features/analytics/holdingsExplorer";
 import{ratioToPercent,clampPercent}from"../data/units";
 import{assetClassLabel}from"../data/assetClasses";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import"../styles/holdingsExplorer.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -18,9 +19,13 @@ const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const FILTERS:Array<[AssetClassFilter,string]>=[
   ["all","Все"],["shares","Акции"],["bonds","Облигации"],["funds","Фонды"],["currency","Валюта"],["futures","Фьючерсы"],["other","Другое"],
 ];
-const DIMENSIONS:Array<[HoldingDimension,string]>=[
-  ["instrument","Инструменты"],["class","Классы"],["issuer","Эмитенты"],["sector","Отрасли"],["currency","Валюты"],
-];
+const DIMENSION_OPTIONS=[
+  {value:"class",label:"Классы",description:"Акции, облигации, фонды, валюта и другие подтверждённые классы."},
+  {value:"instrument",label:"Инструменты",description:"Отдельные позиции с сортировкой, P/L и переходом в карточку актива."},
+  {value:"issuer",label:"Эмитенты",description:"Группировка только по подтверждённому нормализованному эмитенту."},
+  {value:"sector",label:"Отрасли",description:"Группировка только по доступной нормализованной отрасли."},
+  {value:"currency",label:"Валюты",description:"Группировка только по подтверждённой валюте инструмента."},
+] as const satisfies readonly {value:HoldingDimension;label:string;description:string}[];
 const PRESETS:Array<[HoldingPreset,string]>=[
   ["compact","Компактно"],["return","Результат"],["risk","Концентрация"],["fundamental","Карточка"],
 ];
@@ -65,7 +70,7 @@ export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSn
     <label className="v3-holdings-search"><span>Поиск</span><input type="search" inputMode="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Тикер, название, эмитент, отрасль…"/>{query&&<button type="button" aria-label="Очистить поиск" onClick={()=>setQuery("")}>×</button>}</label>
 
     <div className="v3-holdings-control"><small>АКТИВЫ</small><div className="v3-holdings-rail" role="group" aria-label="Фильтр активов">{FILTERS.map(([id,label])=><button type="button" key={id} className={filter===id?"is-active":""} aria-pressed={filter===id} onClick={()=>setFilter(id)}>{label}</button>)}</div></div>
-    <div className="v3-holdings-control"><small>ПОКАЗАТЬ ПО</small><div className="v3-holdings-rail" role="group" aria-label="Группировка активов">{DIMENSIONS.map(([id,label])=><button type="button" key={id} className={dimension===id?"is-active":""} aria-pressed={dimension===id} onClick={()=>setDimension(id)}>{label}</button>)}</div></div>
+    <V3SectionSelector label="Показать структуру по" value={dimension} onChange={setDimension} options={DIMENSION_OPTIONS}/>
 
     {instrumentView&&<div className="v3-holdings-toolbar">
       <div className="v3-holdings-rail" role="group" aria-label="Представление списка">{PRESETS.map(([id,label])=><button type="button" key={id} className={preset===id?"is-active":""} aria-pressed={preset===id} onClick={()=>setPreset(id)}>{label}</button>)}</div>
