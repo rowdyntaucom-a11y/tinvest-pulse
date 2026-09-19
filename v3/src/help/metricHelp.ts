@@ -1,6 +1,6 @@
 import{GLOSSARY}from"../../../v2/src/features/help/glossary";
 
-export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"twr"|"volatility"|"sharpe"|"sortino"|"rollingRisk"|"effectivePositions"|"riskContribution"|"diversificationRatio"|"correlation"|"tailRisk"|"trackingError"|"beta"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"payoutCoverage"|"incomeStability"|"incomeConcentration"|"goalProgress";
+export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"twr"|"volatility"|"sharpe"|"sortino"|"rollingRisk"|"effectivePositions"|"riskContribution"|"diversificationRatio"|"correlation"|"tailRisk"|"trackingError"|"beta"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"payoutCoverage"|"incomeStability"|"incomeConcentration"|"goalProgress"|"goalScenario"|"historicalBootstrap";
 
 export type V3MetricHelpEntry={
   title:string;
@@ -135,6 +135,18 @@ export const V3_METRIC_HELP:Record<V3MetricHelpTopic,V3MetricHelpEntry>={
     title:"Концентрация дохода",
     simple:"Показывает, насколько реально полученный пассивный доход сосредоточен в одном или нескольких источниках.",
     detail:"Расчёт использует только положительные FACT-выплаты после налога. Эффективное число источников = 1 / HHI фактического дохода.",
+  },
+  goalScenario:{
+    title:"Сценарий цели",
+    simple:"Детерминированная траектория из текущего капитала и только тех будущих предпосылок, которые вы явно ввели сами.",
+    detail:"QVANIX не подставляет будущую доходность, инфляцию, пополнения или индексное ожидание. Инфляция меняет номинальную стоимость цели, а выплаты можно учитывать отдельно или реинвестировать.",
+    note:"Это сценарий чувствительности к вашим предпосылкам, а не прогноз или обещанная дата достижения.",
+  },
+  historicalBootstrap:{
+    title:"Исторический block bootstrap",
+    simple:"Сценарный диапазон, полученный многократной пересборкой подтверждённых дневных TWR-доходностей историческими блоками.",
+    detail:"QVANIX сохраняет локальную последовательность движений внутри 5-дневных блоков и показывает P10/медиану/P90 только после минимальной истории. Будущие пополнения, инфляция и изменение состава портфеля не моделируются.",
+    note:"Исторический bootstrap не является прогнозом вероятности будущего результата.",
   },
   goalProgress:{
     title:"Прогресс к цели",
