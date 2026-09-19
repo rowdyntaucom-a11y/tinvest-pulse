@@ -4,7 +4,8 @@ import type{V3HistoryWindow}from"../history/historyLens";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 
 const p=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
-const r=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2,signDisplay:"exceptZero"});\nconst plain=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
+const r=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2,signDisplay:"exceptZero"});
+const plain=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const dateFmt=new Intl.DateTimeFormat("ru-RU",{day:"2-digit",month:"short",year:"numeric"});
 const pct=(value:number|null)=>value==null?"—":p.format(value*100)+"%";
 const ratio=(value:number|null)=>value==null?"—":r.format(value);
