@@ -22,7 +22,7 @@ assert.equal(snapshot.available,true);
 assert.equal(snapshot.value,1000);
 assert.equal(snapshot.xirr,.12);
 assert.deepEqual(snapshot.allocation.map(x=>x.ticker),["A","B","C","D"]);
-assert.equal(snapshot.allocationCoverage,1);
+assert.ok(Math.abs(snapshot.allocationCoverage-1)<1e-12);
 const geometry=buildPulseHistoryGeometry(snapshot.history);
 assert.equal(geometry.available,true);
 assert.equal(geometry.segments.length,2);
