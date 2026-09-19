@@ -109,13 +109,14 @@ The copy explicitly separates risk contribution from P/L and warns that historic
   - mobile horizontal containment.
 - Metric-help regression extended with the three new topics.
 
-## Validation required
-- v3 build;
-- dependency security gate;
-- full v3 test suite;
-- bundle split inspection;
-- squash merge;
-- Render exact-SHA LIVE verification.
+## Validation
+- v3 build: success.
+- dependency security gate: success, 0 vulnerabilities.
+- full v3 test suite: success, including exact risk-history adapter and contribution/correlation UI contracts.
+- bundle split preserved: initial JS 273.77 kB / 84.74 kB gzip; lazy Analysis 52.63 kB / 14.74 kB gzip; shared assetHistoryApi chunk 2.30 kB / 1.06 kB gzip; Asset Workspace 35.88 kB / 10.92 kB gzip; CSS 82.58 kB / 14.18 kB gzip.
+- The heavier covariance/correlation logic remains behind the lazy Analysis workspace; the verified asset-history request itself is triggered only when Detailed Analysis → Risk mounts.
+- Automated Codex review did not run because the connected review quota is exhausted; no review finding was produced.
+- squash merge and Render exact-SHA LIVE verification remain after the final checkpoint CI.
 
 ## Real-device follow-up
 Samsung Internet / Chrome Android:
