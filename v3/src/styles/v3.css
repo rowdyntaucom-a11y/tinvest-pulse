@@ -109,3 +109,25 @@
 .v3-app[data-shell="carbon"] .v3-history-window{background:rgba(8,9,25,.72);border-color:rgba(126,139,255,.2)}
 @media(max-width:430px){.v3-history-window{margin-bottom:6px}.v3-history-window button{min-height:34px}.v3-history-depth{gap:4px;margin-top:6px}.v3-history-depth>div{padding:7px}.v3-history-depth strong{font-size:10px}.v3-history-legend{font-size:8px}}
 @media(max-width:359px){.v3-history-depth{grid-template-columns:1fr 1fr}.v3-history-depth>div:last-child{grid-column:1/-1}.v3-history-window button{padding-inline:4px}}
+
+/* Metric explainability — one contextual entry point at first meaningful use. */
+.v3-metric-help{position:relative;display:inline-flex!important;align-items:center;vertical-align:middle;margin-left:4px;text-transform:none!important;letter-spacing:0!important;color:inherit!important}
+.v3-metric-help>button{display:inline-grid;place-items:center;width:22px;height:22px;min-width:22px;min-height:22px;padding:0;border:1px solid var(--v3-line,rgba(255,255,255,.14));border-radius:50%;background:rgba(255,255,255,.045);color:var(--v3-muted,#9da7aa);font:700 10px/1 Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0;cursor:pointer}
+.v3-metric-help>button[aria-expanded="true"]{border-color:var(--v3-accent,var(--shell-accent,#b7f2d0));color:var(--v3-accent,var(--shell-accent,#b7f2d0));background:rgba(255,255,255,.075)}
+.v3-metric-help>button:focus-visible{outline:2px solid var(--v3-accent,var(--shell-accent,#b7f2d0));outline-offset:2px}
+.v3-metric-help-panel{position:absolute;z-index:70;top:calc(100% + 7px);left:0;display:grid!important;width:min(280px,calc(100vw - 34px));gap:7px;padding:12px;border:1px solid var(--v3-line,rgba(255,255,255,.14));border-radius:14px;background:rgba(10,14,16,.97);box-shadow:0 18px 48px rgba(0,0,0,.34);backdrop-filter:blur(18px);color:#f5f7f8!important;text-align:left!important;text-transform:none!important;letter-spacing:0!important;white-space:normal!important}
+.v3-metric-help-panel>strong,.v3-metric-help-panel>span,.v3-metric-help-panel>small{display:block!important;margin:0!important;text-align:left!important;text-transform:none!important;letter-spacing:0!important;white-space:normal!important}
+.v3-metric-help-panel>strong{font:700 12px/1.25 Inter,system-ui,sans-serif!important;color:#f5f7f8!important}
+.v3-metric-help-panel>span{font:400 10px/1.45 Inter,system-ui,sans-serif!important;color:#c2cbce!important}
+.v3-metric-help-panel>small{padding-top:6px;border-top:1px solid rgba(255,255,255,.08);font:500 9px/1.4 Inter,system-ui,sans-serif!important;color:#8f9b9f!important}
+.v3-app[data-shell="horizon"] .v3-metric-help-panel{background:rgba(252,254,255,.98);border-color:rgba(27,54,69,.14);box-shadow:0 18px 42px rgba(27,54,69,.16)}
+.v3-app[data-shell="horizon"] .v3-metric-help-panel>strong{color:#172027!important}
+.v3-app[data-shell="horizon"] .v3-metric-help-panel>span{color:#42505a!important}
+.v3-app[data-shell="horizon"] .v3-metric-help-panel>small{color:#65727b!important;border-color:rgba(27,54,69,.1)}
+.v3-app[data-shell="carbon"] .v3-metric-help-panel{background:rgba(8,9,25,.98);border-color:rgba(126,139,255,.24)}
+@media(max-width:430px){
+.v3-metric-help{margin-left:3px}
+.v3-metric-help>button{width:30px;height:30px;min-width:30px;min-height:30px;font-size:11px}
+.v3-metric-help-panel{position:fixed;z-index:80;top:auto;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:auto;max-height:min(42vh,330px);overflow:auto;padding:14px;border-radius:17px}
+.v3-metric-help-panel>strong{font-size:13px!important}.v3-metric-help-panel>span{font-size:11px!important}.v3-metric-help-panel>small{font-size:10px!important}
+}
