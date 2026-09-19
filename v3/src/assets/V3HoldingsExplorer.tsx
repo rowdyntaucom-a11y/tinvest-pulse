@@ -11,6 +11,7 @@ import{
   type HoldingSort,
 }from"../../../v2/src/features/analytics/holdingsExplorer";
 import{ratioToPercent,clampPercent}from"../data/units";
+import{assetClassLabel}from"../data/assetClasses";
 import"../styles/holdingsExplorer.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -25,9 +26,6 @@ const PRESETS:Array<[HoldingPreset,string]>=[
   ["compact","Компактно"],["return","Результат"],["risk","Концентрация"],["fundamental","Карточка"],
 ];
 
-function labelClass(key:string){
-  return key==="shares"?"Акции":key==="bonds"?"Облигации":key==="funds"?"Фонды":key==="currency"?"Валюта":key==="futures"?"Фьючерсы":"Другое";
-}
 function identity(position:PositionSnapshot){return position.instrumentUid||position.figi||position.ticker}
 function normalized(value:string){return value.trim().toLocaleLowerCase("ru-RU")}
 function matches(position:PositionSnapshot,query:string){
@@ -60,7 +58,7 @@ export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSn
       {classAggregate.rows.slice(0,6).map(row=>{
         const share=portfolioTotal>0?row.value/portfolioTotal:0;
         return <button key={row.label} type="button" onClick={()=>{const key=row.label as Exclude<AssetClassFilter,"all">;setFilter(key);setDimension("instrument")}}>
-          <span>{labelClass(row.label)}</span><strong>{rub.format(row.value)} ₽</strong><small>{pct.format(share*100)}%</small><i aria-hidden="true"><b style={{width:clampPercent(share*100)+"%"}}/></i>
+          <span>{assetClassLabel(row.label)}</span><strong>{rub.format(row.value)} ₽</strong><small>{pct.format(share*100)}%</small><i aria-hidden="true"><b style={{width:clampPercent(share*100)+"%"}}/></i>
         </button>
       })}
     </div>
@@ -80,7 +78,7 @@ export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSn
         const weightPct=ratioToPercent(position.weight)??0;
         const resultClass=position.expectedYield>0?"is-positive":position.expectedYield<0?"is-negative":"is-neutral";
         return <button type="button" className="v3-holdings-row" key={identity(position)} onClick={()=>onOpenAsset?.(position)}>
-          <div className="v3-holdings-id"><strong>{position.ticker}</strong><span>{position.name}</span><small>{labelClass(classifyPosition(position.instrumentType))}</small></div>
+          <div className="v3-holdings-id"><strong>{position.ticker}</strong><span>{position.name}</span><small>{assetClassLabel(classifyPosition(position.instrumentType))}</small></div>
           <div className="v3-holdings-primary"><strong>{rub.format(position.currentValue)} ₽</strong><span>{pct.format(weightPct)}% портфеля</span></div>
           {preset==="return"&&<div className={"v3-holdings-extra "+resultClass}><span>Broker P/L</span><strong>{position.expectedYield>0?"+":""}{rub.format(position.expectedYield)} ₽</strong></div>}
           {preset==="risk"&&<div className="v3-holdings-extra"><span>Концентрация</span><strong>{pct.format(weightPct)}%</strong></div>}
@@ -92,7 +90,7 @@ export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSn
       <div className="v3-holdings-coverage"><div><span>{dimension==="class"?"Классификация":dimension==="issuer"?"Эмитенты":dimension==="sector"?"Отрасли":"Валюты"}</span><strong>{coverage==null?"—":pct.format(coverage*100)+"%"}</strong></div><small>{aggregate.unclassified>0?"Без подтверждённой классификации: "+rub.format(aggregate.unclassified)+" ₽":"Выбранный срез полностью классифицирован"}</small></div>
       {aggregate.rows.length?aggregate.rows.map(row=>{
         const share=selectedTotal>0?row.value/selectedTotal:0;
-        return <article key={row.label}><div><strong>{dimension==="class"?labelClass(row.label):row.label}</strong><span>{rub.format(row.value)} ₽</span></div><i aria-hidden="true"><b style={{width:clampPercent(share*100)+"%"}}/></i><small>{pct.format(share*100)}% выбранного среза</small></article>
+        return <article key={row.label}><div><strong>{dimension==="class"?assetClassLabel(row.label):row.label}</strong><span>{rub.format(row.value)} ₽</span></div><i aria-hidden="true"><b style={{width:clampPercent(share*100)+"%"}}/></i><small>{pct.format(share*100)}% выбранного среза</small></article>
       }):<div className="v3-holdings-empty">Для этого среза нет подтверждённых метаданных.</div>}
       {aggregate.unclassified>0&&<article className="is-unclassified"><div><strong>Без подтверждённой классификации</strong><span>{rub.format(aggregate.unclassified)} ₽</span></div><small>QVANIX не угадывает отсутствующий эмитент, отрасль или валюту.</small></article>}
     </div>}
