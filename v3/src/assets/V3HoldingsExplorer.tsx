@@ -4,7 +4,6 @@ import{
   aggregateHoldings,
   classifyPosition,
   filterAndSortHoldings,
-  holdingDimension,
   type AssetClassFilter,
   type HoldingDimension,
   type HoldingPreset,
