@@ -5,10 +5,7 @@
 .v3-income-depth-head h2{margin:4px 0 0;font-size:15px;line-height:1.2}
 .v3-income-depth-status{flex:none;min-width:92px;padding:7px 9px;border:1px solid var(--v3-line);border-radius:12px;text-align:right}
 .v3-income-depth-status strong,.v3-income-depth-status small{display:block}.v3-income-depth-status strong{font-size:8px}.v3-income-depth-status small{margin-top:3px;color:var(--v3-muted);font-size:7px}
-.v3-income-depth-status.is-warning{color:#d8b26d}.v3-income-depth-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:10px;padding:3px;border:1px solid var(--v3-line);border-radius:12px;background:rgba(0,0,0,.08)}
-.v3-income-depth-tabs button{min-height:38px;border:0;border-radius:9px;background:transparent;color:var(--v3-muted);font:700 9px/1 Inter,system-ui,sans-serif}
-.v3-income-depth-tabs button.is-active{background:rgba(255,255,255,.07);color:var(--v3-text);box-shadow:0 5px 16px rgba(0,0,0,.12)}
-.v3-income-depth-tabs button:focus-visible,.v3-income-month-ribbon button:focus-visible,.v3-income-event-row:focus-visible,.v3-income-source-row:focus-visible{outline:2px solid var(--v3-accent);outline-offset:2px}
+.v3-income-depth-status.is-warning{color:#d8b26d}.v3-income-month-ribbon button:focus-visible,.v3-income-event-row:focus-visible,.v3-income-source-row:focus-visible{outline:2px solid var(--v3-accent);outline-offset:2px}
 .v3-income-calendar-summary{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
 .v3-income-calendar-summary article{min-width:0;padding:10px;border:1px solid var(--v3-line);border-radius:14px;background:rgba(255,255,255,.022)}
 .v3-income-calendar-summary span,.v3-income-calendar-summary small{display:block;color:var(--v3-muted);font-size:8px;line-height:1.3}
@@ -37,7 +34,7 @@
 .v3-app[data-shell="carbon"] .v3-income-depth{background:rgba(13,15,34,.84)}
 @media(max-width:430px){
 .v3-income-depth{padding:10px;border-radius:16px}.v3-income-depth-head h2{font-size:14px}.v3-income-depth-status{min-width:80px;padding:6px 7px}
-.v3-income-depth-tabs button{min-height:40px;font-size:9px}.v3-income-calendar-summary{gap:5px}.v3-income-calendar-summary article{padding:9px}.v3-income-calendar-summary strong{font-size:14px}
+.v3-income-calendar-summary{gap:5px}.v3-income-calendar-summary article{padding:9px}.v3-income-calendar-summary strong{font-size:14px}
 .v3-income-month-ribbon{grid-auto-columns:82px}.v3-income-event-row{grid-template-columns:78px minmax(0,1fr) auto;gap:6px;padding:8px;min-height:60px}.v3-income-event-row time{font-size:7px}
 .v3-income-history-bars{grid-template-columns:repeat(12,40px)}.v3-income-history-stats{grid-template-columns:1fr 1fr}
 .v3-income-source-row{grid-template-columns:minmax(82px,1.25fr) .9fr 1fr;padding:8px;gap:5px}
