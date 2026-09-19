@@ -1,0 +1,12 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const pulse=readFileSync(new URL("../src/pulse/V3PulseMode.tsx",import.meta.url),"utf8");
+const home=readFileSync(new URL("../src/home/V3Home.tsx",import.meta.url),"utf8");
+const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/styles/pulseMode.css",import.meta.url),"utf8");
+for(const copy of["КАПИТАЛ","РЕЗУЛЬТАТ","ПАССИВНЫЙ ДОХОД","XIRR","ПОЗИЦИЙ","ПОДТВЕРЖДЁННЫЙ СНИМОК"])assert.match(pulse,new RegExp(copy));
+assert.match(pulse,/buildV3PulseSnapshot/);assert.match(pulse,/buildPulseHistoryGeometry/);assert.match(pulse,/Линия показывает стоимость и может включать внешние денежные потоки/);assert.match(pulse,/не доходность/);assert.match(pulse,/role="dialog"/);assert.match(pulse,/aria-modal="true"/);assert.match(pulse,/event\.key==="Escape"/);assert.match(pulse,/event\.key==="Tab"/);assert.match(pulse,/document\.body\.style\.overflow="hidden"/);
+assert.match(home,/className="v3-pulse-entry"/);assert.match(home,/disabled={!trusted}/);assert.match(home,/>ПУЛЬС<\/button>/);
+assert.match(app,/V3PulseMode=lazy/);assert.match(app,/pulseOpen/);assert.match(app,/onPulse=\{\(\)=>setPulseOpen\(true\)\}/);assert.match(app,/onClose=\{\(\)=>setPulseOpen\(false\)\}/);
+assert.match(css,/position:fixed/);assert.match(css,/height:100dvh/);assert.match(css,/overflow:hidden/);assert.match(css,/width:min\(100vw,430px\)/);assert.match(css,/max-height:740px/);assert.match(css,/max-width:359px/);
+assert.doesNotMatch(pulse,/Math\.random|mock|demo|expectedYield|daily return|дневн.*доход/i);
+console.log("v3 Pulse screenshot mode UI/trust contracts: ok");
