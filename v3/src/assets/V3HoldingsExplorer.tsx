@@ -38,7 +38,7 @@ function matches(position:PositionSnapshot,query:string){
 
 export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void}){
   const[filter,setFilter]=useState<AssetClassFilter>("all");
-  const[dimension,setDimension]=useState<HoldingDimension>("instrument");
+  const[dimension,setDimension]=useState<HoldingDimension>("class");
   const[preset,setPreset]=useState<HoldingPreset>("compact");
   const[sort,setSort]=useState<HoldingSort>("weight");
   const[query,setQuery]=useState("");
