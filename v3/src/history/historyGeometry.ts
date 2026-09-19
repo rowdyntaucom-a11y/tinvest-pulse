@@ -1,0 +1,5 @@
+import type{HistoryPoint}from"../../../v2/src/lib/portfolioApi";
+export type ChartPoint={index:number;x:number;y:number;value:number;date:string};
+export type ChartSegment=ChartPoint[];
+export function buildHistorySegments(points:HistoryPoint[],field:"value"|"invested",min:number,max:number):ChartSegment[]{const span=max-min||1,x=(i:number)=>points.length<2?0:(i/(points.length-1))*100,y=(v:number)=>44-((v-min)/span)*36;const segments:ChartSegment[]=[];let current:ChartPoint[]=[];points.forEach((point,index)=>{const value=point[field];if(value==null||!Number.isFinite(value)){if(current.length)segments.push(current);current=[];return}current.push({index,x:x(index),y:y(value),value,date:point.date})});if(current.length)segments.push(current);return segments}
+export function nearestHistoryPoint(segments:ChartSegment[],ratio:number):ChartPoint|null{const points=segments.flat();if(!points.length)return null;const target=Math.max(0,Math.min(1,ratio))*100;return points.reduce((best,point)=>Math.abs(point.x-target)<Math.abs(best.x-target)?point:best)}
