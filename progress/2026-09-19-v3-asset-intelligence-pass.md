@@ -46,11 +46,13 @@ The new v3 Asset Workspace had the right navigation boundary and verified price 
 - Added v3 Asset Intelligence contracts for official fundamentals, exact-FIGI income matching, payout separation, YoC identity rule, five-tab mobile navigation and absence of trading-language shortcuts.
 - Existing v2 boundaries continue to own normalization/business logic.
 
-## Validation required
-- GitHub v3 build + dependency security gate.
-- Full v3 test suite.
-- Bundle-size check: Asset Workspace must remain deferred from initial JS.
-- Samsung Internet + Chrome Android:
+## Validation
+- GitHub v3 build: success.
+- Dependency security gate: success, 0 vulnerabilities.
+- Full v3 test suite: success, including Asset Intelligence regression.
+- Bundle split preserved: initial JS 270.30 kB / 83.23 kB gzip; deferred Asset Workspace 26.49 kB / 8.46 kB gzip; CSS 62.50 kB / 11.32 kB gzip.
+- Automated Codex review did not run because the connected code-review quota is exhausted; no review finding was produced.
+- Remaining real-device validation — Samsung Internet + Chrome Android:
   1. five asset tabs are readable at 360–430 px;
   2. tab rail scrolls only when necessary and never causes page overflow;
   3. long fundamentals values do not break cards;
