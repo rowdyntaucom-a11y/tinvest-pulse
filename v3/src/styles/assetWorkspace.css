@@ -5,7 +5,7 @@
 .v3-asset-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end;margin-top:10px;padding:16px;border:1px solid var(--v3-line);border-radius:22px;background:var(--v3-card);backdrop-filter:blur(16px)}
 .v3-asset-hero span,.v3-asset-hero small,.v3-asset-workspace-grid span,.v3-asset-workspace-grid small,.v3-asset-history-head span,.v3-asset-source{color:var(--v3-muted)}
 .v3-asset-hero span{font-size:9px;letter-spacing:.11em;text-transform:uppercase}.v3-asset-hero h1{margin:5px 0 4px;font-size:clamp(24px,7vw,34px);line-height:1.04;letter-spacing:-.035em}.v3-asset-hero small{font-size:9px}
-.v3-asset-hero-value{text-align:right}.v3-asset-hero-value strong,.v3-asset-hero-value span,.v3-asset-hero-value b{display:block}.v3-asset-hero-value strong{font-size:25px;letter-spacing:-.03em}.v3-asset-hero-value span{margin-top:5px;font-size:10px;color:var(--v3-muted)}.v3-asset-hero-value b{margin-top:4px;font-size:11px;color:var(--v3-accent)}.v3-asset-hero-value b.is-negative,.v3-asset-workspace .is-negative{color:#e39a8b}
+.v3-asset-hero-value{text-align:right}.v3-asset-hero-value strong,.v3-asset-hero-value span,.v3-asset-hero-value b{display:block}.v3-asset-hero-value strong{font-size:25px;letter-spacing:-.03em}.v3-asset-hero-value span{margin-top:5px;font-size:10px;color:var(--v3-muted)}.v3-asset-hero-value b{margin-top:4px;font-size:11px;color:var(--v3-accent)}.v3-asset-hero-value b.is-negative,.v3-asset-workspace .is-negative{color:#e39a8b}.v3-asset-workspace .is-positive{color:#72c995}
 .v3-asset-workspace-tabs{display:grid;grid-template-columns:repeat(6,minmax(66px,1fr));gap:4px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-inline:contain;margin:8px 0;padding:4px;border:1px solid var(--v3-line);border-radius:14px;background:rgba(8,11,14,.5);backdrop-filter:blur(12px)}
 .v3-asset-workspace[data-shell="horizon"] .v3-asset-workspace-tabs{background:rgba(246,249,250,.82)}.v3-asset-workspace[data-shell="carbon"] .v3-asset-workspace-tabs{background:rgba(8,9,25,.78)}
 .v3-asset-workspace-tabs button{min-height:40px;border:0;border-radius:10px;background:transparent;color:var(--v3-muted);font-size:10px}.v3-asset-workspace-tabs button.is-active{background:var(--v3-card);color:inherit;box-shadow:0 4px 12px rgba(0,0,0,.12)}
@@ -57,3 +57,28 @@
 .v3-bond-context strong{min-width:0;max-width:150px;overflow-wrap:anywhere;text-align:right;font-size:10px}
 @media(max-width:430px){.v3-asset-identity{gap:9px}.v3-asset-brand-mark{width:46px;height:46px;border-radius:14px}.v3-asset-risk-grid{gap:5px}.v3-asset-risk-grid article{padding:9px 10px}.v3-bond-context{padding:9px}.v3-bond-context>div{gap:0 8px}.v3-bond-context strong{max-width:120px}}
 @media(max-width:359px){.v3-asset-identity{grid-template-columns:auto minmax(0,1fr)}.v3-asset-brand-mark{width:42px;height:42px}.v3-asset-risk-grid,.v3-bond-context>div{grid-template-columns:1fr}.v3-bond-context article:nth-child(2){border-top:1px solid var(--v3-line)}.v3-bond-context strong{max-width:170px}}
+
+.v3-asset-history-explorer{margin-top:9px}
+.v3-asset-history-selected{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:8px}
+.v3-asset-history-selected>div{min-width:0;padding:8px 9px;border:1px solid var(--v3-line);border-radius:12px;background:rgba(255,255,255,.025)}
+.v3-asset-history-selected span,.v3-asset-history-selected strong{display:block}
+.v3-asset-history-selected span{font-size:8px;color:var(--v3-muted)}
+.v3-asset-history-selected strong{margin-top:3px;font-size:10px;line-height:1.2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.v3-asset-history-plot{position:relative;margin-top:7px;padding:0 0 0}
+.v3-asset-history-y{position:absolute;left:7px;z-index:2;padding:2px 4px;border-radius:6px;background:color-mix(in srgb,var(--v3-card) 82%,transparent);font-size:7px;line-height:1;color:var(--v3-muted);pointer-events:none}
+.v3-asset-history-y.is-top{top:5px}.v3-asset-history-y.is-bottom{bottom:5px}
+.v3-asset-history-chart.is-interactive{height:156px;margin-top:0;cursor:crosshair;touch-action:pan-y;user-select:none}
+.v3-asset-history-chart.is-interactive>line{stroke:var(--v3-line);stroke-width:.3;stroke-dasharray:2 3;vector-effect:non-scaling-stroke}
+.v3-asset-history-chart .v3-asset-history-guide{stroke:var(--v3-accent);stroke-width:.6;stroke-dasharray:1.5 2;opacity:.72;vector-effect:non-scaling-stroke}
+.v3-asset-history-chart .v3-asset-history-selected-dot{fill:var(--v3-accent);stroke:var(--v3-card);stroke-width:1.1;vector-effect:non-scaling-stroke}
+.v3-asset-history-axis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:-1px;color:var(--v3-muted);font-size:8px}
+.v3-asset-history-axis span:nth-child(2){text-align:center}.v3-asset-history-axis span:last-child{text-align:right}
+.v3-asset-history-scrubber{display:block;width:100%;height:24px;margin:2px 0 1px;accent-color:var(--v3-accent);touch-action:pan-y}
+.v3-asset-history-provenance{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:8px}
+.v3-asset-history-provenance article{min-width:0;padding:8px 9px;border:1px solid var(--v3-line);border-radius:12px;background:rgba(255,255,255,.018)}
+.v3-asset-history-provenance span,.v3-asset-history-provenance strong{display:block}
+.v3-asset-history-provenance span{font-size:8px;line-height:1.2;color:var(--v3-muted)}
+.v3-asset-history-provenance strong{margin-top:4px;font-size:9px;line-height:1.25;overflow-wrap:anywhere}
+.v3-asset-workspace[data-shell="horizon"] :is(.v3-asset-history-selected>div,.v3-asset-history-provenance article){background:rgba(35,105,160,.035)}
+@media(max-width:430px){.v3-asset-history-selected{grid-template-columns:repeat(2,minmax(0,1fr))}.v3-asset-history-selected>div{padding:7px 8px}.v3-asset-history-chart.is-interactive{height:142px}.v3-asset-history-provenance{grid-template-columns:1fr 1fr}.v3-asset-history-provenance article:last-child{grid-column:1/-1}.v3-asset-history-scrubber{height:28px}}
+@media(max-width:359px){.v3-asset-history-selected{grid-template-columns:1fr 1fr}.v3-asset-history-chart.is-interactive{height:132px}.v3-asset-history-provenance{grid-template-columns:1fr}.v3-asset-history-provenance article:last-child{grid-column:auto}}
