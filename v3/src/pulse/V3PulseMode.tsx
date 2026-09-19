@@ -21,10 +21,16 @@ export function V3PulseMode({home,positions,shell,onClose}:{home:V3HomeViewModel
 
   useEffect(()=>{
     const previous=document.body.style.overflow;
+    const priorFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
     document.body.style.overflow="hidden";
-    const key=(event:KeyboardEvent)=>{if(event.key==="Escape")onClose()};
+    const close=document.querySelector<HTMLButtonElement>(".v3-pulse-close");
+    close?.focus();
+    const key=(event:KeyboardEvent)=>{
+      if(event.key==="Escape")onClose();
+      if(event.key==="Tab"&&close){event.preventDefault();close.focus()}
+    };
     window.addEventListener("keydown",key);
-    return()=>{document.body.style.overflow=previous;window.removeEventListener("keydown",key)};
+    return()=>{document.body.style.overflow=previous;window.removeEventListener("keydown",key);priorFocus?.focus()};
   },[onClose]);
 
   const resultClass=cls(snapshot.profit);
