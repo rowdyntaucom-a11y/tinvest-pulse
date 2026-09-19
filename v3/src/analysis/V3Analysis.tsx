@@ -4,6 +4,7 @@ import type{V3DetailMode,V3Shell}from"../app/model";
 import{filterHistoryWindow,type V3HistoryWindow}from"../history/historyLens";
 import{ratioToPercent,clampPercent}from"../data/units";
 import{V3MetricHelp}from"../help/V3MetricHelp";
+import{assetClassLabel,assetClassKey}from"../data/assetClasses";
 import{V3AllocationDonut}from"./V3AllocationDonut";
 import{buildV3AnalysisDepth,buildV3RelativeDepth}from"./analysisDepth";
 import{V3ReturnLayer}from"./V3ReturnLayer";
@@ -16,8 +17,7 @@ const n2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 function assetClasses(items:PositionSnapshot[]){
   const map=new Map<string,number>();
   for(const item of items){
-    const raw=item.instrumentType.toLowerCase();
-    const label=raw.includes("bond")?"Облигации":raw.includes("share")||raw.includes("stock")?"Акции":raw.includes("etf")||raw.includes("fund")?"Фонды":"Прочее";
+    const label=assetClassLabel(assetClassKey(item.instrumentType));
     map.set(label,(map.get(label)??0)+item.weight);
   }
   return[...map].sort((a,b)=>b[1]-a[1]);
