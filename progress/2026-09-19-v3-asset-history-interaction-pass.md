@@ -57,11 +57,14 @@ Equal spacing was especially misleading when verified observations had calendar 
 - Updated the Asset Workspace regression after extracting the history explorer.
 - Registered both new tests in the full v3 suite.
 
-## Validation required
-- GitHub v3 build + dependency security gate.
-- Full v3 test suite.
-- Bundle check: initial app JS should remain stable; explorer should remain in deferred Asset Workspace code.
-- Real-device Samsung Internet / Chrome Android:
+## Validation
+- GitHub v3 build: success.
+- Dependency security gate: success, 0 vulnerabilities.
+- Full v3 test suite: success, including time-geometry and interaction/provenance regressions.
+- Bundle split preserved: initial JS 270.30 kB / 83.22 kB gzip; deferred Asset Workspace 38.08 kB / 11.40 kB gzip; CSS 68.04 kB / 12.09 kB gzip.
+- Initial JS is unchanged from the previous live pass; the history explorer remains inside the deferred Asset Workspace chunk.
+- Automated Codex review did not run because the connected code-review quota is exhausted; no review finding was produced.
+- Remaining real-device validation — Samsung Internet / Chrome Android:
   1. horizontal point inspection must not block normal vertical page scrolling;
   2. range scrubber must remain finger-usable at 360–430 px;
   3. selected labels must not overflow on bond percentage-price history;
