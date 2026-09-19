@@ -17,6 +17,6 @@
 .v3-section-selector>span{font-size:9px}.v3-section-selector select{height:48px;font-size:13px}.v3-section-selector>small{font-size:10px;min-height:27px}
 }
 @media(max-width:359px){
-.v3-section-selector{top:70px}.v3-section-selector select{padding-left:10px;font-size:12px}.v3-section-selector>small{font-size:9.5px}
+.v3-section-selector{top:78px}.v3-section-selector select{padding-left:10px;font-size:12px}.v3-section-selector>small{font-size:9.5px}
 }
 @media(prefers-reduced-motion:reduce){.v3-section-selector{scroll-behavior:auto}}
