@@ -50,10 +50,13 @@ V3 Assets had a useful list/inspector but still stopped at position-level detail
 - Added workspace contract test for exact identity, integrity, data provenance, navigation and mobile touch rules.
 - Registered both tests in the v3 test suite.
 
-## Validation still required
-- Full GitHub CI after PR creation.
-- Automated review if quota permits.
-- Samsung Internet + Chrome Android:
+## Validation
+- GitHub v3 build CI: success.
+- Dependency security gate: success, 0 high vulnerabilities.
+- Production build split: initial JS 270.28 kB / 83.23 kB gzip; deferred Asset Workspace chunk 10.47 kB / 3.81 kB gzip; CSS 60.20 kB / 10.99 kB gzip.
+- All v3 tests passed, including the new asset workspace and asset-history lens regressions.
+- Automated code review did not run because the connected Codex review quota was exhausted; no review finding was produced.
+- Remaining real-device validation — Samsung Internet + Chrome Android:
   1. Open an asset from Simple and Detailed lists.
   2. Back returns to the same Assets workspace.
   3. Bottom nav stays hidden only inside the asset drill-down.
