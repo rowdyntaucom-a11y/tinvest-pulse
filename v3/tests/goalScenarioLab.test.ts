@@ -3,7 +3,7 @@ const lab=readFileSync(new URL("../src/goal/V3GoalScenarioLab.tsx",import.meta.u
 const goal=readFileSync(new URL("../src/goal/V3Goal.tsx",import.meta.url),"utf8");
 const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/goalScenarioLab.css",import.meta.url),"utf8");
-assert.match(goal,/const V3GoalScenarioLab=lazy/);
+assert.match(goal,/const V3GoalScenarioLab=lazy/);assert.match(lab,/V3SectionSelector label="Режим сценария"/);assert.match(lab,/TAB_OPTIONS/);assert.doesNotMatch(lab,/v3-goal-scenario-tabs/);
 assert.match(goal,/mode==="detailed"&&target&&trusted&&value!=null/);
 assert.match(goal,/history:HistoryPoint\[\]/);
 assert.match(app,/history={history}/);

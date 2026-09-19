@@ -6,8 +6,14 @@ import{filterIncomeCalendarEvents}from"../../../v2/src/features/income/incomeCal
 import{findPayoutEventPosition,payoutEventIsConfirmed}from"../../../v2/src/features/income/incomeCalendarEventView";
 import{buildV3IncomeDepth}from"./incomeDepth";
 import{V3MetricHelp}from"../help/V3MetricHelp";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";
 
 type View="calendar"|"history"|"sources";
+const VIEW_OPTIONS=[
+  {value:"calendar",label:"Календарь",description:"Подтверждённое 12-месячное расписание будущих выплат."},
+  {value:"history",label:"Факт",description:"Реально полученный пассивный доход по полностью наблюдавшимся месяцам."},
+  {value:"sources",label:"Источники",description:"Факт и расписание по активам с точной FIGI-связью и покрытием."},
+] as const;
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const rub2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -41,7 +47,7 @@ export function V3IncomeDepth({positions,onOpenAsset}:{positions:PositionSnapsho
 
   return <section className="v3-income-depth">
     <div className="v3-income-depth-head"><div><span>ПОДРОБНЫЙ ДОХОД</span><h2>Факт, календарь и источники</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
-    <nav className="v3-income-depth-tabs" aria-label="Подробные разделы дохода">{([["calendar","Календарь"],["history","Факт"],["sources","Источники"]] as const).map(([id,label])=><button key={id} type="button" className={view===id?"is-active":""} aria-current={view===id?"page":undefined} onClick={()=>setView(id)}>{label}</button>)}</nav>
+    <V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={VIEW_OPTIONS}/>
 
     {view==="calendar"&&<div className="v3-income-calendar-depth">
       <div className="v3-income-calendar-summary">

@@ -5,6 +5,7 @@ import{filterHistoryWindow,type V3HistoryWindow}from"../history/historyLens";
 import{ratioToPercent,clampPercent}from"../data/units";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{assetClassLabel,assetClassKey}from"../data/assetClasses";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import{V3AllocationDonut}from"./V3AllocationDonut";
 import{buildV3AnalysisDepth,buildV3RelativeDepth}from"./analysisDepth";
 import{V3ReturnLayer}from"./V3ReturnLayer";
@@ -56,6 +57,13 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
   const positive=rows.filter(item=>item.expectedYield>0).length;
   const classes=assetClasses(rows),bonds=bondLens(rows),breadth=resultBreadth(rows);
   const[section,setSection]=useState<"overview"|"return"|"risk"|"structure"|"market">("overview");
+  const sectionOptions=[
+    {value:"overview",label:"Обзор",description:"Методика, качество истории и ширина текущего broker P/L."},
+    {value:"return",label:"Доходность",description:"TWR, волатильность, Sharpe, Sortino и rolling-окна."},
+    {value:"risk",label:"Риск",description:"Просадка, tail risk, вклад позиций и корреляции."},
+    {value:"structure",label:"Структура",description:"Классы активов, облигационный слой и концентрация капитала."},
+    {value:"market",label:"Рынок",description:"Сопоставление портфеля с IMOEX на общей выборке."},
+  ] as const;
   const[historyWindow,setHistoryWindow]=useState<V3HistoryWindow>("all");
   const relative=useMemo(()=>buildV3RelativeDepth(filterHistoryWindow(trustedHistory,historyWindow)),[trustedHistory,historyWindow]);
   const dd=depth.portfolio.maxDrawdown==null?null:-depth.portfolio.maxDrawdown*100;
@@ -71,9 +79,7 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
       <article><span>Топ-3 позиций <V3MetricHelp topic="top3"/></span><strong>{trusted?n.format(topPct)+"%":"—"}</strong><small>Концентрация капитала</small></article>
       <article><span>Позиций</span><strong>{trusted?rows.length:"—"}</strong><small>Подтверждённый состав</small></article>
     </section>
-    {mode==="detailed"&&<nav className="v3-analysis-tabs is-depth" aria-label="Слои аналитики">
-      {([["overview","Обзор"],["return","Доходность"],["risk","Риск"],["structure","Структура"],["market","Рынок"]] as const).map(([id,label])=><button key={id} className={section===id?"is-active":""} aria-current={section===id?"page":undefined} onClick={()=>setSection(id)}>{label}</button>)}
-    </nav>}
+    {mode==="detailed"&&<V3SectionSelector label="Раздел аналитики" value={section} onChange={setSection} options={sectionOptions}/>} 
     {mode==="detailed"&&section==="overview"&&<section className="v3-analysis-overview-depth">
       <div className="v3-analysis-quality"><div><span>Методика</span><strong>Analytics {depth.portfolio.calcVersion}</strong><small>TWR-first portfolio analytics</small></div><div><span>История</span><strong>{depth.portfolio.historyPoints} точек</strong><small>{depth.portfolio.historyDays} календарных дней</small></div><div><span>Целостность</span><strong className={depth.portfolio.historyIntegrity==="OK"?"is-positive":"is-negative"}>{depth.portfolio.historyIntegrity}</strong><small>{depth.portfolio.conflictingDates?depth.portfolio.conflictingDates+" конфликтных дат":"конфликтов не найдено"}</small></div></div>
       {rows.length>0&&<section className="v3-breadth"><h2>Ширина текущего broker P/L</h2><div><span>В плюсе</span><strong className="is-positive">{breadth.positive}</strong><small>{n.format(ratioToPercent(breadth.positiveWeight)??0)}% капитала</small></div><div><span>В минусе</span><strong className="is-negative">{breadth.negative}</strong><small>{n.format(ratioToPercent(breadth.negativeWeight)??0)}% капитала</small></div><div><span>Без изменения</span><strong>{breadth.flat}</strong><small>по текущему broker P/L</small></div></section>}

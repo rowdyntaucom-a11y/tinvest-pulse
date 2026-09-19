@@ -2,10 +2,15 @@ import{useMemo,useState}from"react";
 import type{HistoryPoint}from"../../../v2/src/lib/portfolioApi";
 import type{GoalProjectionPoint}from"../../../v2/src/features/goals/goalProjection";
 import{V3MetricHelp}from"../help/V3MetricHelp";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import{calculateV3GoalBootstrap,calculateV3GoalScenario}from"./goalScenario";
 import"../styles/goalScenarioLab.css";
 
 type Tab="scenario"|"history";
+const TAB_OPTIONS=[
+  {value:"scenario",label:"Ваш сценарий",description:"Будущие предпосылки задаёте вы; QVANIX ничего не подставляет автоматически."},
+  {value:"history",label:"Исторический диапазон",description:"Block bootstrap из подтверждённых дневных TWR-доходностей, не прогноз."},
+] as const;
 
 type Draft={
   horizonYears:string;
@@ -102,7 +107,7 @@ export function V3GoalScenarioLab({currentCapital,targetCapitalToday,history}:{c
 
   return <section className="v3-goal-scenario-lab">
     <div className="v3-goal-scenario-head"><div><span>СЦЕНАРНЫЙ ЛАБОРАТОРИЙ</span><h2>Цель без скрытых предположений</h2></div><b>v1</b></div>
-    <nav className="v3-goal-scenario-tabs" aria-label="Сценарные разделы"><button type="button" className={tab==="scenario"?"is-active":""} aria-current={tab==="scenario"?"page":undefined} onClick={()=>setTab("scenario")}>Ваш сценарий</button><button type="button" className={tab==="history"?"is-active":""} aria-current={tab==="history"?"page":undefined} onClick={()=>setTab("history")}>Исторический диапазон</button></nav>
+    <V3SectionSelector label="Режим сценария" value={tab} onChange={setTab} options={TAB_OPTIONS}/>
 
     {tab==="scenario"&&<div className="v3-goal-scenario-view">
       <div className="v3-goal-scenario-banner"><div><span>Цель сегодня <V3MetricHelp topic="goalScenario"/></span><strong>{money(targetCapitalToday)}</strong></div><div><span>Стартовый капитал</span><strong>{money(currentCapital)}</strong></div><small>QVANIX не подставляет будущую доходность, инфляцию или взносы автоматически. Все предпосылки ниже задаёте вы.</small></div>
