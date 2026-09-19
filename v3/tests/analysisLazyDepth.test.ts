@@ -1,0 +1,12 @@
+import assert from"node:assert/strict";
+import{readFileSync}from"node:fs";
+const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
+const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8");
+const depth=readFileSync(new URL("../src/analysis/analysisDepth.ts",import.meta.url),"utf8");
+assert.match(app,/const V3Analysis=lazy\(\(\)=>import\("\.\.\/analysis\/V3Analysis"\)/);
+assert.doesNotMatch(app,/import\{V3Analysis\}from/);
+assert.match(app,/Открываем аналитику/);
+for(const fn of["calculatePortfolioAnalytics","calculateRelativePerformance","calculateRollingRisk","calculateTailRisk"])assert.match(depth,new RegExp(fn));
+for(const layer of["V3ReturnLayer","V3RiskLayer","V3MarketLayer"])assert.match(analysis,new RegExp(layer));
+assert.match(analysis,/useState<"overview"\|"return"\|"risk"\|"structure"\|"market">/);
+console.log("v3 deferred analytics engine contracts: ok");
