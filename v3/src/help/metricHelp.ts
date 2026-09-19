@@ -1,6 +1,6 @@
 import{GLOSSARY}from"../../../v2/src/features/help/glossary";
 
-export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"twr"|"volatility"|"sharpe"|"sortino"|"rollingRisk"|"effectivePositions"|"riskContribution"|"diversificationRatio"|"correlation"|"tailRisk"|"trackingError"|"beta"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"goalProgress";
+export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"twr"|"volatility"|"sharpe"|"sortino"|"rollingRisk"|"effectivePositions"|"riskContribution"|"diversificationRatio"|"correlation"|"tailRisk"|"trackingError"|"beta"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"payoutCoverage"|"incomeStability"|"incomeConcentration"|"goalProgress";
 
 export type V3MetricHelpEntry={
   title:string;
@@ -119,6 +119,22 @@ export const V3_METRIC_HELP:Record<V3MetricHelpTopic,V3MetricHelpEntry>={
     title:"Годовой эквивалент среднего",
     simple:"Текущий среднемесячный наблюдаемый пассивный доход, механически масштабированный на 12 месяцев.",
     detail:"Это удобный масштаб для сравнения, а не прогноз будущих купонов или дивидендов.",
+  },
+  payoutCoverage:{
+    title:GLOSSARY.payoutCoverage.label,
+    simple:GLOSSARY.payoutCoverage.simple,
+    detail:"Будущий календарь QVANIX открывает только при полном проверенном покрытии расписания текущих позиций. Неполное или устаревшее покрытие не превращается в прогноз.",
+  },
+  incomeStability:{
+    title:"Стабильность пассивного дохода",
+    simple:"Описание разброса реально полученного пассивного дохода по полностью наблюдавшимся календарным месяцам.",
+    detail:"Нулевые месяцы учитываются только если месяц полностью наблюдался. Частичные и отсутствующие месяцы не подменяются нулём; preview начинается с 3 полных месяцев, зрелая выборка — с 12.",
+    note:"Это ретроспективная характеристика факта, не прогноз будущих выплат.",
+  },
+  incomeConcentration:{
+    title:"Концентрация дохода",
+    simple:"Показывает, насколько реально полученный пассивный доход сосредоточен в одном или нескольких источниках.",
+    detail:"Расчёт использует только положительные FACT-выплаты после налога. Эффективное число источников = 1 / HHI фактического дохода.",
   },
   goalProgress:{
     title:"Прогресс к цели",
