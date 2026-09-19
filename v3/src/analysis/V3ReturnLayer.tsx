@@ -3,7 +3,7 @@ import type{RollingRiskResult}from"../../../v2/src/features/analytics/rollingRis
 import{V3MetricHelp}from"../help/V3MetricHelp";
 
 const p=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
-const r=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2,signDisplay:"exceptZero"});
+const r=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2,signDisplay:"exceptZero"});\nconst plain=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const dateFmt=new Intl.DateTimeFormat("ru-RU",{day:"2-digit",month:"short",year:"numeric"});
 
 const pct=(value:number|null)=>value==null?"—":p.format(value*100)+"%";
@@ -18,7 +18,7 @@ export function V3ReturnLayer({portfolio,rolling,riskFreeRate,riskFreeRateDate}:
       <div className="v3-analysis-metric-grid">
         <article><span>TWR <V3MetricHelp topic="twr"/></span><strong className={signedClass(portfolio.twr)}>{pct(portfolio.twr)}</strong><small>{portfolio.historyPoints} точек · {portfolio.historyDays} дн.</small></article>
         <article><span>Волатильность <V3MetricHelp topic="volatility"/></span><strong>{pct(portfolio.volatility)}</strong><small>годовая по дневным TWR</small></article>
-        <article><span>Sharpe <V3MetricHelp topic="sharpe"/></span><strong className={signedClass(portfolio.sharpe)}>{ratio(portfolio.sharpe)}</strong><small>{riskFreeRate==null?"нужна безрисковая ставка":p.format(riskFreeRate)+"% ставка"}</small></article>
+        <article><span>Sharpe <V3MetricHelp topic="sharpe"/></span><strong className={signedClass(portfolio.sharpe)}>{ratio(portfolio.sharpe)}</strong><small>{riskFreeRate==null?"нужна безрисковая ставка":plain.format(riskFreeRate)+"% ставка"}</small></article>
         <article><span>Sortino <V3MetricHelp topic="sortino"/></span><strong className={signedClass(portfolio.sortino)}>{ratio(portfolio.sortino)}</strong><small>штрафует только downside</small></article>
       </div>
       <div className="v3-analysis-sample"><span>Выборка</span><strong>{portfolio.sampleFrom&&portfolio.sampleTo?dateFmt.format(new Date(portfolio.sampleFrom+"T00:00:00Z"))+" → "+dateFmt.format(new Date(portfolio.sampleTo+"T00:00:00Z")):"Недостаточно истории"}</strong><small>{riskFreeRateDate?"Ставка на "+riskFreeRateDate:"Дата безрисковой ставки недоступна"} · дубликатов схлопнуто {portfolio.duplicateRowsCollapsed}</small></div>
