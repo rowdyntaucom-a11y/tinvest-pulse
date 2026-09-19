@@ -2,6 +2,7 @@ import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import type{AssetHistoryPayload,AssetHistorySeries}from"../../../v2/src/lib/assetHistoryApi";
 import type{CurrentRiskSeriesInput}from"../../../v2/src/features/analytics/currentRiskContribution";
 import type{RiskSeries}from"../../../v2/src/features/analytics/riskMatrix";
+import{positionIdentityKey}from"../assets/positionIdentity";
 
 export type V3RiskHistoryMatch={
   inputs:CurrentRiskSeriesInput[];
@@ -15,7 +16,7 @@ export type V3RiskHistoryMatch={
 const clean=(value:string|null|undefined)=>String(value??"").trim();
 
 function positionKey(position:PositionSnapshot){
-  return clean(position.instrumentUid)||clean(position.figi)||position.ticker;
+  return positionIdentityKey(position)??position.ticker;
 }
 
 export function buildV3RiskHistoryMatch(payload:AssetHistoryPayload|null,positions:PositionSnapshot[]):V3RiskHistoryMatch{
@@ -87,6 +88,8 @@ export function summarizeCorrelationPairs(series:RiskSeries[],cells:Array<{a:str
   const highest=ready.length?ready.reduce((best,cell)=>cell.correlation!>best.correlation!?cell:best):null;
   const lowest=ready.length?ready.reduce((best,cell)=>cell.correlation!<best.correlation!?cell:best):null;
   const describe=(cell:typeof highest)=>cell?{
+    aKey:cell.a,
+    bKey:cell.b,
     a:labels.get(cell.a)??cell.a,
     b:labels.get(cell.b)??cell.b,
     correlation:cell.correlation!,
