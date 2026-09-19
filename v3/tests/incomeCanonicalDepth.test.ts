@@ -1,5 +1,10 @@
 import assert from"node:assert/strict";
-import{buildV3IncomeDepth}from"../src/income/incomeDepth.ts";
+import{evaluatePayoutTrust}from"../../v2/src/lib/dataTrust.ts";
+import{separateTrustedIncomeData}from"../../v2/src/features/income/incomeDataTrust.ts";
+import{buildIncomeCalendarVisual}from"../../v2/src/features/income/incomeCalendarVisual.ts";
+import{buildIncomeSourceRows}from"../../v2/src/features/income/incomeSourceRows.ts";
+import{buildRealizedIncomeHistory,calculateIncomeSourceConcentration,calculateIncomeStability}from"../../v2/src/features/income/incomeHistory.ts";
+import{buildBondIncomeLinkage}from"../../v2/src/features/income/bondIncomeLinkage.ts";
 
 const now=Date.parse("2026-09-19T00:00:00Z");
 const actual=[
@@ -23,20 +28,26 @@ const positions:any[]=[
   {figi:"FIGI1",ticker:"OFZ",name:"OFZ",instrumentType:"bond",currentValue:1000,costBasis:900},
   {figi:"FIGI2",ticker:"AAA",name:"AAA",instrumentType:"share",currentValue:2000,costBasis:1500},
 ];
-const depth=buildV3IncomeDepth(base,positions,now);
-assert.equal(depth.payoutTrust.safeToCalculate,true);
-assert.equal(depth.trustedIncome.futureEvents.length,2);
-assert.equal(depth.calendarMonths.length,12);
-assert.equal(depth.calendarMonths.find(x=>x.key==="2026-10")?.count,1);
-assert.equal(depth.realizedHistory.observation.completeMonths,3);
-assert.equal(depth.stability.status,"preview");
-assert.equal(depth.concentration.sourceCount,2);
-assert.equal(depth.sourceRows.find(x=>x.ticker==="OFZ")?.matchBasis,"FIGI");
-assert.equal(depth.sourceRows.find(x=>x.ticker==="OFZ")?.forecast,120);
-assert.equal(depth.bondLinkage.linkedBondCount,1);
-const partial=buildV3IncomeDepth({...base,coverage:{...base.coverage,resolvedAssets:1,coverageRatio:.5},integrity:{...base.integrity,complete:false}},positions,now);
-assert.equal(partial.payoutTrust.safeToCalculate,false);
-assert.equal(partial.trustedIncome.futureEvents.length,0);
-assert.equal(partial.sourceRows.find(x=>x.ticker==="OFZ")?.forecast,0);
-assert.equal(partial.realizedHistory.months.length,3);
+function depth(calendar:any){
+  const trust=evaluatePayoutTrust({available:calendar.available,stale:calendar.stale,generatedAt:calendar.generatedAt,eligibleAssets:calendar.coverage.eligibleAssets,resolvedAssets:calendar.coverage.resolvedAssets,coverageRatio:calendar.coverage.coverageRatio,scheduleComplete:calendar.integrity.complete},now);
+  const trusted=separateTrustedIncomeData(calendar,trust.safeToCalculate);
+  const history=buildRealizedIncomeHistory(trusted.actualEvents,calendar.actual.observation);
+  return{trust,trusted,months:buildIncomeCalendarVisual(trusted.futureEvents,calendar.period.from,12),sources:buildIncomeSourceRows(trusted.actualEvents,trusted.futureEvents,positions,99),history,stability:calculateIncomeStability(history),concentration:calculateIncomeSourceConcentration(trusted.actualEvents),bonds:buildBondIncomeLinkage(positions,trusted.futureEvents)};
+}
+const complete=depth(base);
+assert.equal(complete.trust.safeToCalculate,true);
+assert.equal(complete.trusted.futureEvents.length,2);
+assert.equal(complete.months.length,12);
+assert.equal(complete.months.find(x=>x.key==="2026-10")?.count,1);
+assert.equal(complete.history.observation.completeMonths,3);
+assert.equal(complete.stability.status,"preview");
+assert.equal(complete.concentration.sourceCount,2);
+assert.equal(complete.sources.find(x=>x.ticker==="OFZ")?.matchBasis,"FIGI");
+assert.equal(complete.sources.find(x=>x.ticker==="OFZ")?.forecast,120);
+assert.equal(complete.bonds.linkedBondCount,1);
+const partial=depth({...base,coverage:{...base.coverage,resolvedAssets:1,coverageRatio:.5},integrity:{...base.integrity,complete:false}});
+assert.equal(partial.trust.safeToCalculate,false);
+assert.equal(partial.trusted.futureEvents.length,0);
+assert.equal(partial.sources.find(x=>x.ticker==="OFZ")?.forecast,0);
+assert.equal(partial.history.months.length,3);
 console.log("v3 canonical income depth: ok");
