@@ -135,12 +135,20 @@ Added:
 
 The canonical fixture verifies that incomplete payout coverage removes future schedule rows while preserving realized FACT history.
 
-## Validation required
-- v3 build;
-- dependency security gate;
-- full v3 test suite;
-- bundle split inspection;
-- merge and Render exact-SHA live verification.
+## Validation
+- v3 build: success.
+- dependency security gate: success, 0 vulnerabilities.
+- full v3 test suite: success.
+- canonical payout trust/history regression: success.
+- detailed Income UI trust regression: success.
+- lazy Income-depth regression: success.
+- initial JS: 276.84 kB / 85.57 kB gzip.
+- initial CSS: 82.58 kB / 14.18 kB gzip.
+- deferred Income JS: 25.88 kB / 8.25 kB gzip.
+- deferred Income CSS: 9.94 kB / 2.10 kB gzip.
+- payout depth CSS was moved into the lazy chunk after validation showed that global registration unnecessarily increased initial CSS.
+- automated Codex review did not run because the connected review quota is exhausted; no code-review finding was produced.
+- merge and Render exact-SHA live verification remain before completion.
 
 ## Remaining real-device validation
 Samsung Internet / Chrome Android still needs physical-device review for:
