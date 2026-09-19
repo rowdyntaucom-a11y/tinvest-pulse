@@ -4,6 +4,7 @@ import type{AssetHistoryPoint}from"../../../v2/src/lib/assetHistoryApi";
 import{V3HistoryWindowControl}from"../history/V3HistoryWindowControl";
 import type{V3HistoryWindow}from"../history/historyLens";
 import{filterAssetHistoryWindow,summarizeAssetHistory}from"./assetHistoryLens";
+import{buildAssetHistoryGeometry}from"./assetHistoryGeometry";
 
 const priceFmt=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
@@ -19,7 +20,6 @@ type HistoryMeta={
 
 function isBond(v:string){return v.toLowerCase().includes("bond")}
 function quote(position:PositionSnapshot,value:number){return priceFmt.format(value)+(isBond(position.instrumentType)?"%":" ₽")}
-function dateValue(date:string){const value=Date.parse(date+"T00:00:00Z");return Number.isFinite(value)?value:null}
 function percentChange(from:number,to:number){return from>0?to/from*100-100:null}
 
 export function V3AssetHistoryChart({position,points,window,onWindowChange,meta}:{position:PositionSnapshot;points:AssetHistoryPoint[];window:V3HistoryWindow;onWindowChange:(value:V3HistoryWindow)=>void;meta:HistoryMeta}){
@@ -29,23 +29,7 @@ export function V3AssetHistoryChart({position,points,window,onWindowChange,meta}
 
   useEffect(()=>{setSelectedIndex(Math.max(0,visible.length-1))},[window,visible.length]);
 
-  const geometry=useMemo(()=>{
-    if(visible.length<2)return null;
-    const times=visible.map(point=>dateValue(point.date));
-    if(times.some(value=>value==null))return null;
-    const firstTime=times[0]!,lastTime=times.at(-1)!,timeSpan=Math.max(1,lastTime-firstTime);
-    const min=Math.min(...visible.map(point=>point.value)),max=Math.max(...visible.map(point=>point.value)),valueSpan=Math.max(1e-9,max-min);
-    const coords=visible.map((point,index)=>({
-      x:4+((times[index]!-firstTime)/timeSpan)*92,
-      y:42-((point.value-min)/valueSpan)*34,
-    }));
-    return{
-      min,max,
-      coords,
-      line:coords.map(point=>`${point.x},${point.y}`).join(" "),
-      area:`4,44 ${coords.map(point=>`${point.x},${point.y}`).join(" ")} 96,44`,
-    };
-  },[visible]);
+  const geometry=useMemo(()=>buildAssetHistoryGeometry(visible),[visible]);
 
   const selected=visible[selectedIndex]??visible.at(-1)??null;
   const selectedCoord=geometry?.coords[selectedIndex]??geometry?.coords.at(-1)??null;
