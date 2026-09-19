@@ -36,7 +36,7 @@ export function summarizeAssetRisk(points:AssetHistoryPoint[]):V3AssetRiskSummar
     minValue,
     maxValue,
     rangePct:minValue>0?maxValue/minValue-1:null,
-    maxDrawdownPct:maxDrawdownPct<0?maxDrawdownPct:null,
+    maxDrawdownPct,
     maxDrawdownPeakDate,
     maxDrawdownTroughDate,
     currentDrawdownPct:latestPeak>0?last.value/latestPeak-1:null,
