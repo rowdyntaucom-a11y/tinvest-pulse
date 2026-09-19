@@ -4,7 +4,7 @@ import type{V3HistoryWindow}from"../history/historyLens";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 
 const p=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
-const r=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2,signDisplay:"exceptZero"});
+const r=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2,signDisplay:"exceptZero"});\nconst plain=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const dateFmt=new Intl.DateTimeFormat("ru-RU",{day:"2-digit",month:"short",year:"numeric"});
 const pct=(value:number|null)=>value==null?"—":p.format(value*100)+"%";
 const ratio=(value:number|null)=>value==null?"—":r.format(value);
@@ -28,7 +28,7 @@ export function V3MarketLayer({relative,window,onWindowChange,market}:{relative:
       <article><span>Корреляция</span><strong>{ratio(relative.correlation)}</strong></article>
     </div>:<div className="v3-analysis-gate">{relative.note}</div>}
     <div className="v3-analysis-sample"><span>Общая выборка</span><strong>{relative.sampleFrom&&relative.sampleTo?dateFmt.format(new Date(relative.sampleFrom+"T00:00:00Z"))+" → "+dateFmt.format(new Date(relative.sampleTo+"T00:00:00Z")):"—"}</strong><small>{relative.overlapPoints} общих точек · дубликатов схлопнуто {relative.duplicateRowsCollapsed}</small></div></>:<div className={"v3-analysis-gate"+(relative.status==="invalid_history"?" is-danger":"")}>{relative.note}</div>}
-    {(market.riskFreeRate!=null||market.nextRateMeeting)&&<section className="v3-market-context is-depth"><h3>Рыночный контекст</h3><div><span>Безрисковая ставка <V3MetricHelp topic="riskFreeRate"/></span><strong>{market.riskFreeRate==null?"—":p.format(market.riskFreeRate)+"%"}</strong><small>{market.riskFreeRateDate??"дата недоступна"}</small></div><div><span>Следующее решение</span><strong>{market.nextRateMeeting??"—"}</strong><small>контекст, не сигнал</small></div></section>}
+    {(market.riskFreeRate!=null||market.nextRateMeeting)&&<section className="v3-market-context is-depth"><h3>Рыночный контекст</h3><div><span>Безрисковая ставка <V3MetricHelp topic="riskFreeRate"/></span><strong>{market.riskFreeRate==null?"—":plain.format(market.riskFreeRate)+"%"}</strong><small>{market.riskFreeRateDate??"дата недоступна"}</small></div><div><span>Следующее решение</span><strong>{market.nextRateMeeting??"—"}</strong><small>контекст, не сигнал</small></div></section>}
     <small className="v3-analysis-method-note">{relative.note} Относительные коэффициенты не показываются до минимальной общей выборки.</small>
   </section>
 }
