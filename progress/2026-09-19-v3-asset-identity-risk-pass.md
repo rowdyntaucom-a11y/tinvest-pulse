@@ -52,11 +52,13 @@ The Asset Workspace had useful depth but still looked visually generic and lacke
 - Updated the existing intelligence regression to the six-tab Asset Workspace.
 - Registered the new regressions in the full v3 suite.
 
-## Validation required
-- GitHub v3 build + dependency security gate.
-- Full v3 tests.
-- Confirm initial JS remains stable and identity/risk code stays inside the deferred Asset Workspace chunk.
-- Samsung Internet + Chrome Android:
+## Validation
+- GitHub v3 build: success.
+- Dependency security gate: success, 0 vulnerabilities.
+- Full v3 test suite: success, including observed-risk and identity/risk regressions.
+- Bundle split preserved: initial JS 270.30 kB / 83.22 kB gzip; deferred Asset Workspace 33.57 kB / 10.28 kB gzip; CSS 64.86 kB / 11.65 kB gzip.
+- Automated Codex review did not run because the connected code-review quota is exhausted; no review finding was produced.
+- Remaining real-device validation — Samsung Internet + Chrome Android:
   1. official logos remain sharp and do not distort the hero;
   2. class fallback is readable when logos are unavailable;
   3. six-tab rail is usable at 360–430 px without page overflow;
