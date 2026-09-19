@@ -67,12 +67,14 @@ The goal of this pass is not to add new calculations. It is to make existing ver
   - scoped Home rate suffix.
 - Existing Home metric semantics regression updated for the direct-child label selector.
 
-## Validation required
-- GitHub v3 build.
-- Dependency security gate.
-- Full v3 test suite.
-- Bundle-size check, especially initial JS because this help layer is intentionally shared by primary workspaces.
-- Real-device Samsung Internet / Chrome Android:
+## Validation
+- GitHub v3 build: success.
+- Dependency security gate: success, 0 vulnerabilities.
+- Full v3 test suite: success, including metric explainability regression.
+- Bundle: initial JS 276.21 kB / 84.82 kB gzip; deferred Asset Workspace unchanged at 38.08 kB / 11.40 kB gzip; CSS 70.96 kB / 12.61 kB gzip.
+- Shared explainability adds ~5.9 kB raw / ~1.6 kB gzip to the primary bundle; accepted because the component is used across Home, Analysis, Income and Goal and does not duplicate financial calculation code.
+- Automated Codex review did not run because the connected code-review quota is exhausted; no review finding was produced.
+- Remaining real-device validation — Samsung Internet / Chrome Android:
   1. 30px inline help control is tappable without accidental neighboring taps;
   2. sheet remains above bottom nav and safe area;
   3. long explanations do not overflow at 360–430 px;
