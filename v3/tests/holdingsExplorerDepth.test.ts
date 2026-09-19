@@ -1,6 +1,6 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const e=readFileSync(new URL("../src/assets/V3HoldingsExplorer.tsx",import.meta.url),"utf8"),a=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/holdingsExplorer.css",import.meta.url),"utf8");
-for(const helper of["aggregateHoldings","classifyPosition","filterAndSortHoldings"])assert.match(e,new RegExp(helper));
+for(const helper of["aggregateHoldings","classifyPosition","filterAndSortHoldings"])assert.match(e,new RegExp(helper));assert.match(e,/V3SectionSelector label="Показать структуру по"/);assert.match(e,/DIMENSION_OPTIONS/);assert.doesNotMatch(e,/Группировка активов/);
 for(const label of["Инструменты","Классы","Эмитенты","Отрасли","Валюты","Акции","Облигации","Фонды","Валюта","Фьючерсы","Другое"])assert.match(e,new RegExp(label));
 assert.match(e,/type="search"/);assert.match(e,/Тикер, название, эмитент, отрасль/);assert.match(e,/По доле/);assert.match(e,/По стоимости/);assert.match(e,/По P\/L/);assert.match(e,/По названию/);
 assert.match(e,/Без подтверждённой классификации/);assert.match(e,/не угадывает отсутствующий эмитент, отрасль или валюту/);assert.match(e,/Broker P\/L — накопленный контекст позиции, а не дневное изменение/);assert.match(e,/YTM и duration здесь не рассчитываются/);
