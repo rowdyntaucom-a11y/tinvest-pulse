@@ -125,14 +125,21 @@ Added:
 
 Updated the old asset-class Analysis regression to validate the shared canonical adapter instead of hard-coded local classifier strings.
 
-## Validation required
-- dependency security gate;
-- TypeScript/Vite production build;
-- full v3 regression suite;
-- bundle split inspection;
-- exact-head CI;
-- squash merge if green;
-- Render exact merged SHA LIVE verification.
+## Validation
+- dependency security gate: success, 0 vulnerabilities.
+- TypeScript/Vite production build: success.
+- full v3 regression suite: success.
+- canonical holdings-structure regression: success.
+- Holdings Explorer UI/trust regression: success.
+- shared asset-class regression: success.
+- lazy explorer regression: success.
+- initial JS: 280.83 kB / 86.70 kB gzip.
+- initial CSS: 82.58 kB / 14.18 kB gzip.
+- deferred Holdings Explorer JS: 8.35 kB / 2.73 kB gzip.
+- deferred Holdings Explorer CSS: 8.17 kB / 1.74 kB gzip.
+- deferred Analysis JS reduced slightly to 52.31 kB / 14.64 kB gzip after removing duplicated local class heuristics.
+- automated Codex review did not run because the connected review quota is exhausted; no review finding was produced.
+- squash merge and Render exact-SHA verification remain before completion.
 
 ## Remaining physical-device validation
 Not performed in this pass:
