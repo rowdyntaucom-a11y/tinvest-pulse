@@ -87,3 +87,25 @@
 .v3-income-hero,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-income-detail{padding:11px 12px;border-radius:16px}.v3-income-hero>div strong{font-size:27px;margin:6px 0 3px}.v3-income-hero>i{width:44px;height:44px;font-size:20px}.v3-income-grid{margin-top:6px}.v3-income-grid strong{font-size:15px;margin-top:5px}.v3-income-context{margin-top:6px;padding:9px 11px}.v3-income-ratios{margin-top:6px}.v3-income-detail{margin-top:6px}
 .v3-goal-hero strong{font-size:24px;margin:6px 0 10px}.v3-goal-progress,.v3-goal-journey,.v3-goal-facts,.v3-goal-milestones,.v3-goal-detail{margin-top:6px}.v3-goal-milestones{padding:9px 8px}.v3-nav{left:7px;right:7px;bottom:max(6px,env(safe-area-inset-bottom));height:58px;border-radius:19px;padding:4px}.v3-nav button{min-height:46px;border-radius:14px}.v3-nav button i{font-size:16px}.v3-nav button span{font-size:8px}
 }
+
+
+/* Historical depth pass — period controls stay secondary; Simple mode remains compact. */
+.v3-history-window{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:0 0 8px;padding:3px;border:1px solid var(--v3-line);border-radius:12px;background:rgba(8,11,14,.44)}
+.v3-history-window button{min-width:0;min-height:36px;padding:0 7px;border:0;border-radius:9px;background:transparent;color:var(--v3-muted);font:700 9px/1 Inter,system-ui,sans-serif;letter-spacing:.03em}
+.v3-history-window button.is-active{background:var(--v3-card);color:var(--v3-text);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.v3-history-window button:focus-visible{outline:2px solid var(--v3-accent);outline-offset:1px}
+.v3-chart-invested{fill:none!important;stroke:var(--v3-muted)!important;stroke-width:.8!important;stroke-dasharray:3 2;opacity:.72}
+.v3-history-legend{display:flex;justify-content:flex-end;gap:12px;margin-top:3px;font-size:9px;color:var(--v3-muted)}
+.v3-history-legend span{display:flex;align-items:center;gap:5px;text-transform:none;letter-spacing:0}
+.v3-history-legend i{width:12px;height:2px;border-radius:99px;background:var(--v3-accent)}
+.v3-history-legend i.is-invested{height:0;border-top:1px dashed var(--v3-muted);background:transparent}
+.v3-history-depth{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:8px}
+.v3-history-depth>div{min-width:0;padding:8px 9px;border:1px solid var(--v3-line);border-radius:12px;background:rgba(255,255,255,.025)}
+.v3-history-depth span,.v3-history-depth small{display:block;color:var(--v3-muted);font-size:8px;line-height:1.25}
+.v3-history-depth strong{display:block;margin:4px 0 2px;font-size:11px;line-height:1.15;font-variant-numeric:tabular-nums}
+.v3-analysis>.v3-history-window{margin-top:6px;margin-bottom:6px}
+.v3-app[data-shell="horizon"] .v3-history-window{background:rgba(246,249,250,.78);border-color:rgba(27,54,69,.1)}
+.v3-app[data-shell="horizon"] .v3-history-window button.is-active{background:#fff;color:#172027}
+.v3-app[data-shell="carbon"] .v3-history-window{background:rgba(8,9,25,.72);border-color:rgba(126,139,255,.2)}
+@media(max-width:430px){.v3-history-window{margin-bottom:6px}.v3-history-window button{min-height:34px}.v3-history-depth{gap:4px;margin-top:6px}.v3-history-depth>div{padding:7px}.v3-history-depth strong{font-size:10px}.v3-history-legend{font-size:8px}}
+@media(max-width:359px){.v3-history-depth{grid-template-columns:1fr 1fr}.v3-history-depth>div:last-child{grid-column:1/-1}.v3-history-window button{padding-inline:4px}}
