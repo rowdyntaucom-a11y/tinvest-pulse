@@ -136,14 +136,19 @@ Added:
 - lazy JS/CSS boundary contract;
 - metric explainability integration.
 
-## Validation required
-- v3 dependency security gate;
-- TypeScript/Vite production build;
-- full v3 regression suite;
-- bundle split inspection;
-- exact-head CI;
-- squash merge only if green;
-- Render exact merged SHA LIVE verification.
+## Validation
+- dependency security gate: success, 0 vulnerabilities.
+- TypeScript/Vite production build: success.
+- full v3 regression suite: success.
+- canonical goal scenario engines regression: success.
+- Scenario Lab UI trust contracts: success.
+- deferred Goal Scenario Lab bundle contract: success.
+- initial JS: 279.25 kB / 86.16 kB gzip.
+- initial CSS: 82.58 kB / 14.18 kB gzip.
+- deferred Goal Scenario Lab JS: 20.36 kB / 6.58 kB gzip.
+- deferred Goal Scenario Lab CSS: 9.02 kB / 1.81 kB gzip.
+- Codex automated review did not run because the connected review quota is exhausted; no code finding was produced.
+- final exact-head CI, squash merge and Render exact-SHA live verification remain before completion.
 
 ## Remaining physical-device validation
 Still not performed in this pass:
