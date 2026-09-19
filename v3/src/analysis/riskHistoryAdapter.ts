@@ -87,6 +87,8 @@ export function summarizeCorrelationPairs(series:RiskSeries[],cells:Array<{a:str
   const highest=ready.length?ready.reduce((best,cell)=>cell.correlation!>best.correlation!?cell:best):null;
   const lowest=ready.length?ready.reduce((best,cell)=>cell.correlation!<best.correlation!?cell:best):null;
   const describe=(cell:typeof highest)=>cell?{
+    aKey:cell.a,
+    bKey:cell.b,
     a:labels.get(cell.a)??cell.a,
     b:labels.get(cell.b)??cell.b,
     correlation:cell.correlation!,
