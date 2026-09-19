@@ -1,6 +1,6 @@
 import{GLOSSARY}from"../../../v2/src/features/help/glossary";
 
-export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"twr"|"volatility"|"sharpe"|"sortino"|"rollingRisk"|"effectivePositions"|"tailRisk"|"trackingError"|"beta"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"goalProgress";
+export type V3MetricHelpTopic="passiveIncome"|"cagr"|"xirr"|"twr"|"volatility"|"sharpe"|"sortino"|"rollingRisk"|"effectivePositions"|"riskContribution"|"diversificationRatio"|"correlation"|"tailRisk"|"trackingError"|"beta"|"maxDrawdown"|"hhi"|"top3"|"imoex"|"riskFreeRate"|"annualizedIncome"|"goalProgress";
 
 export type V3MetricHelpEntry={
   title:string;
@@ -56,6 +56,22 @@ export const V3_METRIC_HELP:Record<V3MetricHelpTopic,V3MetricHelpEntry>={
     title:"Эквивалент позиций",
     simple:"Величина 1 / HHI: сколько равновзвешенных позиций дали бы похожую концентрацию капитала.",
     detail:"Это описание концентрации текущего капитала, а не число независимых источников риска.",
+  },
+  riskContribution:{
+    title:"Вклад в риск",
+    simple:"Доля дисперсии покрытой части портфеля, связанная с текущим весом актива и его совместной динамикой с остальными активами.",
+    detail:"Вклад считается по ковариационной матрице только на общих подтверждённых интервалах. Отрицательный signed contribution возможен, когда актив снижает общую дисперсию за счёт диверсификации.",
+    note:"Это не вероятность убытка, не P/L и не рекомендация изменить вес.",
+  },
+  diversificationRatio:{
+    title:"Diversification Ratio",
+    simple:"Средневзвешенная standalone-волатильность активов, делённая на волатильность их совместного портфеля.",
+    detail:"Показатель отражает исторический эффект совместного движения активов на покрытой выборке. Он зависит от состава, весов и периода истории.",
+  },
+  correlation:{
+    title:"Корреляция",
+    simple:"Pearson ρ между доходностями двух активов на одинаковых интервалах наблюдения.",
+    detail:"QVANIX не считает корреляцию по уровням цен и скрывает пару, пока нет минимальной общей выборки. Отрицательная корреляция не гарантирует защиту в будущем.",
   },
   tailRisk:{
     title:GLOSSARY.tailRisk.label,

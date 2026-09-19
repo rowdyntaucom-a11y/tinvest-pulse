@@ -49,3 +49,40 @@
 .v3-analysis-quality>div:last-child{grid-column:1/-1}
 .v3-analysis-layer-head h2{font-size:13px}
 }
+
+/* Verified asset-history risk contribution + pairwise correlation depth. */
+.v3-risk-contribution{margin-top:10px;padding-top:10px;border-top:1px solid var(--v3-line)}
+.v3-analysis-metric-grid.is-risk-contribution{grid-template-columns:repeat(3,minmax(0,1fr))}
+.v3-risk-contributors{margin-top:8px;border:1px solid var(--v3-line);border-radius:14px;overflow:hidden}
+.v3-risk-contributors-head,.v3-risk-contributors>article{display:grid;grid-template-columns:minmax(78px,1.35fr) .72fr .82fr 1fr;gap:7px;align-items:center}
+.v3-risk-contributors-head{padding:7px 9px;border-bottom:1px solid var(--v3-line);background:rgba(255,255,255,.025);color:var(--v3-muted);font-size:7px;text-transform:uppercase;letter-spacing:.05em}
+.v3-risk-contributors>article{min-width:0;padding:9px;border-bottom:1px solid var(--v3-line);font-size:9px}
+.v3-risk-contributors>article:last-child{border-bottom:0}
+.v3-risk-contributors>article>div,.v3-risk-contributors>article>span{min-width:0}
+.v3-risk-contributors>article>div>strong,.v3-risk-contributors>article>div>small{display:block}
+.v3-risk-contributors>article>div:first-child strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+.v3-risk-contributors>article>div:first-child small,.v3-risk-contributors>article>div:last-child small{margin-top:2px;color:var(--v3-muted);font-size:7px;line-height:1.2}
+.v3-risk-contributors>article>span,.v3-risk-contributors>article>div:last-child>strong{font-variant-numeric:tabular-nums;text-align:right}
+.v3-risk-contributors>article>div:last-child>i{display:block;height:3px;margin-top:4px;border-radius:99px;background:rgba(255,255,255,.055);overflow:hidden}
+.v3-risk-contributors>article>div:last-child>i>b{display:block;height:100%;border-radius:inherit;background:var(--v3-accent)}
+.v3-risk-contributors>article>div:last-child.is-offsetting>i>b{background:var(--v3-muted);opacity:.72}
+.v3-risk-contributors>article>div:last-child.is-offsetting>strong{color:var(--v3-muted)}
+.v3-correlation-depth{margin-top:10px;padding-top:10px;border-top:1px solid var(--v3-line)}
+.v3-correlation-summary{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.v3-correlation-summary article,.v3-correlation-pairs article{min-width:0;padding:9px 10px;border:1px solid var(--v3-line);border-radius:13px;background:rgba(255,255,255,.02)}
+.v3-correlation-summary span,.v3-correlation-summary small,.v3-correlation-pairs span,.v3-correlation-pairs small{display:block;color:var(--v3-muted);font-size:8px;line-height:1.25}
+.v3-correlation-summary strong,.v3-correlation-pairs strong{display:block;margin:4px 0 2px;font-size:13px;font-variant-numeric:tabular-nums}
+.v3-correlation-pairs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px}
+.v3-risk-provenance{margin-top:9px;padding:9px 10px;border:1px solid var(--v3-line);border-radius:13px;background:rgba(255,255,255,.015)}
+.v3-risk-provenance span,.v3-risk-provenance small,.v3-risk-provenance strong{display:block}
+.v3-risk-provenance span{color:var(--v3-muted);font-size:8px}.v3-risk-provenance strong{margin:3px 0;font-size:10px}.v3-risk-provenance small{color:var(--v3-muted);font-size:8px;line-height:1.4}
+.v3-app[data-shell="horizon"] :is(.v3-risk-contributors,.v3-correlation-summary article,.v3-correlation-pairs article,.v3-risk-provenance){background:rgba(255,255,255,.62)}
+@media(max-width:430px){
+.v3-analysis-metric-grid.is-risk-contribution{grid-template-columns:repeat(2,minmax(0,1fr))}
+.v3-risk-contributors{overflow-x:auto;scrollbar-width:none}
+.v3-risk-contributors-head,.v3-risk-contributors>article{min-width:360px;grid-template-columns:minmax(92px,1.35fr) 62px 72px 86px}
+.v3-correlation-pairs{grid-template-columns:1fr}
+}
+@media(max-width:359px){
+.v3-correlation-summary{grid-template-columns:1fr}
+}

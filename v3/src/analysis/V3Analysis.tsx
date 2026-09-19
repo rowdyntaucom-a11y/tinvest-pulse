@@ -47,7 +47,7 @@ function resultBreadth(items:PositionSnapshot[]){
   };
 }
 
-export function V3Analysis({items,history,market,trusted,shell,mode}:{items:PositionSnapshot[];history:HistoryPoint[];market:{riskFreeRate:number|null;riskFreeRateDate:string|null;nextRateMeeting:string|null};trusted:boolean;shell:V3Shell;mode:V3DetailMode}){
+export function V3Analysis({items,history,market,trusted,shell,mode,portfolioValue}:{items:PositionSnapshot[];history:HistoryPoint[];market:{riskFreeRate:number|null;riskFreeRateDate:string|null;nextRateMeeting:string|null};trusted:boolean;shell:V3Shell;mode:V3DetailMode;portfolioValue:number}){
   const rows=trusted?items:[],trustedHistory=trusted?history:[];
   const depth=useMemo(()=>buildV3AnalysisDepth(trustedHistory,rows,trusted?market.riskFreeRate:null),[trustedHistory,rows,trusted,market.riskFreeRate]);
   const ranked=[...rows].sort((a,b)=>b.currentValue-a.currentValue);
@@ -80,7 +80,7 @@ export function V3Analysis({items,history,market,trusted,shell,mode}:{items:Posi
       <section className="v3-analysis-note">Верхняя просадка теперь считается по TWR-индексу, а не по рыночной стоимости счёта: пополнения и выводы не должны искажать риск-метрику. Текущий broker P/L позиций остаётся отдельным срезом.</section>
     </section>}
     {mode==="detailed"&&section==="return"&&trusted&&<V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/>}
-    {mode==="detailed"&&section==="risk"&&trusted&&<V3RiskLayer portfolio={depth.portfolio} tail={depth.tail}/>}
+    {mode==="detailed"&&section==="risk"&&trusted&&<V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={rows} totalPortfolioValue={portfolioValue}/>}
     {mode==="detailed"&&section==="structure"&&rows.length>0&&<><V3AllocationDonut items={rows}/>{bonds&&<section className="v3-bond-lens"><h2>Облигационный слой</h2><div><span>Вес</span><strong>{n.format(ratioToPercent(bonds.weight)??0)}%</strong></div><div><span>Выпусков</span><strong>{bonds.count}</strong></div><div><span>Флоатеры</span><strong>{n.format(ratioToPercent(bonds.floating)??0)}%</strong></div><div><span>Амортиз.</span><strong>{n.format(ratioToPercent(bonds.amortizing)??0)}%</strong></div><small>{bonds.next?"Ближайшее погашение · "+bonds.next:"Даты погашения недоступны"}</small></section>}{classes.length>0&&<section className="v3-class-map"><h2>Классы активов</h2>{classes.map(([label,weight])=>{const weightPct=ratioToPercent(weight)??0;return <div key={label}><span>{label}</span><i><b style={{width:clampPercent(weightPct)+"%"}}/></i><strong>{n.format(weightPct)}%</strong></div>})}</section>}<section className="v3-analysis-detail"><h2>Карта концентрации</h2>{ranked.slice(0,5).map(item=>{const weightPct=ratioToPercent(item.weight)??0;return <div key={item.figi||item.ticker}><span>{item.ticker}</span><i><b style={{width:clampPercent(weightPct)+"%"}}/></i><strong>{n.format(weightPct)}%</strong></div>})}</section></>}
     {mode==="detailed"&&section==="market"&&trusted&&<V3MarketLayer relative={relative} window={historyWindow} onWindowChange={setHistoryWindow} market={market}/>}
     <section className="v3-analysis-note">Показатели описывают текущую структуру и подтверждённую историю. Они не являются рекомендацией купить, продать или выбрать конкретный актив.</section>
