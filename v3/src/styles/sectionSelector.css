@@ -1,0 +1,22 @@
+/* Shared secondary-navigation selector: one clear section control instead of pill forests. */
+.v3-section-selector{display:grid;gap:5px;margin:8px 0;padding:9px 10px;border:1px solid var(--v3-line);border-radius:14px;background:var(--v3-card)}
+.v3-section-selector>span{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--v3-muted)}
+.v3-section-selector>div{position:relative;min-width:0}
+.v3-section-selector select{box-sizing:border-box;width:100%;height:46px;padding:0 38px 0 12px;border:1px solid var(--v3-line);border-radius:11px;appearance:none;background:rgba(255,255,255,.025);color:var(--v3-text);font:700 12px/1.2 Inter,system-ui,sans-serif;letter-spacing:0}
+.v3-section-selector select option{background:#111618;color:#f5f7f8}
+.v3-section-selector i{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-style:normal;font-size:15px;line-height:1;color:var(--v3-muted);pointer-events:none}
+.v3-section-selector>small{display:block;min-height:26px;color:var(--v3-muted);font-size:10px;line-height:1.35}
+.v3-section-selector select:focus-visible{outline:2px solid var(--v3-accent);outline-offset:2px}
+.v3-app[data-shell="horizon"] .v3-section-selector{background:rgba(255,255,255,.9);border-color:rgba(27,54,69,.1);box-shadow:0 8px 26px rgba(27,54,69,.05)}
+.v3-app[data-shell="horizon"] .v3-section-selector select{background:#fff;color:#172027;border-color:rgba(27,54,69,.12)}
+.v3-app[data-shell="horizon"] .v3-section-selector select option{background:#fff;color:#172027}
+.v3-app[data-shell="carbon"] .v3-section-selector{background:rgba(13,15,34,.84);border-color:rgba(126,139,255,.2)}
+.v3-app[data-shell="carbon"] .v3-section-selector select{background:rgba(8,9,25,.74)}
+@media(max-width:430px){
+.v3-section-selector{position:sticky;z-index:18;top:75px;margin:6px 0;padding:8px 9px;border-radius:13px;backdrop-filter:blur(14px)}
+.v3-section-selector>span{font-size:9px}.v3-section-selector select{height:48px;font-size:13px}.v3-section-selector>small{font-size:10px;min-height:27px}
+}
+@media(max-width:359px){
+.v3-section-selector{top:70px}.v3-section-selector select{padding-left:10px;font-size:12px}.v3-section-selector>small{font-size:9.5px}
+}
+@media(prefers-reduced-motion:reduce){.v3-section-selector{scroll-behavior:auto}}
