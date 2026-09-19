@@ -1,0 +1,5 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";import{V3_DEMO_SNAPSHOT}from"../src/demo/demoSnapshot.ts";
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8"),home=readFileSync(new URL("../src/home/V3Home.tsx",import.meta.url),"utf8");
+assert.match(main,/isDemoRoute/);assert.match(main,/function DemoRoot/);assert.match(main,/Синтетические данные · без подключения брокера/);const demoBody=main.slice(main.indexOf("function DemoRoot"),main.indexOf("function LiveRoot"));assert.doesNotMatch(demoBody,/loadV3Portfolio|onRefresh|setInterval/);assert.match(home,/demo\?"DEMO"/);assert.match(home,/disabled=\{!trusted\|\|demo\}/);assert.match(home,/Статический демонстрационный сценарий/);
+assert.equal(V3_DEMO_SNAPSHOT.source,"portfolio");assert.equal(V3_DEMO_SNAPSHOT.positions,V3_DEMO_SNAPSHOT.positionItems.length);assert.ok(Math.abs(V3_DEMO_SNAPSHOT.positionItems.reduce((s,x)=>s+x.weight,0)-1)<1e-9);assert.ok(V3_DEMO_SNAPSHOT.history.length>=8);assert.ok(V3_DEMO_SNAPSHOT.positionItems.every(x=>x.instrumentUid?.startsWith("demo-")||x.ticker.startsWith("OFZ-D")));
+console.log("v3 public demo trust boundary: ok");
