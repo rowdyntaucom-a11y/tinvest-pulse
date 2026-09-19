@@ -6,6 +6,7 @@ import{calculateCorrelationMatrix}from"../../../v2/src/features/analytics/riskMa
 import{ratioToPercent,clampPercent}from"../data/units";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{buildV3RiskHistoryMatch,summarizeCorrelationPairs}from"./riskHistoryAdapter";
+import{resolvePositionByKey}from"../assets/positionIdentity";
 
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const signedPct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
@@ -17,7 +18,7 @@ const p=(value:number|null)=>value==null?"—":pct.format(value*100)+"%";
 const sp=(value:number|null)=>value==null?"—":signedPct.format(value*100)+"%";
 const d=(value:string|null)=>value?dateFmt.format(new Date(value+"T00:00:00Z")):"—";
 
-export function V3RiskContributionPanel({positions,totalPortfolioValue}:{positions:PositionSnapshot[];totalPortfolioValue:number}){
+export function V3RiskContributionPanel({positions,totalPortfolioValue,onOpenAsset}:{positions:PositionSnapshot[];totalPortfolioValue:number;onOpenAsset?:(position:PositionSnapshot)=>void}){
   const[payload,setPayload]=useState<AssetHistoryPayload|null>(null),[state,setState]=useState<"loading"|"live"|"unavailable">("loading");
 
   useEffect(()=>{
@@ -69,8 +70,11 @@ export function V3RiskContributionPanel({positions,totalPortfolioValue}:{positio
         {rows.map(row=>{
           const share=row.riskContributionShare;
           const offsetting=share!=null&&share<0;
+          const position=resolvePositionByKey(positions,row.key);
           return <article key={row.key}>
-            <div><strong>{row.label}</strong><small>{money.format(row.currentValue)} ₽</small></div>
+            <button type="button" className="v3-risk-asset-link" disabled={!position} onClick={()=>{if(position)onOpenAsset?.(position)}} aria-label={position?"Открыть актив "+row.label:undefined}>
+              <strong>{row.label}</strong><small>{money.format(row.currentValue)} ₽{position?" · карточка →":" · идентичность не подтверждена"}</small>
+            </button>
             <span>{p(row.weight)}</span>
             <span>{p(row.annualizedVolatility)}</span>
             <div className={offsetting?"is-offsetting":""}><strong>{sp(share)}</strong><i aria-hidden="true"><b style={{width:clampPercent(Math.abs(ratioToPercent(share)??0))+"%"}}/></i><small>{offsetting?"снижает общую дисперсию":"signed contribution"}</small></div>
@@ -86,7 +90,13 @@ export function V3RiskContributionPanel({positions,totalPortfolioValue}:{positio
         <article><span>Макс. ρ</span><strong>{corr.highest?ratio.format(corr.highest.correlation):"—"}</strong><small>{corr.highest?corr.highest.a+" ↔ "+corr.highest.b:"—"}</small></article>
         <article><span>Мин. ρ</span><strong>{corr.lowest?ratio.format(corr.lowest.correlation):"—"}</strong><small>{corr.lowest?corr.lowest.a+" ↔ "+corr.lowest.b:"—"}</small></article>
       </div>
-      <div className="v3-correlation-pairs">{corr.strongestAbsolute.map(pair=><article key={pair.a+"|"+pair.b}><span>{pair.a} ↔ {pair.b}</span><strong>{ratio.format(pair.correlation)}</strong><small>{pair.pairedReturns} общих интервалов · {pair.mature?"зрелая":"preview"}</small></article>)}</div></>:<div className="v3-analysis-gate">Для парных корреляций нужно минимум {matrix.minimumPairedReturns} доходностей на одинаковых интервалах наблюдения. Искусственные коэффициенты не подставляются.</div>}
+      <div className="v3-correlation-pairs">{corr.strongestAbsolute.map(pair=>{
+        const aPosition=resolvePositionByKey(positions,pair.aKey),bPosition=resolvePositionByKey(positions,pair.bKey);
+        return <article key={pair.aKey+"|"+pair.bKey}>
+          <div className="v3-correlation-assets"><button type="button" disabled={!aPosition} onClick={()=>{if(aPosition)onOpenAsset?.(aPosition)}}>{pair.a}</button><i aria-hidden="true">↔</i><button type="button" disabled={!bPosition} onClick={()=>{if(bPosition)onOpenAsset?.(bPosition)}}>{pair.b}</button></div>
+          <strong>{ratio.format(pair.correlation)}</strong><small>{pair.pairedReturns} общих интервалов · {pair.mature?"зрелая":"preview"} · карточки открываются только по точной идентичности</small>
+        </article>;
+      })}</div></>:<div className="v3-analysis-gate">Для парных корреляций нужно минимум {matrix.minimumPairedReturns} доходностей на одинаковых интервалах наблюдения. Искусственные коэффициенты не подставляются.</div>}
       <small className="v3-analysis-method-note">Pearson ρ считается по доходностям с одинаковыми границами интервала, не по уровням цен. Корреляция описывает прошлую совместную динамику и не является прогнозом.</small>
     </section>
 
