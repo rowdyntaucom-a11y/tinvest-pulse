@@ -131,3 +131,44 @@
 .v3-metric-help-panel{position:fixed;z-index:80;top:auto;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:auto;max-height:min(42vh,330px);overflow:auto;padding:14px;border-radius:17px}
 .v3-metric-help-panel>strong{font-size:13px!important}.v3-metric-help-panel>span{font-size:11px!important}.v3-metric-help-panel>small{font-size:10px!important}
 }
+
+/* Portfolio overview density + semantic financial meaning pass. */
+.v3-app{--v3-text:#f7f8f8;--v3-muted:#91a09c;--v3-line:rgba(255,255,255,.1);--v3-card:rgba(16,21,23,.82);--v3-accent:#e7b06a;--v3-positive:#72c995;--v3-negative:#e39a8b;--v3-neutral:#91a09c}
+.v3-app[data-shell="horizon"]{--v3-text:#172027;--v3-muted:#65727b;--v3-line:rgba(27,54,69,.1);--v3-card:rgba(255,255,255,.88);--v3-accent:#2369a0;--v3-positive:#187a48;--v3-negative:#b64f42;--v3-neutral:#65727b}
+.v3-app[data-shell="carbon"]{--v3-text:#f7f8f8;--v3-muted:#8d91b0;--v3-line:rgba(126,139,255,.2);--v3-card:rgba(13,15,34,.82);--v3-accent:#8fa4ff;--v3-positive:#79d9a7;--v3-negative:#ef9a91;--v3-neutral:#8d91b0}
+.v3-app .is-positive{color:var(--v3-positive)!important}
+.v3-app .is-negative{color:var(--v3-negative)!important}
+.v3-app .is-neutral{color:var(--v3-neutral)!important}
+.v3-hero p>strong{font-weight:700;color:inherit}
+.v3-pulse small.is-positive,.v3-pulse small.is-negative{font-weight:700}
+.v3-asset{display:grid;grid-template-columns:1fr;gap:0;padding:0!important;overflow:hidden}
+.v3-asset-row{display:grid;grid-template-columns:22px minmax(0,1fr) auto 12px;grid-template-rows:auto 3px;gap:5px 8px;align-items:center;width:100%;min-width:0;min-height:66px;padding:9px 10px 7px;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.v3-asset-row:focus-visible{outline:2px solid var(--v3-accent);outline-offset:-2px}
+.v3-asset-row:active{background:rgba(255,255,255,.035)}
+.v3-asset-row .v3-asset-rank{padding:0;align-self:start;margin-top:2px}
+.v3-asset-row .v3-asset-id{min-width:0;gap:1px}
+.v3-asset-row .v3-asset-id strong{font-size:13px;line-height:1.1}
+.v3-asset-row .v3-asset-id span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px;line-height:1.25}
+.v3-asset-row .v3-asset-id small{font-size:7px;line-height:1.2}
+.v3-asset-row .v3-asset-value{min-width:88px;max-width:126px;gap:1px;text-align:right;align-items:flex-end}
+.v3-asset-row .v3-asset-value strong{font-size:12px;line-height:1.1;font-variant-numeric:tabular-nums}
+.v3-asset-row .v3-asset-value span{font-size:8px;line-height:1.2;color:var(--v3-muted)}
+.v3-asset-row .v3-asset-value small{font-size:8px;line-height:1.2;font-variant-numeric:tabular-nums;font-weight:700}
+.v3-asset-chevron{font-style:normal;font-size:18px;line-height:1;color:var(--v3-muted);text-align:right}
+.v3-asset-row .v3-weight{grid-column:1/-1;grid-row:2;height:2px;margin:0}
+.v3-asset.is-open .v3-asset-row{background:rgba(255,255,255,.025)}
+.v3-app[data-shell="horizon"] .v3-asset-row:active,.v3-app[data-shell="horizon"] .v3-asset.is-open .v3-asset-row{background:rgba(35,105,160,.035)}
+.v3-app[data-shell="carbon"] .v3-asset-row:active,.v3-app[data-shell="carbon"] .v3-asset.is-open .v3-asset-row{background:rgba(126,139,255,.045)}
+@media(max-width:430px){
+.v3-asset-list{gap:5px}
+.v3-asset-row{min-height:62px;padding:8px 9px 6px;gap:4px 7px;grid-template-columns:20px minmax(0,1fr) auto 10px}
+.v3-asset-row .v3-asset-id strong{font-size:12px}.v3-asset-row .v3-asset-value strong{font-size:11px}
+.v3-asset-row .v3-asset-value{min-width:82px;max-width:110px}
+.v3-asset-chevron{font-size:16px}
+}
+@media(max-width:359px){
+.v3-asset-row{grid-template-columns:18px minmax(0,1fr) auto 9px;padding-inline:8px}
+.v3-asset-row .v3-asset-id span{max-width:138px}
+.v3-asset-row .v3-asset-id small{display:none}
+.v3-asset-row .v3-asset-value{min-width:76px;max-width:94px}
+}
