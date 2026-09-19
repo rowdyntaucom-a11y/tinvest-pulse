@@ -78,14 +78,22 @@ The six-column tab rail and its <=430 / <=359 overrides were removed.
 - Asset Workspace shared section selector;
 - obsolete Asset Workspace pill-navigation CSS removal.
 
-## Validation required
-- dependency security gate;
-- production TypeScript/Vite build;
-- full v3 suite;
-- inspect bundle effects;
-- exact-head CI;
-- squash merge only if green;
-- exact merged SHA LIVE on Render.
+## Validation
+- dependency security gate: success, 0 vulnerabilities.
+- TypeScript/Vite production build: success.
+- full v3 regression suite: success.
+- exact risk-history adapter and contribution pipeline: success.
+- exact position identity resolver: success.
+- canonical cross-workspace asset drill-down regression: success.
+- first regression run exposed two stale contracts from the old Asset Workspace tab rail; both were updated to the new section-selector contract without weakening financial or identity guards.
+- a later regression run exposed Node strip-types resolving an extensionless new helper import from the risk-history adapter. The adapter kept its existing exact UID/FIGI key derivation locally, while the canonical drill-down resolver remains centralized in `positionIdentity.ts`; this preserves browser build behavior and direct Node regression compatibility.
+- initial JS: 280.96 kB / 86.74 kB gzip.
+- initial CSS: 82.55 kB / 14.20 kB gzip.
+- shared Section Selector: 0.52 kB / 0.32 kB gzip JS; 2.09 kB / 0.76 kB gzip CSS.
+- deferred Asset Workspace: 30.36 kB / 9.13 kB gzip.
+- deferred Analysis: 53.84 kB / 15.08 kB gzip.
+- Codex review bot did not run because connected review quota is exhausted; no review finding was produced.
+- squash merge and Render exact-SHA LIVE verification remain before completion.
 
 ## Physical-device status
 Still not physically validated:
