@@ -1,0 +1,18 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const panel=readFileSync(new URL("../src/analysis/V3RiskContributionPanel.tsx",import.meta.url),"utf8"),layer=readFileSync(new URL("../src/analysis/V3RiskLayer.tsx",import.meta.url),"utf8"),analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8"),app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8"),help=readFileSync(new URL("../src/help/metricHelp.ts",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/analysisDepth.css",import.meta.url),"utf8");
+assert.match(panel,/loadAssetHistory\(controller\.signal\)/);
+assert.match(panel,/calculateCurrentRiskContribution/);
+assert.match(panel,/calculateCorrelationMatrix/);
+assert.match(panel,/risk\.minimumReturns/);
+assert.match(panel,/risk\.matureReturns/);
+assert.match(panel,/Непокрытые позиции не считаются нулевым риском/);
+assert.match(panel,/Signed risk contribution может быть отрицательным/);
+assert.match(panel,/Pearson ρ считается по доходностям с одинаковыми границами интервала/);
+assert.match(panel,/topic="riskContribution"/);assert.match(panel,/topic="diversificationRatio"/);assert.match(panel,/topic="correlation"/);
+assert.match(layer,/V3RiskContributionPanel positions={positions}/);
+assert.match(analysis,/totalPortfolioValue={portfolioValue}/);
+assert.match(app,/portfolioValue={home\.value\?\?0}/);
+for(const topic of["riskContribution","diversificationRatio","correlation"])assert.match(help,new RegExp(topic+":"));
+assert.match(css,/v3-risk-contributors/);assert.match(css,/v3-correlation-depth/);assert.match(css,/min-width:360px/);
+assert.doesNotMatch(panel,/Math\.random|mock|demo|buy|sell/i);
+console.log("v3 risk contribution and correlation UI contracts: ok");
