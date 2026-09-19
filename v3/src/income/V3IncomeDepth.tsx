@@ -1,4 +1,5 @@
 import{useEffect,useMemo,useState}from"react";
+import"../styles/incomeDepth.css";
 import{loadPayoutCalendar,type PayoutCalendar,type PayoutEvent}from"../../../v2/src/lib/payoutsApi";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{filterIncomeCalendarEvents}from"../../../v2/src/features/income/incomeCalendarVisual";
