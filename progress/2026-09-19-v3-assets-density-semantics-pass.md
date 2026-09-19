@@ -93,12 +93,17 @@ Accent color is no longer relied upon as the default meaning of “positive fina
   - analysis breadth/benchmark sign;
   - “Подробный режим” language contract.
 
-## Validation required
-- v3 build.
-- Dependency security gate.
-- Full v3 test suite.
-- Bundle-size comparison.
-- Real-device Samsung Internet / Chrome Android:
+## Validation
+- GitHub v3 build: success.
+- Dependency security gate: success, 0 vulnerabilities.
+- Full v3 test suite: success, including Assets density and semantic financial-meaning regressions.
+- Bundle: initial JS 277.22 kB / 84.98 kB gzip; deferred Asset Workspace 38.13 kB / 11.42 kB gzip; CSS 74.39 kB / 13.11 kB gzip.
+- Versus the prior live pass, initial JS grew by ~1.01 kB raw / ~0.16 kB gzip; most of this pass is CSS and semantic wiring.
+- Automated Codex review did not run because the connected code-review quota is exhausted; no review finding was produced.
+- Two stale contract failures were fixed during CI:
+  - context-header test now expects user-facing “Подробный режим”;
+  - secondary inspector preserved the existing 44 px accessible touch-target contract while remaining visually compact.
+- Remaining real-device validation — Samsung Internet / Chrome Android:
   1. at least ~5–6 compact rows should be scannable in a typical phone viewport after header/summary;
   2. tapping the row opens the Asset Workspace reliably;
   3. tapping “Детали” must not open the Asset Workspace;
