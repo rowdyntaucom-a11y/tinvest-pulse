@@ -122,9 +122,16 @@ Existing v2 glossary definitions are reused for TWR and tail-risk framing where 
 - Deferred Analysis bundle contract.
 - Existing Analysis / benchmark / layers / bonds / breadth / market / semantic-color regressions updated to canonical architecture.
 
-## Validation required
-- v3 build.
-- dependency security gate.
-- full v3 test suite.
-- bundle split inspection.
-- merge and Render live verification.
+## Validation
+- GitHub v3 build: success.
+- Dependency security gate: success, 0 vulnerabilities.
+- Full v3 test suite: success, including canonical analytics maturity/conflict, normalized weight-unit and deferred-engine regressions.
+- Bundle split confirmed:
+  - initial JS: 271.79 kB / 84.14 kB gzip;
+  - deferred Analysis: 35.13 kB / 9.79 kB gzip;
+  - deferred Asset Workspace: 38.14 kB / 11.43 kB gzip;
+  - CSS: 78.95 kB / 13.73 kB gzip.
+- Compared with the previous live pass, initial JS fell from about 277.22 kB / 84.98 kB gzip to 271.79 kB / 84.14 kB gzip because the canonical analytics engine is now deferred until Analysis opens.
+- During CI, stale wording/help contracts were aligned to the new five-layer architecture, and a formatter declaration escape typo was caught by TypeScript and corrected before merge.
+- Automated Codex review did not run because the connected code-review quota is exhausted; no review finding was produced.
+- Remaining real-device validation after live deploy: five-tab Analysis rail, mobile help sheets, and dense metric cards at 360–430 px.
