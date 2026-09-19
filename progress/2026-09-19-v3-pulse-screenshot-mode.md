@@ -98,14 +98,21 @@ Added:
 - lazy JS/CSS bundle contract;
 - Home trusted-entry contract.
 
-## Validation required
-- dependency security gate;
-- production build;
-- full v3 regression suite;
-- inspect Pulse lazy JS/CSS output;
-- exact-head CI;
-- squash merge only if green;
-- exact merged SHA LIVE on Render.
+## Validation
+- dependency security gate: success, 0 vulnerabilities.
+- TypeScript/Vite production build: success.
+- full v3 regression suite: success.
+- Pulse trusted snapshot / fail-closed regression: success.
+- non-interpolated Pulse history geometry regression: success.
+- Pulse screenshot UI/trust regression: success.
+- Pulse lazy JS/CSS regression: success.
+- one initial regression failed only because IEEE floating-point addition returned 0.9999999999999999 for four exact decimal weights; the assertion was corrected to a numeric tolerance without changing product logic.
+- initial JS: 281.77 kB / 86.96 kB gzip.
+- initial CSS: 83.54 kB / 14.36 kB gzip.
+- deferred Pulse JS: 7.21 kB / 2.87 kB gzip.
+- deferred Pulse CSS: 7.36 kB / 2.04 kB gzip.
+- Codex review bot did not produce a review because connected review quota is exhausted; this is not a code finding.
+- squash merge and exact merged SHA LIVE verification remain before completion.
 
 ## Physical-device status
 Still not physically validated:
