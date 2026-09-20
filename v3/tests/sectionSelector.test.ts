@@ -5,11 +5,12 @@ const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta
 const income=readFileSync(new URL("../src/income/V3IncomeDepth.tsx",import.meta.url),"utf8");
 const goal=readFileSync(new URL("../src/goal/V3GoalScenarioLab.tsx",import.meta.url),"utf8");
 const holdings=readFileSync(new URL("../src/assets/V3HoldingsExplorer.tsx",import.meta.url),"utf8");
+const portfolio=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),"utf8");
 const asset=readFileSync(new URL("../src/assets/V3AssetWorkspace.tsx",import.meta.url),"utf8");
 const globalCss=readFileSync(new URL("../src/styles/v3.css",import.meta.url),"utf8");
 assert.match(component,/export type V3SectionOption/);assert.match(component,/select value={value}/);assert.match(component,/aria-label={label}/);assert.match(component,/active\?\.description/);assert.match(component,/onChange\(event\.target\.value as T\)/);
-for(const [source,label] of [[analysis,"Раздел аналитики"],[income,"Раздел дохода"],[goal,"Режим сценария"],[holdings,"Показать структуру по"],[asset,"Раздел актива"]])assert.match(source,new RegExp('V3SectionSelector label="'+label+'"'));
-for(const copy of["TWR, волатильность, Sharpe, Sortino","12-месячное расписание","Будущие предпосылки задаёте вы","нормализованному эмитенту"])assert.ok([analysis,income,goal,holdings,asset].some(source=>source.includes(copy)),copy);
+for(const [source,label] of [[analysis,"Раздел аналитики"],[income,"Раздел дохода"],[goal,"Режим сценария"],[holdings,"Показать структуру по"],[portfolio,"Раздел портфеля"],[asset,"Раздел актива"]])assert.match(source,new RegExp('V3SectionSelector label="'+label+'"'));
+for(const copy of["TWR, волатильность, Sharpe, Sortino","12-месячное расписание","Будущие предпосылки задаёте вы","нормализованному эмитенту","Глубокие срезы по классам"])assert.ok([analysis,income,goal,holdings,portfolio,asset].some(source=>source.includes(copy)),copy);
 assert.match(css,/height:46px/);assert.match(css,/font:700 12px/);assert.match(css,/height:48px/);assert.match(css,/font-size:13px/);assert.match(css,/position:sticky/);assert.match(css,/focus-visible/);assert.match(css,/data-shell="horizon"/);assert.match(css,/data-shell="carbon"/);assert.match(css,/max-width:359px/);
 assert.doesNotMatch(globalCss,/v3-analysis-tabs/);assert.doesNotMatch(income,/v3-income-depth-tabs/);assert.doesNotMatch(goal,/v3-goal-scenario-tabs/);
 console.log("v3 shared section selector contracts: ok");
