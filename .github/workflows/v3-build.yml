@@ -1,19 +1,11 @@
 name: v3 build
-
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'v3/**'
-      - 'QVANIX_V3_DIRECTION.md'
-      - '.github/workflows/v3-build.yml'
+    paths: ['v3/**','QVANIX_V3_DIRECTION.md','.github/workflows/v3-build.yml']
   push:
     branches: [main]
-    paths:
-      - 'v3/**'
-      - 'QVANIX_V3_DIRECTION.md'
-      - '.github/workflows/v3-build.yml'
-
+    paths: ['v3/**','QVANIX_V3_DIRECTION.md','.github/workflows/v3-build.yml']
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,10 +15,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
-        with:
-          node-version: 22
+        with: {node-version: 22}
       - run: npm install --no-audit --no-fund
       - name: Dependency security gate
         run: npm audit --audit-level=high
       - run: npm run build
-      - run: npm test
+      - name: Run v3 tests
+        shell: bash
+        run: set -o pipefail; npm test 2>&1 | tee test-output.log
+      - name: Preserve failing test log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-test-output
+          path: v3/test-output.log
+          retention-days: 1
