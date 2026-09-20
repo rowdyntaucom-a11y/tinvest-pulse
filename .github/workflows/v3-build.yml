@@ -29,4 +29,15 @@ jobs:
       - name: Dependency security gate
         run: npm audit --audit-level=high
       - run: npm run build
-      - run: npm test
+      - name: Run npm test
+        shell: bash
+        run: |
+          set +e
+          npm test > /tmp/v3-test.log 2>&1
+          code=$?
+          echo '### v3 test tail' >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          tail -80 /tmp/v3-test.log >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/v3-test.log
+          exit $code
