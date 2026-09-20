@@ -5,8 +5,10 @@ const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta
 const depth=readFileSync(new URL("../src/analysis/analysisDepth.ts",import.meta.url),"utf8");
 assert.match(app,/const V3Analysis=lazy\(\(\)=>import\("\.\.\/analysis\/V3Analysis"\)/);
 assert.doesNotMatch(app,/import\{V3Analysis\}from/);
+assert.match(app,/import type\{V3AnalysisSection\}from/);
 assert.match(app,/Открываем аналитику/);
 for(const fn of["calculatePortfolioAnalytics","calculateRelativePerformance","calculateRollingRisk","calculateTailRisk"])assert.match(depth,new RegExp(fn));
 for(const layer of["V3ReturnLayer","V3RiskLayer","V3MarketLayer"])assert.match(analysis,new RegExp(layer));
-assert.match(analysis,/useState<"overview"\|"return"\|"risk"\|"structure"\|"market">/);
+assert.match(analysis,/export type V3AnalysisSection="overview"\|"return"\|"risk"\|"structure"\|"market"/);
+assert.match(analysis,/useState<V3AnalysisSection>\(initialSection\)/);
 console.log("v3 deferred analytics engine contracts: ok");
