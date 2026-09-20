@@ -1,0 +1,13 @@
+import assert from"node:assert/strict";
+import{readFileSync}from"node:fs";
+const src=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),"utf8");
+assert.match(src,/V3SectionSelector/);
+assert.match(src,/label="Раздел портфеля"/);
+assert.match(src,/value:"overview",label:"Позиции"/);
+assert.match(src,/value:"explorer",label:"Структура"/);
+assert.match(src,/const overview=mode==="simple"\|\|view==="overview"/);
+assert.match(src,/view==="explorer"&&<Suspense/);
+assert.match(src,/Глубокие срезы по классам, инструментам, эмитентам, отраслям и валютам/);
+assert.match(src,/setView\(next\);setOpen\(null\)/);
+assert.doesNotMatch(src,/mode==="detailed"&&trusted&&<Suspense/);
+console.log("v3 portfolio progressive disclosure contracts: ok");
