@@ -1,0 +1,13 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/adaptiveDesktop.css",import.meta.url),"utf8");
+assert.match(main,/adaptiveDesktop\.css/);
+assert.match(css,/@media \(min-width: 768px\)/);
+assert.match(css,/@media \(min-width: 1024px\)/);
+assert.match(css,/@media \(min-width: 1440px\)/);
+assert.match(css,/\.v3-home,\.v3-assets,\.v3-analysis,\.v3-income,\.v3-goal,\.v3-asset-workspace/);
+assert.match(css,/\.v3-nav\{top:96px;bottom:24px;left:18px;right:auto;width:92px/);
+assert.match(css,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+assert.doesNotMatch(css,/max-height:\s*100dvh/);
+assert.doesNotMatch(css,/overflow-y:\s*hidden/);
+assert.doesNotMatch(css,/\.v3-pulse-mode/);
+console.log("v3 adaptive desktop shell contracts: ok");
