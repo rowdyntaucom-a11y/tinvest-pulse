@@ -1,0 +1,64 @@
+/* Universal responsive shell — phone stays bottom-nav first; wider viewports become a deliberate workspace. */
+.v3-app{overflow-x:clip}
+.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace{width:100%;box-sizing:border-box}
+
+/* Tablet / compact landscape: keep navigation familiar, constrain reading width and use the extra canvas. */
+@media (min-width:600px){
+  .v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace{max-width:880px;margin-inline:auto;padding-left:24px;padding-right:24px}
+  .v3-home{padding-top:20px}
+  .v3-primary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .v3-home-actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .v3-context-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .v3-nav{left:50%;right:auto;width:min(620px,calc(100vw - 32px));transform:translateX(-50%)}
+  .v3-state-detail{width:min(560px,calc(100vw - 48px));margin-inline:auto}
+}
+
+/* Desktop: bottom navigation becomes a stable left rail; content gains useful width without becoming a stretched phone. */
+@media (min-width:1024px){
+  .v3-app{--v3-rail:112px;min-height:100dvh;padding-left:var(--v3-rail)}
+  .v3-topbar{left:calc(var(--v3-rail) + 24px);right:24px;max-width:1180px;margin-inline:auto}
+  .v3-context-bar{position:sticky;top:58px;max-width:1180px;margin-left:auto;margin-right:auto}
+  .v3-data-state{left:calc(var(--v3-rail) + 50%);transform:translateX(-50%);max-width:420px}
+  .v3-state-detail{max-width:560px}
+  .v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace{max-width:1180px;margin-inline:auto;padding-left:32px;padding-right:32px;padding-bottom:40px}
+  .v3-home{padding-top:24px}
+  .v3-assets,.v3-analysis,.v3-income,.v3-goal{padding-top:78px}
+  .v3-nav{top:50%;bottom:auto;left:12px;right:auto;width:88px;height:auto;min-height:390px;transform:translateY(-50%);grid-template-columns:1fr;grid-template-rows:repeat(5,minmax(58px,1fr));padding:8px;border-radius:24px}
+  .v3-nav button{display:grid;place-items:center;align-content:center;gap:5px;min-height:58px;padding:7px 4px}
+  .v3-nav button i{font-size:18px}
+  .v3-nav button span{font-size:10px;white-space:normal;text-align:center}
+  .v3-hero{min-height:210px}
+  .v3-primary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .v3-home-actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .v3-assets-summary,.v3-analysis-signal,.v3-income-grid,.v3-income-ratios,.v3-goal-facts{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .v3-asset-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .v3-analysis-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .v3-income-calendar-summary,.v3-income-history-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+
+/* Wide desktop: cap the analytical canvas and improve scanability rather than stretching text/charts indefinitely. */
+@media (min-width:1440px){
+  .v3-app{--v3-rail:128px}
+  .v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace,.v3-topbar,.v3-context-bar{max-width:1320px}
+  .v3-home{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(360px,.75fr);gap:12px;align-items:start}
+  .v3-home>.v3-hero{grid-column:1/-1}
+  .v3-home>.v3-primary-grid{grid-column:1/-1}
+  .v3-home>.v3-history-card{grid-column:1;grid-row:3/span 3;margin-top:0}
+  .v3-home>.v3-pulse,.v3-home>.v3-home-actions,.v3-home>.v3-context-row{grid-column:2;margin-top:0}
+  .v3-home>.v3-context-row{grid-template-columns:1fr}
+  .v3-chart{height:150px}
+}
+
+/* Narrow/foldable widths remain usable instead of inheriting a 320px floor. */
+@media (max-width:319px){
+  .v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal{padding-left:8px;padding-right:8px}
+  .v3-topbar{left:6px;right:6px}
+  .v3-brand span{display:none}
+  .v3-controls>button{padding-inline:6px;font-size:9px}
+  .v3-shell-switch{grid-template-columns:repeat(3,27px)}
+  .v3-shell-switch button{width:27px;height:27px;min-height:27px!important}
+  .v3-nav{left:4px;right:4px;gap:2px;padding:3px}
+  .v3-nav button span{font-size:8px}
+  .v3-primary-grid,.v3-pulse,.v3-context-row{grid-template-columns:1fr 1fr}
+  .v3-home-actions{grid-template-columns:1fr 1fr}
+}
