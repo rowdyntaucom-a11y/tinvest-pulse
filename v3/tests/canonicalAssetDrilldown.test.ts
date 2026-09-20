@@ -5,7 +5,7 @@ const risk=readFileSync(new URL("../src/analysis/V3RiskContributionPanel.tsx",im
 const adapter=readFileSync(new URL("../src/analysis/riskHistoryAdapter.ts",import.meta.url),"utf8");
 const asset=readFileSync(new URL("../src/assets/V3AssetWorkspace.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/analysisDepth.css",import.meta.url),"utf8");
-assert.match(app,/V3Analysis[^>]+onOpenAsset={setSelectedAsset}/);assert.match(app,/backLabel={active\.label}/);
+assert.match(app,/V3Analysis[^>]+onOpenAsset={demo\?undefined:setSelectedAsset}/);assert.match(app,/backLabel={active\.label}/);
 assert.match(analysis,/onOpenAsset\?\:\(position:PositionSnapshot\)=>void/);assert.match(analysis,/onClick=\{\(\)=>onOpenAsset\?\.\(item\)\}/);assert.match(analysis,/V3RiskLayer[^>]+onOpenAsset={onOpenAsset}/);
 assert.match(risk,/resolvePositionByKey\(positions,row\.key\)/);assert.match(risk,/resolvePositionByKey\(positions,pair\.aKey\)/);assert.match(risk,/resolvePositionByKey\(positions,pair\.bKey\)/);assert.match(risk,/идентичность не подтверждена/);
 assert.match(adapter,/aKey:cell\.a/);assert.match(adapter,/bKey:cell\.b/);assert.match(adapter,/clean\(position\.instrumentUid\)\|\|clean\(position\.figi\)\|\|position\.ticker/);
