@@ -34,6 +34,42 @@
 .v3-metric-help-panel>span{font-size:var(--v3-font-label)!important;line-height:1.5!important}
 .v3-metric-help-panel>small{font-size:var(--v3-font-caption)!important;line-height:1.45!important}
 
+/* Keyboard and switch-access users get one coherent, high-contrast focus language.
+   Mouse/touch interaction is not decorated because :focus-visible is used deliberately. */
+.v3-app :where(button,select,a,[role="button"]):focus-visible{
+  outline:2px solid var(--v3-accent,#e7b06a)!important;
+  outline-offset:3px!important;
+  box-shadow:0 0 0 2px var(--v3-card,rgba(8,11,14,.9))!important;
+}
+.v3-nav button:focus-visible,.v3-home-actions button:focus-visible,.v3-asset-row:focus-visible{border-radius:14px}
+.v3-section-selector select:focus-visible{outline-offset:2px!important}
+
+/* Touch targets: controls that carry navigation or state must not collapse below 44 CSS px.
+   Compact decorative chips are intentionally excluded. */
+.v3-nav button,.v3-home-actions button,.v3-asset-back,.v3-pulse-entry,.v3-data-state{min-height:44px}
+
+/* Respect OS motion preference without removing state changes or financial meaning.
+   The dedicated Pulse screenshot remains visually static either way. */
+@media(prefers-reduced-motion:reduce){
+  .v3-app,.v3-app *,.v3-app *::before,.v3-app *::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    transition-delay:0ms!important;
+  }
+  .v3-atmosphere i,.v3-atmosphere b,.v3-atmosphere span{animation:none!important;transform:none!important}
+  .v3-home-actions button:active,.v3-asset-row:active{transform:none!important}
+}
+
+/* Users asking the OS for stronger contrast should get clearer boundaries, not a new theme. */
+@media(prefers-contrast:more){
+  .v3-app{--v3-line:rgba(255,255,255,.28);--v3-muted:#c1c9c6}
+  .v3-app[data-shell="horizon"]{--v3-line:rgba(27,54,69,.28);--v3-muted:#45545d}
+  .v3-app[data-shell="carbon"]{--v3-line:rgba(166,176,255,.38);--v3-muted:#c0c5df}
+  .v3-nav,.v3-hero,.v3-history-card,.v3-primary-grid article,.v3-asset,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts article{border-width:2px}
+}
+
 @media(max-width:430px){
   .v3-app{--v3-font-caption:10px;--v3-font-label:11px;--v3-font-body:12px;--v3-font-section:13px}
   .v3-context-bar{min-height:28px}
