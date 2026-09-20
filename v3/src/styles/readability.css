@@ -18,6 +18,7 @@
 .v3-history-legend{font-size:var(--v3-font-caption)}
 .v3-history-depth span,.v3-history-depth small{font-size:var(--v3-font-caption);line-height:1.35}
 .v3-history-depth strong{font-size:var(--v3-font-body)}
+.v3-position-result-note{display:block;margin:5px 2px 0;color:var(--v3-muted);font-size:var(--v3-font-caption);line-height:1.35}
 
 /* Portfolio rows: identity and financial context stay compact but no longer microscopic. */
 .v3-asset-row .v3-asset-id span,.v3-asset-row .v3-asset-value span,.v3-asset-row .v3-asset-value small{font-size:var(--v3-font-caption);line-height:1.3}
