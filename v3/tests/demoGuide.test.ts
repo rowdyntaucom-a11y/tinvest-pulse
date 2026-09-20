@@ -1,0 +1,5 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const guide=readFileSync(new URL("../src/demo/V3DemoGuide.tsx",import.meta.url),"utf8"),main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/demo.css",import.meta.url),"utf8");
+assert.match(main,/import\{V3DemoGuide\}/);const demoBody=main.slice(main.indexOf("function DemoRoot"),main.indexOf("function LiveRoot"));assert.match(demoBody,/<V3DemoGuide\/>/);assert.doesNotMatch(main.slice(main.indexOf("function LiveRoot")),/<V3DemoGuide\/>/);
+for(const copy of["Сначала — ответ","Потом — объяснение","Факт отдельно от ожиданий","Сценарий, не обещание","Открыть свой портфель","read-only источника"])assert.ok(guide.includes(copy));assert.ok(guide.includes('href="/v3/"'));assert.doesNotMatch(guide,/fetch\(|loadV3Portfolio|localStorage|sessionStorage/);assert.match(css,/\.v3-demo-guide\{/);assert.match(css,/min-height:44px/);assert.match(css,/max-height:52dvh/);
+console.log("v3 guided demo conversion: ok");
