@@ -1,0 +1,14 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/readability.css",import.meta.url),"utf8"),main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/styles\/readability\.css/);
+assert.match(css,/--v3-font-caption:10px/);
+assert.match(css,/\.v3-nav button span\{font-size:10px/);
+assert.match(css,/\.v3-context-bar span,\.v3-context-bar b\{font-size:10px/);
+assert.match(css,/\.v3-kicker,\.v3-primary-grid span\{font-size:10px/);
+assert.match(css,/\.v3-home-actions span\{font-size:10px/);
+assert.match(css,/\.v3-page-head>span\{font-size:10px/);
+assert.match(css,/\.v3-page-head p\{font-size:11px/);
+assert.match(css,/\.v3-asset-row\{min-height:68px\}/);
+assert.match(css,/@media\(max-width:359px\)[^]*\.v3-asset-row \.v3-asset-id small\{display:block\}/);
+assert.doesNotMatch(css,/font-size:[789](?:\.\d+)?px/);
+console.log("v3 mobile readability contracts: ok");
