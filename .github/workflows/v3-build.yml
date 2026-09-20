@@ -29,12 +29,4 @@ jobs:
       - name: Dependency security gate
         run: npm audit --audit-level=high
       - run: npm run build
-      - name: Run v3 tests
-        run: npm test 2>&1 | tee test-output.log
-      - name: Preserve failing test log
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: v3-test-output
-          path: v3/test-output.log
-          retention-days: 1
+      - run: npm test
