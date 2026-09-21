@@ -472,14 +472,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           const mountainsBinding = bind('background.mountains')
           if (mountainsBinding.mode === 'reviewed-asset' && mountainsBinding.sprite) {
             const sprite = mountainsBinding.sprite as ReturnType<typeof Sprite.from>
-            sprite.position.set(0, 72); sprite.width = WORLD_WIDTH; sprite.height = 760
+            sprite.position.set(0, 20); sprite.width = WORLD_WIDTH; sprite.height = 800
             reviewedMountainsLayer.addChild(sprite); mountainsFar.visible = false; mountainsNear.visible = false; setReviewedMountainsMounted(true)
           } else { mountainsFar.visible = true; mountainsNear.visible = true; setReviewedMountainsMounted(false) }
 
           const forestBinding = bind('background.forest')
           if (forestBinding.mode === 'reviewed-asset' && forestBinding.sprite) {
             const sprite = forestBinding.sprite as ReturnType<typeof Sprite.from>
-            sprite.position.set(0, 58); sprite.width = WORLD_WIDTH; sprite.height = 790; sprite.alpha = 0.88
+            sprite.position.set(0, 24); sprite.width = WORLD_WIDTH; sprite.height = 810; sprite.alpha = 0.82
             reviewedForestLayer.addChild(sprite); forest.visible = false; setReviewedForestMounted(true)
           } else { forest.visible = true; setReviewedForestMounted(false) }
 
@@ -959,10 +959,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         const w = Math.max(1, host.clientWidth)
         const h = Math.max(1, host.clientHeight)
         const immersivePortrait = h > w * 1.15
-        const scale = immersivePortrait ? Math.max(w / WORLD_WIDTH, h / WORLD_HEIGHT) : Math.min(w / WORLD_WIDTH, h / WORLD_HEIGHT)
+        const baseScale = immersivePortrait ? Math.max(w / WORLD_WIDTH, h / WORLD_HEIGHT) : Math.min(w / WORLD_WIDTH, h / WORLD_HEIGHT)
+        // Real-device portrait framing prioritizes the inhabited settlement band over empty sky.
+        // A restrained 8% push-in keeps the foreground/caption clear while making authored structures readable.
+        const scale = immersivePortrait ? baseScale * 1.08 : baseScale
         world.scale.set(scale)
-        const focusX = immersivePortrait ? 800 : WORLD_WIDTH / 2
-        world.position.set(w / 2 - focusX * scale, (h - WORLD_HEIGHT * scale) / 2)
+        const focusX = immersivePortrait ? 820 : WORLD_WIDTH / 2
+        const focusY = immersivePortrait ? 515 : WORLD_HEIGHT / 2
+        world.position.set(w / 2 - focusX * scale, h / 2 - focusY * scale)
       }
       fit()
       const ro = new ResizeObserver(fit)
