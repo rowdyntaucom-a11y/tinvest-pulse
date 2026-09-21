@@ -835,6 +835,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-assets-loaded={assetRuntime.loaded}
       data-world-assets-failed={assetRuntime.failed}
       data-world-reviewed-settlement-mounted={reviewedSettlementMounted ? 'true' : 'false'}
+      data-world-reviewed-terrain-mounted={reviewedTerrainMounted ? 'true' : 'false'}
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
