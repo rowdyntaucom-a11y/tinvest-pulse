@@ -611,6 +611,9 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         ground.clear()
         ground.rect(0, 585, WORLD_WIDTH, 315).fill({ color: atmosphere.terrain })
         ground.rect(0, 615, WORLD_WIDTH, 285).fill({ color: 0x06100d, alpha: 0.42 })
+        settlementPath.clear()
+        settlementPath.poly([770,900,815,700,825,630,850,630,895,700,1015,900]).fill({color:0x243f35,alpha:.3})
+        settlementPath.poly([815,900,842,710,844,650,858,650,875,710,945,900]).fill({color:0x667866,alpha:.08})
 
         rails.clear()
         rails.rect(240, 710, 1180, 5).fill({ color: 0x4b625c, alpha: 0.52 })
