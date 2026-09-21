@@ -1,1 +1,1 @@
-import{defineConfig}from"vite";import react from"@vitejs/plugin-react";export default defineConfig({base:"./",plugins:[react()],server:{host:true,proxy:{"/api":"http://localhost:10000"}},build:{target:"es2022"}});
+import{defineConfig}from"vite";import react from"@vitejs/plugin-react";export default defineConfig({base:"./",plugins:[react()],resolve:{dedupe:["pixi.js"]},server:{host:true,proxy:{"/api":"http://localhost:10000"}},build:{target:"es2022"}});
