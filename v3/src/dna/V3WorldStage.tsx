@@ -340,6 +340,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       foreground.label = 'world:foreground-depth'
       layer('effects').addChild(foreground)
 
+      const foregroundVegetation = new Graphics()
+      foregroundVegetation.label = 'world:foreground-vegetation'
+      layer('effects').addChild(foregroundVegetation)
+
+      const pathDepth = new Graphics()
+      pathDepth.label = 'world:path-depth'
+      layer('effects').addChild(pathDepth)
+
       const settlementLight = new Graphics()
       settlementLight.label = 'world:settlement-light'
       layer('effects').addChild(settlementLight)
@@ -541,6 +549,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         haze.rect(0, 430, WORLD_WIDTH, 190).fill({ color: atmosphere.skyHorizon, alpha: atmosphere.hazeAlpha })
         haze.rect(0, 535, WORLD_WIDTH, 90).fill({ color: atmosphere.celestial, alpha: atmosphere.hazeAlpha * 0.16 })
 
+        pathDepth.clear()
+        pathDepth.poly([650,900,785,655,835,655,1010,900]).fill({color:0x13241f,alpha:.38})
+        pathDepth.poly([0,850,260,705,315,705,170,900,0,900]).fill({color:0x10201b,alpha:.24})
+
         clouds.clear()
         if (atmosphere.cloudAlpha > 0) {
           for (const [x, y, radius] of CLOUD_CLUSTERS) {
@@ -588,6 +600,11 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         starterSettlement.clear()
         starterResidence.clear()
         foreground.clear()
+        foregroundVegetation.clear()
+        const shrubs=[[28,770,58],[112,790,42],[218,760,50],[1280,782,54],[1390,752,46],[1515,785,62]] as const
+        for(const [x,y,size] of shrubs){foregroundVegetation.poly([x-size*.55,y,x,y-size,x+size*.55,y]).fill({color:0x07130f,alpha:.74}).poly([x-size*.72,y+16,x,y-size*.52,x+size*.72,y+16]).fill({color:0x0a1b15,alpha:.82})}
+        foregroundVegetation.rect(0,842,WORLD_WIDTH,58).fill({color:0x06110d,alpha:.56})
+        foregroundVegetation.circle(72,850,46).fill({color:0x091813,alpha:.72}).circle(1540,848,58).fill({color:0x091813,alpha:.76})
 
         // The residence remains a small procedural anchor while reviewed workshop/mine
         // assets own the central authored composition. It is deliberately separated so
