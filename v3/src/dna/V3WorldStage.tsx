@@ -1,4 +1,5 @@
 // @ts-nocheck
+// Spatial-depth pass validated against the 2026-09-21 Samsung capture.
 import { useEffect, useRef, useState } from 'react'
 import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../../../v2/src/features/dna/worldState'
