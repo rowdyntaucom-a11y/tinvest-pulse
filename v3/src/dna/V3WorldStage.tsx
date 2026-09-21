@@ -359,6 +359,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       pathDepth.label = 'world:path-depth'
       layer('effects').addChild(pathDepth)
 
+      const structureGrounding = new Graphics()
+      structureGrounding.label = 'world:structure-grounding'
+      layer('effects').addChild(structureGrounding)
+
       const settlementLight = new Graphics()
       settlementLight.label = 'world:settlement-light'
       layer('effects').addChild(settlementLight)
@@ -464,14 +468,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           const mountainsBinding = bind('background.mountains')
           if (mountainsBinding.mode === 'reviewed-asset' && mountainsBinding.sprite) {
             const sprite = mountainsBinding.sprite as ReturnType<typeof Sprite.from>
-            sprite.position.set(0, 0); sprite.width = WORLD_WIDTH; sprite.height = WORLD_HEIGHT
+            sprite.position.set(0, 72); sprite.width = WORLD_WIDTH; sprite.height = 760
             reviewedMountainsLayer.addChild(sprite); mountainsFar.visible = false; mountainsNear.visible = false; setReviewedMountainsMounted(true)
           } else { mountainsFar.visible = true; mountainsNear.visible = true; setReviewedMountainsMounted(false) }
 
           const forestBinding = bind('background.forest')
           if (forestBinding.mode === 'reviewed-asset' && forestBinding.sprite) {
             const sprite = forestBinding.sprite as ReturnType<typeof Sprite.from>
-            sprite.position.set(0, 0); sprite.width = WORLD_WIDTH; sprite.height = WORLD_HEIGHT
+            sprite.position.set(0, 58); sprite.width = WORLD_WIDTH; sprite.height = 790; sprite.alpha = 0.88
             reviewedForestLayer.addChild(sprite); forest.visible = false; setReviewedForestMounted(true)
           } else { forest.visible = true; setReviewedForestMounted(false) }
 
@@ -625,6 +629,11 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         starterSettlement.clear()
         starterResidence.clear()
         foreground.clear()
+        structureGrounding.clear()
+        structureGrounding.ellipse(557,625,82,15).fill({color:0x030a08,alpha:.34})
+        structureGrounding.ellipse(752,625,128,18).fill({color:0x030a08,alpha:.4})
+        structureGrounding.ellipse(1032,630,126,18).fill({color:0x030a08,alpha:.42})
+        structureGrounding.ellipse(870,696,52,11).fill({color:0x020706,alpha:.3})
         foregroundVegetation.clear()
         const shrubs=[[28,770,58],[112,790,42],[218,760,50],[1280,782,54],[1390,752,46],[1515,785,62]] as const
         for(const [x,y,size] of shrubs){foregroundVegetation.poly([x-size*.55,y,x,y-size,x+size*.55,y]).fill({color:0x07130f,alpha:.74}).poly([x-size*.72,y+16,x,y-size*.52,x+size*.72,y+16]).fill({color:0x0a1b15,alpha:.82})}
