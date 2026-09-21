@@ -1,0 +1,2 @@
+import{clampWorldResolution}from"./perfBudget";
+export async function createDnaWorldRoot(host:HTMLElement){const pixi=await import("pixi.js");const{Application}=pixi;const app=new Application();await app.init({resizeTo:host,antialias:true,autoDensity:true,resolution:clampWorldResolution(window.devicePixelRatio||1,window.innerWidth<900),background:"#071613",preference:"webgl",powerPreference:"high-performance"});return{app,pixi}}
