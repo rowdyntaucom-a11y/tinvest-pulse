@@ -24,6 +24,7 @@ export const WORLD_ASSET_SLOTS = [
   { id: 'structures.workshop', layer: 'structures', labelRu: 'МАСТЕРСКАЯ' },
   { id: 'structures.storage', layer: 'structures', labelRu: 'СКЛАД' },
   { id: 'structures.construction', layer: 'structures', labelRu: 'СТРОЙКА' },
+  { id: 'actors.hero-wanderer', layer: 'actors', labelRu: 'СТРАННИК' },
   { id: 'actors.workers', layer: 'actors', labelRu: 'РАБОЧИЕ' },
   { id: 'actors.residents', layer: 'actors', labelRu: 'ЖИТЕЛИ' },
   { id: 'logistics.rails', layer: 'logistics', labelRu: 'РЕЛЬСЫ' },
