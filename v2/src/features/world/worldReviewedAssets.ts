@@ -7,6 +7,16 @@ import { resolveWorldAssetManifest, type WorldAssetManifestEntry } from './world
  */
 export const REVIEWED_WORLD_ASSET_ENTRIES: readonly WorldAssetManifestEntry[] = [
   {
+    slotId: 'background.mountains',
+    assetPath: '/assets/world/mountains-v1.svg',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-21T09:15:00.000Z' },
+  },
+  {
+    slotId: 'background.forest',
+    assetPath: '/assets/world/forest-v1.svg',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-21T09:15:00.000Z' },
+  },
+  {
     slotId: 'background.distant-settlement',
     assetPath: '/assets/world/distant-settlement-v1.svg',
     provenance: {
