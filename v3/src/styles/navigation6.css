@@ -1,0 +1,1 @@
+.v3-nav{grid-template-columns:repeat(6,minmax(0,1fr))}.v3-nav button{padding-inline:2px}.v3-nav button i{display:block;font-style:normal}.v3-nav button span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:359px){.v3-nav{left:4px;right:4px;gap:2px;padding:3px}.v3-nav button{border-radius:12px}.v3-nav button span{font-size:9px}}

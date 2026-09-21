@@ -1,7 +1,7 @@
-export type V3NavigationWorkspace="home"|"assets"|"analysis"|"income"|"goal";
+export type V3NavigationWorkspace="home"|"assets"|"analysis"|"income"|"goal"|"dna";
 export type V3NavigationLayer="workspace"|"asset"|"pulse";
 export type V3NavigationState={workspace:V3NavigationWorkspace;layer:V3NavigationLayer;assetTicker?:string;scrollY?:number};
-const KEY="qvanixV3Navigation",WORKSPACES:readonly V3NavigationWorkspace[]=["home","assets","analysis","income","goal"];
+const KEY="qvanixV3Navigation",WORKSPACES:readonly V3NavigationWorkspace[]=["home","assets","analysis","income","goal","dna"];
 const isWorkspace=(value:unknown):value is V3NavigationWorkspace=>typeof value==="string"&&WORKSPACES.includes(value as V3NavigationWorkspace);
 const safeScroll=(value:unknown)=>typeof value==="number"&&Number.isFinite(value)&&value>=0?Math.round(value):undefined;
 export function readNavigationState(value:unknown,fallback:V3NavigationWorkspace):V3NavigationState{if(!value||typeof value!=="object")return{workspace:fallback,layer:"workspace"};const raw=(value as Record<string,unknown>)[KEY];if(!raw||typeof raw!=="object")return{workspace:fallback,layer:"workspace"};const state=raw as Record<string,unknown>,workspace=isWorkspace(state.workspace)?state.workspace:fallback,layer:V3NavigationLayer=state.layer==="asset"||state.layer==="pulse"?state.layer:"workspace",assetTicker=typeof state.assetTicker==="string"&&state.assetTicker.trim()?state.assetTicker.trim():undefined,scrollY=safeScroll(state.scrollY);if(layer==="asset"&&!assetTicker)return scrollY==null?{workspace,layer:"workspace"}:{workspace,layer:"workspace",scrollY};const base:V3NavigationState=assetTicker?{workspace,layer,assetTicker}:{workspace,layer};return scrollY==null?base:{...base,scrollY};}
