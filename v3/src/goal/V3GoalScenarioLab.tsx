@@ -37,7 +37,7 @@ const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"ex
 const yearsFmt=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 
 function numeric(value:string){
-  const raw=value.trim().replace(/s/g,"").replace(",",".");
+  const raw=value.trim().replace(/\s/g,"").replace(",",".");
   return raw?Number(raw):Number.NaN;
 }
 
@@ -114,15 +114,18 @@ export function V3GoalScenarioLab({currentCapital,targetCapitalToday,history}:{c
       <div className="v3-goal-scenario-form">
         <Field label="Горизонт" note="целое число от 1 до 50" value={draft.horizonYears} onChange={value=>update("horizonYears",value)} step="1" min="1" max="50" unit="лет"/>
         <Field label="Пополнение" note="в конце каждого месяца" value={draft.monthlyContribution} onChange={value=>update("monthlyContribution",value)} step="100" min="0" unit="₽/мес"/>
-        <Field label="Индексация взноса" note="ваша предпосылка изменения взноса" value={draft.contributionGrowthAnnualPct} onChange={value=>update("contributionGrowthAnnualPct",value)} unit="%/год"/>
         <Field label="Инфляция" note="увеличивает номинальную стоимость цели" value={draft.inflationAnnualPct} onChange={value=>update("inflationAnnualPct",value)} unit="%/год"/>
         <Field label="Изменение цены" note="ваша предпосылка, отдельно от выплат" value={draft.priceReturnAnnualPct} onChange={value=>update("priceReturnAnnualPct",value)} unit="%/год"/>
         <Field label="Доходность выплат" note="дивиденды/купоны как ваша предпосылка" value={draft.incomeYieldAnnualPct} onChange={value=>update("incomeYieldAnnualPct",value)} min="0" max="100" unit="%/год"/>
-        <Field label="Индекс-сценарий" note="необязательно; ожидание не подставляется QVANIX" value={draft.benchmarkReturnAnnualPct} onChange={value=>update("benchmarkReturnAnnualPct",value)} unit="%/год"/>
-        <label className="v3-goal-scenario-toggle"><input type="checkbox" checked={reinvest} onChange={e=>setReinvest(e.target.checked)}/><span><strong>Реинвестировать выплаты</strong><small>если выключено, сценарные выплаты считаются отдельно и не увеличивают капитал</small></span></label>
+        <label className="v3-goal-scenario-toggle"><input type="checkbox" checked={reinvest} onChange={e=>setReinvest(e.target.checked)}/><span><strong>Реинвестировать выплаты</strong><small>выплаты увеличивают капитал только когда вы включили реинвестирование</small></span></label>
+        <details className="v3-goal-scenario-advanced"><summary><span><strong>Дополнительные предпосылки</strong><small>Индексация взноса и индекс-сценарий</small></span><b>2 параметра</b></summary><div>
+          <Field label="Индексация взноса" note="ваша предпосылка изменения взноса" value={draft.contributionGrowthAnnualPct} onChange={value=>update("contributionGrowthAnnualPct",value)} unit="%/год"/>
+          <Field label="Индекс-сценарий" note="необязательно; ожидание не подставляется QVANIX" value={draft.benchmarkReturnAnnualPct} onChange={value=>update("benchmarkReturnAnnualPct",value)} unit="%/год"/>
+        </div></details>
       </div>
       {!ready?<div className="v3-goal-scenario-gate"><strong>Заполните ваши предпосылки</strong><span>Расчёт не запускается из пустых полей и не заменяет их «разумными значениями».</span></div>:projection&&!projection.available?<div className="v3-goal-scenario-gate is-danger"><strong>Сценарий не рассчитан</strong><span>{projection.reason}</span></div>:projection&&<>
-        <div className="v3-goal-scenario-results"><article><span>Капитал в конце</span><strong>{money(projection.finalCapital)}</strong><small>реально {money(projection.finalRealCapital)}</small></article><article><span>Цель с инфляцией</span><strong>{money(projection.finalTargetNominal)}</strong><small>номинальная цель к концу</small></article><article><span>Прогресс сценария</span><strong>{projection.finalProgress==null?"—":pct.format(projection.finalProgress*100)+"%"}</strong><small>капитал / цель с инфляцией</small></article><article><span>Достижение в сценарии</span><strong>{reached}</strong><small>не обещанная дата</small></article><article><span>Свои пополнения</span><strong>{money(projection.cumulativeContributions)}</strong><small>без стартового капитала</small></article>{!reinvest&&<article><span>Выплаты снаружи</span><strong>{money(projection.cumulativeIncomePaidOut)}</strong><small>не реинвестированы</small></article>}{projection.finalBenchmarkCapital!=null&&<article><span>Индекс-сценарий</span><strong>{money(projection.finalBenchmarkCapital)}</strong><small>те же пополнения</small></article>}</div>
+        <div className="v3-goal-scenario-outcome"><div><span>Капитал в конце</span><strong>{money(projection.finalCapital)}</strong><small>в сегодняшних рублях {money(projection.finalRealCapital)}</small></div><div><span>Прогресс к цели</span><strong>{projection.finalProgress==null?"—":pct.format(projection.finalProgress*100)+"%"}</strong><small>{reached}</small></div></div>
+        <details className="v3-goal-scenario-results"><summary><span><strong>Разбор результата</strong><small>Цель, пополнения{!reinvest?", выплаты":""}{projection.finalBenchmarkCapital!=null?", индекс":""}</small></span><b>Подробнее</b></summary><div className="v3-goal-scenario-result-grid"><article><span>Цель с инфляцией</span><strong>{money(projection.finalTargetNominal)}</strong><small>номинальная цель к концу</small></article><article><span>Достижение в сценарии</span><strong>{reached}</strong><small>не обещанная дата</small></article><article><span>Свои пополнения</span><strong>{money(projection.cumulativeContributions)}</strong><small>без стартового капитала</small></article>{!reinvest&&<article><span>Выплаты снаружи</span><strong>{money(projection.cumulativeIncomePaidOut)}</strong><small>не реинвестированы</small></article>}{projection.finalBenchmarkCapital!=null&&<article><span>Индекс-сценарий</span><strong>{money(projection.finalBenchmarkCapital)}</strong><small>те же пополнения</small></article>}</div></details>
         <ScenarioChart series={projection.series} hasBenchmark={projection.finalBenchmarkCapital!=null}/>
         <small className="v3-goal-scenario-method">{projection.note} Методика {projection.version}. Параметры — пользовательские предпосылки, а не оценка QVANIX.</small>
       </>}
