@@ -183,6 +183,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   const [reviewedTerrainMounted, setReviewedTerrainMounted] = useState(false)
   const [reviewedWorkshopMounted, setReviewedWorkshopMounted] = useState(false)
   const [reviewedMineMounted, setReviewedMineMounted] = useState(false)
+  const [reviewedHeroMounted, setReviewedHeroMounted] = useState(false)
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
@@ -329,6 +330,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       heroBody.moveTo(29,-1).lineTo(37,-9).stroke({ color: 0xcbd7ce, width: 2, alpha: .78 })
       hero.addChild(heroShadow,heroBody)
       hero.position.set(870, 676)
+
+      const reviewedHeroLayer = new Container()
+      reviewedHeroLayer.label = 'asset-slot:actors.hero-wanderer:reviewed'
+      hero.addChild(reviewedHeroLayer)
       layer('actors').addChild(hero)
 
       const foreground = new Graphics()
@@ -413,7 +418,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
       const reviewedSettlementReadiness = resolveWorldAssetReadiness(
         REVIEWED_WORLD_ASSET_MANIFEST,
-        ['background.distant-settlement', 'terrain.ground', 'structures.workshop', 'terrain.mine-entrance'],
+        ['background.distant-settlement', 'terrain.ground', 'structures.workshop', 'terrain.mine-entrance', 'actors.hero-wanderer'],
       )
 
       // Browser-native loading keeps the deferred Pixi chunk below its strict budget.
@@ -459,6 +464,13 @@ function WorldPixiStage({ snapshot }: PixiProps) {
             reviewedWorkshopLayer.addChild(sprite); setReviewedWorkshopMounted(true)
           } else setReviewedWorkshopMounted(false)
 
+          const heroBinding = bind('actors.hero-wanderer')
+          if (heroBinding.mode === 'reviewed-asset' && heroBinding.sprite) {
+            const sprite = heroBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.anchor.set(.5, 1); sprite.position.set(0, 8); sprite.width = 92; sprite.height = 133
+            reviewedHeroLayer.addChild(sprite); heroBody.visible = false; setReviewedHeroMounted(true)
+          } else { heroBody.visible = true; setReviewedHeroMounted(false) }
+
           const mineBinding = bind('terrain.mine-entrance')
           const workshopReady = workshopBinding.mode === 'reviewed-asset' && Boolean(workshopBinding.sprite)
           const mineReady = mineBinding.mode === 'reviewed-asset' && Boolean(mineBinding.sprite)
@@ -472,7 +484,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           starterSettlement.visible = !(workshopReady && mineReady)
         })
         .catch(() => {
-          if (!disposed) { starterSettlement.visible = true; setReviewedSettlementMounted(false); setReviewedTerrainMounted(false); setReviewedWorkshopMounted(false); setReviewedMineMounted(false) }
+          if (!disposed) { starterSettlement.visible = true; setReviewedSettlementMounted(false); setReviewedTerrainMounted(false); setReviewedWorkshopMounted(false); setReviewedMineMounted(false); heroBody.visible = true; setReviewedHeroMounted(false) }
         })
 
       let atmosphereSignature = ''
@@ -950,6 +962,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-reviewed-terrain-mounted={reviewedTerrainMounted ? 'true' : 'false'}
       data-world-reviewed-workshop-mounted={reviewedWorkshopMounted ? 'true' : 'false'}
       data-world-reviewed-mine-mounted={reviewedMineMounted ? 'true' : 'false'}
+      data-world-reviewed-hero-mounted={reviewedHeroMounted ? 'true' : 'false'}
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
