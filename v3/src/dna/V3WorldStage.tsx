@@ -323,9 +323,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       const heroShadow = new Graphics().ellipse(0, 4, 31, 9).fill({ color: 0x020706, alpha: 0.36 })
       const heroBody = new Graphics()
       heroBody.circle(0, -52, 10).fill({ color: 0xd4b68b, alpha: 1 })
+      heroBody.arc(0,-53,10,Math.PI,Math.PI*2).stroke({color:0x111a17,width:4,alpha:.9})
       heroBody.poly([-15,-43,13,-43,22,-5,8,7,-11,7,-23,-5]).fill({ color: 0x263630, alpha: 1 })
       heroBody.poly([-18,-42,0,-65,18,-42]).fill({ color: 0x18231f, alpha: 1 })
       heroBody.rect(-18,-24,36,5).fill({ color: 0x9b7049, alpha: .88 })
+      heroBody.poly([-15,-42,-5,-34,-12,-7,-23,-5]).fill({color:0x33463e,alpha:.96})
+      heroBody.poly([13,-42,5,-34,10,-7,22,-5]).fill({color:0x1d2c27,alpha:.96})
+      heroBody.circle(-4,-53,1.2).fill({color:0x0b100f,alpha:.9})
+      heroBody.circle(4,-53,1.2).fill({color:0x0b100f,alpha:.9})
       heroBody.moveTo(16,-38).lineTo(31,1).stroke({ color: 0x9b7049, width: 3, alpha: .9 })
       heroBody.moveTo(29,-1).lineTo(37,-9).stroke({ color: 0xcbd7ce, width: 2, alpha: .78 })
       hero.addChild(heroShadow,heroBody)
@@ -335,6 +340,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       const foreground = new Graphics()
       foreground.label = 'world:foreground-depth'
       layer('effects').addChild(foreground)
+
+      const settlementLight = new Graphics()
+      settlementLight.label = 'world:settlement-light'
+      layer('effects').addChild(settlementLight)
+
+      const emberField = new Graphics()
+      emberField.label = 'world:forge-embers'
+      layer('effects').addChild(emberField)
 
       const actorViews = new Map<string, InstanceType<typeof Container>>()
       for (const plan of WORLD_AMBIENT_ACTOR_SLOTS) {
@@ -585,6 +598,40 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           .moveTo(930,530).lineTo(961,618).stroke({color:0x5f4836,width:5,alpha:.86})
           .rect(926,526,11,92).fill({color:0x171f1c,alpha:.72})
         for(let x=582;x<1000;x+=48){starterSettlement.circle(x,625+(x%3)*3,5).fill({color:0x6c806f,alpha:.5})}
+        // Material pass: timber framing, stone bases, roof courses, mine bracing and
+        // a forge yard make the starter settlement read as authored infrastructure.
+        starterSettlement
+          .rect(595,604,82,14).fill({color:0x0c1512,alpha:.72})
+          .rect(602,556,5,48).fill({color:0x79583d,alpha:.82})
+          .rect(665,556,5,48).fill({color:0x79583d,alpha:.82})
+          .moveTo(598,568).lineTo(673,568).stroke({color:0x9b7049,width:3,alpha:.7})
+          .moveTo(598,589).lineTo(673,589).stroke({color:0x9b7049,width:3,alpha:.62})
+          .poly([590,548,636,516,682,548,676,553,636,525,596,553]).fill({color:0x9c724b,alpha:.66})
+          .rect(746,604,88,14).fill({color:0x0b1411,alpha:.76})
+          .rect(753,553,5,51).fill({color:0x6f523a,alpha:.82})
+          .rect(825,553,5,51).fill({color:0x6f523a,alpha:.82})
+          .moveTo(750,566).lineTo(830,566).stroke({color:0x8f6948,width:3,alpha:.68})
+          .moveTo(750,589).lineTo(830,589).stroke({color:0x8f6948,width:3,alpha:.58})
+          .circle(807,583,7).fill({color:0xe0a55f,alpha:.78})
+          .circle(807,583,15).fill({color:0xf0b86b,alpha:.09})
+          .moveTo(858,618).lineTo(888,562).lineTo(918,618).stroke({color:0xa57a50,width:8,alpha:.92})
+          .moveTo(868,592).lineTo(908,592).stroke({color:0x76563c,width:6,alpha:.9})
+          .moveTo(877,575).lineTo(899,575).stroke({color:0x76563c,width:5,alpha:.82})
+          .rect(915,606,48,12).fill({color:0x111a16,alpha:.86})
+          .circle(931,607,7).fill({color:0x2a3932,alpha:.9})
+          .circle(952,607,7).fill({color:0x2a3932,alpha:.9})
+        for(let x=575;x<980;x+=34){
+          starterSettlement.circle(x,619+(x%4)*2,7).fill({color:0x35443b,alpha:.72})
+          starterSettlement.circle(x+9,622+(x%3),5).fill({color:0x25342d,alpha:.74})
+        }
+        settlementLight.clear()
+          .circle(807,583,74).fill({color:atmosphere.lamp,alpha:.035})
+          .circle(807,583,42).fill({color:atmosphere.lamp,alpha:.045})
+          .circle(650,577,36).fill({color:atmosphere.lamp,alpha:.03})
+        emberField.clear()
+        for(let i=0;i<9;i+=1){
+          emberField.circle(797+(i%3)*8,596-Math.floor(i/3)*7,1.6).fill({color:0xf0b86b,alpha:.58})
+        }
         foreground
           .poly([0,790,120,744,245,778,382,726,520,782,680,740,835,794,1000,746,1170,786,1340,736,1600,782,1600,900,0,900]).fill({color:0x020b08,alpha:.78})
         for(let x=25;x<1600;x+=96){const h=28+(x%5)*5;foreground.poly([x,815,x+15,815-h,x+30,815]).fill({color:0x06120e,alpha:.94})}
@@ -748,6 +795,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         if (reduceMotion) {
           hero.position.y = 676
           hero.rotation = 0
+          settlementLight.alpha = .9
+          emberField.alpha = .72
           lamp.alpha = 0.88
           lampGlow.alpha = 0.75
           clouds.position.x = 0
@@ -780,6 +829,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         }
 
         hero.position.y = 676 + Math.sin(now / 780) * 2.2
+        settlementLight.alpha = .82 + Math.sin(now / 640) * .12
+        emberField.alpha = .62 + Math.sin(now / 180) * .22
         hero.rotation = Math.sin(now / 2100) * 0.008
         lamp.alpha = 0.76 + Math.sin(now / 550) * 0.14
         lampGlow.alpha = 0.65 + Math.sin(now / 720) * 0.18
