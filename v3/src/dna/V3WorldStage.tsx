@@ -305,8 +305,12 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       layer('structures').addChild(reviewedMineLayer)
 
       const starterSettlement = new Graphics()
-      starterSettlement.label = 'world:starter-settlement'
+      starterSettlement.label = 'world:starter-settlement:fallback'
       layer('structures').addChild(starterSettlement)
+
+      const starterResidence = new Graphics()
+      starterResidence.label = 'world:starter-residence'
+      layer('structures').addChild(starterResidence)
 
       const hero = new Container()
       hero.label = 'world:hero-wanderer'
@@ -324,7 +328,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       heroBody.moveTo(16,-38).lineTo(31,1).stroke({ color: 0x9b7049, width: 3, alpha: .9 })
       heroBody.moveTo(29,-1).lineTo(37,-9).stroke({ color: 0xcbd7ce, width: 2, alpha: .78 })
       hero.addChild(heroShadow,heroBody)
-      hero.position.set(800, 676)
+      hero.position.set(870, 676)
       layer('actors').addChild(hero)
 
       const foreground = new Graphics()
@@ -451,19 +455,24 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           const workshopBinding = bind('structures.workshop')
           if (workshopBinding.mode === 'reviewed-asset' && workshopBinding.sprite) {
             const sprite = workshopBinding.sprite as ReturnType<typeof Sprite.from>
-            sprite.position.set(705, 455); sprite.width = 190; sprite.height = 143
+            sprite.position.set(650, 455); sprite.width = 205; sprite.height = 154
             reviewedWorkshopLayer.addChild(sprite); setReviewedWorkshopMounted(true)
           } else setReviewedWorkshopMounted(false)
 
           const mineBinding = bind('terrain.mine-entrance')
+          const workshopReady = workshopBinding.mode === 'reviewed-asset' && Boolean(workshopBinding.sprite)
+          const mineReady = mineBinding.mode === 'reviewed-asset' && Boolean(mineBinding.sprite)
           if (mineBinding.mode === 'reviewed-asset' && mineBinding.sprite) {
             const sprite = mineBinding.sprite as ReturnType<typeof Sprite.from>
-            sprite.position.set(865, 458); sprite.width = 180; sprite.height = 150
+            sprite.position.set(930, 452); sprite.width = 205; sprite.height = 171
             reviewedMineLayer.addChild(sprite); setReviewedMineMounted(true)
           } else setReviewedMineMounted(false)
+          // Only retire the combined procedural workshop/mine fallback when both
+          // reviewed structures are present. Partial loading stays truthful and legible.
+          starterSettlement.visible = !(workshopReady && mineReady)
         })
         .catch(() => {
-          if (!disposed) { setReviewedSettlementMounted(false); setReviewedTerrainMounted(false); setReviewedWorkshopMounted(false); setReviewedMineMounted(false) }
+          if (!disposed) { starterSettlement.visible = true; setReviewedSettlementMounted(false); setReviewedTerrainMounted(false); setReviewedWorkshopMounted(false); setReviewedMineMounted(false) }
         })
 
       let atmosphereSignature = ''
@@ -565,7 +574,19 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         const atmosphere = buildWorldAtmospherePresentation(current)
         development.clear()
         starterSettlement.clear()
+        starterResidence.clear()
         foreground.clear()
+
+        // The residence remains a small procedural anchor while reviewed workshop/mine
+        // assets own the central authored composition. It is deliberately separated so
+        // reviewed structures can replace their fallbacks without double-rendering.
+        starterResidence
+          .poly([500,620,536,565,575,565,615,620]).fill({color:0x17231f,alpha:.98})
+          .rect(520,558,74,62).fill({color:atmosphere.structureBase,alpha:.98})
+          .poly([510,560,557,524,604,560]).fill({color:atmosphere.structureAccent,alpha:.98})
+          .rect(536,585,17,35).fill({color:0x111a17,alpha:.9})
+          .rect(570,579,14,14).fill({color:atmosphere.lamp,alpha:.58})
+          .rect(520,606,74,14).fill({color:0x0c1512,alpha:.72})
 
         // Starter settlement is world identity, not progression. It exists at level 1
         // so the first truthful state still reads as a place rather than an empty chart.
