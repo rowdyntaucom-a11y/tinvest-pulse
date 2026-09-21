@@ -28,6 +28,11 @@ export const REVIEWED_WORLD_ASSET_ENTRIES: readonly WorldAssetManifestEntry[] = 
     provenance: { source: 'reviewed-local', reviewedAt: '2026-09-21T08:45:00.000Z' },
   },
   {
+    slotId: 'actors.hero-wanderer',
+    assetPath: '/assets/world/wanderer-v1.svg',
+    provenance: { source: 'reviewed-local', reviewedAt: '2026-09-21T09:00:00.000Z' },
+  },
+  {
     slotId: 'terrain.mine-entrance',
     assetPath: '/assets/world/mine-entrance-v1.svg',
     provenance: { source: 'reviewed-local', reviewedAt: '2026-09-21T08:45:00.000Z' },
