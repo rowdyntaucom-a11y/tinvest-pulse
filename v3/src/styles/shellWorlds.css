@@ -81,3 +81,18 @@
 .v3-app[data-shell="samurai"] .v3-topbar{filter:drop-shadow(0 7px 16px rgba(0,0,0,.24))}
 @media(max-width:430px){.v3-app[data-shell="samurai"] .v3-theme-scene{background-position:58% 10%;background-size:auto 68vh}.v3-app[data-shell="samurai"] .v3-home{padding-top:min(24vh,190px)}}
 @media(min-width:700px){.v3-app[data-shell="samurai"] .v3-theme-scene{background-position:72% 8%;background-size:auto 88vh}.v3-app[data-shell="samurai"] .v3-home{padding-top:220px}}
+
+/* Real-device correction: Samurai art belongs inside the visible Home hero. */
+.v3-samurai-hero-art{display:none}
+.v3-app[data-shell="samurai"] .v3-home{padding-top:78px!important;background:transparent!important}
+.v3-app[data-shell="samurai"] .v3-home .v3-hero{position:relative;isolation:isolate;overflow:hidden;min-height:360px;padding:16px;background:linear-gradient(90deg,rgba(3,16,20,.92) 0 48%,rgba(3,16,20,.48) 68%,rgba(3,16,20,.2)),url("/assets/themes/samurai-landscape-v1.svg") 61% 35%/cover no-repeat!important;border-color:rgba(111,220,197,.2);box-shadow:0 22px 56px rgba(0,0,0,.34)}
+.v3-app[data-shell="samurai"] .v3-home .v3-hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,0) 42%,rgba(2,13,16,.42) 72%,rgba(2,13,16,.86))}
+.v3-app[data-shell="samurai"] .v3-samurai-hero-art{display:block;position:absolute;inset:0;z-index:-1;pointer-events:none}
+.v3-app[data-shell="samurai"] .v3-samurai-hero-art span{position:absolute;right:3%;top:9%;width:42%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,193,123,.24),rgba(231,116,57,.08) 40%,transparent 70%);filter:blur(4px)}
+.v3-app[data-shell="samurai"] .v3-samurai-hero-art i{position:absolute;right:6%;bottom:12%;width:38%;height:54%;background:linear-gradient(160deg,transparent 0 58%,rgba(1,7,8,.62) 59%);clip-path:polygon(44% 0,58% 13%,67% 38%,85% 70%,100% 100%,0 100%,19% 68%,31% 37%);opacity:.9}
+.v3-app[data-shell="samurai"] .v3-samurai-hero-art b{position:absolute;right:8%;bottom:7%;width:30%;height:16%;background:radial-gradient(ellipse,rgba(0,0,0,.58),transparent 70%)}
+.v3-app[data-shell="samurai"] .v3-hero-top,.v3-app[data-shell="samurai"] .v3-hero>div:not(.v3-samurai-hero-art),.v3-app[data-shell="samurai"] .v3-updated{position:relative;z-index:1;max-width:58%}
+.v3-app[data-shell="samurai"] .v3-hero h1{font-size:clamp(36px,11vw,48px);text-shadow:0 3px 20px rgba(0,0,0,.55)}
+.v3-app[data-shell="samurai"] .v3-hero p{color:#73e7c9;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.v3-app[data-shell="samurai"] .v3-kicker{color:#c2cfcc}
+@media(max-width:430px){.v3-app[data-shell="samurai"] .v3-home .v3-hero{min-height:330px;background-position:59% 35%!important}.v3-app[data-shell="samurai"] .v3-hero-top,.v3-app[data-shell="samurai"] .v3-hero>div:not(.v3-samurai-hero-art),.v3-app[data-shell="samurai"] .v3-updated{max-width:64%}}
