@@ -38,7 +38,9 @@ import {
 } from '../../../v2/src/features/world/worldReviewedSpriteBinding'
 import { buildWorldPresentationMetadata } from '../../../v2/src/features/world/worldPresentationMetadata'
 import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLayer } from '../../../v2/src/features/world/worldSceneLayers'
-import { worldRuntimeRegistry } from '../../../v2/src/features/world/worldRuntimeOwnership'
+import { dnaWorldRuntimeRegistry } from './runtime/runtimeOwnership'
+import { createDnaWorldLayers, requireDnaWorldLayer } from './runtime/sceneLayers'
+import { createDnaWorldRoot } from './runtime/worldRoot'
 
 type Props = {
   state: WorldState
