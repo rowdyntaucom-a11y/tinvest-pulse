@@ -41,3 +41,26 @@
 .v3-app[data-shell="samurai"] .v3-data-state{background:rgba(247,235,211,.88);color:#766552;border-color:rgba(70,42,25,.15)}
 @media(prefers-reduced-motion:no-preference){.v3-app[data-shell="carbon"] .v3-atmosphere:after{animation:v3-orbit-breathe 9s ease-in-out infinite}.v3-app[data-shell="core"] .v3-atmosphere:after{animation:v3-core-drift 14s ease-in-out infinite}}
 @keyframes v3-orbit-breathe{50%{transform:scale(1.025);filter:brightness(1.12)}}@keyframes v3-core-drift{50%{transform:translate3d(-1.5%,1%,0)}}
+
+/* AURORA — expressive northern-light glass world. */
+.v3-app[data-shell="aurora"]{--shell-accent:#72f0d0;--shell-surface:rgba(8,17,31,.78);background:#050914}
+.v3-app[data-shell="aurora"] .v3-atmosphere{background:radial-gradient(ellipse at 20% 8%,rgba(80,238,196,.28),transparent 38%),radial-gradient(ellipse at 78% 20%,rgba(151,85,255,.27),transparent 36%),linear-gradient(180deg,#07101f,#070815 62%,#03050b)}
+.v3-app[data-shell="aurora"] .v3-atmosphere:before{content:"";position:absolute;inset:-15% -10% 38%;background:linear-gradient(115deg,transparent 10%,rgba(79,246,199,.18) 27%,rgba(100,119,255,.14) 46%,rgba(211,80,255,.16) 64%,transparent 82%);filter:blur(24px);transform:skewY(-7deg)}
+.v3-app[data-shell="aurora"] .v3-atmosphere:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 14% 22%,#fff 0 1px,transparent 1.4px),radial-gradient(circle at 67% 12%,#fff 0 1px,transparent 1.3px),radial-gradient(circle at 88% 35%,#fff 0 1px,transparent 1.2px);background-size:190px 160px,260px 220px,310px 250px;opacity:.35}
+.v3-app[data-shell="aurora"] :is(.v3-hero,.v3-asset,.v3-assets-summary article,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-signal>div,.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail){background:linear-gradient(145deg,rgba(10,23,39,.8),rgba(9,11,28,.72));border-color:rgba(114,240,208,.18);box-shadow:inset 0 1px rgba(255,255,255,.06),0 18px 44px rgba(0,0,0,.22)}
+.v3-app[data-shell="aurora"] .v3-nav{background:rgba(5,12,25,.9);border-color:rgba(123,120,255,.22);box-shadow:0 0 34px rgba(83,230,203,.06)}
+
+/* MINIMAL — analytical, quiet and intentionally decoration-light. */
+.v3-app[data-shell="minimal"]{--shell-accent:#315f72;--shell-surface:#fff;background:#f4f5f3;color:#172025}
+.v3-app[data-shell="minimal"] .v3-atmosphere{background:linear-gradient(180deg,#f7f8f6,#f1f3f1)}
+.v3-app[data-shell="minimal"] .v3-atmosphere :is(i,b,span){display:none}
+.v3-app[data-shell="minimal"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-home){color:#172025}
+.v3-app[data-shell="minimal"] :is(.v3-hero,.v3-asset,.v3-assets-summary article,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-signal>div,.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail){background:#fff;border-color:#dfe3df;border-radius:8px;box-shadow:none}
+.v3-app[data-shell="minimal"] :is(.v3-page-head p,.v3-primary-grid span,.v3-context-row span,.v3-asset-id span,.v3-asset-id small,.v3-asset-value small){color:#667177}
+.v3-app[data-shell="minimal"] .v3-brand{color:#172025}.v3-app[data-shell="minimal"] .v3-brand b{background:#172025;color:#fff;border-color:#172025}
+.v3-app[data-shell="minimal"] .v3-controls button{background:#fff;color:#172025;border-color:#d9dedb}
+.v3-app[data-shell="minimal"] .v3-nav{background:rgba(255,255,255,.96);border-color:#d9dedb;border-radius:8px;box-shadow:0 8px 24px rgba(20,32,37,.06)}
+.v3-app[data-shell="minimal"] .v3-nav button{color:#687278}.v3-app[data-shell="minimal"] .v3-nav button.is-active{background:#edf1ef;color:#172025}
+.v3-app[data-shell="minimal"] .v3-data-state{background:#fff;color:#5f6a70;border-color:#d9dedb}
+@media(prefers-reduced-motion:no-preference){.v3-app[data-shell="aurora"] .v3-atmosphere:before{animation:v3-aurora-drift 12s ease-in-out infinite alternate}}
+@keyframes v3-aurora-drift{to{transform:translate3d(3%,2%,0) skewY(-10deg);filter:blur(30px) brightness(1.12)}}
