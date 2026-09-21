@@ -185,6 +185,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   const [reviewedWorkshopMounted, setReviewedWorkshopMounted] = useState(false)
   const [reviewedMineMounted, setReviewedMineMounted] = useState(false)
   const [reviewedHeroMounted, setReviewedHeroMounted] = useState(false)
+  const [reviewedMountainsMounted, setReviewedMountainsMounted] = useState(false)
+  const [reviewedForestMounted, setReviewedForestMounted] = useState(false)
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
@@ -258,6 +260,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       mountainsFar.label = 'asset-slot:background.mountains'
       layer('background').addChild(mountainsFar)
 
+      const reviewedMountainsLayer = new Container()
+      reviewedMountainsLayer.label = 'asset-slot:background.mountains:reviewed'
+      layer('background').addChild(reviewedMountainsLayer)
+
       const mountainsNear = new Graphics()
       mountainsNear.label = 'world:mountains-near'
       layer('background').addChild(mountainsNear)
@@ -265,6 +271,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       const reviewedSettlementLayer = new Container()
       reviewedSettlementLayer.label = 'asset-slot:background.distant-settlement'
       layer('background').addChild(reviewedSettlementLayer)
+
+      const reviewedForestLayer = new Container()
+      reviewedForestLayer.label = 'asset-slot:background.forest:reviewed'
+      layer('background').addChild(reviewedForestLayer)
 
       const forest = new Graphics()
       forest.label = 'asset-slot:background.forest'
@@ -427,7 +437,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
       const reviewedSettlementReadiness = resolveWorldAssetReadiness(
         REVIEWED_WORLD_ASSET_MANIFEST,
-        ['background.distant-settlement', 'terrain.ground', 'structures.workshop', 'terrain.mine-entrance', 'actors.hero-wanderer'],
+        ['background.mountains', 'background.forest', 'background.distant-settlement', 'terrain.ground', 'structures.workshop', 'terrain.mine-entrance', 'actors.hero-wanderer'],
       )
 
       // Browser-native loading keeps the deferred Pixi chunk below its strict budget.
@@ -450,6 +460,20 @@ function WorldPixiStage({ snapshot }: PixiProps) {
               result,
               slotId,
             )
+
+          const mountainsBinding = bind('background.mountains')
+          if (mountainsBinding.mode === 'reviewed-asset' && mountainsBinding.sprite) {
+            const sprite = mountainsBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(0, 0); sprite.width = WORLD_WIDTH; sprite.height = WORLD_HEIGHT
+            reviewedMountainsLayer.addChild(sprite); mountainsFar.visible = false; mountainsNear.visible = false; setReviewedMountainsMounted(true)
+          } else { mountainsFar.visible = true; mountainsNear.visible = true; setReviewedMountainsMounted(false) }
+
+          const forestBinding = bind('background.forest')
+          if (forestBinding.mode === 'reviewed-asset' && forestBinding.sprite) {
+            const sprite = forestBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(0, 0); sprite.width = WORLD_WIDTH; sprite.height = WORLD_HEIGHT
+            reviewedForestLayer.addChild(sprite); forest.visible = false; setReviewedForestMounted(true)
+          } else { forest.visible = true; setReviewedForestMounted(false) }
 
           const settlementBinding = bind('background.distant-settlement')
           if (settlementBinding.mode === 'reviewed-asset' && settlementBinding.sprite) {
@@ -493,7 +517,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           starterSettlement.visible = !(workshopReady && mineReady)
         })
         .catch(() => {
-          if (!disposed) { starterSettlement.visible = true; setReviewedSettlementMounted(false); setReviewedTerrainMounted(false); setReviewedWorkshopMounted(false); setReviewedMineMounted(false); heroBody.visible = true; setReviewedHeroMounted(false) }
+          if (!disposed) { starterSettlement.visible = true; mountainsFar.visible = true; mountainsNear.visible = true; forest.visible = true; setReviewedMountainsMounted(false); setReviewedForestMounted(false); setReviewedSettlementMounted(false); setReviewedTerrainMounted(false); setReviewedWorkshopMounted(false); setReviewedMineMounted(false); heroBody.visible = true; setReviewedHeroMounted(false) }
         })
 
       let atmosphereSignature = ''
@@ -981,6 +1005,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-reviewed-workshop-mounted={reviewedWorkshopMounted ? 'true' : 'false'}
       data-world-reviewed-mine-mounted={reviewedMineMounted ? 'true' : 'false'}
       data-world-reviewed-hero-mounted={reviewedHeroMounted ? 'true' : 'false'}
+      data-world-reviewed-mountains-mounted={reviewedMountainsMounted ? 'true' : 'false'}
+      data-world-reviewed-forest-mounted={reviewedForestMounted ? 'true' : 'false'}
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
