@@ -1,0 +1,13 @@
+import assert from"node:assert/strict";
+import{readFileSync}from"node:fs";
+const src=readFileSync(new URL("../src/goal/V3Goal.tsx",import.meta.url),"utf8");
+assert.match(src,/V3SectionSelector/);
+assert.match(src,/type GoalSection="overview"\|"milestones"\|"scenario"/);
+assert.match(src,/label="Раздел цели"/);
+assert.match(src,/section==="overview"/);
+assert.match(src,/section==="milestones"/);
+assert.match(src,/section==="scenario"/);
+assert.match(src,/section==="scenario"&&\(!trusted\|\|value==null/);
+assert.match(src,/V3GoalScenarioLab=lazy/);
+assert.doesNotMatch(src,/mode==="detailed"&&target&&trusted&&value!=null&&<Suspense/);
+console.log("v3 Goal progressive disclosure contracts: ok");
