@@ -27,18 +27,18 @@
 .v3-app[data-shell="carbon"] :is(.v3-hero,.v3-asset,.v3-assets-summary article,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-signal>div,.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail){background:linear-gradient(145deg,rgba(7,12,31,.88),rgba(3,6,18,.78));border-color:rgba(92,155,255,.22);box-shadow:inset 0 0 28px rgba(58,78,210,.07),0 0 20px rgba(31,93,255,.04)}
 .v3-app[data-shell="carbon"] .v3-nav{background:rgba(2,5,17,.93);border-color:rgba(92,155,255,.28);box-shadow:0 0 30px rgba(34,84,255,.1)}
 
-.v3-app[data-shell="samurai"]{--shell-accent:#d94a37;--shell-surface:rgba(247,235,211,.9);background:#ead9b8;color:#20170f}
-.v3-app[data-shell="samurai"] .v3-atmosphere{background:radial-gradient(circle at 77% 13%,#b52b23 0 5.5%,transparent 5.8%),linear-gradient(180deg,#f3e6ca,#e9d4ad 68%,#d7bb8c)}
-.v3-app[data-shell="samurai"] .v3-atmosphere:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(83,49,27,.035) 0 1px,transparent 1px 5px),radial-gradient(ellipse at 15% 76%,rgba(39,27,17,.18),transparent 23%);mix-blend-mode:multiply}
-.v3-app[data-shell="samurai"] .v3-atmosphere:after{content:"";position:absolute;right:-5%;bottom:9%;width:58%;height:35%;background:#211810;opacity:.14;clip-path:polygon(0 72%,12% 55%,21% 64%,35% 36%,46% 61%,58% 47%,70% 69%,82% 42%,100% 65%,100% 100%,0 100%)}
-.v3-app[data-shell="samurai"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-home){color:#20170f}
-.v3-app[data-shell="samurai"] :is(.v3-hero,.v3-asset,.v3-assets-summary article,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-signal>div,.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail){background:linear-gradient(145deg,rgba(250,240,218,.92),rgba(230,210,174,.82));border-color:rgba(74,45,27,.2);border-radius:5px 18px 5px 18px;box-shadow:0 12px 30px rgba(67,39,20,.09),inset 0 1px rgba(255,255,255,.5)}
-.v3-app[data-shell="samurai"] :is(.v3-page-head p,.v3-primary-grid span,.v3-context-row span,.v3-asset-id span,.v3-asset-id small,.v3-asset-value small){color:#766552}
-.v3-app[data-shell="samurai"] .v3-brand{color:#27180f}.v3-app[data-shell="samurai"] .v3-brand b{background:#9f251e;color:#fff;border-color:#7e1b16}
-.v3-app[data-shell="samurai"] .v3-controls button{background:rgba(247,235,211,.9);color:#27180f;border-color:rgba(72,42,24,.2)}
-.v3-app[data-shell="samurai"] .v3-nav{background:rgba(242,226,197,.95);border-color:rgba(70,42,25,.22);border-radius:5px 20px 5px 20px}
-.v3-app[data-shell="samurai"] .v3-nav button{color:#766552}.v3-app[data-shell="samurai"] .v3-nav button.is-active{background:rgba(159,37,30,.1);color:#9f251e}
-.v3-app[data-shell="samurai"] .v3-data-state{background:rgba(247,235,211,.88);color:#766552;border-color:rgba(70,42,25,.15)}
+.v3-app[data-shell="samurai"]{--shell-accent:#58e4c0;--shell-surface:rgba(5,20,24,.82);background:#071214;color:#f6f3eb}
+.v3-app[data-shell="samurai"] .v3-atmosphere{background:linear-gradient(180deg,rgba(4,12,18,.08),rgba(3,15,17,.5)),url("/assets/themes/samurai-landscape-v1.svg") center/cover no-repeat fixed}
+.v3-app[data-shell="samurai"] .v3-atmosphere:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,10,14,.38),transparent 36%,transparent 72%,rgba(2,8,11,.22)),linear-gradient(180deg,rgba(5,13,20,.08),rgba(2,14,15,.38));box-shadow:inset 0 -180px 180px rgba(2,11,12,.5)}
+.v3-app[data-shell="samurai"] .v3-atmosphere:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 18%,rgba(255,169,94,.16),transparent 22%),linear-gradient(115deg,transparent 0 54%,rgba(87,228,192,.035) 54.5% 55%,transparent 55.5%);mix-blend-mode:screen}
+.v3-app[data-shell="samurai"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-home){color:#f6f3eb}
+.v3-app[data-shell="samurai"] :is(.v3-hero,.v3-asset,.v3-assets-summary article,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-signal>div,.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail){background:linear-gradient(145deg,rgba(5,23,27,.9),rgba(4,13,18,.78));border-color:rgba(104,205,185,.18);border-radius:18px 7px 18px 7px;box-shadow:0 18px 46px rgba(0,0,0,.28),inset 0 1px rgba(255,213,160,.06);backdrop-filter:blur(14px)}
+.v3-app[data-shell="samurai"] :is(.v3-page-head p,.v3-primary-grid span,.v3-context-row span,.v3-asset-id span,.v3-asset-id small,.v3-asset-value small){color:#aab9b7}
+.v3-app[data-shell="samurai"] .v3-brand{color:#f7f2e8}.v3-app[data-shell="samurai"] .v3-brand b{background:rgba(6,22,26,.82);color:#f2b66f;border-color:rgba(242,182,111,.34)}
+.v3-app[data-shell="samurai"] .v3-controls button{background:rgba(4,15,20,.78);color:#f5f0e7;border-color:rgba(239,180,110,.2)}
+.v3-app[data-shell="samurai"] .v3-nav{background:rgba(3,14,18,.9);border-color:rgba(103,205,184,.16);border-radius:18px 7px 18px 7px;box-shadow:0 12px 36px rgba(0,0,0,.26)}
+.v3-app[data-shell="samurai"] .v3-nav button{color:#9caeac}.v3-app[data-shell="samurai"] .v3-nav button.is-active{background:rgba(75,221,190,.1);color:#66e7c7}
+.v3-app[data-shell="samurai"] .v3-data-state{background:rgba(4,17,21,.86);color:#a9b7b5;border-color:rgba(239,180,110,.16)}
 @media(prefers-reduced-motion:no-preference){.v3-app[data-shell="carbon"] .v3-atmosphere:after{animation:v3-orbit-breathe 9s ease-in-out infinite}.v3-app[data-shell="core"] .v3-atmosphere:after{animation:v3-core-drift 14s ease-in-out infinite}}
 @keyframes v3-orbit-breathe{50%{transform:scale(1.025);filter:brightness(1.12)}}@keyframes v3-core-drift{50%{transform:translate3d(-1.5%,1%,0)}}
 
