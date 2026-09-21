@@ -195,7 +195,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     const host = hostRef.current
     if (!host) return
 
-    const lease = worldRuntimeRegistry.acquire(ownerIdRef.current ?? 'world-stage')
+    const lease = dnaWorldRuntimeRegistry.acquire(ownerIdRef.current ?? 'world-stage')
     if (!lease.acquired) {
       setRenderer('blocked')
       return
@@ -211,21 +211,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     }
 
     const boot = async () => {
-      const { Application, Container, Graphics, Sprite } = await import('pixi.js')
-      if (disposed) return
-
-      const resolution = clamp(window.devicePixelRatio || 1, 1, window.innerWidth < 900 ? 1.35 : 1.75)
+      const {app:next,pixi}=await createDnaWorldRoot(host)
+      const {Container,Graphics,Sprite}=pixi
+      if (disposed){next.destroy(true);return}
       const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-      const next = new Application()
-      await next.init({
-        resizeTo: host,
-        antialias: true,
-        autoDensity: true,
-        resolution,
-        background: '#071613',
-        preference: 'webgl',
-        powerPreference: 'high-performance',
-      })
 
       if (disposed) {
         next.destroy(true)
@@ -240,19 +229,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       world.label = 'world:root'
       next.stage.addChild(world)
 
-      const layerContainers = new Map<WorldSceneLayer, InstanceType<typeof Container>>()
-      for (const layerName of WORLD_SCENE_LAYER_ORDER) {
-        const layer = new Container()
-        layer.label = `world:${layerName}`
-        layerContainers.set(layerName, layer)
-        world.addChild(layer)
-      }
-
-      const layer = (name: WorldSceneLayer) => {
-        const resolved = layerContainers.get(name)
-        if (!resolved) throw new Error(`Missing Living World scene layer: ${name}`)
-        return resolved
-      }
+      const layerContainers = createDnaWorldLayers(Container,world)
+      const layer = (name: Parameters<typeof requireDnaWorldLayer>[1]) => requireDnaWorldLayer(layerContainers,name)
 
       const sky = new Graphics()
       sky.label = 'asset-slot:background.sky'
