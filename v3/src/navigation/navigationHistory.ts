@@ -1,4 +1,4 @@
-import{V3_NAV,type V3Workspace}from"../app/model";
+import{V3_NAV,type V3Workspace}from"../app/model.ts";
 
 export type V3NavigationLayer="workspace"|"asset"|"pulse";
 export type V3NavigationState={workspace:V3Workspace;layer:V3NavigationLayer;assetTicker?:string};
