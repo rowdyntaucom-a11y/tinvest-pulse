@@ -44,3 +44,28 @@
 @media(max-width:359px){
 .v3-goal-scenario-form,.v3-goal-scenario-banner,.v3-goal-scenario-results{grid-template-columns:1fr}.v3-goal-scenario-banner>small,.v3-goal-scenario-toggle{grid-column:auto}.v3-goal-bootstrap-band{grid-template-columns:1fr}.v3-goal-bootstrap-meta{grid-template-columns:1fr 1fr}.v3-goal-bootstrap-meta>div:last-child{grid-column:1/-1}.v3-goal-scenario-head{display:grid}.v3-goal-scenario-head>b{justify-self:start}
 }
+
+/* Real-device Goal depth pass: keep the first viewport decision-oriented; details remain one tap away. */
+.v3-goal-scenario-advanced{grid-column:1/-1;border:1px solid var(--v3-line);border-radius:13px;background:rgba(255,255,255,.012)}
+.v3-goal-scenario-advanced>summary,.v3-goal-scenario-results>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:8px 10px;cursor:pointer;list-style:none}
+.v3-goal-scenario-advanced>summary::-webkit-details-marker,.v3-goal-scenario-results>summary::-webkit-details-marker{display:none}
+.v3-goal-scenario-advanced>summary span,.v3-goal-scenario-results>summary span{min-width:0}.v3-goal-scenario-advanced>summary strong,.v3-goal-scenario-advanced>summary small,.v3-goal-scenario-results>summary strong,.v3-goal-scenario-results>summary small{display:block}
+.v3-goal-scenario-advanced>summary strong,.v3-goal-scenario-results>summary strong{font-size:9px}.v3-goal-scenario-advanced>summary small,.v3-goal-scenario-results>summary small{margin-top:3px;color:var(--v3-muted);font-size:8px;line-height:1.3}
+.v3-goal-scenario-advanced>summary b,.v3-goal-scenario-results>summary b{flex:none;color:var(--v3-muted);font-size:8px}
+.v3-goal-scenario-advanced>summary:after,.v3-goal-scenario-results>summary:after{content:"⌄";color:var(--v3-muted);font-size:12px}.v3-goal-scenario-advanced[open]>summary:after,.v3-goal-scenario-results[open]>summary:after{transform:rotate(180deg)}
+.v3-goal-scenario-advanced>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0 8px 8px}
+.v3-goal-scenario-outcome{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);gap:6px;margin-top:8px}
+.v3-goal-scenario-outcome>div{min-width:0;padding:12px;border:1px solid var(--v3-line);border-radius:14px;background:rgba(255,255,255,.025)}
+.v3-goal-scenario-outcome span,.v3-goal-scenario-outcome small{display:block;color:var(--v3-muted);font-size:8px;line-height:1.35}.v3-goal-scenario-outcome strong{display:block;margin:5px 0 3px;font-size:17px;line-height:1.08;font-variant-numeric:tabular-nums}
+.v3-goal-scenario-results{display:block;border:1px solid var(--v3-line);border-radius:13px;background:rgba(255,255,255,.012)}
+.v3-goal-scenario-result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0 8px 8px}.v3-goal-scenario-result-grid article{min-width:0;padding:10px;border:1px solid var(--v3-line);border-radius:12px;background:rgba(255,255,255,.02)}
+.v3-goal-scenario-result-grid span,.v3-goal-scenario-result-grid small{display:block;color:var(--v3-muted);font-size:8px;line-height:1.3}.v3-goal-scenario-result-grid strong{display:block;margin:5px 0 2px;font-size:13px;line-height:1.1;font-variant-numeric:tabular-nums}
+.v3-goal-scenario-advanced>summary:focus-visible,.v3-goal-scenario-results>summary:focus-visible{outline:2px solid var(--v3-accent);outline-offset:2px}
+.v3-app[data-shell="horizon"] :is(.v3-goal-scenario-advanced,.v3-goal-scenario-outcome>div,.v3-goal-scenario-results){background:rgba(255,255,255,.9)}
+@media(max-width:430px){
+ .v3-goal-scenario-head{display:none}.v3-goal-scenario-banner{margin-top:7px}.v3-goal-scenario-banner>small{display:none}
+ .v3-goal-scenario-form{margin-top:6px}.v3-goal-scenario-field>small{display:none}.v3-goal-scenario-field{padding:7px}.v3-goal-scenario-toggle{padding:8px 9px}
+ .v3-goal-scenario-toggle small{display:none}.v3-goal-scenario-outcome>div{padding:10px}.v3-goal-scenario-chart{padding:9px}
+ .v3-goal-scenario-method{font-size:9px}.v3-goal-scenario-advanced>div{grid-template-columns:1fr 1fr}
+}
+@media(max-width:359px){.v3-goal-scenario-outcome,.v3-goal-scenario-result-grid,.v3-goal-scenario-advanced>div{grid-template-columns:1fr}}
