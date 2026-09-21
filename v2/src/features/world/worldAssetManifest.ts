@@ -11,6 +11,7 @@ export const WORLD_ASSET_MANIFEST_SLOT_IDS = [
   'structures.workshop',
   'structures.storage',
   'structures.construction',
+  'actors.hero-wanderer',
   'actors.workers',
   'actors.residents',
   'logistics.rails',
