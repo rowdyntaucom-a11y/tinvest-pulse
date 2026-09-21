@@ -178,6 +178,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     failed: 0,
   })
   const [reviewedSettlementMounted, setReviewedSettlementMounted] = useState(false)
+  const [reviewedTerrainMounted, setReviewedTerrainMounted] = useState(false)
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
@@ -301,6 +302,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       stormFlash.label = 'world:weather-storm-flash'
       layer('atmosphere').addChild(stormFlash)
 
+      const reviewedTerrainLayer = new Container()
+      reviewedTerrainLayer.label = 'asset-slot:terrain.ground:reviewed'
+      layer('terrain').addChild(reviewedTerrainLayer)
+
       const ground = new Graphics()
       ground.label = 'asset-slot:terrain.ground'
       layer('terrain').addChild(ground)
@@ -379,7 +384,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
       const reviewedSettlementReadiness = resolveWorldAssetReadiness(
         REVIEWED_WORLD_ASSET_MANIFEST,
-        ['background.distant-settlement'],
+        ['background.distant-settlement', 'terrain.ground'],
       )
 
       // Browser-native loading keeps the deferred Pixi chunk below its strict budget.
@@ -413,9 +418,29 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           sprite.alpha = 0.92
           reviewedSettlementLayer.addChild(sprite)
           setReviewedSettlementMounted(true)
+
+          const terrainBinding = bindReviewedAssetSprite(
+            { createSprite: source => Sprite.from(source as Parameters<typeof Sprite.from>[0]) },
+            REVIEWED_WORLD_ASSET_MANIFEST,
+            reviewedSettlementReadiness,
+            result,
+            'terrain.ground',
+          )
+          if (terrainBinding.mode === 'reviewed-asset' && terrainBinding.sprite) {
+            const terrainSprite = terrainBinding.sprite as ReturnType<typeof Sprite.from>
+            terrainSprite.position.set(0, 0)
+            terrainSprite.width = WORLD_WIDTH
+            terrainSprite.height = WORLD_HEIGHT
+            terrainSprite.alpha = 0.98
+            reviewedTerrainLayer.addChild(terrainSprite)
+            ground.visible = false
+            setReviewedTerrainMounted(true)
+          } else {
+            setReviewedTerrainMounted(false)
+          }
         })
         .catch(() => {
-          if (!disposed) setReviewedSettlementMounted(false)
+          if (!disposed) { setReviewedSettlementMounted(false); setReviewedTerrainMounted(false) }
         })
 
       let atmosphereSignature = ''
@@ -810,6 +835,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-assets-loaded={assetRuntime.loaded}
       data-world-assets-failed={assetRuntime.failed}
       data-world-reviewed-settlement-mounted={reviewedSettlementMounted ? 'true' : 'false'}
+      data-world-reviewed-terrain-mounted={reviewedTerrainMounted ? 'true' : 'false'}
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
