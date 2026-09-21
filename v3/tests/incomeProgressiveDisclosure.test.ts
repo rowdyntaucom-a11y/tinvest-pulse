@@ -1,0 +1,3 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const income=readFileSync(new URL("../src/income/V3Income.tsx",import.meta.url),"utf8");
+assert.match(income,/const INCOME_VIEWS=/);assert.match(income,/{value:"overview",label:"Обзор"/);assert.match(income,/{value:"depth",label:"Календарь и факт"/);assert.match(income,/useState<IncomeView>\("overview"\)/);assert.match(income,/V3SectionSelector label="Раздел дохода" value={view}/);assert.match(income,/mode==="detailed"&&model\.trusted&&view==="depth"&&<Suspense/);assert.match(income,/const overview=mode==="simple"\|\|view==="overview"/);assert.doesNotMatch(income,/view==="depth"[^]*model\.trusted==false/);console.log("v3 income progressive disclosure contracts: ok");
