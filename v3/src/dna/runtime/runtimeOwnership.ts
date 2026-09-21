@@ -1,0 +1,4 @@
+export type DnaWorldRuntimeLease={acquired:boolean;ownerId:string;blockedBy:string|null;release:()=>void};
+export function createDnaWorldRuntimeRegistry(){let active:{ownerId:string;token:symbol}|null=null;return{acquire(ownerId:string):DnaWorldRuntimeLease{const normalized=String(ownerId||"").trim()||"world-stage";if(active)return{acquired:false,ownerId:normalized,blockedBy:active.ownerId,release:()=>{}};const token=Symbol(normalized);active={ownerId:normalized,token};let released=false;return{acquired:true,ownerId:normalized,blockedBy:null,release:()=>{if(released)return;released=true;if(active?.token===token)active=null}}},activeOwner(){return active?.ownerId??null}}}
+/** Process-local single-owner gate. A second DNA renderer fails closed instead of creating another ticker/canvas. */
+export const dnaWorldRuntimeRegistry=createDnaWorldRuntimeRegistry();
