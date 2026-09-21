@@ -329,7 +329,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       heroBody.moveTo(16,-38).lineTo(31,1).stroke({ color: 0x9b7049, width: 3, alpha: .9 })
       heroBody.moveTo(29,-1).lineTo(37,-9).stroke({ color: 0xcbd7ce, width: 2, alpha: .78 })
       hero.addChild(heroShadow,heroBody)
-      hero.position.set(530, 676)
+      hero.position.set(800, 676)
       layer('actors').addChild(hero)
 
       const foreground = new Graphics()
@@ -569,22 +569,22 @@ function WorldPixiStage({ snapshot }: PixiProps) {
         // Starter settlement is world identity, not progression. It exists at level 1
         // so the first truthful state still reads as a place rather than an empty chart.
         starterSettlement
-          .poly([20,620,70,552,126,548,172,612]).fill({color:0x17231f,alpha:.98})
-          .rect(55,548,82,70).fill({color:atmosphere.structureBase,alpha:.98})
-          .poly([45,550,96,510,147,550]).fill({color:atmosphere.structureAccent,alpha:.98})
-          .rect(76,578,18,40).fill({color:0x111a17,alpha:.9})
-          .rect(110,570,15,15).fill({color:atmosphere.lamp,alpha:.58})
-          .rect(206,548,88,70).fill({color:0x17211e,alpha:.98})
-          .poly([195,550,250,512,306,550]).fill({color:0x594332,alpha:.96})
-          .rect(230,574,42,8).fill({color:0x8a6747,alpha:.9})
-          .moveTo(251,548).lineTo(251,506).stroke({color:0x71563d,width:5,alpha:.9})
-          .circle(251,500,10).stroke({color:atmosphere.lamp,width:3,alpha:.72})
-          .poly([318,618,348,562,378,618]).fill({color:0x101815,alpha:.96})
-          .rect(344,574,8,44).fill({color:0x74573d,alpha:.92})
-          .moveTo(348,562).lineTo(390,530).stroke({color:0x8a6747,width:6,alpha:.9})
-          .moveTo(390,530).lineTo(421,618).stroke({color:0x5f4836,width:5,alpha:.86})
-          .rect(386,526,11,92).fill({color:0x171f1c,alpha:.72})
-        for(let x=42;x<460;x+=48){starterSettlement.circle(x,625+(x%3)*3,5).fill({color:0x6c806f,alpha:.5})}
+          .poly([560,620,610,552,666,548,712,612]).fill({color:0x17231f,alpha:.98})
+          .rect(595,548,82,70).fill({color:atmosphere.structureBase,alpha:.98})
+          .poly([585,550,636,510,687,550]).fill({color:atmosphere.structureAccent,alpha:.98})
+          .rect(616,578,18,40).fill({color:0x111a17,alpha:.9})
+          .rect(650,570,15,15).fill({color:atmosphere.lamp,alpha:.58})
+          .rect(746,548,88,70).fill({color:0x17211e,alpha:.98})
+          .poly([735,550,790,512,846,550]).fill({color:0x594332,alpha:.96})
+          .rect(770,574,42,8).fill({color:0x8a6747,alpha:.9})
+          .moveTo(791,548).lineTo(791,506).stroke({color:0x71563d,width:5,alpha:.9})
+          .circle(791,500,10).stroke({color:atmosphere.lamp,width:3,alpha:.72})
+          .poly([858,618,888,562,918,618]).fill({color:0x101815,alpha:.96})
+          .rect(884,574,8,44).fill({color:0x74573d,alpha:.92})
+          .moveTo(888,562).lineTo(930,530).stroke({color:0x8a6747,width:6,alpha:.9})
+          .moveTo(930,530).lineTo(961,618).stroke({color:0x5f4836,width:5,alpha:.86})
+          .rect(926,526,11,92).fill({color:0x171f1c,alpha:.72})
+        for(let x=582;x<1000;x+=48){starterSettlement.circle(x,625+(x%3)*3,5).fill({color:0x6c806f,alpha:.5})}
         foreground
           .poly([0,790,120,744,245,778,382,726,520,782,680,740,835,794,1000,746,1170,786,1340,736,1600,782,1600,900,0,900]).fill({color:0x020b08,alpha:.78})
         for(let x=25;x<1600;x+=96){const h=28+(x%5)*5;foreground.poly([x,815,x+15,815-h,x+30,815]).fill({color:0x06120e,alpha:.94})}
@@ -597,8 +597,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           development.rect(x + width * 0.18, y + height * 0.35, 18, 18).fill({ color: atmosphere.lamp, alpha: 0.42 })
         }
 
-        if (current.level >= 2) building(360, 515, 150, 70, 32)
-        if (current.level >= 3) building(360, 515, 150, 70, 32)
+        if (current.level >= 2) building(1010, 515, 150, 70, 32)
         if (current.level >= 3) building(540, 485, 180, 100, 38)
         if (current.level >= 4) building(750, 450, 210, 135, 44)
         if (current.level >= 5) building(1010, 410, 230, 175, 50)
@@ -747,6 +746,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
         const now = performance.now()
         if (reduceMotion) {
+          hero.position.y = 676
+          hero.rotation = 0
           lamp.alpha = 0.88
           lampGlow.alpha = 0.75
           clouds.position.x = 0
@@ -778,6 +779,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
           return
         }
 
+        hero.position.y = 676 + Math.sin(now / 780) * 2.2
+        hero.rotation = Math.sin(now / 2100) * 0.008
         lamp.alpha = 0.76 + Math.sin(now / 550) * 0.14
         lampGlow.alpha = 0.65 + Math.sin(now / 720) * 0.18
         clouds.position.x = Math.sin(now / 9000) * 9
@@ -825,9 +828,11 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       const fit = () => {
         const w = Math.max(1, host.clientWidth)
         const h = Math.max(1, host.clientHeight)
-        const scale = Math.min(w / WORLD_WIDTH, h / WORLD_HEIGHT)
+        const immersivePortrait = h > w * 1.15
+        const scale = immersivePortrait ? Math.max(w / WORLD_WIDTH, h / WORLD_HEIGHT) : Math.min(w / WORLD_WIDTH, h / WORLD_HEIGHT)
         world.scale.set(scale)
-        world.position.set((w - WORLD_WIDTH * scale) / 2, (h - WORLD_HEIGHT * scale) / 2)
+        const focusX = immersivePortrait ? 800 : WORLD_WIDTH / 2
+        world.position.set(w / 2 - focusX * scale, (h - WORLD_HEIGHT * scale) / 2)
       }
       fit()
       const ro = new ResizeObserver(fit)
