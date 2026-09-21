@@ -21,7 +21,7 @@ export const REVIEWED_WORLD_ASSET_ENTRIES: readonly WorldAssetManifestEntry[] = 
       source: 'reviewed-local',
       reviewedAt: '2026-09-15T18:20:00.000Z',
     },
-  },,
+  },
   {
     slotId: 'structures.workshop',
     assetPath: '/assets/world/workshop-v1.svg',
