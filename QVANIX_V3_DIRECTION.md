@@ -6,12 +6,12 @@ v3 is a clean mobile-first presentation architecture over verified v2 financial/
 
 ## Direction
 - 360–412 px first.
-- Five stable destinations: Главная · Активы · Анализ · Доход · Цель.
+- Six stable destinations: Главная · Активы · Анализ · Доход · Цель · DNA.
 - High useful information density with strong hierarchy.
 - Просто / Подробно: simple remains information-rich; detailed reveals professional analytics.
 - Real data only; unavailable/untrusted values stay unavailable.
 - Preserve verified formulas, broker/API and Data Trust semantics through adapters.
-- Living World/Pixi is frozen in v2 and is not part of v3. Do not transplant #397.
+- DNA is a first-class v3 destination. Reuse the canonical single-owner Living World/Pixi runtime; do not revive obsolete duplicate renderers or capital-threshold progression.
 
 ## Shells
 Themes are complete shells, not palette swaps, while preserving information architecture.
