@@ -181,6 +181,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   })
   const [reviewedSettlementMounted, setReviewedSettlementMounted] = useState(false)
   const [reviewedTerrainMounted, setReviewedTerrainMounted] = useState(false)
+  const [reviewedWorkshopMounted, setReviewedWorkshopMounted] = useState(false)
+  const [reviewedMineMounted, setReviewedMineMounted] = useState(false)
   const snapshotRef = useRef(snapshot)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
@@ -294,6 +296,14 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       development.label = 'asset-slot:structures.construction'
       layer('structures').addChild(development)
 
+      const reviewedWorkshopLayer = new Container()
+      reviewedWorkshopLayer.label = 'asset-slot:structures.workshop:reviewed'
+      layer('structures').addChild(reviewedWorkshopLayer)
+
+      const reviewedMineLayer = new Container()
+      reviewedMineLayer.label = 'asset-slot:terrain.mine-entrance:reviewed'
+      layer('structures').addChild(reviewedMineLayer)
+
       const starterSettlement = new Graphics()
       starterSettlement.label = 'world:starter-settlement'
       layer('structures').addChild(starterSettlement)
@@ -399,7 +409,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
       const reviewedSettlementReadiness = resolveWorldAssetReadiness(
         REVIEWED_WORLD_ASSET_MANIFEST,
-        ['background.distant-settlement', 'terrain.ground'],
+        ['background.distant-settlement', 'terrain.ground', 'structures.workshop', 'terrain.mine-entrance'],
       )
 
       // Browser-native loading keeps the deferred Pixi chunk below its strict budget.
@@ -414,48 +424,46 @@ function WorldPixiStage({ snapshot }: PixiProps) {
             failed: result.failures.length,
           })
 
-          const binding = bindReviewedAssetSprite(
-            { createSprite: source => Sprite.from(source as Parameters<typeof Sprite.from>[0]) },
-            REVIEWED_WORLD_ASSET_MANIFEST,
-            reviewedSettlementReadiness,
-            result,
-            'background.distant-settlement',
-          )
-          if (binding.mode !== 'reviewed-asset' || !binding.sprite) {
-            setReviewedSettlementMounted(false)
-            return
-          }
+          const bind = (slotId: Parameters<typeof bindReviewedAssetSprite>[4]) =>
+            bindReviewedAssetSprite(
+              { createSprite: source => Sprite.from(source as Parameters<typeof Sprite.from>[0]) },
+              REVIEWED_WORLD_ASSET_MANIFEST,
+              reviewedSettlementReadiness,
+              result,
+              slotId,
+            )
 
-          const sprite = binding.sprite as ReturnType<typeof Sprite.from>
-          sprite.position.set(0, 0)
-          sprite.width = WORLD_WIDTH
-          sprite.height = WORLD_HEIGHT
-          sprite.alpha = 0.92
-          reviewedSettlementLayer.addChild(sprite)
-          setReviewedSettlementMounted(true)
+          const settlementBinding = bind('background.distant-settlement')
+          if (settlementBinding.mode === 'reviewed-asset' && settlementBinding.sprite) {
+            const sprite = settlementBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(0, 0); sprite.width = WORLD_WIDTH; sprite.height = WORLD_HEIGHT; sprite.alpha = 0.92
+            reviewedSettlementLayer.addChild(sprite)
+            setReviewedSettlementMounted(true)
+          } else setReviewedSettlementMounted(false)
 
-          const terrainBinding = bindReviewedAssetSprite(
-            { createSprite: source => Sprite.from(source as Parameters<typeof Sprite.from>[0]) },
-            REVIEWED_WORLD_ASSET_MANIFEST,
-            reviewedSettlementReadiness,
-            result,
-            'terrain.ground',
-          )
+          const terrainBinding = bind('terrain.ground')
           if (terrainBinding.mode === 'reviewed-asset' && terrainBinding.sprite) {
-            const terrainSprite = terrainBinding.sprite as ReturnType<typeof Sprite.from>
-            terrainSprite.position.set(0, 0)
-            terrainSprite.width = WORLD_WIDTH
-            terrainSprite.height = WORLD_HEIGHT
-            terrainSprite.alpha = 0.98
-            reviewedTerrainLayer.addChild(terrainSprite)
-            ground.visible = false
-            setReviewedTerrainMounted(true)
-          } else {
-            setReviewedTerrainMounted(false)
-          }
+            const sprite = terrainBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(0, 0); sprite.width = WORLD_WIDTH; sprite.height = WORLD_HEIGHT; sprite.alpha = 0.98
+            reviewedTerrainLayer.addChild(sprite); ground.visible = false; setReviewedTerrainMounted(true)
+          } else setReviewedTerrainMounted(false)
+
+          const workshopBinding = bind('structures.workshop')
+          if (workshopBinding.mode === 'reviewed-asset' && workshopBinding.sprite) {
+            const sprite = workshopBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(705, 455); sprite.width = 190; sprite.height = 143
+            reviewedWorkshopLayer.addChild(sprite); setReviewedWorkshopMounted(true)
+          } else setReviewedWorkshopMounted(false)
+
+          const mineBinding = bind('terrain.mine-entrance')
+          if (mineBinding.mode === 'reviewed-asset' && mineBinding.sprite) {
+            const sprite = mineBinding.sprite as ReturnType<typeof Sprite.from>
+            sprite.position.set(865, 458); sprite.width = 180; sprite.height = 150
+            reviewedMineLayer.addChild(sprite); setReviewedMineMounted(true)
+          } else setReviewedMineMounted(false)
         })
         .catch(() => {
-          if (!disposed) { setReviewedSettlementMounted(false); setReviewedTerrainMounted(false) }
+          if (!disposed) { setReviewedSettlementMounted(false); setReviewedTerrainMounted(false); setReviewedWorkshopMounted(false); setReviewedMineMounted(false) }
         })
 
       let atmosphereSignature = ''
@@ -919,6 +927,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       data-world-assets-failed={assetRuntime.failed}
       data-world-reviewed-settlement-mounted={reviewedSettlementMounted ? 'true' : 'false'}
       data-world-reviewed-terrain-mounted={reviewedTerrainMounted ? 'true' : 'false'}
+      data-world-reviewed-workshop-mounted={reviewedWorkshopMounted ? 'true' : 'false'}
+      data-world-reviewed-mine-mounted={reviewedMineMounted ? 'true' : 'false'}
       data-world-activity-version={ambientPresentation.version}
       data-world-actors={ambientPresentation.actors.length}
       data-world-carts={ambientPresentation.cartCount}
