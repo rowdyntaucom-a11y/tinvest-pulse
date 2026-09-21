@@ -363,6 +363,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       structureGrounding.label = 'world:structure-grounding'
       layer('effects').addChild(structureGrounding)
 
+      const settlementPath = new Graphics()
+      settlementPath.label = 'world:settlement-path'
+      layer('terrain').addChild(settlementPath)
+
       const settlementLight = new Graphics()
       settlementLight.label = 'world:settlement-light'
       layer('effects').addChild(settlementLight)
