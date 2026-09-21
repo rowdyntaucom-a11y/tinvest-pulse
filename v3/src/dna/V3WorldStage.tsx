@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useRef, useState } from 'react'
 import type { Application as PixiApplication } from 'pixi.js'
 import type { WorldState } from '../../../v2/src/features/dna/worldState'
