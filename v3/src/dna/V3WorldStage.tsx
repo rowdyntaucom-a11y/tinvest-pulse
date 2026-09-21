@@ -211,21 +211,10 @@ function WorldPixiStage({ snapshot }: PixiProps) {
     }
 
     const boot = async () => {
-      const { Application, Container, Graphics, Sprite } = await import('pixi.js')
-      if (disposed) return
-
-      const resolution = clampWorldResolution(window.devicePixelRatio || 1, window.innerWidth < 900)
+      const {app:next,pixi}=await createDnaWorldRoot(host)
+      const {Container,Graphics,Sprite}=pixi
+      if (disposed){next.destroy(true);return}
       const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-      const next = new Application()
-      await next.init({
-        resizeTo: host,
-        antialias: true,
-        autoDensity: true,
-        resolution,
-        background: '#071613',
-        preference: 'webgl',
-        powerPreference: 'high-performance',
-      })
 
       if (disposed) {
         next.destroy(true)
