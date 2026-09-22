@@ -22,5 +22,11 @@ assert.match(worlds, /@media\(max-width:699px\)[\s\S]*Workspace material coheren
 const v14 = worlds.slice(worlds.indexOf("Workspace material coherence v14"));
 assert.ok(v14.includes("backdrop-filter:none!important"));
 assert.ok(v14.includes("-webkit-backdrop-filter:none!important"));
+assert.ok(v14.includes("Deep controls on the three bright worlds"));
+assert.ok(v14.includes(".v3-goal-facts article"));
+assert.ok(v14.includes(".v3-income-ratios article"));
+assert.ok(v14.includes(".v3-holdings-search input"));
+assert.ok(v14.includes(".v3-goal-scenario-field input"));
+assert.ok(v14.includes(".v3-section-selector select option"));
 
 console.log("workspace theme materials regression: ok");
