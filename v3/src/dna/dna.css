@@ -6,3 +6,44 @@
 .v3-dna-back span{font-size:16px;line-height:1}.v3-dna-back:active{transform:scale(.97)}
 .v3-app[data-shell="horizon"] .v3-dna-back,.v3-app[data-shell="samurai"] .v3-dna-back{background:rgba(250,247,239,.9);color:#20170f;border-color:rgba(50,54,58,.16)}
 @media(max-width:430px){.v3-dna-back{top:calc(max(6px,env(safe-area-inset-top)) + 48px);left:10px;min-height:36px}}
+
+/* Six-world DNA integration v21. The Pixi world remains canonical; the selected shell authors the lens, frame and HUD around it. */
+.v3-app[data-workspace="dna"]{--dna-frame:rgba(130,145,255,.24);--dna-lens:rgba(93,108,255,.08);--dna-hud:rgba(5,8,18,.78);--dna-mark:#8aa2ff;--dna-radius:24px}
+.v3-app[data-workspace="dna"] .v3-dna{background:transparent!important}
+.v3-app[data-workspace="dna"] .v3-dna-world{border-color:var(--dna-frame);border-radius:var(--dna-radius);box-shadow:0 26px 72px rgba(0,0,0,.34),inset 0 0 0 1px color-mix(in srgb,var(--dna-mark) 8%,transparent)}
+.v3-app[data-workspace="dna"] .v3-dna-world:before{content:"";position:absolute;z-index:3;inset:0;pointer-events:none;background:radial-gradient(circle at 72% 18%,var(--dna-lens),transparent 34%)}
+.v3-app[data-workspace="dna"] .v3-dna-title span{color:var(--dna-mark)}
+.v3-app[data-workspace="dna"] .v3-dna-context,.v3-app[data-workspace="dna"] .v3-dna-hud article{background:var(--dna-hud);border-color:color-mix(in srgb,var(--dna-mark) 18%,rgba(255,255,255,.1))}
+.v3-app[data-workspace="dna"] .v3-dna-story,.v3-app[data-workspace="dna"] .v3-dna-depth article,.v3-app[data-workspace="dna"] .v3-dna-note{background:var(--v3-deep-card,var(--v3-card));border-color:var(--v3-line)}
+
+.v3-app[data-shell="samurai"][data-workspace="dna"]{--dna-frame:rgba(240,176,109,.32);--dna-lens:rgba(103,214,167,.08);--dna-hud:rgba(8,17,18,.82);--dna-mark:#f0b06d;--dna-radius:24px 8px 24px 8px}
+.v3-app[data-shell="samurai"][data-workspace="dna"] .v3-dna-world:after{background:linear-gradient(180deg,rgba(5,12,12,.34),transparent 26%,transparent 62%,rgba(5,12,12,.64)),linear-gradient(108deg,transparent 0 68%,rgba(240,176,109,.045) 68% 69%,transparent 69%)}
+.v3-app[data-shell="samurai"][data-workspace="dna"] .v3-dna-hud article{border-radius:15px 5px 15px 5px}
+.v3-app[data-shell="samurai"][data-workspace="dna"] .v3-dna-story{border-radius:18px 6px 18px 6px}
+
+.v3-app[data-shell="carbon"][data-workspace="dna"]{--dna-frame:rgba(121,191,255,.3);--dna-lens:rgba(114,132,255,.13);--dna-hud:rgba(4,8,25,.84);--dna-mark:#79bfff;--dna-radius:10px 26px 10px 26px}
+.v3-app[data-shell="carbon"][data-workspace="dna"] .v3-dna-world:after{background:radial-gradient(circle at 76% 13%,rgba(121,191,255,.08),transparent 18%),linear-gradient(180deg,rgba(2,5,20,.42),transparent 29%,transparent 65%,rgba(2,5,20,.7))}
+.v3-app[data-shell="carbon"][data-workspace="dna"] .v3-dna-hud article{border-radius:7px 15px 7px 15px}
+
+.v3-app[data-shell="core"][data-workspace="dna"]{--dna-frame:rgba(201,124,255,.34);--dna-lens:rgba(143,109,255,.14);--dna-hud:rgba(12,9,29,.82);--dna-mark:#c97cff;--dna-radius:28px 14px 28px 14px}
+.v3-app[data-shell="core"][data-workspace="dna"] .v3-dna-world:after{background:radial-gradient(circle at 18% 18%,rgba(201,124,255,.07),transparent 25%),linear-gradient(180deg,rgba(8,5,22,.38),transparent 28%,transparent 65%,rgba(8,5,22,.68))}
+.v3-app[data-shell="core"][data-workspace="dna"] .v3-dna-hud article{border-radius:17px 9px 17px 9px}
+
+.v3-app[data-shell="horizon"][data-workspace="dna"]{--dna-frame:rgba(79,128,108,.3);--dna-lens:rgba(79,128,108,.08);--dna-hud:rgba(239,245,239,.88);--dna-mark:#4f806c;--dna-radius:16px}
+.v3-app[data-shell="horizon"][data-workspace="dna"] .v3-dna-title{text-shadow:0 2px 18px rgba(0,0,0,.66)}
+.v3-app[data-shell="horizon"][data-workspace="dna"] .v3-dna-hud article{background:rgba(7,18,16,.72)}
+
+.v3-app[data-shell="aurora"][data-workspace="dna"]{--dna-frame:rgba(119,184,213,.34);--dna-lens:rgba(119,184,213,.11);--dna-hud:rgba(8,24,34,.78);--dna-mark:#77b8d5;--dna-radius:26px}
+.v3-app[data-shell="aurora"][data-workspace="dna"] .v3-dna-world:after{background:linear-gradient(180deg,rgba(10,35,48,.3),transparent 28%,transparent 66%,rgba(5,22,31,.64)),linear-gradient(118deg,transparent 0 58%,rgba(119,184,213,.05) 70%,transparent 82%)}
+.v3-app[data-shell="aurora"][data-workspace="dna"] .v3-dna-hud article{border-radius:18px}
+
+.v3-app[data-shell="minimal"][data-workspace="dna"]{--dna-frame:rgba(154,106,42,.34);--dna-lens:rgba(154,106,42,.06);--dna-hud:rgba(28,22,15,.8);--dna-mark:#b9843e;--dna-radius:9px}
+.v3-app[data-shell="minimal"][data-workspace="dna"] .v3-dna-world{box-shadow:0 22px 54px rgba(56,40,18,.2),inset 4px 0 0 rgba(154,106,42,.48)}
+.v3-app[data-shell="minimal"][data-workspace="dna"] .v3-dna-hud article,.v3-app[data-shell="minimal"][data-workspace="dna"] .v3-dna-story{border-radius:7px}
+
+/* Mobile DNA performance: the canvas already provides atmospheric depth; live CSS blur adds GPU cost without improving the authored scene. */
+@media(max-width:699px){
+  .v3-app[data-workspace="dna"] :is(.v3-dna-context,.v3-dna-hud article,.v3-dna-back,.v3-dna-world .world-stage__diagnostic){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .v3-app[data-workspace="dna"] .v3-dna-context,.v3-app[data-workspace="dna"] .v3-dna-hud article{background:var(--dna-hud)}
+  .v3-app[data-workspace="dna"] .v3-dna-world{box-shadow:0 18px 44px rgba(0,0,0,.28)}
+}
