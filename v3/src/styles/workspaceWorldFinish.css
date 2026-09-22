@@ -342,3 +342,84 @@
   .v3-asset-tools .v3-asset-sort{max-width:none;width:100%}
   .v3-world-menu{width:calc(100vw - 16px)}
 }
+
+
+/* Shell signature heroes v19 — make the six worlds recognisable from the answer card alone.
+   Same information, different authored geometry. No motion, no new assets. */
+.v3-app:not([data-workspace="home"]){
+  --v3-answer-radius:18px;
+  --v3-answer-mark:linear-gradient(90deg,var(--v3-accent),transparent);
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]){
+  --v3-answer-radius:20px 7px 20px 7px;
+  --v3-answer-mark:linear-gradient(90deg,#f0b06d 0 28%,#67d6a7 64%,transparent 100%);
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]){
+  --v3-answer-radius:9px 23px 9px 23px;
+  --v3-answer-mark:linear-gradient(90deg,#79bfff 0 32%,#7284ff 66%,transparent 100%);
+}
+.v3-app[data-shell="core"]:not([data-workspace="home"]){
+  --v3-answer-radius:24px 12px 24px 12px;
+  --v3-answer-mark:linear-gradient(90deg,#c97cff 0 30%,#8f6dff 64%,transparent 100%);
+}
+.v3-app[data-shell="horizon"]:not([data-workspace="home"]){
+  --v3-answer-radius:14px;
+  --v3-answer-mark:linear-gradient(90deg,#4f806c 0 34%,rgba(79,128,108,.28) 72%,transparent 100%);
+}
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]){
+  --v3-answer-radius:22px;
+  --v3-answer-mark:linear-gradient(90deg,#3b7fa5 0 25%,#77b8d5 58%,transparent 100%);
+}
+.v3-app[data-shell="minimal"]:not([data-workspace="home"]){
+  --v3-answer-radius:8px;
+  --v3-answer-mark:linear-gradient(90deg,#9a6a2a 0 22%,rgba(154,106,42,.22) 62%,transparent 100%);
+}
+
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-assets-hero,
+  .v3-analysis-signal>div:first-child,
+  .v3-income-hero,
+  .v3-goal-hero
+){
+  border-radius:var(--v3-answer-radius)!important;
+}
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-assets-hero,
+  .v3-analysis-signal>div:first-child,
+  .v3-income-hero,
+  .v3-goal-hero
+)::before{
+  content:"";
+  position:absolute;
+  z-index:2;
+  left:0;
+  top:0;
+  width:min(46%,180px);
+  height:2px;
+  background:var(--v3-answer-mark);
+  pointer-events:none;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero)::before{
+  left:12px;top:0;width:min(42%,156px);height:3px;transform:skewX(-28deg);transform-origin:left top;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero)::before{
+  left:auto;right:13px;top:10px;width:56px;height:1px;box-shadow:-14px 7px 0 color-mix(in srgb,var(--v3-accent) 42%,transparent),-28px 14px 0 color-mix(in srgb,var(--v3-accent) 18%,transparent);
+}
+.v3-app[data-shell="core"]:not([data-workspace="home"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero)::before{
+  left:14px;top:0;width:72px;height:3px;border-radius:0 0 8px 8px;
+}
+.v3-app[data-shell="horizon"]:not([data-workspace="home"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero)::before{
+  left:14px;top:auto;bottom:0;width:86px;height:2px;
+}
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero)::before{
+  left:18px;top:0;width:96px;height:2px;border-radius:99px;
+}
+.v3-app[data-shell="minimal"]:not([data-workspace="home"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero)::before{
+  left:0;top:0;width:4px;height:100%;background:#9a6a2a;
+}
+
+@media(max-width:699px){
+  .v3-app:not([data-workspace="home"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero)::before{
+    filter:none!important;
+  }
+}
