@@ -4,6 +4,6 @@ assert.equal(new Set(WORLD_EXPLORATION_LANDMARKS.map(x=>x.id)).size,WORLD_EXPLOR
 for(const item of WORLD_EXPLORATION_LANDMARKS){assert.ok(item.x>=0&&item.x<=100);assert.ok(item.y>=0&&item.y<=100);assert.ok(item.description.length>40)}
 assert.equal(resolveWorldLandmark('wanderer')?.label,'Странник');assert.equal(resolveWorldLandmark('unknown'),null);
 const stage=readFileSync(new URL('../src/dna/V3WorldSessionStage.tsx',import.meta.url),'utf8');
-assert.match(stage,/data-world-exploration="v1"/);assert.match(stage,/aria-label="Исследовать точки живого мира"/);assert.match(stage,/aria-pressed=\{landmark===item\.id\}/);assert.match(stage,/role="status"/);assert.match(stage,/aria-live="polite"/);assert.match(stage,/setLandmark\(null\)/);
-assert.doesNotMatch(stage,/xp|expectedYield|portfolioValue|buy|sell/i);
+assert.match(stage,/data-world-exploration="v1"/);assert.match(stage,/aria-label="Исследовать точки живого мира"/);assert.match(stage,/aria-pressed=\{landmark===item\.id\}/);assert.match(stage,/aria-expanded=\{landmark===item\.id\}/);assert.match(stage,/aria-controls="v3-world-landmark-detail"/);assert.match(stage,/id="v3-world-landmark-detail"/);assert.match(stage,/role="status"/);assert.match(stage,/aria-live="polite"/);assert.match(stage,/setLandmark\(null\)/);assert.match(stage,/width:44,height:44/);
+assert.doesNotMatch(stage,/\bxp\b|expectedYield|portfolioValue|\bbuy\b|\bsell\b/i);
 console.log('v3 DNA world exploration: ok');
