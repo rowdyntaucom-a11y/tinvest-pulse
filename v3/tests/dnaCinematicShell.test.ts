@@ -16,8 +16,12 @@ for(const phase of["dawn","day","sunset","night"]) assert.match(css,new RegExp('
 assert.match(css,/height:calc\(100dvh - 112px\)/);
 assert.match(css,/min-height:44px!important/);
 const v21=css.slice(css.indexOf("DNA cinematic shell frame v21"));
-assert.match(v21,/backdrop-filter:none!important/);
-assert.match(v21,/-webkit-backdrop-filter:none!important/);
+assert.match(css,/Mobile DNA performance/);
+assert.match(css,/backdrop-filter:none!important/);
+assert.match(css,/-webkit-backdrop-filter:none!important/);
+assert.ok(v21.includes("var(--dna-radius,24px)"));
+assert.ok(v21.includes("var(--dna-frame)"));
+assert.doesNotMatch(v21,/--dna-hud:/);
 assert.doesNotMatch(v21,/filter:blur/);
 
 console.log("v3 DNA cinematic shell frame: ok");
