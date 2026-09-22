@@ -47,3 +47,37 @@
   .v3-app[data-workspace="dna"] .v3-dna-context,.v3-app[data-workspace="dna"] .v3-dna-hud article{background:var(--dna-hud)}
   .v3-app[data-workspace="dna"] .v3-dna-world{box-shadow:0 18px 44px rgba(0,0,0,.28)}
 }
+
+/* DNA cinematic shell frame v21 — phase-aware immersion layered on the existing six-shell DNA surface contract.
+   The Pixi renderer remains canonical; this layer only gives its real phase more room and context. */
+.v3-app[data-workspace="dna"] .v3-dna-title>span{color:var(--dna-mark,var(--v3-accent))!important}
+.v3-app[data-workspace="dna"] .v3-dna-world{
+  border-radius:var(--dna-radius,24px)!important;
+  border-color:var(--dna-frame)!important;
+  transition:border-color .25s ease,box-shadow .25s ease;
+}
+.v3-app[data-workspace="dna"] .v3-dna-world-copy strong{color:var(--dna-mark,var(--v3-accent))}
+
+.v3-dna-world[data-phase="dawn"]{box-shadow:0 28px 80px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,192,123,.08)}
+.v3-dna-world[data-phase="day"]{box-shadow:0 28px 80px rgba(0,0,0,.30),inset 0 0 0 1px rgba(186,230,255,.06)}
+.v3-dna-world[data-phase="sunset"]{box-shadow:0 28px 80px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,153,92,.10)}
+.v3-dna-world[data-phase="night"]{box-shadow:0 28px 80px rgba(0,0,0,.40),inset 0 0 0 1px rgba(126,145,255,.09)}
+
+@media(max-width:699px){
+  .v3-dna{padding:54px 8px 82px}
+  .v3-dna-world{height:calc(100dvh - 112px);min-height:540px}
+  .v3-dna-back{min-height:44px!important}
+  .v3-dna-hud article{min-height:44px;box-sizing:border-box}
+  .v3-dna-hud span{font-size:9px}
+  .v3-dna-hud strong{font-size:11px}
+  .v3-dna-world-copy{bottom:72px}
+}
+@media(max-width:359px){
+  .v3-dna-world{height:calc(100dvh - 108px);min-height:500px}
+  .v3-dna-hud span{font-size:8px}
+  .v3-dna-hud strong{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-workspace="dna"] .v3-dna-world{transition:none}
+}
+
