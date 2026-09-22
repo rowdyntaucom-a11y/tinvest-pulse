@@ -389,6 +389,7 @@
 .v3-global-world{background-image:var(--v3-global-grade),var(--v3-global-world)!important}
 
 .v3-app[data-shell="samurai"]{
+ --shell-bg:#071214;
  --v3-global-grade:linear-gradient(180deg,rgba(12,8,6,.04) 0%,rgba(14,9,7,.24) 39%,rgba(11,9,8,.70) 72%,var(--shell-bg,#080b0e) 100%);
  --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 19%,rgba(15,9,7,.10) 34%,rgba(12,9,8,.50) 58%,var(--shell-bg,#080b0e) 87%);
 }
@@ -405,10 +406,12 @@
  --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 20%,rgba(249,247,235,.08) 36%,rgba(244,244,234,.48) 60%,var(--shell-bg,#eef2f4) 88%);
 }
 .v3-app[data-shell="aurora"]{
+ --shell-bg:#050914;
  --v3-global-grade:linear-gradient(180deg,rgba(240,249,253,.02) 0%,rgba(240,249,253,.17) 40%,rgba(237,247,251,.61) 73%,var(--shell-bg,#eef2f4) 100%);
  --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 20%,rgba(240,249,253,.08) 36%,rgba(237,247,251,.47) 60%,var(--shell-bg,#eef2f4) 88%);
 }
 .v3-app[data-shell="minimal"]{
+ --shell-bg:#f4f5f3;
  --v3-global-grade:linear-gradient(180deg,rgba(255,248,229,.02) 0%,rgba(255,248,229,.18) 40%,rgba(250,242,220,.63) 73%,var(--shell-bg,#eef2f4) 100%);
  --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 20%,rgba(255,248,229,.08) 36%,rgba(250,242,220,.49) 60%,var(--shell-bg,#eef2f4) 88%);
 }
