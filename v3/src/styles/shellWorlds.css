@@ -341,3 +341,11 @@
  .v3-home[data-shell="minimal"]{--v3-stage-position:50% -14px}
  .v3-home[data-shell="samurai"] .v3-hero>div:nth-child(3){max-width:58%!important}
 }
+
+/* Retina production worlds v10 — 1088x1920 masters for high-density mobile screens. */
+.v3-home[data-shell="samurai"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73df/ZbEc5tOtr1v9erbGoskpA_Zqpj54LN.webp");--v3-world-filter:saturate(1.08) contrast(1.04)}
+.v3-home[data-shell="carbon"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e0/e-ybxrKFOxxdBMhQ3IUWg_rmwLJ1GW.webp");--v3-world-filter:saturate(1.04) contrast(1.04)}
+.v3-home[data-shell="core"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e1/CDiTm_cyBHRk3xSeQr0Cf_JyWjIqNa.webp");--v3-world-filter:saturate(1.06) contrast(1.04)}
+.v3-home[data-shell="horizon"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e1/QCS2uo2d_VwJLDXvBZ2ac_5XGwOrdI.webp");--v3-world-filter:saturate(1.02) contrast(1.03)}
+.v3-home[data-shell="aurora"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e2/696fnzhzzA8T9xFXC8hyE_uGolWJ95.webp");--v3-world-filter:saturate(1.01) contrast(1.04)}
+.v3-home[data-shell="minimal"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e3/ln4tMrVDflbFwxoXVFq_o_aMCRVDGf.webp");--v3-world-filter:saturate(1.02) contrast(1.03)}
