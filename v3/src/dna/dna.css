@@ -48,43 +48,15 @@
   .v3-app[data-workspace="dna"] .v3-dna-world{box-shadow:0 18px 44px rgba(0,0,0,.28)}
 }
 
-
-/* DNA cinematic shell frame v21 — keep the Pixi world canonical while the surrounding chrome
-   follows the selected QVANIX shell and the real world phase. */
-.v3-dna{
-  --dna-frame:rgba(130,145,255,.22);
-  --dna-hud:rgba(5,8,18,.78);
-  --dna-hud-line:rgba(255,255,255,.12);
-  --dna-title:#9aaeff;
-  --dna-phase:#8aa2ff;
-  --dna-shell-radius:24px;
-}
-.v3-dna[data-shell="samurai"]{--dna-frame:rgba(240,176,109,.28);--dna-hud:rgba(7,20,21,.88);--dna-hud-line:rgba(240,176,109,.18);--dna-title:#f0b06d;--dna-phase:#67d6a7;--dna-shell-radius:24px 9px 24px 9px}
-.v3-dna[data-shell="carbon"]{--dna-frame:rgba(121,191,255,.28);--dna-hud:rgba(4,8,25,.90);--dna-hud-line:rgba(121,191,255,.18);--dna-title:#79bfff;--dna-phase:#8d9aff;--dna-shell-radius:10px 26px 10px 26px}
-.v3-dna[data-shell="core"]{--dna-frame:rgba(201,124,255,.26);--dna-hud:rgba(12,9,29,.90);--dna-hud-line:rgba(201,124,255,.18);--dna-title:#c97cff;--dna-phase:#a98aff;--dna-shell-radius:26px 13px 26px 13px}
-.v3-dna[data-shell="horizon"]{--dna-frame:rgba(79,128,108,.20);--dna-hud:rgba(250,252,246,.91);--dna-hud-line:rgba(79,128,108,.14);--dna-title:#4f806c;--dna-phase:#4f806c;--dna-shell-radius:16px}
-.v3-dna[data-shell="aurora"]{--dna-frame:rgba(59,127,165,.22);--dna-hud:rgba(242,249,252,.91);--dna-hud-line:rgba(59,127,165,.14);--dna-title:#3b7fa5;--dna-phase:#3b7fa5;--dna-shell-radius:24px}
-.v3-dna[data-shell="minimal"]{--dna-frame:rgba(154,106,42,.20);--dna-hud:rgba(253,248,237,.94);--dna-hud-line:rgba(154,106,42,.14);--dna-title:#9a6a2a;--dna-phase:#9a6a2a;--dna-shell-radius:9px}
-
-.v3-dna-title>span{color:var(--dna-title)!important}
-.v3-dna-world{
+/* DNA cinematic shell frame v21 — phase-aware immersion layered on the existing six-shell DNA surface contract.
+   The Pixi renderer remains canonical; this layer only gives its real phase more room and context. */
+.v3-app[data-workspace="dna"] .v3-dna-title>span{color:var(--dna-mark,var(--v3-accent))!important}
+.v3-app[data-workspace="dna"] .v3-dna-world{
+  border-radius:var(--dna-radius,24px)!important;
   border-color:var(--dna-frame)!important;
-  border-radius:var(--dna-shell-radius)!important;
   transition:border-color .25s ease,box-shadow .25s ease;
 }
-.v3-dna-world-copy strong{color:var(--dna-phase)}
-.v3-dna-hud article,.v3-dna-context,.v3-dna-back{
-  background:var(--dna-hud)!important;
-  border-color:var(--dna-hud-line)!important;
-}
-.v3-dna[data-shell="horizon"] :is(.v3-dna-hud article,.v3-dna-context,.v3-dna-back),
-.v3-dna[data-shell="aurora"] :is(.v3-dna-hud article,.v3-dna-context,.v3-dna-back),
-.v3-dna[data-shell="minimal"] :is(.v3-dna-hud article,.v3-dna-context,.v3-dna-back){
-  color:var(--v3-text)!important;
-}
-.v3-dna[data-shell="horizon"] .v3-dna-world-copy span,
-.v3-dna[data-shell="aurora"] .v3-dna-world-copy span,
-.v3-dna[data-shell="minimal"] .v3-dna-world-copy span{color:rgba(255,255,255,.72)}
+.v3-app[data-workspace="dna"] .v3-dna-world-copy strong{color:var(--dna-mark,var(--v3-accent))}
 
 .v3-dna-world[data-phase="dawn"]{box-shadow:0 28px 80px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,192,123,.08)}
 .v3-dna-world[data-phase="day"]{box-shadow:0 28px 80px rgba(0,0,0,.30),inset 0 0 0 1px rgba(186,230,255,.06)}
@@ -94,10 +66,6 @@
 @media(max-width:699px){
   .v3-dna{padding:54px 8px 82px}
   .v3-dna-world{height:calc(100dvh - 112px);min-height:540px}
-  .v3-dna-context,.v3-dna-hud article,.v3-dna-back,.v3-dna-world .world-stage__diagnostic{
-    backdrop-filter:none!important;
-    -webkit-backdrop-filter:none!important;
-  }
   .v3-dna-back{min-height:44px!important}
   .v3-dna-hud article{min-height:44px;box-sizing:border-box}
   .v3-dna-hud span{font-size:9px}
@@ -110,5 +78,6 @@
   .v3-dna-hud strong{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){
-  .v3-dna-world{transition:none}
+  .v3-app[data-workspace="dna"] .v3-dna-world{transition:none}
 }
+
