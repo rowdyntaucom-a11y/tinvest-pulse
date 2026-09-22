@@ -330,6 +330,16 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
       starterResidence.label = 'world:starter-residence'
       layer('structures').addChild(starterResidence)
 
+      // Authored settlement-life props share the canonical scene graph/ticker. They add
+      // human-scale evidence of habitation without introducing another runtime owner.
+      const settlementLife = new Graphics()
+      settlementLife.label = 'world:settlement-life'
+      layer('structures').addChild(settlementLife)
+
+      const settlementLifeGlow = new Graphics()
+      settlementLifeGlow.label = 'world:settlement-life-glow'
+      layer('effects').addChild(settlementLifeGlow)
+
       const hero = new Container()
       hero.label = 'world:hero-wanderer'
       const heroShadow = new Graphics().ellipse(0, 4, 31, 9).fill({ color: 0x020706, alpha: 0.36 })
@@ -641,6 +651,8 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
         development.clear()
         starterSettlement.clear()
         starterResidence.clear()
+        settlementLife.clear()
+        settlementLifeGlow.clear()
         foreground.clear()
         structureGrounding.clear()
         structureGrounding.ellipse(557,625,82,15).fill({color:0x030a08,alpha:.34})
@@ -663,6 +675,45 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
           .rect(536,585,17,35).fill({color:0x111a17,alpha:.9})
           .rect(570,579,14,14).fill({color:atmosphere.lamp,alpha:.58})
           .rect(520,606,74,14).fill({color:0x0c1512,alpha:.72})
+
+        // Human-scale life layer: a small market awning, drying line, water point,
+        // notice shrine, stacked firewood and fences make the settlement read as a
+        // place people occupy rather than a row of progression buildings.
+        settlementLife
+          .rect(455,602,86,7).fill({color:0x5e4632,alpha:.92})
+          .moveTo(462,602).lineTo(462,554).stroke({color:0x73543a,width:5,alpha:.92})
+          .moveTo(532,602).lineTo(532,554).stroke({color:0x73543a,width:5,alpha:.92})
+          .poly([452,557,497,535,541,557]).fill({color:0x7e4938,alpha:.94})
+          .poly([458,557,478,547,497,557,516,547,536,557]).fill({color:0xc38a5f,alpha:.54})
+          .rect(470,584,17,12).fill({color:0x8f7657,alpha:.92})
+          .rect(492,578,20,18).fill({color:0x6e826f,alpha:.9})
+          .circle(521,589,7).fill({color:0xb6905f,alpha:.88})
+          .moveTo(1048,548).lineTo(1138,548).stroke({color:0x9a7958,width:2,alpha:.72})
+          .moveTo(1054,548).lineTo(1054,610).stroke({color:0x6b5039,width:4,alpha:.9})
+          .moveTo(1132,548).lineTo(1132,610).stroke({color:0x6b5039,width:4,alpha:.9})
+          .poly([1064,550,1081,550,1078,570,1067,568]).fill({color:0x8d5960,alpha:.82})
+          .poly([1088,550,1106,550,1102,566,1090,567]).fill({color:0x607f78,alpha:.82})
+          .poly([1112,550,1125,550,1124,572,1114,569]).fill({color:0xa88455,alpha:.82})
+          .circle(1198,602,19).stroke({color:0x6f806f,width:6,alpha:.9})
+          .circle(1198,602,7).fill({color:0x13251f,alpha:.92})
+          .rect(1171,616,54,7).fill({color:0x3d4c42,alpha:.82})
+          .rect(1270,562,8,62).fill({color:0x75553b,alpha:.94})
+          .rect(1324,562,8,62).fill({color:0x75553b,alpha:.94})
+          .moveTo(1263,568).lineTo(1301,532).lineTo(1339,568).stroke({color:0x9b7049,width:7,alpha:.9})
+          .rect(1288,570,26,34).fill({color:0x17231f,alpha:.94})
+          .circle(1301,582,6).fill({color:atmosphere.lamp,alpha:.72})
+        for(let x=1380;x<1518;x+=28){
+          settlementLife.rect(x,596+(x%3)*4,5,34).fill({color:0x644a35,alpha:.82})
+          settlementLife.moveTo(x,604).lineTo(x+28,600).stroke({color:0x76563c,width:3,alpha:.7})
+        }
+        for(let i=0;i<5;i+=1){
+          settlementLife.circle(404+i*13,616-(i%2)*5,7).fill({color:0x5d4431,alpha:.9})
+          settlementLife.moveTo(399+i*13,611-(i%2)*5).lineTo(409+i*13,621-(i%2)*5).stroke({color:0x9a724d,width:2,alpha:.72})
+        }
+        settlementLifeGlow
+          .circle(497,574,48).fill({color:atmosphere.lamp,alpha:.028})
+          .circle(1301,582,54).fill({color:atmosphere.lamp,alpha:.035})
+          .circle(1198,602,34).fill({color:0x78b9a2,alpha:.018})
 
         // Starter settlement is world identity, not progression. It exists at level 1
         // so the first truthful state still reads as a place rather than an empty chart.
@@ -881,6 +932,7 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
           hero.position.y = 676
           hero.rotation = 0
           settlementLight.alpha = .9
+          settlementLifeGlow.alpha = .82
           emberField.alpha = .72
           lamp.alpha = 0.88
           lampGlow.alpha = 0.75
@@ -915,6 +967,7 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
 
         hero.position.y = 676 + Math.sin(now / 780) * 2.2
         settlementLight.alpha = .82 + Math.sin(now / 640) * .12
+        settlementLifeGlow.alpha = .72 + Math.sin(now / 980) * .12
         emberField.alpha = .62 + Math.sin(now / 180) * .22
         hero.rotation = Math.sin(now / 2100) * 0.008
         lamp.alpha = 0.76 + Math.sin(now / 550) * 0.14
