@@ -496,8 +496,8 @@
 
 .v3-app:not([data-workspace="home"]) :is(
  .v3-assets-summary article,.v3-asset,.v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,
- .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-detail,
- .v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-card,.v3-panel,.v3-metric,
+ .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-detail,.v3-income-ratios article,
+ .v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-goal-facts article,.v3-card,.v3-panel,.v3-metric,
  .v3-benchmark,.v3-class-map,.v3-bond-lens,.v3-breadth,.v3-market-context
 ){
  background:var(--v3-deep-card)!important;
@@ -526,12 +526,26 @@
  color:var(--v3-accent)!important;
  background:color-mix(in srgb,var(--v3-accent) 10%,transparent)!important;
 }
+/* Deep controls on the three bright worlds stay native to the selected material instead of reverting to dark defaults. */
+.v3-app[data-shell="horizon"]:not([data-workspace="home"]) :is(.v3-goal-editor input,.v3-holdings-search input,.v3-goal-scenario-field input,.v3-section-selector select),
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]) :is(.v3-goal-editor input,.v3-holdings-search input,.v3-goal-scenario-field input,.v3-section-selector select),
+.v3-app[data-shell="minimal"]:not([data-workspace="home"]) :is(.v3-goal-editor input,.v3-holdings-search input,.v3-goal-scenario-field input,.v3-section-selector select){
+ background:var(--v3-deep-card-strong)!important;
+ border-color:var(--v3-line)!important;
+ color:var(--v3-text)!important;
+}
+.v3-app[data-shell="horizon"]:not([data-workspace="home"]) .v3-section-selector select option,
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]) .v3-section-selector select option,
+.v3-app[data-shell="minimal"]:not([data-workspace="home"]) .v3-section-selector select option{
+ background:var(--shell-bg)!important;color:var(--v3-text)!important;
+}
+
 .v3-app[data-shell="horizon"]:not([data-workspace="home"]) :is(.v3-brand,.v3-assets,.v3-analysis,.v3-income,.v3-goal),
 .v3-app[data-shell="aurora"]:not([data-workspace="home"]) :is(.v3-brand,.v3-assets,.v3-analysis,.v3-income,.v3-goal),
 .v3-app[data-shell="minimal"]:not([data-workspace="home"]) :is(.v3-brand,.v3-assets,.v3-analysis,.v3-income,.v3-goal){color:var(--v3-text)!important}
 
 @media(max-width:699px){
- .v3-app:not([data-workspace="home"]) :is(.v3-assets-summary article,.v3-asset,.v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-detail,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-card,.v3-panel,.v3-metric,.v3-benchmark,.v3-class-map,.v3-bond-lens,.v3-breadth,.v3-market-context,.v3-context-bar,.v3-data-state,.v3-nav){
+ .v3-app:not([data-workspace="home"]) :is(.v3-assets-summary article,.v3-asset,.v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-detail,.v3-income-ratios article,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-goal-facts article,.v3-card,.v3-panel,.v3-metric,.v3-benchmark,.v3-class-map,.v3-bond-lens,.v3-breadth,.v3-market-context,.v3-context-bar,.v3-data-state,.v3-nav){
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important
  }
 }
