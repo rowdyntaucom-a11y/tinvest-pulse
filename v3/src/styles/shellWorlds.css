@@ -296,3 +296,31 @@
  .v3-home[data-shell="samurai"] .v3-hero>div:nth-child(3){max-width:52%!important}
  .v3-home[data-shell="carbon"] .v3-hero>div:nth-child(3),.v3-home[data-shell="core"] .v3-hero>div:nth-child(3){max-width:54%!important}
 }
+
+/* Cinematic theme stage v8 — art first, data second.
+   The portrait artwork owns the upper viewport; financial cards begin below it. */
+@media(max-width:699px){
+ .v3-home{--v3-stage-h:clamp(390px,48dvh,510px);padding-top:max(58px,calc(env(safe-area-inset-top) + 46px))!important}
+ .v3-home:before,.v3-home:after{height:var(--v3-stage-h)!important}
+ .v3-home:before{background-size:100% auto!important;background-repeat:no-repeat!important;background-position:var(--v3-stage-position)!important}
+ .v3-home:after{background:var(--v3-stage-grade)!important}
+ .v3-home .v3-hero{min-height:calc(var(--v3-stage-h) - 72px)!important;padding:8px 2px!important;display:flex;flex-direction:column}
+ .v3-home .v3-hero-top{position:relative;z-index:2}
+ .v3-home .v3-hero>div:nth-child(3){margin-top:auto!important;margin-bottom:24px!important;max-width:70%!important;padding:9px 11px!important;background:var(--v3-stage-plate)!important;border:1px solid var(--v3-world-line)!important;border-radius:14px!important;box-shadow:0 8px 24px rgba(0,0,0,.12)!important}
+ .v3-home .v3-hero h1{font-size:clamp(34px,9.4vw,42px)!important}
+ .v3-home .v3-updated{position:absolute;bottom:6px;left:2px}
+ .v3-home .v3-primary-grid{position:relative;z-index:3;margin-top:-6px}
+ .v3-home[data-shell="samurai"]{--v3-stage-position:58% top;--v3-stage-plate:rgba(8,9,8,.72);--v3-stage-grade:linear-gradient(180deg,transparent 58%,rgba(8,9,8,.88) 100%)}
+ .v3-home[data-shell="carbon"]{--v3-stage-position:52% top;--v3-stage-plate:rgba(3,7,22,.72);--v3-stage-grade:linear-gradient(180deg,transparent 58%,rgba(2,6,20,.9) 100%)}
+ .v3-home[data-shell="core"]{--v3-stage-position:52% top;--v3-stage-plate:rgba(10,7,27,.72);--v3-stage-grade:linear-gradient(180deg,transparent 58%,rgba(8,5,24,.9) 100%)}
+ .v3-home[data-shell="horizon"]{--v3-stage-position:50% top;--v3-stage-plate:rgba(255,253,244,.9);--v3-stage-grade:linear-gradient(180deg,transparent 62%,rgba(248,246,230,.92) 100%)}
+ .v3-home[data-shell="aurora"]{--v3-stage-position:50% top;--v3-stage-plate:rgba(246,252,255,.91);--v3-stage-grade:linear-gradient(180deg,transparent 62%,rgba(235,247,252,.93) 100%)}
+ .v3-home[data-shell="minimal"]{--v3-stage-position:50% top;--v3-stage-plate:rgba(255,249,234,.92);--v3-stage-grade:linear-gradient(180deg,transparent 62%,rgba(250,244,227,.94) 100%)}
+}
+@media(max-width:430px){
+ .v3-home{--v3-stage-h:clamp(410px,50dvh,520px)}
+ .v3-home[data-shell="samurai"]{--v3-stage-position:64% top}
+ .v3-home[data-shell="carbon"]{--v3-stage-position:55% top}
+ .v3-home[data-shell="core"]{--v3-stage-position:54% top}
+ .v3-home .v3-hero>div:nth-child(3){max-width:66%!important}
+}
