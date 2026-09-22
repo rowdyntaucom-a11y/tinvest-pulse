@@ -1,0 +1,42 @@
+name: V3 free preview artifact
+
+on:
+  pull_request:
+    paths:
+      - 'v3/**'
+      - '.github/workflows/v3-free-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v3-free-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: v3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: v3/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Package static preview
+        run: |
+          printf '%s\n' "commit=${GITHUB_SHA}" "built_at=$(date -u +%FT%TZ)" > dist/qvanix-preview-build.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qvanix-v3-preview-${{ github.event.pull_request.number || github.run_number }}
+          path: v3/dist
+          if-no-files-found: error
+          retention-days: 14
