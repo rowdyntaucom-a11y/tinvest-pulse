@@ -191,3 +191,8 @@
 .v3-app[data-shell="samurai"] .v3-home .v3-hero>div:nth-child(3){max-width:min(64%,286px);background:rgba(5,12,12,.64)!important;border:1px solid rgba(241,174,103,.17)!important;border-radius:16px!important;box-shadow:0 14px 34px rgba(0,0,0,.2)!important;backdrop-filter:blur(7px) saturate(1.04)!important}
 .v3-app[data-shell="samurai"] .v3-home:after{background:linear-gradient(90deg,rgba(4,7,7,.66) 0 17%,rgba(4,7,7,.11) 40%,transparent 65%),linear-gradient(180deg,transparent 54%,rgba(5,10,10,.84) 95%)}
 @media(max-width:430px){.v3-app[data-shell="samurai"] .v3-home .v3-hero{min-height:238px!important;padding:8px 2px!important}.v3-app[data-shell="samurai"] .v3-home .v3-hero>div:nth-child(3){max-width:64%}}
+
+/* Samurai exposure pass: protect the subject from legacy dark grading. */
+.v3-home[data-shell="samurai"]{--v3-world-filter:saturate(1.12) contrast(1.01) brightness(1.16);--v3-world-opacity:1}
+.v3-app[data-shell="samurai"] .v3-home:after{background:linear-gradient(90deg,rgba(3,7,7,.48) 0 15%,rgba(3,7,7,.05) 37%,transparent 61%),linear-gradient(180deg,transparent 60%,rgba(5,10,10,.66) 96%)!important}
+@media(max-width:430px){.v3-home[data-shell="samurai"]{--v3-world-position:81% 7%;--v3-world-filter:saturate(1.15) contrast(.99) brightness(1.2)}}
