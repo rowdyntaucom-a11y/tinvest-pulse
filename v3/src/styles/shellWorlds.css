@@ -324,3 +324,20 @@
  .v3-home[data-shell="core"]{--v3-stage-position:54% top}
  .v3-home .v3-hero>div:nth-child(3){max-width:66%!important}
 }
+
+/* Theme hero integration v9 — preserve the cinematic stage while making capital feel native to it. */
+@media(max-width:699px){
+ .v3-home .v3-hero>div:nth-child(3){background:linear-gradient(90deg,var(--v3-stage-plate) 0 64%,color-mix(in srgb,var(--v3-stage-plate) 58%,transparent) 82%,transparent 100%)!important;border-color:color-mix(in srgb,var(--v3-world-line) 78%,transparent)!important;border-right-color:transparent!important;border-radius:14px 0 0 14px!important;box-shadow:none!important}
+ .v3-home .v3-hero h1{letter-spacing:-.045em}
+ .v3-home[data-shell="samurai"]{--v3-stage-position:72% top;--v3-stage-grade:linear-gradient(180deg,transparent 64%,rgba(8,9,8,.82) 100%)}
+ .v3-home[data-shell="horizon"]{--v3-stage-position:50% -10px;--v3-stage-grade:linear-gradient(180deg,transparent 66%,rgba(248,246,230,.9) 100%)}
+ .v3-home[data-shell="aurora"]{--v3-stage-position:50% -8px;--v3-stage-grade:linear-gradient(180deg,transparent 66%,rgba(235,247,252,.91) 100%)}
+ .v3-home[data-shell="minimal"]{--v3-stage-position:50% -10px;--v3-stage-grade:linear-gradient(180deg,transparent 66%,rgba(250,244,227,.92) 100%)}
+}
+@media(max-width:430px){
+ .v3-home[data-shell="samurai"]{--v3-stage-position:78% top}
+ .v3-home[data-shell="horizon"]{--v3-stage-position:50% -14px}
+ .v3-home[data-shell="aurora"]{--v3-stage-position:50% -12px}
+ .v3-home[data-shell="minimal"]{--v3-stage-position:50% -14px}
+ .v3-home[data-shell="samurai"] .v3-hero>div:nth-child(3){max-width:58%!important}
+}
