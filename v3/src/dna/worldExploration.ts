@@ -4,10 +4,10 @@ export type WorldLandmark={id:WorldLandmarkId;label:string;eyebrow:string;descri
 /** Presentation-only authored landmarks. They describe visible scene elements and never imply
  * financial progress, rewards or unlock state. Coordinates are percentages of the DNA viewport. */
 export const WORLD_EXPLORATION_LANDMARKS:readonly WorldLandmark[]=[
- {id:'workshop',label:'Мастерская',eyebrow:'ЖИВОЕ ОКРУЖЕНИЕ',description:'Свет, дым и рабочий двор задают центр поселения. Активность меняется вместе с атмосферой мира.',x:43,y:61},
- {id:'wanderer',label:'Странник',eyebrow:'ТВОЙ СПУТНИК',description:'Странник остаётся частью мира, а не финансовым рейтингом. Его присутствие связывает сцены в один долгий путь.',x:55,y:68},
- {id:'mine',label:'Шахта',eyebrow:'ГЛУБИНА МИРА',description:'Шахтный двор и маршруты жителей добавляют второй план и ощущение работающего пространства.',x:65,y:59},
- {id:'settlement',label:'Поселение',eyebrow:'ГОРИЗОНТ',description:'Дальний слой удерживает масштаб мира: это место продолжается за пределами первого экрана.',x:74,y:47},
+ {id:'workshop',label:'Мастерская',eyebrow:'ЖИВОЕ ОКРУЖЕНИЕ',description:'Тёплый свет из мастерской ложится на рабочий двор. Дым и редкие искры делают центр поселения обитаемым даже издалека.',x:43,y:61},
+ {id:'wanderer',label:'Странник',eyebrow:'ТВОЙ СПУТНИК',description:'Странник задержался у тропы между мастерской и шахтой. Его путь связывает ближний двор с дальними огнями поселения.',x:55,y:68},
+ {id:'mine',label:'Шахта',eyebrow:'ГЛУБИНА МИРА',description:'У входа в шахту темнее и тише. Тележки, следы на земле и редкое движение у ворот продолжают рабочий ритм поселения.',x:65,y:59},
+ {id:'settlement',label:'Поселение',eyebrow:'ГОРИЗОНТ',description:'За ближними постройками видны огни дальнего поселения. Они дают сцене глубину и ощущение мира, который продолжается за горизонтом.',x:74,y:47},
 ] as const
 
 export function resolveWorldLandmark(id:string|null|undefined){return WORLD_EXPLORATION_LANDMARKS.find(item=>item.id===id)??null}
