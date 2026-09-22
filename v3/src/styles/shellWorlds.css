@@ -349,3 +349,21 @@
 .v3-home[data-shell="horizon"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e1/QCS2uo2d_VwJLDXvBZ2ac_5XGwOrdI.webp");--v3-world-filter:saturate(1.02) contrast(1.03)}
 .v3-home[data-shell="aurora"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e2/696fnzhzzA8T9xFXC8hyE_uGolWJ95.webp");--v3-world-filter:saturate(1.01) contrast(1.04)}
 .v3-home[data-shell="minimal"]{--v3-world-image:url("https://v3b.fal.media/files/b/0aab73e3/ln4tMrVDflbFwxoXVFq_o_aMCRVDGf.webp");--v3-world-filter:saturate(1.02) contrast(1.03)}
+
+/* Global world continuity v11 — selected shell remains a world outside Home. */
+.v3-app{--v3-global-world:none;--v3-global-position:50% top;--v3-global-filter:none;isolation:isolate}
+.v3-global-world{position:fixed;z-index:-1;inset:0;pointer-events:none;background-image:linear-gradient(180deg,rgba(5,9,11,.16) 0%,rgba(5,9,11,.58) 44%,var(--shell-bg,#071012) 82%),var(--v3-global-world);background-size:cover;background-position:var(--v3-global-position);background-repeat:no-repeat;filter:var(--v3-global-filter);transform:translateZ(0)}
+.v3-app[data-shell="samurai"]{--v3-global-world:url("https://v3b.fal.media/files/b/0aab73df/ZbEc5tOtr1v9erbGoskpA_Zqpj54LN.webp");--v3-global-position:72% top;--v3-global-filter:saturate(1.06) contrast(1.03)}
+.v3-app[data-shell="carbon"]{--v3-global-world:url("https://v3b.fal.media/files/b/0aab73e0/e-ybxrKFOxxdBMhQ3IUWg_rmwLJ1GW.webp");--v3-global-position:55% top;--v3-global-filter:saturate(1.03) contrast(1.03)}
+.v3-app[data-shell="core"]{--v3-global-world:url("https://v3b.fal.media/files/b/0aab73e1/CDiTm_cyBHRk3xSeQr0Cf_JyWjIqNa.webp");--v3-global-position:54% top;--v3-global-filter:saturate(1.04) contrast(1.03)}
+.v3-app[data-shell="horizon"]{--v3-global-world:url("https://v3b.fal.media/files/b/0aab73e1/QCS2uo2d_VwJLDXvBZ2ac_5XGwOrdI.webp");--v3-global-position:50% top}
+.v3-app[data-shell="aurora"]{--v3-global-world:url("https://v3b.fal.media/files/b/0aab73e2/696fnzhzzA8T9xFXC8hyE_uGolWJ95.webp");--v3-global-position:50% top}
+.v3-app[data-shell="minimal"]{--v3-global-world:url("https://v3b.fal.media/files/b/0aab73e3/ln4tMrVDflbFwxoXVFq_o_aMCRVDGf.webp");--v3-global-position:50% top}
+.v3-app[data-workspace="home"]>.v3-global-world{opacity:0}
+.v3-app:not([data-workspace="home"]){background:transparent!important}
+.v3-app:not([data-workspace="home"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){position:relative;background:linear-gradient(180deg,color-mix(in srgb,var(--shell-bg,#071012) 34%,transparent),color-mix(in srgb,var(--shell-bg,#071012) 76%,transparent) 42%,var(--shell-bg,#071012) 92%)!important}
+.v3-app:not([data-workspace="home"]) :is(.v3-card,.v3-panel,.v3-metric,.v3-goal-card,.v3-income-card){background:color-mix(in srgb,var(--v3-card) 88%,transparent)!important}
+@media(max-width:699px){
+ .v3-global-world{position:absolute;min-height:100dvh;background-size:100% auto;background-position:var(--v3-global-position);filter:var(--v3-global-filter)}
+ .v3-app:not([data-workspace="home"])>.v3-global-world:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 0 24%,color-mix(in srgb,var(--shell-bg,#071012) 42%,transparent) 45%,var(--shell-bg,#071012) 78%)}
+}
