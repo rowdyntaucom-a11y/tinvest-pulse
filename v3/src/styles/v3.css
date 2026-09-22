@@ -188,3 +188,8 @@
 .v3-shell-switch button{display:grid!important;visibility:visible!important;opacity:1!important;width:30px!important;height:30px!important;min-height:30px!important}
 @media(max-width:430px){.v3-brand{display:none}.v3-topbar{justify-content:flex-end}.v3-controls{width:auto;max-width:100%;gap:4px}.v3-controls>button{display:none}.v3-shell-switch{grid-template-columns:repeat(6,28px)!important;gap:2px;padding:3px}.v3-shell-switch button{width:28px!important;height:28px!important;min-height:28px!important}.v3-shell-switch button span{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important}}
 @media(max-width:359px){.v3-shell-switch{grid-template-columns:repeat(6,26px)!important}.v3-shell-switch button{width:26px!important;height:26px!important;min-height:26px!important}}
+
+/* Shell switch semantics: distinct world markers without adding mobile chrome. */
+.v3-shell-switch button:nth-child(1){color:#e7b06a!important}.v3-shell-switch button:nth-child(2){color:#4b8bb4!important}.v3-shell-switch button:nth-child(3){color:#8193ff!important}.v3-shell-switch button:nth-child(4){color:#52bfe8!important}.v3-shell-switch button:nth-child(5){color:#78a06d!important}.v3-shell-switch button:nth-child(6){color:#e38b58!important}
+.v3-shell-switch button i{box-shadow:0 0 0 1px rgba(255,255,255,.18),0 0 8px color-mix(in srgb,currentColor 35%,transparent)}
+.v3-shell-switch button.is-active{background:color-mix(in srgb,currentColor 15%,transparent)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 38%,transparent)}
