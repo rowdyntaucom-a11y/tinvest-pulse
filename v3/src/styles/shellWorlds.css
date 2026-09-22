@@ -196,3 +196,21 @@
 .v3-home[data-shell="samurai"]{--v3-world-filter:saturate(1.12) contrast(1.01) brightness(1.16);--v3-world-opacity:1}
 .v3-app[data-shell="samurai"] .v3-home:after{background:linear-gradient(90deg,rgba(3,7,7,.48) 0 15%,rgba(3,7,7,.05) 37%,transparent 61%),linear-gradient(180deg,transparent 60%,rgba(5,10,10,.66) 96%)!important}
 @media(max-width:430px){.v3-home[data-shell="samurai"]{--v3-world-position:81% 7%;--v3-world-filter:saturate(1.15) contrast(.99) brightness(1.2)}}
+
+/* World composition rebalance — Cosmos is the readability benchmark.
+   Keep each world's authored subject inside the mobile first-screen stage. */
+.v3-home:before{background-position:var(--v3-world-position)!important}
+.v3-home[data-shell="samurai"]{--v3-world-position:56% 12%;--v3-world-filter:saturate(1.16) contrast(1.03) brightness(1.18)}
+.v3-home[data-shell="horizon"],.v3-home[data-shell="minimal"]{--v3-world-position:58% 10%;--v3-world-filter:saturate(1.04) contrast(1.01) brightness(1.02);--v3-local-plate:rgba(255,255,252,.79);--v3-world-surface:rgba(255,255,252,.79)}
+.v3-home[data-shell="aurora"]{--v3-world-position:58% 9%;--v3-world-filter:saturate(1.06) contrast(1.01) brightness(1.01);--v3-local-plate:rgba(245,253,255,.8);--v3-world-surface:rgba(242,252,255,.79)}
+.v3-home[data-shell="samurai"]:after{background:linear-gradient(90deg,rgba(3,7,7,.42) 0 12%,rgba(3,7,7,.025) 32%,transparent 54%),linear-gradient(180deg,transparent 65%,rgba(5,10,10,.58) 97%)!important}
+.v3-home[data-shell="horizon"]:after,.v3-home[data-shell="minimal"]:after{background:linear-gradient(90deg,rgba(250,250,246,.52) 0 12%,rgba(250,250,246,.03) 34%,transparent 58%),linear-gradient(180deg,transparent 65%,rgba(244,247,242,.7) 97%)!important}
+.v3-home[data-shell="aurora"]:after{background:linear-gradient(90deg,rgba(239,251,255,.48) 0 12%,rgba(231,249,255,.025) 34%,transparent 58%),linear-gradient(180deg,transparent 65%,rgba(226,244,250,.68) 97%)!important}
+@media(max-width:430px){
+ .v3-home{--v3-scene-height:680px}
+ .v3-home[data-shell="samurai"]{--v3-world-position:54% 8%;--v3-world-filter:saturate(1.2) contrast(1.03) brightness(1.2)}
+ .v3-home[data-shell="horizon"],.v3-home[data-shell="minimal"]{--v3-world-position:55% 7%}
+ .v3-home[data-shell="aurora"]{--v3-world-position:56% 6%}
+ .v3-home[data-shell="samurai"] .v3-hero>div:nth-child(3){max-width:58%}
+ .v3-home[data-shell="horizon"] .v3-hero>div:nth-child(3),.v3-home[data-shell="minimal"] .v3-hero>div:nth-child(3),.v3-home[data-shell="aurora"] .v3-hero>div:nth-child(3){max-width:60%}
+}
