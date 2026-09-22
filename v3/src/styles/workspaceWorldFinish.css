@@ -1,0 +1,114 @@
+/* Main tabs world finish v15.
+   Loaded last on purpose: this is the final presentation boundary for shell identity
+   after feature-specific CSS. It does not alter data, calculations, navigation state,
+   or DNA rendering. */
+.v3-app:not([data-workspace="home"]){
+  --v3-head-veil:rgba(7,12,16,.82);
+  --v3-deep-subcard:color-mix(in srgb,var(--v3-card,rgba(12,18,20,.84)) 72%,transparent);
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]){--v3-head-veil:rgba(8,17,18,.86)}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]){--v3-head-veil:rgba(4,8,25,.86)}
+.v3-app[data-shell="core"]:not([data-workspace="home"]){--v3-head-veil:rgba(12,9,29,.84)}
+.v3-app[data-shell="horizon"]:not([data-workspace="home"]){--v3-head-veil:rgba(250,252,246,.84)}
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]){--v3-head-veil:rgba(242,249,252,.84)}
+.v3-app[data-shell="minimal"]:not([data-workspace="home"]){--v3-head-veil:rgba(253,248,237,.88)}
+
+/* Keep the art visible while giving the title a local legibility island. */
+.v3-app:not([data-workspace="home"]) .v3-page-head{
+  position:relative;
+  isolation:isolate;
+  padding:8px 10px 10px;
+  margin-left:-2px;
+  margin-right:-2px;
+}
+.v3-app:not([data-workspace="home"]) .v3-page-head::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:-6px;
+  top:-4px;
+  bottom:-4px;
+  width:min(78%,430px);
+  border-radius:14px;
+  background:linear-gradient(90deg,var(--v3-head-veil) 0 60%,transparent 100%);
+  pointer-events:none;
+}
+.v3-app:not([data-workspace="home"]) .v3-page-head h1{color:var(--v3-text)!important}
+.v3-app:not([data-workspace="home"]) .v3-page-head>span,
+.v3-app:not([data-workspace="home"]) .v3-page-head p{color:var(--v3-muted)!important}
+
+/* Primary cards: one material language per selected world. */
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-assets-summary article,.v3-asset,
+  .v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-analysis-layer,.v3-analysis-quality>div,
+  .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-ratios article,.v3-income-depth,
+  .v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-goal-facts article,.v3-goal-journey,.v3-goal-scenario-lab,
+  .v3-holdings-explorer,.v3-section-selector,
+  .v3-asset-hero,.v3-asset-workspace-grid article,.v3-asset-method,.v3-asset-history-card,.v3-asset-intelligence
+){
+  background:var(--v3-deep-card)!important;
+  border-color:var(--v3-line)!important;
+  color:var(--v3-text)!important;
+  box-shadow:var(--v3-deep-shadow)!important;
+}
+
+/* Secondary cards stay quieter so hierarchy survives in deep sections. */
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-risk-contributors,.v3-correlation-summary article,.v3-correlation-pairs article,.v3-risk-provenance,
+  .v3-analysis-metric-grid article,.v3-relative-advanced article,.v3-analysis-sample,
+  .v3-income-calendar-summary article,.v3-income-event-row,.v3-income-source-row,.v3-income-calendar-selection,.v3-income-history-stats article,.v3-income-comparable,.v3-income-bond-link,.v3-income-coverage,
+  .v3-goal-scenario-banner>div,.v3-goal-scenario-field,.v3-goal-scenario-results article,.v3-goal-scenario-chart,.v3-goal-bootstrap-band article,.v3-goal-scenario-outcome>div,
+  .v3-holdings-class-strip button,.v3-holdings-row,.v3-holdings-coverage,.v3-holdings-aggregate article,.v3-holdings-bond-context,
+  .v3-asset-inspector>div,.v3-asset-history-stats article,.v3-fundamental-groups>section,.v3-asset-income-grid article,.v3-asset-risk-grid article,.v3-bond-context,.v3-asset-history-selected>div,.v3-asset-history-provenance article
+){
+  background:var(--v3-deep-subcard)!important;
+  border-color:var(--v3-line)!important;
+  color:var(--v3-text)!important;
+}
+
+/* Inputs/selectors must not fall back to an unrelated dark/light scheme. */
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-section-selector select,.v3-goal-editor input,.v3-holdings-search input,.v3-goal-scenario-field input,.v3-holdings-toolbar select,.v3-asset-back
+){
+  background:var(--v3-deep-card-strong)!important;
+  border-color:var(--v3-line)!important;
+  color:var(--v3-text)!important;
+}
+.v3-app:not([data-workspace="home"]) .v3-section-selector select option{
+  background:var(--shell-bg)!important;
+  color:var(--v3-text)!important;
+}
+
+/* Persistent chrome follows the same shell, not the legacy default shell. */
+.v3-app:not([data-workspace="home"]) :is(.v3-context-bar,.v3-data-state,.v3-nav){
+  background:var(--v3-deep-chrome)!important;
+  border-color:var(--v3-line)!important;
+  color:var(--v3-muted)!important;
+}
+.v3-app:not([data-workspace="home"]) .v3-nav button{color:var(--v3-muted)!important}
+.v3-app:not([data-workspace="home"]) .v3-nav button.is-active{
+  color:var(--v3-accent)!important;
+  background:color-mix(in srgb,var(--v3-accent) 10%,transparent)!important;
+}
+
+/* Semantic finance colors stay semantic across decorative shells. */
+.v3-app:not([data-workspace="home"]) .is-positive{color:var(--v3-positive)!important}
+.v3-app:not([data-workspace="home"]) .is-negative{color:var(--v3-negative)!important}
+.v3-app:not([data-workspace="home"]) .is-neutral{color:var(--v3-neutral,var(--v3-muted))!important}
+
+/* Mobile performance guard: this final layer must not resurrect live blur. */
+@media(max-width:699px){
+  .v3-app:not([data-workspace="home"]) :is(
+    .v3-page-head,.v3-context-bar,.v3-data-state,.v3-nav,
+    .v3-assets-summary article,.v3-asset,
+    .v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-analysis-layer,.v3-analysis-quality>div,
+    .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-ratios article,.v3-income-depth,
+    .v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-goal-facts article,.v3-goal-journey,.v3-goal-scenario-lab,
+    .v3-holdings-explorer,.v3-section-selector,
+    .v3-asset-hero,.v3-asset-workspace-grid article,.v3-asset-method,.v3-asset-history-card,.v3-asset-intelligence
+  ){
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .v3-app:not([data-workspace="home"]) .v3-page-head::before{width:min(84%,360px)}
+}
