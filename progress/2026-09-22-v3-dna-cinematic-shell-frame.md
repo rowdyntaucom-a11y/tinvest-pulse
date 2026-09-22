@@ -8,9 +8,9 @@ Night Living World work starts from the canonical single Pixi renderer. This pas
 - Dawn / day / sunset / night receive distinct static frame lighting while the Pixi atmosphere remains authoritative.
 - Phase copy changes with the actual time phase instead of repeating one generic sentence.
 - Weather copy is derived from world state rather than hard-coded to neutral.
-- All six shells now have their own DNA frame/HUD material language.
+- The pass reuses the existing canonical six-shell DNA frame/HUD material contract rather than defining a second theme layer.
 - Mobile gives the world more vertical viewport and raises the back/HUD targets.
-- Fixed DNA chrome disables backdrop blur on phones to protect the Samsung scroll/performance budget.
+- The existing mobile DNA no-blur guard remains authoritative while the scene gets more viewport height.
 - No world asset slot, event logic, XP rule, finance input or renderer ownership changed.
 - No fal.ai generation was required for this pass.
 
