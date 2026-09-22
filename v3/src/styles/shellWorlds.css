@@ -270,3 +270,29 @@
  .v3-home[data-shell="minimal"]{--v3-world-position:55% 4%}
  .v3-home .v3-hero>div:nth-child(3){max-width:56%!important}
 }
+
+/* Real-device world readability v7 — final art placement, no new effects. */
+@media(max-width:699px){
+ .v3-home[data-shell="samurai"]{--v3-world-position:69% 3%;--v3-world-filter:saturate(1.18) contrast(1.01) brightness(1.1)}
+ .v3-home[data-shell="carbon"]{--v3-world-position:57% 4%;--v3-world-filter:saturate(1.08) contrast(1.02) brightness(1.04)}
+ .v3-home[data-shell="core"]{--v3-world-position:56% 3%;--v3-world-filter:saturate(1.13) contrast(1.03) brightness(1.03)}
+ .v3-home[data-shell="horizon"]{--v3-world-position:52% 3%;--v3-local-plate:rgba(255,253,244,.9);--v3-world-surface:rgba(255,253,244,.92)}
+ .v3-home[data-shell="aurora"]{--v3-world-position:54% 3%;--v3-local-plate:rgba(245,251,255,.91);--v3-world-surface:rgba(245,251,255,.93)}
+ .v3-home[data-shell="minimal"]{--v3-world-position:52% 3%;--v3-local-plate:rgba(255,249,234,.92);--v3-world-surface:rgba(255,249,234,.94)}
+ .v3-home[data-shell="horizon"] :is(.v3-hero>div:nth-child(3),.v3-primary-grid article,.v3-history-card,.v3-home-benchmark),
+ .v3-home[data-shell="aurora"] :is(.v3-hero>div:nth-child(3),.v3-primary-grid article,.v3-history-card,.v3-home-benchmark),
+ .v3-home[data-shell="minimal"] :is(.v3-hero>div:nth-child(3),.v3-primary-grid article,.v3-history-card,.v3-home-benchmark){text-shadow:none!important;border-color:rgba(35,62,72,.13)!important}
+ .v3-home[data-shell="horizon"] :is(.v3-hero h1,.v3-primary-grid strong,.v3-history-card strong,.v3-home-benchmark strong),
+ .v3-home[data-shell="aurora"] :is(.v3-hero h1,.v3-primary-grid strong,.v3-history-card strong,.v3-home-benchmark strong),
+ .v3-home[data-shell="minimal"] :is(.v3-hero h1,.v3-primary-grid strong,.v3-history-card strong,.v3-home-benchmark strong){color:#10232b!important}
+ .v3-home[data-shell="horizon"] :is(.v3-kicker,.v3-updated,.v3-primary-grid span,.v3-primary-grid small),
+ .v3-home[data-shell="aurora"] :is(.v3-kicker,.v3-updated,.v3-primary-grid span,.v3-primary-grid small),
+ .v3-home[data-shell="minimal"] :is(.v3-kicker,.v3-updated,.v3-primary-grid span,.v3-primary-grid small){color:#536970!important}
+}
+@media(max-width:430px){
+ .v3-home[data-shell="samurai"]{--v3-world-position:72% 2%}
+ .v3-home[data-shell="carbon"]{--v3-world-position:59% 3%}
+ .v3-home[data-shell="core"]{--v3-world-position:58% 2%}
+ .v3-home[data-shell="samurai"] .v3-hero>div:nth-child(3){max-width:52%!important}
+ .v3-home[data-shell="carbon"] .v3-hero>div:nth-child(3),.v3-home[data-shell="core"] .v3-hero>div:nth-child(3){max-width:54%!important}
+}
