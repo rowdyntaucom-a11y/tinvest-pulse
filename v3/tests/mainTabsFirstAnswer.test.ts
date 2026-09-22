@@ -19,6 +19,8 @@ for(const selector of[
 ]) assert.ok(finish.includes(selector),selector+" must participate in the first-answer hierarchy");
 assert.ok(finish.includes("color:var(--v3-accent)!important"));
 assert.ok(finish.includes("font-variant-numeric:tabular-nums"));
+assert.ok(finish.includes("z-index:0"));
+assert.ok(finish.includes("z-index:1"));
 assert.match(finish,/@media\(max-width:699px\)[\s\S]*backdrop-filter:none!important/);
 assert.doesNotMatch(finish.slice(finish.indexOf("First-screen answer hierarchy v17")),/animation:/);
 
