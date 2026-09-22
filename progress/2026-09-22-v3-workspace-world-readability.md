@@ -6,7 +6,7 @@ Real Samsung recording after PR #555 confirmed the stacking regression is fixed 
 - Light worlds (Zen, Nord, Imperium) now fade through pale theme-matched tones instead of being dirtied by a generic black veil.
 - Dark worlds (Samurai, Cosmos, Neon) keep richer saturation/contrast while still fading into the canonical workspace background.
 - Raised/reframed the portrait masters on mobile deep workspaces so focal artwork remains visible above the first card stack.
-- Reduced the workspace veil in the upper viewport, then increases it progressively through the content region.
+- Reduced the workspace veil in the upper viewport, then increases it progressively through the content region.\n- Defined explicit lower-page background tails for Samurai, Nord and Imperium so deep scroll does not fall through to the generic fallback.
 - Kept Home's dedicated cinematic composition authoritative and unchanged.
 - Kept the mobile no-blur performance budget: no new backdrop-filter, animation or generated asset.
 - No financial methodology, broker/data contract, navigation semantics or DNA renderer ownership changed.
