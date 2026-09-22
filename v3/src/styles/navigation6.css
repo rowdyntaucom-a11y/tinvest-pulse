@@ -1,1 +1,8 @@
 .v3-nav{grid-template-columns:repeat(6,minmax(0,1fr))}.v3-nav button{padding-inline:2px}.v3-nav button i{display:block;font-style:normal}.v3-nav button span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:359px){.v3-nav{left:4px;right:4px;gap:2px;padding:3px}.v3-nav button{border-radius:12px}.v3-nav button span{font-size:9px}}
+
+/* Mobile browser chrome regression guard: nav remains inside the visual viewport. */
+@media(max-width:767px){
+  .v3-nav{position:fixed!important;z-index:90!important;left:max(8px,env(safe-area-inset-left))!important;right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important;height:64px!important;max-height:64px!important;transform:translateZ(0);contain:layout paint;isolation:isolate}
+  .v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-coming,.v3-dna,.v3-asset-workspace{padding-bottom:max(96px,calc(84px + env(safe-area-inset-bottom)))!important}
+}
+@media(max-width:359px){.v3-nav{left:max(4px,env(safe-area-inset-left))!important;right:max(4px,env(safe-area-inset-right))!important}}
