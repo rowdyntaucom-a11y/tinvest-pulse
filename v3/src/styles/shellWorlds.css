@@ -243,3 +243,30 @@
 .v3-home[data-shell="horizon"],.v3-home[data-shell="aurora"],.v3-home[data-shell="minimal"]{color:#15232b!important}
 .v3-home[data-shell="horizon"] :is(.v3-primary-grid strong,.v3-hero h1),.v3-home[data-shell="aurora"] :is(.v3-primary-grid strong,.v3-hero h1),.v3-home[data-shell="minimal"] :is(.v3-primary-grid strong,.v3-hero h1){color:#13232b!important;text-shadow:none!important}
 @media(max-width:430px){.v3-home{--v3-scene-height:720px}.v3-home[data-shell="samurai"]{--v3-world-position:50% 10%}.v3-home[data-shell="carbon"]{--v3-world-position:50% 9%}.v3-home[data-shell="core"]{--v3-world-position:50% 9%}.v3-home[data-shell="horizon"],.v3-home[data-shell="aurora"],.v3-home[data-shell="minimal"]{--v3-world-position:50% 8%}.v3-home .v3-hero>div:nth-child(3){max-width:58%}}
+
+/* Mobile performance + composition pass v6.
+   One scrolling scene layer, no live backdrop blur on the command center. */
+@media(max-width:699px){
+ .v3-home:before,.v3-home:after{position:absolute!important;top:0!important;transform:translateX(-50%) translateZ(0);will-change:auto;contain:paint}
+ .v3-home:before{height:720px!important;mask-image:none!important;-webkit-mask-image:none!important;background-size:cover!important}
+ .v3-home:after{height:720px!important;mask-image:none!important;-webkit-mask-image:none!important}
+ .v3-home :is(.v3-hero>div:nth-child(3),.v3-updated,.v3-kicker,.v3-trust,.v3-pulse-entry,.v3-primary-grid article,.v3-history-card,.v3-home-benchmark,.v3-pulse article,.v3-home-actions button,.v3-context-row article){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .v3-app .v3-atmosphere{display:none!important}
+ .v3-home[data-shell="samurai"]{--v3-world-position:57% 8%}
+ .v3-home[data-shell="carbon"]{--v3-world-position:58% 8%}
+ .v3-home[data-shell="core"]{--v3-world-position:56% 7%}
+ .v3-home[data-shell="horizon"]{--v3-world-position:53% 7%}
+ .v3-home[data-shell="aurora"]{--v3-world-position:54% 7%}
+ .v3-home[data-shell="minimal"]{--v3-world-position:53% 7%}
+ .v3-world-menu{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}
+@media(max-width:430px){
+ .v3-home{--v3-scene-height:720px;padding-top:max(60px,calc(env(safe-area-inset-top) + 48px))!important}
+ .v3-home[data-shell="samurai"]{--v3-world-position:60% 5%}
+ .v3-home[data-shell="carbon"]{--v3-world-position:61% 5%}
+ .v3-home[data-shell="core"]{--v3-world-position:59% 4%}
+ .v3-home[data-shell="horizon"]{--v3-world-position:55% 4%}
+ .v3-home[data-shell="aurora"]{--v3-world-position:56% 4%}
+ .v3-home[data-shell="minimal"]{--v3-world-position:55% 4%}
+ .v3-home .v3-hero>div:nth-child(3){max-width:56%!important}
+}
