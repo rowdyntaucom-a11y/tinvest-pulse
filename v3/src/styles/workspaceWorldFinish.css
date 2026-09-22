@@ -249,3 +249,96 @@
   .v3-assets-hero strong{font-size:27px}
   .v3-assets-hero>i{flex-basis:42px;width:42px;height:42px}
 }
+
+
+/* Deep controls readability v18 — interactive depth stays touch-safe and belongs to the selected world.
+   Vertical depth is allowed; tiny controls are not a valid density strategy. */
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-asset-tools button,
+  .v3-holdings-rail button,
+  .v3-holdings-class-strip button,
+  .v3-goal-scenario-years button,
+  .v3-goal-bootstrap-years button,
+  .v3-income-month-ribbon button
+){
+  border-color:var(--v3-line)!important;
+  background:var(--v3-deep-subcard)!important;
+  color:var(--v3-muted)!important;
+}
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-asset-tools button.is-active,
+  .v3-holdings-rail button.is-active,
+  .v3-goal-scenario-years button.is-active,
+  .v3-goal-bootstrap-years button.is-active,
+  .v3-income-month-ribbon button.is-active
+){
+  border-color:color-mix(in srgb,var(--v3-accent) 58%,var(--v3-line))!important;
+  background:color-mix(in srgb,var(--v3-accent) 10%,var(--v3-deep-chrome))!important;
+  color:var(--v3-text)!important;
+}
+.v3-app:not([data-workspace="home"]) :is(
+  .v3-asset-tools button,
+  .v3-holdings-rail button,
+  .v3-goal-scenario-years button,
+  .v3-goal-bootstrap-years button
+):focus-visible{
+  outline:2px solid var(--v3-accent)!important;
+  outline-offset:2px!important;
+}
+
+/* The fixed world control is always present: keep it solid on phone instead of paying for live backdrop blur. */
+@media(max-width:699px){
+  .v3-topbar{height:46px}
+  .v3-world-trigger{
+    min-height:44px!important;
+    height:44px!important;
+    background:var(--v3-deep-chrome,var(--v3-card))!important;
+    border-color:var(--v3-line)!important;
+    color:var(--v3-text)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .v3-world-menu{
+    top:49px!important;
+    background:var(--v3-deep-chrome,var(--v3-card))!important;
+    border-color:var(--v3-line)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .v3-world-menu>button{
+    min-height:62px!important;
+    height:62px!important;
+    border-color:var(--v3-line)!important;
+    background:var(--v3-deep-subcard)!important;
+    color:var(--v3-text)!important;
+  }
+  .v3-world-menu small{color:var(--v3-muted)!important}
+
+  .v3-asset-tools button,
+  .v3-holdings-rail button,
+  .v3-goal-scenario-years button,
+  .v3-goal-bootstrap-years button{
+    min-height:44px!important;
+    font-size:10px!important;
+    line-height:1.2!important;
+  }
+  .v3-asset-tools .v3-asset-sort{max-width:132px}
+  .v3-holdings-class-strip button{min-height:78px!important}
+  .v3-income-month-ribbon button{min-height:78px!important}
+
+  .v3-holdings-class-strip :is(span,small),
+  .v3-holdings-row :is(span,small),
+  .v3-holdings-aggregate :is(span,small),
+  .v3-income-month-ribbon :is(span,small),
+  .v3-goal-scenario-years button,
+  .v3-goal-bootstrap-years button{
+    font-size:10px!important;
+    line-height:1.25!important;
+  }
+  .v3-holdings-class-strip strong,.v3-income-month-ribbon strong{font-size:11px!important}
+}
+@media(max-width:359px){
+  .v3-asset-tools{grid-template-columns:1fr!important}
+  .v3-asset-tools .v3-asset-sort{max-width:none;width:100%}
+  .v3-world-menu{width:calc(100vw - 16px)}
+}
