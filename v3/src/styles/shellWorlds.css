@@ -378,3 +378,53 @@
 @media(max-width:699px){
  .v3-global-world{position:absolute!important;top:0;left:0;right:0;bottom:auto;height:max(100dvh,760px);min-height:100dvh}
 }
+
+
+/* Workspace world readability v13 — preserve art identity on deep workspaces without sacrificing text contrast.
+   Real Samsung pass: keep the upper scene vivid, fade into the canonical workspace background, and avoid blur. */
+.v3-app{
+ --v3-global-grade:linear-gradient(180deg,rgba(5,9,11,.08) 0%,rgba(5,9,11,.30) 38%,rgba(5,9,11,.72) 72%,var(--shell-bg,#071012) 100%);
+ --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 18%,rgba(5,9,11,.14) 34%,rgba(5,9,11,.56) 58%,var(--shell-bg,#071012) 86%);
+}
+.v3-global-world{background-image:var(--v3-global-grade),var(--v3-global-world)!important}
+
+.v3-app[data-shell="samurai"]{
+ --shell-bg:#071214;
+ --v3-global-grade:linear-gradient(180deg,rgba(12,8,6,.04) 0%,rgba(14,9,7,.24) 39%,rgba(11,9,8,.70) 72%,var(--shell-bg,#080b0e) 100%);
+ --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 19%,rgba(15,9,7,.10) 34%,rgba(12,9,8,.50) 58%,var(--shell-bg,#080b0e) 87%);
+}
+.v3-app[data-shell="carbon"]{
+ --v3-global-grade:linear-gradient(180deg,rgba(3,7,24,.03) 0%,rgba(3,7,24,.22) 38%,rgba(3,7,24,.68) 72%,var(--shell-bg,#050610) 100%);
+ --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 18%,rgba(3,7,24,.10) 34%,rgba(3,7,24,.48) 58%,var(--shell-bg,#050610) 87%);
+}
+.v3-app[data-shell="core"]{
+ --v3-global-grade:linear-gradient(180deg,rgba(9,6,26,.03) 0%,rgba(9,6,26,.22) 38%,rgba(8,6,24,.69) 72%,var(--shell-bg,#080b0e) 100%);
+ --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 18%,rgba(9,6,26,.10) 34%,rgba(8,6,24,.49) 58%,var(--shell-bg,#080b0e) 87%);
+}
+.v3-app[data-shell="horizon"]{
+ --v3-global-grade:linear-gradient(180deg,rgba(249,247,235,.02) 0%,rgba(249,247,235,.18) 40%,rgba(244,244,234,.62) 73%,var(--shell-bg,#eef2f4) 100%);
+ --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 20%,rgba(249,247,235,.08) 36%,rgba(244,244,234,.48) 60%,var(--shell-bg,#eef2f4) 88%);
+}
+.v3-app[data-shell="aurora"]{
+ --shell-bg:#050914;
+ --v3-global-grade:linear-gradient(180deg,rgba(240,249,253,.02) 0%,rgba(240,249,253,.17) 40%,rgba(237,247,251,.61) 73%,var(--shell-bg,#eef2f4) 100%);
+ --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 20%,rgba(240,249,253,.08) 36%,rgba(237,247,251,.47) 60%,var(--shell-bg,#eef2f4) 88%);
+}
+.v3-app[data-shell="minimal"]{
+ --shell-bg:#f4f5f3;
+ --v3-global-grade:linear-gradient(180deg,rgba(255,248,229,.02) 0%,rgba(255,248,229,.18) 40%,rgba(250,242,220,.63) 73%,var(--shell-bg,#eef2f4) 100%);
+ --v3-global-mobile-grade:linear-gradient(180deg,transparent 0 20%,rgba(255,248,229,.08) 36%,rgba(250,242,220,.49) 60%,var(--shell-bg,#eef2f4) 88%);
+}
+
+@media(max-width:699px){
+ .v3-app:not([data-workspace="home"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+  background:linear-gradient(180deg,color-mix(in srgb,var(--shell-bg,#071012) 10%,transparent) 0 20%,color-mix(in srgb,var(--shell-bg,#071012) 44%,transparent) 48%,color-mix(in srgb,var(--shell-bg,#071012) 80%,transparent) 72%,var(--shell-bg,#071012) 90%)!important
+ }
+ .v3-app:not([data-workspace="home"])>.v3-global-world:after{background:var(--v3-global-mobile-grade)!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]){--v3-global-position:78% -18px;--v3-global-filter:saturate(1.09) contrast(1.04) brightness(1.03)}
+ .v3-app[data-shell="carbon"]:not([data-workspace="home"]){--v3-global-position:56% -16px;--v3-global-filter:saturate(1.05) contrast(1.04) brightness(1.02)}
+ .v3-app[data-shell="core"]:not([data-workspace="home"]){--v3-global-position:56% -16px;--v3-global-filter:saturate(1.07) contrast(1.04) brightness(1.02)}
+ .v3-app[data-shell="horizon"]:not([data-workspace="home"]){--v3-global-position:50% -22px;--v3-global-filter:saturate(1.03) contrast(1.03) brightness(1.03)}
+ .v3-app[data-shell="aurora"]:not([data-workspace="home"]){--v3-global-position:50% -20px;--v3-global-filter:saturate(1.02) contrast(1.03) brightness(1.03)}
+ .v3-app[data-shell="minimal"]:not([data-workspace="home"]){--v3-global-position:50% -22px;--v3-global-filter:saturate(1.03) contrast(1.03) brightness(1.03)}
+}
