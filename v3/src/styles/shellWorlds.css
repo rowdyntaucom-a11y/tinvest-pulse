@@ -367,3 +367,14 @@
  .v3-global-world{position:absolute;min-height:100dvh;background-size:100% auto;background-position:var(--v3-global-position);filter:var(--v3-global-filter)}
  .v3-app:not([data-workspace="home"])>.v3-global-world:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 0 24%,color-mix(in srgb,var(--shell-bg,#071012) 42%,transparent) 45%,var(--shell-bg,#071012) 78%)}
 }
+
+/* Global world stacking fix v12 — Samsung showed z-index:-1 falling behind the app canvas. */
+.v3-app{position:relative}
+.v3-global-world{z-index:0!important}
+.v3-app>.v3-atmosphere,.v3-app>.v3-topbar,.v3-app>.v3-context-bar,.v3-app>.v3-data-state,.v3-app>.v3-state-detail,.v3-app>.v3-state-dismiss,.v3-app>main,.v3-app>.v3-nav,.v3-app>.v3-pulse-loading{position:relative;z-index:1}
+.v3-app>.v3-topbar,.v3-app>.v3-nav{position:fixed!important}
+.v3-app:not([data-workspace="home"]){background:var(--shell-bg,#071012)!important}
+.v3-app:not([data-workspace="home"])>.v3-global-world{opacity:1}
+@media(max-width:699px){
+ .v3-global-world{position:absolute!important;top:0;left:0;right:0;bottom:auto;height:max(100dvh,760px);min-height:100dvh}
+}
