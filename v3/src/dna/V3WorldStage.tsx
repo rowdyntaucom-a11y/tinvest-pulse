@@ -42,14 +42,17 @@ import { WORLD_SCENE_LAYER_ORDER, WORLD_SCENE_LAYER_VERSION, type WorldSceneLaye
 import { dnaWorldRuntimeRegistry } from './runtime/runtimeOwnership'
 import { createDnaWorldLayers, requireDnaWorldLayer } from './runtime/sceneLayers'
 import { createDnaWorldRoot } from './runtime/worldRoot'
+import { WORLD_VIEW_HEIGHT, WORLD_VIEW_WIDTH, resolveWorldCameraFrame, type WorldFocusPoint } from './worldCamera'
 
 type Props = {
   state: WorldState
   cursor?: WorldEventCursorDocument
+  focus?: WorldFocusPoint | null
 }
 
 type PixiProps = {
   snapshot: WorldRenderSnapshot
+  focus?: WorldFocusPoint | null
 }
 
 type AssetRuntimeState = {
@@ -63,8 +66,8 @@ type AmbientRoute = {
   to: readonly [number, number]
 }
 
-const WORLD_WIDTH = 1600
-const WORLD_HEIGHT = 900
+const WORLD_WIDTH = WORLD_VIEW_WIDTH
+const WORLD_HEIGHT = WORLD_VIEW_HEIGHT
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 let worldStageSequence = 0
 
@@ -165,13 +168,13 @@ function preloadBrowserImage(assetPath: string) {
   })
 }
 
-export function WorldStage({ state, cursor }: Props) {
+export function WorldStage({ state, cursor, focus }: Props) {
   const queue = resolveWorldEventQueue(state, cursor ?? emptyWorldEventCursor())
   const snapshot = buildWorldRenderSnapshot(state, queue)
-  return <WorldPixiStage snapshot={snapshot} />
+  return <WorldPixiStage snapshot={snapshot} focus={focus} />
 }
 
-function WorldPixiStage({ snapshot }: PixiProps) {
+function WorldPixiStage({ snapshot, focus }: PixiProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const ownerIdRef = useRef<string | null>(null)
   const [renderer, setRenderer] = useState('initializing')
@@ -188,6 +191,8 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   const [reviewedMountainsMounted, setReviewedMountainsMounted] = useState(false)
   const [reviewedForestMounted, setReviewedForestMounted] = useState(false)
   const snapshotRef = useRef(snapshot)
+  const focusRef = useRef<WorldFocusPoint | null>(focus ?? null)
+  const fitRef = useRef<(() => void) | null>(null)
   const presentation = buildWorldPresentationMetadata(snapshot)
   const ambientPresentation = buildWorldAmbientActivityPresentation(snapshot)
   const caravanPresentation = buildWorldEventCaravanPresentation(buildWorldEventPresentation(snapshot.pendingEvents))
@@ -198,6 +203,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
   }
 
   useEffect(() => { snapshotRef.current = snapshot }, [snapshot])
+  useEffect(() => { focusRef.current = focus ?? null; fitRef.current?.() }, [focus?.x, focus?.y])
 
   useEffect(() => {
     const host = hostRef.current
@@ -956,18 +962,11 @@ function WorldPixiStage({ snapshot }: PixiProps) {
       })
 
       const fit = () => {
-        const w = Math.max(1, host.clientWidth)
-        const h = Math.max(1, host.clientHeight)
-        const immersivePortrait = h > w * 1.15
-        const baseScale = immersivePortrait ? Math.max(w / WORLD_WIDTH, h / WORLD_HEIGHT) : Math.min(w / WORLD_WIDTH, h / WORLD_HEIGHT)
-        // Real-device portrait framing prioritizes the inhabited settlement band over empty sky.
-        // A restrained 8% push-in keeps the foreground/caption clear while making authored structures readable.
-        const scale = immersivePortrait ? baseScale * 1.08 : baseScale
-        world.scale.set(scale)
-        const focusX = immersivePortrait ? 820 : WORLD_WIDTH / 2
-        const focusY = immersivePortrait ? 515 : WORLD_HEIGHT / 2
-        world.position.set(w / 2 - focusX * scale, h / 2 - focusY * scale)
+        const frame = resolveWorldCameraFrame(host.clientWidth, host.clientHeight, focusRef.current)
+        world.scale.set(frame.scale)
+        world.position.set(frame.x, frame.y)
       }
+      fitRef.current = fit
       fit()
       const ro = new ResizeObserver(fit)
       ro.observe(host)
@@ -992,6 +991,7 @@ function WorldPixiStage({ snapshot }: PixiProps) {
 
     return () => {
       disposed = true
+      fitRef.current = null
       if (app) {
         const typed = app as PixiApplication & { __pulseResizeObserver?: ResizeObserver, __pulseVisibility?: () => void }
         typed.__pulseResizeObserver?.disconnect()
