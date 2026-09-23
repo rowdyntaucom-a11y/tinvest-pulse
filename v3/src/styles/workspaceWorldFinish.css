@@ -105,7 +105,7 @@
 /* Primary cards: one material language per selected world. */
 .v3-app:not([data-workspace="home"]) :is(
   .v3-assets-summary article,.v3-asset,
-  .v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-analysis-layer,.v3-analysis-quality>div,
+  .v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-analysis-layer,.v3-analysis-quality>div,.v3-benchmark,.v3-class-map,.v3-bond-lens,.v3-breadth,.v3-market-context,
   .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-ratios article,.v3-income-depth,
   .v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-goal-facts article,.v3-goal-journey,.v3-goal-scenario-lab,
   .v3-holdings-explorer,.v3-section-selector,
