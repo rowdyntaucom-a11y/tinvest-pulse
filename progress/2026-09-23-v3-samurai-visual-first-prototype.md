@@ -1,0 +1,3 @@
+# 2026-09-23 — Samurai visual-first prototype
+
+Product order is now visual-first by explicit direction: finish Samurai under key, then build genuinely distinct shells, and only after shell approval reconnect live finance/math. Samurai Home therefore routes to a dedicated visual prototype with synthetic display values. It no longer renders the shared Home component on that route. The prototype establishes the target composition: compact cinematic stage, portfolio answer, asymmetric performance command module, trajectory chart, portfolio formation module, unified blade dock, and restrained ambient pulse. Existing live finance code remains intact behind the prototype and other workspaces/shells are untouched.
