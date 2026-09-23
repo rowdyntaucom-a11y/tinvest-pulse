@@ -1,0 +1,13 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const asset=readFileSync(new URL("../src/assets/V3AssetWorkspace.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/styles/samuraiDeepWorkspaces.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(asset,/SamuraiWorkspaceChrome/);
+assert.match(asset,/INSTRUMENT \/\/ 06/);
+for(const selector of["v3-asset-hero","v3-analysis-layer-head","v3-income-depth-head","v3-goal-scenario-lab"])assert.match(css,new RegExp(selector));
+assert.match(css,/samWorkspaceArrival/);
+assert.match(css,/prefers-reduced-motion:reduce/);
+assert.doesNotMatch(css,/backdrop-filter/);
+assert.ok(main.indexOf("samuraiWorkspaceSuite.css")<main.indexOf("samuraiDeepWorkspaces.css"));
+assert.ok(main.indexOf("samuraiDeepWorkspaces.css")<main.indexOf("mobilePerformance.css"));
+console.log("samurai deep workspaces regression: ok");
