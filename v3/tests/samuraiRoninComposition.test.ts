@@ -1,7 +1,8 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const css=readFileSync(new URL("../src/styles/samuraiRoninComposition.css",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
-assert.match(main,/samuraiRoninLiveArt\\.css";import"\\.\\/styles\\/samuraiRoninComposition\\.css"/);\nassert.ok(main.indexOf("samuraiRoninComposition.css")<main.indexOf("mobilePerformance.css"));
+assert.match(main,/samuraiRoninLiveArt\.css";import"\.\/styles\/samuraiRoninComposition\.css"/);
+assert.ok(main.indexOf("samuraiRoninComposition.css")<main.indexOf("mobilePerformance.css"));
 assert.match(css,/grid-template-areas:"twr cash xirr count"/);
 assert.match(css,/var\(--samurai-ronin-art\) 76% 27%\/cover no-repeat/);
 assert.match(css,/\.v3-page-head\{[\s\S]*?width:min\(62%,470px\)/);
