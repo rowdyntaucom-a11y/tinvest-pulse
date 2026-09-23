@@ -1,0 +1,16 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/samuraiArtDirection.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/shellLegibility\.css";import"\.\/styles\/samuraiArtDirection\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(css,/Samurai art-directed interface v26/);
+assert.match(css,/grid-template-areas:"twr cash count" "twr xirr count"/);
+assert.match(css,/grid-template-areas:"twr cash" "twr xirr" "count count"/);
+assert.match(css,/data-workspace="home"/);
+for(const workspace of["v3-assets","v3-analysis","v3-income","v3-goal","v3-asset-workspace"])assert.match(css,new RegExp(workspace));
+assert.match(css,/--samurai-copper/);assert.match(css,/--samurai-jade/);
+assert.match(css,/\.v3-nav button\.is-active/);
+assert.match(css,/@media\(max-width:430px\)/);
+assert.match(css,/@media\(max-width:359px\)/);
+assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.doesNotMatch(css,/url\(/);assert.doesNotMatch(css,/@keyframes/);assert.doesNotMatch(css,/animation:/);assert.doesNotMatch(css,/backdrop-filter:blur/);
+console.log("samurai art direction regression: ok");
