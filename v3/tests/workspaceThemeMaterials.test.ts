@@ -18,7 +18,7 @@ for(const radius of["18px 8px 18px 8px","10px 22px 10px 22px","22px 12px 22px 12
 }
 assert.ok(workspace.includes('--v3-deep-chrome:rgba(242,249,252,.94)'));
 assert.doesNotMatch(workspace.slice(workspace.indexOf("Workspace material coherence v14")),/color-mix\(in srgb,var\(--v3-deep-card\)/);
-assert.match(workspace,/\.v3-app:not\(\[data-workspace="home"\]\) :is\([\s\S]*\.v3-analysis-layer[\s\S]*\.v3-asset-history-card/);
+assert.match(workspace,/\\.v3-app:not\\(\\[data-workspace="home"\\]\\) :is\\([\\s\\S]*\\.v3-analysis-layer[\\s\\S]*\\.v3-benchmark[\\s\\S]*\\.v3-class-map[\\s\\S]*\\.v3-bond-lens[\\s\\S]*\\.v3-breadth[\\s\\S]*\\.v3-market-context[\\s\\S]*\\.v3-asset-history-card/);
 assert.match(workspace,/\.v3-nav button\.is-active[\s\S]*color-mix\(in srgb,var\(--v3-accent\) 10%,transparent\)/);
 assert.ok(workspace.includes(".v3-goal-facts article"));
 assert.ok(workspace.includes(".v3-income-ratios article"));
