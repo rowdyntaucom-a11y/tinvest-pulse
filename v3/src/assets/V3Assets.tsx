@@ -3,7 +3,7 @@ import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import type{V3DetailMode,V3Shell}from"../app/model";
 import{ratioToPercent,clampPercent}from"../data/units";
 import{positionAssetClassLabel,assetClassKey}from"../data/assetClasses";
-import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";
 
 const V3HoldingsExplorer=lazy(()=>import("./V3HoldingsExplorer").then(m=>({default:m.V3HoldingsExplorer})));
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0}),num=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -19,8 +19,9 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
   const base=trusted?[...items]:[],total=base.reduce((s,x)=>s+x.currentValue,0),top3=[...base].sort((a,b)=>b.currentValue-a.currentValue).slice(0,3).reduce((s,x)=>s+x.weight,0)*100,positive=base.filter(x=>x.expectedYield>0).length;
   const rows=useMemo(()=>base.filter(x=>filter==="all"||assetClassKey(x.instrumentType)===(filter==="stock"?"shares":filter==="bond"?"bonds":"funds")).sort((a,b)=>sort==="value"?b.currentValue-a.currentValue:b.expectedYield-a.expectedYield),[items,trusted,filter,sort]);
   const overview=mode==="simple"||view==="overview";
-  return <main className="v3-assets" data-shell={shell}><SamuraiWorkspaceChrome shell={shell} glyph="陣" code="FORMATION // 02" label="PORTFOLIO ROSTER"/>
+  return <main className="v3-assets" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="陣" code="FORMATION // 02" label="PORTFOLIO ROSTER"/>
     <header className="v3-page-head"><span>ПОРТФЕЛЬ · СОСТАВ</span><h1>Активы</h1><p>{trusted?"Подтверждённый состав · веса и текущий broker P/L":"Состав скрыт до подтверждения данных"}</p></header>
+    {shell==="samurai"&&!trusted&&<SamuraiTrustGate kind="assets"/>}
     {trusted&&<section className="v3-assets-hero"><div><span>Стоимость портфеля</span><strong>{rub.format(total)} ₽</strong><small>{base.length} позиций · текущая подтверждённая стоимость</small></div><i aria-hidden="true">◆</i></section>}
     {trusted&&<section className="v3-assets-summary"><article><span>Топ-3</span><strong>{num.format(top3)}%</strong><small>капитала</small></article><article><span>В плюсе</span><strong>{positive}/{base.length}</strong><small>по текущему broker P/L</small></article></section>}
     {mode==="detailed"&&trusted&&<V3SectionSelector label="Раздел портфеля" value={view} onChange={next=>{setView(next);setOpen(null)}} options={PORTFOLIO_VIEWS}/>} 
