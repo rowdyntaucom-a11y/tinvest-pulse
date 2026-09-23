@@ -11,7 +11,7 @@ const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
 
 for(const x of["sam-world__scene-page","sam-world__analytics-page","sam-world__scroll-cue","sam-world__capital","sam-world__origin","sam-world__origin-metrics","sam-world__pulsemarks","sam-world__path","sam-world__formation","sam-world__awaiting"])assert.match(ui,new RegExp(x));
 for(const x of["БОЛЬШЕ АНАЛИТИКИ","Аналитика","С МОМЕНТА ОТКРЫТИЯ","ДОСТУПНАЯ ИСТОРИЯ","ПОРТФЕЛЬ","IMOEX","ОПЕРЕЖЕНИЕ","Источник ещё не подтверждён","DATA GATE // FAIL-CLOSED"])assert.match(ui,new RegExp(x));
-assert.match(ui,/\{home\.isTrusted\?<></);
+assert.ok(ui.includes('{home.isTrusted?<>'));
 assert.match(ui,/scrollIntoView\(\{block:"start"\}\)/);
 assert.match(ui,/id="samurai-analytics"/);
 assert.match(ui,/buildV3RelativeDepth\(home\.history\)/);
