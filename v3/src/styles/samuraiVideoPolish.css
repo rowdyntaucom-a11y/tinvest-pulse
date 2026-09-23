@@ -1,0 +1,106 @@
+/* Samsung video pass — fix transition dead time, header overflow and reclaim the first viewport. */
+
+/* Compact cross-shell lazy boundary. Samurai gets the authored treatment below. */
+.v3-workspace-loading{
+ min-height:calc(100dvh - 74px);box-sizing:border-box;padding:112px 16px 104px;color:var(--v3-text);
+}
+.v3-workspace-loading__panel{
+ width:min(100%,520px);margin:0 auto;padding:14px;display:grid;grid-template-columns:42px minmax(0,1fr);gap:12px;align-items:center;
+ border:1px solid var(--v3-line);background:var(--v3-card);
+}
+.v3-workspace-loading__sigil{display:grid;place-items:center;width:40px;height:40px;font-style:normal}
+.v3-workspace-loading__panel span,.v3-workspace-loading__panel small{display:block;color:var(--v3-muted)}
+.v3-workspace-loading__panel span{font-size:8px;letter-spacing:.12em}.v3-workspace-loading__panel strong{display:block;margin-top:4px;font-size:17px}
+.v3-workspace-loading__panel small{margin-top:4px;font-size:9px}
+.v3-workspace-loading__panel>b{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;height:2px}
+.v3-workspace-loading__panel>b i{display:block;background:var(--v3-line)}
+
+.v3-app[data-shell="samurai"] .v3-workspace-loading{
+ padding-top:118px;background:
+ radial-gradient(circle at 75% 18%,rgba(155,34,27,.12),transparent 24%),
+ linear-gradient(180deg,rgba(2,8,7,.62),rgba(2,7,6,.93));
+}
+.v3-app[data-shell="samurai"] .v3-workspace-loading__panel{
+ position:relative;overflow:hidden;padding:15px 15px 13px;border:0;border-left:2px solid #e34b3b;
+ background:linear-gradient(105deg,rgba(5,16,13,.96),rgba(8,18,15,.9) 68%,rgba(27,14,11,.72));
+ clip-path:polygon(0 0,94% 0,100% 18%,98% 100%,0 100%);
+}
+.v3-app[data-shell="samurai"] .v3-workspace-loading__panel:before{
+ content:"";position:absolute;right:-14px;top:-24px;width:92px;height:92px;border:1px solid rgba(201,155,88,.13);border-radius:50%;
+ box-shadow:0 0 0 17px rgba(201,155,88,.025),0 0 0 36px rgba(227,75,59,.018);
+}
+.v3-app[data-shell="samurai"] .v3-workspace-loading__sigil{
+ border:1px solid rgba(201,155,88,.3);color:#e34b3b;font:19px Georgia,serif;transform:rotate(-3deg);
+}
+.v3-app[data-shell="samurai"] .v3-workspace-loading__panel span{color:#c99b58}.v3-app[data-shell="samurai"] .v3-workspace-loading__panel strong{font:500 20px Georgia,serif}
+.v3-app[data-shell="samurai"] .v3-workspace-loading__panel>b i:nth-child(1){background:#72d8c4}.v3-app[data-shell="samurai"] .v3-workspace-loading__panel>b i:nth-child(2){background:#c99b58}.v3-app[data-shell="samurai"] .v3-workspace-loading__panel>b i:nth-child(3){background:#e34b3b}
+
+/* The video exposed the inherited two-column page-head grid: long Russian status copy
+   sat beside the title and escaped the phone. Samurai owns a single-column title stack. */
+@media(max-width:699px){
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto auto!important;
+  align-content:end!important;align-items:start!important;column-gap:0!important;
+  min-height:112px!important;margin:0 8px 8px!important;padding:30px 14px 12px 18px!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head>span,
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head h1,
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head p{
+  grid-column:1!important;width:min(100%,300px)!important;max-width:300px!important;text-align:left!important;justify-self:start!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head h1{
+  margin:5px 0 0!important;font-size:29px!important;line-height:.98!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head p{
+  margin:5px 0 0!important;font-size:9px!important;line-height:1.28!important;color:#8e9e99!important;
+ }
+}
+
+/* Goal with no target is still a useful authored screen, not a card floating over an empty abyss. */
+.v3-app[data-shell="samurai"] .sam-goal-empty-path{
+ position:relative;margin:7px 9px 0;padding:12px 12px 14px 15px;overflow:hidden;
+ border-left:1px solid rgba(114,216,196,.34);border-top:1px solid rgba(201,155,88,.16);
+ background:
+ radial-gradient(circle at 84% 52%,rgba(149,39,28,.1),transparent 27%),
+ repeating-linear-gradient(0deg,rgba(114,216,196,.025) 0 1px,transparent 1px 38px),
+ rgba(3,10,9,.8);
+}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path:before{
+ content:"";position:absolute;left:16px;right:14px;top:64px;height:1px;background:linear-gradient(90deg,#72d8c4,#c99b58 58%,#e34b3b);
+}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path header{position:relative;z-index:2}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path header span{display:block;font:7px Inter,system-ui,sans-serif;letter-spacing:.13em;color:#c99b58}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path header strong{display:block;margin-top:4px;font:500 15px Georgia,serif;color:#edf2ef}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path>div{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:17px}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path article{min-height:80px;padding:9px 7px;background:linear-gradient(145deg,rgba(5,15,13,.92),rgba(3,9,8,.68));border-top:1px solid rgba(201,155,88,.14)}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path article:nth-child(2){transform:translateY(5px)}.v3-app[data-shell="samurai"] .sam-goal-empty-path article:nth-child(3){transform:translateY(1px)}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path article i{display:grid;place-items:center;width:20px;height:20px;border:1px solid rgba(201,155,88,.25);font:10px Georgia,serif;font-style:normal;color:#d6a25b}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path article b{display:block;margin-top:8px;font:700 9px Inter,system-ui,sans-serif;color:#dce5e1}
+.v3-app[data-shell="samurai"] .sam-goal-empty-path article small{display:block;margin-top:4px;font:6.5px/1.3 Inter,system-ui,sans-serif;color:#6d807a}
+
+/* Reclaim ~50 CSS px on the phone home so the Formation deck peeks above the fixed command dock again. */
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__hero{
+  height:46svh!important;min-height:345px!important;max-height:400px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart{height:108px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart svg{height:101px!important;transform:translateY(-3px)!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__path{padding-top:9px!important;padding-bottom:3px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation{padding-top:4px!important}
+}
+
+/* The transition is brief and local; no blocking cinematic overlay. */
+@media(prefers-reduced-motion:no-preference){
+ .v3-app[data-shell="samurai"] .v3-workspace-loading__panel>b i{animation:samTransit 1.15s ease-in-out infinite}
+ .v3-app[data-shell="samurai"] .v3-workspace-loading__panel>b i:nth-child(2){animation-delay:.12s}
+ .v3-app[data-shell="samurai"] .v3-workspace-loading__panel>b i:nth-child(3){animation-delay:.24s}
+ @keyframes samTransit{0%,100%{opacity:.22;transform:scaleX(.35);transform-origin:left}50%{opacity:.9;transform:scaleX(1)}}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] .v3-workspace-loading__panel>b i{animation:none!important}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path>div{grid-template-columns:1fr!important}
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path article{min-height:56px}
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path article:nth-child(2),.v3-app[data-shell="samurai"] .sam-goal-empty-path article:nth-child(3){transform:none}
+}
