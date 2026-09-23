@@ -20,6 +20,7 @@ Treat Samurai as one complete interface system across all primary workspaces bef
 - Goal now uses a path / torii grammar with a route-like progress rail.
 - Reused existing data, click behavior, selectors and drill-downs. No financial calculations or API contracts changed.
 - Kept mobile readability floors and reduced-motion behavior.
+- Integrated the top command chrome as well: Q seal, Samurai world switcher, context rail and data-source state now use the same lacquer / cut-corner grammar.
 - Added regression coverage and import-order guard.
 
 ## Scope unchanged
