@@ -1,5 +1,6 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const ui=readFileSync(new URL("../src/samurai/SamuraiPrototype.tsx",import.meta.url),"utf8");
+const baseCss=readFileSync(new URL("../src/styles/v3.css",import.meta.url),"utf8");
 const repair=readFileSync(new URL("../src/styles/samuraiHomeTelemetryRepair.css",import.meta.url),"utf8");
 const deck=readFileSync(new URL("../src/styles/samuraiHomeCommandDeck.css",import.meta.url),"utf8");
 const inception=readFileSync(new URL("../src/styles/samuraiSinceInception.css",import.meta.url),"utf8");
@@ -32,6 +33,10 @@ assert.match(ui,/pairedGeometry\(home\.history\)/);
 assert.doesNotMatch(ui,/1 284 760|184 320|18,7|21,4|84 620|24,8|18,1|31,6/);
 assert.doesNotMatch(ui,/КРЯХТЯЩИЙ ФОНД/);
 assert.doesNotMatch(ui,/sam-world__answer/);
+
+assert.match(baseCss,/html,body,#root\{margin:0;width:100%;min-width:0;min-height:100%;padding:0\}/);
+assert.match(baseCss,/body\{min-height:100dvh;overflow-x:hidden\}/);
+assert.match(baseCss,/#root\{min-height:100dvh\}/);
 
 assert.match(app,/SamuraiPrototype home=\{home\}/);
 assert.match(app,/samuraiViewportLock=shell==="samurai"&&!home\.isTrusted&&\["assets","analysis","income","goal"\]\.includes\(workspace\)/);
