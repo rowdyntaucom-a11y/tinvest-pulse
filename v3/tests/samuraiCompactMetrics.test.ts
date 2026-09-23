@@ -34,6 +34,8 @@ assert.doesNotMatch(ui,/КРЯХТЯЩИЙ ФОНД/);
 assert.doesNotMatch(ui,/sam-world__answer/);
 
 assert.match(app,/SamuraiPrototype home=\{home\}/);
+assert.match(app,/samuraiViewportLock=shell==="samurai"&&!home\.isTrusted&&\["assets","analysis","income","goal"\]\.includes\(workspace\)/);
+assert.match(app,/data-viewport-lock=\{samuraiViewportLock\?"true":"false"\}/);
 assert.match(app,/loadV3Analysis=\(\)=>import\("\.\.\/analysis\/V3Analysis"\)/);
 assert.match(app,/V3Analysis=lazy\(loadV3Analysis\)/);
 assert.match(app,/workspace==="analysis"\?<Suspense/);
@@ -84,6 +86,11 @@ assert.match(secondaryViewport,/html:has\(\.v3-app\[data-shell="samurai"\]\[data
 assert.match(secondaryViewport,/body:has\(\.v3-app\[data-shell="samurai"\]\[data-workspace="analysis"\]/);
 assert.match(secondaryViewport,/overflow:hidden!important/);
 assert.match(secondaryViewport,/height:100dvh!important/);
+assert.match(secondaryViewport,/data-viewport-lock="true"/);
+assert.match(secondaryViewport,/position:fixed!important/);
+assert.match(secondaryViewport,/inset:0!important/);
+assert.match(secondaryViewport,/scrollbar-width:none!important/);
+assert.match(secondaryViewport,/::-webkit-scrollbar/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));

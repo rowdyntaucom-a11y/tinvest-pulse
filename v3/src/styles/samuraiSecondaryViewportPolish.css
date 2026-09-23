@@ -168,3 +168,48 @@
     max-height:calc(100dvh - 48px)!important;
   }
 }
+
+
+/* Samsung 1000031414.mp4 — explicit viewport lock.
+   The previous :has-based document lock still left Android Chrome's root scrollbar visible.
+   Make the app itself fixed to the visual viewport whenever V3App marks a fail-closed Samurai chapter. */
+@media(max-width:430px){
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"]{
+    position:fixed!important;
+    inset:0!important;
+    width:100%!important;
+    height:100dvh!important;
+    min-height:0!important;
+    max-height:100dvh!important;
+    overflow:hidden!important;
+    overscroll-behavior:none!important;
+    touch-action:manipulation;
+  }
+
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"]>.v3-global-world,
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"]>.v3-atmosphere{
+    position:fixed!important;
+    inset:0!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"],
+    .v3-goal
+  ){
+    overscroll-behavior:none!important;
+    scrollbar-width:none!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"],
+    .v3-goal
+  )::-webkit-scrollbar{
+    width:0!important;
+    height:0!important;
+    display:none!important;
+  }
+}
