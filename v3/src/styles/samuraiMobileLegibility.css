@@ -1,0 +1,78 @@
+/* Samurai mobile legibility v31 — real Samsung screenshot 2026-09-23.
+   The art remains cinematic, but data wins whenever it overlaps the scene. */
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{--v3-stage-h:clamp(330px,47svh,390px)!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{
+  height:var(--v3-stage-h)!important;min-height:var(--v3-stage-h)!important;
+  grid-template-columns:minmax(0,58%) 1fr!important;
+  background:
+   linear-gradient(90deg,rgba(2,6,7,.94) 0 12%,rgba(2,6,7,.78) 37%,rgba(2,6,7,.18) 61%,rgba(2,6,7,.04) 100%),
+   linear-gradient(0deg,rgba(2,6,7,.9) 0 12%,rgba(2,6,7,.2) 34%,transparent 55%),
+   var(--samurai-ronin-art) 73% 28%/cover no-repeat!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero-top{
+  align-items:center!important;gap:6px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-kicker{
+  max-width:52vw!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  font-size:9px!important;letter-spacing:.12em!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero-tools{gap:3px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-trust,.v3-pulse-entry){
+  min-height:30px!important;padding:5px 7px!important;font-size:8px!important;letter-spacing:.03em!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero>div:nth-child(3){
+  width:min(54vw,220px)!important;align-self:end!important;margin-bottom:52px!important;
+  padding:8px 8px 8px 10px!important;
+  background:linear-gradient(90deg,rgba(2,6,7,.9),rgba(2,6,7,.62) 72%,transparent)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero h1{
+  font-family:Inter,system-ui,sans-serif!important;font-size:clamp(26px,8.2vw,35px)!important;line-height:1!important;
+  font-weight:760!important;color:#f5f7f5!important;text-shadow:0 2px 12px #000!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero p{
+  max-width:190px!important;font-size:11px!important;line-height:1.3!important;color:#a7ddd7!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-updated{
+  position:absolute!important;left:18px!important;bottom:40px!important;z-index:3!important;
+  max-width:190px!important;padding-left:7px!important;color:#9ea9a8!important;opacity:.9!important;
+ }
+ /* Keep the instrument strip outside the artwork; the screenshot showed text colliding with the scene. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid{
+  position:relative!important;z-index:4!important;width:calc(100% - 12px)!important;margin:0 6px!important;
+  grid-template-columns:1.08fr .92fr!important;grid-template-areas:"twr cash" "xirr count"!important;
+  background:rgba(3,7,8,.97)!important;
+  border-top:1px solid rgba(213,53,39,.48)!important;border-bottom:1px solid rgba(104,185,178,.2)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article{
+  min-height:72px!important;padding:9px 10px!important;border-bottom:1px solid rgba(255,255,255,.055)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid :is(span,small){
+  font-family:Inter,system-ui,sans-serif!important;font-size:9px!important;line-height:1.22!important;color:#aeb8b7!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid strong{
+  font-family:Inter,system-ui,sans-serif!important;color:#f2f5f3!important;line-height:1.05!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:first-child strong{font-size:25px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:not(:first-child) strong{font-size:18px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark){
+  background:rgba(3,7,8,.94)!important;color:#e9eeec!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-history-card :is(span,strong,small),
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home-benchmark :is(span,strong,small){
+  font-family:Inter,system-ui,sans-serif!important;text-shadow:none!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-section-line span{font-size:12px!important;letter-spacing:.08em!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-section-line strong{font-size:10px!important;color:#aeb8b7!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav{
+  z-index:40!important;min-height:56px!important;background:rgba(3,7,8,.98)!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button span{
+  font-family:Inter,system-ui,sans-serif!important;font-size:9px!important;letter-spacing:.035em!important;color:#b9c3c2!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active span{color:#f3f5f4!important}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{--v3-stage-h:320px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero>div:nth-child(3){margin-bottom:42px!important}
+}
