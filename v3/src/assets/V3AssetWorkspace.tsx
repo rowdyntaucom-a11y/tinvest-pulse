@@ -10,7 +10,7 @@ import{ratioToPercent}from"../data/units";
 import type{V3HistoryWindow}from"../history/historyLens";
 import{summarizeAssetRisk}from"./assetRiskLens";
 import{V3AssetHistoryChart}from"./V3AssetHistoryChart";
-import{V3SectionSelector}from"../navigation/V3SectionSelector";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";
 
 type View="overview"|"fundamentals"|"history"|"risk"|"income"|"position";
 const VIEW_OPTIONS=[
