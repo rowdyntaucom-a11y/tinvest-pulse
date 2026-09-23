@@ -1,0 +1,74 @@
+/* Shell legibility signatures v25.
+   Real-device follow-up: preserve authored compositions while giving text a quiet local reading field.
+   No new art/network/animation; shell identity comes from native chrome and contrast grammar. */
+.v3-app{--shell-reading-field:linear-gradient(90deg,rgba(6,10,14,.88),rgba(6,10,14,.56) 58%,transparent 88%);--shell-rule:var(--v3-line);--shell-value-emphasis:var(--v3-text)}
+.v3-app:not([data-workspace="dna"]) :is(.v3-page-head,.v3-hero-top,.v3-assets-hero>div:first-child,.v3-income-hero>div:first-child,.v3-goal-hero>div:first-child){position:relative;isolation:isolate}
+.v3-app:not([data-workspace="dna"]) .v3-page-head:after{
+ content:"";position:absolute;z-index:-1;inset:-8px -12px;border-radius:inherit;pointer-events:none;background:var(--shell-reading-field);opacity:.72
+}
+.v3-app:not([data-workspace="dna"]) :is(.v3-primary-grid strong,.v3-assets-summary strong,.v3-analysis-grid strong,.v3-income-grid strong,.v3-goal-facts strong){
+ color:var(--shell-value-emphasis);font-variant-numeric:tabular-nums
+}
+
+/* Samurai — ink panel over cinematic art; warm blade rule, no red/orange wash behind copy. */
+.v3-app[data-shell="samurai"]{
+ --shell-reading-field:linear-gradient(90deg,rgba(3,15,18,.94) 0,rgba(3,15,18,.78) 58%,rgba(3,15,18,.12) 100%);
+ --shell-rule:rgba(240,176,109,.48);--shell-value-emphasis:#fff8ec
+}
+.v3-app[data-shell="samurai"] .v3-page-head:after{border-left:2px solid var(--shell-rule);border-radius:2px 16px 2px 16px}
+.v3-app[data-shell="samurai"] :is(.v3-page-head p,.v3-kicker,.v3-primary-grid span,.v3-assets-summary span){color:#c5d1ce!important}
+.v3-app[data-shell="samurai"] :is(.v3-primary-grid strong,.v3-assets-summary strong){text-shadow:0 2px 14px rgba(0,0,0,.62)}
+
+/* Cosmos — brighten the information plane, not the wallpaper. Fine cyan instrument rails. */
+.v3-app[data-shell="carbon"]{
+ --shell-reading-field:linear-gradient(90deg,rgba(5,11,34,.96),rgba(9,17,48,.86) 72%,rgba(17,28,68,.26));
+ --shell-rule:rgba(121,191,255,.52);--shell-value-emphasis:#f8fbff
+}
+.v3-app[data-shell="carbon"] .v3-page-head:after{border:1px solid rgba(121,191,255,.16);border-left:3px solid var(--shell-rule);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)}
+.v3-app[data-shell="carbon"] :is(.v3-primary-grid article,.v3-analysis-grid article){background:linear-gradient(145deg,rgba(11,22,57,.94),rgba(5,11,32,.9))!important}
+.v3-app[data-shell="carbon"] :is(.v3-primary-grid span,.v3-analysis-grid span,.v3-assets-summary span){color:#b8c9ee!important}
+.v3-app[data-shell="carbon"] :is(.v3-primary-grid strong,.v3-analysis-grid strong){text-shadow:0 0 18px rgba(121,191,255,.12)}
+
+/* Neon — luminous poster header with an opaque violet reading strip; keep electric art peripheral. */
+.v3-app[data-shell="core"]{
+ --shell-reading-field:linear-gradient(90deg,rgba(17,9,38,.96),rgba(30,12,54,.86) 68%,rgba(51,15,73,.18));
+ --shell-rule:rgba(220,137,255,.62);--shell-value-emphasis:#fff7ff
+}
+.v3-app[data-shell="core"] .v3-page-head:after{border-top:3px solid var(--shell-rule);border-radius:22px 8px 22px 8px}
+.v3-app[data-shell="core"] :is(.v3-primary-grid article,.v3-analysis-grid article){background:linear-gradient(150deg,rgba(29,15,54,.94),rgba(15,10,35,.9))!important}
+.v3-app[data-shell="core"] :is(.v3-primary-grid span,.v3-analysis-grid span,.v3-assets-summary span){color:#d1b9dd!important}
+
+/* Zen — paper veil instead of dark glass. Ink contrast stays independent of landscape detail. */
+.v3-app[data-shell="horizon"]{
+ --shell-reading-field:linear-gradient(90deg,rgba(251,253,248,.96),rgba(248,252,246,.86) 72%,rgba(248,252,246,.18));
+ --shell-rule:rgba(65,111,91,.32);--shell-value-emphasis:#17332a
+}
+.v3-app[data-shell="horizon"] .v3-page-head:after{border-top:1px solid var(--shell-rule);border-bottom:1px solid var(--shell-rule);border-radius:0}
+.v3-app[data-shell="horizon"] :is(.v3-page-head p,.v3-kicker,.v3-primary-grid span,.v3-analysis-grid span,.v3-assets-summary span){color:#587068!important}
+.v3-app[data-shell="horizon"] :is(.v3-primary-grid strong,.v3-analysis-grid strong,.v3-assets-summary strong){color:#17332a!important}
+
+/* Nord — frost-solid reading slab and stronger slate ink. */
+.v3-app[data-shell="aurora"]{
+ --shell-reading-field:linear-gradient(90deg,rgba(244,250,252,.97),rgba(236,246,250,.9) 72%,rgba(236,246,250,.22));
+ --shell-rule:rgba(59,127,165,.34);--shell-value-emphasis:#102c3a
+}
+.v3-app[data-shell="aurora"] .v3-page-head:after{border-left:4px solid #77b8d5;border-radius:18px}
+.v3-app[data-shell="aurora"] :is(.v3-page-head p,.v3-kicker,.v3-primary-grid span,.v3-analysis-grid span,.v3-assets-summary span){color:#506f7e!important}
+.v3-app[data-shell="aurora"] :is(.v3-primary-grid strong,.v3-analysis-grid strong,.v3-assets-summary strong){color:#102c3a!important}
+
+/* Imperium — ivory ledger header, bronze double rule and high-contrast archival ink. */
+.v3-app[data-shell="minimal"]{
+ --shell-reading-field:linear-gradient(90deg,rgba(255,251,242,.98),rgba(250,244,231,.94) 78%,rgba(250,244,231,.34));
+ --shell-rule:rgba(116,83,43,.42);--shell-value-emphasis:#2d2419
+}
+.v3-app[data-shell="minimal"] .v3-page-head:after{border-top:3px double var(--shell-rule);border-bottom:1px solid var(--shell-rule);border-radius:0}
+.v3-app[data-shell="minimal"] :is(.v3-page-head p,.v3-kicker,.v3-primary-grid span,.v3-analysis-grid span,.v3-assets-summary span){color:#665a49!important}
+.v3-app[data-shell="minimal"] :is(.v3-primary-grid strong,.v3-analysis-grid strong,.v3-assets-summary strong){color:#2d2419!important}
+
+/* Keep artwork visible but never let it become the reading surface on phones. */
+@media(max-width:699px){
+ .v3-app:not([data-workspace="dna"]) .v3-page-head:after{inset:-6px -8px;opacity:.94}
+ .v3-app[data-shell="samurai"] .v3-page-head:after,.v3-app[data-shell="carbon"] .v3-page-head:after,.v3-app[data-shell="core"] .v3-page-head:after{background-position:center}
+ .v3-app[data-shell="horizon"] .v3-page-head:after,.v3-app[data-shell="aurora"] .v3-page-head:after,.v3-app[data-shell="minimal"] .v3-page-head:after{box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){.v3-app:not([data-workspace="dna"]) .v3-page-head:after{transition:none!important}}
