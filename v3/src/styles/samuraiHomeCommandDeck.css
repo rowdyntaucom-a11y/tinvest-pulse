@@ -1,0 +1,172 @@
+/* Samurai Home command deck — capital leaves the artwork and becomes a lower HUD.
+   Direction approved from 2026-09-23 phone review. Mobile-first, no scroll, no finance changes. */
+
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world{
+  height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;
+  overflow:hidden!important;padding-bottom:64px!important;
+  background:#020706!important;
+ }
+
+ /* ART STAGE — no financial card over the samurai/torii composition. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__hero{
+  height:35svh!important;min-height:270px!important;max-height:305px!important;
+  margin:0!important;overflow:hidden!important;
+  background-position:68% 33%!important;
+  box-shadow:inset 0 -36px 44px rgba(2,7,6,.72)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__hero:after{
+  content:"";position:absolute;z-index:3;left:0;right:0;bottom:0;height:42px;
+  pointer-events:none;background:linear-gradient(180deg,transparent,#020706 88%);
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__brand{
+  z-index:8!important;opacity:.9!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__reticle{
+  opacity:.44!important;transform:scale(.84)!important;transform-origin:84% 42%!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__slash{
+  opacity:.18!important;
+ }
+
+ /* CAPITAL — full-width lower command panel, aligned with all following modules. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital{
+  position:relative;z-index:10;box-sizing:border-box;
+  min-height:65px;margin:-2px 0 4px;padding:9px 13px 9px 14px;
+  display:grid;grid-template-columns:minmax(0,1.45fr) minmax(92px,.72fr);gap:10px;align-items:center;
+  overflow:hidden;border:0;border-left:2px solid #c99b58;border-top:1px solid rgba(114,216,196,.2);
+  background:
+   radial-gradient(circle at 91% 50%,rgba(201,155,88,.08),transparent 24%),
+   linear-gradient(104deg,rgba(4,15,13,.985),rgba(5,16,14,.975) 66%,rgba(20,14,9,.94));
+  clip-path:polygon(0 0,94% 0,100% 22%,99% 100%,0 100%);
+  box-shadow:0 -8px 22px rgba(0,0,0,.28),inset 0 0 0 1px rgba(114,216,196,.035);
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital:before{
+  content:"";position:absolute;left:14px;right:12px;bottom:5px;height:1px;
+  background:linear-gradient(90deg,#72d8c4 0 34%,#c99b58 34% 74%,#e34b3b 74%,transparent);
+  opacity:.72;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-main{
+  min-width:0;align-self:center;padding-right:4px;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-main small{
+  display:block;font:700 6.2px/1 Inter,system-ui,sans-serif;letter-spacing:.15em;color:#c99b58;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-main strong{
+  display:block;margin-top:5px;font:800 26px/.9 Inter,system-ui,sans-serif;
+  letter-spacing:-.045em;color:#f3f6f4;white-space:nowrap;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-change{
+  min-width:0;padding-left:9px;border-left:1px solid rgba(201,155,88,.2);
+  display:grid;grid-template-columns:1fr;align-content:center;gap:3px;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-change span{
+  font:600 5.5px/1 Inter,system-ui,sans-serif;letter-spacing:.12em;color:#687b75;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-change b{
+  font:800 9px/1 Inter,system-ui,sans-serif;color:#83d9c8;white-space:nowrap;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-change em{
+  font:700 8px/1 Inter,system-ui,sans-serif;font-style:normal;color:#d2a25f;white-space:nowrap;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-mark{
+  position:absolute;right:9px;top:6px;font:29px Georgia,serif;font-style:normal;
+  color:rgba(201,155,88,.045);pointer-events:none;
+ }
+
+ /* TELEMETRY — visually attached to capital deck but not covering art. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulse{
+  min-height:72px!important;margin:0!important;padding:8px 11px 10px 14px!important;
+  clip-path:polygon(0 0,98% 0,100% 8%,100% 100%,0 100%)!important;
+  background:linear-gradient(105deg,rgba(3,12,10,.96),rgba(5,14,12,.94) 72%,rgba(13,11,8,.9))!important;
+  border-bottom:1px solid rgba(114,216,196,.06);
+  box-shadow:none!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr>strong{
+  font-size:29px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr>small{
+  font-size:5.5px!important;letter-spacing:.1em!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks span{
+  padding-top:2px!important;padding-bottom:2px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulse-line{
+  bottom:4px!important;
+ }
+
+ /* Tighten only lower modules to keep the original one-screen contract. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__bridge{
+  height:9px!important;margin:-1px 0 -5px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__bridge b{
+  width:15px!important;height:15px!important;font-size:6px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__path{
+  padding-top:8px!important;padding-bottom:2px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__path header{
+  min-height:26px!important;margin-bottom:1px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__path header strong{
+  font-size:10px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart{
+  height:82px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart svg{
+  height:76px!important;transform:translateY(-1px)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation{
+  padding-top:3px!important;padding-bottom:5px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation header{
+  min-height:18px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation>div{
+  margin-top:3px!important;gap:4px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button{
+  min-height:43px!important;padding:5px 6px 6px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button>span{
+  margin-top:5px!important;font-size:9px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button>b{
+  margin-top:2px!important;font-size:8px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button>em{
+  bottom:4px!important;
+ }
+
+ .v3-app[data-shell="samurai"][data-workspace="home"]>.v3-nav{
+  bottom:max(6px,env(safe-area-inset-bottom))!important;height:58px!important;max-height:58px!important;
+ }
+}
+
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__hero{
+  height:33svh!important;min-height:245px!important;max-height:278px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital{
+  min-height:61px;padding-inline:11px 10px;grid-template-columns:minmax(0,1.35fr) minmax(82px,.65fr);
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-main strong{font-size:23px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-change b{font-size:8.2px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital-change em{font-size:7.4px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulse{min-height:68px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr>strong{font-size:27px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart{height:72px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart svg{height:67px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button{min-height:39px!important}
+}
+
+@media(prefers-reduced-motion:no-preference) and (max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital:before{
+  animation:samCapitalRail 4.8s ease-in-out infinite;
+ }
+ @keyframes samCapitalRail{50%{filter:brightness(1.45);box-shadow:0 0 8px rgba(114,216,196,.22)}}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__capital:before{animation:none!important}
+}
