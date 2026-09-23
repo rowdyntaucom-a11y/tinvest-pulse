@@ -1,7 +1,8 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const css=readFileSync(new URL("../src/styles/samuraiArtDirection.css",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
-assert.match(main,/shellLegibility\.css";import"\.\/styles\/samuraiArtDirection\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(main,/shellLegibility\.css";import"\.\/styles\/samuraiArtDirection\.css"/);
+assert.ok(main.indexOf("samuraiArtDirection.css")<main.indexOf("mobilePerformance.css"));
 assert.match(css,/Samurai art-directed interface v26/);
 assert.match(css,/grid-template-areas:"twr cash count" "twr xirr count"/);
 assert.match(css,/grid-template-areas:"twr cash" "twr xirr" "count count"/);
