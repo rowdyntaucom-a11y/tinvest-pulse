@@ -78,6 +78,12 @@ assert.match(secondaryViewport,/sam-trust-gate--assets/);
 assert.match(secondaryViewport,/sam-trust-gate--analysis/);
 assert.match(secondaryViewport,/sam-trust-gate--income/);
 assert.match(secondaryViewport,/v3-goal:has\(\.sam-goal-empty-path\)/);
+assert.match(secondaryViewport,/\.v3-app\[data-shell="samurai"\]>.v3-topbar\{/);
+assert.match(secondaryViewport,/box-sizing:border-box!important/);
+assert.match(secondaryViewport,/html:has\(\.v3-app\[data-shell="samurai"\]\[data-workspace="assets"\]/);
+assert.match(secondaryViewport,/body:has\(\.v3-app\[data-shell="samurai"\]\[data-workspace="analysis"\]/);
+assert.match(secondaryViewport,/overflow:hidden!important/);
+assert.match(secondaryViewport,/height:100dvh!important/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));
