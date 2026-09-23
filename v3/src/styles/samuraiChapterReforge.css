@@ -1,0 +1,289 @@
+/* Samurai chapter reforge — perceptually distinct secondary worlds from Samsung recording 1000031392.mp4.
+   This pass intentionally changes composition, silhouette and dominant instrument per chapter.
+   Finance remains fail-closed; no values are invented. */
+
+@media(max-width:699px){
+  /* Locked Samurai pages no longer stack the same cinematic title card above the same trust card. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"] .v3-page-head,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"] .v3-page-head,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"] .v3-page-head{
+    display:none!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]{
+    height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;
+    padding-bottom:70px!important;background:#020807!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"] .sam-workspace-chrome,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"] .sam-workspace-chrome,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"] .sam-workspace-chrome{
+    height:32px!important;min-height:32px!important;margin:0 8px!important;padding:0 7px 0 0!important;
+    background:transparent!important;border-bottom:0!important;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate{
+    height:calc(100dvh - 150px)!important;min-height:0!important;max-height:none!important;
+    box-sizing:border-box!important;margin:0 8px!important;padding:12px 12px 11px!important;
+    overflow:hidden!important;display:grid!important;gap:0!important;
+    border:0!important;border-radius:0!important;clip-path:none!important;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter{
+    position:relative;z-index:5;display:flex;align-items:end;justify-content:space-between;gap:12px;
+    min-height:42px;padding:0 1px 8px;border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter span{
+    font:700 6.5px/1 Inter,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter strong{
+    font:500 28px/.92 Georgia,"Times New Roman",serif;color:#f2f4f1;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header{
+    margin:0!important;padding:9px 0 8px!important;display:grid!important;grid-template-columns:36px minmax(0,1fr)!important;
+    gap:9px!important;align-items:start!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header>i{
+    width:32px!important;height:32px!important;font-size:15px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header span{font-size:6.2px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header strong{font-size:14px!important;margin-top:2px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header small{font-size:7.4px!important;line-height:1.35!important;max-width:290px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate:after{display:none!important}
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action{
+    padding:7px 0 6px!important;gap:7px!important;border-top:1px solid rgba(255,255,255,.06)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action button{
+    min-height:34px!important;padding-inline:11px!important;font-size:7.5px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action span{font-size:6.4px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate footer{
+    margin:0!important;grid-template-columns:auto 1fr minmax(0,1.55fr)!important;gap:6px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate footer span{font-size:5.8px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate footer small{font-size:6px!important}
+
+  /* ASSETS — tactical formation board. Angular, cool, map-first. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets{
+    grid-template-rows:auto auto minmax(142px,1fr) auto auto!important;
+    background:
+      linear-gradient(90deg,rgba(70,210,188,.035) 1px,transparent 1px) 0 0/32px 100%,
+      linear-gradient(0deg,rgba(70,210,188,.025) 1px,transparent 1px) 0 0/100% 30px,
+      linear-gradient(145deg,#03110e 0%,#020908 58%,#071411 100%)!important;
+    border-left:3px solid #62d7c1!important;
+    clip-path:polygon(0 0,94% 0,100% 5%,100% 100%,0 100%)!important;
+    box-shadow:inset 70px 0 110px rgba(60,187,165,.035)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__chapter span{color:#72d8c4}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__chapter strong{color:#dff8f1}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__watermark{
+    right:-8px!important;bottom:50px!important;font-size:150px!important;color:rgba(114,216,196,.025)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-instrument{
+    height:auto!important;min-height:138px!important;margin:0!important;padding:0!important;border:0!important;
+    background:transparent!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-instrument__label{top:6px!important;left:2px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map{inset:28px 7px 22px 4px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .lane{
+    top:0!important;bottom:0!important;background:linear-gradient(transparent,rgba(114,216,196,.5),transparent)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot{
+    width:18px!important;height:18px!important;background:#03100d!important;
+    box-shadow:0 0 0 5px rgba(114,216,196,.018),0 0 16px rgba(114,216,196,.05)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-a{left:11%!important;top:42%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-b{left:32%!important;top:10%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-c{left:49%!important;top:51%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-d{left:68%!important;top:18%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-e{left:85%!important;top:58%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__route{
+    margin:0!important;padding:0!important;border:0!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;
+    align-self:end!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__route article{
+    min-height:62px!important;margin:0!important;padding:7px 6px!important;display:block!important;
+    border:1px solid rgba(114,216,196,.1)!important;border-top:2px solid rgba(114,216,196,.26)!important;
+    background:rgba(3,16,13,.74)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__route b{width:18px!important;height:18px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__route span{display:block!important;margin-top:6px!important;font-size:8px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__route small{display:block!important;margin-top:3px!important;font-size:6.2px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-gate__route i{position:absolute!important;right:5px!important;top:6px!important}
+
+  /* ANALYSIS — scope-first. Circular and amber, deliberately unlike Assets. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis{
+    grid-template-rows:auto auto minmax(178px,1fr) auto auto!important;
+    background:
+      radial-gradient(circle at 50% 47%,rgba(201,155,88,.045),transparent 30%),
+      radial-gradient(circle at 50% 47%,transparent 0 83px,rgba(201,155,88,.055) 84px 85px,transparent 86px),
+      linear-gradient(180deg,#0e0b07 0%,#050907 62%,#020706 100%)!important;
+    border-top:3px solid rgba(201,155,88,.72)!important;
+    clip-path:polygon(4% 0,100% 0,100% 94%,96% 100%,0 100%,0 6%)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__chapter{border-bottom-color:rgba(201,155,88,.16)!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__chapter span{color:#d2a25f}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument{
+    height:auto!important;min-height:176px!important;margin:0!important;border:0!important;background:transparent!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument__label{top:4px!important;left:2px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar{
+    width:172px!important;height:172px!important;right:50%!important;top:4px!important;transform:translateX(50%)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-a{width:146px!important;height:146px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-b{width:102px!important;height:102px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-c{width:54px!important;height:54px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .axis-x{left:8px!important;right:8px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .axis-y{top:8px!important;bottom:8px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .sweep{width:72px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .blip-a{left:118px!important;top:35px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .blip-b{left:48px!important;top:121px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .blip-c{left:136px!important;top:112px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar em{left:72px!important;top:66px!important;font-size:34px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument>small{
+    left:50%!important;right:auto!important;bottom:3px!important;width:260px!important;transform:translateX(-50%)!important;text-align:center!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__route{
+    margin:0 8px!important;padding:0!important;border:0!important;display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:0!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__route article{
+    min-height:48px!important;margin:0!important;padding:6px!important;display:grid!important;grid-template-columns:18px 1fr!important;grid-template-rows:auto auto!important;
+    border:0!important;border-top:1px solid rgba(201,155,88,.2)!important;background:transparent!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__route article+article{border-left:1px solid rgba(201,155,88,.12)!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__route b{grid-row:1/3!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__route span{font-size:7.6px!important;margin:0!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__route small{font-size:5.9px!important;margin:2px 0 0!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__route i{display:none!important}
+
+  /* INCOME — ledger / treasury table. Horizontal, gold, deliberately rectangular. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income{
+    grid-template-rows:auto auto minmax(138px,1fr) auto auto!important;
+    background:
+      repeating-linear-gradient(0deg,transparent 0 24px,rgba(214,169,91,.035) 25px,transparent 26px),
+      linear-gradient(100deg,#100c06 0%,#080b08 54%,#171006 100%)!important;
+    border-right:3px solid rgba(218,169,99,.78)!important;
+    clip-path:polygon(0 0,100% 0,100% 100%,6% 100%,0 94%)!important;
+    box-shadow:inset -72px 0 120px rgba(201,155,88,.045)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__chapter span{color:#e0ad67}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__chapter strong{color:#fff0d2}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-instrument{
+    height:auto!important;min-height:126px!important;margin:0!important;border:0!important;background:transparent!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-instrument__label{left:2px!important;top:5px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger{
+    left:2px!important;right:2px!important;top:27px!important;bottom:20px!important;gap:7px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row{
+    grid-template-columns:44px 1fr 74px!important;gap:8px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row i:first-child{height:5px!important;background:rgba(218,169,99,.18)!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row i:nth-child(2){height:1px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row b{
+    height:8px!important;background:linear-gradient(90deg,rgba(218,169,99,.3),rgba(218,169,99,.08))!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-b b{width:58%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-c b{width:82%!important;background:linear-gradient(90deg,rgba(114,216,196,.23),rgba(114,216,196,.06))!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-d b{width:38%!important;background:linear-gradient(90deg,rgba(227,75,59,.2),rgba(227,75,59,.04))!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__route{
+    margin:0!important;padding:0!important;border:0!important;display:grid!important;grid-template-columns:1fr!important;gap:0!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__route article{
+    min-height:38px!important;margin:0!important;padding:4px 4px!important;display:grid!important;grid-template-columns:24px 78px 1fr 16px!important;
+    border:0!important;border-top:1px solid rgba(218,169,99,.13)!important;background:transparent!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__route article:nth-child(2){background:rgba(201,155,88,.025)!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__route b{width:18px!important;height:18px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__route span{font-size:8.2px!important;margin:0!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-gate__route small{font-size:6.4px!important;margin:0!important}
+
+  /* GOAL — remove the shared red chapter banner; Goal owns a path/torii composition. */
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal>.v3-page-head{display:none!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal{
+    height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;padding-bottom:70px!important;
+    background:
+      radial-gradient(circle at 76% 38%,rgba(227,75,59,.07),transparent 25%),
+      linear-gradient(160deg,#030908 0%,#07110e 60%,#110b08 100%)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-goal-chapter{
+    position:relative;margin:0 8px 5px;padding:14px 15px 12px;min-height:88px;box-sizing:border-box;overflow:hidden;
+    border-left:3px solid #e34b3b;background:
+      linear-gradient(90deg,rgba(227,75,59,.08),transparent 38%),
+      linear-gradient(130deg,rgba(6,17,14,.98),rgba(13,13,10,.84));
+    clip-path:polygon(0 0,90% 0,100% 22%,100% 100%,0 100%);
+  }
+  .v3-app[data-shell="samurai"] .sam-goal-chapter:before{
+    content:"";position:absolute;right:24px;top:16px;width:64px;height:48px;border-top:4px solid rgba(227,75,59,.55);border-bottom:2px solid rgba(201,155,88,.25);
+    box-shadow:15px 0 0 -13px rgba(201,155,88,.4),-15px 0 0 -13px rgba(201,155,88,.4);
+  }
+  .v3-app[data-shell="samurai"] .sam-goal-chapter div{position:relative;z-index:2}
+  .v3-app[data-shell="samurai"] .sam-goal-chapter span{font:700 6.5px/1 Inter,system-ui,sans-serif;letter-spacing:.16em;color:#c99b58}
+  .v3-app[data-shell="samurai"] .sam-goal-chapter h1{margin:6px 0 2px;font:500 29px/.95 Georgia,"Times New Roman",serif;color:#f4f1eb}
+  .v3-app[data-shell="samurai"] .sam-goal-chapter p{margin:0;width:68%;font:7.3px/1.3 Inter,system-ui,sans-serif;color:#7e8e88}
+  .v3-app[data-shell="samurai"] .sam-goal-chapter>i{position:absolute;right:43px;top:27px;font:22px Georgia,serif;font-style:normal;color:rgba(227,75,59,.64)}
+
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal-hero{
+    min-height:112px!important;margin:0 8px 5px!important;padding:13px 14px 12px!important;
+    clip-path:none!important;border-left:1px solid rgba(114,216,196,.45)!important;border-top:1px solid rgba(201,155,88,.15)!important;
+    background:
+      radial-gradient(circle at 83% 48%,transparent 0 35px,rgba(201,155,88,.14) 36px 37px,transparent 38px),
+      linear-gradient(100deg,rgba(4,15,12,.97),rgba(8,14,12,.83))!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal-hero:before{display:none!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal-hero:after{right:26px!important;top:30px!important;font-size:28px!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal-hero>strong{font-size:34px!important}
+
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path{
+    min-height:calc(100dvh - 360px)!important;max-height:360px!important;margin:0 8px!important;padding:14px 14px 12px!important;
+    border:0!important;border-left:2px solid rgba(201,155,88,.42)!important;
+    background:
+      linear-gradient(90deg,rgba(114,216,196,.035) 1px,transparent 1px) 0 0/38px 100%,
+      radial-gradient(circle at 84% 74%,rgba(227,75,59,.07),transparent 23%),
+      rgba(3,10,9,.78)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path:before{top:70px!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path:after{
+    content:"道";position:absolute;right:8px;bottom:-10px;font:132px/1 Georgia,serif;color:rgba(201,155,88,.022)!important;transform:rotate(-8deg);
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path>div{
+    margin-top:20px!important;display:grid!important;grid-template-columns:1fr!important;gap:5px!important;border-left:1px solid rgba(114,216,196,.17)!important;padding-left:11px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path article{
+    min-height:50px!important;padding:6px 8px!important;display:grid!important;grid-template-columns:24px 78px 1fr!important;align-items:center!important;gap:8px!important;
+    border:0!important;border-top:1px solid rgba(201,155,88,.12)!important;background:linear-gradient(90deg,rgba(5,16,13,.78),rgba(3,10,9,.28))!important;transform:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path article i{width:20px!important;height:20px!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path article b{margin:0!important;font-size:8.5px!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path article small{margin:0!important;font-size:6.7px!important;line-height:1.3!important}
+}
+
+@media(max-width:359px){
+  .v3-app[data-shell="samurai"] .sam-trust-gate{height:calc(100dvh - 145px)!important;padding-inline:9px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter strong{font-size:24px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar{width:150px!important;height:150px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-a{width:126px!important;height:126px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-b{width:88px!important;height:88px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-c{width:46px!important;height:46px!important}
+}
+
+@media(prefers-reduced-motion:no-preference){
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-a,
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-e{
+    animation:samFormationBreath 4.8s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-b b{
+    animation:samTreasuryFlow 4.2s ease-in-out infinite;
+  }
+  @keyframes samFormationBreath{50%{filter:brightness(1.6);box-shadow:0 0 14px rgba(114,216,196,.22)}}
+  @keyframes samTreasuryFlow{50%{transform:scaleX(.72);transform-origin:left;filter:brightness(1.5)}}
+}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-a,
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-e,
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-b b{animation:none!important}
+}
