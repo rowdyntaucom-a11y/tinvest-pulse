@@ -1,5 +1,6 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const ui=readFileSync(new URL("../src/samurai/SamuraiPrototype.tsx",import.meta.url),"utf8");
+const gate=readFileSync(new URL("../src/samurai/SamuraiTrustGate.tsx",import.meta.url),"utf8");
 const baseCss=readFileSync(new URL("../src/styles/v3.css",import.meta.url),"utf8");
 const repair=readFileSync(new URL("../src/styles/samuraiHomeTelemetryRepair.css",import.meta.url),"utf8");
 const deck=readFileSync(new URL("../src/styles/samuraiHomeCommandDeck.css",import.meta.url),"utf8");
@@ -14,7 +15,7 @@ const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
 
 for(const x of["sam-world__scene-page","sam-world__analytics-page","sam-world__scroll-cue","sam-world__capital","sam-world__origin","sam-world__origin-metrics","sam-world__pulsemarks","sam-world__path","sam-world__formation","sam-world__awaiting"])assert.match(ui,new RegExp(x));
-for(const x of["БОЛЬШЕ АНАЛИТИКИ","Аналитика","С МОМЕНТА ОТКРЫТИЯ","ДОСТУПНАЯ ИСТОРИЯ","ПОРТФЕЛЬ","IMOEX","ОПЕРЕЖЕНИЕ","Источник ещё не подтверждён","DATA GATE // FAIL-CLOSED"])assert.match(ui,new RegExp(x));
+for(const x of["ИСТОРИЯ И РЕЗУЛЬТАТ","История портфеля","С МОМЕНТА ОТКРЫТИЯ","ДОСТУПНАЯ ИСТОРИЯ","ПОРТФЕЛЬ","IMOEX","ОПЕРЕЖЕНИЕ","Источник ещё не подтверждён","DATA GATE // FAIL-CLOSED"])assert.match(ui,new RegExp(x));
 assert.ok(ui.includes('{home.isTrusted?<>'));
 assert.match(ui,/scrollIntoView\(\{block:"start"\}\)/);
 assert.match(ui,/id="samurai-analytics"/);
@@ -103,6 +104,10 @@ assert.match(secondaryViewport,/scroll-snap-type:y proximity/);
 assert.match(secondaryViewport,/min-height:calc\(118dvh - 48px\)!important/);
 assert.match(secondaryViewport,/min-height:clamp\(292px,39dvh,360px\)!important/);
 assert.match(secondaryViewport,/min-height:58dvh!important/);
+assert.match(gate,/sam-trust-depth-cue/);
+assert.match(gate,/НИЖЕ · МАРШРУТ ПРОВЕРКИ/);
+assert.match(secondaryViewport,/sam-trust-depth-cue/);
+assert.match(secondaryViewport,/samDepthCue/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));
