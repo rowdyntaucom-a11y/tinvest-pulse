@@ -1,0 +1,24 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const gate=readFileSync(new URL("../src/samurai/SamuraiTrustGate.tsx",import.meta.url),"utf8");
+const assets=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),"utf8");
+const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8");
+const income=readFileSync(new URL("../src/income/V3Income.tsx",import.meta.url),"utf8");
+const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/styles/samuraiTrustCanvas.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(gate,/onRefresh/);
+assert.match(gate,/Проверить источник/);
+assert.match(gate,/sam-trust-gate__watermark/);
+for(const src of[assets,analysis,income]){assert.match(src,/onRefresh/);assert.match(src,/refreshing/)}
+assert.ok(app.includes('onRefresh={demo?undefined:onRefresh}'));
+assert.ok(app.includes('refreshing={refreshing}'));
+for(const workspace of["assets","analysis","income","goal"])assert.match(css,new RegExp('data-workspace="'+workspace+'"'));
+assert.match(css,/min-height:clamp\(300px,46dvh,430px\)!important/);
+assert.match(css,/grid-template-columns:1fr!important/);
+assert.match(css,/sam-trust-gate__action/);
+assert.match(css,/overflow:hidden!important/);
+assert.match(css,/prefers-reduced-motion:reduce/);
+assert.doesNotMatch(gate,/\d+[\s\u00A0]*₽|\d+[,.]\d+%/);
+assert.ok(main.indexOf("samuraiChapterCockpit.css")<main.indexOf("samuraiTrustCanvas.css"));
+assert.ok(main.indexOf("samuraiTrustCanvas.css")<main.indexOf("mobilePerformance.css"));
+console.log("samurai trust canvas regression: ok");
