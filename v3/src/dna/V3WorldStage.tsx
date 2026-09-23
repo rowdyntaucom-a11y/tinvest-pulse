@@ -340,23 +340,41 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
       settlementLifeGlow.label = 'world:settlement-life-glow'
       layer('effects').addChild(settlementLifeGlow)
 
+      // The wanderer is the human anchor of the world, not a HUD decoration. Keep the
+      // silhouette readable at portrait scale while reviewed art can still replace it.
       const hero = new Container()
       hero.label = 'world:hero-wanderer'
-      const heroShadow = new Graphics().ellipse(0, 4, 31, 9).fill({ color: 0x020706, alpha: 0.36 })
+      const heroPresence = new Graphics()
+      heroPresence.label = 'world:hero-presence'
+      heroPresence.ellipse(0, 5, 48, 15).fill({ color: 0x07100f, alpha: 0.28 })
+      heroPresence.ellipse(0, 1, 34, 10).stroke({ color: 0xd9a96d, width: 1.4, alpha: 0.42 })
+      const heroShadow = new Graphics().ellipse(0, 5, 34, 10).fill({ color: 0x020706, alpha: 0.48 })
       const heroBody = new Graphics()
-      heroBody.circle(0, -52, 10).fill({ color: 0xd4b68b, alpha: 1 })
-      heroBody.arc(0,-53,10,Math.PI,Math.PI*2).stroke({color:0x111a17,width:4,alpha:.9})
-      heroBody.poly([-15,-43,13,-43,22,-5,8,7,-11,7,-23,-5]).fill({ color: 0x263630, alpha: 1 })
-      heroBody.poly([-18,-42,0,-65,18,-42]).fill({ color: 0x18231f, alpha: 1 })
-      heroBody.rect(-18,-24,36,5).fill({ color: 0x9b7049, alpha: .88 })
-      heroBody.poly([-15,-42,-5,-34,-12,-7,-23,-5]).fill({color:0x33463e,alpha:.96})
-      heroBody.poly([13,-42,5,-34,10,-7,22,-5]).fill({color:0x1d2c27,alpha:.96})
-      heroBody.circle(-4,-53,1.2).fill({color:0x0b100f,alpha:.9})
-      heroBody.circle(4,-53,1.2).fill({color:0x0b100f,alpha:.9})
-      heroBody.moveTo(16,-38).lineTo(31,1).stroke({ color: 0x9b7049, width: 3, alpha: .9 })
-      heroBody.moveTo(29,-1).lineTo(37,-9).stroke({ color: 0xcbd7ce, width: 2, alpha: .78 })
-      hero.addChild(heroShadow,heroBody)
+      // kasa / hood silhouette
+      heroBody.poly([-24,-57,0,-72,25,-57,14,-53,-15,-53]).fill({color:0x18231f,alpha:1})
+      heroBody.poly([-19,-57,0,-67,19,-57]).stroke({color:0xb88a58,width:2,alpha:.82})
+      heroBody.circle(0,-50,9).fill({ color: 0xc8a57d, alpha: 1 })
+      heroBody.rect(-7,-48,14,3).fill({color:0x111917,alpha:.92})
+      // layered travel coat / light armour
+      heroBody.poly([-17,-43,16,-43,24,-5,10,9,-10,9,-25,-5]).fill({ color: 0x263630, alpha: 1 })
+      heroBody.poly([-15,-40,0,-30,15,-40,10,-9,0,-3,-11,-9]).fill({color:0x33463e,alpha:.94})
+      heroBody.rect(-19,-25,38,6).fill({ color: 0xa87746, alpha: .94 })
+      heroBody.rect(-4,-25,8,7).fill({color:0xc49a63,alpha:.9})
+      heroBody.poly([-17,-42,-7,-34,-13,-6,-25,-4]).fill({color:0x3b5047,alpha:.96})
+      heroBody.poly([15,-42,6,-34,11,-6,24,-4]).fill({color:0x1c2b27,alpha:.98})
+      // legs / grounded stance
+      heroBody.poly([-11,7,-2,7,-5,24,-14,24]).fill({color:0x18231f,alpha:1})
+      heroBody.poly([3,7,12,7,15,24,6,24]).fill({color:0x18231f,alpha:1})
+      // visible scabbard + blade hilt
+      heroBody.moveTo(15,-38).lineTo(34,8).stroke({ color: 0x8f633d, width: 4, alpha: .96 })
+      heroBody.moveTo(31,2).lineTo(41,-8).stroke({ color: 0xd9ded8, width: 2.5, alpha: .92 })
+      heroBody.moveTo(27,-2).lineTo(37,-6).stroke({ color: 0xb88a58, width: 3, alpha: .9 })
+      const heroCloak = new Graphics()
+      heroCloak.label = 'world:hero-cloak'
+      heroCloak.poly([-17,-39,-27,-9,-17,5,-8,-7,-5,-33]).fill({color:0x30483f,alpha:.82})
+      hero.addChild(heroPresence,heroShadow,heroBody,heroCloak)
       hero.position.set(870, 676)
+      hero.scale.set(1.16)
 
       const reviewedHeroLayer = new Container()
       reviewedHeroLayer.label = 'asset-slot:actors.hero-wanderer:reviewed'
@@ -931,6 +949,8 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
         if (reduceMotion) {
           hero.position.y = 676
           hero.rotation = 0
+          heroCloak.rotation = 0
+          heroPresence.alpha = .72
           settlementLight.alpha = .9
           settlementLifeGlow.alpha = .82
           emberField.alpha = .72
@@ -965,7 +985,9 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
           return
         }
 
-        hero.position.y = 676 + Math.sin(now / 780) * 2.2
+        hero.position.y = 676 + Math.sin(now / 920) * 2
+        heroCloak.rotation = -0.018 + Math.sin(now / 1450) * 0.025
+        heroPresence.alpha = .58 + Math.sin(now / 1250) * .12
         settlementLight.alpha = .82 + Math.sin(now / 640) * .12
         settlementLifeGlow.alpha = .72 + Math.sin(now / 980) * .12
         emberField.alpha = .62 + Math.sin(now / 180) * .22
