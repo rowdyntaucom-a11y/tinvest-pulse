@@ -1,23 +1,52 @@
 /* Responsive/performance ownership boundary.
-   This file is intentionally imported last. It owns phone blur suppression and
-   page overflow containment; shell and workspace files must not duplicate it. */
-.v3-app{max-width:100%;overflow-x:hidden}
+   This file is intentionally imported last. It owns viewport containment,
+   safe-area clearance, touch corrections and phone effect suppression. Shell
+   identity and workspace composition remain with their respective owners. */
+html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
+@supports(overflow:clip){html,body,#root{overflow-x:clip}}
+.v3-app{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
+@supports(overflow:clip){.v3-app{overflow-x:clip}}
+
+/* Intrinsic grid/flex sizing must not let long Russian copy, identifiers or
+   financial values establish a page width larger than the viewport. */
+.v3-app :is(main,section,article,header,nav,div){min-width:0}
+.v3-app :is(
+  .v3-page-head h1,.v3-page-head p,.v3-hero h1,.v3-asset-hero h1,
+  .v3-asset-id,.v3-asset-identity,.v3-section-line,.v3-analysis-note,
+  .v3-income-detail p,.v3-goal-detail p,.v3-state-detail p,.v3-trust-reason
+){overflow-wrap:anywhere}
+.v3-app :is(
+  .v3-hero h1,.v3-primary-grid strong,.v3-assets-hero strong,.v3-assets-summary strong,
+  .v3-analysis-grid strong,.v3-income-hero strong,.v3-income-grid strong,
+  .v3-goal-hero strong,.v3-goal-facts strong,.v3-asset-hero-value strong,
+  .v3-asset-workspace-grid strong
+){max-width:100%;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 
 @media(max-width:699px){
-  .v3-app:not([data-workspace="dna"]) :is(
-    .v3-topbar,.v3-controls,.v3-context-bar,.v3-data-state,.v3-state-detail,.v3-demo-notice,.v3-nav,
-    .v3-page-head,.v3-hero,.v3-primary-grid article,.v3-history-card,.v3-context-row article,
-    .v3-assets-hero,.v3-assets-summary article,.v3-asset,
-    .v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-analysis-layer,.v3-analysis-quality>div,
-    .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-ratios article,.v3-income-depth,
-    .v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-goal-facts article,.v3-goal-journey,.v3-goal-scenario-lab,
-    .v3-holdings-explorer,.v3-section-selector,.v3-asset-back,.v3-asset-hero,.v3-asset-workspace-grid article
-  ){
+  /* Broad by design: every ordinary workspace is blur-free on phone. DNA owns
+     its renderer/performance contract and is deliberately excluded. */
+  .v3-app:not([data-workspace="dna"]) :is(*,*::before,*::after){
     backdrop-filter:none!important;
     -webkit-backdrop-filter:none!important;
   }
 
   .v3-app :is(button,select,input){touch-action:manipulation}
+  .v3-app :is(.v3-controls>button,.v3-world-trigger,.v3-world-menu button,.v3-nav button,.v3-section-selector select,.v3-asset-back,.v3-state-recovery button){min-height:44px}
+
+  /* The fixed navigation floats above the safe area; every scrolling workspace
+     reserves the same stable nav footprint plus the device inset. */
+  .v3-app :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-coming,.v3-asset-workspace){
+    padding-bottom:max(104px,calc(92px + env(safe-area-inset-bottom)))!important;
+  }
+  .v3-nav{box-sizing:border-box;max-width:calc(100% - max(8px,env(safe-area-inset-left)) - max(8px,env(safe-area-inset-right)))}
+  .v3-nav button{min-width:0;overflow:hidden}
+}
+
+@media(max-width:359px){
+  /* Narrow/foldable cover screens keep the shell grammar but trade columns for
+     vertical depth when two values can no longer wrap safely. */
+  .v3-app :is(.v3-asset-risk-grid,.v3-income-ratios){grid-template-columns:minmax(0,1fr)}
+  .v3-app .v3-state-recovery{align-items:stretch;flex-direction:column}
 }
 
 @media(prefers-reduced-motion:reduce){

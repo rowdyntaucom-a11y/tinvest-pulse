@@ -2,7 +2,7 @@
 
 /* Mobile browser chrome regression guard: nav remains inside the visual viewport. */
 @media(max-width:767px){
-  .v3-nav{position:fixed!important;z-index:90!important;left:max(8px,env(safe-area-inset-left))!important;right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important;height:64px!important;max-height:64px!important;transform:translateZ(0);contain:layout paint;isolation:isolate}
+  .v3-nav{position:fixed!important;z-index:90!important;left:max(8px,env(safe-area-inset-left))!important;right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important;height:64px!important;max-height:64px!important;contain:layout paint;isolation:isolate}
   .v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-coming,.v3-dna,.v3-asset-workspace{padding-bottom:max(96px,calc(84px + env(safe-area-inset-bottom)))!important}
 }
 @media(max-width:359px){.v3-nav{left:max(4px,env(safe-area-inset-left))!important;right:max(4px,env(safe-area-inset-right))!important}}
