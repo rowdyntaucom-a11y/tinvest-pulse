@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/samuraiPosterDashboard.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/samuraiMobileLegibility\.css";import"\.\/styles\/samuraiPosterDashboard\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(css,/display:block!important;height:var\(--v3-stage-h\)/);
+assert.match(css,/position:absolute!important;z-index:4!important;left:14px/);
+assert.match(css,/grid-template-areas:"twr cash" "xirr count"/);
+assert.match(css,/background:#04090a!important/);
+assert.match(css,/animation:none!important/);
+assert.doesNotMatch(css,/backdrop-filter/);assert.doesNotMatch(css,/url\(/);
+console.log("samurai poster dashboard regression: ok");
