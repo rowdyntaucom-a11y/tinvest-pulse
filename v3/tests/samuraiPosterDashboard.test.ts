@@ -1,7 +1,7 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const css=readFileSync(new URL("../src/styles/samuraiPosterDashboard.css",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
-assert.match(main,/samuraiMobileLegibility\\.css";import"\\.\\/styles\\/samuraiPosterDashboard\\.css"/);
+assert.match(main,/samuraiMobileLegibility\.css";import"\.\/styles\/samuraiPosterDashboard\.css"/);
 assert.ok(main.indexOf("samuraiPosterDashboard.css")<main.indexOf("mobilePerformance.css"));
 assert.match(css,/display:block!important;height:var\(--v3-stage-h\)/);
 assert.match(css,/position:absolute!important;z-index:4!important;left:14px/);
