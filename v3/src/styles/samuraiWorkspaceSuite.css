@@ -198,3 +198,35 @@
 @media(prefers-reduced-motion:reduce){
  .v3-app[data-shell="samurai"] .sam-workspace-chrome__sigil,.v3-app[data-shell="samurai"] .sam-workspace-chrome__rail i,.v3-app[data-shell="samurai"] .v3-income-hero:before{animation:none!important}
 }
+
+/* Samurai global chrome — seal, world switcher and source state become part of the command frame. */
+.v3-app[data-shell="samurai"] .v3-topbar{left:9px!important;right:9px!important;height:44px!important;align-items:center!important}
+.v3-app[data-shell="samurai"] .v3-brand{gap:6px!important}
+.v3-app[data-shell="samurai"] .v3-brand b{
+ width:31px!important;height:31px!important;border-radius:0!important;border:1px solid rgba(201,155,88,.42)!important;
+ background:linear-gradient(145deg,rgba(7,18,15,.94),rgba(25,13,11,.86))!important;color:#e34b3b!important;font:700 12px Georgia,serif!important;
+ box-shadow:inset 0 0 0 3px rgba(201,155,88,.035),0 0 12px rgba(0,0,0,.24)!important;transform:rotate(-2deg);
+}
+.v3-app[data-shell="samurai"] .v3-brand span{font-size:8px!important;letter-spacing:.18em!important;color:#cbd6d2!important}
+.v3-app[data-shell="samurai"] .v3-world-trigger{
+ min-width:105px!important;height:35px!important;min-height:35px!important;padding:4px 8px!important;border-radius:0!important;
+ border:1px solid rgba(201,155,88,.24)!important;background:linear-gradient(105deg,rgba(5,15,13,.95),rgba(18,13,10,.92))!important;
+ clip-path:polygon(0 0,91% 0,100% 25%,100% 100%,0 100%)!important;box-shadow:0 7px 20px rgba(0,0,0,.22)!important;
+}
+.v3-app[data-shell="samurai"] .v3-world-trigger i{border-radius:0!important;border-color:rgba(227,75,59,.28)!important}
+.v3-app[data-shell="samurai"] .v3-world-trigger span{font-size:9px!important;letter-spacing:.05em!important}
+.v3-app[data-shell="samurai"] .v3-world-menu{border-radius:0!important;border-color:rgba(201,155,88,.26)!important;background:rgba(3,10,9,.97)!important;clip-path:polygon(0 0,96% 0,100% 4%,100% 100%,4% 100%,0 96%)}
+.v3-app[data-shell="samurai"] .v3-world-menu>button{border-radius:0!important;border-color:rgba(201,155,88,.12)!important;background:linear-gradient(145deg,rgba(7,18,15,.92),rgba(4,10,9,.8))!important}
+.v3-app[data-shell="samurai"] .v3-world-menu>button.is-active{border-color:rgba(227,75,59,.42)!important;background:linear-gradient(145deg,rgba(31,14,12,.86),rgba(7,17,14,.86))!important}
+.v3-app[data-shell="samurai"] .v3-context-bar{
+ top:49px!important;min-height:25px!important;margin:0 9px!important;padding-inline:8px!important;border-radius:0!important;border:0!important;
+ border-bottom:1px solid rgba(114,216,196,.12)!important;background:linear-gradient(90deg,rgba(3,10,9,.92),rgba(3,9,8,.72))!important;
+}
+.v3-app[data-shell="samurai"] .v3-context-bar span{font-size:7px!important;letter-spacing:.08em!important}.v3-app[data-shell="samurai"] .v3-context-bar b{font-size:6px!important}
+.v3-app[data-shell="samurai"] .v3-data-state{
+ top:calc(max(8px,env(safe-area-inset-top)) + 48px)!important;right:12px!important;min-height:22px!important;padding:0 7px!important;
+ border-radius:0!important;border:1px solid rgba(201,155,88,.15)!important;background:rgba(4,12,10,.9)!important;color:#82938e!important;
+ clip-path:polygon(0 0,94% 0,100% 25%,100% 100%,0 100%)!important;
+}
+.v3-app[data-shell="samurai"] .v3-data-state i{border-radius:0!important;width:5px!important;height:5px!important;transform:rotate(45deg)}
+.v3-app[data-shell="samurai"] .v3-data-state span{font-size:7px!important;letter-spacing:.04em!important}
