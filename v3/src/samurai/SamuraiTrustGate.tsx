@@ -1,8 +1,8 @@
 type GateKind="assets"|"analysis"|"income";
-const COPY:Record<GateKind,{glyph:string,eyebrow:string,title:string,lead:string,steps:[string,string,string][]}>={
- assets:{glyph:"陣",eyebrow:"FORMATION LOCKED",title:"Строй ждёт подтверждения",lead:"Состав не подменяется нулями: позиции появятся только после валидного снимка портфеля.",steps:[["壱","Источник","Получить брокерский снимок"],["弐","Покрытие","Проверить полноту состава"],["参","Строй","Показать веса и позиции"]]},
- analysis:{glyph:"眼",eyebrow:"TACTICAL LOCKED",title:"Диагностика ждёт историю",lead:"Риск и доходность остаются скрыты, пока источник или покрытие не прошли проверку.",steps:[["壱","История","Подтвердить точки TWR"],["弐","Состав","Связать текущие позиции"],["参","Матрица","Открыть риск и структуру"]]},
- income:{glyph:"禄",eyebrow:"TREASURY LOCKED",title:"Казначейство ждёт факт",lead:"Купоны и дивиденды не заменяются оценками: нужен подтверждённый поток операций.",steps:[["壱","Операции","Получить выплаты"],["弐","Связь","Сопоставить источники"],["参","Поток","Показать факт и темп"]]}
+const COPY:Record<GateKind,{glyph:string,chapter:string,code:string,eyebrow:string,title:string,lead:string,steps:[string,string,string][]}>={
+ assets:{glyph:"陣",chapter:"Активы",code:"FORMATION // 02",eyebrow:"FORMATION LOCKED",title:"Строй ждёт подтверждения",lead:"Состав не подменяется нулями: позиции появятся только после валидного снимка портфеля.",steps:[["壱","Источник","Получить брокерский снимок"],["弐","Покрытие","Проверить полноту состава"],["参","Строй","Показать веса и позиции"]]},
+ analysis:{glyph:"眼",chapter:"Анализ",code:"TACTICAL // 03",eyebrow:"TACTICAL LOCKED",title:"Диагностика ждёт историю",lead:"Риск и доходность остаются скрыты, пока источник или покрытие не прошли проверку.",steps:[["壱","История","Подтвердить точки TWR"],["弐","Состав","Связать текущие позиции"],["参","Матрица","Открыть риск и структуру"]]},
+ income:{glyph:"禄",chapter:"Доход",code:"TREASURY // 04",eyebrow:"TREASURY LOCKED",title:"Казначейство ждёт факт",lead:"Купоны и дивиденды не заменяются оценками: нужен подтверждённый поток операций.",steps:[["壱","Операции","Получить выплаты"],["弐","Связь","Сопоставить источники"],["参","Поток","Показать факт и темп"]]}
 };
 
 function GateInstrument({kind}:{kind:GateKind}){
@@ -40,7 +40,8 @@ function GateInstrument({kind}:{kind:GateKind}){
 
 export function SamuraiTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind;onRefresh?:()=>void|Promise<void>;refreshing?:boolean}){
  const x=COPY[kind];
- return <section className={"sam-trust-gate sam-trust-gate--"+kind} aria-label={x.title}>
+ return <section className={"sam-trust-gate sam-trust-gate--"+kind} data-kind={kind} aria-label={x.title}>
+  <div className="sam-trust-gate__chapter"><span>{x.code}</span><strong>{x.chapter}</strong></div>
   <div className="sam-trust-gate__watermark" aria-hidden="true">{x.glyph}</div>
   <header><i aria-hidden="true">{x.glyph}</i><div><span>{x.eyebrow}</span><strong>{x.title}</strong><small>{x.lead}</small></div></header>
   <GateInstrument kind={kind}/>
