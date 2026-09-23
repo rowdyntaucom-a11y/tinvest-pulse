@@ -30,7 +30,8 @@ function dayDistance(a:string|null,b:string|null){
 }
 function pairedGeometry(history:V3HomeViewModel["history"]){
  const rows=history
-  .filter((x):x is typeof x&{portfolio:number;imoex:number}=>typeof x.portfolio==="number"&&Number.isFinite(x.portfolio)&&x.portfolio>0&&typeof x.imoex==="number"&&Number.isFinite(x.imoex)&&x.imoex>0)
+  .filter(x=>typeof x.portfolio==="number"&&Number.isFinite(x.portfolio)&&x.portfolio>0&&typeof x.imoex==="number"&&Number.isFinite(x.imoex)&&x.imoex>0)
+  .map(x=>({date:x.date,portfolio:x.portfolio as number,imoex:x.imoex as number}))
   .sort((a,b)=>a.date.localeCompare(b.date));
  if(rows.length<2)return null;
  const p0=rows[0].portfolio,i0=rows[0].imoex;
