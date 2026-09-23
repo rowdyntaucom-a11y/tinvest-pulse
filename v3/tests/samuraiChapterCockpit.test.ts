@@ -1,0 +1,16 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/styles/samuraiChapterCockpit.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(app,/samuraiStateChip/);
+for(const label of["SYNC","LIVE","ЧАСТИЧНО","УСТАРЕЛО","РЕЗЕРВ","ОШИБКА","НЕТ ДАННЫХ"])assert.match(app,new RegExp(label));
+for(const workspace of["assets","analysis","income","goal"])assert.match(css,new RegExp('data-workspace="'+workspace+'"'));
+assert.match(css,/min-height:94px!important/);
+assert.match(css,/height:100dvh!important/);
+assert.match(css,/overflow-y:hidden!important/);
+assert.match(css,/font-size:7\.6px!important/);
+assert.match(css,/samChapterPulse/);
+assert.match(css,/prefers-reduced-motion:reduce/);
+assert.ok(main.indexOf("samuraiTrustGates.css")<main.indexOf("samuraiChapterCockpit.css"));
+assert.ok(main.indexOf("samuraiChapterCockpit.css")<main.indexOf("mobilePerformance.css"));
+console.log("samurai chapter cockpit regression: ok");
