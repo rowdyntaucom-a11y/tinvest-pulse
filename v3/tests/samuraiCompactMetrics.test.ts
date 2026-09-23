@@ -7,6 +7,7 @@ const story=readFileSync(new URL("../src/styles/samuraiScrollStory.css",import.m
 const empty=readFileSync(new URL("../src/styles/samuraiEmptyAnalyticsAtmosphere.css",import.meta.url),"utf8");
 const transition=readFileSync(new URL("../src/styles/samuraiScrollTransitionPolish.css",import.meta.url),"utf8");
 const continuity=readFileSync(new URL("../src/styles/samuraiSecondaryContinuity.css",import.meta.url),"utf8");
+const secondaryViewport=readFileSync(new URL("../src/styles/samuraiSecondaryViewportPolish.css",import.meta.url),"utf8");
 const dock=readFileSync(new URL("../src/styles/samuraiFormationDock.css",import.meta.url),"utf8");
 const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
@@ -70,6 +71,13 @@ assert.match(continuity,/data-workspace="income"/);
 assert.match(continuity,/var\(--samurai-ronin-art\)/);
 assert.match(continuity,/v3-workspace-loading\[data-shell="samurai"\]/);
 assert.match(continuity,/v3-workspace-loading__panel/);
+assert.match(secondaryViewport,/height:calc\(100dvh - 48px\)!important/);
+assert.match(secondaryViewport,/sam-workspace-chrome/);
+assert.match(secondaryViewport,/display:none!important/);
+assert.match(secondaryViewport,/sam-trust-gate--assets/);
+assert.match(secondaryViewport,/sam-trust-gate--analysis/);
+assert.match(secondaryViewport,/sam-trust-gate--income/);
+assert.match(secondaryViewport,/v3-goal:has\(\.sam-goal-empty-path\)/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));
@@ -77,5 +85,6 @@ assert.ok(main.indexOf("samuraiSinceInception.css")<main.indexOf("samuraiScrollS
 assert.ok(main.indexOf("samuraiScrollStory.css")<main.indexOf("samuraiEmptyAnalyticsAtmosphere.css"));
 assert.ok(main.indexOf("samuraiEmptyAnalyticsAtmosphere.css")<main.indexOf("samuraiScrollTransitionPolish.css"));
 assert.ok(main.indexOf("samuraiScrollTransitionPolish.css")<main.indexOf("samuraiSecondaryContinuity.css"));
-assert.ok(main.indexOf("samuraiSecondaryContinuity.css")<main.indexOf("mobilePerformance.css"));
+assert.ok(main.indexOf("samuraiSecondaryContinuity.css")<main.indexOf("samuraiSecondaryViewportPolish.css"));
+assert.ok(main.indexOf("samuraiSecondaryViewportPolish.css")<main.indexOf("mobilePerformance.css"));
 console.log("samurai compact metrics regression: ok");
