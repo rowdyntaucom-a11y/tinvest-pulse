@@ -1,7 +1,8 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const css=readFileSync(new URL("../src/styles/samuraiSamsungRepair.css",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
-assert.match(main,/samuraiRoninComposition\.css";import"\.\/styles\/samuraiSamsungRepair\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(main,/samuraiRoninComposition\.css";import"\.\/styles\/samuraiSamsungRepair\.css"/);
+assert.ok(main.indexOf("samuraiSamsungRepair.css")<main.indexOf("mobilePerformance.css"));
 assert.match(css,/writing-mode:horizontal-tb!important/);
 assert.match(css,/word-break:normal!important/);
 assert.match(css,/--v3-stage-h:clamp\(315px,45svh,370px\)/);

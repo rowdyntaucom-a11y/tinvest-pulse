@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/samuraiMobileLegibility.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/samuraiSamsungRepair\.css";import"\.\/styles\/samuraiMobileLegibility\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(css,/grid-template-areas:"twr cash" "xirr count"/);
+assert.match(css,/margin:0 6px!important/);
+assert.match(css,/font-family:Inter,system-ui,sans-serif!important/);
+assert.match(css,/background:rgba\(3,7,8,\.97\)!important/);
+assert.match(css,/\.v3-kicker\{[\s\S]*?text-overflow:ellipsis!important/);
+assert.doesNotMatch(css,/backdrop-filter/);assert.doesNotMatch(css,/url\(/);assert.doesNotMatch(css,/animation:/);
+console.log("samurai mobile legibility regression: ok");
