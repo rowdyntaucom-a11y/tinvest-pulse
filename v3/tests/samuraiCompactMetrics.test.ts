@@ -33,10 +33,10 @@ assert.doesNotMatch(ui,/КРЯХТЯЩИЙ ФОНД/);
 assert.doesNotMatch(ui,/sam-world__answer/);
 
 assert.match(app,/SamuraiPrototype home=\{home\}/);
-assert.match(app,/import\{V3Analysis\}from"\.\.\/analysis\/V3Analysis"/);
-assert.doesNotMatch(app,/loadV3Analysis/);
-assert.doesNotMatch(app,/workspace==="analysis"\?<Suspense/);
-assert.match(app,/workspace==="analysis"\?<V3Analysis/);
+assert.match(app,/loadV3Analysis=\(\)=>import\("\.\.\/analysis\/V3Analysis"\)/);
+assert.match(app,/V3Analysis=lazy\(loadV3Analysis\)/);
+assert.match(app,/workspace==="analysis"\?<Suspense/);
+assert.match(app,/void loadV3Analysis\(\);void loadV3AssetWorkspace\(\);void loadV3DnaWorkspace\(\)/);
 assert.match(repair,/overflow:hidden!important/);
 assert.match(deck,/sam-world__capital/);
 assert.match(inception,/sam-world__origin/);
@@ -68,6 +68,8 @@ assert.match(continuity,/data-workspace="assets"/);
 assert.match(continuity,/data-workspace="analysis"/);
 assert.match(continuity,/data-workspace="income"/);
 assert.match(continuity,/var\(--samurai-ronin-art\)/);
+assert.match(continuity,/v3-workspace-loading\[data-shell="samurai"\]/);
+assert.match(continuity,/v3-workspace-loading__panel/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));
