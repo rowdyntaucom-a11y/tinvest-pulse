@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/samuraiRoninComposition.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/samuraiRoninLiveArt\.css";import"\.\/styles\/samuraiRoninComposition\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(css,/grid-template-areas:"twr cash xirr count"/);
+assert.match(css,/var\(--samurai-ronin-art\) 76% 27%\/cover no-repeat/);
+assert.match(css,/\.v3-page-head\{[\s\S]*?width:min\(62%,470px\)/);
+assert.match(css,/\.v3-analysis-grid\{[\s\S]*?width:min\(88%,690px\)/);
+assert.match(css,/\.v3-nav\{[\s\S]*?min-height:52px/);
+assert.doesNotMatch(css,/backdrop-filter/);assert.doesNotMatch(css,/url\(/);
+console.log("samurai ronin composition regression: ok");
