@@ -1,4 +1,4 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";const css=readFileSync(new URL("../src/styles/samuraiIntegratedShell.css",import.meta.url),"utf8");const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
-assert.match(main,/samuraiCommandDeck\\.css";import"\\.\\/styles\\/samuraiIntegratedShell\\.css"/);
+assert.ok(main.includes('samuraiCommandDeck.css";import"./styles/samuraiIntegratedShell.css"'));
 assert.ok(main.indexOf("samuraiIntegratedShell.css")<main.indexOf("mobilePerformance.css"));
 assert.match(css,/grid-template-columns:1\.45fr 1fr 1fr/);assert.match(css,/grid-row:1\/3!important/);assert.match(css,/clip-path:polygon\(2% 0,98% 0/);assert.match(css,/\.v3-context-bar\{display:none!important/);assert.match(css,/--sam-brass:#c99b58/);assert.doesNotMatch(css,/backdrop-filter|animation:/);console.log("samurai integrated shell regression: ok");
