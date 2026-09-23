@@ -1,0 +1,107 @@
+/* Full shell design systems v23.
+   Final visual boundary: six shells change typography, geometry, spacing, chrome and card composition,
+   not merely wallpaper. Data semantics and component ownership remain unchanged. */
+.v3-app{
+  --shell-font:Inter,system-ui,sans-serif;
+  --shell-radius:18px;
+  --shell-card-border:1px solid var(--v3-line);
+  --shell-card-shadow:none;
+  --shell-card-pad:14px;
+  --shell-title-case:none;
+  --shell-title-spacing:-.03em;
+  font-family:var(--shell-font);
+}
+.v3-app :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){font-family:var(--shell-font)}
+.v3-app :is(.v3-hero,.v3-primary-grid article,.v3-history-card,.v3-context-row article,.v3-pulse article,
+.v3-assets-hero,.v3-assets-summary article,.v3-asset,.v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,
+.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail,
+.v3-holdings-explorer,.v3-section-selector,.v3-asset-hero,.v3-asset-workspace-grid article){
+  border-radius:var(--shell-radius)!important;border:var(--shell-card-border)!important;box-shadow:var(--shell-card-shadow)!important;
+}
+.v3-app .v3-page-head h1{letter-spacing:var(--shell-title-spacing)!important;text-transform:var(--shell-title-case)}
+.v3-app .v3-context-bar,.v3-app .v3-nav,.v3-app .v3-world-trigger{font-family:var(--shell-font)}
+
+/* SAMURAI — lacquer, paper and blade geometry. Warm editorial type, cut corners, vertical rhythm. */
+.v3-app[data-shell="samurai"]{
+  --shell-font:Georgia,"Times New Roman",serif;--shell-radius:2px 18px 2px 18px;
+  --shell-card-border:1px solid rgba(224,184,126,.28);--shell-card-shadow:inset 3px 0 rgba(103,214,167,.28),0 18px 38px rgba(0,0,0,.22);
+  --shell-title-spacing:.01em;
+}
+.v3-app[data-shell="samurai"] .v3-page-head h1{font-weight:500!important}
+.v3-app[data-shell="samurai"] :is(.v3-kicker,.v3-page-head>span,.v3-primary-grid span,.v3-context-bar,.v3-nav,.v3-world-trigger,.v3-section-selector){font-family:Inter,system-ui,sans-serif;letter-spacing:.09em}
+.v3-app[data-shell="samurai"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){border-left:3px solid #67d6a7!important;border-top-color:rgba(240,176,109,.5)!important}
+.v3-app[data-shell="samurai"] .v3-nav{border-radius:2px 18px 2px 18px!important}
+.v3-app[data-shell="samurai"] .v3-nav button.is-active{box-shadow:inset 0 -2px #f0b06d}
+
+/* COSMOS — technical orbital console. Compact uppercase labels, clipped/diagonal panels and luminous rails. */
+.v3-app[data-shell="carbon"]{
+  --shell-font:"Arial Narrow",Inter,system-ui,sans-serif;--shell-radius:4px 22px 4px 22px;
+  --shell-card-border:1px solid rgba(121,191,255,.3);--shell-card-shadow:inset 0 0 0 1px rgba(114,132,255,.05),0 14px 34px rgba(0,0,0,.28);
+  --shell-title-case:uppercase;--shell-title-spacing:.055em;
+}
+.v3-app[data-shell="carbon"] :is(.v3-kicker,.v3-page-head>span,.v3-primary-grid span,.v3-context-row span,.v3-nav span){text-transform:uppercase;letter-spacing:.11em}
+.v3-app[data-shell="carbon"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}
+.v3-app[data-shell="carbon"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid){gap:5px!important}
+.v3-app[data-shell="carbon"] .v3-nav{border-radius:4px 20px 4px 20px!important;border-top:1px solid rgba(121,191,255,.42)!important}
+
+/* NEON — arcade/synth instrument. Bold rounded modules and electric header rail. */
+.v3-app[data-shell="core"]{
+  --shell-font:Inter,system-ui,sans-serif;--shell-radius:26px 12px 26px 12px;
+  --shell-card-border:1px solid rgba(201,124,255,.34);--shell-card-shadow:0 0 0 1px rgba(143,109,255,.04),0 14px 32px rgba(25,6,48,.26);
+  --shell-title-spacing:-.055em;
+}
+.v3-app[data-shell="core"] .v3-page-head h1{font-weight:900!important}
+.v3-app[data-shell="core"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){border-top:3px solid #c97cff!important}
+.v3-app[data-shell="core"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article){border-radius:12px 22px 12px 22px!important}
+.v3-app[data-shell="core"] .v3-nav{border-radius:24px 10px 24px 10px!important}
+
+/* ZEN — editorial calm. Air, hairline rules, almost-flat paper; cards stop looking like glass tiles. */
+.v3-app[data-shell="horizon"]{
+  --shell-font:ui-serif,Georgia,serif;--shell-radius:3px;
+  --shell-card-border:0 solid transparent;--shell-card-shadow:0 1px 0 rgba(61,94,77,.2);
+  --shell-title-spacing:-.015em;
+}
+.v3-app[data-shell="horizon"] :is(.v3-kicker,.v3-page-head>span,.v3-primary-grid span,.v3-context-bar,.v3-nav,.v3-world-trigger,.v3-section-selector){font-family:Inter,system-ui,sans-serif}
+.v3-app[data-shell="horizon"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){padding-left:18px!important;border-left:1px solid rgba(79,128,108,.42)!important}
+.v3-app[data-shell="horizon"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid){gap:12px!important}
+.v3-app[data-shell="horizon"] .v3-nav{border-radius:3px!important;box-shadow:0 -1px rgba(61,94,77,.14)!important}
+
+/* NORD — Scandinavian utility. Cool solid panels, generous radius, strong sans hierarchy. */
+.v3-app[data-shell="aurora"]{
+  --shell-font:Inter,system-ui,sans-serif;--shell-radius:20px;
+  --shell-card-border:1px solid rgba(70,125,151,.18);--shell-card-shadow:0 10px 24px rgba(55,91,108,.08);
+  --shell-title-spacing:-.045em;
+}
+.v3-app[data-shell="aurora"] .v3-page-head h1{font-weight:750!important}
+.v3-app[data-shell="aurora"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){border-radius:28px!important;border-top:4px solid #77b8d5!important}
+.v3-app[data-shell="aurora"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article){border-radius:14px!important}
+.v3-app[data-shell="aurora"] .v3-nav{border-radius:20px!important}
+
+/* IMPERIUM — archival/financial ledger. Sharp ivory panels, bronze rules, tabular authority. */
+.v3-app[data-shell="minimal"]{
+  --shell-font:Georgia,"Times New Roman",serif;--shell-radius:0;
+  --shell-card-border:1px solid rgba(116,83,43,.24);--shell-card-shadow:3px 3px 0 rgba(116,83,43,.08);
+  --shell-title-case:uppercase;--shell-title-spacing:.035em;
+}
+.v3-app[data-shell="minimal"] :is(.v3-kicker,.v3-page-head>span,.v3-primary-grid span,.v3-context-row span,.v3-nav,.v3-world-trigger,.v3-section-selector){font-family:Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.v3-app[data-shell="minimal"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){border-left:4px double #9a6a2a!important;border-top:1px solid rgba(154,106,42,.5)!important}
+.v3-app[data-shell="minimal"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid){gap:4px!important}
+.v3-app[data-shell="minimal"] .v3-nav{border-radius:0!important;border-top:3px double rgba(116,83,43,.35)!important}
+
+/* Home must carry the same system instead of falling back to a shared dashboard skin. */
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{border-radius:2px 22px 2px 22px!important}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px))}
+.v3-app[data-shell="core"][data-workspace="home"] .v3-hero{border-top:3px solid #c97cff!important}
+.v3-app[data-shell="horizon"][data-workspace="home"] .v3-hero{border-left:1px solid rgba(79,128,108,.42)!important}
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero{border-top:4px solid #77b8d5!important}
+.v3-app[data-shell="minimal"][data-workspace="home"] .v3-hero{border-left:4px double #9a6a2a!important}
+
+@media(max-width:699px){
+  .v3-app :is(.v3-hero,.v3-primary-grid article,.v3-history-card,.v3-context-row article,.v3-pulse article,
+  .v3-assets-hero,.v3-assets-summary article,.v3-asset,.v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,
+  .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail){
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  }
+  .v3-app[data-shell="horizon"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid){gap:10px!important}
+}
+@media(prefers-reduced-motion:reduce){.v3-app *{scroll-behavior:auto}}
