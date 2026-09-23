@@ -4,6 +4,8 @@
 > This document unifies the current product state, approved UX direction, Snowball benchmark lessons, growth/distribution roadmap, data-honesty constraints and scale architecture.
 > Future ChatGPT/Codex sessions should read this document together with `PROJECT_CONTEXT.md`, current `main`, recent `progress/*.md`, `QVANIX_RESPONSIVE_REQUIREMENTS.md`, `QVANIX_DESIGN_SYSTEM.md` and `PRODUCT_ACCESS_MODEL_V1.md` before making material product changes.
 
+> **Priority update — 2026-09-23:** after real-device review, further Living World/DNA scene work is paused. The active presentation priority is the main workspaces and six complete, readable shell design systems. A shell must change interface material, geometry, typography, hierarchy and chrome—not merely background artwork or hue. DNA remains preserved as a first-class destination, but is not the current visual-development epic.
+
 ## 1. Product thesis
 
 QVANIX is not trying to become a clone of Snowball Income or a generic broker dashboard.
