@@ -1,0 +1,13 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/shellComposition.css",import.meta.url),"utf8"),main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/fullShellSystems\.css";import"\.\/styles\/shellComposition\.css"/);
+assert.match(css,/Shell composition systems v24/);
+for(const shell of["samurai","carbon","core","horizon","aurora","minimal"])assert.match(css,new RegExp('data-shell="'+shell+'"'));
+assert.match(css,/Samurai: asymmetrical scroll/);assert.match(css,/Cosmos: instrument deck/);assert.match(css,/Neon: poster hierarchy/);assert.match(css,/Zen: editorial column/);assert.match(css,/Nord: modular utility/);assert.match(css,/Imperium: ledger/);
+assert.match(css,/data-shell="minimal"[^]*grid-template-columns:1fr!important/);
+assert.match(css,/data-shell="horizon"[^]*display:flex!important/);
+assert.match(css,/data-shell="core"[^]*grid-column:span 2/);
+assert.match(css,/data-shell="carbon"[^]*grid-template-columns:1fr 1fr 1fr 1fr/);
+assert.match(css,/@media\(max-width:699px\)/);assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.doesNotMatch(css,/backdrop-filter:/);assert.doesNotMatch(css,/animation:/);assert.doesNotMatch(css,/url\(/);
+console.log("shell composition regression: ok");
