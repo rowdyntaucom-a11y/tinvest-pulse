@@ -1,0 +1,92 @@
+/* Samurai poster-dashboard v32 — structural mobile redesign from real Samsung evidence.
+   One cinematic poster, one compact instrument dock, then depth. */
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{
+  --v3-stage-h:clamp(360px,50svh,420px)!important;
+  padding-left:0!important;padding-right:0!important;padding-bottom:78px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{
+  position:relative!important;display:block!important;height:var(--v3-stage-h)!important;min-height:var(--v3-stage-h)!important;
+  margin:0 8px!important;padding:0!important;overflow:hidden!important;
+  border-left:2px solid var(--samurai-cold)!important;border-bottom:1px solid rgba(213,53,39,.45)!important;
+  background:
+   linear-gradient(90deg,rgba(2,6,7,.62) 0 17%,rgba(2,6,7,.12) 44%,transparent 70%),
+   linear-gradient(0deg,rgba(2,6,7,.94) 0 15%,rgba(2,6,7,.28) 42%,transparent 63%),
+   var(--samurai-ronin-art) 74% 26%/cover no-repeat!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero-top{
+  position:absolute!important;z-index:4!important;top:10px!important;left:12px!important;right:10px!important;
+  display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:8px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-kicker{
+  width:auto!important;max-width:54%!important;padding:7px 9px!important;
+  background:rgba(3,7,8,.72)!important;border-left:1px solid var(--samurai-red)!important;
+  font:700 8px/1.1 Inter,system-ui,sans-serif!important;letter-spacing:.13em!important;color:#f2f4f2!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero-tools{
+  display:flex!important;align-items:center!important;gap:4px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-trust,.v3-pulse-entry){
+  min-height:27px!important;padding:4px 6px!important;border-radius:0!important;
+  background:rgba(3,7,8,.68)!important;border:1px solid rgba(255,255,255,.08)!important;
+  font:700 7px/1 Inter,system-ui,sans-serif!important;letter-spacing:.04em!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero>div:nth-child(3){
+  position:absolute!important;z-index:4!important;left:14px!important;right:14px!important;bottom:38px!important;
+  width:auto!important;margin:0!important;padding:0 0 0 10px!important;align-self:auto!important;
+  background:transparent!important;border-left:2px solid var(--samurai-red)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero h1{
+  margin:0!important;font:760 clamp(30px,9.5vw,40px)/.96 Inter,system-ui,sans-serif!important;
+  letter-spacing:-.04em!important;color:#f7f8f6!important;text-shadow:0 2px 18px #000!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero p{
+  width:min(230px,70vw)!important;max-width:none!important;margin:7px 0 0!important;
+  font:500 11px/1.28 Inter,system-ui,sans-serif!important;color:#9ed8d1!important;text-shadow:0 2px 10px #000!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-updated{
+  position:absolute!important;z-index:4!important;left:26px!important;bottom:15px!important;
+  margin:0!important;padding:0!important;border:0!important;max-width:65%!important;
+  font:500 8px/1.15 Inter,system-ui,sans-serif!important;color:#9ba6a5!important;
+ }
+
+ /* New hierarchy: four metrics become a compact command dock, not a card wall. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid{
+  display:grid!important;width:calc(100% - 16px)!important;margin:0 8px!important;padding:0!important;
+  grid-template-columns:1fr 1fr!important;grid-template-areas:"twr cash" "xirr count"!important;gap:0!important;
+  background:#04090a!important;border:0!important;border-bottom:1px solid rgba(104,185,178,.22)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article{
+  min-height:64px!important;padding:9px 11px 8px!important;border:0!important;border-radius:0!important;
+  border-right:1px solid rgba(255,255,255,.055)!important;border-bottom:1px solid rgba(255,255,255,.055)!important;
+  background:transparent!important;box-shadow:none!important;animation:none!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:first-child{border-left:2px solid var(--samurai-cold)!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid span{
+  display:flex!important;align-items:center!important;gap:3px!important;font:700 8px/1.1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.1em!important;color:#a9b5b3!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid .v3-metric-help>button{
+  width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;font-size:9px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid strong{
+  display:block!important;margin-top:5px!important;font:730 20px/1 Inter,system-ui,sans-serif!important;color:#f3f5f3!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:first-child strong{font-size:24px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid small{
+  display:block!important;margin-top:5px!important;font:500 8px/1.2 Inter,system-ui,sans-serif!important;color:#84918f!important;
+ }
+
+ /* Depth is visually separated from the poster instead of bleeding behind the fixed nav. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark,.v3-pulse,.v3-home-actions){
+  width:calc(100% - 16px)!important;margin:8px 8px 0!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark){
+  padding:11px!important;background:#050a0b!important;border:0!important;border-left:1px solid rgba(104,185,178,.3)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-nav{box-shadow:0 -14px 28px rgba(0,0,0,.62)!important}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{--v3-stage-h:335px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-kicker{max-width:48%!important;font-size:7px!important}
+}
