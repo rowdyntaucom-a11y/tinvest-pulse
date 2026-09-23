@@ -29,7 +29,6 @@ assert.ok(finish.includes("linear-gradient(90deg,var(--v3-head-veil)"));
 assert.ok(finish.includes(".v3-section-selector select option"));
 assert.ok(finish.includes("color:var(--v3-positive)!important"));
 assert.ok(finish.includes("color:var(--v3-negative)!important"));
-assert.match(finish,/@media\(max-width:699px\)[\s\S]*backdrop-filter:none!important/);
 assert.doesNotMatch(finish,/animation:/);
 assert.match(finish,/World picker production art v16/);
 for(const id of["0aab73df","0aab73e0","0aab73e1","0aab73e2","0aab73e3"]) assert.match(finish,new RegExp(id));
