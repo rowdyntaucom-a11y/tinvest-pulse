@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+const camera=fs.readFileSync(new URL('../src/dna/worldCamera.ts',import.meta.url),'utf8')
+const session=fs.readFileSync(new URL('../src/dna/V3WorldSessionStage.tsx',import.meta.url),'utf8')
+const css=fs.readFileSync(new URL('../src/dna/dna.css',import.meta.url),'utf8')
+const stage=fs.readFileSync(new URL('../src/dna/V3WorldStage.tsx',import.meta.url),'utf8')
+assert.match(session,/className="v3-world-session"/)
+assert.match(session,/className="v3-world-entry"/)
+assert.match(camera,/baseScale\*1\.035/)
+assert.match(camera,/focus\?\.x\?\?865/)
+assert.match(camera,/focus\?\.y\?\?565/)
+assert.match(css,/Mobile visibility pass v22/)
+assert.match(css,/\.v3-world-session\{isolation:isolate/)
+assert.match(css,/\.v3-dna-title p\{display:none\}/)
+assert.equal((stage.match(/next\.ticker\.add\(/g)||[]).length,1)
+assert.equal((stage.match(/new Application\(/g)||[]).length,0)
+console.log('dna mobile visibility regression: ok')
