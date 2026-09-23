@@ -7,6 +7,7 @@ assert.match(home,/className="v3-samurai-instruments"/);
 assert.match(home,/:<><header className="v3-hero"/);
 assert.match(css,/grid-template-columns:repeat\(4,1fr\)/);
 assert.match(css,/height:clamp\(430px,59svh,500px\)/);
-assert.match(main,/samuraiPosterDashboard\.css";import"\.\/styles\/samuraiCommandDeck\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(main,/samuraiPosterDashboard\\.css";import"\\.\\/styles\\/samuraiCommandDeck\\.css"/);
+assert.ok(main.indexOf("samuraiCommandDeck.css")<main.indexOf("mobilePerformance.css"));
 assert.doesNotMatch(css,/backdrop-filter|animation:/);
 console.log("samurai dedicated command deck regression: ok");
