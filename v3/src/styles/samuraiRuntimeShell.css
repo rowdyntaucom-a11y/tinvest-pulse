@@ -1,0 +1,23 @@
+/* Runtime correction from Samsung recording: make Samurai an app shell, not a page over wallpaper. */
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"]{--sam-bar:rgba(4,11,10,.96);--sam-line:rgba(119,216,197,.28)}
+ .v3-app[data-shell="samurai"]>.v3-global-world{position:fixed!important;inset:0!important;background:linear-gradient(180deg,rgba(1,6,6,.28),rgba(1,6,6,.92) 62%,#020606 100%),var(--samurai-ronin-art) 70% 20%/cover no-repeat!important;opacity:1!important}
+ .v3-app[data-shell="samurai"]>.v3-atmosphere{display:none!important}
+ .v3-app[data-shell="samurai"]>.v3-topbar{position:sticky!important;top:0!important;z-index:70!important;width:auto!important;margin:0!important;padding:5px 10px!important;height:48px!important;min-height:48px!important;background:linear-gradient(90deg,#06100f 0 68%,#0a1714)!important;border-bottom:1px solid rgba(201,155,88,.34)!important}
+ .v3-app[data-shell="samurai"]>.v3-topbar .v3-brand{display:flex!important;width:30px!important;height:30px!important}
+ .v3-app[data-shell="samurai"]>.v3-topbar .v3-controls{margin-left:auto!important}
+ .v3-app[data-shell="samurai"]>.v3-data-state{position:fixed!important;z-index:71!important;top:11px!important;left:50px!important;right:auto!important;width:112px!important;max-width:112px!important;height:27px!important;min-height:27px!important;margin:0!important;overflow:hidden!important}
+ .v3-app[data-shell="samurai"]>.v3-data-state span{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+ .v3-app[data-shell="samurai"] .v3-samurai-scene{height:286px!important;margin:6px 10px 0!important;background:linear-gradient(90deg,rgba(2,6,7,.86) 0 28%,rgba(2,6,7,.14) 56%,transparent 74%),linear-gradient(0deg,rgba(2,6,7,.88),transparent 45%),var(--samurai-ronin-art) 72% 38%/cover no-repeat!important;box-shadow:0 14px 34px rgba(0,0,0,.32)!important}
+ .v3-samurai-scene-head{display:none!important}
+ .v3-samurai-answer{left:16px!important;bottom:15px!important;width:49%!important}
+ .v3-samurai-answer>strong{font-size:30px!important}
+ .v3-samurai-answer p{font-size:9px!important}
+ .v3-app[data-shell="samurai"] .v3-samurai-instruments{grid-template-columns:1.35fr 1fr 1fr!important;grid-template-rows:54px 54px!important;margin:-7px 10px 0!important}
+ .v3-app[data-shell="samurai"] .v3-samurai-instruments article:first-child{clip-path:polygon(0 0,100% 0,92% 100%,0 100%)!important;background:linear-gradient(135deg,#081311,#06100f)!important}
+ .v3-app[data-shell="samurai"] .v3-samurai-instruments article:nth-child(2){clip-path:polygon(5% 0,100% 0,100% 100%,0 100%)!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark){margin-top:6px!important;background:linear-gradient(105deg,rgba(7,16,15,.96),rgba(4,10,9,.86))!important}
+ .v3-app[data-shell="samurai"] .v3-nav{height:56px!important;max-height:56px!important;background:linear-gradient(90deg,#06100f,#0b1715 48%,#06100f)!important;border-top:1px solid rgba(201,155,88,.4)!important}
+ .v3-app[data-shell="samurai"] .v3-nav button{min-height:46px!important}
+ .v3-app[data-shell="samurai"] .v3-nav button.is-active{background:linear-gradient(180deg,rgba(228,72,57,.16),transparent)!important}
+}
