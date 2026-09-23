@@ -29,9 +29,11 @@ export function resolveWorldCameraFrame(width:number,height:number,focus?:WorldF
   const baseScale=immersivePortrait
     ?Math.max(w/WORLD_VIEW_WIDTH,h/WORLD_VIEW_HEIGHT)
     :Math.min(w/WORLD_VIEW_WIDTH,h/WORLD_VIEW_HEIGHT)
-  const scale=immersivePortrait?baseScale*1.08:baseScale
-  const focusX=immersivePortrait?(focus?.x??820):WORLD_VIEW_WIDTH/2
-  const focusY=immersivePortrait?(focus?.y??515):WORLD_VIEW_HEIGHT/2
+  // Phone portrait prioritises the inhabited band rather than the geometric centre.
+  // The smaller push-in keeps workshop + wanderer + mine readable together before interaction.
+  const scale=immersivePortrait?baseScale*1.035:baseScale
+  const focusX=immersivePortrait?(focus?.x??865):WORLD_VIEW_WIDTH/2
+  const focusY=immersivePortrait?(focus?.y??565):WORLD_VIEW_HEIGHT/2
   const scaledWidth=WORLD_VIEW_WIDTH*scale
   const scaledHeight=WORLD_VIEW_HEIGHT*scale
   const desiredX=w/2-focusX*scale
