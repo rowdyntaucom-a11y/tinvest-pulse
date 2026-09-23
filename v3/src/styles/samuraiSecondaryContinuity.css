@@ -1,0 +1,65 @@
+/* Samsung 1000031411.mp4 — secondary navigation continuity.
+   Keep each Samurai chapter distinct, but remove the dead black shelf under the global topbar. */
+
+@media(max-width:699px){
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    padding-top:max(20px,calc(env(safe-area-inset-top) + 16px))!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(2,8,7,.48) 0,rgba(2,8,7,.76) 165px,#020807 315px),
+      radial-gradient(circle at 22% 17%,rgba(73,211,188,.10),transparent 24%),
+      var(--samurai-ronin-art) 62% 18%/cover no-repeat!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(4,7,6,.42) 0,rgba(5,7,6,.72) 170px,#030706 320px),
+      radial-gradient(circle at 55% 9%,rgba(208,40,35,.16),transparent 30%),
+      var(--samurai-ronin-art) 66% 16%/cover no-repeat!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(5,7,5,.44) 0,rgba(7,8,6,.74) 165px,#050705 315px),
+      radial-gradient(circle at 78% 18%,rgba(210,163,87,.11),transparent 24%),
+      var(--samurai-ronin-art) 72% 19%/cover no-repeat!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal{
+    background:
+      linear-gradient(180deg,rgba(4,7,6,.42) 0,rgba(4,8,7,.75) 165px,#030807 320px),
+      radial-gradient(circle at 70% 16%,rgba(221,55,43,.12),transparent 26%),
+      var(--samurai-ronin-art) 68% 18%/cover no-repeat!important;
+  }
+
+  /* Chapter chrome sits directly on the world, not on a detached black ledge. */
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .sam-workspace-chrome{
+    position:relative;
+    z-index:4;
+    backdrop-filter:blur(3px);
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-workspace-chrome{
+    background:linear-gradient(90deg,rgba(2,13,11,.58),rgba(2,8,7,.18))!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-workspace-chrome{
+    background:linear-gradient(90deg,rgba(15,10,7,.52),rgba(3,8,7,.18))!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-workspace-chrome{
+    background:linear-gradient(90deg,rgba(18,13,7,.54),rgba(4,8,7,.16))!important;
+  }
+
+  /* The theme selector should feel anchored to the same glass plane during chapter changes. */
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]) .v3-topbar{
+    background:linear-gradient(180deg,rgba(2,10,9,.95),rgba(2,10,9,.78))!important;
+    backdrop-filter:blur(8px);
+  }
+}
+
+@media(max-width:359px){
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    padding-top:max(16px,calc(env(safe-area-inset-top) + 12px))!important;
+  }
+}
