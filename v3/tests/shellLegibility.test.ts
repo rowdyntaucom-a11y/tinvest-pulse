@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/shellLegibility.css",import.meta.url),"utf8"),main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/shellComposition\.css";import"\.\/styles\/shellLegibility\.css"/);
+assert.match(css,/Shell legibility signatures v25/);
+for(const shell of["samurai","carbon","core","horizon","aurora","minimal"])assert.match(css,new RegExp('data-shell="'+shell+'"'));
+for(const token of["--shell-reading-field","--shell-rule","--shell-value-emphasis"])assert.match(css,new RegExp(token));
+assert.match(css,/Samurai — ink panel/);assert.match(css,/Cosmos — brighten the information plane/);assert.match(css,/Neon — luminous poster header/);assert.match(css,/Zen — paper veil/);assert.match(css,/Nord — frost-solid reading slab/);assert.match(css,/Imperium — ivory ledger header/);
+assert.match(css,/font-variant-numeric:tabular-nums/);
+assert.match(css,/@media\(max-width:699px\)/);assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.doesNotMatch(css,/url\(/);assert.doesNotMatch(css,/backdrop-filter:/);assert.doesNotMatch(css,/@keyframes/);assert.doesNotMatch(css,/animation:/);
+console.log("shell legibility signatures regression: ok");
