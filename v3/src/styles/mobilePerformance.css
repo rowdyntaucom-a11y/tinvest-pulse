@@ -1,0 +1,25 @@
+/* Responsive/performance ownership boundary.
+   This file is intentionally imported last. It owns phone blur suppression and
+   page overflow containment; shell and workspace files must not duplicate it. */
+.v3-app{max-width:100%;overflow-x:hidden}
+
+@media(max-width:699px){
+  .v3-app:not([data-workspace="dna"]) :is(
+    .v3-topbar,.v3-controls,.v3-context-bar,.v3-data-state,.v3-state-detail,.v3-demo-notice,.v3-nav,
+    .v3-page-head,.v3-hero,.v3-primary-grid article,.v3-history-card,.v3-context-row article,
+    .v3-assets-hero,.v3-assets-summary article,.v3-asset,
+    .v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,.v3-analysis-note,.v3-analysis-layer,.v3-analysis-quality>div,
+    .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-ratios article,.v3-income-depth,
+    .v3-goal-hero,.v3-goal-progress,.v3-goal-detail,.v3-goal-facts article,.v3-goal-journey,.v3-goal-scenario-lab,
+    .v3-holdings-explorer,.v3-section-selector,.v3-asset-back,.v3-asset-hero,.v3-asset-workspace-grid article
+  ){
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+
+  .v3-app :is(button,select,input){touch-action:manipulation}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .v3-app:not([data-workspace="dna"]) *{scroll-behavior:auto!important}
+}
