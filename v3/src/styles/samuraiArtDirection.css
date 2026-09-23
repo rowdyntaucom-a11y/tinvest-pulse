@@ -1,0 +1,99 @@
+/* Samurai art-directed interface v26.
+   The artwork owns the composition. Widgets occupy the quiet left/bottom zones instead of floating as a generic dashboard. */
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]){
+ --samurai-ink:#090b0a;--samurai-paper:#efe5d2;--samurai-copper:#e39b59;--samurai-jade:#6ed7bb;
+ --samurai-line:rgba(227,155,89,.34);--samurai-panel:rgba(8,12,11,.88);
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) :is(.v3-topbar,.v3-context-bar){font-family:Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-topbar{border-bottom:1px solid var(--samurai-line)}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-brand b{border-radius:2px 10px 2px 10px!important;color:var(--samurai-copper)}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-context-bar{border:0!important;border-left:2px solid var(--samurai-copper)!important;border-radius:0!important;background:linear-gradient(90deg,rgba(8,11,10,.92),rgba(8,11,10,.48) 72%,transparent)!important}
+
+/* HOME — reserve the art/right side, build a vertical command scroll on the left and a low data rail. */
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{position:relative}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{
+ display:grid!important;grid-template-columns:minmax(0,54%) 1fr;grid-template-rows:auto 1fr auto;align-items:end;
+ min-height:clamp(410px,58vh,560px)!important;padding:20px 16px 18px!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero-top{grid-column:1/-1;align-self:start;max-width:100%!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero>div:nth-child(3){
+ grid-column:1;align-self:end;max-width:none!important;margin:0 0 18px!important;padding:15px 14px 13px!important;
+ background:linear-gradient(90deg,rgba(7,10,9,.94),rgba(7,10,9,.78) 82%,transparent)!important;
+ border:0!important;border-left:3px solid var(--samurai-copper)!important;border-radius:0!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero h1{font-family:Georgia,"Times New Roman",serif;font-weight:500!important;font-size:clamp(38px,10.8vw,52px)!important;line-height:.96}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero p{margin-top:10px;font-family:Inter,system-ui,sans-serif;font-size:11px}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-updated{grid-column:1;max-width:none!important;margin:0!important;padding-left:14px;border-left:1px solid rgba(227,155,89,.24);color:#c5bbb0!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid{
+ display:grid!important;grid-template-columns:1.45fr .8fr .8fr!important;grid-template-areas:"twr cash count" "twr xirr count";gap:0!important;
+ margin-top:-26px!important;padding:0 12px;position:relative;z-index:4;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article{
+ min-height:78px!important;padding:12px 13px!important;border-radius:0!important;border:0!important;border-top:1px solid var(--samurai-line)!important;
+ border-right:1px solid rgba(227,155,89,.16)!important;background:rgba(8,12,11,.94)!important;box-shadow:none!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(1){grid-area:twr;display:flex;flex-direction:column;justify-content:center;border-left:3px solid var(--samurai-jade)!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(2){grid-area:cash}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(3){grid-area:xirr}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(4){grid-area:count}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(1) strong{font:500 clamp(28px,8vw,38px)/1 Georgia,"Times New Roman",serif!important;color:var(--samurai-paper)!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark){
+ margin-inline:12px!important;border-radius:0 16px 0 0!important;border:0!important;border-left:1px solid var(--samurai-line)!important;
+ background:linear-gradient(110deg,rgba(8,12,11,.94),rgba(8,12,11,.78))!important;box-shadow:none!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-pulse{margin-inline:12px;gap:0!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-pulse article{border-radius:0!important;border:0!important;border-top:1px solid var(--samurai-line)!important;background:rgba(8,12,11,.88)!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-home-actions{margin-inline:12px}
+
+/* INNER WORKSPACES — an asymmetric scroll, not the shared tile wall. The global art remains exposed at right. */
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){
+ padding-right:clamp(14px,9vw,54px)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+ width:min(76%,520px);margin-left:0!important;padding:14px 16px 13px!important;border:0!important;border-left:3px solid var(--samurai-copper)!important;
+ background:linear-gradient(90deg,rgba(8,12,11,.95),rgba(8,12,11,.72) 78%,transparent)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head:after{display:none!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){
+ width:min(88%,620px);margin-left:0!important;margin-right:auto!important;border-radius:0 18px 0 0!important;border:0!important;border-left:2px solid var(--samurai-jade)!important;
+ background:linear-gradient(105deg,rgba(8,12,11,.96),rgba(8,12,11,.78) 76%,rgba(8,12,11,.34))!important;box-shadow:none!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts){
+ display:grid!important;grid-template-columns:1.25fr .75fr!important;gap:0!important;width:min(94%,680px);margin-left:auto!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*{
+ min-height:76px!important;padding:12px 13px!important;transform:none!important;border-radius:0!important;border:0!important;
+ border-top:1px solid var(--samurai-line)!important;background:rgba(8,12,11,.91)!important;box-shadow:none!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*:nth-child(even){
+ border-left:1px solid rgba(227,155,89,.16)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-asset,.v3-analysis-detail,.v3-analysis-note,.v3-analysis-layer,.v3-income-context,.v3-income-depth,.v3-goal-progress,.v3-goal-detail,.v3-goal-journey,.v3-holdings-explorer){
+ border-radius:0 14px 0 0!important;border-color:rgba(227,155,89,.2)!important;background:rgba(8,12,11,.9)!important;box-shadow:none!important;
+}
+
+/* Samurai navigation is a blade rail; the active section is marked, not filled like a generic app tab. */
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav{
+ left:10px!important;right:10px!important;border-radius:0!important;border:0!important;border-top:1px solid var(--samurai-line)!important;
+ background:rgba(7,10,9,.97)!important;box-shadow:0 -12px 34px rgba(0,0,0,.34)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button{border-radius:0!important;background:transparent!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active{color:var(--samurai-paper)!important;box-shadow:inset 0 3px var(--samurai-copper)!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active:after{display:none!important}
+
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{min-height:440px!important;grid-template-columns:minmax(0,58%) 1fr;padding-inline:10px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero>div:nth-child(3){padding:12px 10px!important;margin-bottom:20px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid{grid-template-columns:1.25fr .75fr!important;grid-template-areas:"twr cash" "twr xirr" "count count";padding-inline:8px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(4){min-height:58px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark,.v3-pulse,.v3-home-actions){margin-inline:8px!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){padding-right:12px!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{width:72%;padding:11px 12px!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){width:86%}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts){width:96%;grid-template-columns:1.18fr .82fr!important}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{grid-template-columns:minmax(0,64%) 1fr}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{width:80%}
+}
+@media(prefers-reduced-motion:reduce){.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) *{scroll-behavior:auto}}
