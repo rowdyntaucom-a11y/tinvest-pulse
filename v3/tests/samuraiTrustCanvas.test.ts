@@ -21,4 +21,17 @@ assert.match(css,/prefers-reduced-motion:reduce/);
 assert.doesNotMatch(gate,/\d+[\s\u00A0]*₽|\d+[,.]\d+%/);
 assert.ok(main.indexOf("samuraiChapterCockpit.css")<main.indexOf("samuraiTrustCanvas.css"));
 assert.ok(main.indexOf("samuraiTrustCanvas.css")<main.indexOf("mobilePerformance.css"));
+
+for(const className of["sam-trust-instrument--formation","sam-trust-instrument--radar","sam-trust-instrument--ledger"])assert.ok(gate.includes(className));
+for(const label of["FORMATION MAP","TACTICAL SCOPE","TREASURY LEDGER"])assert.ok(gate.includes(label));
+assert.match(css,/sam-formation-map/);
+assert.match(css,/sam-radar/);
+assert.match(css,/sam-ledger/);
+assert.match(css,/samRadarSweep/);
+assert.match(css,/samFormationPing/);
+assert.match(css,/samLedgerPulse/);
+assert.match(css,/\.v3-context-bar\{\s*display:none!important/);
+assert.match(css,/left:50%!important;right:auto!important;transform:translateX\(-50%\)!important/);
+assert.match(css,/sam-goal-empty-path:after/);
+assert.match(css,/min-height:clamp\(230px,30dvh,292px\)!important/);
 console.log("samurai trust canvas regression: ok");
