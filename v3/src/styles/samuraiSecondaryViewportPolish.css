@@ -1,0 +1,126 @@
+/* Samsung 1000031412.mp4 — secondary viewport polish.
+   Remove duplicate chapter strips and browser-level overflow from fail-closed Samurai cockpits. */
+
+@media(max-width:430px){
+  /* The 48px sticky Samurai topbar already consumes viewport height.
+     Secondary fail-closed pages must occupy the remainder, not another full 100dvh. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]{
+    height:calc(100dvh - 48px)!important;
+    min-height:calc(100dvh - 48px)!important;
+    max-height:calc(100dvh - 48px)!important;
+    padding-top:8px!important;
+    padding-bottom:max(66px,calc(58px + env(safe-area-inset-bottom)))!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+
+  /* The trust gate already owns the chapter identity (Formation/Tactical/Treasury + title).
+     The narrow workspace strip above it was repeating the same information and eating atmosphere. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-workspace-chrome,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-workspace-chrome,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-workspace-chrome{
+    display:none!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-trust-gate{
+    height:calc(100dvh - 48px - max(76px,calc(66px + env(safe-area-inset-bottom))))!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0 8px!important;
+  }
+
+  /* Pull the authored chapter title upward now that the duplicate strip is gone. */
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-gate__chapter{
+    min-height:38px!important;
+    padding-bottom:6px!important;
+  }
+
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-gate__chapter strong{
+    font-size:27px!important;
+  }
+
+  /* Give the instrument, not empty chrome, the recovered vertical space. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-instrument{
+    min-height:154px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument{
+    min-height:184px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-instrument{
+    min-height:142px!important;
+  }
+
+  /* The top state chip was technically present in the recording but almost disappeared into the shelf. */
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"])>.v3-data-state{
+    color:#91a49d!important;
+    border-color:rgba(201,155,88,.24)!important;
+    background:linear-gradient(90deg,rgba(4,15,13,.92),rgba(18,13,9,.82))!important;
+    opacity:.92!important;
+  }
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"])>.v3-data-state span{
+    opacity:.9!important;
+  }
+
+  /* Empty Goal has the same outer-page overflow pattern. Keep it as a single authored cockpit.
+     Goal becomes scrollable again automatically once a target exists. */
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path){
+    height:calc(100dvh - 48px)!important;
+    min-height:calc(100dvh - 48px)!important;
+    max-height:calc(100dvh - 48px)!important;
+    padding-top:6px!important;
+    padding-bottom:max(66px,calc(58px + env(safe-area-inset-bottom)))!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path)>.sam-workspace-chrome{
+    display:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter{
+    min-height:72px!important;
+    margin-top:0!important;
+    padding-top:10px!important;
+    padding-bottom:9px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .v3-goal-hero{
+    min-height:100px!important;
+    margin-bottom:4px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-empty-path{
+    min-height:calc(100dvh - 48px - 66px - 72px - 100px - 26px)!important;
+    max-height:none!important;
+    margin-bottom:0!important;
+  }
+}
+
+@media(max-width:359px){
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]{
+    padding-top:5px!important;
+  }
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-gate__chapter strong{
+    font-size:24px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter{
+    min-height:66px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .v3-goal-hero{
+    min-height:92px!important;
+  }
+}
