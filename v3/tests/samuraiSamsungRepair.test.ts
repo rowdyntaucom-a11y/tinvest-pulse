@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/samuraiSamsungRepair.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/samuraiRoninComposition\.css";import"\.\/styles\/samuraiSamsungRepair\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(css,/writing-mode:horizontal-tb!important/);
+assert.match(css,/word-break:normal!important/);
+assert.match(css,/--v3-stage-h:clamp\(315px,45svh,370px\)/);
+assert.match(css,/grid-template-areas:"twr cash xirr count"/);
+assert.match(css,/\.v3-nav button span\{font-size:8px!important;white-space:nowrap!important\}/);
+assert.doesNotMatch(css,/backdrop-filter/);assert.doesNotMatch(css,/animation:/);assert.doesNotMatch(css,/url\(/);
+console.log("samurai Samsung composition repair regression: ok");
