@@ -1,0 +1,3 @@
+# 2026-09-23 — Samurai integrated shell
+
+Direction: Samurai must read as one authored shell, not artwork used as wallpaper. The mobile shell now shares one material and geometry system across chrome, hero, metrics, depth panels and navigation: ink-black lacquer, jade edge light, restrained crimson blade state, small brass hierarchy marks, clipped/notched silhouettes and asymmetric massing. The hero is reduced so data returns to the first screen; TWR becomes the dominant vertical instrument while income/XIRR/assets form a compact secondary register. Generic context chrome is removed on Samurai mobile and the bottom navigation is rebuilt as a blade dock. No financial semantics, API, DNA or other shells changed.
