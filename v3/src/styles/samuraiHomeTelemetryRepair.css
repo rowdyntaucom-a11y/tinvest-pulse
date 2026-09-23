@@ -1,0 +1,98 @@
+/* Samsung home telemetry repair — 2026-09-23.
+   Fixes the highlighted TWR/XIRR/12M/assets block so no labels leak or clip at the right edge.
+   Home-only visual patch; values/finance stay unchanged. */
+
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulse{
+  display:grid!important;
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;
+  align-items:stretch!important;
+  column-gap:10px!important;
+  min-height:92px!important;
+  padding:10px 11px 13px 14px!important;
+  overflow:hidden!important;
+ }
+
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr{
+  position:relative!important;
+  width:auto!important;
+  min-width:0!important;
+  display:grid!important;
+  grid-template-rows:auto auto auto!important;
+  align-content:center!important;
+  padding-right:3px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr:after{
+  content:"";position:absolute;right:-6px;top:4px;bottom:9px;width:1px;
+  background:linear-gradient(transparent,rgba(201,155,88,.32),rgba(114,216,196,.18),transparent);
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr>span{
+  font-size:6.4px!important;letter-spacing:.16em!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr>strong{
+  margin-top:6px!important;font-size:33px!important;line-height:.86!important;
+  white-space:nowrap!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr>small{
+  margin-top:6px!important;font-size:5.8px!important;line-height:1.1!important;
+  white-space:normal!important;
+ }
+
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks{
+  position:relative!important;
+  right:auto!important;top:auto!important;width:auto!important;min-width:0!important;
+  display:grid!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;
+  align-self:stretch!important;
+  overflow:hidden!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks span{
+  min-width:0!important;min-height:0!important;
+  padding:3px 1px 3px 10px!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-rows:1fr!important;
+  align-items:center!important;
+  column-gap:8px!important;
+  overflow:hidden!important;
+  border-left:0!important;
+  border-bottom:1px solid rgba(114,216,196,.075)!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks span:last-child{
+  border-bottom:0!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks span:before{
+  left:1px!important;top:50%!important;width:4px!important;height:1px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks i{
+  min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  white-space:nowrap!important;font-size:5.9px!important;letter-spacing:.055em!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks b{
+  justify-self:end!important;min-width:max-content!important;
+  font-size:8.8px!important;white-space:nowrap!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks em{
+  display:none!important;
+ }
+
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulse-line{
+  left:14px!important;right:11px!important;bottom:5px!important;height:5px!important;
+ }
+
+ /* Keep the decorative slashed polygon away from readable telemetry. */
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulse:after{
+  right:-16%!important;top:-72%!important;width:38%!important;height:176%!important;
+  opacity:.62!important;
+ }
+}
+
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulse{
+  grid-template-columns:minmax(0,.84fr) minmax(0,1.16fr)!important;
+  column-gap:7px!important;padding-inline:11px 8px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__twr>strong{font-size:29px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks span{padding-left:8px!important;column-gap:5px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks i{font-size:5.5px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__pulsemarks b{font-size:8.2px!important}
+}
