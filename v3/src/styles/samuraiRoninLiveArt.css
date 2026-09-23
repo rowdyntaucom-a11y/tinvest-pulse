@@ -1,0 +1,58 @@
+/* Samurai / Ronin live-art integration v28.
+   Approved fal.ai master becomes the Samurai world; motion is UI-native, cheap and reduced-motion safe. */
+.v3-app[data-shell="samurai"]{
+ --samurai-ronin-art:url("https://v3b.fal.media/files/b/0aab89fd/6ymr4kwM8fgLwL9X06LIW_lMzq7G5n.webp");
+ --v3-global-world:var(--samurai-ronin-art);--v3-global-position:72% top;
+ --v3-global-filter:saturate(1.12) contrast(1.07) brightness(.88);
+ --samurai-red:#d53527;--samurai-ember:#f29a58;--samurai-cold:#68b9b2;
+}
+.v3-home[data-shell="samurai"]{
+ --v3-world-image:var(--samurai-ronin-art);--v3-stage-position:72% top;
+ --v3-world-filter:saturate(1.12) contrast(1.07) brightness(.9);
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{
+ background:linear-gradient(90deg,rgba(4,7,8,.95) 0 36%,rgba(4,7,8,.72) 53%,rgba(4,7,8,.18) 100%),var(--samurai-ronin-art) 72% 34%/cover no-repeat!important;
+ border-top:1px solid rgba(213,53,39,.42)!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero:after{
+ background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(5,6,7,.3) 62%,rgba(5,7,8,.9) 100%)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-context-bar{border-left-color:var(--samurai-red)!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-primary-grid article:nth-child(1){border-left-color:var(--samurai-cold)!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active{box-shadow:inset 0 3px var(--samurai-red),0 -7px 22px rgba(213,53,39,.09)!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active:before{
+ content:"";position:absolute;left:22%;right:22%;top:0;height:1px;background:#ff7a5c;box-shadow:0 0 8px #d53527,0 0 18px rgba(213,53,39,.55);pointer-events:none;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button{position:relative}
+
+/* Quiet scene-linked motion: ember glints, breathing blade rail and a slow crimson light sweep. */
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-atmosphere:after{
+ content:"";position:absolute;inset:0;pointer-events:none;opacity:.42;
+ background:
+ radial-gradient(circle at 82% 22%,rgba(242,154,88,.72) 0 1px,transparent 1.8px),
+ radial-gradient(circle at 76% 31%,rgba(213,53,39,.65) 0 1px,transparent 1.6px),
+ radial-gradient(circle at 88% 42%,rgba(242,154,88,.52) 0 1px,transparent 1.7px);
+ background-size:137px 173px,191px 229px,233px 281px;
+ animation:samurai-embers 8s linear infinite;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero:before{
+ content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+ background:linear-gradient(112deg,transparent 35%,rgba(213,53,39,.04) 48%,rgba(242,154,88,.1) 50%,rgba(213,53,39,.03) 52%,transparent 66%);
+ transform:translate3d(-65%,0,0);animation:samurai-light-sweep 11s ease-in-out infinite;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-primary-grid article:nth-child(1){
+ box-shadow:inset 3px 0 rgba(104,185,178,.36),0 0 0 rgba(104,185,178,0)!important;
+ animation:samurai-anchor-breathe 5.5s ease-in-out infinite;
+}
+@keyframes samurai-embers{0%{transform:translate3d(0,18px,0);opacity:.12}35%{opacity:.46}100%{transform:translate3d(-9px,-46px,0);opacity:0}}
+@keyframes samurai-light-sweep{0%,68%{transform:translate3d(-65%,0,0);opacity:0}76%{opacity:.72}90%,100%{transform:translate3d(65%,0,0);opacity:0}}
+@keyframes samurai-anchor-breathe{50%{box-shadow:inset 3px 0 rgba(104,185,178,.72),0 0 18px rgba(104,185,178,.08)!important}}
+@media(max-width:430px){
+ .v3-home[data-shell="samurai"]{--v3-stage-position:76% top}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{background-position:76% 30%!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-atmosphere:after{opacity:.3}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) :is(.v3-atmosphere:after,.v3-hero:before,.v3-primary-grid article:nth-child(1)){animation:none!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero:before{display:none}
+}

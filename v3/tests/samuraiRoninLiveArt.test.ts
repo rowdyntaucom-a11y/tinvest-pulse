@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const css=readFileSync(new URL("../src/styles/samuraiRoninLiveArt.css",import.meta.url),"utf8");
+const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+assert.match(main,/samuraiMobileFirstScreen\.css";import"\.\/styles\/samuraiRoninLiveArt\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(css,/0aab89fd\/6ymr4kwM8fgLwL9X06LIW_lMzq7G5n\.webp/);
+assert.match(css,/--v3-global-world:var\(--samurai-ronin-art\)/);
+assert.match(css,/--v3-world-image:var\(--samurai-ronin-art\)/);
+assert.match(css,/samurai-embers/);assert.match(css,/samurai-light-sweep/);assert.match(css,/samurai-anchor-breathe/);
+assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.doesNotMatch(css,/backdrop-filter/);
+console.log("samurai ronin live art regression: ok");
