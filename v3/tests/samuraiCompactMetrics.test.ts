@@ -3,12 +3,15 @@ const ui=readFileSync(new URL("../src/samurai/SamuraiPrototype.tsx",import.meta.
 const repair=readFileSync(new URL("../src/styles/samuraiHomeTelemetryRepair.css",import.meta.url),"utf8");
 const deck=readFileSync(new URL("../src/styles/samuraiHomeCommandDeck.css",import.meta.url),"utf8");
 const inception=readFileSync(new URL("../src/styles/samuraiSinceInception.css",import.meta.url),"utf8");
+const story=readFileSync(new URL("../src/styles/samuraiScrollStory.css",import.meta.url),"utf8");
 const dock=readFileSync(new URL("../src/styles/samuraiFormationDock.css",import.meta.url),"utf8");
 const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
 
-for(const x of["sam-world__capital","sam-world__origin","sam-world__origin-metrics","sam-world__pulsemarks","sam-world__path","sam-world__formation"])assert.match(ui,new RegExp(x));
-for(const x of["С МОМЕНТА ОТКРЫТИЯ","ДОСТУПНАЯ ИСТОРИЯ","ПОРТФЕЛЬ","IMOEX","ОПЕРЕЖЕНИЕ"])assert.match(ui,new RegExp(x));
+for(const x of["sam-world__scene-page","sam-world__analytics-page","sam-world__scroll-cue","sam-world__capital","sam-world__origin","sam-world__origin-metrics","sam-world__pulsemarks","sam-world__path","sam-world__formation"])assert.match(ui,new RegExp(x));
+for(const x of["БОЛЬШЕ АНАЛИТИКИ","Аналитика","С МОМЕНТА ОТКРЫТИЯ","ДОСТУПНАЯ ИСТОРИЯ","ПОРТФЕЛЬ","IMOEX","ОПЕРЕЖЕНИЕ"])assert.match(ui,new RegExp(x));
+assert.match(ui,/scrollIntoView\(\{block:"start"\}\)/);
+assert.match(ui,/id="samurai-analytics"/);
 assert.match(ui,/buildV3RelativeDepth\(home\.history\)/);
 assert.match(ui,/home\.openedDate/);
 assert.match(ui,/home\.value/);
@@ -29,13 +32,21 @@ assert.match(app,/SamuraiPrototype home=\{home\}/);
 assert.match(repair,/overflow:hidden!important/);
 assert.match(deck,/sam-world__capital/);
 assert.match(inception,/sam-world__origin/);
-assert.match(inception,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-assert.match(inception,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-assert.match(inception,/height:100dvh!important|single-screen|single-screen mobile contract/);
-assert.match(inception,/prefers-reduced-motion:reduce/);
 assert.match(dock,/sam-world__formation button:before/);
+
+assert.match(story,/scroll-snap-type:y proximity/);
+assert.match(story,/overflow-y:auto!important/);
+assert.match(story,/sam-world__scene-page/);
+assert.match(story,/height:100dvh/);
+assert.match(story,/sam-world__analytics-page/);
+assert.match(story,/filter:saturate\(1\.28\) contrast\(1\.09\) brightness\(1\.03\)/);
+assert.match(story,/sam-world__scroll-cue/);
+assert.match(story,/grid-template-columns:1fr 1fr!important/);
+assert.match(story,/height:155px!important/);
+assert.match(story,/prefers-reduced-motion:reduce/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));
-assert.ok(main.indexOf("samuraiSinceInception.css")<main.indexOf("mobilePerformance.css"));
+assert.ok(main.indexOf("samuraiSinceInception.css")<main.indexOf("samuraiScrollStory.css"));
+assert.ok(main.indexOf("samuraiScrollStory.css")<main.indexOf("mobilePerformance.css"));
 console.log("samurai compact metrics regression: ok");

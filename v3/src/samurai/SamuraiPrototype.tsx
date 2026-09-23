@@ -73,63 +73,77 @@ export function SamuraiPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavig
     :"Аналитика появится после подтверждения данных";
  const leaders=home.leaders.slice(0,3);
  return <main className="sam-proto sam-world">
-  <div className="sam-world__spine" aria-hidden="true"><b>侍</b><i/><span>RONIN // 01</span><i/></div>
+  <section className="sam-world__scene-page" aria-label="Samurai — обзор портфеля">
+   <div className="sam-world__spine" aria-hidden="true"><b>侍</b><i/><span>RONIN // 01</span><i/></div>
 
-  <section className="sam-world__hero">
-   <div className="sam-world__brand"><span>戦略 TERMINAL</span><b>QVANIX</b><i>壱</i></div>
-   <div className="sam-world__reticle" aria-hidden="true"><i/><i/><b>道</b></div>
-   <div className="sam-world__rain" aria-hidden="true"/>
-   <div className="sam-world__mist" aria-hidden="true"/>
-   <div className="sam-world__embers" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
-   <div className="sam-world__slash" aria-hidden="true"/>
+   <section className="sam-world__hero" aria-label="Samurai">
+    <div className="sam-world__brand"><span>戦略 TERMINAL</span><b>QVANIX</b><i>壱</i></div>
+    <div className="sam-world__reticle" aria-hidden="true"><i/><i/><b>道</b></div>
+    <div className="sam-world__rain" aria-hidden="true"/>
+    <div className="sam-world__mist" aria-hidden="true"/>
+    <div className="sam-world__embers" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
+    <div className="sam-world__slash" aria-hidden="true"/>
+   </section>
+
+   <section className="sam-world__capital" aria-label="Капитал портфеля">
+    <div className="sam-world__capital-main"><small>壱 / КАПИТАЛ</small><strong>{moneyText(home.value)}</strong></div>
+    <div className="sam-world__capital-change"><span>РЕЗУЛЬТАТ</span><b>{moneyText(home.profit)}</b><em>{percentText(home.profitPct)}</em></div>
+    <i className="sam-world__capital-mark" aria-hidden="true">資</i>
+   </section>
+
+   <button className="sam-world__scroll-cue" type="button" onClick={()=>document.getElementById("samurai-analytics")?.scrollIntoView({block:"start"})}>
+    <span>БОЛЬШЕ АНАЛИТИКИ</span><i aria-hidden="true">⌄</i>
+   </button>
   </section>
 
-  <section className="sam-world__capital" aria-label="Капитал портфеля">
-   <div className="sam-world__capital-main"><small>壱 / КАПИТАЛ</small><strong>{moneyText(home.value)}</strong></div>
-   <div className="sam-world__capital-change"><span>РЕЗУЛЬТАТ</span><b>{moneyText(home.profit)}</b><em>{percentText(home.profitPct)}</em></div>
-   <i className="sam-world__capital-mark" aria-hidden="true">資</i>
+  <section id="samurai-analytics" className="sam-world__analytics-page" aria-label="Аналитика портфеля">
+   <header className="sam-world__analytics-head">
+    <div><span>弐 / ANALYTICS</span><strong>Аналитика</strong><small>{originMeta}</small></div>
+    <i aria-hidden="true">始</i>
+   </header>
+
+   <section className="sam-world__origin" aria-label="Аналитика с момента открытия">
+    <header><div><span>{originTitle}</span><strong>{relative.available?`${dateText(relative.sampleFrom)} → ${dateText(relative.sampleTo)}`:"ПЕРИОД ЕЩЁ НЕ ПОДТВЕРЖДЁН"}</strong></div><i aria-hidden="true">道</i></header>
+    <div className="sam-world__origin-metrics">
+     <article><span>ПОРТФЕЛЬ</span><strong>{ratioText(relative.portfolioReturn)}</strong><small>TWR-период</small></article>
+     <article><span>IMOEX</span><strong>{ratioText(relative.benchmarkReturn)}</strong><small>тот же период</small></article>
+     <article><span>ОПЕРЕЖЕНИЕ</span><strong>{ppText(relative.excessReturn)}</strong><small>портфель − IMOEX</small></article>
+    </div>
+    <footer>{coverage}</footer>
+   </section>
+
+   <section className="sam-world__pulse" aria-label="Ключевые метрики">
+    <div className="sam-world__pulsemarks">
+     <span><i>TWR</i><b>{ratioText(home.twr)}</b><em>СТРАТЕГИЯ</em></span>
+     <span><i>XIRR</i><b>{ratioText(home.xirr)}</b><em>С ПОТОКАМИ</em></span>
+     <span><i>ДОХОД</i><b>{moneyText(home.passiveIncome)}</b><em>ФАКТ</em></span>
+     <span><i>АКТИВЫ</i><b>{home.positions??"—"}</b><em>В ПОРТФЕЛЕ</em></span>
+    </div>
+    <div className="sam-world__pulse-line" aria-hidden="true"><i/><i/><i/><i/></div>
+   </section>
+
+   <div className="sam-world__bridge" aria-hidden="true"><i/><b>道</b><i/></div>
+
+   <section className="sam-world__path">
+    <header><div><span>参 / CAPITAL PATH</span><strong>ПУТЬ КАПИТАЛА</strong></div><b>{ppText(relative.excessReturn)}</b></header>
+    <div className="sam-world__chart">
+     {geometry?<svg viewBox="0 0 360 170" preserveAspectRatio="none" aria-label="Портфель против IMOEX за общий подтверждённый период">
+       <polyline className="sam-world__portfolio" points={points(geometry.portfolio)}/>
+       <polyline className="sam-world__index" points={points(geometry.imoex)}/>
+      </svg>:<div className="sam-world__chart-empty">Сравнение появится после подтверждения истории</div>}
+     <div className="sam-world__sun" aria-hidden="true"><i/><i/></div>
+     <i className="sam-world__beacon"/>
+     <footer><span>朱 PORTFOLIO</span><span>翠 IMOEX</span><b>{relative.available?`${dateText(relative.sampleFrom)} → ${dateText(relative.sampleTo)}`:"—"}</b></footer>
+    </div>
+   </section>
+
+   <section className="sam-world__formation">
+    <header><span>肆</span><strong>СТРОЙ</strong><small>{leaders.length} / {home.positions??0}</small></header>
+    {leaders.length?<div>{leaders.map((x,i)=><button key={x.ticker} onClick={()=>onNavigate?.("assets")}><i>{String(i+1).padStart(2,"0")}</i><span>{x.ticker}</span><b>{pct.format(x.weight*100)}%</b><em><i style={{"--rank":i+1} as CSSProperties}/></em></button>)}</div>:<div className="sam-world__formation-empty">Состав появится после подтверждения портфеля</div>}
+   </section>
+
+   <div className="sam-world__analytics-tail" aria-hidden="true"><span>戦略</span><i/><b>QVANIX</b></div>
+   <div className="sam-world__seal" aria-hidden="true"><b>Q</b><span>侍</span></div>
   </section>
-
-  <section className="sam-world__origin" aria-label="Аналитика с момента открытия">
-   <header><div><span>弐 / {originTitle}</span><strong>{originMeta}</strong></div><i aria-hidden="true">始</i></header>
-   <div className="sam-world__origin-metrics">
-    <article><span>ПОРТФЕЛЬ</span><strong>{ratioText(relative.portfolioReturn)}</strong><small>TWR-период</small></article>
-    <article><span>IMOEX</span><strong>{ratioText(relative.benchmarkReturn)}</strong><small>тот же период</small></article>
-    <article><span>ОПЕРЕЖЕНИЕ</span><strong>{ppText(relative.excessReturn)}</strong><small>портфель − IMOEX</small></article>
-   </div>
-   <footer>{coverage}</footer>
-  </section>
-
-  <section className="sam-world__pulse" aria-label="Ключевые метрики">
-   <div className="sam-world__pulsemarks">
-    <span><i>TWR</i><b>{ratioText(home.twr)}</b><em>СТРАТЕГИЯ</em></span>
-    <span><i>XIRR</i><b>{ratioText(home.xirr)}</b><em>С ПОТОКАМИ</em></span>
-    <span><i>ДОХОД</i><b>{moneyText(home.passiveIncome)}</b><em>ФАКТ</em></span>
-    <span><i>АКТИВЫ</i><b>{home.positions??"—"}</b><em>В ПОРТФЕЛЕ</em></span>
-   </div>
-   <div className="sam-world__pulse-line" aria-hidden="true"><i/><i/><i/><i/></div>
-  </section>
-
-  <div className="sam-world__bridge" aria-hidden="true"><i/><b>道</b><i/></div>
-
-  <section className="sam-world__path">
-   <header><div><span>参 / CAPITAL PATH</span><strong>ПУТЬ КАПИТАЛА</strong></div><b>{ppText(relative.excessReturn)}</b></header>
-   <div className="sam-world__chart">
-    {geometry?<svg viewBox="0 0 360 170" preserveAspectRatio="none" aria-label="Портфель против IMOEX за общий подтверждённый период">
-      <polyline className="sam-world__portfolio" points={points(geometry.portfolio)}/>
-      <polyline className="sam-world__index" points={points(geometry.imoex)}/>
-     </svg>:<div className="sam-world__chart-empty">Сравнение появится после подтверждения истории</div>}
-    <div className="sam-world__sun" aria-hidden="true"><i/><i/></div>
-    <i className="sam-world__beacon"/>
-    <footer><span>朱 PORTFOLIO</span><span>翠 IMOEX</span><b>{relative.available?`${dateText(relative.sampleFrom)} → ${dateText(relative.sampleTo)}`:"—"}</b></footer>
-   </div>
-  </section>
-
-  <section className="sam-world__formation">
-   <header><span>肆</span><strong>СТРОЙ</strong><small>{leaders.length} / {home.positions??0}</small></header>
-   {leaders.length?<div>{leaders.map((x,i)=><button key={x.ticker} onClick={()=>onNavigate?.("assets")}><i>{String(i+1).padStart(2,"0")}</i><span>{x.ticker}</span><b>{pct.format(x.weight*100)}%</b><em><i style={{"--rank":i+1} as CSSProperties}/></em></button>)}</div>:<div className="sam-world__formation-empty">Состав появится после подтверждения портфеля</div>}
-  </section>
-
-  <div className="sam-world__seal" aria-hidden="true"><b>Q</b><span>侍</span></div>
  </main>;
 }
