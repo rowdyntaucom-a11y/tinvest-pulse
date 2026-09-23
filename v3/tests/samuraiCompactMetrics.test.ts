@@ -10,6 +10,7 @@ const empty=readFileSync(new URL("../src/styles/samuraiEmptyAnalyticsAtmosphere.
 const transition=readFileSync(new URL("../src/styles/samuraiScrollTransitionPolish.css",import.meta.url),"utf8");
 const continuity=readFileSync(new URL("../src/styles/samuraiSecondaryContinuity.css",import.meta.url),"utf8");
 const secondaryViewport=readFileSync(new URL("../src/styles/samuraiSecondaryViewportPolish.css",import.meta.url),"utf8");
+const finalWorld=readFileSync(new URL("../src/styles/samuraiFinalWorldAtmosphere.css",import.meta.url),"utf8");
 const dock=readFileSync(new URL("../src/styles/samuraiFormationDock.css",import.meta.url),"utf8");
 const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
@@ -116,5 +117,15 @@ assert.ok(main.indexOf("samuraiScrollStory.css")<main.indexOf("samuraiEmptyAnaly
 assert.ok(main.indexOf("samuraiEmptyAnalyticsAtmosphere.css")<main.indexOf("samuraiScrollTransitionPolish.css"));
 assert.ok(main.indexOf("samuraiScrollTransitionPolish.css")<main.indexOf("samuraiSecondaryContinuity.css"));
 assert.ok(main.indexOf("samuraiSecondaryContinuity.css")<main.indexOf("samuraiSecondaryViewportPolish.css"));
-assert.ok(main.indexOf("samuraiSecondaryViewportPolish.css")<main.indexOf("mobilePerformance.css"));
+assert.match(finalWorld,/data-workspace="assets"/);
+assert.match(finalWorld,/data-workspace="analysis"/);
+assert.match(finalWorld,/data-workspace="income"/);
+assert.match(finalWorld,/data-workspace="goal"/);
+assert.match(finalWorld,/samAssetsBeacon/);
+assert.match(finalWorld,/samAnalysisSweep/);
+assert.match(finalWorld,/samIncomeReserve/);
+assert.match(finalWorld,/samGoalHorizon/);
+assert.match(finalWorld,/prefers-reduced-motion:reduce/);
+assert.ok(main.indexOf("samuraiSecondaryViewportPolish.css")<main.indexOf("samuraiFinalWorldAtmosphere.css"));
+assert.ok(main.indexOf("samuraiFinalWorldAtmosphere.css")<main.indexOf("mobilePerformance.css"));
 console.log("samurai compact metrics regression: ok");
