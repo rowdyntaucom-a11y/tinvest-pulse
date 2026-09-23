@@ -1,0 +1,38 @@
+/* Neon signature system v1 — kinetic synth-grid instrument, not a purple recolor. */
+.v3-app[data-shell="core"]{
+ --neon-magenta:#ff62dc;--neon-cyan:#5de8ff;--neon-amber:#ffc56a;--neon-night:#080617;--neon-panel:rgba(15,8,35,.76);
+}
+.v3-app[data-shell="core"] .v3-global-world{filter:saturate(1.2) contrast(1.06) brightness(.76)}
+.v3-app[data-shell="core"] .v3-atmosphere:before{
+ content:"";position:absolute;left:-12%;right:-12%;bottom:-18%;height:64%;pointer-events:none;
+ background:repeating-linear-gradient(90deg,rgba(93,232,255,.11) 0 1px,transparent 1px 52px),repeating-linear-gradient(0deg,rgba(255,98,220,.09) 0 1px,transparent 1px 42px);
+ transform:perspective(420px) rotateX(58deg);transform-origin:center bottom;mask-image:linear-gradient(transparent,#000 34%,#000);animation:neon-grid-drive 14s linear infinite;
+}
+.v3-app[data-shell="core"] .v3-atmosphere:after{
+ content:"";position:absolute;inset:0;pointer-events:none;opacity:.48;
+ background:linear-gradient(108deg,transparent 18%,rgba(255,98,220,.14) 18.3% 18.8%,transparent 19.1% 48%,rgba(93,232,255,.1) 48.3% 48.7%,transparent 49%),radial-gradient(circle at 82% 17%,rgba(255,197,106,.5) 0 1px,transparent 2px);
+ animation:neon-scan-drift 10s ease-in-out infinite alternate;
+}
+.v3-app[data-shell="core"] :is(.v3-context-bar,.v3-data-state){background:linear-gradient(100deg,rgba(15,7,35,.9),rgba(7,13,34,.58))!important;border-color:rgba(93,232,255,.2)!important}
+.v3-app[data-shell="core"] .v3-page-head{position:relative;padding-left:14px!important;border-left:3px solid var(--neon-magenta)}
+.v3-app[data-shell="core"] .v3-page-head:after{content:"SYNTH // ONLINE";position:absolute;right:5px;top:5px;font:800 7px/1 Inter,system-ui,sans-serif;letter-spacing:.16em;color:rgba(93,232,255,.56)}
+.v3-app[data-shell="core"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero){
+ position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(20,8,43,.86),rgba(6,12,34,.74))!important;border-top:2px solid rgba(255,98,220,.7)!important;border-right-color:rgba(93,232,255,.22)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.05),0 16px 42px rgba(9,2,31,.34),0 0 24px rgba(255,98,220,.04)!important;
+}
+.v3-app[data-shell="core"] :is(.v3-hero,.v3-assets-hero,.v3-analysis-signal>div:first-child,.v3-income-hero,.v3-goal-hero):after{
+ content:"";position:absolute;right:-12px;bottom:9px;width:78px;height:28px;pointer-events:none;opacity:.62;background:repeating-linear-gradient(90deg,var(--neon-cyan) 0 2px,transparent 2px 7px);clip-path:polygon(0 74%,8% 54%,16% 67%,24% 22%,32% 61%,40% 43%,48% 78%,56% 30%,64% 57%,72% 12%,80% 68%,88% 48%,100% 72%,100% 100%,0 100%);
+}
+.v3-app[data-shell="core"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts>*){background:linear-gradient(155deg,rgba(18,9,39,.82),rgba(6,13,31,.74))!important;border-color:rgba(255,98,220,.19)!important;box-shadow:inset 0 1px rgba(255,255,255,.04),0 13px 30px rgba(5,2,20,.26)!important}
+.v3-app[data-shell="core"] .v3-primary-grid article:nth-child(1){border-top-color:var(--neon-cyan)!important;box-shadow:inset 0 2px rgba(93,232,255,.5),0 0 28px rgba(93,232,255,.07)!important}
+.v3-app[data-shell="core"] .v3-nav{background:linear-gradient(90deg,rgba(11,5,28,.97),rgba(8,13,34,.96),rgba(11,5,28,.97))!important;border-top:1px solid rgba(255,98,220,.38)!important;box-shadow:0 -10px 34px rgba(8,2,27,.34)!important}
+.v3-app[data-shell="core"] .v3-nav button{position:relative}.v3-app[data-shell="core"] .v3-nav button.is-active{color:var(--neon-cyan)!important;background:linear-gradient(180deg,rgba(255,98,220,.08),rgba(93,232,255,.04))!important}.v3-app[data-shell="core"] .v3-nav button.is-active:before{content:"";position:absolute;left:20%;right:20%;top:0;height:2px;background:linear-gradient(90deg,var(--neon-magenta),var(--neon-cyan));box-shadow:0 0 9px rgba(255,98,220,.75),0 0 18px rgba(93,232,255,.45)}
+/* Each workspace is a different deck in the same synth instrument. */
+.v3-app[data-shell="core"][data-workspace="assets"] .v3-assets-hero{border-left:3px solid var(--neon-cyan)!important}.v3-app[data-shell="core"][data-workspace="assets"] .v3-asset{border-left:2px solid rgba(93,232,255,.26)!important;background-image:linear-gradient(90deg,rgba(93,232,255,.045),transparent 42%)!important}
+.v3-app[data-shell="core"][data-workspace="analysis"] .v3-analysis-signal>div:first-child{border-left:3px solid var(--neon-magenta)!important}.v3-app[data-shell="core"][data-workspace="analysis"] .v3-analysis-grid article{background-image:linear-gradient(135deg,rgba(255,98,220,.065),transparent 48%)!important}
+.v3-app[data-shell="core"][data-workspace="income"] .v3-income-hero{border-left:3px solid var(--neon-amber)!important}.v3-app[data-shell="core"][data-workspace="income"] .v3-income-grid article{background-image:linear-gradient(145deg,rgba(255,197,106,.06),transparent 52%)!important}
+.v3-app[data-shell="core"][data-workspace="goal"] .v3-goal-hero{border-left:3px solid var(--neon-cyan)!important}.v3-app[data-shell="core"][data-workspace="goal"] .v3-goal-progress{background-image:linear-gradient(110deg,rgba(93,232,255,.07),rgba(255,98,220,.035),transparent 72%)!important}
+@keyframes neon-grid-drive{to{background-position:52px 0,0 42px}}
+@keyframes neon-scan-drift{0%{transform:translate3d(-1.5%,0,0);opacity:.3}100%{transform:translate3d(2%,1%,0);opacity:.56}}
+@media(max-width:430px){.v3-app[data-shell="core"] .v3-atmosphere:before{height:52%;opacity:.65}.v3-app[data-shell="core"] .v3-page-head:after{font-size:6px}.v3-app[data-shell="core"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid){gap:7px!important}}
+@media(prefers-reduced-motion:reduce){.v3-app[data-shell="core"] :is(.v3-atmosphere:before,.v3-atmosphere:after){animation:none!important;transform:none!important}}
