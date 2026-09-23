@@ -147,3 +147,139 @@
  .v3-app[data-shell="samurai"] .sam-trust-gate__action{grid-template-columns:1fr!important}
  .v3-app[data-shell="samurai"] .sam-trust-gate__action button{width:100%}
 }
+
+
+/* Samsung recording 2026-09-23 — chapter instruments, tighter chrome, less repeated-card language. */
+@media(max-width:699px){
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-context-bar{
+  display:none!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-data-state{
+  top:calc(max(8px,env(safe-area-inset-top)) + 8px)!important;
+  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+  min-height:27px!important;max-width:92px!important;padding:0 8px!important;
+  z-index:32!important;border-color:rgba(201,155,88,.2)!important;
+  background:linear-gradient(90deg,rgba(4,13,11,.94),rgba(17,12,10,.9))!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.2)!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-data-state span{
+  font-size:6.7px!important;letter-spacing:.08em!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+  padding-top:max(48px,calc(env(safe-area-inset-top) + 39px))!important;
+ }
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .sam-workspace-chrome{
+  margin-top:0!important;
+ }
+}
+
+@media(max-width:699px){
+ .v3-app[data-shell="samurai"] .sam-trust-gate{
+  min-height:clamp(390px,51dvh,468px)!important;
+  grid-template-rows:auto 78px minmax(0,1fr) auto auto!important;
+  gap:0!important;
+ }
+ .v3-app[data-shell="samurai"] .sam-trust-gate:after{top:74px!important}
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route{
+  align-self:stretch!important;margin:8px 0 6px!important;gap:3px!important;
+ }
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route article{
+  min-height:41px!important;padding:4px 7px!important;
+ }
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route article:nth-child(2){margin-left:6px!important}
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route article:nth-child(3){margin-left:12px!important}
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route span{font-size:8.5px!important}
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route small{font-size:7.1px!important}
+}
+
+.v3-app[data-shell="samurai"] .sam-trust-instrument{
+ position:relative;z-index:2;align-self:center;height:68px;margin:7px 0 3px;padding:7px 9px 7px 9px;overflow:hidden;
+ border-top:1px solid rgba(201,155,88,.12);border-bottom:1px solid rgba(114,216,196,.09);
+ background:linear-gradient(90deg,rgba(4,14,12,.68),rgba(2,8,7,.28));
+}
+.v3-app[data-shell="samurai"] .sam-trust-instrument__label{
+ position:absolute;left:9px;top:6px;z-index:4;display:flex;align-items:baseline;gap:7px;
+ font-family:Inter,system-ui,sans-serif;
+}
+.v3-app[data-shell="samurai"] .sam-trust-instrument__label span{font-size:6.3px;letter-spacing:.14em;color:#c99b58}
+.v3-app[data-shell="samurai"] .sam-trust-instrument__label b{font-size:5.5px;letter-spacing:.09em;color:#657872}
+.v3-app[data-shell="samurai"] .sam-trust-instrument>small{
+ position:absolute;left:9px;right:8px;bottom:5px;z-index:4;font:5.8px/1.2 Inter,system-ui,sans-serif;color:#5f716c;
+}
+
+/* Assets — a formation board, not another generic card. */
+.v3-app[data-shell="samurai"] .sam-trust-instrument--formation{
+ background:
+  repeating-linear-gradient(90deg,transparent 0 30px,rgba(114,216,196,.035) 31px,transparent 32px),
+  linear-gradient(90deg,rgba(4,17,14,.8),rgba(2,8,7,.34));
+}
+.v3-app[data-shell="samurai"] .sam-formation-map{position:absolute;inset:20px 7px 15px 8px}
+.v3-app[data-shell="samurai"] .sam-formation-map .lane{position:absolute;top:7px;bottom:5px;width:1px;background:linear-gradient(rgba(114,216,196,.08),rgba(114,216,196,.36),rgba(201,155,88,.08))}
+.v3-app[data-shell="samurai"] .sam-formation-map .lane-a{left:24%}.v3-app[data-shell="samurai"] .sam-formation-map .lane-b{left:51%}.v3-app[data-shell="samurai"] .sam-formation-map .lane-c{left:77%}
+.v3-app[data-shell="samurai"] .sam-formation-map .slot{position:absolute;width:12px;height:12px;border:1px solid rgba(114,216,196,.34);background:#06110e;transform:rotate(45deg);box-shadow:0 0 0 3px rgba(114,216,196,.018)}
+.v3-app[data-shell="samurai"] .sam-formation-map .slot-a{left:18%;top:14px}.v3-app[data-shell="samurai"] .sam-formation-map .slot-b{left:39%;top:2px}.v3-app[data-shell="samurai"] .sam-formation-map .slot-c{left:51%;top:17px;border-color:rgba(201,155,88,.4)}.v3-app[data-shell="samurai"] .sam-formation-map .slot-d{left:68%;top:5px}.v3-app[data-shell="samurai"] .sam-formation-map .slot-e{left:82%;top:18px;border-color:rgba(227,75,59,.42)}
+.v3-app[data-shell="samurai"] .sam-formation-map>b{position:absolute;right:9px;top:-5px;font:32px Georgia,serif;color:rgba(114,216,196,.07)}
+
+/* Analysis — actual scope geometry. */
+.v3-app[data-shell="samurai"] .sam-trust-instrument--radar{
+ background:radial-gradient(circle at 76% 50%,rgba(201,155,88,.045),transparent 34%),linear-gradient(90deg,rgba(4,13,11,.7),rgba(8,12,10,.38));
+}
+.v3-app[data-shell="samurai"] .sam-radar{position:absolute;right:8px;top:9px;width:112px;height:54px}
+.v3-app[data-shell="samurai"] .sam-radar .ring{position:absolute;left:50%;top:50%;border:1px solid rgba(201,155,88,.16);border-radius:50%;transform:translate(-50%,-50%)}
+.v3-app[data-shell="samurai"] .sam-radar .ring-a{width:48px;height:48px}.v3-app[data-shell="samurai"] .sam-radar .ring-b{width:34px;height:34px;border-color:rgba(114,216,196,.16)}.v3-app[data-shell="samurai"] .sam-radar .ring-c{width:18px;height:18px;border-color:rgba(227,75,59,.18)}
+.v3-app[data-shell="samurai"] .sam-radar .axis{position:absolute;background:rgba(114,216,196,.12)}.v3-app[data-shell="samurai"] .sam-radar .axis-x{left:18px;right:18px;top:50%;height:1px}.v3-app[data-shell="samurai"] .sam-radar .axis-y{top:3px;bottom:3px;left:50%;width:1px}
+.v3-app[data-shell="samurai"] .sam-radar .sweep{position:absolute;left:50%;top:50%;width:43px;height:1px;transform-origin:left;background:linear-gradient(90deg,rgba(201,155,88,.7),transparent);transform:rotate(-24deg)}
+.v3-app[data-shell="samurai"] .sam-radar .blip{position:absolute;width:4px;height:4px;background:#72d8c4;box-shadow:0 0 6px rgba(114,216,196,.5);transform:rotate(45deg)}.v3-app[data-shell="samurai"] .sam-radar .blip-a{left:72px;top:12px}.v3-app[data-shell="samurai"] .sam-radar .blip-b{left:33px;top:35px;background:#c99b58}.v3-app[data-shell="samurai"] .sam-radar .blip-c{left:88px;top:37px;background:#e34b3b}
+.v3-app[data-shell="samurai"] .sam-radar em{position:absolute;left:3px;top:12px;font:29px Georgia,serif;font-style:normal;color:rgba(201,155,88,.07)}
+
+/* Income — a ledger / cash-flow instrument. */
+.v3-app[data-shell="samurai"] .sam-trust-instrument--ledger{
+ background:repeating-linear-gradient(0deg,transparent 0 13px,rgba(201,155,88,.035) 14px,transparent 15px),linear-gradient(90deg,rgba(8,15,11,.76),rgba(18,12,8,.3));
+}
+.v3-app[data-shell="samurai"] .sam-ledger{position:absolute;left:10px;right:9px;top:22px;bottom:14px;display:grid;gap:3px}
+.v3-app[data-shell="samurai"] .sam-ledger .row{display:grid;grid-template-columns:18% 1fr 24px;gap:5px;align-items:center}
+.v3-app[data-shell="samurai"] .sam-ledger .row i{display:block;height:1px;background:rgba(201,155,88,.19)}.v3-app[data-shell="samurai"] .sam-ledger .row i:nth-child(2){background:linear-gradient(90deg,rgba(114,216,196,.27),rgba(114,216,196,.04))}
+.v3-app[data-shell="samurai"] .sam-ledger .row b{display:block;height:4px;background:rgba(201,155,88,.16)}
+.v3-app[data-shell="samurai"] .sam-ledger .row-b b{width:72%}.v3-app[data-shell="samurai"] .sam-ledger .row-c b{width:48%;background:rgba(114,216,196,.17)}.v3-app[data-shell="samurai"] .sam-ledger .row-d b{width:86%;background:rgba(227,75,59,.13)}
+.v3-app[data-shell="samurai"] .sam-ledger em{position:absolute;right:10px;top:-6px;font:31px Georgia,serif;font-style:normal;color:rgba(201,155,88,.07)}
+
+/* Empty Goal is a real path instrument and deliberately consumes the former dead zone. */
+@media(max-width:699px){
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path{
+  min-height:clamp(230px,30dvh,292px)!important;box-sizing:border-box;
+  padding:14px 13px 14px 15px!important;
+  background:
+   radial-gradient(circle at 86% 24%,rgba(227,75,59,.1),transparent 22%),
+   linear-gradient(132deg,transparent 0 58%,rgba(201,155,88,.035) 58.3%,transparent 59%),
+   repeating-linear-gradient(0deg,rgba(114,216,196,.022) 0 1px,transparent 1px 34px),
+   rgba(3,10,9,.82)!important;
+ }
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path:after{
+  content:"道";position:absolute;right:18px;bottom:13px;font:88px/1 Georgia,serif;color:rgba(201,155,88,.025);transform:rotate(-5deg);
+ }
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path>div{
+  grid-template-columns:1fr!important;gap:4px!important;margin-top:16px!important;padding-left:10px!important;
+  border-left:1px solid rgba(114,216,196,.14);
+ }
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path article{
+  min-height:45px!important;display:grid!important;grid-template-columns:23px 72px minmax(0,1fr)!important;align-items:center!important;gap:8px!important;
+  padding:5px 7px!important;transform:none!important;background:linear-gradient(90deg,rgba(5,16,13,.88),rgba(3,10,9,.38))!important;
+ }
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path article i{width:19px!important;height:19px!important}
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path article b{margin:0!important;font-size:8.7px!important}
+ .v3-app[data-shell="samurai"] .sam-goal-empty-path article small{margin:0!important;font-size:7px!important;line-height:1.25!important}
+}
+
+@media(prefers-reduced-motion:no-preference){
+ .v3-app[data-shell="samurai"] .sam-radar .sweep{animation:samRadarSweep 5.2s linear infinite}
+ .v3-app[data-shell="samurai"] .sam-formation-map .slot-c{animation:samFormationPing 3.4s ease-in-out infinite}
+ .v3-app[data-shell="samurai"] .sam-ledger .row-c b{animation:samLedgerPulse 3.8s ease-in-out infinite}
+ @keyframes samRadarSweep{to{transform:rotate(336deg)}}
+ @keyframes samFormationPing{50%{box-shadow:0 0 10px rgba(201,155,88,.42);filter:brightness(1.35)}}
+ @keyframes samLedgerPulse{50%{filter:brightness(1.7);box-shadow:0 0 8px rgba(114,216,196,.25)}}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] .sam-radar .sweep,
+ .v3-app[data-shell="samurai"] .sam-formation-map .slot-c,
+ .v3-app[data-shell="samurai"] .sam-ledger .row-c b{animation:none!important}
+}
