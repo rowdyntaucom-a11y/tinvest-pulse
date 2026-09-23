@@ -92,13 +92,13 @@ export function SamuraiPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavig
    </section>
 
    <button className="sam-world__scroll-cue" type="button" onClick={()=>document.getElementById("samurai-analytics")?.scrollIntoView({block:"start"})}>
-    <span>БОЛЬШЕ АНАЛИТИКИ</span><i aria-hidden="true">⌄</i>
+    <span>ИСТОРИЯ И РЕЗУЛЬТАТ</span><i aria-hidden="true">⌄</i>
    </button>
   </section>
 
-  <section id="samurai-analytics" className="sam-world__analytics-page" aria-label="Аналитика портфеля">
+  <section id="samurai-analytics" className="sam-world__analytics-page" aria-label="История портфеля">
    <header className="sam-world__analytics-head">
-    <div><span>弐 / ANALYTICS</span><strong>Аналитика</strong><small>{originMeta}</small></div>
+    <div><span>弐 / PORTFOLIO HISTORY</span><strong>История портфеля</strong><small>{originMeta}</small></div>
     <i aria-hidden="true">始</i>
    </header>
 
