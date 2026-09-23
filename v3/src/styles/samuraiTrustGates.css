@@ -1,0 +1,83 @@
+/* Samsung pass II — trust-gated workspaces stay intentional without inventing finance. */
+
+.v3-app[data-shell="samurai"] .sam-trust-gate{
+ position:relative;margin:7px 9px 0;padding:13px 12px 12px 15px;overflow:hidden;
+ border-top:1px solid rgba(201,155,88,.18);border-left:2px solid rgba(114,216,196,.34);
+ background:
+ radial-gradient(circle at 84% 23%,rgba(150,37,29,.11),transparent 23%),
+ repeating-linear-gradient(0deg,rgba(114,216,196,.022) 0 1px,transparent 1px 34px),
+ linear-gradient(145deg,rgba(5,16,13,.94),rgba(3,9,8,.76));
+}
+.v3-app[data-shell="samurai"] .sam-trust-gate:before{
+ content:"";position:absolute;right:-28px;top:-41px;width:132px;height:132px;border:1px solid rgba(201,155,88,.1);border-radius:50%;
+ box-shadow:0 0 0 22px rgba(201,155,88,.025),0 0 0 49px rgba(227,75,59,.018);
+}
+.v3-app[data-shell="samurai"] .sam-trust-gate:after{
+ content:"";position:absolute;left:15px;right:12px;top:69px;height:1px;background:linear-gradient(90deg,#72d8c4 0 33%,#c99b58 33% 69%,#e34b3b 69%,transparent);
+}
+.v3-app[data-shell="samurai"] .sam-trust-gate header{position:relative;z-index:2;display:grid;grid-template-columns:42px minmax(0,1fr);gap:10px;align-items:center}
+.v3-app[data-shell="samurai"] .sam-trust-gate header>i{
+ width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(201,155,88,.28);font:18px Georgia,serif;font-style:normal;color:#e34b3b;transform:rotate(-3deg);
+}
+.v3-app[data-shell="samurai"] .sam-trust-gate header span{display:block;font:6.5px Inter,system-ui,sans-serif;letter-spacing:.15em;color:#c99b58}
+.v3-app[data-shell="samurai"] .sam-trust-gate header strong{display:block;margin-top:3px;font:500 15px/1.05 Georgia,serif;color:#edf2ef}
+.v3-app[data-shell="samurai"] .sam-trust-gate header small{display:block;margin-top:4px;max-width:250px;font:7px/1.35 Inter,system-ui,sans-serif;color:#71837d}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:17px}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route article{
+ position:relative;min-height:76px;padding:9px 7px 8px;border-top:1px solid rgba(201,155,88,.14);background:linear-gradient(145deg,rgba(5,15,13,.9),rgba(3,9,8,.63));
+}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route article:nth-child(2){transform:translateY(5px)}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route article:nth-child(3){transform:translateY(1px)}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route b{display:grid;place-items:center;width:18px;height:18px;border:1px solid rgba(201,155,88,.24);font:9px Georgia,serif;color:#d4a05b}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route span{display:block;margin-top:7px;font:700 8.5px Inter,system-ui,sans-serif;color:#dce5e1}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route small{display:block;margin-top:4px;padding-right:8px;font:6.3px/1.3 Inter,system-ui,sans-serif;color:#667872}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route i{position:absolute;right:6px;top:8px;font:8px Inter,system-ui,sans-serif;font-style:normal;color:#7f978f}
+.v3-app[data-shell="samurai"] .sam-trust-gate footer{position:relative;z-index:2;display:grid;grid-template-columns:auto 1fr minmax(0,2fr);gap:7px;align-items:center;margin-top:11px}
+.v3-app[data-shell="samurai"] .sam-trust-gate footer span{font:6px Inter,system-ui,sans-serif;letter-spacing:.12em;color:#e07568}
+.v3-app[data-shell="samurai"] .sam-trust-gate footer>i{height:1px;background:linear-gradient(90deg,rgba(227,75,59,.5),rgba(201,155,88,.18))}
+.v3-app[data-shell="samurai"] .sam-trust-gate footer small{font:6px/1.25 Inter,system-ui,sans-serif;color:#5f716c}
+
+.v3-app[data-shell="samurai"] .sam-trust-gate--analysis{border-left-color:rgba(201,155,88,.45)}
+.v3-app[data-shell="samurai"] .sam-trust-gate--analysis header>i{color:#d2a25f}
+.v3-app[data-shell="samurai"] .sam-trust-gate--income{border-left-color:rgba(201,155,88,.52)}
+.v3-app[data-shell="samurai"] .sam-trust-gate--income header>i{color:#c99b58}
+
+/* When finance is untrusted, remove the old dash-filled scaffolding instead of
+   making the user read fake emptiness. The trust gate above explains exactly what is missing. */
+.v3-app[data-shell="samurai"] .v3-assets[data-trusted="false"] .v3-asset-list,
+.v3-app[data-shell="samurai"] .v3-analysis[data-trusted="false"] :is(.v3-analysis-grid,.v3-analysis-note,.v3-analysis-overview-depth,.v3-section-selector),
+.v3-app[data-shell="samurai"] .v3-income[data-trusted="false"] :is(.v3-income-hero,.v3-income-grid,.v3-income-context,.v3-income-ratios,.v3-income-detail){
+ display:none!important;
+}
+
+/* Home: make the Formation deck itself visible above the fixed dock on the same phone viewport. */
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__hero{
+  height:42svh!important;min-height:315px!important;max-height:360px!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart{height:92px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__chart svg{height:87px!important;transform:translateY(-5px)!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__path header{margin-bottom:0!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation{padding:3px 8px 7px 12px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation>div{gap:4px!important;margin-top:4px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button{min-height:52px!important;padding:6px 7px 8px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button:before{width:14px;height:14px;right:6px;top:5px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button:after{height:20px;right:11px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button>span{margin-top:6px!important;font-size:10px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button>b{margin-top:3px!important;font-size:8.5px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .sam-world__formation button>em{bottom:5px!important}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route{grid-template-columns:1fr}
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route article{min-height:50px}
+ .v3-app[data-shell="samurai"] .sam-trust-gate__route article:nth-child(2),.v3-app[data-shell="samurai"] .sam-trust-gate__route article:nth-child(3){transform:none}
+}
+@media(prefers-reduced-motion:no-preference){
+ .v3-app[data-shell="samurai"] .sam-trust-gate header>i{animation:samGateSigil 7s ease-in-out infinite}
+ .v3-app[data-shell="samurai"] .sam-trust-gate footer>i{animation:samGateRail 4s ease-in-out infinite}
+ @keyframes samGateSigil{50%{transform:rotate(2deg);filter:brightness(1.25)}}
+ @keyframes samGateRail{50%{filter:brightness(1.5);box-shadow:0 0 7px rgba(201,155,88,.28)}}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] .sam-trust-gate header>i,.v3-app[data-shell="samurai"] .sam-trust-gate footer>i{animation:none!important}
+}
