@@ -1,0 +1,155 @@
+/* Samurai Ronin composition v29 — the interface follows the approved artwork instead of covering it. */
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]){
+ --ronin-glass:rgba(5,9,10,.72);--ronin-solid:rgba(5,8,9,.91);--ronin-line:rgba(226,70,53,.28);
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-global-world{
+ background-position:76% top!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-context-bar{
+ width:max-content;max-width:72%;margin:0 0 0 10px!important;padding:5px 10px!important;
+ background:linear-gradient(90deg,rgba(4,8,9,.88),rgba(4,8,9,.42),transparent)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-data-state{right:10px!important}
+
+/* HOME: portrait poster first, instruments around it. No opaque dashboard slab. */
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{
+ min-height:clamp(430px,61svh,610px)!important;
+ grid-template-columns:minmax(0,43%) 1fr!important;grid-template-rows:auto 1fr auto!important;
+ padding:14px 12px 15px!important;
+ background:
+ linear-gradient(90deg,rgba(3,7,8,.9) 0 25%,rgba(3,7,8,.54) 39%,rgba(3,7,8,.06) 62%,rgba(3,7,8,.14) 100%),
+ linear-gradient(0deg,rgba(3,6,7,.8),transparent 28%),
+ var(--samurai-ronin-art) 73% 28%/cover no-repeat!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero-top{grid-column:1/-1}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero>div:nth-child(3){
+ grid-column:1!important;align-self:center!important;margin:0!important;padding:0 8px 0 10px!important;
+ background:transparent!important;border-left:1px solid rgba(255,102,76,.66)!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero h1{
+ font-size:clamp(31px,8vw,48px)!important;letter-spacing:-.035em;text-shadow:0 2px 18px #000;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero p{max-width:210px;text-shadow:0 1px 8px #000}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-updated{
+ grid-column:1!important;align-self:end;padding:0 0 0 10px!important;border-left:1px solid rgba(104,185,178,.45)!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid{
+ width:min(94%,720px);margin:-52px 8px 0 auto!important;padding:0!important;
+ grid-template-columns:1.55fr .78fr .78fr .64fr!important;grid-template-areas:"twr cash xirr count"!important;
+ background:linear-gradient(90deg,rgba(4,8,9,.94),rgba(4,8,9,.78))!important;
+ border-top:1px solid rgba(226,70,53,.36);border-bottom:1px solid rgba(104,185,178,.18);
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article{
+ min-height:86px!important;background:transparent!important;border-top:0!important;border-right:1px solid rgba(255,255,255,.07)!important;
+ padding:12px 11px!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(1){border-left:2px solid var(--samurai-red)!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(1) strong{font-size:clamp(29px,7vw,42px)!important}
+.v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark){
+ width:calc(100% - 28px)!important;margin:13px 14px 0!important;
+ background:linear-gradient(100deg,rgba(4,8,9,.86),rgba(4,8,9,.57) 66%,rgba(4,8,9,.22))!important;
+ border:0!important;border-left:1px solid rgba(104,185,178,.42)!important;border-radius:0!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-pulse{
+ width:calc(72% - 14px);margin:12px 14px 0 auto!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-pulse article{
+ background:rgba(4,8,9,.72)!important;border-top:1px solid var(--ronin-line)!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-home-actions{
+ width:calc(86% - 14px);margin:12px 14px 0 auto!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="home"] .v3-home-actions button{
+ background:linear-gradient(180deg,rgba(7,11,12,.78),rgba(4,7,8,.9))!important;border-radius:0!important;border-color:rgba(226,70,53,.18)!important;
+}
+
+/* DEEP TABS: offset editorial rails leave a continuous right-side view into the Ronin world. */
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){
+ padding-left:10px!important;padding-right:10px!important;
+ background:linear-gradient(90deg,rgba(3,7,8,.74) 0 48%,rgba(3,7,8,.22) 76%,transparent 100%)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+ width:min(62%,470px)!important;margin:6px 0 16px!important;padding:10px 12px!important;
+ background:linear-gradient(90deg,rgba(4,8,9,.9),rgba(4,8,9,.48),transparent)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head h1{font-size:clamp(28px,7vw,42px)!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-hero,.v3-income-hero,.v3-goal-hero){
+ width:min(70%,560px)!important;margin:0 0 12px!important;padding:13px 14px!important;
+ background:linear-gradient(105deg,rgba(5,9,10,.91),rgba(5,9,10,.61) 72%,transparent)!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-signal{
+ width:min(78%,620px)!important;margin-left:0!important;margin-right:auto!important;display:grid!important;grid-template-columns:1.35fr .65fr!important;
+ background:transparent!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-signal>div{
+ background:rgba(5,9,10,.79)!important;border-radius:0!important;border:0!important;border-top:1px solid var(--ronin-line)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-summary,.v3-income-grid,.v3-goal-facts){
+ width:min(72%,590px)!important;margin:0 0 14px auto!important;grid-template-columns:1fr 1fr!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-grid{
+ width:min(88%,690px)!important;margin:0 0 14px auto!important;grid-template-columns:1.2fr .8fr!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*{
+ background:rgba(5,9,10,.76)!important;min-height:68px!important;
+}
+.v3-app[data-shell="samurai"] :is(.v3-asset-list,.v3-analysis-overview-depth,.v3-income-context,.v3-income-detail,.v3-goal-progress,.v3-goal-journey,.v3-goal-milestones){
+ width:min(90%,760px);margin-left:auto!important;
+}
+.v3-app[data-shell="samurai"] .v3-asset{
+ background:linear-gradient(90deg,rgba(5,9,10,.88),rgba(5,9,10,.68))!important;border-left:1px solid rgba(104,185,178,.24)!important;
+}
+.v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal-progress{
+ background:rgba(5,9,10,.73)!important;border-left:1px solid var(--ronin-line)!important;
+}
+
+/* Blade navigation floats as a thin instrument rail, not a heavy footer card. */
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav{
+ left:8px!important;right:8px!important;bottom:max(6px,env(safe-area-inset-bottom))!important;
+ min-height:52px!important;background:linear-gradient(90deg,rgba(3,7,8,.94),rgba(8,10,11,.88),rgba(3,7,8,.94))!important;
+ border-top:1px solid rgba(226,70,53,.32)!important;
+}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button{min-height:48px!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button i{font-size:14px!important}
+.v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button span{font-size:8px!important;letter-spacing:.08em}
+
+/* Samsung / compact phones: poster still owns the first screen, with one narrow instrument strip. */
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{--v3-stage-h:clamp(350px,52svh,430px)!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero{
+  height:var(--v3-stage-h)!important;min-height:var(--v3-stage-h)!important;
+  grid-template-columns:minmax(0,42%) 1fr!important;padding:8px 7px 12px!important;
+  background:
+   linear-gradient(90deg,rgba(3,7,8,.87) 0 21%,rgba(3,7,8,.46) 38%,rgba(3,7,8,.02) 62%),
+   linear-gradient(0deg,rgba(3,6,7,.78),transparent 26%),
+   var(--samurai-ronin-art) 76% 27%/cover no-repeat!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero>div:nth-child(3){padding-left:7px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero h1{font-size:clamp(27px,7.7vw,34px)!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-hero p{font-size:9px!important;max-width:145px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-updated{font-size:8px!important;max-width:145px}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid{
+  width:calc(100% - 12px)!important;margin:-45px 6px 0!important;
+  grid-template-columns:1.28fr .8fr .72fr .62fr!important;grid-template-areas:"twr cash xirr count"!important;
+ }
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article{min-height:72px!important;padding:8px 7px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid :is(span,small){font-size:8px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:nth-child(1) strong{font-size:25px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article:not(:first-child) strong{font-size:15px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark){width:calc(100% - 12px)!important;margin:9px 6px 0!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-pulse{width:78%;margin:9px 6px 0 auto!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home-actions{width:92%;margin:9px 6px 0 auto!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{width:58%!important;margin-top:3px!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head p{font-size:9px!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-hero,.v3-income-hero,.v3-goal-hero){width:67%!important}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-signal{width:76%!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets-summary,.v3-income-grid,.v3-goal-facts){width:78%!important}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-grid{width:88%!important}
+ .v3-app[data-shell="samurai"] :is(.v3-asset-list,.v3-analysis-overview-depth,.v3-income-context,.v3-income-detail,.v3-goal-progress,.v3-goal-journey,.v3-goal-milestones){width:94%}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{--v3-stage-h:340px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid{grid-template-columns:1.2fr .8fr!important;grid-template-areas:"twr cash" "xirr count"!important;margin-top:-36px!important}
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-primary-grid article{min-height:54px!important}
+ .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{width:68%!important}
+}
