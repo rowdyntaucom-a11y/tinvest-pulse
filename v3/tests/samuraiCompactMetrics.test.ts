@@ -96,6 +96,13 @@ assert.match(secondaryViewport,/position:fixed!important/);
 assert.match(secondaryViewport,/inset:0!important/);
 assert.match(secondaryViewport,/scrollbar-width:none!important/);
 assert.match(secondaryViewport,/::-webkit-scrollbar/);
+assert.match(secondaryViewport,/Samsung 1000031415\.mp4 — intentional secondary chapter depth/);
+assert.match(secondaryViewport,/overflow-y:auto!important/);
+assert.match(secondaryViewport,/touch-action:pan-y/);
+assert.match(secondaryViewport,/scroll-snap-type:y proximity/);
+assert.match(secondaryViewport,/min-height:calc\(118dvh - 48px\)!important/);
+assert.match(secondaryViewport,/min-height:clamp\(292px,39dvh,360px\)!important/);
+assert.match(secondaryViewport,/min-height:58dvh!important/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));

@@ -213,3 +213,171 @@
     display:none!important;
   }
 }
+
+
+/* Samsung 1000031415.mp4 — intentional secondary chapter depth.
+   The web scrollbar regression is resolved. The remaining right-side grey pill is
+   fixed at the same screen coordinates across Home/Assets/Analysis/Income/Goal,
+   so it is Samsung's system Edge handle rather than document scroll chrome.
+
+   Keep the document/app shell fixed, but move deliberate chapter depth into one
+   hidden-scrollbar internal owner. This implements the approved "first screen
+   answers, depth may scroll" composition without bringing the browser scrollbar back. */
+@media(max-width:430px){
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"],
+    .v3-goal:has(.sam-goal-empty-path)
+  ){
+    height:calc(100dvh - 48px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior-y:contain!important;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    scroll-snap-type:y proximity;
+    scroll-padding-bottom:max(94px,calc(82px + env(safe-area-inset-bottom)));
+    padding-top:8px!important;
+    padding-bottom:max(104px,calc(92px + env(safe-area-inset-bottom)))!important;
+    scrollbar-width:none!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"],
+    .v3-goal:has(.sam-goal-empty-path)
+  )::-webkit-scrollbar{
+    width:0!important;
+    height:0!important;
+    display:none!important;
+  }
+
+  /* One authored chapter now spans more than one viewport: the instrument is the
+     first-screen visual answer, while route/action detail lives lower in the same world. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-trust-gate{
+    height:auto!important;
+    min-height:calc(118dvh - 48px)!important;
+    max-height:none!important;
+    margin:0 8px 22px!important;
+    padding-bottom:18px!important;
+    grid-template-rows:auto minmax(0,1fr) auto auto auto!important;
+    scroll-snap-align:start;
+  }
+
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-gate__chapter{
+    min-height:52px!important;
+    padding-top:4px!important;
+    padding-bottom:10px!important;
+  }
+
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-gate__chapter small{
+    max-width:310px!important;
+    font-size:8px!important;
+    line-height:1.42!important;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-instrument{
+    min-height:clamp(260px,35dvh,330px)!important;
+    margin-top:12px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument{
+    min-height:clamp(292px,39dvh,360px)!important;
+    margin-top:12px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-instrument{
+    min-height:clamp(240px,32dvh,300px)!important;
+    margin-top:12px!important;
+  }
+
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-gate__route{
+    margin-top:clamp(24px,4.6dvh,42px)!important;
+    margin-bottom:14px!important;
+  }
+
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-gate__action{
+    margin-top:10px!important;
+    padding-top:12px!important;
+    padding-bottom:12px!important;
+  }
+
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) footer{
+    margin-top:10px!important;
+    padding-bottom:4px!important;
+  }
+
+  /* Goal follows the same scene -> decision -> route rhythm instead of compressing
+     all three beats into a single cockpit viewport. */
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path){
+    min-height:0!important;
+    max-height:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter{
+    min-height:108px!important;
+    margin:0 8px 14px!important;
+    padding-top:18px!important;
+    padding-bottom:15px!important;
+    scroll-snap-align:start;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .v3-goal-hero{
+    min-height:178px!important;
+    margin:0 8px 20px!important;
+    padding-top:20px!important;
+    padding-bottom:18px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-empty-path{
+    min-height:58dvh!important;
+    max-height:none!important;
+    margin:0 8px 24px!important;
+    padding-top:22px!important;
+    padding-bottom:24px!important;
+  }
+
+  /* Reveal more of the world around the authored panels instead of turning the
+     entire viewport into one uninterrupted widget wall. */
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"],
+    .v3-goal:has(.sam-goal-empty-path)
+  ){
+    background-color:transparent!important;
+  }
+}
+
+@media(max-width:359px){
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-trust-gate{
+    min-height:124dvh!important;
+    padding-inline:10px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-instrument{min-height:250px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument{min-height:276px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-instrument{min-height:230px!important}
+}
