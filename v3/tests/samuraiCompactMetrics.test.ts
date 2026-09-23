@@ -5,6 +5,7 @@ const deck=readFileSync(new URL("../src/styles/samuraiHomeCommandDeck.css",impor
 const inception=readFileSync(new URL("../src/styles/samuraiSinceInception.css",import.meta.url),"utf8");
 const story=readFileSync(new URL("../src/styles/samuraiScrollStory.css",import.meta.url),"utf8");
 const empty=readFileSync(new URL("../src/styles/samuraiEmptyAnalyticsAtmosphere.css",import.meta.url),"utf8");
+const transition=readFileSync(new URL("../src/styles/samuraiScrollTransitionPolish.css",import.meta.url),"utf8");
 const dock=readFileSync(new URL("../src/styles/samuraiFormationDock.css",import.meta.url),"utf8");
 const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
@@ -52,10 +53,16 @@ assert.match(empty,/min-height:calc\(100dvh - 250px\)/);
 assert.match(empty,/sam-world__awaiting-route/);
 assert.match(empty,/sam-world__awaiting-art/);
 assert.match(empty,/prefers-reduced-motion:reduce/);
+assert.match(transition,/sam-world__scene-page:after/);
+assert.match(transition,/padding-top:max\(42px,calc\(env\(safe-area-inset-top\) \+ 30px\)\)!important/);
+assert.match(transition,/linear-gradient\(180deg,rgba\(2,7,6,.82\),rgba\(2,8,7,.90\)\)/);
+assert.match(transition,/min-height:calc\(100dvh - 286px\)!important/);
+assert.match(transition,/prefers-reduced-motion:reduce/);
 
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));
 assert.ok(main.indexOf("samuraiSinceInception.css")<main.indexOf("samuraiScrollStory.css"));
 assert.ok(main.indexOf("samuraiScrollStory.css")<main.indexOf("samuraiEmptyAnalyticsAtmosphere.css"));
-assert.ok(main.indexOf("samuraiEmptyAnalyticsAtmosphere.css")<main.indexOf("mobilePerformance.css"));
+assert.ok(main.indexOf("samuraiEmptyAnalyticsAtmosphere.css")<main.indexOf("samuraiScrollTransitionPolish.css"));
+assert.ok(main.indexOf("samuraiScrollTransitionPolish.css")<main.indexOf("mobilePerformance.css"));
 console.log("samurai compact metrics regression: ok");
