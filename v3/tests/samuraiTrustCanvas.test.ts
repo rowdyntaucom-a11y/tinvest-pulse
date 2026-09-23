@@ -10,8 +10,8 @@ assert.match(gate,/onRefresh/);
 assert.match(gate,/Проверить источник/);
 assert.match(gate,/sam-trust-gate__watermark/);
 for(const src of[assets,analysis,income]){assert.match(src,/onRefresh/);assert.match(src,/refreshing/)}
-assert.match(app,/onRefresh={demo?undefined:onRefresh}/);
-assert.match(app,/refreshing={refreshing}/);
+assert.ok(app.includes('onRefresh={demo?undefined:onRefresh}'));
+assert.ok(app.includes('refreshing={refreshing}'));
 for(const workspace of["assets","analysis","income","goal"])assert.match(css,new RegExp('data-workspace="'+workspace+'"'));
 assert.match(css,/min-height:clamp\(300px,46dvh,430px\)!important/);
 assert.match(css,/grid-template-columns:1fr!important/);
