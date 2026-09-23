@@ -1,0 +1,94 @@
+/* Shell composition systems v24 — authored layout grammar, not wallpaper.
+   Same semantic DOM/data; each shell composes first-screen answers differently. */
+.v3-app{
+ --shell-head-align:left;--shell-hero-pad:15px;--shell-metric-gap:8px;--shell-metric-columns:1fr 1fr;
+ --shell-section-gap:8px;--shell-label-weight:600;
+}
+.v3-app:not([data-workspace="dna"]) :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal){position:relative}
+.v3-app:not([data-workspace="dna"]) .v3-page-head{text-align:var(--shell-head-align)}
+.v3-app:not([data-workspace="dna"]) :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts){
+ gap:var(--shell-metric-gap)!important;grid-template-columns:var(--shell-metric-columns)!important;
+}
+.v3-app:not([data-workspace="dna"]) :is(.v3-assets-hero,.v3-analysis-signal>div,.v3-income-hero,.v3-goal-hero){padding:var(--shell-hero-pad)!important}
+.v3-app:not([data-workspace="dna"]) :is(.v3-kicker,.v3-page-head>span,.v3-primary-grid span,.v3-assets-summary span,.v3-analysis-grid span,.v3-income-grid span,.v3-goal-facts span){font-weight:var(--shell-label-weight)}
+
+/* Samurai: asymmetrical scroll — answer card leads, supporting metrics step inward. */
+.v3-app[data-shell="samurai"]{--shell-head-align:left;--shell-hero-pad:18px 16px 17px 21px;--shell-metric-gap:9px;--shell-label-weight:500}
+.v3-app[data-shell="samurai"] :is(.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>:nth-child(even){transform:translateY(5px)}
+.v3-app[data-shell="samurai"] :is(.v3-primary-grid)>:nth-child(2n){transform:translateY(5px)}
+.v3-app[data-shell="samurai"] .v3-page-head{padding-left:9px;border-left:1px solid rgba(240,176,109,.42)}
+.v3-app[data-shell="samurai"] :is(.v3-asset-list,.v3-analysis-overview-depth,.v3-income-context,.v3-goal-journey){margin-left:7px}
+
+/* Cosmos: instrument deck — compact three-column readouts where content permits, hard alignment. */
+.v3-app[data-shell="carbon"]{--shell-head-align:left;--shell-hero-pad:14px 18px;--shell-metric-gap:4px;--shell-label-weight:800}
+.v3-app[data-shell="carbon"] .v3-primary-grid{grid-template-columns:1fr 1fr 1fr 1fr!important}
+.v3-app[data-shell="carbon"] .v3-primary-grid article{min-width:0;padding:10px 7px!important}
+.v3-app[data-shell="carbon"] .v3-primary-grid strong{font-size:clamp(14px,4.4vw,20px)!important}
+.v3-app[data-shell="carbon"] :is(.v3-assets-summary,.v3-income-grid,.v3-goal-facts){grid-template-columns:1.15fr .85fr!important}
+.v3-app[data-shell="carbon"] .v3-analysis-grid{grid-template-columns:1fr 1fr 1fr 1fr!important}
+.v3-app[data-shell="carbon"] .v3-analysis-grid article{padding:10px 7px!important}
+.v3-app[data-shell="carbon"] :is(.v3-page-head,.v3-assets-hero,.v3-analysis-signal,.v3-income-hero,.v3-goal-hero){border-right:1px solid rgba(121,191,255,.18)}
+.v3-app[data-shell="carbon"] .v3-page-head{padding-right:12px}
+
+/* Neon: poster hierarchy — oversized answer, chunky 2x2 modules. */
+.v3-app[data-shell="core"]{--shell-head-align:left;--shell-hero-pad:19px 17px;--shell-metric-gap:7px;--shell-label-weight:800}
+.v3-app[data-shell="core"] .v3-page-head h1{font-size:clamp(38px,12vw,52px)!important;line-height:.92}
+.v3-app[data-shell="core"] :is(.v3-assets-hero,.v3-income-hero,.v3-goal-hero){min-height:104px}
+.v3-app[data-shell="core"] .v3-analysis-signal{grid-template-columns:1.55fr .65fr!important}
+.v3-app[data-shell="core"] :is(.v3-primary-grid,.v3-analysis-grid)>:first-child{grid-column:span 2}
+.v3-app[data-shell="core"] .v3-primary-grid{grid-template-columns:1fr 1fr 1fr!important}
+.v3-app[data-shell="core"] .v3-analysis-grid{grid-template-columns:1fr 1fr 1fr!important}
+
+/* Zen: editorial column — fewer boxes, deliberate whitespace and horizontal facts. */
+.v3-app[data-shell="horizon"]{--shell-head-align:center;--shell-hero-pad:20px 12px;--shell-metric-gap:0px;--shell-label-weight:500}
+.v3-app[data-shell="horizon"] .v3-page-head{max-width:310px;margin-inline:auto}
+.v3-app[data-shell="horizon"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts){
+ display:flex!important;flex-wrap:wrap;border-top:1px solid rgba(79,128,108,.18);border-bottom:1px solid rgba(79,128,108,.18)
+}
+.v3-app[data-shell="horizon"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*{
+ flex:1 1 46%;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important
+}
+.v3-app[data-shell="horizon"] :is(.v3-assets-hero,.v3-income-hero,.v3-goal-hero){text-align:center}
+.v3-app[data-shell="horizon"] .v3-income-hero{justify-content:center!important;gap:22px}
+
+/* Nord: modular utility — strong left answer rail + calm equal facts. */
+.v3-app[data-shell="aurora"]{--shell-head-align:left;--shell-hero-pad:17px 18px;--shell-metric-gap:10px;--shell-label-weight:700}
+.v3-app[data-shell="aurora"] :is(.v3-assets-hero,.v3-income-hero,.v3-goal-hero){display:grid!important;grid-template-columns:1fr auto;align-items:center}
+.v3-app[data-shell="aurora"] .v3-analysis-signal{grid-template-columns:1fr 1fr!important}
+.v3-app[data-shell="aurora"] :is(.v3-primary-grid,.v3-analysis-grid){gap:10px!important}
+.v3-app[data-shell="aurora"] :is(.v3-primary-grid,.v3-analysis-grid)>*{min-height:82px}
+.v3-app[data-shell="aurora"] .v3-page-head{padding-left:2px}
+
+/* Imperium: ledger — one-column ruled register, no dashboard tile wall. */
+.v3-app[data-shell="minimal"]{--shell-head-align:center;--shell-hero-pad:16px 14px;--shell-metric-gap:0px;--shell-label-weight:700}
+.v3-app[data-shell="minimal"] .v3-page-head{border-top:3px double rgba(154,106,42,.38);border-bottom:1px solid rgba(154,106,42,.25);padding:12px 4px 10px}
+.v3-app[data-shell="minimal"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts){
+ display:grid!important;grid-template-columns:1fr!important;border-top:1px solid rgba(154,106,42,.25)
+}
+.v3-app[data-shell="minimal"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;min-height:52px!important;
+ border-width:0 0 1px!important;border-color:rgba(154,106,42,.22)!important;box-shadow:none!important
+}
+.v3-app[data-shell="minimal"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*>strong{margin:0!important;text-align:right}
+.v3-app[data-shell="minimal"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*>small{grid-column:1/-1}
+.v3-app[data-shell="minimal"] .v3-analysis-signal{grid-template-columns:1fr!important;gap:0!important}
+.v3-app[data-shell="minimal"] .v3-analysis-signal>div{border-radius:0!important;box-shadow:none!important}
+
+/* Phone: authored differences survive, but never by shrinking touch or body text. */
+@media(max-width:699px){
+ .v3-app[data-shell="carbon"] .v3-primary-grid,.v3-app[data-shell="carbon"] .v3-analysis-grid{grid-template-columns:1fr 1fr!important}
+ .v3-app[data-shell="carbon"] .v3-primary-grid article,.v3-app[data-shell="carbon"] .v3-analysis-grid article{min-height:68px}
+ .v3-app[data-shell="core"] .v3-primary-grid,.v3-app[data-shell="core"] .v3-analysis-grid{grid-template-columns:1fr 1fr!important}
+ .v3-app[data-shell="core"] :is(.v3-primary-grid,.v3-analysis-grid)>:first-child{grid-column:span 2}
+ .v3-app[data-shell="samurai"] :is(.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>:nth-child(even){transform:translateY(3px)}
+ .v3-app[data-shell="samurai"] .v3-primary-grid>:nth-child(2n){transform:translateY(3px)}
+ .v3-app[data-shell="horizon"] .v3-page-head{max-width:290px}
+ .v3-app[data-shell="minimal"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*{padding-block:10px!important}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="carbon"] .v3-primary-grid,.v3-app[data-shell="carbon"] .v3-analysis-grid{grid-template-columns:1fr 1fr!important}
+ .v3-app[data-shell="core"] .v3-page-head h1{font-size:36px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid,.v3-goal-facts)>*{transform:none!important}
+}
