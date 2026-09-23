@@ -124,3 +124,47 @@
     min-height:92px!important;
   }
 }
+
+
+/* Samsung 1000031413.mp4 — final root-scroll fix.
+   The visible right scrollbar came from the document/root box, not the chapter canvas itself:
+   the sticky Samurai topbar used a 48px content height plus padding/border, and the document
+   was still allowed to scroll even when the fail-closed cockpit fitted internally. */
+@media(max-width:430px){
+  .v3-app[data-shell="samurai"]>.v3-topbar{
+    box-sizing:border-box!important;
+  }
+
+  html:has(.v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]),
+  body:has(.v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]),
+  html:has(.v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]),
+  body:has(.v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]),
+  html:has(.v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]),
+  body:has(.v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]),
+  html:has(.v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal .sam-goal-empty-path),
+  body:has(.v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal .sam-goal-empty-path){
+    height:100%;
+    overflow:hidden!important;
+    overscroll-behavior:none;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"]:has(.v3-assets[data-trusted="false"]),
+  .v3-app[data-shell="samurai"][data-workspace="analysis"]:has(.v3-analysis[data-trusted="false"]),
+  .v3-app[data-shell="samurai"][data-workspace="income"]:has(.v3-income[data-trusted="false"]),
+  .v3-app[data-shell="samurai"][data-workspace="goal"]:has(.sam-goal-empty-path){
+    height:100dvh!important;
+    min-height:100dvh!important;
+    max-height:100dvh!important;
+    overflow:hidden!important;
+  }
+
+  /* With topbar now truly 48px border-box, keep the chapter viewport arithmetic exact. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"],
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path){
+    height:calc(100dvh - 48px)!important;
+    min-height:calc(100dvh - 48px)!important;
+    max-height:calc(100dvh - 48px)!important;
+  }
+}
