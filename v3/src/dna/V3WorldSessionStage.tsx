@@ -24,7 +24,8 @@ export function V3WorldSessionStage({state}:{state:WorldState}){
   const focus=selected?{x:selected.x,y:selected.y}:null;
   const camera=useMemo(()=>resolveWorldCameraFrame(viewport.width,viewport.height,focus),[viewport.width,viewport.height,selected?.x,selected?.y]);
 
-  return <div ref={hostRef} data-world-exploration="v2" style={{position:"relative",width:"100%",height:"100%"}}>
+  return <div ref={hostRef} className="v3-world-session" data-world-exploration="v3" style={{position:"relative",width:"100%",height:"100%"}}>
+    <div className="v3-world-entry" aria-hidden="true"><span/><b>QVANIX WORLD</b></div>
     <WorldStage state={rendererState} focus={focus}/>
     <nav aria-label="Исследовать точки живого мира" style={{position:"absolute",inset:0,zIndex:7,pointerEvents:"none"}}>
       {WORLD_EXPLORATION_LANDMARKS.map((item,index)=>{
