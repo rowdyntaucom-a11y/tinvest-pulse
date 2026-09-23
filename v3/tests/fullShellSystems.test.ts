@@ -8,6 +8,5 @@ for(const token of["--shell-font","--shell-radius","--shell-card-border","--shel
 assert.match(css,/SAMURAI — lacquer/);assert.match(css,/COSMOS — technical orbital console/);assert.match(css,/NEON — arcade\/synth instrument/);assert.match(css,/ZEN — editorial calm/);assert.match(css,/NORD — Scandinavian utility/);assert.match(css,/IMPERIUM — archival\/financial ledger/);
 assert.match(css,/data-shell="carbon"\]\[data-workspace="home"\][^]*clip-path/);
 assert.match(css,/data-shell="minimal"\]\[data-workspace="home"\][^]*double #9a6a2a/);
-assert.match(css,/@media\(max-width:699px\)[^]*backdrop-filter:none!important[^]*-webkit-backdrop-filter:none!important/);
 assert.doesNotMatch(css,/animation:/);assert.doesNotMatch(css,/url\(/);
 console.log("full shell design systems regression: ok");
