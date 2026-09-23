@@ -1,0 +1,191 @@
+/* Samurai deep workspace pass — drill-downs inherit the same authored material system. */
+
+/* Asset intelligence — engraved dossier */
+.v3-app[data-shell="samurai"] .v3-asset-workspace{
+ position:relative;background:linear-gradient(180deg,rgba(2,7,6,.98),rgba(3,9,8,.98) 62%,#020505)!important;
+}
+.v3-app[data-shell="samurai"] .v3-asset-back{
+ margin-inline:9px!important;border-radius:0!important;border:1px solid rgba(201,155,88,.2)!important;
+ background:linear-gradient(90deg,rgba(6,17,14,.9),rgba(11,14,11,.76))!important;color:#c8d2ce!important;
+}
+.v3-app[data-shell="samurai"] .v3-asset-hero{
+ position:relative;margin-inline:9px!important;overflow:hidden;border:0!important;border-left:3px solid #72d8c4!important;border-radius:0!important;
+ background:linear-gradient(112deg,rgba(5,16,13,.98),rgba(7,18,15,.92) 62%,rgba(29,14,12,.76))!important;
+ clip-path:polygon(0 0,92% 0,100% 17%,97% 100%,0 100%)!important;box-shadow:0 15px 30px rgba(0,0,0,.24)!important;
+}
+.v3-app[data-shell="samurai"] .v3-asset-hero:before{
+ content:"銘";position:absolute;right:18px;top:17px;width:43px;height:43px;display:grid;place-items:center;
+ border:1px solid rgba(201,155,88,.26);font:19px Georgia,serif;color:rgba(201,155,88,.55);transform:rotate(45deg);
+}
+.v3-app[data-shell="samurai"] .v3-asset-hero:after{
+ content:"";position:absolute;right:4px;top:0;width:42%;height:100%;
+ background:linear-gradient(145deg,transparent 47%,rgba(227,75,59,.14) 47.4%,transparent 48.2%);pointer-events:none;
+}
+.v3-app[data-shell="samurai"] .v3-asset-identity strong{font-size:22px!important;letter-spacing:-.03em}
+.v3-app[data-shell="samurai"] .v3-asset-identity :is(span,small){font-family:Inter,system-ui,sans-serif!important}
+.v3-app[data-shell="samurai"] .v3-asset-hero-value strong{font-size:24px!important}
+.v3-app[data-shell="samurai"] .v3-asset-workspace-grid{
+ margin-inline:9px!important;gap:3px!important;border:1px solid rgba(114,216,196,.09)!important;background:rgba(3,10,9,.42)!important;
+}
+.v3-app[data-shell="samurai"] .v3-asset-workspace-grid article{
+ position:relative;border:0!important;border-radius:0!important;border-top:1px solid rgba(201,155,88,.12)!important;
+ background:linear-gradient(145deg,rgba(4,13,11,.92),rgba(3,9,8,.7))!important;box-shadow:none!important;
+}
+.v3-app[data-shell="samurai"] .v3-asset-workspace-grid article:before{
+ content:"";position:absolute;left:0;top:10px;bottom:10px;width:1px;background:linear-gradient(#e34b3b,#c99b58,#72d8c4);
+}
+.v3-app[data-shell="samurai"] :is(.v3-asset-method,.v3-asset-intelligence,.v3-asset-history-card,.v3-bond-context,.v3-asset-warning,.v3-fundamental-groups,.v3-asset-source){
+ border-radius:0!important;border-color:rgba(201,155,88,.15)!important;background:linear-gradient(145deg,rgba(5,15,13,.88),rgba(3,9,8,.66))!important;
+}
+.v3-app[data-shell="samurai"] .v3-asset-history-head{border-bottom:1px solid rgba(201,155,88,.15)!important}
+.v3-app[data-shell="samurai"] .v3-asset-risk-grid,.v3-app[data-shell="samurai"] .v3-asset-income-grid{gap:3px!important}
+.v3-app[data-shell="samurai"] :is(.v3-asset-risk-grid,.v3-asset-income-grid)>*{border-radius:0!important;background:rgba(4,12,10,.82)!important}
+.v3-app[data-shell="samurai"] .v3-asset-history-empty{border-radius:0!important;border-color:rgba(201,155,88,.16)!important}
+
+/* Section selector becomes an engraved switch plate. */
+.v3-app[data-shell="samurai"] .v3-section-selector{
+ position:relative;overflow:hidden;padding:10px 11px!important;
+}
+.v3-app[data-shell="samurai"] .v3-section-selector:before{
+ content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(#e34b3b,#c99b58,#72d8c4);
+}
+.v3-app[data-shell="samurai"] .v3-section-selector>span{font-size:7px!important;letter-spacing:.12em!important;color:#c99b58!important}
+.v3-app[data-shell="samurai"] .v3-section-selector>div{margin-top:5px!important}
+.v3-app[data-shell="samurai"] .v3-section-selector select{
+ border-radius:0!important;border:1px solid rgba(114,216,196,.13)!important;background:#06100e!important;color:#eef3f1!important;
+}
+.v3-app[data-shell="samurai"] .v3-section-selector small{font-size:7px!important;line-height:1.35!important;color:#6f817c!important}
+
+/* Analysis depth — layered tactical dossiers */
+.v3-app[data-shell="samurai"] .v3-analysis-layer{position:relative;margin-inline:9px!important;padding-top:3px}
+.v3-app[data-shell="samurai"] .v3-analysis-layer-head{
+ position:relative;min-height:58px;padding:10px 12px 9px 15px!important;border:0!important;border-left:2px solid rgba(201,155,88,.45)!important;
+ background:linear-gradient(100deg,rgba(6,17,14,.93),rgba(3,10,9,.72))!important;
+}
+.v3-app[data-shell="samurai"] .v3-analysis-layer-head:after{
+ content:"";position:absolute;left:15px;right:10px;bottom:0;height:1px;background:linear-gradient(90deg,#72d8c4,#c99b58 56%,#e34b3b,transparent 88%);
+}
+.v3-app[data-shell="samurai"] .v3-analysis-layer-head span{font-family:Inter,system-ui,sans-serif!important;font-size:7px!important;letter-spacing:.1em;color:#8c9b96!important}
+.v3-app[data-shell="samurai"] .v3-analysis-layer-head h2,.v3-app[data-shell="samurai"] .v3-analysis-layer-head h3{margin-top:4px!important;font-weight:500!important;letter-spacing:.01em}
+.v3-app[data-shell="samurai"] .v3-analysis-layer-head>b{
+ min-width:43px;padding:5px 7px!important;border:1px solid rgba(201,155,88,.19)!important;border-radius:0!important;background:rgba(20,15,10,.52)!important;color:#c99b58!important;
+}
+.v3-app[data-shell="samurai"] .v3-analysis-metric-grid{
+ gap:1px!important;padding:1px!important;border:1px solid rgba(114,216,196,.08)!important;background:rgba(114,216,196,.05)!important;
+}
+.v3-app[data-shell="samurai"] .v3-analysis-metric-grid article{
+ position:relative;min-height:82px!important;border:0!important;border-radius:0!important;background:linear-gradient(145deg,rgba(3,11,9,.98),rgba(5,14,12,.86))!important;box-shadow:none!important;
+}
+.v3-app[data-shell="samurai"] .v3-analysis-metric-grid article:after{
+ content:"";position:absolute;left:10px;right:10px;bottom:8px;height:1px;background:linear-gradient(90deg,rgba(114,216,196,.18),transparent);
+}
+.v3-app[data-shell="samurai"] .v3-analysis-metric-grid article span{font-family:Inter,system-ui,sans-serif!important;font-size:7.5px!important}
+.v3-app[data-shell="samurai"] .v3-analysis-metric-grid article strong{font-size:20px!important}
+.v3-app[data-shell="samurai"] :is(.v3-rolling-card,.v3-tail-card,.v3-relative-advanced,.v3-analysis-sample,.v3-market-context.is-depth,.v3-risk-contribution,.v3-analysis-gate){
+ border-radius:0!important;border-color:rgba(201,155,88,.14)!important;background:linear-gradient(140deg,rgba(5,15,13,.86),rgba(3,9,8,.68))!important;
+}
+.v3-app[data-shell="samurai"] .v3-rolling-windows span{
+ border-radius:0!important;border-color:rgba(114,216,196,.13)!important;background:#06100e!important;
+}
+.v3-app[data-shell="samurai"] .v3-rolling-windows span.is-ready{border-color:rgba(201,155,88,.25)!important;color:#d8ae6e!important}
+.v3-app[data-shell="samurai"] .v3-analysis-method-note{font-family:Inter,system-ui,sans-serif!important;color:#71827d!important}
+.v3-app[data-shell="samurai"] .v3-analysis-gate{border-left:2px solid rgba(201,155,88,.35)!important}
+.v3-app[data-shell="samurai"] .v3-analysis-gate.is-danger{border-left-color:#e34b3b!important}
+
+/* Income depth — payout ledger / calendar register */
+.v3-app[data-shell="samurai"] .v3-income-depth{margin-inline:9px!important}
+.v3-app[data-shell="samurai"] .v3-income-depth-head{
+ position:relative;padding:11px 12px 10px 15px!important;border:0!important;border-left:2px solid #c99b58!important;
+ background:linear-gradient(100deg,rgba(6,17,14,.94),rgba(18,13,9,.66))!important;
+}
+.v3-app[data-shell="samurai"] .v3-income-depth-head:after{
+ content:"禄";position:absolute;right:13px;top:8px;font:20px Georgia,serif;color:rgba(201,155,88,.2)
+}
+.v3-app[data-shell="samurai"] .v3-income-depth-head span{font-family:Inter,system-ui,sans-serif!important;font-size:7px!important;letter-spacing:.12em}
+.v3-app[data-shell="samurai"] .v3-income-calendar-depth,.v3-app[data-shell="samurai"] .v3-income-history-depth,.v3-app[data-shell="samurai"] .v3-income-sources-depth{
+ border-radius:0!important;border-color:rgba(201,155,88,.14)!important;background:rgba(3,10,9,.76)!important;
+}
+.v3-app[data-shell="samurai"] .v3-income-calendar-summary{
+ display:grid!important;grid-template-columns:1fr 1fr!important;gap:1px!important;padding:1px!important;background:rgba(114,216,196,.06)!important;
+}
+.v3-app[data-shell="samurai"] .v3-income-calendar-summary article{
+ min-height:78px!important;border:0!important;border-radius:0!important;background:linear-gradient(145deg,rgba(4,13,11,.95),rgba(3,9,8,.78))!important;box-shadow:none!important;
+}
+.v3-app[data-shell="samurai"] .v3-income-month-ribbon{gap:3px!important}
+.v3-app[data-shell="samurai"] .v3-income-month-ribbon button{
+ border-radius:0!important;border-color:rgba(114,216,196,.13)!important;background:rgba(4,13,11,.88)!important;
+}
+.v3-app[data-shell="samurai"] .v3-income-month-ribbon button.is-active{
+ border-color:rgba(227,75,59,.4)!important;background:linear-gradient(145deg,rgba(31,14,12,.84),rgba(7,16,14,.84))!important;
+}
+.v3-app[data-shell="samurai"] :is(.v3-income-event-row,.v3-income-source-row){
+ position:relative;border-radius:0!important;border-color:rgba(201,155,88,.1)!important;background:linear-gradient(100deg,rgba(4,13,11,.9),rgba(3,9,8,.72))!important;
+}
+.v3-app[data-shell="samurai"] :is(.v3-income-event-row,.v3-income-source-row):before{
+ content:"";position:absolute;left:0;top:8px;bottom:8px;width:1px;background:linear-gradient(#c99b58,#72d8c4);
+}
+.v3-app[data-shell="samurai"] .v3-income-history-bars i{border-radius:0!important;background:linear-gradient(180deg,#c99b58,#72d8c4)!important}
+.v3-app[data-shell="samurai"] :is(.v3-income-history-stats,.v3-income-comparable,.v3-income-coverage,.v3-income-method,.v3-income-depth-gate){
+ border-radius:0!important;border-color:rgba(201,155,88,.13)!important;background:rgba(4,12,10,.8)!important;
+}
+
+/* Goal scenario lab — campaign map, not generic form. */
+.v3-app[data-shell="samurai"] .v3-goal-scenario-lab{
+ margin-inline:9px!important;border-radius:0!important;border-color:rgba(201,155,88,.14)!important;background:linear-gradient(180deg,rgba(4,13,11,.92),rgba(3,9,8,.76))!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-head{
+ position:relative;padding-left:15px!important;border-left:2px solid rgba(227,75,59,.48)!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-head:after{
+ content:"道";position:absolute;right:10px;top:5px;font:20px Georgia,serif;color:rgba(227,75,59,.18)
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-banner{
+ border-radius:0!important;border-color:rgba(201,155,88,.14)!important;background:linear-gradient(90deg,rgba(25,17,10,.7),rgba(5,13,11,.68))!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-form{gap:4px!important}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-field{
+ border-radius:0!important;border-color:rgba(114,216,196,.1)!important;background:rgba(3,11,9,.82)!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-field input{
+ border-radius:0!important;border-color:rgba(201,155,88,.16)!important;background:#06100e!important;color:#eef4f1!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-toggle button,.v3-app[data-shell="samurai"] .v3-goal-scenario-view button{
+ border-radius:0!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-chart{
+ position:relative;overflow:hidden;border-radius:0!important;border-color:rgba(201,155,88,.14)!important;
+ background:
+ radial-gradient(circle at 82% 20%,rgba(153,38,28,.12),transparent 22%),
+ repeating-linear-gradient(0deg,rgba(114,216,196,.025) 0 1px,transparent 1px 34px),
+ rgba(3,10,9,.86)!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-chart:before{
+ content:"";position:absolute;right:-30px;top:-34px;width:116px;height:116px;border-radius:50%;border:1px solid rgba(201,155,88,.1);box-shadow:0 0 0 18px rgba(201,155,88,.025),0 0 0 42px rgba(227,75,59,.018)
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-focus{
+ border-radius:0!important;border-left:2px solid #72d8c4!important;background:rgba(4,13,11,.9)!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-years button{
+ border-radius:0!important;border-color:rgba(114,216,196,.11)!important;background:#06100e!important;
+}
+.v3-app[data-shell="samurai"] .v3-goal-scenario-years button.is-active{border-color:rgba(227,75,59,.42)!important;color:#efc48a!important}
+.v3-app[data-shell="samurai"] :is(.v3-goal-scenario-results,.v3-goal-scenario-result-grid article,.v3-goal-scenario-method,.v3-goal-bootstrap-view,.v3-goal-scenario-gate){
+ border-radius:0!important;border-color:rgba(201,155,88,.13)!important;background:rgba(4,12,10,.8)!important;
+}
+
+/* Workspace arrival is a restrained authored transition, never a full-page cinematic blocker. */
+@media(prefers-reduced-motion:no-preference) and (max-width:699px){
+ .v3-app[data-shell="samurai"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){
+  animation:samWorkspaceArrival .34s cubic-bezier(.2,.75,.25,1) both;
+ }
+ .v3-app[data-shell="samurai"] .v3-analysis-layer-head:after{animation:samDepthSignal 4.4s ease-in-out infinite}
+ @keyframes samWorkspaceArrival{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:none}}
+ @keyframes samDepthSignal{50%{filter:brightness(1.4);box-shadow:0 0 9px rgba(114,216,196,.2)}}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){animation:none!important}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .v3-analysis-metric-grid article{min-height:76px!important;padding-inline:8px!important}
+ .v3-app[data-shell="samurai"] .v3-income-calendar-summary{grid-template-columns:1fr!important}
+}
