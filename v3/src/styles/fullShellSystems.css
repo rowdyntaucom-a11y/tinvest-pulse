@@ -97,11 +97,6 @@
 .v3-app[data-shell="minimal"][data-workspace="home"] .v3-hero{border-left:4px double #9a6a2a!important}
 
 @media(max-width:699px){
-  .v3-app :is(.v3-hero,.v3-primary-grid article,.v3-history-card,.v3-context-row article,.v3-pulse article,
-  .v3-assets-hero,.v3-assets-summary article,.v3-asset,.v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-detail,
-  .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-goal-hero,.v3-goal-progress,.v3-goal-detail){
-    backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-  }
   .v3-app[data-shell="horizon"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid){gap:10px!important}
 }
 @media(prefers-reduced-motion:reduce){.v3-app *{scroll-behavior:auto}}
