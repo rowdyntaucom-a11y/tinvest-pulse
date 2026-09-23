@@ -48,7 +48,7 @@ function resultBreadth(items:PositionSnapshot[]){
   };
 }
 
-export function V3Analysis({items,history,market,trusted,shell,mode,portfolioValue,onOpenAsset}:{items:PositionSnapshot[];history:HistoryPoint[];market:{riskFreeRate:number|null;riskFreeRateDate:string|null;nextRateMeeting:string|null};trusted:boolean;shell:V3Shell;mode:V3DetailMode;portfolioValue:number;onOpenAsset?:(position:PositionSnapshot)=>void}){
+export function V3Analysis({items,history,market,trusted,shell,mode,portfolioValue,onOpenAsset,onRefresh,refreshing=false}:{items:PositionSnapshot[];history:HistoryPoint[];market:{riskFreeRate:number|null;riskFreeRateDate:string|null;nextRateMeeting:string|null};trusted:boolean;shell:V3Shell;mode:V3DetailMode;portfolioValue:number;onOpenAsset?:(position:PositionSnapshot)=>void;onRefresh?:()=>void|Promise<void>;refreshing?:boolean}){
   const rows=trusted?items:[],trustedHistory=trusted?history:[];
   const depth=useMemo(()=>buildV3AnalysisDepth(trustedHistory,rows,trusted?market.riskFreeRate:null),[trustedHistory,rows,trusted,market.riskFreeRate]);
   const ranked=[...rows].sort((a,b)=>b.currentValue-a.currentValue);
@@ -72,7 +72,7 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
 
   return <main className="v3-analysis" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="眼" code="TACTICAL // 03" label="RISK & RETURN"/>
     <header className="v3-page-head"><span>ПОРТФЕЛЬ · ДИАГНОСТИКА</span><h1>Анализ</h1><p>{trusted?"Доходность, риск и структура · без торговых рекомендаций":"Аналитика скрыта до подтверждения данных"}</p></header>
-    {shell==="samurai"&&!trusted&&<SamuraiTrustGate kind="analysis"/>}
+    {shell==="samurai"&&!trusted&&<SamuraiTrustGate kind="analysis" onRefresh={onRefresh} refreshing={refreshing}/>}
     {trusted&&<section className="v3-analysis-signal"><div><span>Концентрация <V3MetricHelp topic="effectivePositions"/></span><strong>{effective==null?"—":n2.format(effective)+" экв."}</strong><small>{depth.portfolio.hhi==null?"HHI недоступен":"HHI "+n2.format(depth.portfolio.hhi)}</small></div><div><span>Крупнейшая</span><strong>{largest?.ticker??"—"}</strong><small>{largest?n.format(ratioToPercent(largest.weight)??0)+"% портфеля":"—"}</small></div></section>}
     <section className="v3-analysis-grid">
       <article><span>Макс. просадка <V3MetricHelp topic="maxDrawdown"/></span><strong className={dd==null?"is-neutral":dd<0?"is-negative":"is-neutral"}>{dd==null?"—":n.format(dd)+"%"}</strong><small>TWR · {depth.portfolio.historyPoints} точек</small></article>
