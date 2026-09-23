@@ -14,14 +14,14 @@ const PORTFOLIO_VIEWS=[
 type PortfolioView=typeof PORTFOLIO_VIEWS[number]["value"];
 function kind(v:string){return positionAssetClassLabel(v)}
 
-export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOpenAsset}:{items:PositionSnapshot[];trusted:boolean;shell:V3Shell;mode:V3DetailMode;allowAssetWorkspace?:boolean;onOpenAsset?:(position:PositionSnapshot)=>void}){
+export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOpenAsset,onRefresh,refreshing=false}:{items:PositionSnapshot[];trusted:boolean;shell:V3Shell;mode:V3DetailMode;allowAssetWorkspace?:boolean;onOpenAsset?:(position:PositionSnapshot)=>void;onRefresh?:()=>void|Promise<void>;refreshing?:boolean}){
   const[filter,setFilter]=useState<"all"|"stock"|"bond"|"fund">("all"),[sort,setSort]=useState<"value"|"result">("value"),[open,setOpen]=useState<string|null>(null),[view,setView]=useState<PortfolioView>("overview");
   const base=trusted?[...items]:[],total=base.reduce((s,x)=>s+x.currentValue,0),top3=[...base].sort((a,b)=>b.currentValue-a.currentValue).slice(0,3).reduce((s,x)=>s+x.weight,0)*100,positive=base.filter(x=>x.expectedYield>0).length;
   const rows=useMemo(()=>base.filter(x=>filter==="all"||assetClassKey(x.instrumentType)===(filter==="stock"?"shares":filter==="bond"?"bonds":"funds")).sort((a,b)=>sort==="value"?b.currentValue-a.currentValue:b.expectedYield-a.expectedYield),[items,trusted,filter,sort]);
   const overview=mode==="simple"||view==="overview";
   return <main className="v3-assets" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="陣" code="FORMATION // 02" label="PORTFOLIO ROSTER"/>
     <header className="v3-page-head"><span>ПОРТФЕЛЬ · СОСТАВ</span><h1>Активы</h1><p>{trusted?"Подтверждённый состав · веса и текущий broker P/L":"Состав скрыт до подтверждения данных"}</p></header>
-    {shell==="samurai"&&!trusted&&<SamuraiTrustGate kind="assets"/>}
+    {shell==="samurai"&&!trusted&&<SamuraiTrustGate kind="assets" onRefresh={onRefresh} refreshing={refreshing}/>}
     {trusted&&<section className="v3-assets-hero"><div><span>Стоимость портфеля</span><strong>{rub.format(total)} ₽</strong><small>{base.length} позиций · текущая подтверждённая стоимость</small></div><i aria-hidden="true">◆</i></section>}
     {trusted&&<section className="v3-assets-summary"><article><span>Топ-3</span><strong>{num.format(top3)}%</strong><small>капитала</small></article><article><span>В плюсе</span><strong>{positive}/{base.length}</strong><small>по текущему broker P/L</small></article></section>}
     {mode==="detailed"&&trusted&&<V3SectionSelector label="Раздел портфеля" value={view} onChange={next=>{setView(next);setOpen(null)}} options={PORTFOLIO_VIEWS}/>} 
