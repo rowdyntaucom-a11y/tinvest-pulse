@@ -4,12 +4,14 @@ const repair=readFileSync(new URL("../src/styles/samuraiHomeTelemetryRepair.css"
 const deck=readFileSync(new URL("../src/styles/samuraiHomeCommandDeck.css",import.meta.url),"utf8");
 const inception=readFileSync(new URL("../src/styles/samuraiSinceInception.css",import.meta.url),"utf8");
 const story=readFileSync(new URL("../src/styles/samuraiScrollStory.css",import.meta.url),"utf8");
+const empty=readFileSync(new URL("../src/styles/samuraiEmptyAnalyticsAtmosphere.css",import.meta.url),"utf8");
 const dock=readFileSync(new URL("../src/styles/samuraiFormationDock.css",import.meta.url),"utf8");
 const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
 
-for(const x of["sam-world__scene-page","sam-world__analytics-page","sam-world__scroll-cue","sam-world__capital","sam-world__origin","sam-world__origin-metrics","sam-world__pulsemarks","sam-world__path","sam-world__formation"])assert.match(ui,new RegExp(x));
-for(const x of["БОЛЬШЕ АНАЛИТИКИ","Аналитика","С МОМЕНТА ОТКРЫТИЯ","ДОСТУПНАЯ ИСТОРИЯ","ПОРТФЕЛЬ","IMOEX","ОПЕРЕЖЕНИЕ"])assert.match(ui,new RegExp(x));
+for(const x of["sam-world__scene-page","sam-world__analytics-page","sam-world__scroll-cue","sam-world__capital","sam-world__origin","sam-world__origin-metrics","sam-world__pulsemarks","sam-world__path","sam-world__formation","sam-world__awaiting"])assert.match(ui,new RegExp(x));
+for(const x of["БОЛЬШЕ АНАЛИТИКИ","Аналитика","С МОМЕНТА ОТКРЫТИЯ","ДОСТУПНАЯ ИСТОРИЯ","ПОРТФЕЛЬ","IMOEX","ОПЕРЕЖЕНИЕ","Источник ещё не подтверждён","DATA GATE // FAIL-CLOSED"])assert.match(ui,new RegExp(x));
+assert.match(ui,/home\.isTrusted\?<></);
 assert.match(ui,/scrollIntoView\(\{block:"start"\}\)/);
 assert.match(ui,/id="samurai-analytics"/);
 assert.match(ui,/buildV3RelativeDepth\(home\.history\)/);
@@ -45,8 +47,15 @@ assert.match(story,/grid-template-columns:1fr 1fr!important/);
 assert.match(story,/height:155px!important/);
 assert.match(story,/prefers-reduced-motion:reduce/);
 
+assert.match(empty,/sam-world__awaiting/);
+assert.match(empty,/min-height:calc\(100dvh - 250px\)/);
+assert.match(empty,/sam-world__awaiting-route/);
+assert.match(empty,/sam-world__awaiting-art/);
+assert.match(empty,/prefers-reduced-motion:reduce/);
+
 assert.ok(main.indexOf("samuraiHomeTelemetryRepair.css")<main.indexOf("samuraiHomeCommandDeck.css"));
 assert.ok(main.indexOf("samuraiHomeCommandDeck.css")<main.indexOf("samuraiSinceInception.css"));
 assert.ok(main.indexOf("samuraiSinceInception.css")<main.indexOf("samuraiScrollStory.css"));
-assert.ok(main.indexOf("samuraiScrollStory.css")<main.indexOf("mobilePerformance.css"));
+assert.ok(main.indexOf("samuraiScrollStory.css")<main.indexOf("samuraiEmptyAnalyticsAtmosphere.css"));
+assert.ok(main.indexOf("samuraiEmptyAnalyticsAtmosphere.css")<main.indexOf("mobilePerformance.css"));
 console.log("samurai compact metrics regression: ok");
