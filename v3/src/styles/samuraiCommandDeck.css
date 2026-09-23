@@ -1,0 +1,34 @@
+/* Dedicated Samurai Home DOM. This is intentionally not a reskin of the shared dashboard. */
+.v3-samurai-scene,.v3-samurai-instruments{display:none}
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="home"] .v3-home{padding:0 0 78px!important}
+ .v3-app[data-shell="samurai"] .v3-samurai-scene{
+  display:block;position:relative;height:clamp(430px,59svh,500px);margin:0 8px;overflow:hidden;
+  border-left:2px solid #72d8c4;border-bottom:1px solid rgba(225,48,38,.6);
+  background:linear-gradient(0deg,rgba(2,6,7,.94) 0 12%,rgba(2,6,7,.18) 42%,transparent 62%),
+   linear-gradient(90deg,rgba(2,6,7,.3),transparent 38%),var(--samurai-ronin-art) 72% 24%/cover no-repeat;
+ }
+ .v3-samurai-scene-head{position:absolute;z-index:3;top:14px;left:14px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+ .v3-samurai-scene-head>span{padding:7px 9px;border-left:1px solid #dc3d30;background:rgba(3,7,8,.82);font:750 8px/1 Inter,sans-serif;letter-spacing:.13em;color:#f6f6f2;white-space:nowrap}
+ .v3-samurai-scene-head>div{display:flex;gap:4px;align-items:center}
+ .v3-samurai-scene-head b,.v3-samurai-scene-head button{min-height:28px;padding:0 7px;border:1px solid rgba(255,255,255,.09);border-radius:0;background:rgba(3,7,8,.78);color:#d7dfdd;font:700 7px/1 Inter,sans-serif}
+ .v3-samurai-scene-head button:disabled{opacity:.45}
+ .v3-samurai-answer{position:absolute;z-index:3;left:18px;right:18px;bottom:18px;padding:0 0 0 12px;border-left:2px solid #df4436;text-shadow:0 2px 14px #000}
+ .v3-samurai-answer small{display:block;margin-bottom:7px;font:700 7px/1 Inter,sans-serif;letter-spacing:.18em;color:#7fcfc3}
+ .v3-samurai-answer>strong{display:block;font:780 clamp(34px,10.5vw,44px)/.94 Inter,sans-serif;letter-spacing:-.045em;color:#f7f8f5}
+ .v3-samurai-answer p{margin:7px 0 9px;max-width:270px;font:520 11px/1.25 Inter,sans-serif;color:#b4cfcb}
+ .v3-samurai-answer p b{font:700 11px/1.25 Inter,sans-serif}
+ .v3-samurai-answer i{font:500 8px/1 Inter,sans-serif;color:#788886;font-style:normal}
+ .v3-app[data-shell="samurai"] .v3-samurai-instruments{
+  display:grid;grid-template-columns:repeat(4,1fr);margin:0 8px;background:#030708;border-bottom:1px solid rgba(114,216,196,.2)
+ }
+ .v3-samurai-instruments article{position:relative;min-width:0;height:84px;padding:10px 7px 8px;border-right:1px solid rgba(255,255,255,.055)}
+ .v3-samurai-instruments article:first-child{border-left:2px solid #72d8c4}
+ .v3-samurai-instruments article:before{content:"";position:absolute;left:7px;right:7px;bottom:6px;height:2px;background:linear-gradient(90deg,rgba(114,216,196,.5),rgba(114,216,196,.06))}
+ .v3-samurai-instruments span{display:flex;align-items:center;gap:2px;white-space:nowrap;font:750 7px/1 Inter,sans-serif;letter-spacing:.08em;color:#9eaaa8}
+ .v3-samurai-instruments .v3-metric-help>button{width:18px;height:18px;min-width:18px;min-height:18px;font-size:8px}
+ .v3-samurai-instruments strong{display:block;margin-top:9px;font:760 18px/1 Inter,sans-serif;color:#f3f5f2;white-space:nowrap}
+ .v3-samurai-instruments small{display:block;margin-top:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:650 6px/1 Inter,sans-serif;letter-spacing:.08em;color:#687674}
+ .v3-app[data-shell="samurai"][data-workspace="home"] :is(.v3-history-card,.v3-home-benchmark){background:#04090a!important}
+}
+@media(max-width:359px){.v3-app[data-shell="samurai"] .v3-samurai-scene{height:400px}.v3-samurai-scene-head>span{font-size:7px}.v3-samurai-instruments article{padding-inline:5px}}
