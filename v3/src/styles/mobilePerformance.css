@@ -1951,3 +1951,37 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     display:none!important;
   }
 }
+
+
+/* Cosmos Goal Lab entry — first viewport stays atmospheric; the arrow reveals
+   the deep planning workspace below without hiding the art. */
+@media(max-width:430px){
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-depth-cue{
+    position:absolute!important;
+    z-index:12!important;
+    left:50%!important;
+    top:calc(100svh - 175px)!important;
+    display:grid!important;
+    place-items:center!important;
+    width:42px!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+    padding:0!important;
+    transform:translateX(-50%)!important;
+    border:0!important;
+    border-radius:50%!important;
+    background:rgba(1,6,20,.22)!important;
+    box-shadow:0 0 0 1px rgba(114,232,255,.08),0 0 20px rgba(35,92,255,.08)!important;
+    color:#e1fbff!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-depth-cue i{
+    font:26px/.8 Inter,system-ui,sans-serif!important;
+    font-style:normal!important;
+    text-shadow:0 0 12px rgba(114,232,255,.35)!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] #cos-goal-lab{
+    position:relative!important;
+    z-index:6!important;
+  }
+}
