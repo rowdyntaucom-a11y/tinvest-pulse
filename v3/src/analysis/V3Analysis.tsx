@@ -10,7 +10,7 @@ import{V3AllocationDonut}from"./V3AllocationDonut";
 import{buildV3AnalysisDepth,buildV3RelativeDepth}from"./analysisDepth";
 import{V3ReturnLayer}from"./V3ReturnLayer";
 import{V3RiskLayer}from"./V3RiskLayer";
-import{V3MarketLayer}from"./V3MarketLayer";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";
+import{V3MarketLayer}from"./V3MarketLayer";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";import{CosmosTrustGate}from"../cosmos/CosmosTrustGate";
 
 const n=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const n2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -69,6 +69,7 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
   const dd=depth.portfolio.maxDrawdown==null?null:-depth.portfolio.maxDrawdown*100;
   const effective=depth.portfolio.effectivePositions;
   const topPct=ratioToPercent(topRatio)??0;
+  if(shell==="carbon"&&!trusted)return <CosmosTrustGate kind="analysis" onRefresh={onRefresh} refreshing={refreshing}/>;
 
   return <main className="v3-analysis" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="眼" code="TACTICAL // 03" label="RISK & RETURN"/>
     <header className="v3-page-head"><span>ПОРТФЕЛЬ · ДИАГНОСТИКА</span><h1>Анализ</h1><p>{trusted?"Доходность, риск и структура · без торговых рекомендаций":"Аналитика скрыта до подтверждения данных"}</p></header>
