@@ -647,40 +647,4 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     background:rgba(6,24,49,.74)!important;
   }
 
-  /* Secondary world motion: subtle scene life only, no movement of values. */
-  @media(prefers-reduced-motion:no-preference){
-    .v3-app[data-shell="carbon"] .cos-workspace-stage{
-      animation:cosmosWorkspaceDrift 18s ease-in-out infinite alternate!important;
-      will-change:background-position;
-    }
-    .v3-app[data-shell="carbon"] .cos-gate__scene{
-      animation:cosmosGateDrift 20s ease-in-out infinite alternate!important;
-      will-change:background-position;
-    }
-    .v3-app[data-shell="carbon"] .cos-gate__instrument{
-      animation:cosmosGateInstrumentFloat 6.5s ease-in-out infinite!important;
-    }
-  }
-}
-
-@keyframes cosmosWorkspaceDrift{
-  0%{background-position:50% 15%}
-  100%{background-position:52% 17%}
-}
-@keyframes cosmosGateDrift{
-  0%{background-position:50% 15%}
-  100%{background-position:51.5% 17%}
-}
-@keyframes cosmosGateInstrumentFloat{
-  0%,100%{transform:translate3d(0,0,0)}
-  50%{transform:translate3d(0,-5px,0)}
-}
-
-@media(prefers-reduced-motion:reduce){
-  .v3-app[data-shell="carbon"] .cos-workspace-stage,
-  .v3-app[data-shell="carbon"] .cos-gate__scene,
-  .v3-app[data-shell="carbon"] .cos-gate__instrument{
-    animation:none!important;
-    transform:none!important;
-  }
 }
