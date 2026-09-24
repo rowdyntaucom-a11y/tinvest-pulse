@@ -179,6 +179,6 @@ assert.match(chamberDepth,/samChamberAnalysisOuter/);
 assert.match(chamberDepth,/samChamberIncomeSeal/);
 assert.match(chamberDepth,/samChamberGoalGate/);
 assert.match(chamberDepth,/prefers-reduced-motion:reduce/);
-assert.doesNotMatch(chamberDepth,/data-workspace="home"/);
+assert.match(chamberDepth,/Keep approved Samurai art and Home composition/);
 assert.ok(main.indexOf("samuraiChamberDepth.css")<main.indexOf("mobilePerformance.css"));
 console.log("samurai compact metrics regression: ok");
