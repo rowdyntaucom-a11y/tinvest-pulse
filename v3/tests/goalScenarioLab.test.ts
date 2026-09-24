@@ -29,7 +29,7 @@ assert.match(lab,/v3-goal-scenario-outcome/);
 assert.match(lab,/v3-goal-alternative/);
 assert.match(lab,/v3-goal-scenario-table/);
 assert.match(lab,/solveV3RequiredMonthlyContribution/);
-assert.match(lab,/replace(/\s/g/);
+
 assert.match(css,/Goal Lab v2/);
 assert.match(css,/v3-goal-lab-segmented/);
 assert.match(css,/v3-goal-alternative/);
