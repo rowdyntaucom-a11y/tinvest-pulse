@@ -1,0 +1,386 @@
+/* Samurai secondary parity — Samsung 1000031561.mp4.
+   Cosmos set the current shell-quality bar. Samurai keeps the approved Ronin art,
+   but secondary fail-closed chapters now use open side instruments instead of
+   stacked title/status/card walls. First viewport = world + one answer.
+   Verification depth begins below a visible, actionable cue. */
+
+@media(max-width:430px){
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"]
+  ){
+    position:relative!important;
+    isolation:isolate!important;
+    height:calc(100dvh - 48px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:0 0 max(104px,calc(92px + env(safe-area-inset-bottom)))!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    scroll-snap-type:y proximity!important;
+    scrollbar-width:none!important;
+    background-color:#020706!important;
+  }
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"]
+  )::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+
+  /* Generic chapter chrome is redundant here. The trust scene owns identity. */
+  .v3-app[data-shell="samurai"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"]
+  )>.v3-page-head,
+  .v3-app[data-shell="samurai"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"]
+  )>.sam-workspace-chrome{
+    display:none!important;
+  }
+
+  /* Regrade each chamber so the Ronin is readable instead of buried under black. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(2,8,7,.08) 0,rgba(2,8,7,.14) 42%,rgba(2,8,7,.30) 68%,rgba(2,8,7,.66) 100%),
+      radial-gradient(circle at 17% 25%,rgba(60,211,185,.13),transparent 30%),
+      var(--samurai-ronin-art) 64% 18%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(3,7,6,.07) 0,rgba(3,7,6,.14) 43%,rgba(3,7,6,.30) 69%,rgba(3,7,6,.67) 100%),
+      radial-gradient(circle at 80% 24%,rgba(211,161,82,.12),transparent 29%),
+      var(--samurai-ronin-art) 69% 17%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(4,7,5,.07) 0,rgba(4,7,5,.14) 42%,rgba(4,7,5,.31) 70%,rgba(4,7,5,.68) 100%),
+      radial-gradient(circle at 20% 26%,rgba(218,169,99,.12),transparent 31%),
+      var(--samurai-ronin-art) 72% 19%/cover no-repeat!important;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    min-height:calc(184svh - 48px)!important;
+    height:auto!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0 9px 20px!important;
+    box-sizing:border-box!important;
+    border:0!important;
+    background:transparent!important;
+    clip-path:none!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    scroll-snap-align:start!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate:before,
+  .v3-app[data-shell="samurai"] .sam-trust-gate:after{
+    content:""!important;
+    position:absolute!important;
+    pointer-events:none!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate:before{
+    left:9px!important;
+    right:9px!important;
+    top:calc(100svh - 118px)!important;
+    height:1px!important;
+    background:linear-gradient(90deg,transparent,rgba(201,155,88,.24),rgba(114,216,196,.14),transparent)!important;
+    box-shadow:none!important;
+    opacity:1!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate:after{
+    left:9px!important;
+    right:9px!important;
+    top:calc(100svh - 92px)!important;
+    height:132px!important;
+    background:linear-gradient(180deg,transparent,rgba(2,7,6,.48) 44%,rgba(2,7,6,.88) 100%)!important;
+    z-index:0!important;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate__watermark{
+    position:absolute!important;
+    z-index:1!important;
+    right:12px!important;
+    top:27%!important;
+    bottom:auto!important;
+    font-size:84px!important;
+    color:rgba(201,155,88,.035)!important;
+    opacity:1!important;
+    transform:rotate(-4deg)!important;
+  }
+
+  /* Compact chapter marker. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter{
+    position:absolute!important;
+    z-index:7!important;
+    top:22px!important;
+    width:40%!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:8px 9px 9px!important;
+    border:0!important;
+    border-top:1px solid rgba(201,155,88,.18)!important;
+    border-left:1px solid rgba(227,75,59,.44)!important;
+    background:linear-gradient(100deg,rgba(3,11,9,.68),rgba(3,11,9,.28) 78%,transparent)!important;
+    clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter span{
+    display:block!important;
+    color:#c99b58!important;
+    font-size:5.5px!important;
+    line-height:1!important;
+    letter-spacing:.13em!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter strong{
+    display:block!important;
+    margin-top:4px!important;
+    color:#efe3cb!important;
+    font-size:22px!important;
+    line-height:.94!important;
+    letter-spacing:-.025em!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-gate__chapter{
+    right:9px!important;
+    left:auto!important;
+    border-left:0!important;
+    border-right:1px solid rgba(201,155,88,.46)!important;
+    background:linear-gradient(260deg,rgba(11,10,7,.70),rgba(11,10,7,.28) 78%,transparent)!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--income) .sam-trust-gate__chapter{
+    left:9px!important;right:auto!important;
+  }
+
+  /* Status is a side note, not a full-width panel. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header{
+    position:absolute!important;
+    z-index:7!important;
+    top:18%!important;
+    display:grid!important;
+    grid-template-columns:30px minmax(0,1fr)!important;
+    gap:7px!important;
+    width:44%!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:8px 8px 9px!important;
+    border:0!important;
+    border-top:1px solid rgba(114,216,196,.10)!important;
+    background:linear-gradient(100deg,rgba(3,12,10,.64),rgba(3,12,10,.26) 76%,transparent)!important;
+    box-shadow:none!important;
+    clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header>i{
+    width:28px!important;height:28px!important;
+    display:grid!important;place-items:center!important;
+    border:1px solid rgba(201,155,88,.20)!important;
+    background:rgba(4,12,9,.44)!important;
+    color:#d0a363!important;font-size:13px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header span{
+    font-size:5px!important;letter-spacing:.10em!important;color:#7d9088!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header strong{
+    display:block!important;margin-top:3px!important;
+    font-size:10.5px!important;line-height:1.05!important;color:#e9ddc7!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header small{
+    display:block!important;margin-top:4px!important;
+    font-size:5.6px!important;line-height:1.28!important;color:#74867f!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets>header,
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income>header{
+    right:9px!important;left:auto!important;
+    border-right:1px solid rgba(114,216,196,.22)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis>header{
+    left:9px!important;right:auto!important;
+    border-left:1px solid rgba(201,155,88,.26)!important;
+  }
+
+  /* One authored instrument in a side safe-zone. Central Ronin corridor stays open. */
+  .v3-app[data-shell="samurai"] .sam-trust-instrument{
+    position:absolute!important;
+    z-index:6!important;
+    top:45%!important;
+    width:36%!important;
+    height:112px!important;
+    min-height:112px!important;
+    margin:0!important;
+    padding:7px 7px 8px!important;
+    box-sizing:border-box!important;
+    border:0!important;
+    border-top:1px solid rgba(201,155,88,.14)!important;
+    border-bottom:1px solid rgba(114,216,196,.08)!important;
+    background:linear-gradient(100deg,rgba(3,11,9,.50),rgba(3,11,9,.16),transparent)!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-instrument{
+    left:9px!important;right:auto!important;border-left:1px solid rgba(114,216,196,.34)!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument{
+    right:9px!important;left:auto!important;top:43%!important;height:122px!important;min-height:122px!important;
+    border-right:1px solid rgba(201,155,88,.36)!important;
+    background:linear-gradient(260deg,rgba(10,10,7,.50),rgba(10,10,7,.16),transparent)!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-instrument{
+    right:9px!important;left:auto!important;top:49%!important;border-right:1px solid rgba(218,169,99,.34)!important;
+    background:linear-gradient(260deg,rgba(12,10,6,.50),rgba(12,10,6,.16),transparent)!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-instrument__label{
+    left:7px!important;right:7px!important;top:6px!important;display:grid!important;gap:2px!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-instrument__label span{font-size:5.2px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-instrument__label b{font-size:4.7px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-instrument>small{
+    left:7px!important;right:7px!important;bottom:5px!important;font-size:5px!important;line-height:1.18!important
+  }
+  .v3-app[data-shell="samurai"] .sam-formation-map{inset:25px 5px 21px 5px!important}
+  .v3-app[data-shell="samurai"] .sam-formation-map .slot{width:9px!important;height:9px!important}
+  .v3-app[data-shell="samurai"] .sam-formation-map>b{font-size:23px!important}
+  .v3-app[data-shell="samurai"] .sam-radar{
+    right:2px!important;top:23px!important;width:92px!important;height:62px!important;
+    transform:scale(.92)!important;transform-origin:right center!important
+  }
+  .v3-app[data-shell="samurai"] .sam-ledger{left:7px!important;right:7px!important;top:25px!important;bottom:21px!important}
+
+  /* Actionable cue is always above the fixed nav and always visible without scrolling. */
+  .v3-app[data-shell="samurai"] .sam-trust-depth-cue{
+    position:absolute!important;
+    z-index:12!important;
+    left:50%!important;
+    top:calc(100svh - 176px)!important;
+    transform:translateX(-50%)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    width:auto!important;
+    min-width:118px!important;
+    min-height:34px!important;
+    margin:0!important;
+    padding:0 9px!important;
+    border:0!important;
+    border-top:1px solid rgba(201,155,88,.14)!important;
+    border-radius:0!important;
+    background:rgba(3,9,7,.20)!important;
+    box-shadow:none!important;
+    color:rgba(214,169,99,.76)!important;
+    font:700 5.8px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.10em!important;
+    pointer-events:auto!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-depth-cue:before,
+  .v3-app[data-shell="samurai"] .sam-trust-depth-cue:after{display:none!important}
+  .v3-app[data-shell="samurai"] .sam-trust-depth-cue i{
+    color:#72d8c4!important;font:17px/1 Georgia,serif!important;font-style:normal!important
+  }
+
+  /* Second viewport: compact verification route, not another card wall. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate__route{
+    position:relative!important;
+    z-index:4!important;
+    width:calc(100% - 18px)!important;
+    margin:calc(100svh - 92px) 9px 0!important;
+    padding:12px 0 4px 10px!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:4px!important;
+    border-left:1px solid rgba(201,155,88,.18)!important;
+    border-top:0!important;
+    border-bottom:0!important;
+    background:linear-gradient(90deg,rgba(3,10,8,.74),rgba(3,10,8,.28) 76%,transparent)!important;
+    scroll-margin-top:14px!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__route article{
+    min-height:42px!important;
+    display:grid!important;
+    grid-template-columns:22px 64px minmax(0,1fr) 15px!important;
+    align-items:center!important;
+    gap:5px!important;
+    margin:0!important;
+    padding:5px 7px!important;
+    border:0!important;
+    border-top:1px solid rgba(201,155,88,.08)!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    transform:none!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__route b{
+    width:18px!important;height:18px!important;display:grid!important;place-items:center!important;
+    margin:0!important;border:1px solid rgba(201,155,88,.18)!important;color:#d0a363!important;font-size:8px!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__route span{font-size:7.5px!important;color:#b8c3bd!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate__route small{font-size:6.2px!important;line-height:1.25!important;color:#72847c!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate__route i{font-size:8px!important;color:#72d8c4!important}
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action{
+    position:relative!important;z-index:4!important;
+    width:calc(100% - 18px)!important;
+    margin:8px 9px 0!important;padding:9px 0 9px 10px!important;
+    display:grid!important;grid-template-columns:auto 1fr!important;align-items:center!important;gap:9px!important;
+    border-top:1px solid rgba(114,216,196,.08)!important;
+    background:linear-gradient(90deg,rgba(3,10,8,.58),rgba(3,10,8,.18),transparent)!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action button{
+    min-height:34px!important;padding:0 10px!important;border:1px solid rgba(201,155,88,.24)!important;
+    border-radius:0!important;background:linear-gradient(90deg,rgba(201,155,88,.10),rgba(227,75,59,.06))!important;
+    color:#dfc58e!important;font-size:6.5px!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action span{font-size:6px!important;color:#6f8179!important}
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate>footer{
+    position:relative!important;z-index:4!important;
+    width:calc(100% - 18px)!important;margin:4px 9px 0!important;padding:5px 0 3px 10px!important;
+    background:transparent!important;border:0!important
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate>footer span{font-size:5.5px!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate>footer small{font-size:5.8px!important;color:#687a73!important}
+
+  /* Anything after the gate is genuine deep content and begins after verification depth. */
+  .v3-app[data-shell="samurai"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"]
+  )>.sam-trust-gate~*{
+    position:relative!important;
+    z-index:4!important;
+  }
+}
+
+@media(max-width:359px){
+  .v3-app[data-shell="samurai"] .sam-trust-gate__chapter{width:43%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-gate>header{width:46%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-instrument{width:39%!important}
+  .v3-app[data-shell="samurai"] .sam-trust-depth-cue{min-width:108px!important;font-size:5.4px!important}
+}
+
+@media(prefers-reduced-motion:no-preference) and (max-width:430px){
+  .v3-app[data-shell="samurai"] .sam-trust-depth-cue i{
+    animation:samParityDepthCue 2.3s ease-in-out infinite!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-c{
+    animation:samParityFormationPing 3.8s ease-in-out infinite!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .sweep{
+    animation:samParityScopeSweep 7.8s linear infinite!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-c{
+    animation:samParityLedgerPulse 4.6s ease-in-out infinite!important;
+  }
+}
+@keyframes samParityDepthCue{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(4px);opacity:1}}
+@keyframes samParityFormationPing{50%{transform:rotate(45deg) scale(1.16);box-shadow:0 0 12px rgba(114,216,196,.26)}}
+@keyframes samParityScopeSweep{to{transform:rotate(336deg)}}
+@keyframes samParityLedgerPulse{50%{transform:translateX(4px);opacity:.72}}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="samurai"] :is(.sam-trust-depth-cue i,.sam-formation-map .slot-c,.sam-radar .sweep,.sam-ledger .row-c){
+    animation:none!important;transform:none!important
+  }
+}
