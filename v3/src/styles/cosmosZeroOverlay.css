@@ -1,60 +1,4 @@
-/* Responsive/performance ownership boundary.
-   This file is intentionally imported last. It owns viewport containment,
-   safe-area clearance, touch corrections and phone effect suppression. Shell
-   identity and workspace composition remain with their respective owners. */
-html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
-@supports(overflow:clip){html,body,#root{overflow-x:clip}}
-.v3-app{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
-@supports(overflow:clip){.v3-app{overflow-x:clip}}
-
-/* Intrinsic grid/flex sizing must not let long Russian copy, identifiers or
-   financial values establish a page width larger than the viewport. */
-.v3-app :is(main,section,article,header,nav,div){min-width:0}
-.v3-app :is(
-  .v3-page-head h1,.v3-page-head p,.v3-hero h1,.v3-asset-hero h1,
-  .v3-asset-id,.v3-asset-identity,.v3-section-line,.v3-analysis-note,
-  .v3-income-detail p,.v3-goal-detail p,.v3-state-detail p,.v3-trust-reason
-){overflow-wrap:anywhere}
-.v3-app :is(
-  .v3-hero h1,.v3-primary-grid strong,.v3-assets-hero strong,.v3-assets-summary strong,
-  .v3-analysis-grid strong,.v3-income-hero strong,.v3-income-grid strong,
-  .v3-goal-hero strong,.v3-goal-facts strong,.v3-asset-hero-value strong,
-  .v3-asset-workspace-grid strong
-){max-width:100%;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-
-@media(max-width:699px){
-  /* Broad by design: every ordinary workspace is blur-free on phone. DNA owns
-     its renderer/performance contract and is deliberately excluded. */
-  .v3-app:not([data-workspace="dna"]) :is(*,*::before,*::after){
-    backdrop-filter:none!important;
-    -webkit-backdrop-filter:none!important;
-  }
-
-  .v3-app :is(button,select,input){touch-action:manipulation}
-  .v3-app :is(.v3-controls>button,.v3-world-trigger,.v3-world-menu button,.v3-nav button,.v3-section-selector select,.v3-asset-back,.v3-state-recovery button){min-height:44px}
-
-  /* The fixed navigation floats above the safe area; every scrolling workspace
-     reserves the same stable nav footprint plus the device inset. */
-  .v3-app :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-coming,.v3-asset-workspace){
-    padding-bottom:max(104px,calc(92px + env(safe-area-inset-bottom)))!important;
-  }
-  .v3-nav{box-sizing:border-box;max-width:calc(100% - max(8px,env(safe-area-inset-left)) - max(8px,env(safe-area-inset-right)))}
-  .v3-nav button{min-width:0;overflow:hidden}
-}
-
-@media(max-width:359px){
-  /* Narrow/foldable cover screens keep the shell grammar but trade columns for
-     vertical depth when two values can no longer wrap safely. */
-  .v3-app :is(.v3-asset-risk-grid,.v3-income-ratios){grid-template-columns:minmax(0,1fr)}
-  .v3-app .v3-state-recovery{align-items:stretch;flex-direction:column}
-}
-
-@media(prefers-reduced-motion:reduce){
-  .v3-app:not([data-workspace="dna"]) *{scroll-behavior:auto!important}
-}
-
-
- .cos-workspace-stage{display:none}\n\n/* Cosmos Zero Overlay — strict art-safe composition.
+/* Cosmos Zero Overlay — strict art-safe composition.
    No toolbar, status chip, heading, instrument or navigation cue may cover Mix C.
    Loaded after mobilePerformance so these rules are final on phone. */
 
@@ -259,3 +203,6 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   }
 }
 
+@media(min-width:431px){
+  .cos-workspace-stage{display:none}
+}
