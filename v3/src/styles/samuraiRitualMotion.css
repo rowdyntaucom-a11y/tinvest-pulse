@@ -1,0 +1,231 @@
+/* Samurai ritual motion v1 — real-device follow-up after 1000031511.mp4.
+   User decision: KEEP the current Samurai artwork and KEEP the Home first-screen composition.
+   This layer only deepens Samurai secondary chapters: more world reveal, authored chapter
+   silhouettes, distinct motion languages and tactile blade/navigation feedback.
+   Presentation-only. No finance, trust, broker, navigation ownership or DNA semantics change. */
+
+@media(max-width:699px){
+  /* SECONDARY CHAPTERS: stop reading as one full-width dark widget slab.
+     Each chapter leaves a deliberate vertical view into the existing Ronin world. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-trust-gate{
+    width:calc(100% - 48px)!important;
+    max-width:620px!important;
+    margin-left:8px!important;
+    margin-right:auto!important;
+    border-right:1px solid rgba(114,216,196,.10)!important;
+    box-shadow:22px 18px 54px rgba(0,0,0,.30),inset 2px 0 rgba(114,216,196,.24)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-trust-gate{
+    width:calc(100% - 48px)!important;
+    max-width:620px!important;
+    margin-left:auto!important;
+    margin-right:8px!important;
+    border-left:1px solid rgba(201,155,88,.12)!important;
+    box-shadow:-22px 18px 54px rgba(0,0,0,.32),inset 0 2px rgba(201,155,88,.26)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-trust-gate{
+    width:calc(100% - 44px)!important;
+    max-width:624px!important;
+    margin-left:8px!important;
+    margin-right:auto!important;
+    border-right:1px solid rgba(218,169,99,.12)!important;
+    box-shadow:24px 18px 54px rgba(0,0,0,.30),inset -2px 0 rgba(218,169,99,.22)!important;
+  }
+
+  /* Assets = formation screen. The exposed right corridor becomes part of the map. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets{
+    background:
+      linear-gradient(90deg,rgba(114,216,196,.045) 1px,transparent 1px) 0 0/34px 100%,
+      linear-gradient(0deg,rgba(114,216,196,.028) 1px,transparent 1px) 0 0/100% 30px,
+      radial-gradient(circle at 86% 38%,rgba(114,216,196,.07),transparent 25%),
+      linear-gradient(145deg,rgba(3,17,14,.97),rgba(2,9,8,.91) 66%,rgba(7,19,16,.82))!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets:before{
+    right:-18px!important;top:19%!important;width:92px!important;height:62%!important;border:0!important;border-radius:0!important;
+    background:
+      linear-gradient(90deg,transparent 46%,rgba(114,216,196,.22) 47% 48%,transparent 49%),
+      repeating-linear-gradient(0deg,transparent 0 35px,rgba(114,216,196,.11) 36px,transparent 37px)!important;
+    box-shadow:none!important;opacity:.54!important;
+  }
+
+  /* Analysis = scope chamber. Let the left world corridor frame a centered instrument. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis{
+    background:
+      radial-gradient(circle at 53% 42%,rgba(201,155,88,.06),transparent 31%),
+      radial-gradient(circle at 53% 42%,transparent 0 95px,rgba(201,155,88,.055) 96px 97px,transparent 98px),
+      linear-gradient(180deg,rgba(14,11,7,.97),rgba(5,9,7,.91) 62%,rgba(2,7,6,.86))!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis:before{
+    left:-28px!important;right:auto!important;top:29%!important;width:120px!important;height:120px!important;
+    border:1px dashed rgba(201,155,88,.14)!important;border-radius:50%!important;
+    box-shadow:0 0 0 24px rgba(201,155,88,.018)!important;opacity:.64!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-a{
+    border-style:dashed!important;border-color:rgba(201,155,88,.23)!important;
+  }
+
+  /* Income = treasury ledger. Rectangular and horizontal rather than another cockpit card. */
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income{
+    background:
+      repeating-linear-gradient(0deg,transparent 0 25px,rgba(218,169,99,.042) 26px,transparent 27px),
+      linear-gradient(100deg,rgba(16,12,6,.97),rgba(8,11,8,.92) 54%,rgba(23,16,6,.86))!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income:before{
+    right:16px!important;top:24%!important;width:58px!important;height:58px!important;
+    border:1px solid rgba(218,169,99,.18)!important;border-radius:50%!important;
+    box-shadow:inset 0 0 0 6px rgba(218,169,99,.025),0 0 0 1px rgba(227,75,59,.08)!important;
+    opacity:.7!important;
+  }
+
+  /* Goal = a deliberate zig-zag path through the same world. No Home changes. */
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter{
+    width:78%!important;
+    margin-left:auto!important;
+    margin-right:8px!important;
+    border-left:2px solid rgba(227,75,59,.42)!important;
+    background:linear-gradient(95deg,rgba(4,14,12,.76),rgba(20,10,8,.88))!important;
+    box-shadow:-18px 14px 42px rgba(0,0,0,.22)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .v3-goal-hero{
+    width:84%!important;
+    margin-left:8px!important;
+    margin-right:auto!important;
+    border-right:1px solid rgba(201,155,88,.16)!important;
+    background:linear-gradient(102deg,rgba(6,16,13,.94),rgba(24,12,9,.82))!important;
+    box-shadow:20px 16px 48px rgba(0,0,0,.24)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-empty-path{
+    width:calc(100% - 36px)!important;
+    margin-left:auto!important;
+    margin-right:8px!important;
+    position:relative!important;
+    border-left:1px solid rgba(114,216,196,.14)!important;
+    box-shadow:-22px 18px 52px rgba(0,0,0,.28)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-goal-empty-path:before{
+    content:"";position:absolute;z-index:0;left:24px;top:62px;bottom:20px;width:1px;
+    background:linear-gradient(rgba(227,75,59,.68),rgba(201,155,88,.52) 48%,rgba(114,216,196,.34),transparent);
+    box-shadow:0 0 12px rgba(227,75,59,.12);pointer-events:none;
+  }
+  .v3-app[data-shell="samurai"] .sam-goal-empty-path>header,
+  .v3-app[data-shell="samurai"] .sam-goal-empty-path>div{position:relative;z-index:1}
+
+  /* Tactile Samurai chrome: a blade draw instead of generic selected-tab glow. */
+  .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active:before{
+    transform-origin:center!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action button{
+    transition:transform .16s ease,border-color .16s ease,background .16s ease!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate__action button:active{
+    transform:translateY(1px) scale(.985)!important;
+    border-color:rgba(201,155,88,.48)!important;
+    background:linear-gradient(90deg,rgba(201,155,88,.18),rgba(227,75,59,.12))!important;
+  }
+
+  /* Keep the lower verification route secondary; it must not return to a wall of cards. */
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__route{
+    opacity:.84;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__route article{
+    box-shadow:none!important;
+  }
+}
+
+@media(max-width:430px){
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-trust-gate{
+    width:calc(100% - 42px)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-trust-gate{
+    width:calc(100% - 38px)!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__chapter strong{
+    font-size:30px!important;
+    letter-spacing:-.025em;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-depth-cue{
+    margin-top:12px!important;
+    margin-bottom:8px!important;
+  }
+}
+
+@media(max-width:359px){
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-trust-gate,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-trust-gate{
+    width:calc(100% - 24px)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) :is(.sam-goal-chapter,.v3-goal-hero,.sam-goal-empty-path){
+    width:calc(100% - 20px)!important;
+  }
+}
+
+/* Distinct motion language per chapter.
+   Continuous motion is intentionally subtle; entry choreography does the stronger identity work. */
+@media(prefers-reduced-motion:no-preference) and (max-width:699px){
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets{
+    animation:samRitualAssetsEnter .62s cubic-bezier(.2,.78,.22,1) both;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis{
+    animation:samRitualAnalysisEnter .68s cubic-bezier(.2,.78,.22,1) both;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income{
+    animation:samRitualIncomeEnter .64s cubic-bezier(.2,.78,.22,1) both;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .lane-a{animation:samFormationLane 4.8s ease-in-out infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .lane-b{animation:samFormationLane 5.4s ease-in-out -1.1s infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .lane-c{animation:samFormationLane 6.1s ease-in-out -2s infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-a{animation:samFormationSlot 4.4s ease-in-out infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-formation-map .slot-e{animation:samFormationSlot 4.4s ease-in-out -2.2s infinite}
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .ring-a{
+    animation:samScopeOuter 18s linear infinite;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .blip-a{animation:samScopeBlip 3.4s ease-in-out infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .blip-b{animation:samScopeBlip 4.1s ease-in-out -1.4s infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-radar .blip-c{animation:samScopeBlip 3.8s ease-in-out -2.2s infinite}
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-a{animation:samLedgerBreath 5.6s ease-in-out infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-b{animation:samLedgerBreath 5.6s ease-in-out -1.2s infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-c{animation:samLedgerBreath 5.6s ease-in-out -2.4s infinite}
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-ledger .row-d{animation:samLedgerBreath 5.6s ease-in-out -3.6s infinite}
+
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-chapter{animation:samPathChapterIn .48s ease-out both}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal-hero{animation:samPathHeroIn .58s .08s cubic-bezier(.2,.78,.22,1) both}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path{animation:samPathRouteIn .68s .15s cubic-bezier(.2,.78,.22,1) both}
+  .v3-app[data-shell="samurai"] .sam-goal-empty-path:before{animation:samPathRail 4.8s ease-in-out infinite}
+
+  .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active:before{
+    animation:samBladeSelect .46s cubic-bezier(.18,.8,.24,1) both;
+  }
+
+  @keyframes samRitualAssetsEnter{from{opacity:.18;transform:translate3d(-14px,0,0)}to{opacity:1;transform:none}}
+  @keyframes samRitualAnalysisEnter{from{opacity:.18;transform:translate3d(12px,5px,0) scale(.985)}to{opacity:1;transform:none}}
+  @keyframes samRitualIncomeEnter{from{opacity:.18;transform:translate3d(-10px,7px,0)}to{opacity:1;transform:none}}
+  @keyframes samFormationLane{50%{transform:translate3d(0,-12px,0) scaleY(.82);opacity:.82}}
+  @keyframes samFormationSlot{50%{transform:rotate(45deg) scale(1.18);box-shadow:0 0 14px rgba(114,216,196,.26)}}
+  @keyframes samScopeOuter{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  @keyframes samScopeBlip{50%{opacity:.28;box-shadow:0 0 12px currentColor}}
+  @keyframes samLedgerBreath{50%{transform:translate3d(5px,0,0);opacity:.64}}
+  @keyframes samPathChapterIn{from{opacity:0;transform:translate3d(14px,0,0)}to{opacity:1;transform:none}}
+  @keyframes samPathHeroIn{from{opacity:0;transform:translate3d(-16px,0,0)}to{opacity:1;transform:none}}
+  @keyframes samPathRouteIn{from{opacity:0;transform:translate3d(14px,8px,0)}to{opacity:1;transform:none}}
+  @keyframes samPathRail{50%{opacity:.42;transform:scaleY(.92);transform-origin:top}}
+  @keyframes samBladeSelect{from{transform:scaleX(.12);opacity:.28}to{transform:scaleX(1);opacity:1}}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income,
+    .sam-formation-map .lane,.sam-formation-map .slot,
+    .sam-radar .ring-a,.sam-radar .blip,
+    .sam-ledger .row,.sam-goal-chapter,.v3-goal-hero,.sam-goal-empty-path
+  ),
+  .v3-app[data-shell="samurai"] .sam-goal-empty-path:before,
+  .v3-app[data-shell="samurai"]:not([data-workspace="dna"]) .v3-nav button.is-active:before{
+    animation:none!important;
+    transform:none;
+  }
+}
