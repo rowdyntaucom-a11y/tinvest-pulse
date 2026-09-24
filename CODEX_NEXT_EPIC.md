@@ -1,5 +1,19 @@
 # CODEX NEXT EPIC — QVANIX UX Architecture + Comprehension
 
+## Current priority lock — 2026-09-24
+
+**DNA / Living World is frozen and is the lowest-priority area.** Do not implement or polish Pixi/DNA scenes, characters, animations, weather, XP, gamification, world-state systems or DNA-specific visual work in this Epic. Touch DNA only for a blocking regression that prevents the normal financial application from functioning.
+
+Current serial implementation order:
+1. finish Assets Depth and real-device usability;
+2. build/finish Analysis Depth;
+3. build/finish Income Depth;
+4. finish Goal and remaining ordinary tab depth;
+5. unify shared deterministic data/functionality across Samurai/Cosmos and complete readability/responsive polish;
+6. return to DNA only after those workspaces are accepted.
+
+The financial workspaces are the product priority. The world is preserved for later; it is not an active Epic.
+
 ## Mission
 
 Work in repository `rowdyntaucom-a11y/tinvest-pulse` from the latest `main`.
@@ -72,6 +86,7 @@ Do NOT:
 - expose/store broker credentials in frontend/localStorage/repository/logs;
 - raise bundle budgets merely to pass CI;
 - rewrite DNA/Pixi ownership;
+- add any new DNA/Living World feature, scene, animation, gamification mechanic, art pass or world-state work while the main tabs remain incomplete;
 - copy Snowball UI literally.
 
 Preserve current deterministic analytics and current API/data boundaries.
