@@ -1326,7 +1326,6 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     stroke:#72e8ff!important;
     stroke-width:1.6!important;
     vector-effect:non-scaling-stroke!important;
-    filter:drop-shadow(0 0 4px rgba(114,232,255,.24))!important;
   }
 
   /* ANALYTICS — chart is the hero; risk/benchmark/correlation form instruments. */
