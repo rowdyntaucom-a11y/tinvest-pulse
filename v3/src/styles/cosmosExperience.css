@@ -363,3 +363,85 @@
     transform:none!important;
   }
 }
+
+
+/* Functional-instrument motion: each Cosmos workspace has its own low-cost
+   animation vocabulary. Only decorative geometry moves; financial values do not. */
+@media(prefers-reduced-motion:no-preference) and (max-width:430px){
+  .v3-app[data-shell="carbon"] .cos-allocation-orbit{animation:cosAllocationOrbit 16s linear infinite}
+  .v3-app[data-shell="carbon"] .cos-holding-rows i{animation:cosHoldingScan 4.8s ease-in-out infinite}
+  .v3-app[data-shell="carbon"] .cos-holding-rows i:nth-child(2){animation-delay:-1.2s}
+  .v3-app[data-shell="carbon"] .cos-holding-rows i:nth-child(3){animation-delay:-2.4s}
+  .v3-app[data-shell="carbon"] .cos-module--asset-intel .cos-chart-line,
+  .v3-app[data-shell="carbon"] .cos-module--asset-intel svg path{animation:cosLinePulse 5.2s ease-in-out infinite}
+
+  .v3-app[data-shell="carbon"] .cos-chart-line{stroke-dasharray:9 5;animation:cosChartTravel 10s linear infinite}
+  .v3-app[data-shell="carbon"] .cos-risk-arc>i{animation:cosRiskNeedle 6.5s ease-in-out infinite}
+  .v3-app[data-shell="carbon"] .cos-correlation-matrix i{animation:cosMatrixPulse 5.6s ease-in-out infinite}
+  .v3-app[data-shell="carbon"] .cos-correlation-matrix i:nth-child(3n){animation-delay:-1.3s}
+  .v3-app[data-shell="carbon"] .cos-correlation-matrix i:nth-child(4n){animation-delay:-2.5s}
+
+  .v3-app[data-shell="carbon"] .cos-flow-line{stroke-dasharray:10 6;animation:cosChartTravel 9s linear infinite}
+  .v3-app[data-shell="carbon"] .cos-calendar-grid i:nth-child(2),
+  .v3-app[data-shell="carbon"] .cos-calendar-grid i:nth-child(7),
+  .v3-app[data-shell="carbon"] .cos-calendar-grid i:nth-child(11){animation:cosCalendarBeacon 3.4s ease-in-out infinite}
+  .v3-app[data-shell="carbon"] .cos-calendar-grid i:nth-child(7){animation-delay:-1.1s}
+  .v3-app[data-shell="carbon"] .cos-calendar-grid i:nth-child(11){animation-delay:-2.1s}
+  .v3-app[data-shell="carbon"] .cos-coverage-ring{animation:cosCoverageBreathe 7s ease-in-out infinite}
+
+  .v3-app[data-shell="carbon"] .cos-goal-target-ring>i{animation:cosGoalTargetSpin 18s linear infinite}
+  .v3-app[data-shell="carbon"] .cos-goal-progress-track>b{animation:cosGoalVectorGlow 4.8s ease-in-out infinite}
+}
+@keyframes cosAllocationOrbit{
+  0%,100%{transform:scale(.99);filter:brightness(.96)}
+  50%{transform:scale(1.025);filter:brightness(1.08)}
+}
+@keyframes cosHoldingScan{
+  0%,100%{opacity:.55;transform:scaleX(.92)}
+  50%{opacity:1;transform:scaleX(1)}
+}
+@keyframes cosLinePulse{
+  0%,100%{opacity:.55}
+  50%{opacity:1}
+}
+@keyframes cosChartTravel{
+  to{stroke-dashoffset:-60}
+}
+@keyframes cosRiskNeedle{
+  0%,100%{transform:rotate(24deg)}
+  50%{transform:rotate(40deg)}
+}
+@keyframes cosMatrixPulse{
+  0%,100%{opacity:.28}
+  50%{opacity:.72}
+}
+@keyframes cosCalendarBeacon{
+  0%,100%{opacity:.4;box-shadow:none}
+  50%{opacity:1;box-shadow:0 0 9px rgba(114,232,255,.30)}
+}
+@keyframes cosCoverageBreathe{
+  50%{transform:scale(1.035);filter:brightness(1.08)}
+}
+@keyframes cosGoalTargetSpin{
+  to{transform:rotate(360deg)}
+}
+@keyframes cosGoalVectorGlow{
+  0%,100%{opacity:.52}
+  50%{opacity:1;box-shadow:0 0 8px rgba(114,232,255,.26)}
+}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="carbon"] .cos-allocation-orbit,
+  .v3-app[data-shell="carbon"] .cos-holding-rows i,
+  .v3-app[data-shell="carbon"] .cos-module--asset-intel svg path,
+  .v3-app[data-shell="carbon"] .cos-chart-line,
+  .v3-app[data-shell="carbon"] .cos-risk-arc>i,
+  .v3-app[data-shell="carbon"] .cos-correlation-matrix i,
+  .v3-app[data-shell="carbon"] .cos-flow-line,
+  .v3-app[data-shell="carbon"] .cos-calendar-grid i,
+  .v3-app[data-shell="carbon"] .cos-coverage-ring,
+  .v3-app[data-shell="carbon"] .cos-goal-target-ring>i,
+  .v3-app[data-shell="carbon"] .cos-goal-progress-track>b{
+    animation:none!important;
+    transform:none!important;
+  }
+}
