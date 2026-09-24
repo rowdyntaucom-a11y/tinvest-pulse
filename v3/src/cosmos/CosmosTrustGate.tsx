@@ -10,12 +10,12 @@ export function CosmosTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind
  return <main className={"cos-gate cos-gate--"+kind} aria-label={x.title}>
   <section className="cos-gate__scene">
    <div className="cos-gate__stars" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
-   <div className="cos-gate__instrument" aria-hidden="true">
-    {kind==="assets"?<div className="cos-formation"><i/><i/><i/><i/><span/><span/><b>陣</b></div>:kind==="analysis"?<div className="cos-radar"><i/><i/><i/><span/><b>眼</b></div>:<div className="cos-flow"><i/><i/><i/><span/><b>禄</b></div>}
-   </div>
-   <header><span>{x.code}</span><b>{x.label}</b></header>
+  </section>
+  <section className="cos-gate__instrument" aria-hidden="true">
+   {kind==="assets"?<div className="cos-formation"><i/><i/><i/><i/><span/><span/><b>陣</b></div>:kind==="analysis"?<div className="cos-radar"><i/><i/><i/><span/><b>眼</b></div>:<div className="cos-flow"><i/><i/><i/><span/><b>禄</b></div>}
   </section>
   <section className="cos-gate__panel">
+   <div className="cos-gate__chapter"><span>{x.code}</span><b>{x.label}</b></div>
    <header><span>DATA GATE // FAIL-CLOSED</span><strong>{x.title}</strong><p>{x.lead}</p></header>
    <div className="cos-gate__route">
     <article><i>01</i><b>Источник</b><span>получить снимок</span></article>
