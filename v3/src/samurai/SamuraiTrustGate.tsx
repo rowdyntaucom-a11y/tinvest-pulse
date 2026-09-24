@@ -45,7 +45,7 @@ export function SamuraiTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKin
   <div className="sam-trust-gate__watermark" aria-hidden="true">{x.glyph}</div>
   <header><i aria-hidden="true">{x.glyph}</i><div><span>{x.eyebrow}</span><strong>{x.title}</strong><small>{x.lead}</small></div></header>
   <GateInstrument kind={kind}/>
-  <div className="sam-trust-depth-cue" aria-hidden="true"><span>НИЖЕ · МАРШРУТ ПРОВЕРКИ</span><i>⌄</i></div>
+  <button type="button" className="sam-trust-depth-cue" onClick={e=>{const route=e.currentTarget.closest(".sam-trust-gate")?.querySelector(".sam-trust-gate__route");const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;route?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})}} aria-label="Перейти к маршруту проверки"><span>НИЖЕ · МАРШРУТ ПРОВЕРКИ</span><i aria-hidden="true">⌄</i></button>
   <div className="sam-trust-gate__route">{x.steps.map(([n,title,copy],index)=><article key={n}><b>{n}</b><span>{title}</span><small>{copy}</small><i aria-hidden="true">{index<2?"→":"✓"}</i></article>)}</div>
   <div className="sam-trust-gate__action"><button type="button" onClick={()=>void onRefresh?.()} disabled={refreshing||!onRefresh}>{refreshing?"Синхронизация…":"Проверить источник"}</button><span>{refreshing?"Повторно запрашиваем подтверждённый снимок":"Запустить повторную проверку данных"}</span></div>
   <footer><span>FAIL-CLOSED</span><i aria-hidden="true"/><small>QVANIX показывает только подтверждённые финансовые значения</small></footer>
