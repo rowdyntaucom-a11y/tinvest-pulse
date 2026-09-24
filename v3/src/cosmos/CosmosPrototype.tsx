@@ -10,6 +10,12 @@ const ratioText=(v:number|null)=>v==null?"—":pct.format(v*100)+"%";
 export function CosmosPrototype({home,onNavigate,onPulse}:{home:V3HomeViewModel;onNavigate?:(x:V3Workspace)=>void;onPulse?:()=>void}){
  const trusted=home.isTrusted;
  const leader=home.leaders[0]?.ticker??"—";
+ const scrollTo=(id:string)=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;
+  el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
+ };
  return <main className="cos-home" aria-label="Cosmos — обзор портфеля">
   <section className="cos-home__scene" aria-label="Cosmos Mix C">
    <div className="cos-home__orbit cos-home__orbit--a" aria-hidden="true"/>
@@ -25,17 +31,22 @@ export function CosmosPrototype({home,onNavigate,onPulse}:{home:V3HomeViewModel;
    </footer>
   </section>
 
-  <section className="cos-home__capital" aria-label="Капитал">
+  <button className="cos-home__scroll-cue" type="button" onClick={()=>scrollTo("cosmos-capital")} aria-label="Плавно перейти к капиталу">
+   <span>ДАННЫЕ ПОРТФЕЛЯ</span><i aria-hidden="true">⌄</i>
+  </button>
+
+  <section id="cosmos-capital" className="cos-home__capital" aria-label="Капитал">
    <div className="cos-home__capital-main">
     <small>CAPITAL VECTOR</small>
     <strong>{moneyText(home.value)}</strong>
     <p>{trusted?<><span>Результат</span><b>{moneyText(home.profit)}</b><em>{pctText(home.profitPct)}</em></>:"Источник ещё не подтверждён"}</p>
    </div>
    <div className="cos-home__capital-node" aria-hidden="true"><i/><b>Q</b><i/></div>
+   <button className="cos-home__next-cue" type="button" onClick={()=>scrollTo("cosmos-telemetry")} aria-label="Плавно перейти к ключевым метрикам">МЕТРИКИ <i aria-hidden="true">⌄</i></button>
   </section>
 
-  <section className="cos-home__telemetry" aria-label="Ключевые метрики">
-   <header><span>TELEMETRY DECK</span><i/><b>{trusted?"SYNCED":"FAIL-CLOSED"}</b></header>
+  <section id="cosmos-telemetry" className="cos-home__telemetry" aria-label="Ключевые метрики">
+   <header><span>TELEMETRY DECK</span><i/><b>{trusted?"SYNCED":"FAIL-CLOSED"}</b><button type="button" className="cos-home__telemetry-cue" onClick={()=>scrollTo("cosmos-routes")} aria-label="Плавно перейти к разделам">РАЗДЕЛЫ <em aria-hidden="true">⌄</em></button></header>
    <div>
     <article><small>TWR</small><strong>{ratioText(home.twr)}</strong><span>СТРАТЕГИЯ</span><i/></article>
     <article><small>XIRR</small><strong>{ratioText(home.xirr)}</strong><span>С ПОТОКАМИ</span><i/></article>
@@ -44,7 +55,7 @@ export function CosmosPrototype({home,onNavigate,onPulse}:{home:V3HomeViewModel;
    </div>
   </section>
 
-  <section className="cos-home__routes" aria-label="Навигация по данным">
+  <section id="cosmos-routes" className="cos-home__routes" aria-label="Навигация по данным">
    <button onClick={()=>onNavigate?.("assets")}><i>01</i><span>СОСТАВ</span><b>{home.positions??"—"}</b></button>
    <button onClick={()=>onNavigate?.("analysis")}><i>02</i><span>АНАЛИЗ</span><b>RISK</b></button>
    <button onClick={()=>onNavigate?.("income")}><i>03</i><span>ДОХОД</span><b>{moneyText(home.monthlyIncome)}</b></button>
