@@ -43,3 +43,6 @@
 .v3-income-calendar-summary{grid-template-columns:1fr}.v3-income-depth-head{display:grid;grid-template-columns:1fr}.v3-income-depth-status{min-width:0;text-align:left}
 .v3-income-event-row{grid-template-columns:1fr auto}.v3-income-event-row time{grid-column:1/-1}.v3-income-source-row{grid-template-columns:1fr 1fr}.v3-income-source-row>div:first-child{grid-column:1/-1}.v3-income-source-row>div:nth-child(2){text-align:left}
 }
+
+.v3-income-tax-depth{display:grid;gap:12px}.v3-income-tax-schedule{display:grid;gap:4px;padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(7,12,20,.56)}.v3-income-tax-schedule>span{font-size:10px;letter-spacing:.09em;text-transform:uppercase;opacity:.62}.v3-income-tax-schedule>strong{font-size:22px;line-height:1.05}.v3-income-tax-schedule>small{font-size:10px;line-height:1.45;opacity:.68}
+[data-shell="samurai"] .v3-income-tax-schedule{border-color:rgba(216,63,44,.2);background:linear-gradient(145deg,rgba(42,10,8,.72),rgba(9,7,8,.72))}[data-shell="carbon"] .v3-income-tax-schedule{border-color:rgba(76,185,255,.2);background:linear-gradient(145deg,rgba(4,31,58,.72),rgba(3,10,20,.76))}
