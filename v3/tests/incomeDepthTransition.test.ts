@@ -1,0 +1,4 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const view=readFileSync(new URL("../src/income/V3Income.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/incomeDepthTransition.css",import.meta.url),"utf8");
+assert.match(view,/incomeDepthTransition\.css/);assert.match(view,/v3-income-depth-cue/);assert.match(view,/v3-income-depth-spacer/);assert.match(view,/v3-income-depth-anchor/);assert.match(view,/scrollIntoView/);assert.match(view,/prefers-reduced-motion/);assert.match(view,/shell==="samurai"\|\|shell==="carbon"/);assert.match(css,/data-workspace="income"/);assert.match(css,/data-shell="carbon"/);assert.match(css,/data-shell="samurai"/);assert.match(css,/prefers-reduced-motion:reduce/);assert.doesNotMatch(view,/Math\.random|mock|demo/i);
+console.log("v3 income depth transition contracts: ok");
