@@ -4,7 +4,8 @@ const css=readFileSync(new URL("../src/styles/samuraiSecondaryParity.css",import
 const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
 
 for(const token of[
- "sam-trust-gate--assets","sam-trust-gate--analysis","sam-trust-gate--income",
+ 'type GateKind="assets"|"analysis"|"income"',
+ '"sam-trust-gate sam-trust-gate--"+kind',
  "sam-trust-depth-cue","sam-trust-gate__route","scrollIntoView"
 ])assert.ok(gate.includes(token),token);
 
@@ -12,7 +13,7 @@ assert.match(gate,/<button type="button" className="sam-trust-depth-cue"/);
 assert.doesNotMatch(gate,/sam-trust-depth-cue" aria-hidden="true"/);
 
 for(const token of[
- "Samurai secondary parity","data-workspace=\"assets\"","data-workspace=\"analysis\"","data-workspace=\"income\"",
+ "Samurai secondary parity",'data-workspace="assets"','data-workspace="analysis"','data-workspace="income"',
  ".v3-page-head",".sam-trust-gate__chapter",".sam-trust-instrument",".sam-trust-depth-cue",
  ".sam-trust-gate__route","samParityDepthCue","prefers-reduced-motion"
 ])assert.ok(css.includes(token),token);
