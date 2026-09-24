@@ -1473,3 +1473,303 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   /* Retire the old equal-card Goal deck if stale markup remains in cache. */
   .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-deck{display:none!important}
 }
+
+
+/* ========================================================================== */
+/* Cosmos Safe-Zone Instruments — real Samsung pass 1000031544.mp4            */
+/* Keep the Mix C focal corridor readable: instruments frame the character     */
+/* from the side rails instead of laying a 2x2 dark blanket across the art.    */
+/* ========================================================================== */
+@media(max-width:430px){
+  /* Shared scene rule: reserve a clean central corridor for the main figure.
+     Cards become edge HUD instruments with lighter material. */
+  .v3-app[data-shell="carbon"][data-trusted="false"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"]) .cos-gate__modules{
+    left:8px!important;
+    right:8px!important;
+    top:42px!important;
+    bottom:58px!important;
+    height:auto!important;
+    display:block!important;
+    margin:0!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules .cos-module{
+    position:absolute!important;
+    width:auto!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:7px 8px!important;
+    border:0!important;
+    border-left:1px solid rgba(114,232,255,.40)!important;
+    border-top:1px solid rgba(114,232,255,.12)!important;
+    background:linear-gradient(112deg,rgba(2,10,29,.56),rgba(2,10,29,.27) 74%,rgba(2,10,29,.05))!important;
+    clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules .cos-module header>span{
+    font-size:6.5px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules .cos-module header>i{
+    font-size:6px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules .cos-module>small,
+  .v3-app[data-shell="carbon"] .cos-gate__modules .cos-module footer{
+    font-size:5.5px!important;
+  }
+
+  /* ASSETS — left allocation/asset intelligence, right positions/concentration.
+     The central 34–66% corridor stays substantially open. */
+  .v3-app[data-shell="carbon"] .cos-gate__modules--assets .cos-module--allocation{
+    left:0!important;
+    right:auto!important;
+    top:34%!important;
+    width:31%!important;
+    height:128px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--assets .cos-module--holdings{
+    left:auto!important;
+    right:0!important;
+    top:38%!important;
+    width:30%!important;
+    height:82px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--assets .cos-module--concentration{
+    left:auto!important;
+    right:0!important;
+    top:57%!important;
+    width:30%!important;
+    height:76px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--assets .cos-module--asset-intel{
+    left:0!important;
+    right:auto!important;
+    top:65%!important;
+    width:32%!important;
+    height:72px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-allocation-orbit{
+    width:58px!important;
+    height:58px!important;
+    margin:7px auto 5px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-allocation-orbit:before{inset:6px!important}
+  .v3-app[data-shell="carbon"] .cos-allocation-orbit>b{font-size:14px!important}
+  .v3-app[data-shell="carbon"] .cos-module--allocation footer{
+    gap:3px!important;
+    font-size:5px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-holding-rows{gap:4px!important;margin:6px 0!important}
+  .v3-app[data-shell="carbon"] .cos-holding-rows i{height:4px!important}
+  .v3-app[data-shell="carbon"] .cos-concentration-bars{height:29px!important;margin:5px 0 3px!important}
+  .v3-app[data-shell="carbon"] .cos-module--asset-intel svg{height:24px!important;margin:2px 0 0!important}
+
+  /* ANALYSIS — performance and benchmark on the left rail; risk and
+     correlations on the right. No panel crosses the figure. */
+  .v3-app[data-shell="carbon"] .cos-gate__modules--analysis .cos-module--performance{
+    left:0!important;
+    right:auto!important;
+    top:35%!important;
+    width:34%!important;
+    height:105px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--analysis .cos-module--risk{
+    left:auto!important;
+    right:0!important;
+    top:37%!important;
+    width:29%!important;
+    height:92px!important;
+    border-left-color:rgba(117,108,255,.48)!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--analysis .cos-module--benchmark{
+    left:0!important;
+    right:auto!important;
+    top:61%!important;
+    width:34%!important;
+    height:72px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--analysis .cos-module--correlation{
+    left:auto!important;
+    right:0!important;
+    top:60%!important;
+    width:29%!important;
+    height:80px!important;
+    border-left-color:rgba(117,108,255,.40)!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-module--performance svg{height:42px!important;margin:3px 0 0!important}
+  .v3-app[data-shell="carbon"] .cos-risk-arc{width:54px!important;height:28px!important;margin:7px auto 5px!important}
+  .v3-app[data-shell="carbon"] .cos-risk-arc:before{width:52px!important;height:52px!important;border-width:4px!important}
+  .v3-app[data-shell="carbon"] .cos-risk-arc>b{font-size:13px!important}
+  .v3-app[data-shell="carbon"] .cos-risk-arc>i{left:27px!important;height:20px!important}
+  .v3-app[data-shell="carbon"] .cos-benchmark-track{height:25px!important;margin:6px 1px 3px!important}
+  .v3-app[data-shell="carbon"] .cos-benchmark-track:before{top:13px!important}
+  .v3-app[data-shell="carbon"] .cos-benchmark-track>i,
+  .v3-app[data-shell="carbon"] .cos-benchmark-track>b{top:9px!important;width:8px!important;height:8px!important}
+  .v3-app[data-shell="carbon"] .cos-benchmark-track>span{top:12px!important}
+  .v3-app[data-shell="carbon"] .cos-correlation-matrix{
+    width:46px!important;height:46px!important;gap:2px!important;margin:5px auto 2px!important;
+  }
+
+  /* INCOME — payout flow/sources left, calendar/coverage right. */
+  .v3-app[data-shell="carbon"] .cos-gate__modules--income .cos-module--cashflow{
+    left:0!important;
+    right:auto!important;
+    top:34%!important;
+    width:35%!important;
+    height:104px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--income .cos-module--calendar{
+    left:auto!important;
+    right:0!important;
+    top:36%!important;
+    width:29%!important;
+    height:94px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--income .cos-module--sources{
+    left:0!important;
+    right:auto!important;
+    top:61%!important;
+    width:35%!important;
+    height:72px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__modules--income .cos-module--coverage{
+    left:auto!important;
+    right:0!important;
+    top:60%!important;
+    width:29%!important;
+    height:82px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-module--cashflow svg{height:42px!important;margin:3px 0 0!important}
+  .v3-app[data-shell="carbon"] .cos-calendar-grid{gap:2px!important;margin:6px 0 4px!important}
+  .v3-app[data-shell="carbon"] .cos-calendar-grid i{height:8px!important}
+  .v3-app[data-shell="carbon"] .cos-source-bars{gap:4px!important;margin:6px 0 4px!important}
+  .v3-app[data-shell="carbon"] .cos-source-bars i{height:4px!important}
+  .v3-app[data-shell="carbon"] .cos-coverage-ring{width:50px!important;height:50px!important;margin:5px auto 2px!important}
+  .v3-app[data-shell="carbon"] .cos-coverage-ring:before{inset:5px!important}
+  .v3-app[data-shell="carbon"] .cos-coverage-ring>b{font-size:13px!important}
+
+  /* GOAL — remove the oversized title stack from the art. Keep four functional
+     surfaces (target control + capital + route + scenarios) around the edges. */
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-page-head{
+    position:relative!important;
+    z-index:4!important;
+    width:36%!important;
+    max-width:none!important;
+    min-height:0!important;
+    margin:11dvh 0 0 12px!important;
+    padding:7px 8px!important;
+    border:0!important;
+    border-left:1px solid rgba(117,108,255,.42)!important;
+    background:linear-gradient(100deg,rgba(3,10,30,.42),rgba(3,10,30,.08))!important;
+    clip-path:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-page-head>span{
+    font-size:5.5px!important;
+    letter-spacing:.12em!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-page-head h1{
+    margin:3px 0 0!important;
+    font-size:16px!important;
+    line-height:1!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-page-head p{display:none!important}
+
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-goal-hero{
+    position:relative!important;
+    z-index:5!important;
+    width:38%!important;
+    min-height:88px!important;
+    margin:34dvh 12px 0 auto!important;
+    padding:9px 10px!important;
+    border:0!important;
+    border-right:1px solid rgba(117,108,255,.48)!important;
+    border-top:1px solid rgba(114,232,255,.12)!important;
+    background:linear-gradient(255deg,rgba(4,11,34,.58),rgba(4,11,34,.24) 74%,rgba(4,11,34,.04))!important;
+    clip-path:polygon(8px 0,100% 0,100% 100%,0 100%,0 8px)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-goal-title{
+    display:block!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-goal-title span{
+    font-size:6px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-goal-title small{
+    display:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-goal-hero>strong{
+    display:block!important;
+    margin:7px 0 8px!important;
+    font-size:17px!important;
+    line-height:1!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .v3-goal-hero>button{
+    min-height:30px!important;
+    padding:5px 8px!important;
+    font-size:7px!important;
+  }
+
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission{
+    position:absolute!important;
+    z-index:4!important;
+    inset:0!important;
+    width:auto!important;
+    height:calc(100svh - 50px)!important;
+    margin:0!important;
+    display:block!important;
+    pointer-events:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission>article{
+    position:absolute!important;
+    min-width:0!important;
+    height:auto!important;
+    padding:7px 8px!important;
+    border:0!important;
+    border-left:1px solid rgba(114,232,255,.34)!important;
+    border-top:1px solid rgba(114,232,255,.10)!important;
+    background:linear-gradient(110deg,rgba(3,10,30,.50),rgba(3,10,30,.20) 76%,rgba(3,10,30,.04))!important;
+    clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,0 100%)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__vector{
+    left:10px!important;
+    top:43%!important;
+    width:31%!important;
+    height:78px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__target{
+    display:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__progress{
+    left:10px!important;
+    top:62%!important;
+    width:32%!important;
+    height:66px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__scenarios{
+    right:10px!important;
+    top:66%!important;
+    width:31%!important;
+    height:66px!important;
+    border-left-color:rgba(117,108,255,.40)!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission header span{
+    font-size:6px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__vector>strong{
+    margin-top:5px!important;
+    font-size:13px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__vector>div{
+    margin:7px 0 4px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-progress-track{
+    margin:7px 0 5px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__progress>strong,
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__scenarios>strong{
+    font-size:12px!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-mission__scenarios>div{
+    margin:6px 0 4px!important;
+  }
+}
