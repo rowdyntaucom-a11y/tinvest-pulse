@@ -29,11 +29,10 @@ export function CosmosPrototype({home,onNavigate,onPulse}:{home:V3HomeViewModel;
    <footer className="cos-home__scene-foot">
     <span>SENTINEL ORDER</span><i/><b>BLUE SINGULARITY</b>
    </footer>
+   <button className="cos-home__scroll-cue" type="button" onClick={()=>scrollTo("cosmos-capital")} aria-label="Плавно перейти к данным портфеля">
+    <i aria-hidden="true">⌄</i>
+   </button>
   </section>
-
-  <button className="cos-home__scroll-cue" type="button" onClick={()=>scrollTo("cosmos-capital")} aria-label="Плавно перейти к данным портфеля">
-   <i aria-hidden="true">⌄</i>
-  </button>
 
   <section id="cosmos-capital" className="cos-home__capital" aria-label="Капитал">
    <div className="cos-home__capital-main">
