@@ -4,6 +4,12 @@
 > Read this file together with the current `main` branch before changing the project.
 > Never store API tokens, credentials or other secrets here.
 
+## 0. Current priority override — 2026-09-24
+
+**Living World / DNA WORLD is frozen and is now the lowest priority.** Preserve what already works, but do not invest active development time in DNA scenes, art, animation, XP/gamification, world events or related polish until the ordinary investment workspaces are finished and accepted.
+
+Current order: **Assets Depth → Analysis Depth → Income Depth → Goal/main-tab completion → shared cross-shell/mobile polish → DNA WORLD last.** Existing DNA work below is retained as future/historical direction, not as current implementation priority. A DNA change is allowed before then only when required to fix a regression that blocks the rest of the application.
+
 ## 1. Product idea
 TInvest Pulse is a mobile-first personal investment dashboard for a long-term T-Bank / Tinkoff Investments portfolio. It should not look like a conventional broker terminal. The core idea is to turn dry portfolio data into an understandable, visual and living system: what is happening now, how capital is structured, what real events matter, how much passive income is generated, and how the investor progresses over years rather than trades day-to-day. The product is designed first for smartphone use and clean screenshots for Tinkoff Pulse.
 
