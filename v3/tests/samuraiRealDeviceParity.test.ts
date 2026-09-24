@@ -9,7 +9,7 @@ for(const token of[
 ])assert.ok(css.includes(token),token);
 
 assert.ok(main.includes('import"./styles/samuraiRealDeviceParity.css"'));
-assert.ok(main.indexOf("mobilePerformance.css")<main.indexOf("samuraiRealDeviceParity.css"),"real-device cascade lock must load after generic mobile corrections");
+assert.ok(main.indexOf("samuraiRealDeviceParity.css")<main.indexOf("mobilePerformance.css"),"mobile performance remains the final stylesheet owner");
 
 assert.match(css,/sam-trust-gate--assets>\.sam-trust-gate__route,[\s\S]*margin:calc\(100svh - 88px\)/);
 assert.match(css,/v3-goal:has\(\.sam-goal-empty-path\) \.sam-goal-empty-path\{[\s\S]*display:none!important/);
