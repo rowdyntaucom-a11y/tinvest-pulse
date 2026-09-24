@@ -10,7 +10,7 @@
 body{min-height:100svh;background:radial-gradient(circle at 50% 0,#0a2c5f 0,transparent 34%),#020714}
 header{position:sticky;top:0;z-index:20;padding:max(12px,env(safe-area-inset-top)) 14px 11px;background:linear-gradient(180deg,rgba(2,7,20,.98),rgba(2,7,20,.84));backdrop-filter:blur(18px);border-bottom:1px solid rgba(82,188,255,.18)}
 h1{font-size:18px;line-height:1.1;margin:0 0 5px;letter-spacing:-.02em}header p{margin:0;color:#86a8c8;font-size:11px;line-height:1.35}
-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}nav a{color:#a7dcff;text-decoration:none;text-align:center;padding:8px 4px;border:1px solid rgba(83,188,255,.2);background:rgba(5,22,48,.72);font-size:11px;border-radius:9px}
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}nav a{color:#a7dcff;text-decoration:none;text-align:center;padding:8px 4px;border:1px solid rgba(83,188,255,.2);background:rgba(5,22,48,.72);font-size:11px;border-radius:9px}
 main{padding:10px 10px calc(24px + env(safe-area-inset-bottom));display:grid;gap:14px}
 .card{position:relative;min-height:74svh;border:1px solid rgba(79,187,255,.20);border-radius:18px;overflow:hidden;background:#031025;box-shadow:0 20px 56px rgba(0,0,0,.42);scroll-margin-top:105px}
 .card img{display:block;width:100%;height:auto;min-height:74svh;object-fit:cover;background:#031025}
@@ -23,24 +23,29 @@ main{padding:10px 10px calc(24px + env(safe-area-inset-bottom));display:grid;gap
 <body>
 <header>
 <h1>QVANIX / COSMOS — BLUE ART ROUND</h1>
-<p>Новый раунд: больше синего, контраста и сочности. Нажми D / E / F или просто листай вниз.</p>
-<nav><a href="#d">D · Сингулярность</a><a href="#e">E · Цитадель</a><a href="#f">F · Планета</a></nav>
+<p>Палитра D сохранена. Теперь сравниваем только композицию: оригинал D и три варианта, спроектированные под реальный мобильный интерфейс.</p>
+<nav><a href="#d">D · Исходник</a><a href="#d1">D1 · Crown</a><a href="#d2">D2 · Frame</a><a href="#d3">D3 · Portrait</a></nav>
 </header>
 <main>
 <section class="card" id="d">
-<div class="badge">D · Blue Singularity</div>
-<img src="https://v3b.fal.media/files/b/0aabaaa4/9FAVl-iZPM_nuRQPYVM_7_llmqDkUo.webp" alt="Cosmos D — Blue Singularity">
-<div class="meta"><b>Blue Singularity</b><span>Чёрная дыра / синее плазменное кольцо / исследовательская платформа.</span></div>
+<div class="badge">D · Original palette reference</div>
+<img src="https://v3b.fal.media/files/b/0aabaaa4/9FAVl-iZPM_nuRQPYVM_7_llmqDkUo.webp" alt="Cosmos D — original Blue Singularity">
+<div class="meta"><b>D · исходный Blue Singularity</b><span>Оставляем как эталон палитры. Здесь сравниваем, насколько новые композиции лучше переживут наложение интерфейса.</span></div>
 </section>
-<section class="card" id="e">
-<div class="badge">E · Azure Citadel</div>
-<img src="https://v3b.fal.media/files/b/0aabaaaa/Gd42tlm61ORE7NoPF5lQv_ONZIMjqT.webp" alt="Cosmos E — Azure Orbital Citadel">
-<div class="meta"><b>Azure Orbital Citadel</b><span>Космическая цитадель / кобальтовая туманность / световые каналы.</span></div>
+<section class="card" id="d1">
+<div class="badge">D1 · Singularity Crown</div>
+<img src="https://v3b.fal.media/files/b/0aabab1f/N_37XaZBkfAJt2Prb-eNp_4bzQ9j7r.webp" alt="Cosmos D1 — Singularity Crown">
+<div class="meta"><b>D1 · Singularity Crown</b><span>Сингулярность поднята и сдвинута вправо; центр и левый коридор специально освобождены под виджеты.</span></div>
 </section>
-<section class="card" id="f">
-<div class="badge">F · Blue Planet Rings</div>
-<img src="https://v3b.fal.media/files/b/0aabaab1/tK4tkRNSGkA93i1Dx4Jaf_9Oxxv711.webp" alt="Cosmos F — Blue Planet Rings">
-<div class="meta"><b>Blue Planet Rings</b><span>Сапфировая планета / гигантские орбитальные кольца / наблюдательный модуль.</span></div>
+<section class="card" id="d2">
+<div class="badge">D2 · Event Horizon Frame</div>
+<img src="https://v3b.fal.media/files/b/0aabab2d/-I_k_LbkDPBpWwa9C7tSC_R8ARGdZ6.webp" alt="Cosmos D2 — Event Horizon Frame">
+<div class="meta"><b>D2 · Event Horizon Frame</b><span>Яркая дуга работает как рамка по верхнему и правому краю, поэтому должна оставаться видимой даже под плотным интерфейсом.</span></div>
+</section>
+<section class="card" id="d3">
+<div class="badge">D3 · Singularity Portrait</div>
+<img src="https://v3b.fal.media/files/b/0aabab38/AqhgRqNHKD-UcVNv2XowL_1RaskktR.webp" alt="Cosmos D3 — Singularity Portrait">
+<div class="meta"><b>D3 · Singularity Portrait</b><span>Левая часть спокойная под финансовый текст, а весь характер мира собран справа — ближе к логике удачного Samurai-постера.</span></div>
 </section>
 </main>
 </body>
