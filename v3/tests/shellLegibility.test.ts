@@ -11,9 +11,9 @@ assert.doesNotMatch(css,/url\(/);assert.doesNotMatch(css,/backdrop-filter:/);ass
 assert.match(main,/imperiumSignatureSystem\.css";import"\.\/styles\/shellSamsung1510Polish\.css";import"\.\/styles\/mobilePerformance\.css"/);
 assert.match(samsung,/Samsung 1000031510\.mp4/);
 assert.match(samsung,/data-shell="horizon"\]:not\(\[data-workspace="home"\]\)/);
-assert.match(samsung,/--v3-text:#eff5f1/);
+assert.match(samsung,/color:#eff5f1!important/);
 assert.match(samsung,/data-shell="aurora"\]:not\(\[data-workspace="home"\]\)/);
-assert.match(samsung,/--v3-text:#f1f9fd/);
+assert.match(samsung,/color:#f1f9fd!important/);
 assert.match(samsung,/white-space:nowrap!important/);
 assert.match(samsung,/\.v3-empty/);
 assert.match(samsung,/data-shell="minimal"\] \.v3-global-world/);
