@@ -327,3 +327,39 @@
 @media(prefers-reduced-motion:reduce){
  .cos-home__orbit,.cos-home__stars i,.cos-home__scan,.cos-home__capital-node b,.cos-home__telemetry article>i,.cos-home__scroll-cue i,.cos-home__next-cue i,.cos-home__telemetry-cue em,.cos-gate__stars i,.cos-radar span,.cos-flow span,.cos-formation i{animation:none!important;transform:none!important}
 }
+
+
+/* Secondary Cosmos scene motion lives with shell identity, not the responsive owner. */
+@media(prefers-reduced-motion:no-preference) and (max-width:430px){
+  .v3-app[data-shell="carbon"] .cos-workspace-stage{
+    animation:cosmosWorkspaceDrift 18s ease-in-out infinite alternate;
+    will-change:background-position;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__scene{
+    animation:cosmosGateDrift 20s ease-in-out infinite alternate;
+    will-change:background-position;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__instrument{
+    animation:cosmosGateInstrumentFloat 6.5s ease-in-out infinite;
+  }
+}
+@keyframes cosmosWorkspaceDrift{
+  0%{background-position:50% 15%}
+  100%{background-position:52% 17%}
+}
+@keyframes cosmosGateDrift{
+  0%{background-position:50% 15%}
+  100%{background-position:51.5% 17%}
+}
+@keyframes cosmosGateInstrumentFloat{
+  0%,100%{transform:translate3d(0,0,0)}
+  50%{transform:translate3d(0,-5px,0)}
+}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="carbon"] .cos-workspace-stage,
+  .v3-app[data-shell="carbon"] .cos-gate__scene,
+  .v3-app[data-shell="carbon"] .cos-gate__instrument{
+    animation:none!important;
+    transform:none!important;
+  }
+}
