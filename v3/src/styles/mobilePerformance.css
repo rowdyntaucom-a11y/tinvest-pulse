@@ -52,3 +52,213 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
 @media(prefers-reduced-motion:reduce){
   .v3-app:not([data-workspace="dna"]) *{scroll-behavior:auto!important}
 }
+
+
+/* Cosmos Zero Overlay — strict art-safe composition.
+   No toolbar, status chip, heading, instrument or navigation cue may cover Mix C.
+   Loaded after mobilePerformance so these rules are final on phone. */
+
+@media(max-width:430px){
+  .v3-app[data-shell="carbon"]{
+    background:#010510!important;
+  }
+
+  /* Remove the generic wallpaper completely. Every Cosmos art occurrence is now
+     an explicit stage with a known beginning and end. */
+  .v3-app[data-shell="carbon"]>.v3-global-world,
+  .v3-app[data-shell="carbon"]>.v3-atmosphere{
+    display:none!important;
+  }
+
+  /* Header gets its own black strip ABOVE the art instead of floating on it. */
+  .v3-app[data-shell="carbon"]>.v3-topbar{
+    position:relative!important;
+    z-index:80!important;
+    inset:auto!important;
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+    width:100%!important;
+    height:50px!important;
+    min-height:50px!important;
+    box-sizing:border-box!important;
+    padding:7px 10px!important;
+    margin:0!important;
+    border:0!important;
+    border-bottom:1px solid rgba(114,232,255,.09)!important;
+    background:#010510!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-brand{display:none!important}
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-controls{
+    width:100%!important;
+    display:flex!important;
+    justify-content:flex-end!important;
+    margin:0!important;
+  }
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-controls>button{display:none!important}
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-world-trigger{
+    position:relative!important;
+    height:36px!important;
+    min-height:36px!important;
+    min-width:128px!important;
+    margin:0!important;
+    background:#061027!important;
+    border:1px solid rgba(114,232,255,.18)!important;
+    box-shadow:none!important;
+  }
+
+  /* Generic context and trust bars are removed from Cosmos phone composition.
+     Cosmos authored surfaces already communicate fail-closed/live state. */
+  .v3-app[data-shell="carbon"]>.v3-context-bar,
+  .v3-app[data-shell="carbon"]>.v3-data-state{
+    display:none!important;
+  }
+
+  /* HOME ART: clean image only. Not even labels sit on top of it. */
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home{
+    padding-top:0!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__scene{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:941/1672!important;
+    width:100%!important;
+    margin:0!important;
+    overflow:hidden!important;
+    background:
+      url("/assets/themes/cosmos-mixc-master.webp") 50% 50%/100% 100% no-repeat!important;
+    clip-path:none!important;
+    box-shadow:none!important;
+    border:0!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__scene:before,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__scene:after,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__scene-head,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__scene-foot,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__orbit,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__stars,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__scan{
+    display:none!important;
+  }
+
+  /* Scroll cue begins AFTER the image; zero negative margin = zero overlap. */
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__scroll-cue{
+    width:62%!important;
+    min-height:31px!important;
+    margin:7px auto 0!important;
+    position:relative!important;
+    z-index:6!important;
+    background:#061027!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"] .cos-home__capital{
+    margin-top:7px!important;
+  }
+
+  /* Generic workspace stage: exact full Mix C, then content. */
+  .v3-app[data-shell="carbon"] .cos-workspace-stage{
+    display:block!important;
+    width:calc(100% - 20px)!important;
+    height:auto!important;
+    aspect-ratio:941/1672!important;
+    margin:0 10px 9px!important;
+    background:url("/assets/themes/cosmos-mixc-master.webp") 50% 50%/100% 100% no-repeat!important;
+    border:0!important;
+    box-shadow:none!important;
+    clip-path:none!important;
+  }
+
+  /* Undo old Cosmos rules that reserved another phantom art viewport behind the
+     new explicit stage. */
+  .v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    min-height:100dvh!important;
+    padding-top:0!important;
+    background:#010510!important;
+  }
+  .v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before,
+  .v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):after{
+    display:none!important;
+    content:none!important;
+  }
+  .v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+    position:relative!important;
+    inset:auto!important;
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+    width:auto!important;
+    max-width:none!important;
+    margin:0 10px 9px!important;
+  }
+
+  /* FAIL-CLOSED ART: also completely clean. Instrument starts below the image. */
+  .v3-app[data-shell="carbon"] .cos-gate{
+    padding-top:0!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__scene{
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:941/1672!important;
+    margin:0!important;
+    background:url("/assets/themes/cosmos-mixc-master.webp") 50% 50%/100% 100% no-repeat!important;
+    clip-path:none!important;
+    box-shadow:none!important;
+    border:0!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__scene:before,
+  .v3-app[data-shell="carbon"] .cos-gate__scene:after,
+  .v3-app[data-shell="carbon"] .cos-gate__scene>header,
+  .v3-app[data-shell="carbon"] .cos-gate__stars{
+    display:none!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__instrument{
+    position:relative!important;
+    inset:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    width:calc(100% - 20px)!important;
+    height:86px!important;
+    margin:7px 10px 0!important;
+    opacity:1!important;
+    overflow:hidden!important;
+    border:1px solid rgba(114,232,255,.1)!important;
+    background:#050e24!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__instrument>div{
+    width:118px!important;
+    height:86px!important;
+    margin:0 auto!important;
+    transform:scale(.72)!important;
+    transform-origin:center!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__panel{
+    margin-top:7px!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__chapter{
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    margin-bottom:10px!important;
+    color:#7195ab!important;
+    font-size:6px!important;
+    letter-spacing:.15em!important;
+  }
+  .v3-app[data-shell="carbon"] .cos-gate__chapter b{
+    margin-left:auto!important;
+    color:#83bfd1!important;
+    font-size:6px!important;
+  }
+
+  /* The bottom navigation may float over data, never over an art stage. */
+  .v3-app[data-shell="carbon"]>.v3-nav{
+    z-index:100!important;
+  }
+}
+
+@media(min-width:431px){
+  .cos-workspace-stage{display:none}
+}
