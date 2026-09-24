@@ -31,19 +31,6 @@
 
 /* ZEN — recording showed dark garden instruments inheriting the old light Horizon
    ink tokens. Keep the pale paper header, but make every deep instrument truly dark. */
-.v3-app[data-shell="horizon"]:not([data-workspace="home"]){
-  --v3-text:#eff5f1;
-  --v3-muted:#aebfb7;
-  --v3-accent:#83cfb1;
-  --v3-positive:#83cfa5;
-  --v3-negative:#efa092;
-  --v3-line:rgba(192,221,207,.16);
-  --v3-card:rgba(25,42,35,.88);
-  --v3-deep-card:linear-gradient(150deg,rgba(39,58,48,.88),rgba(20,36,30,.84));
-  --v3-deep-card-strong:linear-gradient(150deg,rgba(45,64,53,.94),rgba(22,39,32,.92));
-  --v3-deep-subcard:rgba(37,55,46,.82);
-  --v3-deep-chrome:rgba(18,33,27,.97);
-}
 .v3-app[data-shell="horizon"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
   background:linear-gradient(102deg,rgba(250,252,246,.96),rgba(240,247,237,.9) 72%,rgba(240,247,237,.48))!important;
   border-top:1px solid rgba(65,111,91,.18)!important;
@@ -69,19 +56,6 @@
 
 /* NORD — same inherited-token problem: dark polar instruments were receiving dark
    slate ink. Frost paper remains dark-ink; instruments switch to ice-light copy. */
-.v3-app[data-shell="aurora"]:not([data-workspace="home"]){
-  --v3-text:#f1f9fd;
-  --v3-muted:#aac2d0;
-  --v3-accent:#a9f4ee;
-  --v3-positive:#8ad9b5;
-  --v3-negative:#efa49a;
-  --v3-line:rgba(169,244,238,.17);
-  --v3-card:rgba(9,24,40,.88);
-  --v3-deep-card:linear-gradient(148deg,rgba(14,34,55,.9),rgba(7,20,36,.86));
-  --v3-deep-card-strong:linear-gradient(148deg,rgba(18,40,63,.95),rgba(8,23,40,.93));
-  --v3-deep-subcard:rgba(15,34,52,.84);
-  --v3-deep-chrome:rgba(6,18,32,.97);
-}
 .v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
   background:linear-gradient(102deg,rgba(247,252,254,.97),rgba(236,247,251,.92) 72%,rgba(236,247,251,.52))!important;
   border:1px solid rgba(59,127,165,.16)!important;
