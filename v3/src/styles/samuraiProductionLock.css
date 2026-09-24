@@ -1,0 +1,146 @@
+/* Samurai production lock — final interaction/responsive pass after Samsung 1000031513.
+   Presentation only. Finance, trust, broker, navigation and DNA semantics remain untouched. */
+
+/* Give the Samurai shell a tactile control language without moving layout. */
+.v3-app[data-shell="samurai"] :is(button,[role="button"]){
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.v3-app[data-shell="samurai"] :is(.v3-topbar button,.v3-nav button,.v3-world-trigger){
+  transition:transform .16s ease,border-color .2s ease,background-color .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+.v3-app[data-shell="samurai"] :is(.v3-topbar button,.v3-nav button,.v3-world-trigger):active{
+  transform:translateY(1px) scale(.975);
+  filter:brightness(1.12);
+}
+.v3-app[data-shell="samurai"] :is(.v3-topbar button,.v3-nav button,.v3-world-trigger):focus-visible{
+  outline:2px solid rgba(218,169,99,.78);
+  outline-offset:3px;
+  box-shadow:0 0 0 5px rgba(218,169,99,.10);
+}
+
+/* Bottom navigation becomes a forged command rail rather than generic glass. */
+.v3-app[data-shell="samurai"]>.v3-nav{
+  border:1px solid rgba(201,155,88,.22)!important;
+  background:linear-gradient(180deg,rgba(5,14,12,.94),rgba(5,9,8,.985))!important;
+  box-shadow:0 -1px 0 rgba(114,216,196,.05),0 12px 36px rgba(0,0,0,.42)!important;
+  backdrop-filter:blur(18px) saturate(.9);
+}
+.v3-app[data-shell="samurai"]>.v3-nav button{
+  position:relative;
+  overflow:hidden;
+  border:1px solid transparent!important;
+  background:transparent!important;
+}
+.v3-app[data-shell="samurai"]>.v3-nav button::after{
+  content:"";
+  position:absolute;
+  left:26%;right:26%;bottom:4px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(218,169,99,.92),transparent);
+  transform:scaleX(0);
+  opacity:0;
+  transition:transform .22s ease,opacity .22s ease;
+}
+.v3-app[data-shell="samurai"]>.v3-nav button[aria-current="page"],
+.v3-app[data-shell="samurai"]>.v3-nav button.is-active{
+  border-color:rgba(201,155,88,.16)!important;
+  background:linear-gradient(180deg,rgba(201,155,88,.085),rgba(114,216,196,.025))!important;
+  box-shadow:inset 0 1px 0 rgba(218,169,99,.08)!important;
+}
+.v3-app[data-shell="samurai"]>.v3-nav button[aria-current="page"]::after,
+.v3-app[data-shell="samurai"]>.v3-nav button.is-active::after{
+  transform:scaleX(1);opacity:1;
+}
+
+/* Chapter canvases stay readable while allowing the world to breathe around them. */
+.v3-app[data-shell="samurai"] :is(.sam-trust-gate,.sam-goal-empty-path,.v3-goal-hero){
+  text-wrap:pretty;
+}
+.v3-app[data-shell="samurai"] :is(.sam-trust-gate__chapter,.sam-goal-chapter) strong{
+  text-wrap:balance;
+  letter-spacing:.015em;
+}
+
+@media(max-width:430px){
+  /* Keep touch targets usable even on the narrow validation matrix. */
+  .v3-app[data-shell="samurai"]>.v3-nav button{min-width:0;min-height:52px!important}
+  .v3-app[data-shell="samurai"]>.v3-nav button i{font-size:clamp(15px,4.5vw,19px)!important;line-height:1!important}
+  .v3-app[data-shell="samurai"]>.v3-nav button span{font-size:clamp(8px,2.35vw,10px)!important;line-height:1.15!important;letter-spacing:-.01em}
+
+  /* The first viewport must answer before depth begins. */
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets[data-trusted="false"],
+    .v3-analysis[data-trusted="false"],
+    .v3-income[data-trusted="false"],
+    .v3-goal:has(.sam-goal-empty-path)
+  ){
+    scroll-behavior:smooth;
+    scroll-snap-type:y proximity;
+  }
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-gate--assets,
+    .sam-trust-gate--analysis,
+    .sam-trust-gate--income
+  ) .sam-trust-instrument{
+    scroll-margin-top:8px;
+  }
+
+  /* Edge fades communicate deliberate vertical depth without a visible browser scrollbar. */
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"]::after{
+    content:"";
+    position:fixed;
+    z-index:79;
+    left:0;right:0;
+    bottom:calc(max(8px,env(safe-area-inset-bottom)) + 64px);
+    height:18px;
+    pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(2,7,6,.34));
+  }
+}
+
+/* Very narrow/foldable widths: preserve six destinations without 8px text or horizontal overflow. */
+@media(max-width:319px){
+  .v3-app[data-shell="samurai"]>.v3-nav{
+    left:max(3px,env(safe-area-inset-left))!important;
+    right:max(3px,env(safe-area-inset-right))!important;
+    gap:1px!important;
+    padding:3px!important;
+  }
+  .v3-app[data-shell="samurai"]>.v3-nav button{padding-inline:0!important;border-radius:10px!important}
+  .v3-app[data-shell="samurai"]>.v3-nav button span{font-size:8px!important;letter-spacing:-.035em!important}
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate__chapter,.sam-goal-chapter) strong{font-size:clamp(22px,8.5vw,25px)!important}
+}
+
+/* Tablet / desktop Samurai must not simply stretch the phone composition. */
+@media(min-width:700px){
+  .v3-app[data-shell="samurai"]>.v3-atmosphere .v3-theme-scene{display:block;opacity:.72;pointer-events:none}
+  .v3-app[data-shell="samurai"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    width:min(1180px,calc(100% - 40px));
+    margin-inline:auto;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate,.v3-goal-hero,.sam-goal-empty-path){
+    box-shadow:0 24px 72px rgba(0,0,0,.22);
+  }
+}
+@media(min-width:1024px){
+  .v3-app[data-shell="samurai"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    width:min(1240px,calc(100% - 72px));
+  }
+}
+
+@media(hover:hover) and (pointer:fine){
+  .v3-app[data-shell="samurai"] :is(.v3-topbar button,.v3-world-trigger,.v3-nav button):hover{
+    border-color:rgba(201,155,88,.30)!important;
+    filter:brightness(1.08);
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="samurai"] :is(button,[role="button"],.v3-nav button::after){
+    transition:none!important;
+    scroll-behavior:auto!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.v3-topbar button,.v3-nav button,.v3-world-trigger):active{
+    transform:none!important;
+  }
+}
