@@ -1343,7 +1343,7 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     display:block!important;width:100%!important;height:54px!important;margin:5px 0 1px!important;overflow:visible!important;
   }
   .v3-app[data-shell="carbon"] .cos-chart-grid{fill:none!important;stroke:rgba(114,232,255,.08)!important;stroke-width:1!important}
-  .v3-app[data-shell="carbon"] .cos-chart-line{fill:none!important;stroke:#72e8ff!important;stroke-width:1.8!important;vector-effect:non-scaling-stroke!important;filter:drop-shadow(0 0 4px rgba(114,232,255,.25))!important}
+  .v3-app[data-shell="carbon"] .cos-chart-line{fill:none!important;stroke:#72e8ff!important;stroke-width:1.8!important;vector-effect:non-scaling-stroke!important}
   .v3-app[data-shell="carbon"] .cos-module--performance footer{justify-content:space-between!important}
   .v3-app[data-shell="carbon"] .cos-risk-arc{
     position:relative!important;
@@ -1397,7 +1397,7 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   .v3-app[data-shell="carbon"] .cos-module--coverage{grid-area:coverage!important}
   .v3-app[data-shell="carbon"] .cos-module--cashflow svg{display:block!important;width:100%!important;height:56px!important;margin:4px 0 0!important}
   .v3-app[data-shell="carbon"] .cos-flow-area{fill:rgba(114,232,255,.08)!important;stroke:none!important}
-  .v3-app[data-shell="carbon"] .cos-flow-line{fill:none!important;stroke:#72e8ff!important;stroke-width:1.7!important;vector-effect:non-scaling-stroke!important;filter:drop-shadow(0 0 4px rgba(114,232,255,.22))!important}
+  .v3-app[data-shell="carbon"] .cos-flow-line{fill:none!important;stroke:#72e8ff!important;stroke-width:1.7!important;vector-effect:non-scaling-stroke!important}
   .v3-app[data-shell="carbon"] .cos-module--cashflow footer{justify-content:space-between!important}
   .v3-app[data-shell="carbon"] .cos-calendar-grid{
     display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:4px!important;margin:10px 0 7px!important;
