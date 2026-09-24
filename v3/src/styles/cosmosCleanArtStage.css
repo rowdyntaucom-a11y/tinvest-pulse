@@ -1,0 +1,528 @@
+/* Cosmos Clean Art Stage v3 — 2026-09-24
+   Corrective pass after Samsung recording 1000031528.mp4.
+   Principle: Mix C is a scene, not a wallpaper. No information panel may cover
+   the singularity, sentinel silhouette or citadel on the authored art stage. */
+
+.v3-app[data-shell="carbon"]{
+  --cosmos-stage-phone:clamp(455px,61dvh,640px);
+  --cosmos-stage-wide:clamp(520px,64dvh,760px);
+  --cosmos-edge:max(14px,env(safe-area-inset-left));
+  --cosmos-ink:#010510;
+  --cosmos-line:rgba(111,231,255,.22);
+  --cosmos-line-hot:rgba(111,231,255,.62);
+  --cosmos-panel:rgba(3,12,34,.92);
+}
+
+/* Top chrome is its own dark band. It no longer floats as a translucent card
+   over the illustration. */
+.v3-app[data-shell="carbon"]>.v3-topbar{
+  position:relative!important;
+  z-index:20!important;
+  min-height:58px!important;
+  background:linear-gradient(180deg,#010510 0,rgba(1,5,16,.97) 74%,rgba(1,5,16,.9) 100%)!important;
+  border-bottom:1px solid rgba(111,231,255,.08)!important;
+  box-shadow:none!important;
+}
+.v3-app[data-shell="carbon"]>.v3-context-bar{
+  position:relative!important;
+  z-index:19!important;
+  width:auto!important;
+  max-width:none!important;
+  min-height:28px!important;
+  margin:0!important;
+  padding:5px var(--cosmos-edge)!important;
+  clip-path:none!important;
+  border:0!important;
+  border-bottom:1px solid rgba(111,231,255,.08)!important;
+  background:#010510!important;
+}
+.v3-app[data-shell="carbon"]>.v3-context-bar:after{display:none!important}
+.v3-app[data-shell="carbon"]>.v3-context-bar>b{display:block!important;color:#597289!important;font-size:8px!important}
+.v3-app[data-shell="carbon"]>.v3-data-state{
+  position:relative!important;
+  z-index:18!important;
+  width:auto!important;
+  max-width:none!important;
+  min-height:30px!important;
+  margin:0!important;
+  padding:5px var(--cosmos-edge)!important;
+  border:0!important;
+  border-radius:0!important;
+  border-bottom:1px solid rgba(111,231,255,.06)!important;
+  background:#010510!important;
+  box-shadow:none!important;
+}
+.v3-app[data-shell="carbon"]>.v3-data-state>span{font-size:9px!important}
+
+/* The world itself is allowed to read cleanly. Remove the extra fabricated
+   circles and city silhouettes that were competing with the Mix C art. */
+.v3-app[data-shell="carbon"]>.v3-global-world{
+  opacity:1!important;
+  background-position:50% top!important;
+  filter:saturate(1.08) contrast(1.035) brightness(1.02)!important;
+  transform-origin:60% 18%;
+}
+.v3-app[data-shell="carbon"]>.v3-atmosphere{
+  display:block!important;
+  background:transparent!important;
+}
+.v3-app[data-shell="carbon"]>.v3-atmosphere>i,
+.v3-app[data-shell="carbon"]>.v3-atmosphere>b,
+.v3-app[data-shell="carbon"]>.v3-atmosphere>span{
+  display:none!important;
+}
+.v3-app[data-shell="carbon"]>.v3-atmosphere:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  opacity:.24!important;
+  background-image:
+    radial-gradient(circle at 13% 19%,rgba(231,251,255,.72) 0 1px,transparent 1.3px),
+    radial-gradient(circle at 72% 16%,rgba(111,231,255,.66) 0 1px,transparent 1.3px),
+    radial-gradient(circle at 87% 51%,rgba(120,104,255,.62) 0 1px,transparent 1.2px),
+    radial-gradient(circle at 36% 68%,rgba(231,251,255,.42) 0 1px,transparent 1.2px)!important;
+  background-size:223px 251px,301px 277px,361px 331px,269px 297px!important;
+  mask-image:linear-gradient(180deg,#000 0 72%,transparent 100%)!important;
+}
+.v3-app[data-shell="carbon"]>.v3-atmosphere:after{
+  content:""!important;
+  position:absolute!important;
+  left:-42%!important;
+  top:54dvh!important;
+  width:38%!important;
+  height:1px!important;
+  opacity:.42!important;
+  background:linear-gradient(90deg,transparent,rgba(111,231,255,.72),transparent)!important;
+  box-shadow:0 0 12px rgba(111,231,255,.22)!important;
+}
+
+/* HOME: first the scene, then the dashboard. None of the hero content is
+   positioned over the art anymore. */
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-home{
+  position:relative!important;
+  padding-top:0!important;
+  background:linear-gradient(180deg,transparent 0 var(--cosmos-stage-phone),#010510 calc(var(--cosmos-stage-phone) + 86px))!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:calc(var(--cosmos-stage-phone) + 14px) var(--cosmos-edge) 14px!important;
+  overflow:visible!important;
+  border:0!important;
+  border-radius:0!important;
+  clip-path:none!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-production-theme-art{
+  position:absolute!important;
+  z-index:0!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  height:var(--cosmos-stage-phone)!important;
+  border:0!important;
+  border-radius:0!important;
+  background:
+    linear-gradient(90deg,rgba(1,5,16,.12),transparent 28% 78%,rgba(1,5,16,.08)),
+    linear-gradient(180deg,rgba(1,5,16,0) 0 72%,rgba(1,5,16,.22) 84%,#010510 100%)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-production-theme-art:before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:var(--cosmos-edge)!important;
+  bottom:18px!important;
+  width:92px!important;
+  height:1px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:linear-gradient(90deg,var(--cosmos-cyan),transparent)!important;
+  box-shadow:0 0 10px rgba(111,231,255,.3)!important;
+  opacity:.75!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-production-theme-art:after{
+  content:"COSMOS / SENTINEL ORDER"!important;
+  display:block!important;
+  position:absolute!important;
+  left:var(--cosmos-edge)!important;
+  right:auto!important;
+  bottom:5px!important;
+  width:auto!important;
+  height:auto!important;
+  color:rgba(187,232,249,.48)!important;
+  background:none!important;
+  clip-path:none!important;
+  font:700 6px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.2em!important;
+  opacity:1!important;
+}
+
+/* Undo v2's floating overlays. These become a compact information rail below
+   the art stage. */
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero-top{
+  position:relative!important;
+  z-index:3!important;
+  inset:auto!important;
+  width:100%!important;
+  max-width:none!important;
+  display:grid!important;
+  grid-template-columns:auto 1fr!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:0 0 8px!important;
+  border-bottom:1px solid rgba(111,231,255,.1)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-kicker{
+  padding:0!important;
+  border:0!important;
+  background:none!important;
+  clip-path:none!important;
+  color:#8fc6da!important;
+  font-size:8px!important;
+  letter-spacing:.22em!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero-tools{
+  justify-self:end!important;
+  display:flex!important;
+  gap:7px!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] :is(.v3-trust,.v3-pulse-entry){
+  min-height:28px!important;
+  padding:5px 9px!important;
+  border:1px solid rgba(111,231,255,.14)!important;
+  border-radius:2px 10px 2px 10px!important;
+  background:rgba(4,15,40,.72)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>div:nth-child(3){
+  position:relative!important;
+  z-index:3!important;
+  inset:auto!important;
+  width:100%!important;
+  max-width:none!important;
+  min-height:0!important;
+  padding:14px 0 12px!important;
+  border:0!important;
+  border-left:0!important;
+  border-top:1px solid rgba(111,231,255,.18)!important;
+  border-bottom:1px solid rgba(111,231,255,.1)!important;
+  clip-path:none!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>div:nth-child(3):before{
+  content:"CAPITAL VECTOR"!important;
+  display:block!important;
+  margin-bottom:8px!important;
+  color:rgba(111,231,255,.5)!important;
+  font:700 7px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.22em!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero h1{
+  margin:0!important;
+  font-size:clamp(34px,9.5vw,50px)!important;
+  line-height:.92!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>div:nth-child(3)>p{
+  max-width:82%!important;
+  margin:8px 0 0!important;
+  color:#a4b5ca!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-updated{
+  position:relative!important;
+  z-index:3!important;
+  inset:auto!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  color:#617b91!important;
+  font-size:8px!important;
+  letter-spacing:.08em!important;
+}
+
+/* Telemetry is a compact deck below the scene, not a second poster. */
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:7px!important;
+  margin:0 var(--cosmos-edge) 12px!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid:before{
+  content:"TELEMETRY"!important;
+  grid-column:1/-1!important;
+  min-height:16px!important;
+  padding:7px 0 0!important;
+  border-top:1px solid rgba(111,231,255,.08)!important;
+  color:rgba(126,179,202,.42)!important;
+  font:700 6px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.22em!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid article:nth-child(n){
+  grid-column:auto!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid article{
+  min-height:78px!important;
+  padding:11px 11px 10px!important;
+  border:1px solid rgba(111,231,255,.13)!important;
+  border-left:2px solid rgba(111,231,255,.3)!important;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)!important;
+  background:linear-gradient(145deg,rgba(4,17,45,.86),rgba(2,8,27,.82))!important;
+  box-shadow:none!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid article:after{
+  content:""!important;
+  position:absolute!important;
+  right:9px!important;
+  top:9px!important;
+  width:4px!important;
+  height:4px!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:var(--cosmos-cyan)!important;
+  box-shadow:0 0 8px rgba(111,231,255,.55)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid article>strong{
+  margin-top:7px!important;
+  font-size:clamp(19px,5.8vw,28px)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid article>small{
+  margin-top:6px!important;
+  font-size:8px!important;
+  line-height:1.25!important;
+  color:#647d91!important;
+}
+
+/* Secondary workspaces: the first chapter is now pure art. Page titles and
+   all functional cards begin after it. */
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+  position:relative!important;
+  min-height:100dvh!important;
+  padding-top:var(--cosmos-stage-phone)!important;
+  background:
+    linear-gradient(180deg,transparent 0 calc(var(--cosmos-stage-phone) - 90px),rgba(1,5,16,.44) calc(var(--cosmos-stage-phone) - 32px),#010510 var(--cosmos-stage-phone),#010510 100%)!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before{
+  content:""!important;
+  position:absolute!important;
+  z-index:1!important;
+  top:calc(var(--cosmos-stage-phone) - 14px)!important;
+  left:var(--cosmos-edge)!important;
+  width:84px!important;
+  height:1px!important;
+  background:linear-gradient(90deg,var(--cosmos-cyan),transparent)!important;
+  box-shadow:0 0 10px rgba(111,231,255,.2)!important;
+  clip-path:none!important;
+  opacity:.72!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):after{
+  content:"ART / DATA SEPARATION"!important;
+  position:absolute!important;
+  z-index:1!important;
+  top:calc(var(--cosmos-stage-phone) - 4px)!important;
+  left:var(--cosmos-edge)!important;
+  right:auto!important;
+  width:auto!important;
+  height:auto!important;
+  color:rgba(139,198,220,.38)!important;
+  background:none!important;
+  box-shadow:none!important;
+  font:700 6px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.2em!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+  position:relative!important;
+  z-index:3!important;
+  inset:auto!important;
+  width:auto!important;
+  max-width:none!important;
+  margin:12px var(--cosmos-edge) 10px!important;
+  padding:12px 0 10px!important;
+  border:0!important;
+  border-top:1px solid rgba(111,231,255,.13)!important;
+  border-bottom:1px solid rgba(111,231,255,.07)!important;
+  clip-path:none!important;
+  background:transparent!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head:before{
+  content:""!important;
+  position:absolute!important;
+  left:0!important;
+  top:-1px!important;
+  width:38px!important;
+  height:1px!important;
+  background:var(--cosmos-cyan)!important;
+  box-shadow:0 0 10px rgba(111,231,255,.36)!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head:after{
+  display:block!important;
+  margin-top:7px!important;
+  color:rgba(111,231,255,.4)!important;
+  font-size:6px!important;
+  letter-spacing:.22em!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head h1{
+  margin:5px 0 4px!important;
+  font-size:clamp(30px,8.5vw,44px)!important;
+  line-height:.94!important;
+  letter-spacing:-.035em!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head p{
+  max-width:84%!important;
+  margin:0!important;
+  color:#8198aa!important;
+  font-size:9px!important;
+  line-height:1.35!important;
+}
+
+/* Cards are deliberately quiet. The art provides spectacle; the data provides
+   precision. */
+.v3-app[data-shell="carbon"] :is(
+  .v3-assets-hero,.v3-assets-summary article,.v3-asset,.v3-empty,
+  .v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-overview-depth,.v3-analysis-note,
+  .v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-detail,.v3-income-ratios article,
+  .v3-goal-hero,.v3-goal-progress,.v3-goal-journey,.v3-goal-facts article,.v3-goal-milestones,.v3-goal-detail
+){
+  position:relative!important;
+  z-index:2!important;
+  border:1px solid rgba(111,231,255,.12)!important;
+  border-left:2px solid rgba(111,231,255,.24)!important;
+  border-radius:0!important;
+  clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,0 100%)!important;
+  background:linear-gradient(145deg,rgba(4,16,43,.88),rgba(2,8,26,.88))!important;
+  box-shadow:none!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="analysis"] :is(.v3-analysis-signal>div,.v3-analysis-grid article,.v3-analysis-overview-depth,.v3-analysis-note){
+  border-left-color:rgba(120,104,255,.38)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="income"] :is(.v3-income-hero,.v3-income-grid article,.v3-income-context,.v3-income-detail,.v3-income-ratios article){
+  border-left-color:rgba(93,205,255,.38)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="goal"] :is(.v3-goal-hero,.v3-goal-progress,.v3-goal-journey,.v3-goal-facts article,.v3-goal-milestones,.v3-goal-detail){
+  border-left-color:rgba(120,104,255,.36)!important;
+}
+
+/* Remove v2's oversized decorative rings from functional cards. */
+.v3-app[data-shell="carbon"] :is(
+  .v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts article
+):after{
+  max-width:4px!important;
+  max-height:4px!important;
+}
+
+/* Bottom navigation: slim instrument rail; active destination uses a tiny beacon,
+   not a large floating tile. */
+.v3-app[data-shell="carbon"]>.v3-nav{
+  min-height:58px!important;
+  border-radius:0 15px 0 15px!important;
+  background:rgba(1,5,17,.97)!important;
+  border:1px solid rgba(111,231,255,.14)!important;
+  box-shadow:0 -8px 28px rgba(0,0,0,.28)!important;
+}
+.v3-app[data-shell="carbon"]>.v3-nav:before{
+  top:17px!important;
+  opacity:.55!important;
+}
+.v3-app[data-shell="carbon"]>.v3-nav button{
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.v3-app[data-shell="carbon"]>.v3-nav button.is-active{
+  background:linear-gradient(180deg,rgba(25,92,255,.09),transparent)!important;
+  box-shadow:inset 0 1px rgba(111,231,255,.5)!important;
+}
+.v3-app[data-shell="carbon"]>.v3-nav button.is-active:after{
+  width:4px!important;
+  height:4px!important;
+  top:6px!important;
+  box-shadow:0 0 8px rgba(111,231,255,.55)!important;
+}
+
+/* Cosmos motion language: very small depth changes on art, star drift and a thin
+   scan. No decorative object crosses a focal subject. */
+@media(prefers-reduced-motion:no-preference){
+  .v3-app[data-shell="carbon"]>.v3-global-world{
+    animation:cosmosCleanParallax 20s ease-in-out infinite alternate!important;
+    will-change:transform;
+  }
+  .v3-app[data-shell="carbon"]>.v3-atmosphere:before{
+    animation:cosmosCleanStars 38s linear infinite!important;
+    will-change:transform;
+  }
+  .v3-app[data-shell="carbon"]>.v3-atmosphere:after{
+    animation:cosmosCleanScan 12s ease-in-out infinite!important;
+    will-change:transform,opacity;
+  }
+  .v3-app[data-shell="carbon"]>.v3-nav button.is-active:after{
+    animation:cosmosCleanBeacon 2.8s ease-in-out infinite!important;
+  }
+}
+@keyframes cosmosCleanParallax{
+  0%{transform:translate3d(0,0,0) scale(1.004)}
+  100%{transform:translate3d(-3px,3px,0) scale(1.012)}
+}
+@keyframes cosmosCleanStars{to{transform:translate3d(-12px,17px,0)}}
+@keyframes cosmosCleanScan{
+  0%,100%{transform:translate3d(0,0,0);opacity:0}
+  18%{opacity:.36}
+  52%{transform:translate3d(370%,0,0);opacity:.18}
+  70%,100%{opacity:0}
+}
+@keyframes cosmosCleanBeacon{50%{opacity:.28;transform:scale(.72)}}
+
+@media(max-width:699px){
+  .v3-app[data-shell="carbon"]>.v3-global-world{
+    background-size:auto min(78dvh,760px)!important;
+    background-position:50% top!important;
+  }
+  .v3-app[data-shell="carbon"] .v3-controls>button{display:none!important}
+  .v3-app[data-shell="carbon"] .v3-world-trigger{
+    min-width:126px!important;
+    background:#020817!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-home{
+    padding-bottom:max(94px,calc(82px + env(safe-area-inset-bottom)))!important;
+  }
+  .v3-app[data-shell="carbon"] :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    overflow:visible!important;
+  }
+  .v3-app[data-shell="carbon"]>.v3-nav{
+    left:max(8px,env(safe-area-inset-left))!important;
+    right:max(8px,env(safe-area-inset-right))!important;
+    width:auto!important;
+  }
+}
+
+@media(max-width:380px){
+  .v3-app[data-shell="carbon"]{--cosmos-stage-phone:clamp(420px,58dvh,555px)}
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero h1{font-size:32px!important}
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid article{min-height:74px!important}
+}
+
+@media(min-width:700px){
+  .v3-app[data-shell="carbon"]{--cosmos-stage-phone:var(--cosmos-stage-wide)}
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{
+    padding-left:max(28px,6vw)!important;
+    padding-right:max(28px,6vw)!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    margin-left:max(28px,6vw)!important;
+    margin-right:max(28px,6vw)!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-primary-grid:before{grid-column:1/-1!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="carbon"]>.v3-global-world,
+  .v3-app[data-shell="carbon"]>.v3-atmosphere:before,
+  .v3-app[data-shell="carbon"]>.v3-atmosphere:after,
+  .v3-app[data-shell="carbon"]>.v3-nav button.is-active:after{
+    animation:none!important;
+    transform:none!important;
+  }
+}
