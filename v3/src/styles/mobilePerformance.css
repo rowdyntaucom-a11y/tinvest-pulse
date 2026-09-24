@@ -1236,20 +1236,13 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   /* PORTFOLIO — allocation cockpit + holdings + concentration + asset intel. */
   .v3-app[data-shell="carbon"] .cos-gate__modules--assets{
     grid-template-columns:1.08fr .92fr!important;
-    grid-template-rows:1fr .88fr!important;
-    grid-template-areas:"allocation holdings" "allocation lower"!important;
+    grid-template-rows:1fr .82fr .78fr!important;
+    grid-template-areas:"allocation holdings" "allocation concentration" "allocation intel"!important;
   }
   .v3-app[data-shell="carbon"] .cos-module--allocation{grid-area:allocation!important}
   .v3-app[data-shell="carbon"] .cos-module--holdings{grid-area:holdings!important}
-  .v3-app[data-shell="carbon"] .cos-module--concentration{grid-area:lower!important}
-  .v3-app[data-shell="carbon"] .cos-module--asset-intel{
-    position:absolute!important;
-    left:calc(54% + 3px)!important;
-    right:0!important;
-    bottom:0!important;
-    height:82px!important;
-    transform:translateY(87px)!important;
-  }
+  .v3-app[data-shell="carbon"] .cos-module--concentration{grid-area:concentration!important}
+  .v3-app[data-shell="carbon"] .cos-module--asset-intel{grid-area:intel!important}
   .v3-app[data-shell="carbon"] .cos-allocation-orbit{
     position:relative!important;
     display:grid!important;
