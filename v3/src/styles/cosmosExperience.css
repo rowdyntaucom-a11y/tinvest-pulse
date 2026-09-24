@@ -445,3 +445,21 @@
     transform:none!important;
   }
 }
+
+
+/* Goal Lab cue motion lives with Cosmos identity. */
+@media(prefers-reduced-motion:no-preference) and (max-width:430px){
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-depth-cue i{
+    animation:cosGoalLabCue 2.2s ease-in-out infinite;
+  }
+}
+@keyframes cosGoalLabCue{
+  0%,100%{transform:translateY(0);opacity:.55}
+  50%{transform:translateY(4px);opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="carbon"][data-workspace="goal"] .cos-goal-depth-cue i{
+    animation:none!important;
+    transform:none!important;
+  }
+}
