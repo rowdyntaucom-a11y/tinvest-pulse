@@ -103,6 +103,12 @@
   padding-top:0!important;
   background:linear-gradient(180deg,transparent 0 var(--cosmos-stage-phone),#010510 calc(var(--cosmos-stage-phone) + 86px))!important;
 }
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero:before,
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero:after{
+  display:none!important;
+  content:none!important;
+}
+
 .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{
   display:flex!important;
   flex-direction:column!important;
