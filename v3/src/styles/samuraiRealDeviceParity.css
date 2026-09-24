@@ -1,0 +1,286 @@
+/* Samurai real-device parity — Samsung 1000031562.mp4.
+   This layer is intentionally loaded last. Earlier Samurai files contain several
+   high-specificity !important rules from previous cockpit iterations; they were
+   re-expanding route/title surfaces on the real device. This pass resolves the
+   cascade, not the visual concept. */
+
+@media(max-width:430px){
+  /* Locked secondary tabs: first viewport stays cinematic. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]>.sam-trust-gate.sam-trust-gate--assets,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]>.sam-trust-gate.sam-trust-gate--analysis,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]>.sam-trust-gate.sam-trust-gate--income{
+    display:block!important;
+    min-height:calc(188svh - 48px)!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0 9px 18px!important;
+    border:0!important;
+    background:transparent!important;
+    clip-path:none!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets .sam-trust-gate__chapter,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis .sam-trust-gate__chapter,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income .sam-trust-gate__chapter{
+    position:absolute!important;
+    top:18px!important;
+    width:34%!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:7px 8px 8px!important;
+    border:0!important;
+    box-shadow:none!important;
+    background:linear-gradient(100deg,rgba(3,11,9,.55),rgba(3,11,9,.16),transparent)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets .sam-trust-gate__chapter,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income .sam-trust-gate__chapter{
+    left:9px!important;right:auto!important;border-left:1px solid rgba(227,75,59,.36)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis .sam-trust-gate__chapter{
+    right:9px!important;left:auto!important;border-right:1px solid rgba(201,155,88,.34)!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__chapter strong{
+    margin-top:4px!important;
+    font-size:18px!important;
+    line-height:.95!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__chapter span{
+    font-size:5px!important;
+    line-height:1!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets>header,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis>header,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income>header{
+    position:absolute!important;
+    top:16%!important;
+    width:36%!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:7px!important;
+    display:grid!important;
+    grid-template-columns:26px minmax(0,1fr)!important;
+    gap:6px!important;
+    border:0!important;
+    background:linear-gradient(100deg,rgba(3,12,10,.50),rgba(3,12,10,.15),transparent)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets>header,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income>header{
+    right:9px!important;left:auto!important;border-right:1px solid rgba(114,216,196,.18)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis>header{
+    left:9px!important;right:auto!important;border-left:1px solid rgba(201,155,88,.20)!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>header>i{
+    width:24px!important;height:24px!important;font-size:11px!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>header strong{
+    font-size:9.2px!important;line-height:1.05!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>header small{
+    margin-top:3px!important;font-size:5.2px!important;line-height:1.2!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets .sam-trust-instrument,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis .sam-trust-instrument,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income .sam-trust-instrument{
+    position:absolute!important;
+    top:46%!important;
+    width:29%!important;
+    min-height:0!important;
+    height:104px!important;
+    margin:0!important;
+    padding:6px!important;
+    border:0!important;
+    background:linear-gradient(100deg,rgba(3,11,9,.38),rgba(3,11,9,.10),transparent)!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets .sam-trust-instrument{
+    left:9px!important;right:auto!important;border-left:1px solid rgba(114,216,196,.26)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis .sam-trust-instrument,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income .sam-trust-instrument{
+    right:9px!important;left:auto!important;border-right:1px solid rgba(201,155,88,.26)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis .sam-radar{
+    width:82px!important;height:82px!important;right:4px!important;top:18px!important;
+    transform:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets .sam-formation-map{
+    inset:22px 4px 18px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets .sam-formation-map .slot{
+    width:8px!important;height:8px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income .sam-ledger{
+    left:5px!important;right:5px!important;top:21px!important;bottom:18px!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-instrument__label{
+    top:4px!important;left:5px!important;right:5px!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-instrument>small{
+    left:5px!important;right:5px!important;bottom:4px!important;font-size:4.6px!important;
+  }
+
+  /* Force verification route below the first viewport. The per-kind selectors
+     deliberately outrank old reforge/canvas rules that used margin:0!important. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets>.sam-trust-gate__route,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis>.sam-trust-gate__route,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income>.sam-trust-gate__route{
+    position:relative!important;
+    z-index:4!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:4px!important;
+    width:calc(100% - 18px)!important;
+    margin:calc(100svh - 88px) 9px 0!important;
+    padding:11px 0 4px 9px!important;
+    border:0!important;
+    border-left:1px solid rgba(201,155,88,.16)!important;
+    background:linear-gradient(90deg,rgba(3,10,8,.72),rgba(3,10,8,.24) 78%,transparent)!important;
+    align-self:auto!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>.sam-trust-gate__route article{
+    min-height:40px!important;
+    margin:0!important;
+    padding:5px 6px!important;
+    display:grid!important;
+    grid-template-columns:20px 58px minmax(0,1fr) 14px!important;
+    grid-template-rows:1fr!important;
+    align-items:center!important;
+    gap:5px!important;
+    transform:none!important;
+    border:0!important;
+    border-top:1px solid rgba(201,155,88,.07)!important;
+    background:transparent!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>.sam-trust-gate__route span{
+    margin:0!important;font-size:7px!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>.sam-trust-gate__route small{
+    margin:0!important;padding:0!important;font-size:5.8px!important;line-height:1.2!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>.sam-trust-gate__route i{
+    position:static!important;justify-self:end!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets>.sam-trust-gate__action,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis>.sam-trust-gate__action,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income>.sam-trust-gate__action{
+    position:relative!important;
+    z-index:4!important;
+    width:calc(100% - 18px)!important;
+    margin:7px 9px 0!important;
+    padding:8px 0 8px 9px!important;
+    display:grid!important;
+    grid-template-columns:auto 1fr!important;
+    gap:8px!important;
+    background:linear-gradient(90deg,rgba(3,10,8,.52),rgba(3,10,8,.14),transparent)!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-gate--assets>footer,
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-trust-gate--analysis>footer,
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-gate--income>footer{
+    position:relative!important;
+    z-index:4!important;
+    width:calc(100% - 18px)!important;
+    margin:3px 9px 0!important;
+    padding:5px 0 3px 9px!important;
+  }
+
+  /* The depth cue remains at the bottom of the first screen and must not inherit
+     the old pointer-events:none rule. */
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>.sam-trust-depth-cue{
+    position:absolute!important;
+    z-index:12!important;
+    left:50%!important;
+    top:calc(100svh - 176px)!important;
+    transform:translateX(-50%)!important;
+    min-width:112px!important;
+    min-height:32px!important;
+    margin:0!important;
+    padding:0 8px!important;
+    pointer-events:auto!important;
+  }
+
+  /* Goal: defeat the legacy :has(.sam-goal-empty-path) sizing that was still
+     stretching the top card to ~1/3 of the real Samsung viewport. */
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-empty-path{
+    display:none!important;
+    min-height:0!important;
+    height:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter{
+    position:absolute!important;
+    top:9dvh!important;
+    left:10px!important;
+    width:36%!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:7px 8px 8px!important;
+    border:0!important;
+    border-left:1px solid rgba(227,75,59,.46)!important;
+    border-top:1px solid rgba(201,155,88,.14)!important;
+    background:linear-gradient(100deg,rgba(4,12,10,.56),rgba(4,12,10,.17),transparent)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter h1{
+    margin:3px 0 2px!important;font-size:19px!important;line-height:.95!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter p{
+    font-size:5.7px!important;line-height:1.18!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter>i{
+    font-size:20px!important;opacity:.45!important;
+  }
+
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-command{
+    position:absolute!important;
+    top:13dvh!important;
+    right:10px!important;
+    width:28%!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:7px 8px!important;
+    background:linear-gradient(255deg,rgba(10,15,11,.56),rgba(10,15,11,.16),transparent)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-command__value strong{
+    font-size:11.5px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-command__action{
+    min-height:24px!important;margin-top:6px!important;font-size:5.4px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-path-rail{
+    left:10px!important;
+    top:57dvh!important;
+    width:27%!important;
+    gap:3px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-path-rail article{
+    min-height:24px!important;
+    grid-template-columns:17px 1fr auto!important;
+    padding:3px 5px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-path-rail span,
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-path-rail b{
+    font-size:5.3px!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-depth-cue{
+    top:calc(100svh - 176px)!important;
+  }
+}
+
+@media(max-width:359px){
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-chapter{width:39%!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path) .sam-goal-command{width:31%!important}
+}
