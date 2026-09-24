@@ -204,3 +204,24 @@ Backend direction: a lightweight `gamification-service` or analytics module shou
 6. Social/chronicle features only after product traction.
 
 DNA WORLD should become a reason to return because it reflects the user’s own history and behavior, not merely a pretty visualization of the same numbers competitors show.
+
+
+## 20. Cosmos shell direction — approved 2026-09-24
+
+This section records the latest explicit user decisions and overrides older Cosmos experiments when they conflict.
+
+- Samurai is considered sufficiently mature to stop broad visual iteration for now. Preserve its approved artwork and Home composition.
+- Visual development remains serial: after Samurai, the active shell is **Cosmos**.
+- Do **not** use OpenArt for QVANIX production work.
+- The user rejected the early fal.ai Cosmos concepts (observatory / lighthouse / orbital garden) and also rejected later composition variants D1/D2/D3.
+- The user liked the vivid **Blue Singularity** palette: saturated cobalt, sapphire, ultramarine, electric cyan, icy white, restrained violet; avoid warm red/orange dominance.
+- The approved Cosmos concept is the later **Mix C** composition: one dominant cloaked cosmic guardian seen from behind, several smaller distant guardians / an implied order, a colossal blue singularity high/right, monumental orbital-cathedral / floating-city architecture, bridges and spires, strong depth and reflective surfaces.
+- A fal.ai image-to-image attempt based on a downscaled reference produced visibly soft / blurry output on Samsung. The user explicitly rejected that fal render for quality. Do not use the blurry fal.ai result as the Cosmos master.
+- The current Cosmos MASTER is the sharper generated Mix C artwork shown in-chat after that failure. Treat it as the visual source of truth for Cosmos unless the user explicitly replaces it.
+- Key integration requirement: the artwork must remain visible under the actual mobile shell. Design UI around the art rather than covering it with opaque cards. Preserve the singularity and guardian silhouettes as readable spatial anchors.
+- Cosmos should become a complete shell, not merely a wallpaper swap: its own geometry, card material, typography, motion language, navigation feedback and secondary-workspace atmosphere should be derived from the approved master art.
+- Preferred motion vocabulary: orbital drift, slow parallax, singularity glow / lensing, star drift and sentinel/environmental depth. Keep motion transform/opacity based and respect reduced-motion.
+- Canonical UX still applies: **FIRST SCREEN MUST ANSWER. DEPTH MAY SCROLL.**
+- No finance, broker, trust, security, navigation ownership or DNA logic should be changed merely to achieve the Cosmos visual pass.
+
+Current resume point: continue from the approved sharp Cosmos Mix C master and implement the Cosmos shell around it. Do not generate another replacement image unless the user explicitly asks.
