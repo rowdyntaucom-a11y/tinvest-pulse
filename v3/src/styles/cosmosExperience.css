@@ -1,0 +1,265 @@
+/* Dedicated Cosmos experience.
+   Replaces generic dashboard-over-wallpaper behavior on mobile Home and fail-closed
+   workspaces with authored scene composition, like Samurai but with a distinct
+   orbital language. */
+
+.cos-home,.cos-gate{display:none}
+
+@media(max-width:430px){
+  .v3-app[data-shell="carbon"]{
+    --cos-cyan:#72e8ff;
+    --cos-blue:#235cff;
+    --cos-violet:#756cff;
+    --cos-ink:#010510;
+    --cos-panel:#06112c;
+  }
+
+  /* Dedicated Cosmos owns the art. Remove the generic full-page wallpaper and
+     generic status bars that caused the visual stacking in the Samsung videos. */
+  .v3-app[data-shell="carbon"][data-workspace="home"]>.v3-global-world,
+  .v3-app[data-shell="carbon"][data-trusted="false"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"])>.v3-global-world{
+    display:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"]>.v3-atmosphere,
+  .v3-app[data-shell="carbon"][data-trusted="false"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"])>.v3-atmosphere{
+    display:none!important;
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"]>.v3-context-bar,
+  .v3-app[data-shell="carbon"][data-workspace="home"]>.v3-data-state,
+  .v3-app[data-shell="carbon"][data-trusted="false"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"])>.v3-context-bar,
+  .v3-app[data-shell="carbon"][data-trusted="false"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"])>.v3-data-state{
+    display:none!important;
+  }
+  .v3-app[data-shell="carbon"]>.v3-topbar{
+    position:absolute!important;
+    z-index:80!important;
+    top:10px!important;
+    left:10px!important;
+    right:10px!important;
+    height:42px!important;
+    min-height:42px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-brand{display:none!important}
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-controls{margin-left:auto!important}
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-controls>button{display:none!important}
+  .v3-app[data-shell="carbon"]>.v3-topbar .v3-world-trigger{
+    height:36px!important;
+    min-height:36px!important;
+    min-width:128px!important;
+    background:rgba(2,8,25,.82)!important;
+    border:1px solid rgba(114,232,255,.22)!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.24)!important;
+  }
+
+  .cos-home{
+    display:block;
+    position:relative;
+    z-index:3;
+    min-height:100dvh;
+    padding:0 10px 90px;
+    color:#eefbff;
+    background:#010510;
+    font-family:Inter,system-ui,sans-serif;
+  }
+  .cos-home__scene{
+    position:relative;
+    height:49svh;
+    min-height:350px;
+    max-height:430px;
+    overflow:hidden;
+    background:
+      linear-gradient(180deg,rgba(1,5,16,.05) 0 64%,rgba(1,5,16,.55) 83%,#010510 100%),
+      url("/assets/themes/cosmos-mixc-master.webp") 50% 28%/cover no-repeat;
+    clip-path:polygon(0 0,100% 0,100% 96%,96% 100%,0 100%);
+    box-shadow:inset 0 -1px rgba(114,232,255,.08);
+  }
+  .cos-home__scene:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-left:1px solid rgba(114,232,255,.22);
+    border-right:1px solid rgba(117,108,255,.12);
+    pointer-events:none;
+  }
+  .cos-home__scene-head{
+    position:absolute;
+    left:14px;
+    right:14px;
+    top:15px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    pointer-events:none;
+  }
+  .cos-home__scene-head div{display:grid;gap:3px}
+  .cos-home__scene-head span{color:#93dff0;font-size:7px;font-weight:750;letter-spacing:.22em}
+  .cos-home__scene-head b{font-size:7px;letter-spacing:.15em;color:#667f9d}
+  .cos-home__scene-head small{
+    padding:4px 7px;
+    border:1px solid rgba(114,232,255,.14);
+    background:rgba(1,6,20,.42);
+    color:#86a9bf;
+    font-size:6px;
+    letter-spacing:.12em;
+  }
+  .cos-home__scene-foot{
+    position:absolute;
+    left:14px;
+    right:14px;
+    bottom:17px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#7c9fb6;
+    font-size:6px;
+    letter-spacing:.15em;
+  }
+  .cos-home__scene-foot i{flex:1;height:1px;background:linear-gradient(90deg,rgba(114,232,255,.52),rgba(117,108,255,.08),transparent)}
+  .cos-home__scene-foot b{color:#a7d9e8;font-size:6px}
+
+  .cos-home__orbit{position:absolute;border-radius:50%;pointer-events:none}
+  .cos-home__orbit--a{
+    width:138px;height:138px;right:-56px;top:78px;
+    border:1px solid rgba(114,232,255,.14);
+    box-shadow:0 0 0 19px rgba(35,92,255,.024),0 0 0 43px rgba(117,108,255,.012);
+  }
+  .cos-home__orbit--b{
+    width:84px;height:84px;left:-39px;bottom:92px;
+    border:1px dashed rgba(117,108,255,.12);
+  }
+  .cos-home__stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#dff9ff;box-shadow:0 0 7px rgba(114,232,255,.75)}
+  .cos-home__stars i:nth-child(1){left:18%;top:23%}.cos-home__stars i:nth-child(2){left:77%;top:31%}.cos-home__stars i:nth-child(3){left:62%;top:14%}.cos-home__stars i:nth-child(4){left:34%;top:42%}.cos-home__stars i:nth-child(5){left:83%;top:59%}.cos-home__stars i:nth-child(6){left:14%;top:67%}.cos-home__stars i:nth-child(7){left:55%;top:74%}.cos-home__stars i:nth-child(8){left:71%;top:82%}
+  .cos-home__scan{position:absolute;left:-38%;top:61%;width:36%;height:1px;background:linear-gradient(90deg,transparent,rgba(114,232,255,.72),transparent);box-shadow:0 0 10px rgba(114,232,255,.24)}
+
+  .cos-home__capital{
+    position:relative;
+    display:grid;
+    grid-template-columns:1fr 52px;
+    gap:10px;
+    margin-top:-8px;
+    padding:15px 14px 14px;
+    border-left:2px solid var(--cos-cyan);
+    border-top:1px solid rgba(114,232,255,.12);
+    background:linear-gradient(135deg,#07132e 0 94%,transparent 94%);
+    box-shadow:0 16px 34px rgba(0,0,0,.24);
+    z-index:5;
+  }
+  .cos-home__capital-main small{display:block;color:#85a9bf;font-size:6px;letter-spacing:.18em}
+  .cos-home__capital-main>strong{display:block;margin-top:8px;font-size:31px;line-height:.92;letter-spacing:-.045em}
+  .cos-home__capital-main p{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0;color:#8ba0b5;font-size:8px}
+  .cos-home__capital-main p b{color:#cdeef7}.cos-home__capital-main p em{color:#72e8ff;font-style:normal}
+  .cos-home__capital-node{position:relative;display:grid;place-items:center;min-height:58px}
+  .cos-home__capital-node b{
+    display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+    border:1px solid rgba(114,232,255,.32);color:#c9f6ff;font-size:10px;
+    box-shadow:0 0 0 7px rgba(35,92,255,.035),0 0 20px rgba(114,232,255,.11);
+  }
+  .cos-home__capital-node i{position:absolute;width:42px;height:1px;background:linear-gradient(90deg,transparent,rgba(114,232,255,.25),transparent)}
+  .cos-home__capital-node i:first-child{transform:rotate(45deg)}.cos-home__capital-node i:last-child{transform:rotate(-45deg)}
+
+  .cos-home__telemetry{margin-top:7px;padding:12px;border:1px solid rgba(114,232,255,.11);background:#040d24}
+  .cos-home__telemetry>header{display:flex;align-items:center;gap:8px;color:#7192aa;font-size:6px;letter-spacing:.15em}
+  .cos-home__telemetry>header i{flex:1;height:1px;background:linear-gradient(90deg,rgba(114,232,255,.28),transparent)}
+  .cos-home__telemetry>header b{color:#89bed0;font-size:6px}
+  .cos-home__telemetry>div{display:grid;grid-template-columns:1.12fr .88fr;gap:5px;margin-top:10px}
+  .cos-home__telemetry article{position:relative;min-height:73px;padding:10px;border-left:1px solid rgba(114,232,255,.28);background:linear-gradient(135deg,#07152f 0 91%,transparent 91%)}
+  .cos-home__telemetry article:nth-child(2),.cos-home__telemetry article:nth-child(3){border-left-color:rgba(117,108,255,.32)}
+  .cos-home__telemetry article small,.cos-home__telemetry article span{display:block;color:#70889e;font-size:5.7px;letter-spacing:.11em}
+  .cos-home__telemetry article strong{display:block;margin:9px 0 6px;font-size:18px;line-height:.95}
+  .cos-home__telemetry article>i{position:absolute;right:9px;top:9px;width:4px;height:4px;border-radius:50%;background:var(--cos-cyan);box-shadow:0 0 8px rgba(114,232,255,.66)}
+
+  .cos-home__routes{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px}
+  .cos-home__routes button{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:7px;min-height:48px;padding:9px;border:1px solid rgba(114,232,255,.09);border-radius:0;background:#061027;color:#edf9ff;text-align:left;clip-path:polygon(0 0,100% 0,100% 84%,94% 100%,0 100%)}
+  .cos-home__routes button i{color:#6de2f8;font:700 6px/1 monospace}.cos-home__routes button span{font-size:8px;letter-spacing:.11em}.cos-home__routes button b{color:#7792aa;font-size:7px}
+  .cos-home__status{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:7px;padding:11px 12px;border-top:1px solid rgba(114,232,255,.1);color:#7d98ad}
+  .cos-home__status div{display:grid;gap:3px}.cos-home__status span{font-size:7px;letter-spacing:.08em}.cos-home__status small{font-size:6px;color:#5f778b}
+  .cos-home__status button{min-height:34px;padding:6px 11px;border:1px solid rgba(114,232,255,.18);border-radius:0;background:#07152f;color:#bdeef8;font-size:7px;letter-spacing:.12em}.cos-home__status button:disabled{opacity:.35}
+
+  /* Fail-closed workspaces: one compact art stage plus a real themed instrument,
+     not a giant repeated wallpaper and empty card. */
+  .cos-gate{
+    display:block;
+    position:relative;
+    z-index:3;
+    min-height:100dvh;
+    padding:0 10px 90px;
+    color:#eefbff;
+    background:#010510;
+    font-family:Inter,system-ui,sans-serif;
+  }
+  .cos-gate__scene{
+    position:relative;
+    height:40svh;
+    min-height:295px;
+    max-height:360px;
+    overflow:hidden;
+    background:
+      linear-gradient(180deg,rgba(1,5,16,.02) 0 58%,rgba(1,5,16,.52) 82%,#010510 100%),
+      url("/assets/themes/cosmos-mixc-master.webp") 50% 26%/cover no-repeat;
+    clip-path:polygon(0 0,100% 0,100% 95%,96% 100%,0 100%);
+  }
+  .cos-gate__scene:before{content:"";position:absolute;inset:0;border-left:1px solid rgba(114,232,255,.18);pointer-events:none}
+  .cos-gate__scene>header{position:absolute;left:14px;right:14px;bottom:18px;display:flex;align-items:center;gap:8px;color:#7a9db3;font-size:6px;letter-spacing:.15em}
+  .cos-gate__scene>header span{color:#9fe8f5}.cos-gate__scene>header b{margin-left:auto;color:#6d86a0;font-size:6px}
+  .cos-gate__stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#ddf9ff;box-shadow:0 0 6px rgba(114,232,255,.7)}
+  .cos-gate__stars i:nth-child(1){left:19%;top:18%}.cos-gate__stars i:nth-child(2){left:75%;top:21%}.cos-gate__stars i:nth-child(3){left:58%;top:39%}.cos-gate__stars i:nth-child(4){left:29%;top:55%}.cos-gate__stars i:nth-child(5){left:83%;top:61%}.cos-gate__stars i:nth-child(6){left:49%;top:72%}
+  .cos-gate__instrument{position:absolute;right:10px;bottom:38px;width:118px;height:118px;opacity:.7}
+  .cos-formation,.cos-radar,.cos-flow{position:relative;width:100%;height:100%}
+  .cos-formation i{position:absolute;width:8px;height:8px;border:1px solid rgba(114,232,255,.4);transform:rotate(45deg)}
+  .cos-formation i:nth-child(1){left:18px;top:54px}.cos-formation i:nth-child(2){left:48px;top:22px}.cos-formation i:nth-child(3){right:18px;top:48px}.cos-formation i:nth-child(4){left:50px;bottom:18px}
+  .cos-formation span{position:absolute;left:20px;right:20px;top:58px;height:1px;background:rgba(114,232,255,.22);transform:rotate(24deg)}.cos-formation span:nth-of-type(2){transform:rotate(-25deg)}
+  .cos-formation b,.cos-radar b,.cos-flow b{position:absolute;right:44px;top:45px;color:rgba(205,246,255,.55);font-size:18px}
+  .cos-radar i{position:absolute;inset:16px;border:1px solid rgba(117,108,255,.28);border-radius:50%}.cos-radar i:nth-child(2){inset:30px}.cos-radar i:nth-child(3){inset:44px}
+  .cos-radar span{position:absolute;left:59px;top:17px;width:1px;height:44px;background:linear-gradient(rgba(114,232,255,.55),transparent);transform-origin:bottom}
+  .cos-flow i{position:absolute;left:16px;right:16px;height:1px;background:linear-gradient(90deg,transparent,rgba(114,232,255,.5),transparent)}.cos-flow i:nth-child(1){top:34px}.cos-flow i:nth-child(2){top:58px}.cos-flow i:nth-child(3){top:82px}
+  .cos-flow span{position:absolute;left:24px;top:25px;width:3px;height:66px;background:linear-gradient(transparent,#72e8ff,transparent);box-shadow:0 0 8px rgba(114,232,255,.3)}
+
+  .cos-gate__panel{position:relative;margin-top:-8px;padding:15px 13px 14px;border-left:2px solid var(--cos-cyan);background:linear-gradient(135deg,#07132e 0 96%,transparent 96%);z-index:4}
+  .cos-gate--analysis .cos-gate__panel{border-left-color:var(--cos-violet)}
+  .cos-gate__panel>header span{display:block;color:#76a9bd;font-size:6px;letter-spacing:.17em}.cos-gate__panel>header strong{display:block;margin-top:8px;font-size:22px}.cos-gate__panel>header p{max-width:90%;margin:7px 0 0;color:#8b9eb1;font-size:9px;line-height:1.4}
+  .cos-gate__route{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:14px}.cos-gate__route article{min-height:62px;padding:8px;background:#050e24;border-top:1px solid rgba(114,232,255,.09)}.cos-gate__route i,.cos-gate__route b,.cos-gate__route span{display:block}.cos-gate__route i{color:#72e8ff;font:700 6px/1 monospace}.cos-gate__route b{margin-top:8px;font-size:8px}.cos-gate__route span{margin-top:4px;color:#627c92;font-size:6px;line-height:1.25}
+  .cos-gate__panel>button{width:100%;min-height:42px;margin-top:8px;border:1px solid rgba(114,232,255,.18);border-radius:0;background:#081831;color:#b9eefa;font-size:7px;letter-spacing:.13em}.cos-gate__panel>button:disabled{opacity:.45}
+
+  .v3-app[data-shell="carbon"]>.v3-nav{
+    height:60px!important;
+    min-height:60px!important;
+    left:10px!important;right:10px!important;bottom:max(7px,env(safe-area-inset-bottom))!important;
+    border-radius:0!important;
+    clip-path:polygon(2% 0,98% 0,100% 16%,100% 100%,0 100%,0 16%)!important;
+    background:rgba(2,7,20,.97)!important;
+    border:1px solid rgba(114,232,255,.13)!important;
+    box-shadow:0 -8px 24px rgba(0,0,0,.28)!important;
+  }
+  .v3-app[data-shell="carbon"]>.v3-nav button{min-height:50px!important;background:transparent!important;box-shadow:none!important}
+  .v3-app[data-shell="carbon"]>.v3-nav button.is-active{background:linear-gradient(180deg,rgba(35,92,255,.16),transparent)!important;box-shadow:inset 0 1px rgba(114,232,255,.55)!important}
+
+  @media(prefers-reduced-motion:no-preference){
+    .cos-home__orbit--a{animation:cosOrbitA 12s ease-in-out infinite}
+    .cos-home__orbit--b{animation:cosOrbitB 16s linear infinite}
+    .cos-home__stars i,.cos-gate__stars i{animation:cosStarPulse 3.4s ease-in-out infinite}
+    .cos-home__stars i:nth-child(2),.cos-gate__stars i:nth-child(2){animation-delay:.6s}.cos-home__stars i:nth-child(4),.cos-gate__stars i:nth-child(4){animation-delay:1.2s}.cos-home__stars i:nth-child(6),.cos-gate__stars i:nth-child(6){animation-delay:1.8s}
+    .cos-home__scan{animation:cosScan 10s ease-in-out infinite}
+    .cos-home__capital-node b{animation:cosNode 4s ease-in-out infinite}
+    .cos-home__telemetry article>i{animation:cosNode 3.2s ease-in-out infinite}
+    .cos-radar span{animation:cosRadar 7s linear infinite}
+    .cos-flow span{animation:cosFlow 4.8s ease-in-out infinite}
+    .cos-formation i{animation:cosFormation 5.5s ease-in-out infinite}
+  }
+  @keyframes cosOrbitA{50%{transform:translate3d(-7px,6px,0) scale(1.05);opacity:.8}}
+  @keyframes cosOrbitB{to{transform:rotate(360deg)}}
+  @keyframes cosStarPulse{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+  @keyframes cosScan{0%,100%{transform:translate3d(0,0,0);opacity:0}18%{opacity:.5}56%{transform:translate3d(410%,0,0);opacity:.16}72%,100%{opacity:0}}
+  @keyframes cosNode{50%{transform:scale(.78);opacity:.38}}
+  @keyframes cosRadar{to{transform:rotate(360deg)}}
+  @keyframes cosFlow{50%{transform:translate3d(68px,0,0);opacity:.35}}
+  @keyframes cosFormation{50%{transform:rotate(45deg) scale(1.25);box-shadow:0 0 10px rgba(114,232,255,.35)}}
+}
+
+@media(prefers-reduced-motion:reduce){
+ .cos-home__orbit,.cos-home__stars i,.cos-home__scan,.cos-home__capital-node b,.cos-home__telemetry article>i,.cos-gate__stars i,.cos-radar span,.cos-flow span,.cos-formation i{animation:none!important;transform:none!important}
+}
