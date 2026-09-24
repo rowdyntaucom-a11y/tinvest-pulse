@@ -1,0 +1,14 @@
+/* Income depth transition — shared verified income data, shell-specific chamber. */
+.v3-income-depth-cue,.v3-income-depth-spacer{display:none}
+.v3-income-depth-anchor{scroll-margin-top:64px}
+@media(max-width:430px){
+ .v3-app:is([data-shell="carbon"],[data-shell="samurai"])[data-workspace="income"] .v3-income-depth-cue{position:absolute;z-index:18;left:50%;top:calc(100svh - 174px);display:grid;place-items:center;width:44px;height:40px;min-height:40px;margin:0;padding:0;transform:translateX(-50%);border:0;border-radius:50%;background:rgba(4,8,14,.28);color:var(--v3-text);box-shadow:0 0 0 1px color-mix(in srgb,var(--v3-accent) 18%,transparent),0 0 22px color-mix(in srgb,var(--v3-accent) 10%,transparent)}
+ .v3-app:is([data-shell="carbon"],[data-shell="samurai"])[data-workspace="income"] .v3-income-depth-cue i{font:26px/.8 Inter,system-ui,sans-serif;font-style:normal}
+ .v3-app:is([data-shell="carbon"],[data-shell="samurai"])[data-workspace="income"] .v3-income-depth-spacer{display:block;min-height:clamp(84px,18svh,170px);pointer-events:none}
+ .v3-app:is([data-shell="carbon"],[data-shell="samurai"])[data-workspace="income"] .v3-income-depth-anchor{position:relative;z-index:8;margin:0 10px 12px;padding:10px;border:1px solid var(--v3-line);background:color-mix(in srgb,var(--v3-card) 95%,#000 5%)}
+ .v3-app[data-shell="carbon"][data-workspace="income"] .v3-income-depth-anchor{border-radius:0;border-color:rgba(114,232,255,.14);background:#02091b;clip-path:polygon(0 0,calc(100% - 15px) 0,100% 15px,100% 100%,0 100%)}
+ .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income-depth-anchor{border-radius:18px;border-color:rgba(201,160,92,.20);background:linear-gradient(180deg,rgba(19,15,14,.98),rgba(10,9,9,.99));box-shadow:inset 0 1px rgba(255,236,190,.025)}
+}
+@media(prefers-reduced-motion:no-preference){.v3-app[data-workspace="income"] .v3-income-depth-cue i{animation:v3IncomeDepthCue 2.1s ease-in-out infinite}}
+@keyframes v3IncomeDepthCue{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(4px);opacity:1}}
+@media(prefers-reduced-motion:reduce){.v3-income-depth-cue i{animation:none!important;transform:none!important}}
