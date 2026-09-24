@@ -1,44 +1,374 @@
-/* Cosmos signature system v2 — orbital observatory, not a Samurai recolor.
-   Carbon is the internal shell id retained for compatibility. */
-.v3-app[data-shell="carbon"]{--cosmos-blue:#69c9ff;--cosmos-violet:#8d78ff;--cosmos-ink:#020611;--cosmos-panel:rgba(4,9,28,.82);--cosmos-grid:rgba(105,201,255,.055)}
-.v3-app[data-shell="carbon"] :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){background:radial-gradient(circle at 82% 10%,rgba(53,105,255,.12),transparent 28%),linear-gradient(180deg,rgba(2,5,17,.2),rgba(2,5,17,.82))!important}
-.v3-app[data-shell="carbon"] .v3-topbar{background:linear-gradient(180deg,rgba(2,5,18,.94),rgba(2,5,18,.72))!important;border-bottom:1px solid rgba(105,201,255,.2)!important;backdrop-filter:blur(10px)}
-.v3-app[data-shell="carbon"] .v3-context-bar{background:linear-gradient(90deg,rgba(5,11,32,.9),rgba(5,11,32,.38),transparent)!important;border-left:2px solid var(--cosmos-blue)!important;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}
-.v3-app[data-shell="carbon"] .v3-page-head{position:relative;padding-left:14px!important;border-left:1px solid rgba(105,201,255,.44)}
-.v3-app[data-shell="carbon"] .v3-page-head:after{content:"ORBIT / VERIFIED";display:block;margin-top:6px;font:600 8px/1 Inter,system-ui,sans-serif;letter-spacing:.2em;color:rgba(105,201,255,.56)}
-.v3-app[data-shell="carbon"] :is(.v3-hero,.v3-assets-hero,.v3-income-hero,.v3-goal-hero,.v3-analysis-signal>div){background:linear-gradient(135deg,rgba(7,15,43,.9),rgba(3,7,23,.76))!important;border-color:rgba(105,201,255,.25)!important;box-shadow:inset 0 0 34px rgba(91,82,255,.06),0 18px 44px rgba(0,0,0,.28)!important}
-.v3-app[data-shell="carbon"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts article){position:relative;background:linear-gradient(155deg,rgba(7,14,39,.88),rgba(3,7,22,.76))!important;border-color:rgba(105,201,255,.2)!important;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
-.v3-app[data-shell="carbon"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts article):before{content:"";position:absolute;left:9px;top:8px;width:18px;height:1px;background:var(--cosmos-blue);box-shadow:0 0 8px rgba(105,201,255,.55);opacity:.68}
-.v3-app[data-shell="carbon"] :is(.v3-asset,.v3-income-context,.v3-income-detail,.v3-analysis-overview-depth,.v3-goal-progress,.v3-goal-journey,.v3-goal-milestones){background:linear-gradient(105deg,rgba(4,10,30,.88),rgba(3,7,22,.7))!important;border-color:rgba(120,132,255,.18)!important}
-.v3-app[data-shell="carbon"] .v3-nav{background:linear-gradient(180deg,rgba(3,7,23,.94),rgba(1,4,14,.97))!important;border:1px solid rgba(105,201,255,.22)!important;box-shadow:0 -8px 34px rgba(24,63,190,.12)!important}
-.v3-app[data-shell="carbon"] .v3-nav button{position:relative;color:#7f91b5!important}
-.v3-app[data-shell="carbon"] .v3-nav button.is-active{color:#bdeaff!important;background:linear-gradient(180deg,rgba(105,201,255,.1),transparent)!important;box-shadow:inset 0 2px var(--cosmos-blue)!important}
-.v3-app[data-shell="carbon"] .v3-nav button.is-active:after{content:"";position:absolute;top:5px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#d8f5ff;box-shadow:0 0 9px var(--cosmos-blue)}
-/* Deep-space glass: sparse starfield + telemetry grid. It sits behind content and keeps the first viewport legible. */
-.v3-app[data-shell="carbon"]:not([data-workspace="dna"]) .v3-atmosphere:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.48;background-image:radial-gradient(circle at 17% 22%,rgba(220,246,255,.75) 0 1px,transparent 1.4px),radial-gradient(circle at 71% 14%,rgba(141,120,255,.72) 0 1px,transparent 1.5px),radial-gradient(circle at 84% 54%,rgba(105,201,255,.62) 0 1px,transparent 1.3px),linear-gradient(var(--cosmos-grid) 1px,transparent 1px),linear-gradient(90deg,var(--cosmos-grid) 1px,transparent 1px);background-size:173px 197px,251px 229px,313px 281px,48px 48px,48px 48px;mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.62) 52%,transparent 96%)}
-.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{position:relative;overflow:hidden;isolation:isolate}
-.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero:after{content:"";position:absolute;z-index:0;width:min(76vw,520px);aspect-ratio:1;right:-22%;top:-24%;border-radius:50%;border:1px solid rgba(105,201,255,.17);box-shadow:0 0 0 32px rgba(105,201,255,.025),0 0 0 74px rgba(141,120,255,.018);background:conic-gradient(from 210deg,transparent 0 68%,rgba(105,201,255,.09) 69%,transparent 72%);pointer-events:none}
-.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>*{position:relative;z-index:1}
-/* Each workspace gets a different orbital instrument without changing data ownership. */
-.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before{content:"";position:absolute;z-index:0;pointer-events:none;width:min(74vw,520px);aspect-ratio:1;right:-26vw;top:70px;border-radius:50%;border:1px solid rgba(105,201,255,.12);box-shadow:0 0 0 26px rgba(105,201,255,.018),0 0 0 64px rgba(141,120,255,.012);opacity:.72}
-.v3-app[data-shell="carbon"][data-workspace="assets"] .v3-assets:before{background:conic-gradient(from 20deg,transparent 0 19%,rgba(105,201,255,.08) 20%,transparent 22% 58%,rgba(141,120,255,.06) 60%,transparent 62%)}
-.v3-app[data-shell="carbon"][data-workspace="analysis"] .v3-analysis:before{background:repeating-radial-gradient(circle,transparent 0 34px,rgba(105,201,255,.05) 35px 36px),linear-gradient(90deg,transparent 49.8%,rgba(105,201,255,.09) 50%,transparent 50.2%)}
-.v3-app[data-shell="carbon"][data-workspace="income"] .v3-income:before{border-radius:12%;background:repeating-linear-gradient(90deg,transparent 0 31px,rgba(105,201,255,.035) 32px)}
-.v3-app[data-shell="carbon"][data-workspace="goal"] .v3-goal:before{background:radial-gradient(circle,rgba(105,201,255,.11) 0 2px,transparent 3px),conic-gradient(from 210deg,transparent 0 74%,rgba(141,120,255,.1) 75%,transparent 77%)}
+/* QVANIX Cosmos — Blue Singularity / Sentinel Order.
+   Active shell id remains "carbon" for compatibility.
+   This layer is intentionally art-ready: the approved sharp Mix C master is NOT
+   substituted with a generated or blurry derivative. When the exact master asset
+   is persisted, it can be mounted into .v3-production-theme-art without changing
+   finance, navigation, trust or workspace ownership. */
+
+.v3-app[data-shell="carbon"]{
+  --cosmos-cobalt:#195cff;
+  --cosmos-sapphire:#123bda;
+  --cosmos-cyan:#6fe7ff;
+  --cosmos-ice:#e7fbff;
+  --cosmos-violet:#7868ff;
+  --cosmos-ink:#010510;
+  --cosmos-panel:rgba(4,12,34,.74);
+  --cosmos-panel-strong:rgba(3,9,27,.9);
+  --cosmos-line:rgba(111,231,255,.26);
+  --cosmos-line-soft:rgba(111,231,255,.12);
+  --cosmos-grid:rgba(88,144,255,.055);
+  --shell-font:"Bahnschrift Condensed","Arial Narrow",Inter,system-ui,sans-serif;
+  --shell-radius:2px 22px 2px 22px;
+  --shell-card-border:1px solid var(--cosmos-line);
+  --shell-card-shadow:inset 0 1px rgba(231,251,255,.045),0 18px 42px rgba(0,3,18,.38);
+  --shell-title-case:uppercase;
+  --shell-title-spacing:.065em;
+  background:var(--cosmos-ink);
+  color:#eefaff;
+}
+
+/* World canvas: saturated blue depth, singularity high/right, distant sentinel order,
+   and cathedral/city depth. These are framing layers, not a replacement illustration. */
+.v3-app[data-shell="carbon"] .v3-atmosphere{
+  background:
+    radial-gradient(circle at 82% 10%,rgba(44,111,255,.32),transparent 19%),
+    radial-gradient(ellipse at 58% 38%,rgba(27,72,218,.22),transparent 34%),
+    radial-gradient(circle at 17% 24%,rgba(96,77,255,.12),transparent 24%),
+    linear-gradient(180deg,#06143d 0,#030b24 42%,#010611 78%,#01040b 100%)!important;
+}
+.v3-app[data-shell="carbon"] .v3-atmosphere:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.58;
+  background-image:
+    radial-gradient(circle at 8% 16%,rgba(231,251,255,.9) 0 1px,transparent 1.4px),
+    radial-gradient(circle at 68% 18%,rgba(111,231,255,.72) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 87% 48%,rgba(120,104,255,.76) 0 1px,transparent 1.4px),
+    radial-gradient(circle at 34% 67%,rgba(231,251,255,.54) 0 1px,transparent 1.2px),
+    linear-gradient(var(--cosmos-grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--cosmos-grid) 1px,transparent 1px);
+  background-size:191px 223px,277px 241px,337px 307px,239px 269px,72px 72px,72px 72px;
+  mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.76) 58%,transparent 97%);
+}
+.v3-app[data-shell="carbon"] .v3-atmosphere i{
+  width:min(76vw,680px);
+  aspect-ratio:1;
+  right:-18%;
+  top:-9%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%,#e7fbff 0 2%,#7beaff 4%,#245fff 11%,rgba(20,43,168,.92) 24%,rgba(3,8,31,.92) 43%,rgba(1,4,15,.1) 62%,transparent 68%),
+    conic-gradient(from 22deg,transparent 0 28%,rgba(111,231,255,.16) 31%,transparent 35% 62%,rgba(120,104,255,.12) 65%,transparent 70%);
+  box-shadow:
+    0 0 34px rgba(111,231,255,.2),
+    0 0 92px rgba(25,92,255,.22),
+    0 0 0 1px rgba(111,231,255,.1);
+  opacity:.9;
+}
+.v3-app[data-shell="carbon"] .v3-atmosphere b{
+  left:-4%;
+  right:-4%;
+  bottom:-3vh;
+  height:46vh;
+  opacity:.34;
+  background:
+    linear-gradient(176deg,transparent 0 46%,rgba(38,84,191,.18) 46.5% 47%,transparent 47.5%),
+    repeating-linear-gradient(90deg,transparent 0 7.5%,rgba(111,231,255,.08) 7.7% 8%,transparent 8.2% 15%);
+  clip-path:polygon(0 100%,0 69%,7% 63%,11% 42%,14% 64%,19% 59%,22% 26%,25% 61%,31% 55%,36% 39%,39% 58%,45% 50%,50% 30%,53% 56%,59% 49%,64% 20%,67% 52%,72% 44%,77% 31%,80% 53%,85% 47%,89% 27%,92% 55%,100% 47%,100% 100%);
+}
+.v3-app[data-shell="carbon"] .v3-atmosphere span{
+  left:10%;
+  right:22%;
+  bottom:8vh;
+  height:26vh;
+  opacity:.3;
+  background:
+    radial-gradient(ellipse at 14% 100%,rgba(0,0,0,.9) 0 22%,transparent 23%),
+    radial-gradient(ellipse at 42% 100%,rgba(0,0,0,.88) 0 18%,transparent 19%),
+    radial-gradient(ellipse at 68% 100%,rgba(0,0,0,.84) 0 15%,transparent 16%),
+    radial-gradient(ellipse at 88% 100%,rgba(0,0,0,.82) 0 12%,transparent 13%);
+  filter:drop-shadow(0 -10px 22px rgba(37,94,255,.14));
+}
+
+/* The exact Mix C art will live here once its original bytes are durable.
+   Until then this is a transparent compositional lens, not replacement artwork. */
+.v3-app[data-shell="carbon"] .v3-production-theme-art{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle at 84% 16%,rgba(111,231,255,.12),transparent 21%),
+    linear-gradient(105deg,rgba(1,5,16,.86) 0 34%,rgba(2,8,25,.46) 52%,rgba(2,8,25,.14) 72%,transparent 100%);
+}
+.v3-app[data-shell="carbon"] .v3-production-theme-art:before{
+  content:"";
+  position:absolute;
+  width:58%;
+  aspect-ratio:1;
+  right:-14%;
+  top:-20%;
+  border-radius:50%;
+  border:1px solid rgba(111,231,255,.22);
+  box-shadow:0 0 0 18px rgba(25,92,255,.035),0 0 0 54px rgba(120,104,255,.022);
+}
+.v3-app[data-shell="carbon"] .v3-production-theme-art:after{
+  content:"";
+  position:absolute;
+  left:52%;
+  right:7%;
+  bottom:0;
+  height:62%;
+  opacity:.28;
+  background:repeating-linear-gradient(90deg,transparent 0 9%,rgba(111,231,255,.16) 9.4% 9.8%,transparent 10.2% 19%);
+  clip-path:polygon(0 100%,0 77%,11% 70%,17% 43%,23% 71%,34% 62%,39% 18%,45% 66%,56% 55%,64% 32%,71% 68%,84% 52%,90% 25%,100% 58%,100% 100%);
+}
+
+/* Chrome: a sentinel console rather than the rejected observatory HUD. */
+.v3-app[data-shell="carbon"] .v3-topbar{
+  background:linear-gradient(180deg,rgba(1,5,18,.96),rgba(2,8,27,.72))!important;
+  border-bottom:1px solid rgba(111,231,255,.22)!important;
+  box-shadow:0 10px 30px rgba(0,4,20,.32);
+  backdrop-filter:blur(9px);
+}
+.v3-app[data-shell="carbon"] .v3-brand b{
+  border-color:rgba(111,231,255,.38)!important;
+  background:linear-gradient(145deg,rgba(25,92,255,.28),rgba(3,10,30,.88))!important;
+  color:var(--cosmos-ice)!important;
+  box-shadow:inset 0 0 16px rgba(111,231,255,.08),0 0 18px rgba(25,92,255,.12);
+}
+.v3-app[data-shell="carbon"] .v3-world-trigger,
+.v3-app[data-shell="carbon"] .v3-controls>button{
+  background:rgba(3,10,30,.7)!important;
+  border-color:rgba(111,231,255,.19)!important;
+  color:#dff9ff!important;
+}
+.v3-app[data-shell="carbon"] .v3-context-bar{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(90deg,rgba(4,15,45,.92),rgba(4,14,40,.55) 54%,rgba(3,10,29,.12))!important;
+  border-left:2px solid var(--cosmos-cyan)!important;
+  border-bottom:1px solid rgba(111,231,255,.08)!important;
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%);
+}
+.v3-app[data-shell="carbon"] .v3-context-bar:after{
+  content:"SENTINEL LINK";
+  position:absolute;
+  right:24px;
+  top:50%;
+  transform:translateY(-50%);
+  font:700 8px/1 var(--shell-font);
+  letter-spacing:.2em;
+  color:rgba(111,231,255,.46);
+}
+
+/* First screen: leave the right/high visual anchor open for the Mix C singularity and guardian. */
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-home{
+  background:transparent!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:clamp(320px,43vh,500px);
+  padding:18px;
+  background:linear-gradient(112deg,rgba(2,8,28,.94) 0 36%,rgba(2,9,31,.72) 54%,rgba(2,9,31,.3) 73%,rgba(2,9,31,.08) 100%)!important;
+  border-color:rgba(111,231,255,.29)!important;
+  clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,24px 100%,0 calc(100% - 24px));
+  box-shadow:inset 3px 0 rgba(111,231,255,.13),0 24px 58px rgba(0,3,22,.42)!important;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>*:not(.v3-production-theme-art){
+  position:relative;
+  z-index:2;
+}
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero-top,
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>div:not(.v3-production-theme-art),
+.v3-app[data-shell="carbon"][data-workspace="home"] .v3-updated{
+  max-width:64%;
+}
+.v3-app[data-shell="carbon"] .v3-kicker{
+  color:#a9dff1!important;
+  letter-spacing:.2em!important;
+}
+.v3-app[data-shell="carbon"] .v3-hero h1{
+  color:#f2fdff;
+  text-shadow:0 0 28px rgba(62,166,255,.18),0 4px 24px rgba(0,0,0,.42);
+}
+.v3-app[data-shell="carbon"] .v3-updated{
+  color:#88a9c4!important;
+}
+
+/* Sentinel slabs: asymmetrical, translucent, visually lighter so the world breathes. */
+.v3-app[data-shell="carbon"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts article){
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(150deg,rgba(6,20,54,.76),rgba(2,8,27,.65))!important;
+  border-color:rgba(111,231,255,.19)!important;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,10px 100%,0 calc(100% - 10px));
+}
+.v3-app[data-shell="carbon"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts article):before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:38%;
+  height:1px;
+  background:linear-gradient(90deg,var(--cosmos-cyan),transparent);
+  box-shadow:0 0 10px rgba(111,231,255,.42);
+  opacity:.78;
+}
+.v3-app[data-shell="carbon"] :is(.v3-hero,.v3-assets-hero,.v3-income-hero,.v3-goal-hero,.v3-analysis-signal>div:first-child){
+  background:linear-gradient(138deg,rgba(6,19,54,.82),rgba(2,8,27,.68))!important;
+  border-color:rgba(111,231,255,.24)!important;
+  clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));
+}
+.v3-app[data-shell="carbon"] :is(.v3-asset,.v3-income-context,.v3-income-detail,.v3-analysis-overview-depth,.v3-goal-progress,.v3-goal-journey,.v3-goal-milestones,.v3-history-card,.v3-home-benchmark){
+  background:linear-gradient(104deg,rgba(4,14,42,.78),rgba(2,8,26,.62))!important;
+  border-color:rgba(120,104,255,.16)!important;
+  box-shadow:inset 0 1px rgba(231,251,255,.025),0 14px 34px rgba(0,2,16,.22)!important;
+}
+.v3-app[data-shell="carbon"] :is(.v3-primary-grid,.v3-assets-summary,.v3-analysis-grid,.v3-income-grid){
+  gap:8px!important;
+}
+
+/* Workspace identity comes from sentinel architecture, not one shared rotating observatory dial. */
+.v3-app[data-shell="carbon"] .v3-page-head{
+  position:relative;
+  padding:2px 0 10px 16px!important;
+  border-left:1px solid rgba(111,231,255,.46);
+}
+.v3-app[data-shell="carbon"] .v3-page-head:before{
+  content:"";
+  position:absolute;
+  left:-1px;
+  top:0;
+  width:1px;
+  height:38%;
+  background:var(--cosmos-cyan);
+  box-shadow:0 0 12px rgba(111,231,255,.62);
+}
+.v3-app[data-shell="carbon"] .v3-page-head:after{
+  display:block;
+  margin-top:7px;
+  font:700 8px/1 var(--shell-font);
+  letter-spacing:.22em;
+  color:rgba(111,231,255,.52);
+}
+.v3-app[data-shell="carbon"][data-workspace="assets"] .v3-page-head:after{content:"SENTINEL / HOLDINGS";}
+.v3-app[data-shell="carbon"][data-workspace="analysis"] .v3-page-head:after{content:"SENTINEL / ANALYSIS";}
+.v3-app[data-shell="carbon"][data-workspace="income"] .v3-page-head:after{content:"SENTINEL / FLOW";}
+.v3-app[data-shell="carbon"][data-workspace="goal"] .v3-page-head:after{content:"SENTINEL / VECTOR";}
+
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){
+  position:relative;
+  background:
+    linear-gradient(180deg,rgba(1,5,17,.08),rgba(1,5,17,.68)),
+    radial-gradient(circle at 86% 2%,rgba(25,92,255,.14),transparent 26%)!important;
+}
+.v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  right:-8%;
+  top:84px;
+  width:46%;
+  height:180px;
+  opacity:.4;
+  background:
+    linear-gradient(90deg,transparent 0 18%,rgba(111,231,255,.1) 18.4% 18.8%,transparent 19.2% 38%,rgba(120,104,255,.08) 38.4% 38.8%,transparent 39.2%),
+    linear-gradient(0deg,transparent 0 62%,rgba(111,231,255,.08) 62.4% 62.8%,transparent 63.2%);
+  clip-path:polygon(0 100%,10% 61%,24% 72%,32% 28%,44% 74%,58% 52%,69% 12%,76% 69%,88% 38%,100% 62%,100% 100%);
+}
+
+/* Dock navigation: active destination behaves like a docking beacon. */
+.v3-app[data-shell="carbon"] .v3-nav{
+  background:linear-gradient(180deg,rgba(3,11,31,.95),rgba(1,5,17,.98))!important;
+  border:1px solid rgba(111,231,255,.2)!important;
+  border-radius:2px 20px 2px 20px!important;
+  box-shadow:0 -10px 34px rgba(10,47,170,.12)!important;
+}
+.v3-app[data-shell="carbon"] .v3-nav button{
+  position:relative;
+  color:#7895b4!important;
+}
+.v3-app[data-shell="carbon"] .v3-nav button.is-active{
+  color:#e3fbff!important;
+  background:linear-gradient(180deg,rgba(25,92,255,.18),rgba(25,92,255,.03))!important;
+  box-shadow:inset 0 2px var(--cosmos-cyan)!important;
+}
+.v3-app[data-shell="carbon"] .v3-nav button.is-active:after{
+  content:"";
+  position:absolute;
+  top:5px;
+  left:50%;
+  width:5px;
+  height:5px;
+  margin-left:-2.5px;
+  border-radius:50%;
+  background:var(--cosmos-ice);
+  box-shadow:0 0 11px var(--cosmos-cyan),0 0 22px rgba(25,92,255,.42);
+}
+.v3-app[data-shell="carbon"] :is(.v3-kicker,.v3-page-head>span,.v3-primary-grid span,.v3-context-row span,.v3-nav span){
+  text-transform:uppercase;
+  letter-spacing:.1em;
+}
+
+/* Motion vocabulary: slow orbit/parallax/lensing only; no expensive animated blur. */
 @media(prefers-reduced-motion:no-preference){
- .v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before{animation:cosmos-orbit-drift 24s linear infinite}
- .v3-app[data-shell="carbon"] .v3-nav button.is-active:after{animation:cosmos-beacon 2.8s ease-in-out infinite}
- .v3-app[data-shell="carbon"]:not([data-workspace="dna"]) .v3-atmosphere:before{animation:cosmos-star-drift 22s linear infinite}
- .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero:after{animation:cosmos-home-orbit 32s linear infinite}
+  .v3-app[data-shell="carbon"] .v3-atmosphere:before{animation:cosmos-star-parallax 28s linear infinite;}
+  .v3-app[data-shell="carbon"] .v3-atmosphere i{animation:cosmos-singularity-breathe 9s ease-in-out infinite;}
+  .v3-app[data-shell="carbon"] .v3-atmosphere span{animation:cosmos-sentinel-drift 18s ease-in-out infinite alternate;}
+  .v3-app[data-shell="carbon"] .v3-nav button.is-active:after{animation:cosmos-dock-beacon 2.6s ease-in-out infinite;}
+  .v3-app[data-shell="carbon"] .v3-production-theme-art:before{animation:cosmos-lens-drift 24s linear infinite;}
 }
-@keyframes cosmos-orbit-drift{to{rotate:360deg}}
-@keyframes cosmos-home-orbit{to{rotate:-360deg}}
-@keyframes cosmos-star-drift{to{transform:translate3d(-12px,18px,0)}}
-@keyframes cosmos-beacon{50%{opacity:.35;box-shadow:0 0 3px var(--cosmos-blue)}}
+@keyframes cosmos-star-parallax{to{transform:translate3d(-16px,20px,0)}}
+@keyframes cosmos-singularity-breathe{50%{transform:scale(1.018);opacity:.96}}
+@keyframes cosmos-sentinel-drift{to{transform:translate3d(8px,-5px,0);opacity:.38}}
+@keyframes cosmos-dock-beacon{50%{opacity:.34;transform:scale(.78)}}
+@keyframes cosmos-lens-drift{to{transform:rotate(360deg)}}
+
 @media(max-width:699px){
- .v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before{right:-42vw;top:86px;opacity:.52}
- .v3-app[data-shell="carbon"] .v3-page-head:after{font-size:7px}
- .v3-app[data-shell="carbon"]:not([data-workspace="dna"]) .v3-atmosphere:before{opacity:.32;background-size:181px 211px,263px 239px,331px 293px,56px 56px,56px 56px}
- .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero:after{right:-44%;top:-10%;opacity:.68}
+  .v3-app[data-shell="carbon"] .v3-topbar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .v3-app[data-shell="carbon"] .v3-context-bar:after{display:none}
+  .v3-app[data-shell="carbon"] .v3-atmosphere i{width:112vw;right:-55vw;top:-5vh;opacity:.76}
+  .v3-app[data-shell="carbon"] .v3-atmosphere b{height:38vh;opacity:.24}
+  .v3-app[data-shell="carbon"] .v3-atmosphere span{left:4%;right:8%;height:20vh;bottom:12vh;opacity:.2}
+  .v3-app[data-shell="carbon"] .v3-atmosphere:before{opacity:.34;background-size:211px 237px,293px 257px,353px 323px,251px 281px,84px 84px,84px 84px}
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{
+    min-height:340px;
+    padding:16px;
+    clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,18px 100%,0 calc(100% - 18px));
+  }
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero-top,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>div:not(.v3-production-theme-art),
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-updated{max-width:70%}
+  .v3-app[data-shell="carbon"] .v3-production-theme-art:before{width:82%;right:-38%;top:-10%}
+  .v3-app[data-shell="carbon"] .v3-production-theme-art:after{left:47%;right:-3%;height:58%;opacity:.2}
+  .v3-app[data-shell="carbon"] .v3-page-head:after{font-size:7px}
+  .v3-app[data-shell="carbon"]:not([data-workspace="home"]):not([data-workspace="dna"]) :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before{right:-22%;width:64%;opacity:.27}
+  .v3-app[data-shell="carbon"] :is(.v3-primary-grid article,.v3-assets-summary article,.v3-analysis-grid article,.v3-income-grid article,.v3-goal-facts article){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 }
-@media(prefers-reduced-motion:reduce){.v3-app[data-shell="carbon"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before,.v3-app[data-shell="carbon"] .v3-nav button.is-active:after,.v3-app[data-shell="carbon"] .v3-atmosphere:before,.v3-app[data-shell="carbon"] .v3-hero:after{animation:none!important}}
+@media(max-width:380px){
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero-top,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>div:not(.v3-production-theme-art),
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-updated{max-width:74%}
+}
+@media(min-width:900px){
+  .v3-app[data-shell="carbon"] .v3-atmosphere i{right:-8%;top:-16%}
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero{min-height:460px}
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero-top,
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-hero>div:not(.v3-production-theme-art),
+  .v3-app[data-shell="carbon"][data-workspace="home"] .v3-updated{max-width:50%}
+}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="carbon"] .v3-atmosphere:before,
+  .v3-app[data-shell="carbon"] .v3-atmosphere i,
+  .v3-app[data-shell="carbon"] .v3-atmosphere span,
+  .v3-app[data-shell="carbon"] .v3-nav button.is-active:after,
+  .v3-app[data-shell="carbon"] .v3-production-theme-art:before{animation:none!important;transform:none!important}
+}
