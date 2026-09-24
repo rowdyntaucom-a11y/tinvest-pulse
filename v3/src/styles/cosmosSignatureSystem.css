@@ -1,9 +1,30 @@
 /* QVANIX Cosmos — Blue Singularity / Sentinel Order.
    Active shell id remains "carbon" for compatibility.
-   This layer is intentionally art-ready: the approved sharp Mix C master is NOT
-   substituted with a generated or blurry derivative. When the exact master asset
-   is persisted, it can be mounted into .v3-production-theme-art without changing
-   finance, navigation, trust or workspace ownership. */
+   The approved sharp Mix C master is persisted locally and is the canonical Cosmos art.
+   Do not replace it with the rejected astronaut/observatory art or blurry derivatives. */
+
+/* Canonical Mix C art lock. Loaded after legacy shell layers so the approved
+   sentinel/citadel composition always wins over old astronaut/observatory URLs. */
+.v3-app[data-shell="carbon"]{
+  --v3-global-world:url("/assets/themes/cosmos-mixc-master.webp")!important;
+  --v3-global-position:50% top!important;
+  --v3-global-filter:saturate(1.08) contrast(1.045) brightness(1.02)!important;
+}
+.v3-home[data-shell="carbon"]{
+  --v3-world-image:url("/assets/themes/cosmos-mixc-master.webp")!important;
+  --v3-world-position:50% 0%!important;
+  --v3-world-opacity:1!important;
+  --v3-world-filter:saturate(1.08) contrast(1.045) brightness(1.02)!important;
+}
+.v3-app[data-shell="carbon"] .v3-world-trigger>i,
+.v3-world-menu .world-carbon{
+  background-image:url("/assets/themes/cosmos-mixc-master.webp")!important;
+  background-position:50% 18%!important;
+}
+@media(max-width:430px){
+  .v3-home[data-shell="carbon"]{--v3-world-position:50% 0%!important}
+  .v3-app[data-shell="carbon"]:not([data-workspace="home"]){--v3-global-position:50% top!important}
+}
 
 .v3-app[data-shell="carbon"]{
   --cosmos-cobalt:#195cff;
