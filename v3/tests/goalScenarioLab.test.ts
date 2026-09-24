@@ -10,7 +10,7 @@ for(const token of[
  "TAB_OPTIONS","cos-goal-depth-cue","scrollToLab","onTargetChange={commitTarget}","history:HistoryPoint[]"
 ])assert.ok((token.startsWith("const V3Goal")?goal:token==="history:HistoryPoint[]"?goal:token==="cos-goal-depth-cue"||token==="scrollToLab"||token==="onTargetChange={commitTarget}"?goal:lab).includes(token),token);
 
-assert.ok(goal.includes('shell==="carbon"||mode==="detailed"'));
+assert.ok(goal.includes('shell==="carbon"||shell==="samurai"||mode==="detailed"'));
 assert.ok(app.includes("history={history}"));
 assert.ok(!lab.includes("v3-goal-scenario-tabs"));
 
