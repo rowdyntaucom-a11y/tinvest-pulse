@@ -393,7 +393,8 @@
   .v3-app[data-shell="carbon"] .cos-goal-progress-track>b{animation:cosGoalVectorGlow 4.8s ease-in-out infinite}
 }
 @keyframes cosAllocationOrbit{
-  to{transform:rotate(360deg)}
+  0%,100%{transform:scale(.99);filter:brightness(.96)}
+  50%{transform:scale(1.025);filter:brightness(1.08)}
 }
 @keyframes cosHoldingScan{
   0%,100%{opacity:.55;transform:scaleX(.92)}
