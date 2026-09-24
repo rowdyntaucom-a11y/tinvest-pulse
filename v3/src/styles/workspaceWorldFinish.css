@@ -176,7 +176,7 @@
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 3px 10px rgba(0,0,0,.18)!important;
 }
 .v3-app[data-shell="samurai"] .v3-world-trigger>i{background-image:url("https://v3b.fal.media/files/b/0aab73df/ZbEc5tOtr1v9erbGoskpA_Zqpj54LN.webp")!important;background-position:72% 12%!important}
-.v3-app[data-shell="carbon"] .v3-world-trigger>i{background-image:url("https://v3b.fal.media/files/b/0aab73e0/e-ybxrKFOxxdBMhQ3IUWg_rmwLJ1GW.webp")!important;background-position:56% 10%!important}
+.v3-app[data-shell="carbon"] .v3-world-trigger>i{background-image:url("/assets/themes/cosmos-mixc-master.webp")!important;background-position:56% 10%!important}
 .v3-app[data-shell="core"] .v3-world-trigger>i{background-image:url("https://v3b.fal.media/files/b/0aab73e1/CDiTm_cyBHRk3xSeQr0Cf_JyWjIqNa.webp")!important;background-position:56% 10%!important}
 .v3-app[data-shell="horizon"] .v3-world-trigger>i{background-image:url("https://v3b.fal.media/files/b/0aab73e1/QCS2uo2d_VwJLDXvBZ2ac_5XGwOrdI.webp")!important;background-position:50% 8%!important}
 .v3-app[data-shell="aurora"] .v3-world-trigger>i{background-image:url("https://v3b.fal.media/files/b/0aab73e2/696fnzhzzA8T9xFXC8hyE_uGolWJ95.webp")!important;background-position:50% 8%!important}
@@ -188,7 +188,7 @@
   border-color:color-mix(in srgb,var(--shell-accent) 28%,rgba(255,255,255,.10))!important;
 }
 .v3-world-menu .world-samurai{background-image:url("https://v3b.fal.media/files/b/0aab73df/ZbEc5tOtr1v9erbGoskpA_Zqpj54LN.webp")!important;background-position:72% 10%!important}
-.v3-world-menu .world-carbon{background-image:url("https://v3b.fal.media/files/b/0aab73e0/e-ybxrKFOxxdBMhQ3IUWg_rmwLJ1GW.webp")!important;background-position:56% 8%!important}
+.v3-world-menu .world-carbon{background-image:url("/assets/themes/cosmos-mixc-master.webp")!important;background-position:56% 8%!important}
 .v3-world-menu .world-core{background-image:url("https://v3b.fal.media/files/b/0aab73e1/CDiTm_cyBHRk3xSeQr0Cf_JyWjIqNa.webp")!important;background-position:56% 8%!important}
 .v3-world-menu .world-horizon{background-image:url("https://v3b.fal.media/files/b/0aab73e1/QCS2uo2d_VwJLDXvBZ2ac_5XGwOrdI.webp")!important;background-position:50% 7%!important}
 .v3-world-menu .world-aurora{background-image:url("https://v3b.fal.media/files/b/0aab73e2/696fnzhzzA8T9xFXC8hyE_uGolWJ95.webp")!important;background-position:50% 7%!important}
