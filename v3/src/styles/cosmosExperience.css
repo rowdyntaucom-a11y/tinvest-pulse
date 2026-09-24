@@ -122,6 +122,68 @@
   .cos-home__scene-foot i{flex:1;height:1px;background:linear-gradient(90deg,rgba(114,232,255,.52),rgba(117,108,255,.08),transparent)}
   .cos-home__scene-foot b{color:#a7d9e8;font-size:6px}
 
+  /* Samurai-style progressive flight through the Home story. The cue sits on
+     the dark scene boundary, so it never covers the singularity or sentinel. */
+  .cos-home__scroll-cue{
+    position:relative;
+    z-index:7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    width:62%;
+    min-height:30px;
+    margin:-9px auto 0;
+    padding:5px 12px;
+    border:1px solid rgba(114,232,255,.16);
+    border-radius:0;
+    background:rgba(3,11,31,.94);
+    color:#91bdcf;
+    font:700 6px/1 Inter,system-ui,sans-serif;
+    letter-spacing:.18em;
+    box-shadow:0 10px 22px rgba(0,0,0,.24);
+    clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  }
+  .cos-home__scroll-cue i{
+    color:#72e8ff;
+    font-size:12px;
+    font-style:normal;
+    line-height:.7;
+  }
+  #cosmos-capital,#cosmos-telemetry,#cosmos-routes{scroll-margin-top:62px}
+
+  .cos-home__next-cue{
+    position:absolute;
+    right:12px;
+    bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    min-height:24px;
+    padding:3px 7px;
+    border:0;
+    border-top:1px solid rgba(114,232,255,.16);
+    background:transparent;
+    color:#68899f;
+    font:700 5.5px/1 Inter,system-ui,sans-serif;
+    letter-spacing:.13em;
+  }
+  .cos-home__next-cue i{color:#72e8ff;font-style:normal;font-size:9px}
+  .cos-home__telemetry-cue{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    margin-left:2px;
+    padding:2px 0 2px 6px;
+    border:0;
+    border-left:1px solid rgba(114,232,255,.13);
+    background:transparent;
+    color:#668aa1;
+    font:700 5.5px/1 Inter,system-ui,sans-serif;
+    letter-spacing:.11em;
+  }
+  .cos-home__telemetry-cue em{color:#72e8ff;font-style:normal;font-size:9px}
+
   .cos-home__orbit{position:absolute;border-radius:50%;pointer-events:none}
   .cos-home__orbit--a{
     width:138px;height:138px;right:-56px;top:78px;
@@ -246,6 +308,7 @@
     .cos-home__scan{animation:cosScan 10s ease-in-out infinite}
     .cos-home__capital-node b{animation:cosNode 4s ease-in-out infinite}
     .cos-home__telemetry article>i{animation:cosNode 3.2s ease-in-out infinite}
+    .cos-home__scroll-cue i,.cos-home__next-cue i,.cos-home__telemetry-cue em{animation:cosCueDrop 2.1s ease-in-out infinite}
     .cos-radar span{animation:cosRadar 7s linear infinite}
     .cos-flow span{animation:cosFlow 4.8s ease-in-out infinite}
     .cos-formation i{animation:cosFormation 5.5s ease-in-out infinite}
@@ -255,11 +318,12 @@
   @keyframes cosStarPulse{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
   @keyframes cosScan{0%,100%{transform:translate3d(0,0,0);opacity:0}18%{opacity:.5}56%{transform:translate3d(410%,0,0);opacity:.16}72%,100%{opacity:0}}
   @keyframes cosNode{50%{transform:scale(.78);opacity:.38}}
+  @keyframes cosCueDrop{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(3px);opacity:1}}
   @keyframes cosRadar{to{transform:rotate(360deg)}}
   @keyframes cosFlow{50%{transform:translate3d(68px,0,0);opacity:.35}}
   @keyframes cosFormation{50%{transform:rotate(45deg) scale(1.25);box-shadow:0 0 10px rgba(114,232,255,.35)}}
 }
 
 @media(prefers-reduced-motion:reduce){
- .cos-home__orbit,.cos-home__stars i,.cos-home__scan,.cos-home__capital-node b,.cos-home__telemetry article>i,.cos-gate__stars i,.cos-radar span,.cos-flow span,.cos-formation i{animation:none!important;transform:none!important}
+ .cos-home__orbit,.cos-home__stars i,.cos-home__scan,.cos-home__capital-node b,.cos-home__telemetry article>i,.cos-home__scroll-cue i,.cos-home__next-cue i,.cos-home__telemetry-cue em,.cos-gate__stars i,.cos-radar span,.cos-flow span,.cos-formation i{animation:none!important;transform:none!important}
 }
