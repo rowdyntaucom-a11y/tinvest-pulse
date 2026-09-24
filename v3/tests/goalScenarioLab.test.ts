@@ -6,7 +6,7 @@ const css=readFileSync(new URL("../src/styles/goalScenarioLab.css",import.meta.u
 
 for(const token of[
  "const V3GoalScenarioLab=lazy",
- 'V3SectionSelector label="Режим"',
+ 'V3SectionSelector label="Режим сценария"',
  "TAB_OPTIONS","cos-goal-depth-cue","scrollToLab","onTargetChange={commitTarget}","history:HistoryPoint[]"
 ])assert.ok((token.startsWith("const V3Goal")?goal:token==="history:HistoryPoint[]"?goal:token==="cos-goal-depth-cue"||token==="scrollToLab"||token==="onTargetChange={commitTarget}"?goal:lab).includes(token),token);
 
