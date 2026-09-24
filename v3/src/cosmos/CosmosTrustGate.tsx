@@ -36,14 +36,15 @@ export function CosmosTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind
  return <main className={"cos-gate cos-gate--"+kind} aria-label={x.title}>
   <section className="cos-gate__scene">
    <div className="cos-gate__stars" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
+   <header className="cos-gate__scene-head"><span>{x.code}</span><b>{x.label}</b></header>
+   <div className="cos-gate__instrument" aria-hidden="true">
+    {kind==="assets"?<div className="cos-formation"><i/><i/><i/><i/><span/><span/><b>陣</b></div>:kind==="analysis"?<div className="cos-radar"><i/><i/><i/><span/><b>眼</b></div>:<div className="cos-flow"><i/><i/><i/><span/><b>禄</b></div>}
+   </div>
    <div className="cos-gate__modules" aria-label="Функциональные модули">
     {x.modules.map(module=><article key={module.code}>
      <i>{module.code}</i><small>{module.label}</small><strong>—</strong><span>{module.detail}</span>
     </article>)}
    </div>
-  </section>
-  <section className="cos-gate__instrument" aria-hidden="true">
-   {kind==="assets"?<div className="cos-formation"><i/><i/><i/><i/><span/><span/><b>陣</b></div>:kind==="analysis"?<div className="cos-radar"><i/><i/><i/><span/><b>眼</b></div>:<div className="cos-flow"><i/><i/><i/><span/><b>禄</b></div>}
   </section>
   <section className="cos-gate__panel">
    <div className="cos-gate__chapter"><span>{x.code}</span><b>{x.label}</b></div>
