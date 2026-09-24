@@ -212,7 +212,7 @@ export function V3GoalScenarioLab({
 
     {tab==="scenario"&&<div className="v3-goal-scenario-view">
       <section className="v3-goal-lab-target">
-        <header><span>01 · ЦЕЛЬ</span><small>Настройка без скрытых предположений</small></header>
+        <header><span>01 · ЦЕЛЬ <V3MetricHelp topic="goalScenario"/></span><small>Настройка без скрытых предположений</small></header>
         <div className="v3-goal-lab-segmented" role="group" aria-label="Тип сценария цели">
           <button type="button" className={goalMode==="capital"?"is-active":""} onClick={()=>setGoalMode("capital")}>Капитал</button>
           <button type="button" className={goalMode==="income"?"is-active":""} onClick={()=>setGoalMode("income")}>Пассивный доход</button>
