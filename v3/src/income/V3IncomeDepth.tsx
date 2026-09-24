@@ -8,11 +8,12 @@ import{buildV3IncomeDepth}from"./incomeDepth";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
 
-type View="calendar"|"history"|"sources";
+type View="calendar"|"history"|"sources"|"tax";
 const VIEW_OPTIONS=[
   {value:"calendar",label:"Календарь",description:"Подтверждённое 12-месячное расписание будущих выплат."},
   {value:"history",label:"Факт",description:"Реально полученный пассивный доход по полностью наблюдавшимся месяцам."},
   {value:"sources",label:"Источники",description:"Факт и расписание по активам с точной FIGI-связью и покрытием."},
+  {value:"tax",label:"Удержания",description:"Фактические суммы до удержаний, удержано и на руки."},
 ] as const;
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const rub2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -89,6 +90,8 @@ export function V3IncomeDepth({positions,onOpenAsset}:{positions:PositionSnapsho
       {depth.comparable.available&&<div className="v3-income-comparable"><span>Сопоставимые месяцы</span><strong className={(depth.comparable.changeNet??0)>0?"is-positive":(depth.comparable.changeNet??0)<0?"is-negative":"is-neutral"}>{depth.comparable.changeRatio==null?money(depth.comparable.changeNet):((depth.comparable.changeRatio??0)>=0?"+":"")+pct.format((depth.comparable.changeRatio??0)*100)+"%"}</strong><small>{depth.comparable.monthCount} одинаковых полных месяцев · {depth.comparable.currentYear}/{depth.comparable.previousYear} · без годового пересчёта</small></div>}
       <small className="v3-income-method">Нулём считается только полностью наблюдавшийся календарный месяц. Частичный или отсутствующий месяц не превращается в ноль. Стабильность открывается после 3 полных месяцев; зрелая выборка — после 12.</small>
     </div>}
+
+    {view==="tax"&&<div className="v3-income-tax-depth"><div className="v3-income-calendar-summary"><article><span>Факт · до удержаний</span><strong>{money(depth.taxBridge.actual.gross)}</strong><small>{depth.taxBridge.actual.completeRows}/{depth.taxBridge.actual.rows} полных строк</small></article><article><span>Факт · удержано</span><strong>{money(depth.taxBridge.actual.tax)}</strong><small>только явное поле источника</small></article></div><div className="v3-income-tax-schedule"><span>Факт · на руки</span><strong>{money(depth.taxBridge.actual.net)}</strong><small>Пропуски не реконструируются</small></div><div className="v3-income-tax-schedule"><span>12М · расписание · на руки</span><strong>{scheduleReady?money(depth.taxBridge.forecast12m.net):"—"}</strong><small>{scheduleReady?money(depth.taxBridge.forecast12m.gross)+" до удержаний · "+money(depth.taxBridge.forecast12m.tax)+" удержано":"закрыто до полного покрытия"}</small></div><small className="v3-income-method">Факт и будущее расписание раздельны. Показываются только нормализованные значения источника.</small></div>}
 
     {view==="sources"&&<div className="v3-income-sources-depth">
       <div className="v3-income-calendar-summary">
