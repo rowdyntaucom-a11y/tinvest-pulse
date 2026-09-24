@@ -208,7 +208,7 @@ export function V3GoalScenarioLab({
 
   return <section id="cos-goal-lab" className="v3-goal-scenario-lab v3-goal-lab-v2">
     <div className="v3-goal-scenario-head"><div><span>GOAL LAB // 02</span><h2>Сценарный конструктор цели</h2></div><b>v2</b></div>
-    <V3SectionSelector label="Режим" value={tab} onChange={setTab} options={TAB_OPTIONS}/>
+    <V3SectionSelector label="Режим сценария" value={tab} onChange={setTab} options={TAB_OPTIONS}/>
 
     {tab==="scenario"&&<div className="v3-goal-scenario-view">
       <section className="v3-goal-lab-target">
