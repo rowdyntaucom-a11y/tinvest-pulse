@@ -1,5 +1,5 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
-const css=readFileSync(new URL("../src/styles/shellLegibility.css",import.meta.url),"utf8"),main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/styles/shellLegibility.css",import.meta.url),"utf8"),samsung=readFileSync(new URL("../src/styles/shellSamsung1510Polish.css",import.meta.url),"utf8"),main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
 assert.match(main,/shellComposition\.css";import"\.\/styles\/shellLegibility\.css"/);
 assert.match(css,/Shell legibility signatures v25/);
 for(const shell of["samurai","carbon","core","horizon","aurora","minimal"])assert.match(css,new RegExp('data-shell="'+shell+'"'));
@@ -8,4 +8,13 @@ assert.match(css,/Samurai — ink panel/);assert.match(css,/Cosmos — brighten 
 assert.match(css,/font-variant-numeric:tabular-nums/);
 assert.match(css,/@media\(max-width:699px\)/);assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 assert.doesNotMatch(css,/url\(/);assert.doesNotMatch(css,/backdrop-filter:/);assert.doesNotMatch(css,/@keyframes/);assert.doesNotMatch(css,/animation:/);
+assert.match(main,/imperiumSignatureSystem\.css";import"\.\/styles\/shellSamsung1510Polish\.css";import"\.\/styles\/mobilePerformance\.css"/);
+assert.match(samsung,/Samsung 1000031510\.mp4/);
+assert.match(samsung,/data-shell="horizon"\]:not\(\[data-workspace="home"\]\)/);
+assert.match(samsung,/color:#eff5f1!important/);
+assert.match(samsung,/data-shell="aurora"\]:not\(\[data-workspace="home"\]\)/);
+assert.match(samsung,/color:#f1f9fd!important/);
+assert.match(samsung,/white-space:nowrap!important/);
+assert.match(samsung,/\.v3-empty/);
+assert.match(samsung,/data-shell="minimal"\] \.v3-global-world/);
 console.log("shell legibility signatures regression: ok");
