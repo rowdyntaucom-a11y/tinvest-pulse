@@ -54,7 +54,7 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
 }
 
 
-/* Cosmos Zero Overlay — strict art-safe composition.
+ .cos-workspace-stage{display:none}\n\n/* Cosmos Zero Overlay — strict art-safe composition.
    No toolbar, status chip, heading, instrument or navigation cue may cover Mix C.
    Loaded after mobilePerformance so these rules are final on phone. */
 
@@ -259,6 +259,3 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   }
 }
 
-@media(min-width:431px){
-  .cos-workspace-stage{display:none}
-}
