@@ -1,0 +1,166 @@
+/* NORD / Amber Fjord — fal.ai production candidate.
+   Art is generated without UI; canonical React data stays above it.
+   Direction: cold Nordic myth + restrained amber, not a generic polar research skin. */
+
+.v3-app[data-shell="aurora"]{
+  --nord-night:#04101c;
+  --nord-deep:#061522;
+  --nord-steel:#163247;
+  --nord-ice:#cfe8f3;
+  --nord-cyan:#74dbe8;
+  --nord-amber:#f2b36d;
+  --nord-muted:#9bb6c5;
+  --v3-text:#f4f8fa;
+  --v3-muted:#9bb6c5;
+  --v3-accent:#7ed7e5;
+  --v3-line:rgba(168,214,231,.16);
+  --v3-card:rgba(5,18,30,.78);
+  background:
+    radial-gradient(circle at 76% 9%,rgba(65,204,205,.08),transparent 28%),
+    linear-gradient(180deg,#071626 0%,#05111d 58%,#030a12 100%)!important;
+}
+
+.v3-app[data-shell="aurora"] .v3-atmosphere{
+  background:
+    radial-gradient(circle at 86% 13%,rgba(78,216,208,.10),transparent 26%),
+    radial-gradient(circle at 70% 48%,rgba(242,179,109,.055),transparent 22%),
+    linear-gradient(180deg,rgba(4,16,28,.15),rgba(3,10,17,.62))!important;
+}
+.v3-app[data-shell="aurora"] .v3-atmosphere:before{
+  inset:-12% -18% 45%!important;
+  opacity:.58!important;
+  background:linear-gradient(112deg,transparent 12%,rgba(78,221,201,.04) 24%,rgba(81,218,208,.18) 41%,rgba(91,151,211,.08) 55%,transparent 76%)!important;
+  filter:blur(32px)!important;
+}
+.v3-app[data-shell="aurora"] .v3-atmosphere:after{opacity:.20!important}
+
+.v3-app[data-shell="aurora"] .v3-home{
+  --v3-bg:transparent;
+  background:transparent!important;
+  padding-top:74px!important;
+}
+
+/* The selected fal.ai art: Viking + wolf on the right, fjord/city depth, quiet left rail. */
+.v3-app[data-shell="aurora"] .v3-home .v3-production-theme-art{
+  background-image:
+    linear-gradient(90deg,rgba(3,12,22,.92) 0%,rgba(3,12,22,.77) 32%,rgba(3,12,22,.30) 58%,rgba(3,12,22,.08) 76%),
+    linear-gradient(180deg,rgba(3,10,18,.04) 0%,rgba(3,10,18,.05) 48%,rgba(3,10,18,.76) 100%),
+    url("https://v3b.fal.media/files/b/0aabb8ec/15HWbV9uOV25-aVFgkt_p_bWYjhG0d.webp")!important;
+  background-position:58% 43%!important;
+  background-size:cover!important;
+  opacity:1!important;
+  filter:saturate(.92) contrast(1.05) brightness(.88)!important;
+}
+
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero{
+  position:relative;
+  isolation:isolate;
+  min-height:408px!important;
+  padding:18px!important;
+  overflow:hidden;
+  border:1px solid rgba(181,222,236,.17)!important;
+  border-top:1px solid rgba(242,179,109,.52)!important;
+  border-radius:6px 26px 6px 26px!important;
+  background:rgba(3,13,23,.18)!important;
+  box-shadow:0 28px 68px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.035)!important;
+}
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero:after{
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:auto 0 0;
+  height:38%;
+  pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(2,9,15,.76) 66%,rgba(2,8,14,.94));
+}
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero>*:not(.v3-production-theme-art){position:relative;z-index:2;max-width:62%}
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero h1{
+  margin-top:22px!important;
+  font-family:Georgia,"Times New Roman",serif;
+  font-weight:500!important;
+  letter-spacing:-.035em!important;
+  text-shadow:0 3px 20px rgba(0,0,0,.72);
+}
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-kicker{
+  color:#dceaf0!important;
+  letter-spacing:.18em!important;
+}
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero p{
+  color:var(--nord-amber)!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.72);
+}
+.v3-app[data-shell="aurora"][data-workspace="home"] .v3-updated{color:#b5c8d2!important}
+
+.v3-app[data-shell="aurora"] :is(.v3-primary-grid article,.v3-history-card,.v3-home-benchmark,.v3-pulse article,.v3-home-actions button){
+  background:linear-gradient(145deg,rgba(8,27,42,.93),rgba(4,17,29,.86))!important;
+  border-color:rgba(151,205,224,.15)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035),0 14px 30px rgba(0,0,0,.20)!important;
+}
+.v3-app[data-shell="aurora"] .v3-primary-grid article:first-child{
+  border-top-color:rgba(242,179,109,.52)!important;
+}
+.v3-app[data-shell="aurora"] .v3-primary-grid article strong,
+.v3-app[data-shell="aurora"] .v3-history-card strong,
+.v3-app[data-shell="aurora"] .v3-home-benchmark strong{color:#f4f8fa}
+.v3-app[data-shell="aurora"] .v3-chart polyline{stroke:#7bdbe8!important}
+
+.v3-app[data-shell="aurora"] .v3-nav{
+  background:linear-gradient(180deg,rgba(5,18,30,.95),rgba(2,10,18,.98))!important;
+  border:1px solid rgba(151,205,224,.15)!important;
+  border-radius:6px 22px 6px 22px!important;
+  box-shadow:0 -12px 38px rgba(0,0,0,.28)!important;
+}
+.v3-app[data-shell="aurora"] .v3-nav button{color:#8ca9b9!important}
+.v3-app[data-shell="aurora"] .v3-nav button.is-active{
+  color:#ffe0ae!important;
+  background:linear-gradient(180deg,rgba(242,179,109,.11),rgba(242,179,109,.035))!important;
+  box-shadow:inset 0 1px rgba(242,179,109,.45)!important;
+}
+.v3-app[data-shell="aurora"] .v3-nav button.is-active:before{
+  background:var(--nord-amber)!important;
+  box-shadow:0 0 10px rgba(242,179,109,.48)!important;
+}
+
+/* Controls/chrome: carved-metal restraint instead of bright polar lab glass. */
+.v3-app[data-shell="aurora"] :is(.v3-world-trigger,.v3-controls>button,.v3-context-bar,.v3-data-state){
+  color:#e7f0f4!important;
+  border-color:rgba(160,207,224,.15)!important;
+  background:linear-gradient(145deg,rgba(6,21,34,.92),rgba(4,14,24,.82))!important;
+}
+.v3-app[data-shell="aurora"] .v3-world-trigger i{
+  box-shadow:inset 0 0 0 1px rgba(242,179,109,.25),0 0 12px rgba(242,179,109,.08)!important;
+}
+.v3-app[data-shell="aurora"] .v3-data-state i{background:var(--nord-amber)!important}
+
+/* Secondary financial workspaces keep one material language while retaining their
+   own content architecture. No duplicate financial logic is introduced here. */
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"])
+:is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.v3-asset-workspace){
+  background:
+    radial-gradient(circle at 82% 4%,rgba(85,207,211,.07),transparent 24%),
+    linear-gradient(180deg,#071624 0%,#05101b 60%,#030a12 100%)!important;
+}
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+  color:#eef6f8!important;
+  background:linear-gradient(105deg,rgba(8,27,42,.94),rgba(5,18,30,.78) 76%,rgba(5,18,30,.35))!important;
+  border:1px solid rgba(160,207,224,.14)!important;
+  border-left:2px solid rgba(242,179,109,.62)!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.20)!important;
+}
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head:after{
+  content:"NORD // FJORD"!important;
+  color:rgba(242,179,109,.62)!important;
+}
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]) .v3-page-head :is(h1,p),
+.v3-app[data-shell="aurora"]:not([data-workspace="home"]) .v3-page-head>span{color:#eaf4f7!important}
+
+@media(max-width:430px){
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero{min-height:376px!important;padding:16px!important}
+  .v3-app[data-shell="aurora"] .v3-home .v3-production-theme-art{background-position:61% 43%!important}
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero>*:not(.v3-production-theme-art){max-width:65%}
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero h1{font-size:clamp(36px,10.8vw,46px)!important}
+  .v3-app[data-shell="aurora"] .v3-primary-grid{gap:7px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="aurora"] .v3-atmosphere:before{animation:none!important;transform:none!important}
+}
