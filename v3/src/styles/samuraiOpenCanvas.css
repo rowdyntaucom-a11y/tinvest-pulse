@@ -1,0 +1,195 @@
+/* Samurai open-canvas pass — direct response to Samsung recording 1000031512.mp4.
+   Keep the approved Ronin art and Home composition. The problem in the recording is
+   secondary chapters still reading as large opaque widgets. This pass turns them into
+   open instruments laid over the existing world: local reading fields, exposed art,
+   stronger atmospheric depth and chapter-specific ambient motion. Presentation only. */
+
+@media(max-width:699px){
+  /* Re-open the Ronin world behind fail-closed secondary chapters. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(2,8,7,.28) 0,rgba(2,8,7,.56) 30%,rgba(2,8,7,.72) 74%,rgba(2,8,7,.84) 100%),
+      radial-gradient(circle at 78% 17%,rgba(114,216,196,.10),transparent 24%),
+      var(--samurai-ronin-art) 64% 18%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(4,7,6,.24) 0,rgba(5,7,6,.52) 32%,rgba(3,7,6,.72) 74%,rgba(3,7,6,.84) 100%),
+      radial-gradient(circle at 34% 18%,rgba(201,155,88,.11),transparent 26%),
+      var(--samurai-ronin-art) 70% 17%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(5,7,5,.24) 0,rgba(7,8,6,.54) 31%,rgba(5,7,5,.72) 75%,rgba(5,7,5,.85) 100%),
+      radial-gradient(circle at 72% 21%,rgba(218,169,99,.10),transparent 24%),
+      var(--samurai-ronin-art) 73% 19%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path){
+    background:
+      linear-gradient(180deg,rgba(4,7,6,.22) 0,rgba(4,8,7,.50) 34%,rgba(3,8,7,.70) 74%,rgba(3,8,7,.84) 100%),
+      radial-gradient(circle at 74% 17%,rgba(227,75,59,.12),transparent 24%),
+      var(--samurai-ronin-art) 69% 18%/cover no-repeat!important;
+  }
+
+  /* The gate becomes a coordinate frame, not a giant opaque widget. */
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income){
+    background:transparent!important;
+    border-top:0!important;
+    border-bottom:0!important;
+    clip-path:none!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    isolation:isolate;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income):before{
+    z-index:-1!important;
+  }
+
+  /* Local reading field under title only. */
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__chapter{
+    padding:9px 12px 11px!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    background:linear-gradient(90deg,rgba(3,10,9,.88),rgba(3,10,9,.56) 70%,rgba(3,10,9,.08))!important;
+    border-bottom:1px solid rgba(255,255,255,.07)!important;
+  }
+
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>header{
+    width:min(86%,560px)!important;
+    padding:10px 12px!important;
+    background:linear-gradient(100deg,rgba(3,11,9,.88),rgba(3,11,9,.50) 72%,transparent)!important;
+    border-left:1px solid rgba(201,155,88,.14)!important;
+  }
+
+  /* Instruments now float directly on the scene. */
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-instrument{
+    margin:4px 0 2px!important;
+    background:rgba(2,8,7,.20)!important;
+    border-top:1px solid rgba(201,155,88,.08)!important;
+    border-bottom:1px solid rgba(114,216,196,.06)!important;
+    box-shadow:none!important;
+  }
+
+  .v3-app[data-shell="samurai"] .sam-trust-gate--assets .sam-trust-instrument{
+    background:
+      linear-gradient(90deg,rgba(2,16,13,.42),rgba(2,10,8,.12)),
+      repeating-linear-gradient(90deg,transparent 0 44px,rgba(114,216,196,.045) 45px,transparent 46px)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--analysis .sam-trust-instrument{
+    background:radial-gradient(circle at 50% 48%,rgba(201,155,88,.055),transparent 35%),rgba(3,8,7,.14)!important;
+  }
+  .v3-app[data-shell="samurai"] .sam-trust-gate--income .sam-trust-instrument{
+    background:
+      repeating-linear-gradient(0deg,transparent 0 25px,rgba(218,169,99,.035) 26px,transparent 27px),
+      linear-gradient(90deg,rgba(18,12,7,.28),rgba(4,9,8,.12))!important;
+  }
+
+  /* Lower route detail becomes one quiet rail, not another stack of cards. */
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__route{
+    background:linear-gradient(90deg,rgba(3,10,9,.62),rgba(3,10,9,.28),transparent)!important;
+    border-top:1px solid rgba(255,255,255,.05)!important;
+    border-bottom:1px solid rgba(255,255,255,.035)!important;
+    padding:7px 6px!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__route article{
+    background:transparent!important;
+    border-left:0!important;
+    border-right:0!important;
+    border-bottom:0!important;
+    opacity:.92;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__action{
+    width:min(88%,560px)!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+    padding:9px 10px!important;
+    background:linear-gradient(90deg,transparent,rgba(3,10,9,.54) 22%,rgba(3,10,9,.82))!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>footer{
+    padding:4px 10px!important;
+    background:linear-gradient(90deg,rgba(3,10,9,.52),rgba(3,10,9,.18),transparent)!important;
+  }
+
+  /* World-level atmosphere is allowed to read clearly now that the gate is open. */
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"])>.v3-atmosphere{
+    opacity:1!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"]>.v3-atmosphere>i{opacity:.54!important}
+  .v3-app[data-shell="samurai"][data-workspace="assets"]>.v3-atmosphere>b{opacity:.90!important}
+  .v3-app[data-shell="samurai"][data-workspace="analysis"]>.v3-atmosphere>i{opacity:.94!important}
+  .v3-app[data-shell="samurai"][data-workspace="analysis"]>.v3-atmosphere>span{opacity:.72!important}
+  .v3-app[data-shell="samurai"][data-workspace="income"]>.v3-atmosphere>i{opacity:.48!important}
+  .v3-app[data-shell="samurai"][data-workspace="income"]>.v3-atmosphere>b{opacity:.78!important}
+  .v3-app[data-shell="samurai"][data-workspace="goal"]>.v3-atmosphere>i{opacity:.78!important}
+
+  /* Goal already had the strongest composition in the recording; open its surfaces rather than recompose it. */
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal-hero{
+    background:linear-gradient(100deg,rgba(4,13,11,.82),rgba(18,11,8,.56),rgba(18,11,8,.16))!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path{
+    background:
+      linear-gradient(90deg,rgba(3,10,9,.72),rgba(3,10,9,.30) 74%,rgba(3,10,9,.08)),
+      repeating-linear-gradient(0deg,rgba(114,216,196,.018) 0 1px,transparent 1px 34px)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path article{
+    background:linear-gradient(90deg,rgba(5,16,13,.64),rgba(3,10,9,.18))!important;
+    border-top-color:rgba(201,155,88,.08)!important;
+  }
+}
+
+@media(max-width:430px){
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>header{
+    width:92%!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__action{
+    width:94%!important;
+  }
+}
+
+/* Chapter-specific ambient motion is intentionally visible enough to read on a real phone,
+   but it never animates financial values. */
+@media(prefers-reduced-motion:no-preference) and (max-width:699px){
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .sam-trust-instrument--formation:after{
+    content:"";position:absolute;left:-12%;right:-12%;top:16%;height:1px;pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(114,216,196,.48),transparent);
+    box-shadow:0 0 16px rgba(114,216,196,.10);
+    animation:samOpenFormationScan 5.4s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-radar:after{
+    content:"";position:absolute;inset:8px;border-radius:50%;pointer-events:none;
+    background:conic-gradient(from 0deg,transparent 0 76%,rgba(201,155,88,.08) 82%,transparent 88%);
+    animation:samOpenScopeVeil 10s linear infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .sam-trust-instrument--ledger:after{
+    content:"";position:absolute;left:9%;right:8%;top:38%;height:12%;pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(218,169,99,.075),transparent);
+    animation:samOpenLedgerSweep 6.8s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .sam-goal-empty-path:after{
+    animation:samOpenGoalGlyph 7.2s ease-in-out infinite;
+  }
+
+  @keyframes samOpenFormationScan{
+    0%,100%{transform:translate3d(0,0,0);opacity:.18}
+    50%{transform:translate3d(0,180px,0);opacity:.82}
+  }
+  @keyframes samOpenScopeVeil{to{transform:rotate(360deg)}}
+  @keyframes samOpenLedgerSweep{
+    0%,100%{transform:translate3d(-8%,0,0);opacity:.12}
+    50%{transform:translate3d(8%,0,0);opacity:.66}
+  }
+  @keyframes samOpenGoalGlyph{
+    50%{opacity:.055;transform:rotate(-3deg) scale(1.035)}
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="samurai"] :is(
+    .sam-trust-instrument--formation:after,
+    .sam-radar:after,
+    .sam-trust-instrument--ledger:after,
+    .sam-goal-empty-path:after
+  ){animation:none!important;transform:none!important}
+}
