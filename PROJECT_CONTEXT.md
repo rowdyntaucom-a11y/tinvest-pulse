@@ -204,3 +204,24 @@ Backend direction: a lightweight `gamification-service` or analytics module shou
 6. Social/chronicle features only after product traction.
 
 DNA WORLD should become a reason to return because it reflects the user’s own history and behavior, not merely a pretty visualization of the same numbers competitors show.
+
+
+## 20. Cosmos shell direction — approved 2026-09-24
+
+This section records the latest explicit user decisions and overrides older Cosmos experiments when they conflict.
+
+- Samurai is sufficiently mature to stop broad visual iteration for now; preserve its approved artwork and Home composition.
+- Visual development remains serial: after Samurai, the active shell is **Cosmos**.
+- Do **not** use OpenArt for QVANIX production work.
+- Early fal.ai Cosmos concepts (observatory / lighthouse / orbital garden) and later D1/D2/D3 composition studies were rejected.
+- Approved palette direction: vivid Blue Singularity — saturated cobalt, sapphire, ultramarine, electric cyan, icy white and restrained violet; avoid warm red/orange dominance.
+- Approved Cosmos concept: the sharp **Mix C** artwork — one dominant cloaked cosmic guardian seen from behind, several smaller distant guardians / an implied sentinel order, a colossal blue singularity high/right, monumental orbital-cathedral / floating-city architecture, bridges, spires, strong depth and reflective surfaces.
+- A fal.ai image-to-image attempt based on a downscaled reference produced visibly soft / blurry output on Samsung and was rejected. Do not use that blurry fal.ai derivative as the Cosmos master.
+- The sharp in-chat Mix C is the current Cosmos MASTER and visual source of truth unless the user explicitly replaces it.
+- Integration rule: design the UI around the artwork instead of covering it with opaque cards. Preserve the singularity and guardian silhouettes as readable anchors.
+- Cosmos must be a complete shell, not a wallpaper swap: its own geometry, card material, typography, motion language, navigation feedback and secondary-workspace atmosphere should derive from the approved master.
+- Preferred motion vocabulary: orbital drift, slow parallax, singularity glow/lensing, star drift and sentinel/environmental depth. Use transform/opacity and respect reduced-motion.
+- Canonical UX remains **FIRST SCREEN MUST ANSWER. DEPTH MAY SCROLL.**
+- Do not change finance, broker, trust, security, navigation ownership or DNA logic merely for the Cosmos visual pass.
+
+Resume point: continue from the approved sharp Cosmos Mix C master and implement the Cosmos shell around it. Do not generate another replacement image unless the user explicitly asks.
