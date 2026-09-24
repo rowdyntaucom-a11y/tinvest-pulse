@@ -1,0 +1,169 @@
+/* Samurai chamber depth — Samsung 1000031514.mp4.
+   Keep approved Samurai art and Home composition. Make secondary chapters feel
+   like different chambers of the same world, not the same red scene with different
+   overlays. Motion remains transform/opacity only and reduced-motion safe. */
+
+@media(max-width:699px){
+  /* Stronger chapter grading while preserving the same Ronin artwork. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"] .v3-assets[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(2,8,7,.18),rgba(2,8,7,.48) 36%,rgba(2,8,7,.76) 82%),
+      radial-gradient(circle at 26% 26%,rgba(66,216,190,.20),transparent 34%),
+      linear-gradient(102deg,rgba(27,128,110,.20),transparent 52%),
+      var(--samurai-ronin-art) 64% 18%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(4,7,6,.18),rgba(5,7,6,.46) 38%,rgba(3,7,6,.76) 82%),
+      radial-gradient(circle at 62% 27%,rgba(216,168,91,.18),transparent 34%),
+      linear-gradient(258deg,rgba(142,94,34,.17),transparent 48%),
+      var(--samurai-ronin-art) 70% 17%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"] .v3-income[data-trusted="false"]{
+    background:
+      linear-gradient(180deg,rgba(5,7,5,.18),rgba(7,8,6,.47) 37%,rgba(5,7,5,.77) 82%),
+      radial-gradient(circle at 78% 25%,rgba(225,176,94,.19),transparent 31%),
+      linear-gradient(104deg,rgba(112,74,26,.18),transparent 50%),
+      var(--samurai-ronin-art) 73% 19%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"] .v3-goal:has(.sam-goal-empty-path){
+    background:
+      linear-gradient(180deg,rgba(4,7,6,.18),rgba(4,8,7,.44) 38%,rgba(3,8,7,.75) 82%),
+      radial-gradient(circle at 72% 24%,rgba(225,63,48,.20),transparent 32%),
+      linear-gradient(256deg,rgba(110,30,25,.18),transparent 48%),
+      var(--samurai-ronin-art) 69% 18%/cover no-repeat!important;
+  }
+
+  /* Two extra atmosphere planes from the existing decorative scene container. */
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"])>.v3-atmosphere .v3-theme-scene:before,
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"])>.v3-atmosphere .v3-theme-scene:after{
+    content:"";
+    position:absolute;
+    display:block;
+    pointer-events:none;
+    will-change:transform,opacity;
+  }
+
+  /* Assets — cool tactical fog corridor + vertical scanner. */
+  .v3-app[data-shell="samurai"][data-workspace="assets"]>.v3-atmosphere .v3-theme-scene:before{
+    left:0;top:12%;width:42%;height:70%;
+    background:linear-gradient(90deg,rgba(53,204,179,.16),rgba(53,204,179,.035) 60%,transparent);
+    clip-path:polygon(0 0,72% 9%,100% 100%,0 92%);
+    opacity:.64;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"]>.v3-atmosphere .v3-theme-scene:after{
+    left:7%;top:13%;width:2px;height:58%;
+    background:linear-gradient(transparent,rgba(114,216,196,.95),rgba(114,216,196,.15),transparent);
+    box-shadow:0 0 18px rgba(114,216,196,.26),20vw 0 0 -1px rgba(114,216,196,.10);
+    opacity:.78;
+  }
+
+  /* Analysis — amber optic halo with a narrow counter-rotating arc. */
+  .v3-app[data-shell="samurai"][data-workspace="analysis"]>.v3-atmosphere .v3-theme-scene:before{
+    width:340px;height:340px;left:50%;top:9%;margin-left:-170px;border-radius:50%;
+    border:1px dotted rgba(214,166,88,.18);
+    box-shadow:0 0 0 42px rgba(201,155,88,.018),0 0 72px rgba(201,155,88,.07);
+    opacity:.72;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"]>.v3-atmosphere .v3-theme-scene:after{
+    width:188px;height:188px;left:50%;top:calc(9% + 76px);margin-left:-94px;border-radius:50%;
+    border-top:1px solid rgba(218,169,99,.52);
+    border-right:1px solid rgba(114,216,196,.18);
+    opacity:.72;
+  }
+
+  /* Income — warm ledger haze + suspended seal line. */
+  .v3-app[data-shell="samurai"][data-workspace="income"]>.v3-atmosphere .v3-theme-scene:before{
+    left:7%;right:7%;top:15%;height:58%;
+    background:
+      repeating-linear-gradient(0deg,transparent 0 53px,rgba(218,169,99,.055) 54px,transparent 55px),
+      linear-gradient(90deg,rgba(154,105,41,.13),transparent 35%,rgba(218,169,99,.05));
+    opacity:.72;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"]>.v3-atmosphere .v3-theme-scene:after{
+    right:6%;top:29%;width:92px;height:92px;border-radius:50%;
+    border:1px solid rgba(218,169,99,.24);
+    box-shadow:inset 0 0 0 8px rgba(218,169,99,.018),0 0 32px rgba(218,169,99,.05);
+    opacity:.64;
+  }
+
+  /* Goal — red mist corridor and destination gate, stronger than other chapters. */
+  .v3-app[data-shell="samurai"][data-workspace="goal"]>.v3-atmosphere .v3-theme-scene:before{
+    left:17%;right:17%;top:28%;height:52%;
+    background:linear-gradient(180deg,rgba(227,75,59,.10),transparent 38%),
+      linear-gradient(78deg,transparent 48%,rgba(201,155,88,.08) 49%,transparent 50%),
+      linear-gradient(102deg,transparent 48%,rgba(201,155,88,.08) 49%,transparent 50%);
+    clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);
+    opacity:.76;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"]>.v3-atmosphere .v3-theme-scene:after{
+    left:50%;top:36%;width:84px;height:126px;margin-left:-42px;
+    border-left:2px solid rgba(227,75,59,.20);
+    border-right:2px solid rgba(227,75,59,.20);
+    border-top:8px solid rgba(227,75,59,.24);
+    box-shadow:0 0 42px rgba(227,75,59,.08);
+    opacity:.7;
+  }
+
+  /* The first-screen answer copy should stay readable over the richer world. */
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>header strong{
+    font-size:15.5px!important;
+    letter-spacing:-.01em;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income)>header small{
+    font-size:7.8px!important;
+    line-height:1.4!important;
+    color:#84958f!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__route span{
+    font-size:8.3px!important;
+  }
+  .v3-app[data-shell="samurai"] :is(.sam-trust-gate--assets,.sam-trust-gate--analysis,.sam-trust-gate--income) .sam-trust-gate__route small{
+    font-size:6.8px!important;
+    line-height:1.28!important;
+  }
+}
+
+@media(prefers-reduced-motion:no-preference) and (max-width:699px){
+  .v3-app[data-shell="samurai"][data-workspace="assets"]>.v3-atmosphere .v3-theme-scene:before{
+    animation:samChamberAssetsFog 8.8s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="assets"]>.v3-atmosphere .v3-theme-scene:after{
+    animation:samChamberAssetsScan 5.2s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"]>.v3-atmosphere .v3-theme-scene:before{
+    animation:samChamberAnalysisOuter 26s linear infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="analysis"]>.v3-atmosphere .v3-theme-scene:after{
+    animation:samChamberAnalysisInner 11s linear infinite reverse;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"]>.v3-atmosphere .v3-theme-scene:before{
+    animation:samChamberIncomeRows 9.4s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="income"]>.v3-atmosphere .v3-theme-scene:after{
+    animation:samChamberIncomeSeal 7.4s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"]>.v3-atmosphere .v3-theme-scene:before{
+    animation:samChamberGoalRoad 8.6s ease-in-out infinite;
+  }
+  .v3-app[data-shell="samurai"][data-workspace="goal"]>.v3-atmosphere .v3-theme-scene:after{
+    animation:samChamberGoalGate 7.8s ease-in-out infinite;
+  }
+
+  @keyframes samChamberAssetsFog{50%{transform:translate3d(8px,0,0) scaleX(1.06);opacity:.82}}
+  @keyframes samChamberAssetsScan{0%,100%{transform:translate3d(0,-8%,0);opacity:.24}50%{transform:translate3d(0,42%,0);opacity:.94}}
+  @keyframes samChamberAnalysisOuter{to{transform:rotate(360deg)}}
+  @keyframes samChamberAnalysisInner{to{transform:rotate(360deg)}}
+  @keyframes samChamberIncomeRows{50%{transform:translate3d(0,-22px,0);opacity:.9}}
+  @keyframes samChamberIncomeSeal{50%{transform:rotate(6deg) scale(1.05);opacity:.88}}
+  @keyframes samChamberGoalRoad{50%{transform:scale(.94,1.045);transform-origin:50% 0;opacity:.92}}
+  @keyframes samChamberGoalGate{50%{transform:translate3d(0,18px,0) scale(.94);opacity:.9}}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"])>.v3-atmosphere .v3-theme-scene:before,
+  .v3-app[data-shell="samurai"]:not([data-workspace="home"]):not([data-workspace="dna"])>.v3-atmosphere .v3-theme-scene:after{
+    animation:none!important;
+    transform:none!important;
+  }
+}
