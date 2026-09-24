@@ -16,7 +16,9 @@ assert.ok(workspace.includes('--shell-bg:#f3eee2;--shell-accent:#9a6a2a'));
 for(const radius of["18px 8px 18px 8px","10px 22px 10px 22px","22px 12px 22px 12px","14px","20px","8px"]){
   assert.ok(workspace.includes(`--v3-deep-radius:${radius}`));
 }
-assert.ok(workspace.includes('--v3-deep-chrome:rgba(242,249,252,.94)'));
+assert.ok(workspace.includes('--v3-deep-chrome:rgba(6,18,32,.97)'));
+assert.ok(workspace.includes('--v3-text:#eff5f1;--v3-muted:#aebfb7'));
+assert.ok(workspace.includes('--v3-text:#f1f9fd;--v3-muted:#aac2d0'));
 assert.doesNotMatch(workspace.slice(workspace.indexOf("Workspace material coherence v14")),/color-mix\(in srgb,var\(--v3-deep-card\)/);
 assert.match(workspace,/\.v3-app:not\(\[data-workspace="home"\]\) :is\([\s\S]*\.v3-analysis-layer[\s\S]*\.v3-benchmark[\s\S]*\.v3-class-map[\s\S]*\.v3-bond-lens[\s\S]*\.v3-breadth[\s\S]*\.v3-market-context[\s\S]*\.v3-asset-history-card/);
 assert.match(workspace,/\.v3-nav button\.is-active[\s\S]*color-mix\(in srgb,var\(--v3-accent\) 10%,transparent\)/);
