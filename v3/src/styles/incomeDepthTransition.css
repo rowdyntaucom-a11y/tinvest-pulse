@@ -1,0 +1,14 @@
+/* Income depth transition for themed Samurai/Cosmos shells. */
+.v3-income-depth-cue{display:grid;place-items:center;width:42px;height:42px;margin:12px auto 0;border:1px solid var(--v3-line);border-radius:999px;background:color-mix(in srgb,var(--v3-card) 82%,transparent);color:var(--v3-text);box-shadow:0 10px 30px rgba(0,0,0,.18);backdrop-filter:blur(12px);cursor:pointer}
+.v3-income-depth-cue i{font-style:normal;font-size:24px;line-height:1;animation:v3IncomeCue 1.8s ease-in-out infinite}
+.v3-income-depth-spacer{height:clamp(84px,13svh,160px)}
+.v3-income-depth-anchor{scroll-margin-top:16px}
+.v3-app[data-shell="samurai"] .v3-income-depth-cue{border-color:rgba(255,184,99,.28);background:linear-gradient(180deg,rgba(53,24,15,.64),rgba(17,10,8,.76));color:#ffd1a0;box-shadow:0 12px 36px rgba(71,24,10,.28),inset 0 0 18px rgba(255,134,61,.05)}
+.v3-app[data-shell="samurai"] .v3-income-depth-anchor{position:relative;padding-top:4px}
+.v3-app[data-shell="samurai"] .v3-income-depth-anchor:before{content:"禄 · FLOW CHAMBER";display:block;margin:0 0 7px;color:rgba(255,193,130,.72);font-size:8px;letter-spacing:.16em}
+.v3-app[data-shell="carbon"] .v3-income-depth-cue{border-color:rgba(106,210,255,.32);background:radial-gradient(circle at 50% 20%,rgba(65,190,255,.16),rgba(7,12,34,.78));color:#bceeff;box-shadow:0 0 30px rgba(52,154,255,.16),inset 0 0 18px rgba(84,191,255,.08)}
+.v3-app[data-shell="carbon"] .v3-income-depth-anchor{position:relative;padding-top:4px}
+.v3-app[data-shell="carbon"] .v3-income-depth-anchor:before{content:"CASHFLOW TELEMETRY · VERIFIED";display:block;margin:0 0 7px;color:rgba(150,222,255,.72);font-size:8px;letter-spacing:.16em}
+@keyframes v3IncomeCue{0%,100%{transform:translateY(-2px);opacity:.72}50%{transform:translateY(4px);opacity:1}}
+@media(max-width:430px){.v3-income-depth-cue{width:40px;height:40px}.v3-income-depth-spacer{height:clamp(72px,11svh,130px)}}
+@media(prefers-reduced-motion:reduce){.v3-income-depth-cue i{animation:none}}
