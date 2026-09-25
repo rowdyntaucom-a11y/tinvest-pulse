@@ -3289,3 +3289,37 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     z-index:8!important;
   }
 }
+
+
+/* Samurai Snowball+ fail-closed depth v2.
+   Preserve the legacy viewport-lock data contract, but do not trap the new
+   functional atlas inside one device viewport. */
+@media(max-width:430px){
+  html:has(.v3-app[data-shell="samurai"][data-viewport-lock="true"]),
+  body:has(.v3-app[data-shell="samurai"][data-viewport-lock="true"]){
+    height:auto!important;
+    min-height:100%!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    position:static!important;
+  }
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"]{
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:100dvh!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  .v3-app[data-shell="samurai"][data-viewport-lock="true"] :is(
+    .v3-assets,.v3-analysis,.v3-income,.v3-goal,.sam-trust-gate
+  ){
+    height:auto!important;
+    max-height:none!important;
+    min-height:calc(100dvh - 48px)!important;
+    overflow:visible!important;
+    touch-action:pan-y!important;
+    scroll-snap-type:none!important;
+  }
+}

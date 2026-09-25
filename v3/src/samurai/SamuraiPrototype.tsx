@@ -1,5 +1,6 @@
 import type{CSSProperties}from"react";
 import type{V3Workspace}from"../app/model";
+import{SamuraiFailClosedAtlas}from"./SamuraiFailClosedAtlas";
 import type{V3HomeViewModel}from"../home/homeViewModel";
 import{buildV3RelativeDepth}from"../analysis/analysisDepth";
 
@@ -143,16 +144,18 @@ export function SamuraiPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavig
     <header><span>肆</span><strong>СТРОЙ</strong><small>{leaders.length} / {home.positions??0}</small></header>
     {leaders.length?<div>{leaders.map((x,i)=><button key={x.ticker} onClick={()=>onNavigate?.("assets")}><i>{String(i+1).padStart(2,"0")}</i><span>{x.ticker}</span><b>{pct.format(x.weight*100)}%</b><em><i style={{"--rank":i+1} as CSSProperties}/></em></button>)}</div>:<div className="sam-world__formation-empty">Состав появится после подтверждения портфеля</div>}
    </section>
-   </>:<section className="sam-world__awaiting" aria-label="Источник данных не подтверждён">
+   </>:<>
+   <SamuraiFailClosedAtlas kind="home"/>
+   <section className="sam-world__awaiting sam-world__awaiting--compact" aria-label="Маршрут подтверждения источника">
     <div className="sam-world__awaiting-art" aria-hidden="true"><span>始</span><i/><i/><i/></div>
-    <header><span>DATA GATE // FAIL-CLOSED</span><strong>Источник ещё не подтверждён</strong><small>Не рисуем нули и не заполняем экран пустыми финансовыми карточками.</small></header>
+    <header><span>DATA GATE // FAIL-CLOSED</span><strong>Источник ещё не подтверждён</strong><small>Функциональность видна выше; финансовые значения появятся только после проверки источника.</small></header>
     <div className="sam-world__awaiting-route">
      <article><b>壱</b><span>Счёт</span><small>получить брокерский снимок</small></article>
      <article><b>弐</b><span>История</span><small>проверить точки TWR</small></article>
      <article><b>参</b><span>Рынок</span><small>связать IMOEX по периоду</small></article>
     </div>
-    <footer><span>После подтверждения раскроются дата открытия, TWR, XIRR, доход, сравнение с IMOEX и состав.</span></footer>
-   </section>}
+   </section>
+   </>}
 
    <div className="sam-world__analytics-tail" aria-hidden="true"><span>戦略</span><i/><b>QVANIX</b></div>
    <div className="sam-world__seal" aria-hidden="true"><b>Q</b><span>侍</span></div>
