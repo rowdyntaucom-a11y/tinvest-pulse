@@ -9,6 +9,7 @@ import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import type{V3Shell}from"../app/model";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
+import{V3IncomeForwardPanel,V3IncomeMarketDiscovery}from"./V3IncomeCalendarV2";
 
 type View="calendar"|"history"|"sources";
 const VIEW_OPTIONS=[
@@ -50,12 +51,15 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   return <section className="v3-income-depth">
     <div className="v3-income-depth-head"><div><span>ПОДРОБНЫЙ ДОХОД</span><h2>Факт, календарь и источники</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
     {samuraiReference&&<SamuraiChapterNav label="Доход Samurai" chapters={[
-      {id:"sam-income-calendar",code:"壱",label:"Календарь",note:"будущие подтверждённые выплаты"},
-      {id:"sam-income-history",code:"弐",label:"Факт",note:"реально полученный доход"},
-      {id:"sam-income-sources",code:"参",label:"Источники",note:"активы · концентрация · YoC"}
+      {id:"sam-income-upcoming",code:"壱",label:"Ближайшие",note:"3М · 6М · 12М"},
+      {id:"sam-income-calendar",code:"弐",label:"Календарь",note:"будущие подтверждённые выплаты"},
+      {id:"sam-income-history",code:"参",label:"Факт",note:"реально полученный доход"},
+      {id:"sam-income-sources",code:"肆",label:"Источники",note:"активы · концентрация · YoC"},
+      {id:"sam-income-market",code:"伍",label:"Рынок",note:"отдельный dividend discovery"}
     ]}/>}
     {!samuraiReference&&<V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={VIEW_OPTIONS}/>} 
 
+    {samuraiReference&&scheduleReady&&<V3IncomeForwardPanel events={futureEvents} loadedAt={loadedAt}/>}
     {(samuraiReference||view==="calendar")&&<div id="sam-income-calendar" className="v3-income-calendar-depth">
       <div className="v3-income-calendar-summary">
         <article><span>12М · расписание <V3MetricHelp topic="payoutCoverage"/></span><strong>{scheduleReady?money(calendar.forecast.gross):"—"}</strong><small>{scheduleReady?calendar.forecast.count+" событий":"закрыто до полного покрытия"}</small></article>
@@ -114,5 +118,6 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
       <div className="v3-income-coverage"><span>Покрытие расписания</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>{depth.integrity.resolvedAssets}/{depth.integrity.eligibleAssets||"—"} активов · ошибок {depth.integrity.errors}</small></div>
       <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>
     </div>}
+    {samuraiReference&&<V3IncomeMarketDiscovery/>}
   </section>
 }
