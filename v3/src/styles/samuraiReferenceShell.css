@@ -1,0 +1,104 @@
+/* Samurai reference shell — progressive chapter map for Snowball-parity depth.
+   Ordinary workspaces may extend vertically; first screen answers, chapters go deeper. */
+.v3-app[data-shell="samurai"] .sam-chapter-nav{
+ position:relative;z-index:6;margin:10px 9px 14px;padding:10px 10px 8px;
+ border:1px solid rgba(201,155,88,.14);border-left:2px solid rgba(227,75,59,.38);
+ background:linear-gradient(115deg,rgba(4,13,11,.94),rgba(7,16,13,.80) 68%,rgba(24,14,11,.56));
+ clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,0 100%);
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav:before{
+ content:"";position:absolute;left:12px;right:34%;top:0;height:1px;
+ background:linear-gradient(90deg,#72d8c4,#c99b58,#e34b3b,transparent)
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>header{
+ display:flex;align-items:end;justify-content:space-between;gap:10px;padding-bottom:8px;
+ border-bottom:1px solid rgba(114,216,196,.08)
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>header span{
+ color:#c99b58;font:750 5.6px/1 Inter,system-ui,sans-serif;letter-spacing:.14em
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>header strong{
+ color:#e9eeeb;font:500 12px/1 Georgia,"Times New Roman",serif
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>div{display:grid;grid-template-columns:1fr;gap:2px;margin-top:7px}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button{
+ position:relative;display:grid;grid-template-columns:24px minmax(0,1fr) 22px;align-items:center;gap:7px;
+ min-height:45px;padding:5px 7px;border:0;border-top:1px solid rgba(201,155,88,.08);border-radius:0;
+ background:linear-gradient(90deg,rgba(5,15,13,.78),rgba(4,11,10,.36),transparent);
+ color:#d7dfdb;text-align:left
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button:first-child{border-top:0}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button>i{
+ width:22px;height:22px;display:grid;place-items:center;border:1px solid rgba(201,155,88,.20);
+ color:#d4a561;background:rgba(18,13,9,.34);font:11px/1 Georgia,serif;font-style:normal
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button span b{display:block;font-size:8px;line-height:1.1}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button span small{display:block;margin-top:3px;color:#70817b;font-size:5.8px;line-height:1.2}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button>em{
+ color:#61756f;font:700 5.5px/1 Inter,system-ui,sans-serif;font-style:normal;letter-spacing:.12em;text-align:right
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button:after{
+ content:"";position:absolute;left:7px;bottom:0;width:0;height:1px;
+ background:linear-gradient(90deg,#e34b3b,#c99b58,#72d8c4);transition:width .28s ease
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button:active:after{width:72%}
+
+.v3-app[data-shell="samurai"] .sam-reference-chapter,
+.v3-app[data-shell="samurai"] #sam-assets-classes,
+.v3-app[data-shell="samurai"] #sam-assets-pnl,
+.v3-app[data-shell="samurai"] #sam-assets-sectors,
+.v3-app[data-shell="samurai"] #sam-assets-bonds,
+.v3-app[data-shell="samurai"] #sam-assets-positions,
+.v3-app[data-shell="samurai"] #sam-income-calendar,
+.v3-app[data-shell="samurai"] #sam-income-history,
+.v3-app[data-shell="samurai"] #sam-income-sources,
+.v3-app[data-shell="samurai"] #sam-goal-current,
+.v3-app[data-shell="samurai"] #sam-goal-path,
+.v3-app[data-shell="samurai"] #cos-goal-lab{
+ scroll-margin-top:54px
+}
+.v3-app[data-shell="samurai"] .sam-reference-chapter{
+ position:relative;margin-top:12px;padding-top:4px
+}
+.v3-app[data-shell="samurai"] .sam-reference-chapter:before{
+ content:"";display:block;width:44%;height:1px;margin:0 0 9px;
+ background:linear-gradient(90deg,#e34b3b,#c99b58 48%,#72d8c4,transparent)
+}
+.v3-app[data-shell="samurai"] .sam-chapter-next{
+ position:relative;z-index:7;display:flex;align-items:center;justify-content:center;gap:8px;
+ width:176px;min-height:36px;margin:14px auto 4px;padding:0 12px;
+ border:0;border-top:1px solid rgba(201,155,88,.18);border-bottom:1px solid rgba(114,216,196,.10);
+ border-radius:0;background:linear-gradient(90deg,transparent,rgba(7,18,15,.78) 18% 82%,transparent);
+ color:#baa579;font:750 5.8px/1 Inter,system-ui,sans-serif;letter-spacing:.12em
+}
+.v3-app[data-shell="samurai"] .sam-chapter-next i{
+ color:#72d8c4;font:18px/.8 Georgia,serif;font-style:normal
+}
+.v3-app[data-shell="samurai"] .sam-chapter-next:before,
+.v3-app[data-shell="samurai"] .sam-chapter-next:after{
+ content:"";position:absolute;top:50%;width:26px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,155,88,.22))
+}
+.v3-app[data-shell="samurai"] .sam-chapter-next:before{left:-22px}
+.v3-app[data-shell="samurai"] .sam-chapter-next:after{right:-22px;transform:scaleX(-1)}
+
+.v3-app[data-shell="samurai"] .v3-income-depth>.sam-chapter-nav,
+.v3-app[data-shell="samurai"] .v3-assets-depth>.sam-chapter-nav{margin-inline:0}
+.v3-app[data-shell="samurai"] .v3-income-depth :is(#sam-income-calendar,#sam-income-history,#sam-income-sources){
+ margin-top:12px;scroll-margin-top:54px
+}
+.v3-app[data-shell="samurai"] .v3-income-depth :is(#sam-income-calendar,#sam-income-history,#sam-income-sources):before{
+ content:"";display:block;width:42%;height:1px;margin:0 0 8px;background:linear-gradient(90deg,#c99b58,#72d8c4,transparent)
+}
+
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .sam-chapter-nav{padding-inline:8px}
+ .v3-app[data-shell="samurai"] .sam-chapter-nav button{grid-template-columns:22px minmax(0,1fr) 18px;gap:5px}
+ .v3-app[data-shell="samurai"] .sam-chapter-next{width:156px;font-size:5.4px}
+}
+@media(prefers-reduced-motion:no-preference){
+ .v3-app[data-shell="samurai"] .sam-chapter-next i{animation:samChapterCue 2.1s ease-in-out infinite}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] .sam-chapter-next i{animation:none!important}
+}
+@keyframes samChapterCue{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(4px);opacity:1}}
