@@ -32,10 +32,7 @@ export type PortfolioReportModel={
 function finite(value:number){return Number.isFinite(value)?value:0}
 function positive(value:number){const n=finite(value);return n>0?n:0}
 function reportPnl(position:PositionSnapshot){
- const broker=finite(position.expectedYield);
- if(broker!==0)return broker;
- const value=finite(position.currentValue),basis=finite(position.costBasis);
- return value&&basis?value-basis:0;
+ return finite(position.expectedYield);
 }
 function normalizeLabel(value:unknown){
  const text=String(value??"").trim();
