@@ -10,6 +10,7 @@ type AtlasChapter={
  detail:string;
  source:string;
  destination?:AtlasDestination;
+ targetId?:string;
 };
 
 const COPY:Record<SamuraiFailClosedKind,{code:string;title:string;subtitle:string;glyph:string}>={
@@ -46,6 +47,7 @@ const CHAPTERS:Record<SamuraiFailClosedKind,AtlasChapter[]>={
   {id:"rebalance",code:"伍",label:"Ребалансировка",note:"цель · drift · сценарная дельта классов",detail:"Пользовательская цель и детерминированные сценарии изменения долей классов.",source:"Текущий состав и цель, введённая самим пользователем."},
   {id:"lab",code:"陸",label:"Лаборатория",note:"MCFTR · RGBITR · исторические сценарии",detail:"Сравнение двух пользовательских структур на одной исторической выборке индексов.",source:"MCFTR / RGBITR и текущий подтверждённый snapshot."},
   {id:"fallen",code:"漆",label:"Просадки",note:"high · low · SMA · восстановление",detail:"Технический discovery по подтверждённой истории: drawdown, recovery и расстояние до SMA.",source:"Валидная ценовая история текущих позиций."},
+  {id:"screener",code:"捌",label:"Скринер",note:"TQBR · движение · оборот · листинг",detail:"Публичный рыночный фильтр MOEX по наблюдаемым параметрам торгового дня.",source:"MOEX ISS · TQBR. Broker-доступ не требуется.",targetId:"sam-analysis-screener"},
  ],
  income:[
   {id:"calendar",code:"壱",label:"Календарь",note:"даты · статус · источник",detail:"Будущие подтверждённые выплаты текущего портфеля по выбранному горизонту.",source:"Проверенное расписание выплат текущих позиций."},
@@ -127,6 +129,13 @@ function IncomePreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];sel
  </div>;
 }
 
+function scrollToTarget(id:string){
+ const target=document.getElementById(id);
+ if(!target)return;
+ const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;
+ target.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
+}
+
 function scrollToSourceRoute(node:HTMLElement|null){
  if(!node)return;
  const root=node.closest(".sam-trust-gate")??node.closest(".sam-world__analytics-page");
@@ -169,6 +178,7 @@ export function SamuraiFailClosedAtlas({kind,onNavigate}:{kind:SamuraiFailClosed
    </div>
    <div className="sam-offline-atlas__detail-actions">
     {selected.destination&&onNavigate&&<button type="button" onClick={()=>onNavigate(selected.destination!)}>Открыть раздел</button>}
+    {selected.targetId&&<button type="button" onClick={()=>scrollToTarget(selected.targetId!)}>Открыть инструмент</button>}
     <button type="button" onClick={()=>scrollToSourceRoute(detailRef.current)}>Маршрут проверки</button>
    </div>
   </aside>}
