@@ -723,6 +723,8 @@ async function getCbrMacro() {
 
 const HISTORY_CACHE = new Map();
 const HISTORY_CACHE_TTL_MS = 5 * 60 * 1000;
+const STRATEGY_LAB_CACHE = { createdAt: 0, data: null };
+const STRATEGY_LAB_CACHE_TTL_MS = 30 * 60 * 1000;
 
 
 function tradePriceValue(op) {
