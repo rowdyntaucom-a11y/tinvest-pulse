@@ -3,8 +3,10 @@ export type SamuraiChapter={id:string;code:string;label:string;note?:string};
 function go(id:string){
  const el=document.getElementById(id);
  if(!el)return;
- const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;
- el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
+ // Samsung recordings 1740/1742 exposed long native smooth-scroll tails on
+ // deep mobile chapters. Internal chapter navigation is an explicit jump:
+ // land immediately, then return scroll ownership to the user's finger.
+ el.scrollIntoView({behavior:"auto",block:"start"});
 }
 
 export function SamuraiChapterNav({chapters,label="Карта раздела"}:{chapters:SamuraiChapter[];label?:string}){
