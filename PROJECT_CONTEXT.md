@@ -1,5 +1,7 @@
 # TInvest Pulse — Project Context
 
+**Reference-shell strategy (2026-09-25):** Samurai is now the first complete functional reference implementation. Reach Snowball-level-or-greater workflow breadth there before transferring the shared engines and chapter architecture into Cosmos, NORD and later shells. Visual identity remains shell-specific; finance/data contracts remain shared.
+
 > Canonical project memory for future ChatGPT sessions and development work.
 > Read this file together with the current `main` branch before changing the project.
 > Never store API tokens, credentials or other secrets here.
