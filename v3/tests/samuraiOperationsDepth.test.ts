@@ -18,7 +18,7 @@ test("Samurai adds operations and integrity as real vertical chapters",()=>{
 });
 
 test("demo never opens the live operations endpoint",()=>{
- assert.match(assets,/shell==="samurai"&&allowAssetWorkspace&&<V3OperationsDepth/);
+ assert.match(assets,/shell==="samurai"&&allowAssetWorkspace&&<Suspense[\s\S]*?<V3OperationsDepth\/?>/);
 });
 
 test("fail-closed atlas advertises the workflow without fake operation values",()=>{
