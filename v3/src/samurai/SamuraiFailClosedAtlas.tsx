@@ -1,4 +1,4 @@
-import{useEffect,useRef,useState}from"react";
+import{useRef,useState}from"react";
 
 export type SamuraiFailClosedKind="home"|"assets"|"analysis"|"income";
 type AtlasDestination="assets"|"analysis"|"income";
@@ -150,15 +150,6 @@ export function SamuraiFailClosedAtlas({kind,onNavigate}:{kind:SamuraiFailClosed
  const[selectedId,setSelectedId]=useState<string|null>(null);
  const detailRef=useRef<HTMLElement|null>(null);
  const selected=chapters.find(chapter=>chapter.id===selectedId)??null;
-
- useEffect(()=>{
-  if(!selected)return;
-  const node=detailRef.current;
-  if(!node)return;
-  const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;
-  node.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"});
-  node.focus({preventScroll:true});
- },[selectedId,selected]);
 
  const choose=(chapter:AtlasChapter)=>setSelectedId(current=>current===chapter.id?null:chapter.id);
 
