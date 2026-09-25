@@ -25,7 +25,7 @@ export const RISK_SECTIONS = [
 ] as const
 
 export const PORTFOLIO_SECTIONS = [{ label: 'Портфель', options: [{ id: 'overview', label: 'Обзор' }, { id: 'positions', label: 'Позиции' }, { id: 'structure', label: 'Структура' }] }] as const
-export const INCOME_SECTIONS = [{ label: 'Доход', options: [{ id: 'overview', label: 'Обзор' }, { id: 'calendar', label: 'Календарь' }, { id: 'sources', label: 'Источники дохода' }, { id: 'taxes', label: 'Налоги и ИИС' }] }] as const
+export const INCOME_SECTIONS = [{ label: 'Доход', options: [{ id: 'overview', label: 'Обзор' }, { id: 'calendar', label: 'Календарь' }, { id: 'sources', label: 'Источники дохода' }, { id: 'market', label: 'Рынок', description: 'Подтверждённые дивидендные фундаменталы по рынку' }, { id: 'taxes', label: 'Налоги и ИИС' }] }] as const
 
 export function sectionLabel<T extends string>(groups: ReadonlyArray<SectionGroup<T>>, value: T) {
   return groups.flatMap(group => group.options).find(option => option.id === value)?.label ?? null
