@@ -1,3 +1,4 @@
+import type{MouseEvent}from"react";
 type GateKind="assets"|"analysis"|"income";
 
 const COPY:Record<GateKind,{rune:string;code:string;title:string;lead:string;steps:[string,string,string][]}>={
@@ -8,7 +9,7 @@ const COPY:Record<GateKind,{rune:string;code:string;title:string;lead:string;ste
 
 export function NordTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind;onRefresh?:()=>void|Promise<void>;refreshing?:boolean}){
  const x=COPY[kind];
- const scrollToRoute=(event:React.MouseEvent<HTMLButtonElement>)=>{
+ const scrollToRoute=(event:MouseEvent<HTMLButtonElement>)=>{
   const route=event.currentTarget.closest(".nord-gate")?.querySelector<HTMLElement>(".nord-gate__route");
   const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;
   route?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
