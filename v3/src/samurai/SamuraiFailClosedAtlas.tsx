@@ -2,7 +2,7 @@ export type SamuraiFailClosedKind="home"|"assets"|"analysis"|"income";
 
 const COPY:Record<SamuraiFailClosedKind,{code:string;title:string;subtitle:string;glyph:string}>={
  home:{code:"PORTFOLIO // PREVIEW",title:"История и результат",subtitle:"Архитектура доступна, финансовые значения ждут подтверждения",glyph:"始"},
- assets:{code:"FORMATION // PREVIEW",title:"Активы и структура",subtitle:"Состав, классы, отрасли, облигации и drill-down",glyph:"陣"},
+ assets:{code:"FORMATION // PREVIEW",title:"Активы и структура",subtitle:"Состав, операции, события, отрасли, облигации и drill-down",glyph:"陣"},
  analysis:{code:"TACTICAL // PREVIEW",title:"Аналитика портфеля",subtitle:"Доходность, риск, структура и рынок",glyph:"眼"},
  income:{code:"TREASURY // PREVIEW",title:"Доход и выплаты",subtitle:"Календарь, факт и концентрация источников",glyph:"禄"}
 };
