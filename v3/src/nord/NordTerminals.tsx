@@ -1,4 +1,4 @@
-import type{ReactNode}from"react";
+import type{CSSProperties,ReactNode}from"react";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -9,7 +9,7 @@ export function NordAssetsTerminal({total,count,top3,positive,leaders}:{total:nu
  return <section className="nord-terminal nord-terminal--assets" aria-label="NORD · строй активов">
   <header className="nord-terminal__head"><div><span>FORMATION BOARD // LIVE</span><strong>Строй капитала</strong><small>Состав и концентрация без торговых сигналов</small></div><i aria-hidden="true">ᛟ</i></header>
   <div className="nord-assets-board">
-   <div className="nord-assets-board__shield" aria-label={"Топ-3 занимают "+pct.format(top3)+"% портфеля"} style={{"--nord-concentration":Math.max(0,Math.min(100,top3))+"%"} as React.CSSProperties}>
+   <div className="nord-assets-board__shield" aria-label={"Топ-3 занимают "+pct.format(top3)+"% портфеля"} style={{"--nord-concentration":Math.max(0,Math.min(100,top3))+"%"} as CSSProperties}>
     <i/><i/><b>{pct.format(top3)}%</b><span>TOP-3</span>
    </div>
    <div className="nord-assets-board__capital"><span>Капитал</span><strong>{rub.format(total)} ₽</strong><small>{count} позиций · {positive} в плюсе по broker P/L</small></div>
@@ -25,7 +25,7 @@ export function NordAnalysisTerminal({maxDrawdown,effective,largestTicker,larges
  return <section className="nord-terminal nord-terminal--analysis" aria-label="NORD · рунная навигация">
   <header className="nord-terminal__head"><div><span>RUNE COMPASS // LIVE</span><strong>Карта риска</strong><small>Просадка, концентрация и ширина текущего P/L</small></div><i aria-hidden="true">ᚱ</i></header>
   <div className="nord-analysis-map">
-   <div className="nord-analysis-map__scope" style={{"--nord-risk":risk+"%"} as React.CSSProperties} aria-label={maxDrawdown==null?"Просадка недоступна":"Максимальная просадка "+pct.format(maxDrawdown)+"%"}>
+   <div className="nord-analysis-map__scope" style={{"--nord-risk":risk+"%"} as CSSProperties} aria-label={maxDrawdown==null?"Просадка недоступна":"Максимальная просадка "+pct.format(maxDrawdown)+"%"}>
     <i/><i/><i/><span/><b>{maxDrawdown==null?"—":pct.format(maxDrawdown)+"%"}</b><small>MAX DD</small>
    </div>
    <div className="nord-analysis-map__coordinates">
@@ -63,7 +63,7 @@ export function NordGoalTerminal({target,current,progress,remaining,onEdit,editi
   <header className="nord-terminal__head"><div><span>EXPEDITION PATH // USER</span><strong>Маршрут капитала</strong><small>Ориентир пользователя, не прогноз доходности</small></div><i aria-hidden="true">ᛏ</i></header>
   {editing&&editor?<div className="nord-goal-route__editor">{editor}</div>:<div className="nord-goal-route">
    <div className="nord-goal-route__target"><span>Цель</span><strong>{targetText}</strong><button type="button" onClick={onEdit}>{target?"Изменить":"Задать цель"}</button></div>
-   <div className="nord-goal-route__track" style={{"--nord-progress":marker+"%"} as React.CSSProperties}>
+   <div className="nord-goal-route__track" style={{"--nord-progress":marker+"%"} as CSSProperties}>
     <i/><i/><i/><i/><b/><em/>
     <span className="nord-goal-route__start"><small>Сейчас</small><strong>{currentText}</strong></span>
     <span className="nord-goal-route__finish"><small>Ориентир</small><strong>{targetText}</strong></span>
