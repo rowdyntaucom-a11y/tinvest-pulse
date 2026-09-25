@@ -7,6 +7,7 @@ import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWor
 
 const V3HoldingsExplorer=lazy(()=>import("./V3HoldingsExplorer").then(m=>({default:m.V3HoldingsExplorer})));
 const V3AssetsDepth=lazy(()=>import("./V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
+const V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0}),num=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const PORTFOLIO_VIEWS=[
   {value:"overview",label:"Позиции",description:"Быстрый список текущих активов, веса и накопленный broker P/L."},
@@ -51,9 +52,12 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
        {id:"sam-assets-pnl",code:"弐",label:"Результат",note:"broker P/L"},
        {id:"sam-assets-sectors",code:"参",label:"Отрасли",note:"покрытие метаданных"},
        {id:"sam-assets-bonds",code:"肆",label:"Облигации",note:"сроки · эмитенты"},
-       {id:"sam-assets-positions",code:"伍",label:"Позиции",note:"карточки инструментов"}
+       {id:"sam-assets-positions",code:"伍",label:"Позиции",note:"карточки инструментов"},
+       {id:"sam-assets-operations",code:"陸",label:"Операции",note:"сделки · потоки · доход"},
+       {id:"sam-assets-integrity",code:"漆",label:"Целостность",note:"покрытие · события"}
       ]}/>}
       <Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>
+      {shell==="samurai"&&allowAssetWorkspace&&<Suspense fallback={<section className="v3-empty">Открываем журнал операций…</section>}><V3OperationsDepth/></Suspense>}
     </>}
   </main>;
 }

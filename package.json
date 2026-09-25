@@ -1,15 +1,22 @@
 {
-  "name":"tinvest-pulse",
-  "version":"15.8.0",
-  "private":true,
-  "description":"Mobile and desktop T-Invest portfolio dashboard with living DNA world",
-  "main":"server.js",
-  "scripts":{
-    "start":"node server.js",
-    "postinstall":"cd v2 && npm ci --no-audit --no-fund && npm run build",
-    "test:api":"node --check production-v163.js && node tests/production-v163-dashboard-identity.test.js && node tests/production-v162-fundamentals-injection.test.js && node tests/api-route-policy.test.js"
+  "name": "tinvest-pulse",
+  "version": "15.8.0",
+  "private": true,
+  "description": "Mobile and desktop T-Invest portfolio dashboard with living DNA world",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "cd v2 && npm ci --no-audit --no-fund && npm run build",
+    "test:api": "node --check production-v163.js && node tests/production-v163-dashboard-identity.test.js && node tests/production-v162-fundamentals-injection.test.js && node tests/api-route-policy.test.js && node tests/operations-summary-contract.test.js"
   },
-  "engines":{"node":">=20 <25"},
-  "dependencies":{"dotenv":"^16.4.7","express":"^4.21.2"},
-  "overrides":{"qs":"6.16.0"}
+  "engines": {
+    "node": ">=20 <25"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "overrides": {
+    "qs": "6.16.0"
+  }
 }

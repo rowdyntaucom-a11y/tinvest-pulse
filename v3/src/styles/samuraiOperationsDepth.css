@@ -1,0 +1,76 @@
+/* Samurai Operations + Event Integrity v1.
+   Real broker events first; corporate-action completeness stays explicitly unverified. */
+.v3-app[data-shell="samurai"] .sam-ops-depth{margin:8px 9px 84px;display:grid;gap:10px}
+.v3-app[data-shell="samurai"] .sam-ops-depth__block{
+ position:relative;overflow:hidden;border:1px solid rgba(201,155,88,.14);border-left:2px solid rgba(114,216,196,.38);
+ background:linear-gradient(145deg,rgba(4,14,12,.94),rgba(3,9,8,.78));padding:12px;
+}
+.v3-app[data-shell="samurai"] .sam-ops-depth__block:before{
+ content:"";position:absolute;left:0;right:35%;top:0;height:1px;background:linear-gradient(90deg,#72d8c4,#c99b58,#e34b3b,transparent)
+}
+.v3-app[data-shell="samurai"] .sam-ops-depth__head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start}
+.v3-app[data-shell="samurai"] .sam-ops-depth__head span,.v3-app[data-shell="samurai"] .sam-ops-depth__title span{color:#c99b58;font:750 8px/1 Inter,system-ui,sans-serif;letter-spacing:.12em}
+.v3-app[data-shell="samurai"] .sam-ops-depth__head h3,.v3-app[data-shell="samurai"] .sam-ops-depth__title h3{margin:6px 0 0;color:#edf3f0;font:500 20px/1.05 Georgia,serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__head p{margin:6px 0 0;max-width:520px;color:#84958f;font:9px/1.45 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__head>button,.v3-app[data-shell="samurai"] .sam-ops-depth__more{
+ border:1px solid rgba(201,155,88,.23);border-radius:0;background:rgba(18,14,10,.66);color:#d6ad70;
+ font:750 8px/1 Inter,system-ui,sans-serif;letter-spacing:.08em;min-height:36px;padding:0 10px
+}
+.v3-app[data-shell="samurai"] .sam-ops-depth__head>button:disabled{opacity:.55}
+.v3-app[data-shell="samurai"] .sam-ops-depth__summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;margin-top:12px}
+.v3-app[data-shell="samurai"] .sam-ops-depth__summary article{min-height:74px;padding:9px;border:1px solid rgba(114,216,196,.08);background:rgba(3,11,9,.82)}
+.v3-app[data-shell="samurai"] .sam-ops-depth__summary span{display:block;color:#7d8f89;font:8px/1.15 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__summary strong{display:block;margin-top:7px;color:#edf3f0;font:600 19px/1 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__summary small{display:block;margin-top:6px;color:#657872;font:7.5px/1.25 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__filters{display:flex;gap:5px;overflow-x:auto;margin:12px -2px 8px;padding:2px;scrollbar-width:none}
+.v3-app[data-shell="samurai"] .sam-ops-depth__filters::-webkit-scrollbar{display:none}
+.v3-app[data-shell="samurai"] .sam-ops-depth__filters button{
+ flex:0 0 auto;border:1px solid rgba(114,216,196,.11);border-radius:0;background:#06100e;color:#82958f;padding:8px 9px;
+ font:700 8px/1 Inter,system-ui,sans-serif
+}
+.v3-app[data-shell="samurai"] .sam-ops-depth__filters button.is-active{border-color:rgba(227,75,59,.42);background:linear-gradient(145deg,rgba(35,16,13,.86),rgba(5,15,12,.86));color:#efc58d}
+.v3-app[data-shell="samurai"] .sam-ops-depth__rows{display:grid;gap:3px}
+.v3-app[data-shell="samurai"] .sam-ops-depth__rows article{
+ position:relative;display:grid;grid-template-columns:80px minmax(0,1fr) auto;gap:8px;align-items:center;min-height:60px;padding:8px 9px;
+ border:1px solid rgba(201,155,88,.08);background:linear-gradient(100deg,rgba(4,13,11,.92),rgba(3,9,8,.72))
+}
+.v3-app[data-shell="samurai"] .sam-ops-depth__rows article:before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:1px;background:#6b7d77}
+.v3-app[data-shell="samurai"] .sam-ops-depth__rows article.is-trade:before{background:#72d8c4}
+.v3-app[data-shell="samurai"] .sam-ops-depth__rows article.is-income:before{background:#c99b58}
+.v3-app[data-shell="samurai"] .sam-ops-depth__rows article.is-external-cash:before{background:#7a9ad8}
+.v3-app[data-shell="samurai"] .sam-ops-depth__rows article.is-fee:before{background:#e34b3b}
+.v3-app[data-shell="samurai"] .sam-ops-depth__when strong,.v3-app[data-shell="samurai"] .sam-ops-depth__what strong,.v3-app[data-shell="samurai"] .sam-ops-depth__money strong{display:block;color:#e8efec;font:700 10px/1.2 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__when span{display:block;margin-top:5px;color:#748781;font:7px/1.15 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__what{min-width:0}
+.v3-app[data-shell="samurai"] .sam-ops-depth__what strong,.v3-app[data-shell="samurai"] .sam-ops-depth__what span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v3-app[data-shell="samurai"] .sam-ops-depth__what span,.v3-app[data-shell="samurai"] .sam-ops-depth__money span{display:block;margin-top:5px;color:#70817c;font:7.5px/1.2 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__money{text-align:right}
+.v3-app[data-shell="samurai"] .sam-ops-depth__money strong.is-positive{color:#72d8c4}
+.v3-app[data-shell="samurai"] .sam-ops-depth__money strong.is-negative{color:#e27569}
+.v3-app[data-shell="samurai"] .sam-ops-depth__more{width:100%;margin-top:7px}
+.v3-app[data-shell="samurai"] .sam-ops-depth__gate,.v3-app[data-shell="samurai"] .sam-ops-depth__empty{
+ margin-top:12px;padding:14px;border:1px dashed rgba(114,216,196,.14);background:rgba(3,10,9,.6);color:#81938d;font:9px/1.45 Inter,system-ui,sans-serif
+}
+.v3-app[data-shell="samurai"] .sam-ops-depth__gate strong,.v3-app[data-shell="samurai"] .sam-ops-depth__gate span{display:block}
+.v3-app[data-shell="samurai"] .sam-ops-depth__gate strong{color:#d6ddd9;font-size:11px}
+.v3-app[data-shell="samurai"] .sam-ops-depth__gate span{margin-top:5px}
+.v3-app[data-shell="samurai"] .sam-ops-depth__gate.is-warning{border-color:rgba(227,75,59,.2)}
+.v3-app[data-shell="samurai"] .sam-ops-depth__note,.v3-app[data-shell="samurai"] .sam-ops-depth__warning{margin:10px 0 0;color:#73857f;font:8px/1.45 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__warning{padding:9px;border-left:2px solid #e34b3b;background:rgba(60,20,15,.17);color:#b99087}
+.v3-app[data-shell="samurai"] .sam-ops-depth__title{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.v3-app[data-shell="samurai"] .sam-ops-depth__title>small{color:#c99b58;font:750 8px/1 Inter,system-ui,sans-serif;letter-spacing:.08em}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks{display:grid;gap:4px;margin-top:12px}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks article{display:grid;grid-template-columns:12px minmax(0,1fr);gap:9px;align-items:start;padding:9px;border:1px solid rgba(201,155,88,.08);background:rgba(4,12,10,.76)}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks i{width:8px;height:8px;margin-top:3px;border:1px solid #6d7e79;transform:rotate(45deg)}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks i.is-ok{border-color:#72d8c4;background:rgba(114,216,196,.18)}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks i.is-warning{border-color:#e34b3b;background:rgba(227,75,59,.16)}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks i.is-unverified{border-color:#c99b58;background:rgba(201,155,88,.12)}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks strong{display:block;color:#dce5e1;font:700 9px/1.2 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-ops-depth__checks small{display:block;margin-top:4px;color:#758680;font:7.5px/1.35 Inter,system-ui,sans-serif}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .sam-ops-depth__rows article{grid-template-columns:68px minmax(0,1fr);gap:6px}
+ .v3-app[data-shell="samurai"] .sam-ops-depth__money{grid-column:2;text-align:left}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] .sam-ops-depth *{scroll-behavior:auto!important}
+}

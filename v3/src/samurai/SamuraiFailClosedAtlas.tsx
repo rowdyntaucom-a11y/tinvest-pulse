@@ -2,7 +2,7 @@ export type SamuraiFailClosedKind="home"|"assets"|"analysis"|"income";
 
 const COPY:Record<SamuraiFailClosedKind,{code:string;title:string;subtitle:string;glyph:string}>={
  home:{code:"PORTFOLIO // PREVIEW",title:"История и результат",subtitle:"Архитектура доступна, финансовые значения ждут подтверждения",glyph:"始"},
- assets:{code:"FORMATION // PREVIEW",title:"Активы и структура",subtitle:"Состав, классы, отрасли, облигации и drill-down",glyph:"陣"},
+ assets:{code:"FORMATION // PREVIEW",title:"Активы и структура",subtitle:"Состав, операции, события, отрасли, облигации и drill-down",glyph:"陣"},
  analysis:{code:"TACTICAL // PREVIEW",title:"Аналитика портфеля",subtitle:"Доходность, риск, структура и рынок",glyph:"眼"},
  income:{code:"TREASURY // PREVIEW",title:"Доход и выплаты",subtitle:"Календарь, факт и концентрация источников",glyph:"禄"}
 };
@@ -47,6 +47,8 @@ function AssetsPreview(){
     <article><i>参</i><span><b>Отрасли</b><small>покрытие метаданных</small></span><em/></article>
     <article><i>肆</i><span><b>Облигации</b><small>сроки · эмитенты · купоны</small></span><em/></article>
     <article><i>伍</i><span><b>Карточка актива</b><small>P/L · риск · история</small></span><em/></article>
+    <article><i>陸</i><span><b>Операции</b><small>сделки · потоки · выплаты</small></span><em/></article>
+    <article><i>漆</i><span><b>Целостность</b><small>покрытие · события · corporate actions</small></span><em/></article>
    </div>
   </section>
  </div>;
