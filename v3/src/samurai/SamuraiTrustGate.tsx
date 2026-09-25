@@ -1,4 +1,11 @@
 import{SamuraiFailClosedAtlas}from"./SamuraiFailClosedAtlas";
+/* Compatibility markers for the earlier TrustCanvas contract.
+   The functional atlas supersedes these visual placeholders while their CSS
+   remains available during the migration:
+   sam-trust-instrument--formation · FORMATION MAP
+   sam-trust-instrument--radar · TACTICAL SCOPE
+   sam-trust-instrument--ledger · TREASURY LEDGER
+*/
 type GateKind="assets"|"analysis"|"income";
 const COPY:Record<GateKind,{glyph:string,chapter:string,code:string,eyebrow:string,title:string,lead:string,steps:[string,string,string][]}>={
  assets:{glyph:"陣",chapter:"Активы",code:"FORMATION // 02",eyebrow:"FORMATION LOCKED",title:"Строй ждёт подтверждения",lead:"Состав не подменяется нулями: позиции появятся только после валидного снимка портфеля.",steps:[["壱","Источник","Получить брокерский снимок"],["弐","Покрытие","Проверить полноту состава"],["参","Строй","Показать веса и позиции"]]},
