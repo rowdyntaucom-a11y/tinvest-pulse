@@ -3,21 +3,22 @@ import test from"node:test";
 import{readFileSync}from"node:fs";
 
 const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8");
+const toolbox=readFileSync(new URL("../src/analysis/V3AnalysisToolbox.tsx",import.meta.url),"utf8");
 const ui=readFileSync(new URL("../src/analysis/V3MarketScreener.tsx",import.meta.url),"utf8");
 const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/samuraiMarketScreener.css",import.meta.url),"utf8");
 
-test("Samurai exposes a ninth public screener chapter",()=>{
- assert.match(analysis,/sam-analysis-screener/);
- assert.match(analysis,/label:"Скринер"/);
- assert.match(atlas,/label:"Скринер"/);
- assert.match(atlas,/id:"screener"/);
+test("Samurai exposes the public screener inside the professional toolbox",()=>{
+ assert.match(analysis,/sam-analysis-tools/);
+ assert.match(toolbox,/V3MarketScreener/);
+ assert.match(toolbox,/Скринер/);
+ assert.match(atlas,/id:"tools"/);
 });
 
-test("screener stays accessible without broker trust through the inline Atlas tool",()=>{
- assert.match(analysis,/inlineTools=\{\{screener:<Suspense/);
- assert.match(analysis,/samuraiReference&&trusted&&<div id="sam-analysis-screener"/);
+test("screener stays accessible without broker trust through the locked Tools entry",()=>{
+ assert.match(analysis,/inlineTools=\{\{tools:<Suspense/);
  assert.match(atlas,/inlineTools\?\.\[chapter\.id\]/);
+ assert.match(atlas,/id:"tools"/);
 });
 
 test("screener is descriptive not an attractiveness ranking",()=>{
