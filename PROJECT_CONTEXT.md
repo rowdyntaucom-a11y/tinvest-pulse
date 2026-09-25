@@ -6,7 +6,7 @@
 
 ## 0. Current priority override — 2026-09-24
 
-**Living World / DNA WORLD is frozen and is now the lowest priority.** Preserve what already works, but do not invest active development time in DNA scenes, art, animation, XP/gamification, world events or related polish until the ordinary investment workspaces are finished and accepted.
+**Reference-shell lock (2026-09-25):** build Snowball-level-or-greater functional breadth first in **Samurai**. Treat Samurai as the product reference shell until the financial workspaces are complete and accepted on a real phone. Shared data/calculation components remain shell-neutral; Cosmos/NORD/etc. receive accepted functionality afterward with their own layouts/effects. Do not duplicate financial logic per shell.\n\n**Living World / DNA WORLD is frozen and is now the lowest priority.** Preserve what already works, but do not invest active development time in DNA scenes, art, animation, XP/gamification, world events or related polish until the ordinary investment workspaces are finished and accepted.
 
 Current order: **Assets Depth → Analysis Depth → Income Depth → Goal/main-tab completion → shared cross-shell/mobile polish → DNA WORLD last.** Existing DNA work below is retained as future/historical direction, not as current implementation priority. A DNA change is allowed before then only when required to fix a regression that blocks the rest of the application.
 
