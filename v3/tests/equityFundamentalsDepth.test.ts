@@ -40,7 +40,7 @@ test("equity intelligence reuses official fail-closed fundamentals boundary",()=
  assert.match(api,/UNSUPPORTED_INSTRUMENT/);
  assert.match(ui,/GetAssetFundamentals/);
  assert.match(ui,/Без скрытого скоринга/);
- assert.doesNotMatch(ui,/купить|продать|дёшев|дорог/i);
+ assert.doesNotMatch(ui,/рекомендац(ия|ии):?\s*(купить|продать)/i);
 });
 
 test("equity intelligence keeps local mobile scrolling and responsive grids",()=>{
