@@ -1,6 +1,6 @@
 import assert from"node:assert/strict";
 import test from"node:test";
-import{calculateFuturesScenario,futuresScenarioWarnings,parseScenarioNumber}from"../src/terminal/futuresMath.ts";
+import{buildFuturesShockGrid,calculateFuturesScenario,futuresScenarioWarnings,parseScenarioNumber}from"../src/terminal/futuresMath.ts";
 
 test("futures scenario calculates notional leverage pnl and basis deterministically",()=>{
  const input={futuresPrice:100,spotPrice:98,scenarioPrice:105,contracts:2,priceValuePerPoint:10,marginPerContract:250,daysToExpiry:30};
@@ -28,4 +28,22 @@ test("scenario parser accepts Russian decimal comma and warnings flag extreme le
  const input={futuresPrice:100,spotPrice:100,scenarioPrice:101,contracts:1,priceValuePerPoint:10,marginPerContract:50,daysToExpiry:5};
  const result=calculateFuturesScenario(input);
  assert.ok(futuresScenarioWarnings(input,result).some(x=>/плечо/i.test(x)));
+});
+
+
+test("futures shock grid is deterministic, symmetric and margin-aware",()=>{
+ const input={futuresPrice:100,spotPrice:null,scenarioPrice:null,contracts:2,priceValuePerPoint:10,marginPerContract:250,daysToExpiry:null};
+ const grid=buildFuturesShockGrid(input,[-5,5]);
+ assert.deepEqual(grid.map(x=>x.movePct),[-5,5]);
+ assert.equal(grid[0]?.scenarioPrice,95);
+ assert.equal(grid[0]?.pnl,-100);
+ assert.equal(grid[0]?.marginReturnPct,-20);
+ assert.equal(grid[1]?.scenarioPrice,105);
+ assert.equal(grid[1]?.pnl,100);
+ assert.equal(grid[1]?.marginReturnPct,20);
+});
+
+test("futures shock grid fails closed without contract value inputs",()=>{
+ const input={futuresPrice:100,spotPrice:null,scenarioPrice:null,contracts:1,priceValuePerPoint:null,marginPerContract:250,daysToExpiry:null};
+ assert.deepEqual(buildFuturesShockGrid(input),[]);
 });
