@@ -25,7 +25,8 @@ test("Assets Depth reuses canonical deterministic portfolio models",()=>{
 });
 
 test("Assets Depth exposes composition, concentration, P\/L, sectors, bonds and asset drilldown",()=>{
- for(const token of["01 · СОСТАВ","02 · РЕЗУЛЬТАТ","03 · ОТРАСЛИ","04 · ОБЛИГАЦИИ","05 · ПОЗИЦИИ"])assert.match(depth,new RegExp(token));
+ for(const token of["01 · СОСТАВ","02 · РЕЗУЛЬТАТ","03 · ОТРАСЛИ","05 · ОБЛИГАЦИИ","06 · ПОЗИЦИИ"])assert.match(depth,new RegExp(token));
+ assert.match(depth,/V3EquityFundamentalsDepth/);
  assert.match(depth,/TOP-1/);
  assert.match(depth,/TOP-3/);
  assert.match(depth,/1 \/ HHI/);

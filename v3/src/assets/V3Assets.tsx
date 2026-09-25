@@ -52,13 +52,14 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
        {id:"sam-assets-classes",code:"壱",label:"Состав",note:"классы активов"},
        {id:"sam-assets-pnl",code:"弐",label:"Результат",note:"broker P/L"},
        {id:"sam-assets-sectors",code:"参",label:"Отрасли",note:"покрытие метаданных"},
-       {id:"sam-assets-bonds",code:"肆",label:"Облигации",note:"сроки · эмитенты"},
-       {id:"sam-assets-positions",code:"伍",label:"Позиции",note:"карточки инструментов"},
-       {id:"sam-assets-operations",code:"陸",label:"Операции",note:"сделки · потоки · доход"},
-       {id:"sam-assets-integrity",code:"漆",label:"Целостность",note:"покрытие · события"},
-       {id:"sam-assets-report",code:"捌",label:"Отчёт",note:"стоимость · база · P/L"},
-       {id:"sam-assets-categories",code:"玖",label:"Категории",note:"классы · доли"},
-       {id:"sam-assets-currencies",code:"拾",label:"Валюты",note:"покрытие · структура"}
+       {id:"sam-assets-fundamentals",code:"肆",label:"Акции",note:"фундаментальные показатели"},
+       {id:"sam-assets-bonds",code:"伍",label:"Облигации",note:"доходность · duration"},
+       {id:"sam-assets-positions",code:"陸",label:"Позиции",note:"карточки инструментов"},
+       {id:"sam-assets-operations",code:"漆",label:"Операции",note:"сделки · потоки · доход"},
+       {id:"sam-assets-integrity",code:"捌",label:"Целостность",note:"покрытие · события"},
+       {id:"sam-assets-report",code:"玖",label:"Отчёт",note:"стоимость · база · P/L"},
+       {id:"sam-assets-categories",code:"拾",label:"Категории",note:"классы · доли"},
+       {id:"sam-assets-currencies",code:"拾壱",label:"Валюты",note:"покрытие · структура"}
       ]}/>}
       <Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>
       {shell==="samurai"&&allowAssetWorkspace&&<Suspense fallback={<section className="v3-empty">Открываем журнал операций…</section>}><V3OperationsDepth/></Suspense>}
