@@ -3,6 +3,8 @@ import type{HistoryPoint}from"../../../v2/src/lib/portfolioApi";
 import type{GoalProjectionInput,GoalProjectionPoint}from"../../../v2/src/features/goals/goalProjection";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
+import type{V3Shell}from"../app/model";
+import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{calculateV3GoalBootstrap,calculateV3GoalScenario,solveV3RequiredMonthlyContribution}from"./goalScenario";
 import"../styles/goalScenarioLab.css";
 
@@ -142,13 +144,15 @@ export function V3GoalScenarioLab({
   targetCapitalToday,
   history,
   onTargetChange,
+  shell,
 }:{
   currentCapital:number|null;
   targetCapitalToday:number|null;
   history:HistoryPoint[];
   onTargetChange?:(value:number)=>void;
+  shell?:V3Shell;
 }){
-  const initial=useMemo(readSettings,[]);
+  const initial=useMemo(readSettings,[]),samuraiReference=shell==="samurai";
   const[tab,setTab]=useState<Tab>("scenario");
   const[draft,setDraft]=useState<Draft>(initial.draft);
   const[reinvest,setReinvest]=useState(initial.reinvest);
@@ -208,9 +212,13 @@ export function V3GoalScenarioLab({
 
   return <section id="cos-goal-lab" className="v3-goal-scenario-lab v3-goal-lab-v2">
     <div className="v3-goal-scenario-head"><div><span>GOAL LAB // 02</span><h2>Сценарный конструктор цели</h2></div><b>v2</b></div>
-    <V3SectionSelector label="Режим сценария" value={tab} onChange={setTab} options={TAB_OPTIONS}/>
+    {samuraiReference&&<SamuraiChapterNav label="Цель Samurai" chapters={[
+      {id:"sam-goal-scenario",code:"壱",label:"Сценарий",note:"ваши предпосылки"},
+      {id:"sam-goal-history",code:"弐",label:"История",note:"block bootstrap"}
+    ]}/>}
+    {!samuraiReference&&<V3SectionSelector label="Режим сценария" value={tab} onChange={setTab} options={TAB_OPTIONS}/>} 
 
-    {tab==="scenario"&&<div className="v3-goal-scenario-view">
+    {(samuraiReference||tab==="scenario")&&<div id="sam-goal-scenario" className="v3-goal-scenario-view">
       <section className="v3-goal-lab-target">
         <header><span>01 · ЦЕЛЬ <V3MetricHelp topic="goalScenario"/></span><small>Настройка без скрытых предположений</small></header>
         <div className="v3-goal-lab-segmented" role="group" aria-label="Тип сценария цели">
@@ -269,9 +277,9 @@ export function V3GoalScenarioLab({
           <small className="v3-goal-scenario-method">{projection.note} Методика {projection.version}. Все будущие параметры — пользовательские предпосылки.</small>
         </section>
       </>}
-    </div>}
+    {samuraiReference&&<SamuraiNextCue targetId="sam-goal-history" label="ДАЛЬШЕ · ИСТОРИЧЕСКИЙ ДИАПАЗОН"/>}</div>}
 
-    {tab==="history"&&<div className="v3-goal-bootstrap-view">
+    {(samuraiReference||tab==="history")&&<div id="sam-goal-history" className="v3-goal-bootstrap-view">
       <div className="v3-goal-bootstrap-head"><div><span>HISTORICAL BLOCK BOOTSTRAP <V3MetricHelp topic="historicalBootstrap"/></span><strong>Диапазон из подтверждённой TWR-истории</strong></div><div className="v3-goal-bootstrap-years" role="group" aria-label="Горизонт исторического bootstrap">{[1,3,5,10].map(year=><button type="button" key={year} className={bootstrapYears===year?"is-active":""} aria-pressed={bootstrapYears===year} onClick={()=>setBootstrapYears(year)}>{year}Г</button>)}</div></div>
       {bootstrap==null?<div className="v3-goal-scenario-gate"><strong>Нужен подтверждённый стартовый капитал</strong><span>Исторический диапазон строится только от подтверждённой текущей стоимости.</span></div>:!bootstrap.available?<div className="v3-goal-scenario-gate"><strong>Истории пока недостаточно</strong><span>{bootstrap.note}</span></div>:<>
         <div className="v3-goal-bootstrap-band">
