@@ -95,7 +95,7 @@ export async function loadBondYieldDepth(signal?:AbortSignal):Promise<BondYieldP
    available:false,version:null,source:null,generatedAt:null,summary:null,maturityBuckets:[],rateScenarios:[],items:[],coverage:null,note:null,
    reason:text(raw?.error)||"Bond analytics source is unavailable.",
   };
-  const items=(Array.isArray(raw.items)?raw.items:[]).map(normalizeItem).filter((x):x is BondYieldItem=>Boolean(x));
+  const items=(Array.isArray(raw.items)?raw.items:[]).map(normalizeItem).filter((x:BondYieldItem|null):x is BondYieldItem=>Boolean(x));
   const summaryRaw=raw.summary&&typeof raw.summary==="object"?raw.summary:null;
   const summary=summaryRaw?{
    bondCapital:finite(summaryRaw.bondCapital),
