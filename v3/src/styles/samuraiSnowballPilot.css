@@ -1,0 +1,57 @@
+/* Samurai reference-shell pilot — functional depth first.
+   Snowball parity is prototyped here before cross-shell transfer. */
+.v3-app[data-shell="samurai"] .sam-chapter-nav{
+ position:relative;margin:12px 9px 14px;padding:11px 10px 10px 14px;
+ border:1px solid rgba(201,155,88,.14);border-left:2px solid rgba(227,75,59,.48);
+ background:linear-gradient(110deg,rgba(5,16,13,.96),rgba(3,10,9,.78));
+ clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,0 100%);
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav:before{
+ content:"";position:absolute;left:14px;right:40%;top:0;height:1px;
+ background:linear-gradient(90deg,#72d8c4,#c99b58,#e34b3b,transparent);
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>header{display:flex;align-items:end;justify-content:space-between;gap:10px;padding-bottom:9px;border-bottom:1px solid rgba(114,216,196,.08)}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>header span{color:#c99b58;font:750 6px/1 Inter,system-ui,sans-serif;letter-spacing:.15em}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>header strong{color:#d8e1de;font:500 12px/1 Georgia,serif}
+.v3-app[data-shell="samurai"] .sam-chapter-nav>div{display:grid;gap:4px;margin-top:7px}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button{
+ width:100%;min-height:48px;display:grid;grid-template-columns:28px minmax(0,1fr) 20px;align-items:center;gap:8px;
+ padding:7px 7px 7px 9px;border:0;border-top:1px solid rgba(201,155,88,.08);background:transparent;color:#e9efec;text-align:left;
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button:first-child{border-top:0}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button>i{
+ display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(201,155,88,.18);color:#d5a85f;
+ font:500 11px/1 Georgia,serif;font-style:normal;transform:rotate(-3deg)
+}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button span b{display:block;font-size:8.5px}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button span small{display:block;margin-top:3px;color:#6f817b;font-size:6px}
+.v3-app[data-shell="samurai"] .sam-chapter-nav button em{color:#5d706a;font:700 5.5px/1 Inter,system-ui,sans-serif;font-style:normal;letter-spacing:.1em}
+.v3-app[data-shell="samurai"] .sam-reference-chapter{scroll-margin-top:58px;margin-top:12px}
+.v3-app[data-shell="samurai"] .sam-reference-chapter+.sam-reference-chapter{margin-top:18px}
+.v3-app[data-shell="samurai"] .sam-chapter-next{
+ display:flex;align-items:center;justify-content:center;gap:7px;width:166px;min-height:34px;margin:14px auto 2px;padding:0 10px;
+ border:0;border-top:1px solid rgba(201,155,88,.17);border-bottom:1px solid rgba(114,216,196,.08);border-radius:0;
+ background:linear-gradient(90deg,transparent,rgba(4,13,11,.80),transparent);color:#9fb0aa;
+ font:750 5.7px/1 Inter,system-ui,sans-serif;letter-spacing:.12em;
+}
+.v3-app[data-shell="samurai"] .sam-chapter-next i{color:#72d8c4;font:17px/1 Georgia,serif;font-style:normal}
+.v3-app[data-shell="samurai"] :is(#sam-assets-classes,#sam-assets-pnl,#sam-assets-sectors,#sam-assets-bonds,#sam-assets-positions,#sam-income-calendar,#sam-income-history,#sam-income-sources,#sam-goal-scenario,#sam-goal-history){scroll-margin-top:58px}
+.v3-app[data-shell="samurai"] .v3-income-depth>.sam-chapter-nav,
+.v3-app[data-shell="samurai"] .v3-goal-scenario-lab>.sam-chapter-nav{margin-left:0;margin-right:0}
+.v3-app[data-shell="samurai"] #sam-income-history,
+.v3-app[data-shell="samurai"] #sam-income-sources,
+.v3-app[data-shell="samurai"] #sam-goal-history{
+ margin-top:18px;padding-top:10px;border-top:1px solid rgba(201,155,88,.11)
+}
+.v3-app[data-shell="samurai"] #sam-analysis-market{padding-bottom:4px}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .sam-chapter-nav{margin-inline:7px;padding-inline:9px}
+ .v3-app[data-shell="samurai"] .sam-chapter-nav button{grid-template-columns:25px minmax(0,1fr) 18px;padding-inline:5px}
+}
+@media(prefers-reduced-motion:no-preference){
+ .v3-app[data-shell="samurai"] .sam-chapter-next i{animation:samChapterDrop 2.1s ease-in-out infinite}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] .sam-chapter-next i{animation:none!important}
+}
+@keyframes samChapterDrop{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(4px);opacity:1}}
