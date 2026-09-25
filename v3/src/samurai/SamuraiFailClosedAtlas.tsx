@@ -15,7 +15,7 @@ type AtlasChapter={
 
 const COPY:Record<SamuraiFailClosedKind,{code:string;title:string;subtitle:string;glyph:string}>={
  home:{code:"PORTFOLIO // PREVIEW",title:"История и результат",subtitle:"Архитектура доступна, финансовые значения ждут подтверждения",glyph:"始"},
- assets:{code:"FORMATION // PREVIEW",title:"Активы и структура",subtitle:"Состав, операции, события, отрасли, облигации и drill-down",glyph:"陣"},
+ assets:{code:"FORMATION // PREVIEW",title:"Активы и структура",subtitle:"Состав, отрасли, фундаментал акций, облигации и drill-down",glyph:"陣"},
  analysis:{code:"TACTICAL // PREVIEW",title:"Аналитика портфеля",subtitle:"Доходность, риск, структура и рынок",glyph:"眼"},
  income:{code:"TREASURY // PREVIEW",title:"Доход и выплаты",subtitle:"Календарь, факт и концентрация источников",glyph:"禄"}
 };
@@ -31,13 +31,14 @@ const CHAPTERS:Record<SamuraiFailClosedKind,AtlasChapter[]>={
   {id:"positions",code:"壱",label:"Состав",note:"позиции · веса · стоимость",detail:"Текущие позиции, вес каждой бумаги и подтверждённая стоимость.",source:"Broker portfolio snapshot."},
   {id:"classes",code:"弐",label:"Классы",note:"акции · облигации · фонды",detail:"Разделение капитала по нормализованным типам инструментов.",source:"Тип инструмента из подтверждённых метаданных."},
   {id:"sectors",code:"参",label:"Отрасли",note:"покрытие метаданных",detail:"Отраслевой разрез с явным показателем покрытия классификации.",source:"Проверенные sector-метаданные; неизвестное не угадывается."},
-  {id:"bonds",code:"肆",label:"Облигации",note:"сроки · эмитенты · купоны",detail:"Сроки, параметры выпуска и подтверждённые купонные характеристики облигаций.",source:"Метаданные облигаций и расписание выплат."},
-  {id:"asset",code:"伍",label:"Карточка актива",note:"P/L · риск · история",detail:"Drill-down конкретной позиции: broker P/L, история, риск и события.",source:"Позиция, метаданные и ценовая история инструмента."},
-  {id:"operations",code:"陸",label:"Операции",note:"сделки · потоки · выплаты",detail:"Исполненные брокерские события с фильтрами по типам операций.",source:"Broker operations journal."},
-  {id:"integrity",code:"漆",label:"Целостность",note:"покрытие · события · corporate actions",detail:"Проверки покрытия, идентификаторов, дубликатов и расхождений агрегатов.",source:"Операционный журнал и отдельные source-gates корпоративных действий."},
-  {id:"report",code:"捌",label:"Отчёт",note:"стоимость · база · broker P/L",detail:"Текущая стоимость, cost basis и broker P/L с явной сверкой.",source:"Подтверждённые позиции и broker expectedYield."},
-  {id:"categories",code:"玖",label:"Категории",note:"классы · доли · результат",detail:"Разрез стоимости, базы и результата по классам активов.",source:"Нормализованные типы инструментов."},
-  {id:"currencies",code:"拾",label:"Валюты",note:"покрытие · подтверждённый срез",detail:"Валютная структура только там, где валюта подтверждена метаданными.",source:"Валюта инструмента; RUB не подставляется автоматически."},
+  {id:"fundamentals",code:"肆",label:"Акции",note:"мультипликаторы · рентабельность · финансы",detail:"Проверяемые фундаментальные показатели текущих акций: valuation, profitability, financials и shareholder context без скрытого скоринга.",source:"Официальный T-Invest GetAssetFundamentals по точному instrumentUid текущей позиции."},
+  {id:"bonds",code:"伍",label:"Облигации",note:"YTM · duration · купоны",detail:"Доходность, процентный риск, сроки, параметры выпуска и подтверждённые купонные характеристики облигаций.",source:"T-Bank BondBy, GetBondCoupons и GetMarketValues."},
+  {id:"asset",code:"陸",label:"Карточка актива",note:"P/L · риск · история",detail:"Drill-down конкретной позиции: broker P/L, история, риск и события.",source:"Позиция, метаданные и ценовая история инструмента."},
+  {id:"operations",code:"漆",label:"Операции",note:"сделки · потоки · выплаты",detail:"Исполненные брокерские события с фильтрами по типам операций.",source:"Broker operations journal."},
+  {id:"integrity",code:"捌",label:"Целостность",note:"покрытие · события · corporate actions",detail:"Проверки покрытия, идентификаторов, дубликатов и расхождений агрегатов.",source:"Операционный журнал и отдельные source-gates корпоративных действий."},
+  {id:"report",code:"玖",label:"Отчёт",note:"стоимость · база · broker P/L",detail:"Текущая стоимость, cost basis и broker P/L с явной сверкой.",source:"Подтверждённые позиции и broker expectedYield."},
+  {id:"categories",code:"拾",label:"Категории",note:"классы · доли · результат",detail:"Разрез стоимости, базы и результата по классам активов.",source:"Нормализованные типы инструментов."},
+  {id:"currencies",code:"拾壱",label:"Валюты",note:"покрытие · подтверждённый срез",detail:"Валютная структура только там, где валюта подтверждена метаданными.",source:"Валюта инструмента; RUB не подставляется автоматически."},
  ],
  analysis:[
   {id:"return",code:"壱",label:"Доходность",note:"TWR · Sharpe · Sortino · rolling",detail:"Доходность и риск-скорректированные метрики на одной проверенной истории.",source:"Валидная TWR-история и risk-free контекст."},
