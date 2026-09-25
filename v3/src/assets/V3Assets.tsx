@@ -6,7 +6,8 @@ import{positionAssetClassLabel,assetClassKey}from"../data/assetClasses";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiChapterNav}from"../samurai/SamuraiChapterNav";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";import{CosmosTrustGate}from"../cosmos/CosmosTrustGate";import{CosmosWorkspaceStage}from"../cosmos/CosmosWorkspaceStage";import{NordTrustGate}from"../nord/NordTrustGate";import{NordWorkspaceStage}from"../nord/NordWorkspaceStage";import{NordAssetsTerminal}from"../nord/NordTerminals";
 
 const V3HoldingsExplorer=lazy(()=>import("./V3HoldingsExplorer").then(m=>({default:m.V3HoldingsExplorer})));
-const V3AssetsDepth=lazy(()=>import("./V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));\nconst V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
+const V3AssetsDepth=lazy(()=>import("./V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
+const V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0}),num=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const PORTFOLIO_VIEWS=[
   {value:"overview",label:"Позиции",description:"Быстрый список текущих активов, веса и накопленный broker P/L."},
