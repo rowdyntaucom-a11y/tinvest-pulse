@@ -1,3 +1,4 @@
+import{SamuraiFailClosedAtlas}from"./SamuraiFailClosedAtlas";
 type GateKind="assets"|"analysis"|"income";
 const COPY:Record<GateKind,{glyph:string,chapter:string,code:string,eyebrow:string,title:string,lead:string,steps:[string,string,string][]}>={
  assets:{glyph:"陣",chapter:"Активы",code:"FORMATION // 02",eyebrow:"FORMATION LOCKED",title:"Строй ждёт подтверждения",lead:"Состав не подменяется нулями: позиции появятся только после валидного снимка портфеля.",steps:[["壱","Источник","Получить брокерский снимок"],["弐","Покрытие","Проверить полноту состава"],["参","Строй","Показать веса и позиции"]]},
@@ -44,7 +45,7 @@ export function SamuraiTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKin
   <div className="sam-trust-gate__chapter"><span>{x.code}</span><strong>{x.chapter}</strong></div>
   <div className="sam-trust-gate__watermark" aria-hidden="true">{x.glyph}</div>
   <header><i aria-hidden="true">{x.glyph}</i><div><span>{x.eyebrow}</span><strong>{x.title}</strong><small>{x.lead}</small></div></header>
-  <GateInstrument kind={kind}/>
+  <SamuraiFailClosedAtlas kind={kind}/>
   <button type="button" className="sam-trust-depth-cue" onClick={e=>{const route=e.currentTarget.closest(".sam-trust-gate")?.querySelector(".sam-trust-gate__route");const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;route?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})}} aria-label="Перейти к маршруту проверки"><span>НИЖЕ · МАРШРУТ ПРОВЕРКИ</span><i aria-hidden="true">⌄</i></button>
   <div className="sam-trust-gate__route">{x.steps.map(([n,title,copy],index)=><article key={n}><b>{n}</b><span>{title}</span><small>{copy}</small><i aria-hidden="true">{index<2?"→":"✓"}</i></article>)}</div>
   <div className="sam-trust-gate__action"><button type="button" onClick={()=>void onRefresh?.()} disabled={refreshing||!onRefresh}>{refreshing?"Синхронизация…":"Проверить источник"}</button><span>{refreshing?"Повторно запрашиваем подтверждённый снимок":"Запустить повторную проверку данных"}</span></div>
