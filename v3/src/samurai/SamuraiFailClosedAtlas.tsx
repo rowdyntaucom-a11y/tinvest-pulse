@@ -47,7 +47,7 @@ const CHAPTERS:Record<SamuraiFailClosedKind,AtlasChapter[]>={
   {id:"rebalance",code:"伍",label:"Ребалансировка",note:"цель · drift · сценарная дельта классов",detail:"Пользовательская цель и детерминированные сценарии изменения долей классов.",source:"Текущий состав и цель, введённая самим пользователем."},
   {id:"lab",code:"陸",label:"Лаборатория",note:"MCFTR · RGBITR · исторические сценарии",detail:"Сравнение двух пользовательских структур на одной исторической выборке индексов.",source:"MCFTR / RGBITR и текущий подтверждённый snapshot."},
   {id:"fallen",code:"漆",label:"Просадки",note:"high · low · SMA · восстановление",detail:"Технический discovery по подтверждённой истории: drawdown, recovery и расстояние до SMA.",source:"Валидная ценовая история текущих позиций."},
-  {id:"screener",code:"捌",label:"Скринер",note:"TQBR · движение · оборот · листинг",detail:"Публичный рыночный фильтр MOEX по наблюдаемым параметрам торгового дня.",source:"MOEX ISS · TQBR. Broker-доступ не требуется.",targetId:"sam-analysis-screener"},
+  {id:"screener",code:"捌",label:"Скринер",note:"TQBR · движение · оборот · листинг",detail:"Публичный рыночный фильтр MOEX по наблюдаемым параметрам торгового дня.",source:"MOEX ISS · TQBR. Broker-доступ не требуется."},
  ],
  income:[
   {id:"calendar",code:"壱",label:"Календарь",note:"даты · статус · источник",detail:"Будущие подтверждённые выплаты текущего портфеля по выбранному горизонту.",source:"Проверенное расписание выплат текущих позиций."},
@@ -160,7 +160,7 @@ function scrollToSourceRoute(node:HTMLElement|null){
  target.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
 }
 
-export function SamuraiFailClosedAtlas({kind,onNavigate}:{kind:SamuraiFailClosedKind;onNavigate?:(workspace:AtlasDestination)=>void}){
+export function SamuraiFailClosedAtlas({kind,onNavigate,inlineTools}:{kind:SamuraiFailClosedKind;onNavigate?:(workspace:AtlasDestination)=>void;inlineTools?:Record<string,ReactNode>}){
  const x=COPY[kind],chapters=CHAPTERS[kind];
  const[selectedId,setSelectedId]=useState<string|null>(null);
  const detailRef=useRef<HTMLElement|null>(null);
@@ -177,6 +177,7 @@ export function SamuraiFailClosedAtlas({kind,onNavigate}:{kind:SamuraiFailClosed
    {chapter.targetId&&<button type="button" onClick={()=>scrollToTarget(chapter.targetId!)}>Открыть инструмент</button>}
    <button type="button" onClick={()=>scrollToSourceRoute(detailRef.current)}>Маршрут проверки</button>
   </div>
+  {inlineTools?.[chapter.id]&&<div className="sam-offline-atlas__tool-slot" data-atlas-tool={chapter.id}>{inlineTools[chapter.id]}</div>}
  </aside>;
 
  return <section className={"sam-offline-atlas sam-offline-atlas--"+kind} aria-label={x.title}>
