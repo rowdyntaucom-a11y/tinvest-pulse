@@ -7,18 +7,19 @@ const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",imp
 const gate=readFileSync(new URL("../src/samurai/SamuraiTrustGate.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/samuraiAtlasInteraction.css",import.meta.url),"utf8");
 
-test("recording 1743: fail-closed Screener mounts only inside the tapped Atlas card",()=>{
- assert.match(analysis,/inlineTools=\{\{screener:<Suspense/);
- assert.match(analysis,/samuraiReference&&trusted&&<div id="sam-analysis-screener"/);
+test("recording 1743: fail-closed public Screener stays inline inside the consolidated Tools card",()=>{
+ assert.match(analysis,/inlineTools=\{\{tools:<Suspense/);
+ assert.match(analysis,/sam-analysis-tools/);
  assert.doesNotMatch(analysis,/samuraiReference&&<div id="sam-analysis-screener"/);
  assert.match(gate,/inlineTools\?:Record<string,ReactNode>/);
+ assert.match(atlas,/id:"tools"/);
  assert.match(atlas,/sam-offline-atlas__tool-slot/);
  assert.match(atlas,/inlineTools\?\.\[chapter\.id\]/);
 });
 
-test("recording 1743: fail-closed Screener no longer jumps to detached bottom target",()=>{
- const screenerLine=atlas.split("\n").find(line=>line.includes('id:"screener"'))??"";
- assert.doesNotMatch(screenerLine,/targetId/);
+test("recording 1743: fail-closed Screener no longer jumps to a detached bottom target",()=>{
+ const toolsLine=atlas.split("\n").find(line=>line.includes('id:"tools"'))??"";
+ assert.doesNotMatch(toolsLine,/targetId/);
  assert.match(css,/sam-offline-atlas__tool-slot\{[\s\S]*?overflow-anchor:none/);
  assert.match(css,/sam-offline-atlas__tool-slot \.sam-screener\{[\s\S]*?min-height:0/);
 });
