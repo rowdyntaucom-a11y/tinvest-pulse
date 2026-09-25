@@ -3,6 +3,7 @@ import type{V3Workspace}from"../app/model";
 import type{V3HomeViewModel}from"../home/homeViewModel";
 import{buildV3RelativeDepth}from"../analysis/analysisDepth";
 import{NordOfflineDeck}from"./NordOfflineDeck";
+import{NordScrollCue}from"./NordScrollCue";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
@@ -37,7 +38,7 @@ export function NordPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavigate
      <small>{trusted?<>Результат {money(home.profit)} · {percentRaw(home.profitPct)}</>:"Финансовые значения не подставляются до подтверждения снимка"}</small>
     </div>
     <div className="nord-home-v3__threshold-sigil" aria-hidden="true"><i/><b>ᛟ</b><i/></div>
-    <button type="button" className="nord-home-v3__first-cue" onClick={()=>scrollTo("nord-terminal")} aria-label="Плавно перейти в северный терминал"><span>ВОЙТИ В ТЕРМИНАЛ</span><i aria-hidden="true">⌄</i></button>
+    <NordScrollCue targetId="nord-terminal" label="ВОЙТИ В ТЕРМИНАЛ"/>
    </section>
   </section>
 
