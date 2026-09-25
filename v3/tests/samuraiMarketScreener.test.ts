@@ -14,10 +14,11 @@ test("Samurai exposes a ninth public screener chapter",()=>{
  assert.match(atlas,/id:"screener"/);
 });
 
-test("screener stays accessible without broker trust through the inline Atlas tool",()=>{
+test("screener stays accessible without broker trust only through the inline Atlas tool",()=>{
  assert.match(analysis,/inlineTools=\{\{screener:<Suspense/);
  assert.match(analysis,/samuraiReference&&trusted&&<div id="sam-analysis-screener"/);
  assert.match(atlas,/inlineTools\?\.\[chapter\.id\]/);
+ assert.doesNotMatch(atlas,/targetId:"sam-analysis-screener"/);
 });
 
 test("screener is descriptive not an attractiveness ranking",()=>{
