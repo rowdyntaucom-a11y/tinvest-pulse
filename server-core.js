@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const https = require('https');
 const crypto = require('crypto');
+const { normalizeMoexScreener } = require('./market-screener-core');
 require('dotenv').config();
 
 const app = express();
@@ -725,6 +726,8 @@ const HISTORY_CACHE = new Map();
 const HISTORY_CACHE_TTL_MS = 5 * 60 * 1000;
 const STRATEGY_LAB_CACHE = { createdAt: 0, data: null };
 const STRATEGY_LAB_CACHE_TTL_MS = 30 * 60 * 1000;
+const MARKET_SCREENER_CACHE = { createdAt: 0, data: null };
+const MARKET_SCREENER_CACHE_TTL_MS = 60 * 1000;
 
 
 function tradePriceValue(op) {
@@ -1454,6 +1457,51 @@ app.get('/api/strategy-lab-history', async (req, res) => {
     STRATEGY_LAB_CACHE.createdAt = Date.now();
     STRATEGY_LAB_CACHE.data = payload;
     res.setHeader('Cache-Control', 'public, max-age=300');
+    res.json(payload);
+  } catch (err) {
+    res.status(502).json({ok:false,error:err.message});
+  }
+});
+
+// Public MOEX TQBR market screener. Independent of broker credentials.
+app.get('/api/market-screener', async (req, res) => {
+  try {
+    if (MARKET_SCREENER_CACHE.data && Date.now() - MARKET_SCREENER_CACHE.createdAt < MARKET_SCREENER_CACHE_TTL_MS) {
+      res.setHeader('Cache-Control', 'public, max-age=30');
+      return res.json(MARKET_SCREENER_CACHE.data);
+    }
+
+    const url =
+      `${MOEX_BASE}engines/stock/markets/shares/boards/TQBR/securities.json` +
+      `?iss.meta=off&iss.only=securities,marketdata` +
+      `&securities.columns=SECID,SHORTNAME,LOTSIZE,LISTLEVEL,PREVPRICE` +
+      `&marketdata.columns=SECID,LAST,MARKETPRICE,MARKETPRICE2,WAPRICE,LASTTOPREVPRICE,VALTODAY,VALTODAY_RUR,VOLTODAY,NUMTRADES,OPEN,HIGH,LOW`;
+
+    const result = await safeFetch(url);
+    if (!result.ok) return res.status(502).json({ok:false,error:'MOEX screener source unavailable',status:result.status});
+
+    let parsed;
+    try {
+      parsed = JSON.parse(result.text);
+    } catch {
+      return res.status(502).json({ok:false,error:'MOEX screener payload is not valid JSON'});
+    }
+
+    const rows = normalizeMoexScreener(parsed);
+    const payload = {
+      ok: rows.length > 0,
+      contractVersion: '1.0',
+      fetchedAt: new Date().toISOString(),
+      source: 'MOEX ISS',
+      board: 'TQBR',
+      rows,
+      reason: rows.length ? null : 'MOEX returned no valid TQBR market rows.',
+      note: 'Public market snapshot only. Sorting/filtering is descriptive and does not rank investment attractiveness.'
+    };
+
+    MARKET_SCREENER_CACHE.createdAt = Date.now();
+    MARKET_SCREENER_CACHE.data = payload;
+    res.setHeader('Cache-Control', 'public, max-age=30');
     res.json(payload);
   } catch (err) {
     res.status(502).json({ok:false,error:err.message});
