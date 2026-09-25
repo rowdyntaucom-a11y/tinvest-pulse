@@ -49,6 +49,9 @@ function AssetsPreview(){
     <article><i>伍</i><span><b>Карточка актива</b><small>P/L · риск · история</small></span><em/></article>
     <article><i>陸</i><span><b>Операции</b><small>сделки · потоки · выплаты</small></span><em/></article>
     <article><i>漆</i><span><b>Целостность</b><small>покрытие · события · corporate actions</small></span><em/></article>
+    <article><i>捌</i><span><b>Отчёт</b><small>стоимость · база · broker P/L</small></span><em/></article>
+    <article><i>玖</i><span><b>Категории</b><small>классы · доли · результат</small></span><em/></article>
+    <article><i>拾</i><span><b>Валюты</b><small>покрытие · подтверждённый срез</small></span><em/></article>
    </div>
   </section>
  </div>;
