@@ -1,6 +1,4 @@
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
-import{classifyPosition}from"../../../v2/src/features/analytics/holdingsExplorer";
-import{assetClassLabel}from"../data/assetClasses";
 
 export type PortfolioReportRow={
  key:string;
@@ -31,12 +29,19 @@ export type PortfolioReportModel={
 
 function finite(value:number){return Number.isFinite(value)?value:0}
 function positive(value:number){const n=finite(value);return n>0?n:0}
-function reportPnl(position:PositionSnapshot){
- return finite(position.expectedYield);
-}
+function reportPnl(position:PositionSnapshot){return finite(position.expectedYield)}
 function normalizeLabel(value:unknown){
  const text=String(value??"").trim();
  return text||null;
+}
+function reportAssetClass(type:unknown){
+ const value=String(type??"").toLowerCase();
+ if(value.includes("share")||value.includes("stock"))return{key:"shares",label:"Акции"};
+ if(value.includes("bond"))return{key:"bonds",label:"Облигации"};
+ if(value.includes("etf")||value.includes("fund"))return{key:"funds",label:"Фонды"};
+ if(value.includes("currenc"))return{key:"currency",label:"Валюта"};
+ if(value.includes("future"))return{key:"futures",label:"Фьючерсы"};
+ return{key:"other",label:"Другое"};
 }
 
 type Classifier=(position:PositionSnapshot)=>{key:string;label:string}|null;
@@ -83,10 +88,7 @@ export function buildPortfolioReport(positions:PositionSnapshot[]):PortfolioRepo
  const totalCostBasis=usable.reduce((sum,row)=>sum+positive(row.costBasis),0);
  const totalPnl=usable.reduce((sum,row)=>sum+reportPnl(row),0);
 
- const category=buildSlice(usable,totalValue,position=>{
-  const key=classifyPosition(position.instrumentType);
-  return{key,label:assetClassLabel(key)};
- });
+ const category=buildSlice(usable,totalValue,position=>reportAssetClass(position.instrumentType));
  const currency=buildSlice(usable,totalValue,position=>{
   const raw=normalizeLabel(position.bond?.currency);
   if(!raw)return null;
