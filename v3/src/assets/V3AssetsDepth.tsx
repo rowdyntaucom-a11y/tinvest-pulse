@@ -9,6 +9,7 @@ import{assetClassLabel}from"../data/assetClasses";
 import{clampPercent}from"../data/units";
 import{V3HoldingsExplorer}from"./V3HoldingsExplorer";
 import{V3BondYieldDepth}from"./V3BondYieldDepth";
+import{V3EquityFundamentalsDepth}from"./V3EquityFundamentalsDepth";
 import"../styles/assetsDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -82,8 +83,10 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    {model.sectors.unclassified>0&&<p>Без подтверждённой отрасли: {rub.format(model.sectors.unclassified)} ₽. QVANIX не угадывает сектор по названию бумаги.</p>}
   </section>
 
+  <V3EquityFundamentalsDepth positions={positions} onOpenAsset={onOpenAsset}/>
+
   <section id="sam-assets-bonds" className="v3-assets-depth__block v3-assets-depth__bonds">
-   <div className="v3-assets-depth__title"><div><span>04 · ОБЛИГАЦИИ</span><h3>Сроки и структура</h3></div><small>{model.bonds.bondCount?rub.format(model.bonds.total)+" ₽":"нет позиций"}</small></div>
+   <div className="v3-assets-depth__title"><div><span>05 · ОБЛИГАЦИИ</span><h3>Сроки и структура</h3></div><small>{model.bonds.bondCount?rub.format(model.bonds.total)+" ₽":"нет позиций"}</small></div>
    {model.bonds.bondCount?<><div className="v3-assets-depth__bond-grid">
     <article><span>ОФЗ</span><strong>{pct.format(model.bonds.ofzShare*100)}%</strong><small>облигационной части</small></article>
     <article><span>Срок</span><strong>{model.bonds.weightedYearsToMaturity==null?"—":num.format(model.bonds.weightedYearsToMaturity)+" г."}</strong><small>взвешенный до погашения</small></article>
@@ -99,7 +102,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
   </section>
 
   <section id="sam-assets-positions" className="v3-assets-depth__block v3-assets-depth__positions">
-   <div className="v3-assets-depth__title"><div><span>05 · ПОЗИЦИИ</span><h3>Состав и детализация</h3></div><small>тап → карточка актива</small></div>
+   <div className="v3-assets-depth__title"><div><span>06 · ПОЗИЦИИ</span><h3>Состав и детализация</h3></div><small>тап → карточка актива</small></div>
    <V3HoldingsExplorer positions={positions} onOpenAsset={onOpenAsset}/>
   </section>
  </section>;
