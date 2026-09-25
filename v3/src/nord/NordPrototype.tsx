@@ -2,6 +2,7 @@ import type{CSSProperties}from"react";
 import type{V3Workspace}from"../app/model";
 import type{V3HomeViewModel}from"../home/homeViewModel";
 import{buildV3RelativeDepth}from"../analysis/analysisDepth";
+import{NordOfflineDeck}from"./NordOfflineDeck";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
@@ -77,11 +78,7 @@ export function NordPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavigate
     <button type="button" onClick={()=>onNavigate?.("income")}><i>ᚠ</i><span><b>Доход</b><small>казна и выплаты</small></span><em>03</em></button>
     <button type="button" onClick={()=>onNavigate?.("goal")}><i>ᛏ</i><span><b>Цель</b><small>путь капитала</small></span><em>04</em></button>
    </section>
-   </>:<section className="nord-home-v3__sealed" aria-label="Источник данных не подтверждён">
-    <div className="nord-home-v3__sealed-mark" aria-hidden="true"><i/><b>ᛉ</b><i/></div>
-    <header><span>SEALED HALL</span><strong>Терминал закрыт до подтверждения данных</strong><small>QVANIX не заполняет финансовые приборы нулями или предположениями.</small></header>
-    <div><span>После подтверждения откроются</span><b>капитал · TWR · XIRR · IMOEX · доход · структура</b></div>
-   </section>}
+   </>:<NordOfflineDeck onNavigate={onNavigate}/> }
 
    <footer className="nord-home-v3__footer" aria-hidden="true"><i/><span>СЕВЕРНЫЙ ПУТЬ · ДИСЦИПЛИНА · ГОРИЗОНТ</span><i/></footer>
   </section>
