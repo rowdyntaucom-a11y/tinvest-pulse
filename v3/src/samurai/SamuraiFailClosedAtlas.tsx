@@ -1,4 +1,4 @@
-import{useRef,useState}from"react";
+import{Fragment,type ReactNode,useRef,useState}from"react";
 
 export type SamuraiFailClosedKind="home"|"assets"|"analysis"|"income";
 type AtlasDestination="assets"|"analysis"|"income";
@@ -68,7 +68,21 @@ function AtlasChapterCard({chapter,selected,onSelect,formation=false}:{chapter:A
  </article>;
 }
 
-function HomePreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];selected:string|null;onSelect:(chapter:AtlasChapter)=>void}){
+type PreviewProps={
+ chapters:AtlasChapter[];
+ selected:string|null;
+ onSelect:(chapter:AtlasChapter)=>void;
+ renderDetail:(chapter:AtlasChapter)=>ReactNode;
+};
+
+function chapterNodes({chapters,selected,onSelect,renderDetail}:{chapters:AtlasChapter[];selected:string|null;onSelect:(chapter:AtlasChapter)=>void;renderDetail:(chapter:AtlasChapter)=>ReactNode},formation=false){
+ return chapters.map(chapter=><Fragment key={chapter.id}>
+  <AtlasChapterCard chapter={chapter} selected={selected===chapter.id} onSelect={onSelect} formation={formation}/>
+  {selected===chapter.id&&renderDetail(chapter)}
+ </Fragment>);
+}
+
+function HomePreview({chapters,selected,onSelect,renderDetail}:PreviewProps){
  return <div className="sam-offline-atlas__body sam-offline-atlas__body--home">
   <section className="sam-offline-history">
    <div className="sam-offline-history__metrics">
@@ -85,20 +99,20 @@ function HomePreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];selec
    </div>
    <footer><span>Портфель</span><i/><span>IMOEX</span><i/><small>график откроется после подтверждения истории</small></footer>
   </section>
-  <div className="sam-offline-atlas__chapters">{chapters.map(chapter=><AtlasChapterCard key={chapter.id} chapter={chapter} selected={selected===chapter.id} onSelect={onSelect}/>)}</div>
+  <div className="sam-offline-atlas__chapters">{chapterNodes({chapters,selected,onSelect,renderDetail})}</div>
  </div>;
 }
 
-function AssetsPreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];selected:string|null;onSelect:(chapter:AtlasChapter)=>void}){
+function AssetsPreview({chapters,selected,onSelect,renderDetail}:PreviewProps){
  return <div className="sam-offline-atlas__body sam-offline-atlas__body--assets">
   <section className="sam-offline-formation">
    <div className="sam-offline-formation__shield" aria-hidden="true"><i/><i/><i/><b>陣</b><span>TOP-3 —</span></div>
-   <div className="sam-offline-formation__rows">{chapters.map(chapter=><AtlasChapterCard key={chapter.id} chapter={chapter} selected={selected===chapter.id} onSelect={onSelect} formation/>)}</div>
+   <div className="sam-offline-formation__rows">{chapterNodes({chapters,selected,onSelect,renderDetail},true)}</div>
   </section>
  </div>;
 }
 
-function AnalysisPreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];selected:string|null;onSelect:(chapter:AtlasChapter)=>void}){
+function AnalysisPreview({chapters,selected,onSelect,renderDetail}:PreviewProps){
  return <div className="sam-offline-atlas__body sam-offline-atlas__body--analysis">
   <section className="sam-offline-scope">
    <div className="sam-offline-scope__radar" aria-hidden="true"><i/><i/><i/><i/><span/><b>眼</b></div>
@@ -109,11 +123,11 @@ function AnalysisPreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];s
     <EmptyMetric label="BETA" note="рынок"/>
    </div>
   </section>
-  <div className="sam-offline-atlas__chapters is-analysis">{chapters.map(chapter=><AtlasChapterCard key={chapter.id} chapter={chapter} selected={selected===chapter.id} onSelect={onSelect}/>)}</div>
+  <div className="sam-offline-atlas__chapters is-analysis">{chapterNodes({chapters,selected,onSelect,renderDetail})}</div>
  </div>;
 }
 
-function IncomePreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];selected:string|null;onSelect:(chapter:AtlasChapter)=>void}){
+function IncomePreview({chapters,selected,onSelect,renderDetail}:PreviewProps){
  return <div className="sam-offline-atlas__body sam-offline-atlas__body--income">
   <section className="sam-offline-treasury">
    <div className="sam-offline-treasury__summary">
@@ -125,7 +139,7 @@ function IncomePreview({chapters,selected,onSelect}:{chapters:AtlasChapter[];sel
    </div>
    <div className="sam-offline-treasury__flow" aria-hidden="true"><i/><i/><i/><i/><b>禄</b></div>
   </section>
-  <div className="sam-offline-atlas__chapters">{chapters.map(chapter=><AtlasChapterCard key={chapter.id} chapter={chapter} selected={selected===chapter.id} onSelect={onSelect}/>)}</div>
+  <div className="sam-offline-atlas__chapters">{chapterNodes({chapters,selected,onSelect,renderDetail})}</div>
  </div>;
 }
 
@@ -149,30 +163,28 @@ export function SamuraiFailClosedAtlas({kind,onNavigate}:{kind:SamuraiFailClosed
  const x=COPY[kind],chapters=CHAPTERS[kind];
  const[selectedId,setSelectedId]=useState<string|null>(null);
  const detailRef=useRef<HTMLElement|null>(null);
- const selected=chapters.find(chapter=>chapter.id===selectedId)??null;
-
  const choose=(chapter:AtlasChapter)=>setSelectedId(current=>current===chapter.id?null:chapter.id);
+ const renderDetail=(chapter:AtlasChapter)=><aside ref={detailRef} id="sam-offline-atlas-detail" className="sam-offline-atlas__detail is-inline" tabIndex={-1} aria-live="polite">
+  <header><div><span>{chapter.code} · PREVIEW</span><strong>{chapter.label}</strong></div><button type="button" onClick={()=>setSelectedId(null)} aria-label="Закрыть превью">×</button></header>
+  <p>{chapter.detail}</p>
+  <div className="sam-offline-atlas__detail-grid">
+   <article><span>СТАТУС</span><strong>DATA LOCK</strong><small>Интерфейс доступен, финансовые значения не подставляются без источника.</small></article>
+   <article><span>НУЖЕН ИСТОЧНИК</span><strong>VERIFY</strong><small>{chapter.source}</small></article>
+  </div>
+  <div className="sam-offline-atlas__detail-actions">
+   {chapter.destination&&onNavigate&&<button type="button" onClick={()=>onNavigate(chapter.destination!)}>Открыть раздел</button>}
+   {chapter.targetId&&<button type="button" onClick={()=>scrollToTarget(chapter.targetId!)}>Открыть инструмент</button>}
+   <button type="button" onClick={()=>scrollToSourceRoute(detailRef.current)}>Маршрут проверки</button>
+  </div>
+ </aside>;
 
  return <section className={"sam-offline-atlas sam-offline-atlas--"+kind} aria-label={x.title}>
   <header className="sam-offline-atlas__head">
    <div><span>{x.code}</span><strong>{x.title}</strong><small>{x.subtitle}</small></div>
    <i aria-hidden="true">{x.glyph}</i>
   </header>
-  <div className="sam-offline-atlas__interaction-hint"><span>TAP / DETAILS</span><small>Карточки разделов открываются даже в DATA LOCK</small></div>
-  {kind==="home"?<HomePreview chapters={chapters} selected={selectedId} onSelect={choose}/>:kind==="assets"?<AssetsPreview chapters={chapters} selected={selectedId} onSelect={choose}/>:kind==="analysis"?<AnalysisPreview chapters={chapters} selected={selectedId} onSelect={choose}/>:<IncomePreview chapters={chapters} selected={selectedId} onSelect={choose}/>}
-  {selected&&<aside ref={detailRef} id="sam-offline-atlas-detail" className="sam-offline-atlas__detail" tabIndex={-1} aria-live="polite">
-   <header><div><span>{selected.code} · PREVIEW</span><strong>{selected.label}</strong></div><button type="button" onClick={()=>setSelectedId(null)} aria-label="Закрыть превью">×</button></header>
-   <p>{selected.detail}</p>
-   <div className="sam-offline-atlas__detail-grid">
-    <article><span>СТАТУС</span><strong>DATA LOCK</strong><small>Интерфейс доступен, финансовые значения не подставляются без источника.</small></article>
-    <article><span>НУЖЕН ИСТОЧНИК</span><strong>VERIFY</strong><small>{selected.source}</small></article>
-   </div>
-   <div className="sam-offline-atlas__detail-actions">
-    {selected.destination&&onNavigate&&<button type="button" onClick={()=>onNavigate(selected.destination!)}>Открыть раздел</button>}
-    {selected.targetId&&<button type="button" onClick={()=>scrollToTarget(selected.targetId!)}>Открыть инструмент</button>}
-    <button type="button" onClick={()=>scrollToSourceRoute(detailRef.current)}>Маршрут проверки</button>
-   </div>
-  </aside>}
+  <div className="sam-offline-atlas__interaction-hint"><span>TAP / DETAILS</span><small>Карточки разделов раскрываются прямо под выбранным пунктом</small></div>
+  {kind==="home"?<HomePreview chapters={chapters} selected={selectedId} onSelect={choose} renderDetail={renderDetail}/>:kind==="assets"?<AssetsPreview chapters={chapters} selected={selectedId} onSelect={choose} renderDetail={renderDetail}/>:kind==="analysis"?<AnalysisPreview chapters={chapters} selected={selectedId} onSelect={choose} renderDetail={renderDetail}/>:<IncomePreview chapters={chapters} selected={selectedId} onSelect={choose} renderDetail={renderDetail}/>}
   <footer className="sam-offline-atlas__status"><span>DATA LOCK</span><i/><small>«—» означает: функция есть, но значение не подтверждено источником</small></footer>
  </section>;
 }
