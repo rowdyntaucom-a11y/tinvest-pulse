@@ -1492,22 +1492,38 @@ app.get('/api/operations-summary', async (req, res) => {
 
     const operations = await getOperations(account.id);
     const rows = (Array.isArray(operations) ? operations : []).map(op => ({
+      id: op.id || op.operationId || null,
       date: op.date || null,
       type: op.type || null,
       name: op.name || null,
       ticker: op.ticker || null,
       figi: op.figi || null,
+      instrumentUid: op.instrumentUid || null,
+      quantity: op.quantity ?? null,
       payment: operationCash(op),
       isExternalCash: isExternalCashOperation(op),
       isIncome: isIncomeOperation(op)
     }));
+    const observedDates = rows
+      .map(row => safeDate(row.date))
+      .filter(Boolean)
+      .sort((a, b) => a - b);
+    const rowCap = 10 * 1000;
 
     res.json({
       ok: true,
+      contractVersion: '2.0',
+      fetchedAt: new Date().toISOString(),
       account: { id: account.id, name: account.name || account.type || 'T-Invest account' },
       count: rows.length,
       externalCashTotal: rows.filter(x => x.isExternalCash).reduce((s, x) => s + x.payment, 0),
       passiveIncomeTotal: rows.filter(x => x.isIncome).reduce((s, x) => s + Math.abs(x.payment), 0),
+      coverage: {
+        observedFrom: observedDates.length ? observedDates[0].toISOString() : null,
+        observedTo: observedDates.length ? observedDates[observedDates.length - 1].toISOString() : null,
+        rowCap,
+        possiblyTruncated: rows.length >= rowCap
+      },
       operations: rows
     });
   } catch (err) {
