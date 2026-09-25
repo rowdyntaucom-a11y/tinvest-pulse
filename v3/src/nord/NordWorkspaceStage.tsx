@@ -1,4 +1,5 @@
 import type{ReactNode}from"react";
+import{NordScrollCue}from"./NordScrollCue";
 
 export type NordWorkspaceKind="assets"|"analysis"|"income"|"goal";
 const COPY:Record<NordWorkspaceKind,{code:string;title:string;subtitle:string;rune:string;cue:string}>={
@@ -23,6 +24,6 @@ export function NordWorkspaceStage({kind,targetId,value,meta,children}:{kind:Nor
    <div className="nord-stage-v3__rune" aria-hidden="true"><i/><b>{x.rune}</b><i/></div>
    {children}
   </section>
-  <button type="button" className="nord-stage-v3__cue" onClick={()=>scrollTo(targetId)} aria-label={"Плавно перейти ниже: "+x.cue}><span>{x.cue}</span><i aria-hidden="true">⌄</i></button>
+  <NordScrollCue targetId={targetId} label={x.cue}/>
  </section>;
 }
