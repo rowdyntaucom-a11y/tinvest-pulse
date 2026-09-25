@@ -55,7 +55,7 @@ export async function loadMarketScreener(signal?:AbortSignal):Promise<MarketScre
   const response=await fetch("/api/market-screener",{cache:"no-store",signal});
   if(!response.ok)return{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"HTTP "+response.status};
   const raw=await response.json() as any;
-  const rows=(Array.isArray(raw?.rows)?raw.rows:[]).map(row).filter((x):x is MarketScreenerRow=>Boolean(x));
+  const rows=(Array.isArray(raw?.rows)?raw.rows:[]).map(row).filter((x:MarketScreenerRow|null):x is MarketScreenerRow=>Boolean(x));
   return{
    available:raw?.ok===true&&rows.length>0,
    fetchedAt:typeof raw?.fetchedAt==="string"?raw.fetchedAt:null,
