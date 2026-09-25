@@ -148,7 +148,7 @@ export function SamuraiPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavig
    <SamuraiFailClosedAtlas kind="home"/>
    <section className="sam-world__awaiting sam-world__awaiting--compact" aria-label="Маршрут подтверждения источника">
     <div className="sam-world__awaiting-art" aria-hidden="true"><span>始</span><i/><i/><i/></div>
-    <header><span>DATA GATE // FAIL-CLOSED</span><strong>Подтвердить источник</strong><small>Функциональность видна выше, но QVANIX не подставляет неподтверждённые финансовые значения.</small></header>
+    <header><span>DATA GATE // FAIL-CLOSED</span><strong>Источник ещё не подтверждён</strong><small>Функциональность видна выше; финансовые значения появятся только после проверки источника.</small></header>
     <div className="sam-world__awaiting-route">
      <article><b>壱</b><span>Счёт</span><small>получить брокерский снимок</small></article>
      <article><b>弐</b><span>История</span><small>проверить точки TWR</small></article>
