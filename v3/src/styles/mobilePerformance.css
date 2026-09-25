@@ -3132,18 +3132,3 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   background:linear-gradient(180deg,rgba(12,31,41,.97),rgba(5,15,23,.98))!important;
  }
 }
-@media(prefers-reduced-motion:no-preference) and (max-width:430px){
- .v3-app[data-shell="aurora"] .nord-scroll-cue:not(.is-hidden) i:first-of-type{
-  animation:nordScrollCueDrop 1.75s ease-in-out infinite;
- }
- .v3-app[data-shell="aurora"] .nord-scroll-cue:not(.is-hidden) i:last-of-type{
-  animation:nordScrollCueDrop 1.75s .12s ease-in-out infinite;
- }
-}
-@media(prefers-reduced-motion:reduce){
- .v3-app[data-shell="aurora"] .nord-scroll-cue i{animation:none!important}
-}
-@keyframes nordScrollCueDrop{
- 0%,100%{transform:translateY(-1px);opacity:.45}
- 50%{transform:translateY(4px);opacity:1}
-}
