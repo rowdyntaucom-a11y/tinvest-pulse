@@ -1,3 +1,4 @@
+import type{ReactNode}from"react";
 import{SamuraiFailClosedAtlas}from"./SamuraiFailClosedAtlas";
 /* Compatibility markers for the earlier TrustCanvas contract.
    The functional atlas supersedes these visual placeholders while their CSS
@@ -13,13 +14,13 @@ const COPY:Record<GateKind,{glyph:string,chapter:string,code:string,eyebrow:stri
  income:{glyph:"禄",chapter:"Доход",code:"TREASURY // 04",eyebrow:"TREASURY LOCKED",title:"Казначейство ждёт факт",lead:"Купоны и дивиденды не заменяются оценками: нужен подтверждённый поток операций.",steps:[["壱","Операции","Получить выплаты"],["弐","Связь","Сопоставить источники"],["参","Поток","Показать факт и темп"]]}
 };
 
-export function SamuraiTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind;onRefresh?:()=>void|Promise<void>;refreshing?:boolean}){
+export function SamuraiTrustGate({kind,onRefresh,refreshing=false,inlineTools}:{kind:GateKind;onRefresh?:()=>void|Promise<void>;refreshing?:boolean;inlineTools?:Record<string,ReactNode>}){
  const x=COPY[kind];
  return <section className={"sam-trust-gate sam-trust-gate--"+kind} data-kind={kind} aria-label={x.title}>
   <div className="sam-trust-gate__chapter"><span>{x.code}</span><strong>{x.chapter}</strong></div>
   <div className="sam-trust-gate__watermark" aria-hidden="true">{x.glyph}</div>
   <header><i aria-hidden="true">{x.glyph}</i><div><span>{x.eyebrow}</span><strong>{x.title}</strong><small>{x.lead}</small></div></header>
-  <SamuraiFailClosedAtlas kind={kind}/>
+  <SamuraiFailClosedAtlas kind={kind} inlineTools={inlineTools}/>
   <button type="button" className="sam-trust-depth-cue" onClick={e=>{const route=e.currentTarget.closest(".sam-trust-gate")?.querySelector(".sam-trust-gate__route");const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;route?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})}} aria-label="Перейти к маршруту проверки"><span>НИЖЕ · МАРШРУТ ПРОВЕРКИ</span><i aria-hidden="true">⌄</i></button>
   <div className="sam-trust-gate__route">{x.steps.map(([n,title,copy],index)=><article key={n}><b>{n}</b><span>{title}</span><small>{copy}</small><i aria-hidden="true">{index<2?"→":"✓"}</i></article>)}</div>
   <div className="sam-trust-gate__action"><button type="button" onClick={()=>void onRefresh?.()} disabled={refreshing||!onRefresh}>{refreshing?"Синхронизация…":"Проверить источник"}</button><span>{refreshing?"Повторно запрашиваем подтверждённый снимок":"Запустить повторную проверку данных"}</span></div>
