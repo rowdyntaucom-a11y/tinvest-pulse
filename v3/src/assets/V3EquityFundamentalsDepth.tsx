@@ -63,7 +63,7 @@ export function V3EquityFundamentalsDepth({positions,onOpenAsset}:{positions:Pos
  if(!equities.length)return <section id="sam-assets-fundamentals" className="v3-equity-fundamentals"><div className="v3-equity-fundamentals__gate">Акций в текущем подтверждённом составе нет.</div></section>;
 
  return <section id="sam-assets-fundamentals" className="v3-equity-fundamentals" aria-label="Фундаментальные показатели акций">
-  <header className="v3-equity-fundamentals__head"><div><span>EQUITY INTELLIGENCE // V1</span><h3>Фундаментальные показатели акций</h3><p>Только официальные ненулевые метрики T‑Invest. Без скрытого скоринга, ярлыков «дёшево/дорого» и торговых выводов.</p></div><strong>{state==="loading"?"SYNC":state==="live"?"T‑INVEST":"NO DATA"}</strong></header>
+  <header className="v3-equity-fundamentals__head"><div><span>04 · АКЦИИ // EQUITY INTELLIGENCE V1</span><h3>Фундаментальные показатели акций</h3><p>Только официальные ненулевые метрики T‑Invest. Без скрытого скоринга, ярлыков «дёшево/дорого» и торговых выводов.</p></div><strong>{state==="loading"?"SYNC":state==="live"?"T‑INVEST":"NO DATA"}</strong></header>
 
   <div className="v3-equity-fundamentals__summary">
    <article><span>Капитал в акциях</span><strong>{rub.format(coverage.equityCapital||equities.reduce((sum,row)=>sum+row.currentValue,0))} ₽</strong><small>{coverage.companies||equities.length} компаний</small></article>
