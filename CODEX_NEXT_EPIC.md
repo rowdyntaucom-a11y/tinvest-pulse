@@ -1,4 +1,26 @@
-# CODEX NEXT EPIC — QVANIX UX Architecture + Comprehension
+# CODEX NEXT EPIC — QVANIX Financial Core / Pre-Monday Sprint
+
+## Latest override — 2026-09-25 evening
+
+This file previously described a narrower UX Architecture Epic. The user has now expanded and reprioritized the work.
+
+Read `QVANIX_FINANCIAL_CORE_SPRINT.md` first. Current mission:
+- DNA / Living World frozen indefinitely; preserve only, no active feature work;
+- Samurai remains the reference shell;
+- develop deterministic financial functions, widgets, charts and professional tools before Monday;
+- reduce navigation overload by grouping deep tools instead of deleting capability;
+- phone/tablet/desktop share one information architecture, with desktop treated as a first-class cockpit;
+- preserve future registration and per-user read-only broker/API credential architecture;
+- support professional analytics including futures/derivatives and later options/order-book/microstructure when verified data contracts exist;
+- **no order entry, no broker execution, no auto-trading**;
+- Snowball is a functional/usability benchmark, not a UI template;
+- Monday review focuses on composition and widget priority after the financial core is stronger.
+
+Implementation should proceed in large coherent patches with tests and progress checkpoints. Do not work on DNA unless a regression blocks the financial app.
+
+---
+
+## Previous UX Architecture brief (retained as supporting guidance)
 
 ## Reference-shell lock — 2026-09-25\n\nThe latest user direction supersedes prior shell-rotation sequencing: **Samurai is the reference implementation for Snowball+ functional parity.** Build and validate the full financial product depth there first. Do not spend implementation time porting each unfinished feature into Cosmos/NORD in parallel. Keep financial engines shared; after Samurai acceptance, transfer the same capabilities to the other shells using shell-specific presentation only.\n\n## Current priority lock — 2026-09-24
 
