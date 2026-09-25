@@ -1985,3 +1985,132 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     z-index:6!important;
   }
 }
+
+
+/* ========================================================================== */
+/* NORD real-device correction — recording 1000031704.mp4                     */
+/* Keep the Rune Gate cinematic stage, remove inherited frost-paper surfaces   */
+/* and keep fail-closed data readable without white cards over the artwork.     */
+/* ========================================================================== */
+@media(max-width:430px){
+  .v3-app[data-shell="aurora"]{
+    --v3-card:rgba(5,15,24,.88)!important;
+    --v3-line:rgba(169,244,238,.13)!important;
+    --v3-text:#edf8f8!important;
+    --v3-muted:#94adb0!important;
+    --v3-accent:#a9f4ee!important;
+    background:#040b12!important;
+  }
+
+  /* The hero must actually touch both viewport edges on Samsung-class phones. */
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-home{
+    width:100%!important;
+    margin:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    background:#040b12!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  /* Below the art: dark Nordic instrument deck, never inherited white paper. */
+  .v3-app[data-shell="aurora"][data-workspace="home"] :is(
+    .v3-primary-grid article,
+    .v3-history-card,
+    .v3-home-benchmark,
+    .v3-pulse article,
+    .v3-home-actions button,
+    .v3-context-row article
+  ){
+    color:#edf8f8!important;
+    background:linear-gradient(145deg,rgba(8,23,34,.97),rgba(4,13,21,.97))!important;
+    border-color:rgba(169,244,238,.12)!important;
+    box-shadow:inset 0 1px rgba(255,255,255,.025)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] :is(
+    .v3-primary-grid span,.v3-primary-grid small,
+    .v3-history-card span,.v3-history-card small,
+    .v3-home-benchmark span,.v3-home-benchmark small,
+    .v3-pulse span,.v3-pulse small,
+    .v3-home-actions span,.v3-home-actions strong,
+    .v3-context-row span,.v3-context-row small
+  ){color:#91a9ad!important}
+  .v3-app[data-shell="aurora"][data-workspace="home"] :is(
+    .v3-primary-grid strong,.v3-history-card strong,
+    .v3-home-benchmark strong,.v3-pulse strong,.v3-context-row strong
+  ){color:#eef9f8!important}
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-home-actions strong{color:#d8e8e8!important}
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-pulse article,
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-home-actions button{
+    border-radius:13px!important;
+  }
+
+  /* Old NORD frost-paper rules clash with the new Rune Gate world. */
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+    width:64%!important;
+    max-width:248px!important;
+    margin-left:12px!important;
+    margin-right:0!important;
+    padding:10px 12px 11px!important;
+    color:#edf8f8!important;
+    border:0!important;
+    border-left:2px solid rgba(169,244,238,.48)!important;
+    border-top:1px solid rgba(169,244,238,.13)!important;
+    border-radius:0!important;
+    background:linear-gradient(100deg,rgba(5,15,24,.91),rgba(5,15,24,.68) 74%,rgba(5,15,24,.10))!important;
+    box-shadow:0 16px 36px rgba(0,0,0,.18)!important;
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)!important;
+  }
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head:before{
+    background:transparent!important;
+  }
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head:after{
+    inset:auto 8px auto auto!important;
+    top:7px!important;
+    width:auto!important;
+    height:auto!important;
+    border:0!important;
+    border-radius:0!important;
+    background:none!important;
+    box-shadow:none!important;
+    color:rgba(240,176,93,.68)!important;
+    opacity:1!important;
+  }
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]) .v3-page-head :is(h1,p),
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]) .v3-page-head>span{
+    color:#edf8f8!important;
+  }
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]) .v3-page-head>span{
+    color:#8fc9cd!important;
+  }
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]) .v3-page-head p{
+    color:#9db4b6!important;
+  }
+
+  /* Fail-closed metrics stay atmospheric and legible instead of reading as blanks. */
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]) :is(
+    .v3-assets-hero,.v3-assets-summary article,
+    .v3-analysis-signal>div,.v3-analysis-grid article,
+    .v3-income-hero,.v3-income-grid article,
+    .v3-goal-hero,.v3-goal-progress,.v3-goal-journey,.v3-goal-facts>*
+  ){
+    color:#edf8f8!important;
+    background:linear-gradient(145deg,rgba(7,21,32,.88),rgba(4,14,23,.80))!important;
+    border-color:rgba(169,244,238,.12)!important;
+  }
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]) :is(
+    .v3-assets-summary span,.v3-assets-summary small,
+    .v3-analysis-grid span,.v3-analysis-grid small,
+    .v3-analysis-signal span,.v3-analysis-signal small,
+    .v3-income-grid span,.v3-income-grid small,
+    .v3-goal-facts span,.v3-goal-facts small
+  ){color:#95adaf!important}
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]) :is(
+    .v3-assets-summary strong,.v3-analysis-grid strong,
+    .v3-analysis-signal strong,.v3-income-grid strong,.v3-goal-facts strong
+  ){color:#edf8f8!important}
+}
