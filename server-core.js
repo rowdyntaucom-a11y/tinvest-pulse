@@ -1411,6 +1411,55 @@ app.get('/api/history-debug', async (req, res) => {
   }
 });
 
+// Public market-history contract for Portfolio Laboratory.
+// Uses official MOEX total-return indices and never requires broker credentials.
+app.get('/api/strategy-lab-history', async (req, res) => {
+  try {
+    if (STRATEGY_LAB_CACHE.data && Date.now() - STRATEGY_LAB_CACHE.createdAt < STRATEGY_LAB_CACHE_TTL_MS) {
+      res.setHeader('Cache-Control', 'public, max-age=300');
+      return res.json(STRATEGY_LAB_CACHE.data);
+    }
+
+    const to = new Date();
+    const from = new Date(to);
+    from.setUTCFullYear(from.getUTCFullYear() - 5);
+
+    const [equityPoints, bondPoints] = await Promise.all([
+      getMoexIndexHistory('MCFTR', from, to),
+      getMoexIndexHistory('RGBITR', from, to)
+    ]);
+
+    const payload = {
+      ok: equityPoints.length > 1 && bondPoints.length > 1,
+      contractVersion: '1.0',
+      fetchedAt: new Date().toISOString(),
+      from: dateKey(from),
+      to: dateKey(to),
+      equity: {
+        code: 'MCFTR',
+        label: 'MOEX Russia Total Return Index',
+        method: 'gross total return',
+        points: equityPoints
+      },
+      bond: {
+        code: 'RGBITR',
+        label: 'Russian Government Bond Index Total Return',
+        method: 'total return',
+        points: bondPoints
+      },
+      reason: equityPoints.length > 1 && bondPoints.length > 1 ? null : 'MOEX total-return history is incomplete.',
+      note: 'Portfolio Lab aligns shared trading dates client-side. This market history is independent from the user portfolio and does not reconstruct actual past holdings.'
+    };
+
+    STRATEGY_LAB_CACHE.createdAt = Date.now();
+    STRATEGY_LAB_CACHE.data = payload;
+    res.setHeader('Cache-Control', 'public, max-age=300');
+    res.json(payload);
+  } catch (err) {
+    res.status(502).json({ok:false,error:err.message});
+  }
+});
+
 // Basic health check. Does not contact T-Bank.
 app.get('/api/health', (req, res) => {
   res.json({
