@@ -47,6 +47,8 @@ function AssetsPreview(){
     <article><i>参</i><span><b>Отрасли</b><small>покрытие метаданных</small></span><em/></article>
     <article><i>肆</i><span><b>Облигации</b><small>сроки · эмитенты · купоны</small></span><em/></article>
     <article><i>伍</i><span><b>Карточка актива</b><small>P/L · риск · история</small></span><em/></article>
+    <article><i>陸</i><span><b>Операции</b><small>сделки · потоки · выплаты</small></span><em/></article>
+    <article><i>漆</i><span><b>Целостность</b><small>покрытие · события · corporate actions</small></span><em/></article>
    </div>
   </section>
  </div>;
