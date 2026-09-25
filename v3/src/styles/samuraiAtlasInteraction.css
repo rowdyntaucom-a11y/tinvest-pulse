@@ -1,0 +1,123 @@
+/* Samurai fail-closed Atlas interaction v1.
+   Chapters stay fail-closed for finance data, but the architecture itself is now usable. */
+.v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint{
+ display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:8px;padding:7px 8px;
+ border:1px solid rgba(201,155,88,.10);background:linear-gradient(90deg,rgba(20,14,9,.34),rgba(4,13,11,.44))
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint span{
+ color:#d6ad70;font:750 7px/1 Inter,system-ui,sans-serif;letter-spacing:.12em
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint small{
+ color:#768881;font:7px/1.25 Inter,system-ui,sans-serif;text-align:right
+}
+
+.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article{
+ position:relative;isolation:isolate;transition:border-color .18s ease,background .18s ease,transform .18s ease
+}
+.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article.is-selected{
+ border-color:rgba(114,216,196,.36)!important;
+ background:linear-gradient(115deg,rgba(10,31,27,.92),rgba(22,17,10,.70))!important;
+ transform:translateY(-1px)
+}
+.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article.is-selected>i{
+ border-color:rgba(114,216,196,.34);color:#aee6d9
+}
+.v3-app[data-shell="samurai"] .sam-offline-chapter-hit{
+ position:absolute;z-index:4;inset:0;width:100%;height:100%;padding:0;border:0;border-radius:0;background:transparent;
+ cursor:pointer;-webkit-tap-highlight-color:rgba(114,216,196,.08);touch-action:manipulation
+}
+.v3-app[data-shell="samurai"] .sam-offline-chapter-hit:after{
+ content:"›";position:absolute;right:6px;top:50%;transform:translateY(-50%);
+ color:rgba(201,155,88,.46);font:700 13px/1 Georgia,serif;transition:transform .18s ease,color .18s ease
+}
+.v3-app[data-shell="samurai"] .sam-offline-chapter-hit[aria-expanded="true"]:after{
+ content:"⌄";color:#72d8c4;transform:translateY(-50%) rotate(0deg)
+}
+.v3-app[data-shell="samurai"] .sam-offline-chapter-hit:focus-visible{
+ outline:1px solid #72d8c4;outline-offset:-2px
+}
+@media(hover:hover){
+ .v3-app[data-shell="samurai"] .sam-offline-chapter-hit:hover:after{color:#e1b978;transform:translate(2px,-50%)}
+ .v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article:has(.sam-offline-chapter-hit:hover){
+  border-color:rgba(201,155,88,.20)
+ }
+}
+
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail{
+ position:relative;z-index:4;margin-top:10px;padding:11px;
+ border:1px solid rgba(114,216,196,.18);border-left:2px solid rgba(201,155,88,.48);
+ background:
+ radial-gradient(circle at 94% 10%,rgba(227,75,59,.09),transparent 28%),
+ linear-gradient(145deg,rgba(3,13,11,.98),rgba(5,10,8,.94));
+ box-shadow:0 14px 28px rgba(0,0,0,.20)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail:focus{outline:none}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail>header{
+ display:flex;justify-content:space-between;gap:10px;align-items:start;padding:0 0 8px;border-bottom:1px solid rgba(201,155,88,.08)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail>header span{
+ display:block;color:#c99b58;font:750 7px/1 Inter,system-ui,sans-serif;letter-spacing:.12em
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail>header strong{
+ display:block;margin-top:5px;color:#edf3f0;font:600 14px/1.05 Inter,system-ui,sans-serif
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail>header button{
+ flex:0 0 30px;width:30px;height:30px;border:1px solid rgba(201,155,88,.14);border-radius:0;
+ background:rgba(17,13,9,.50);color:#8fa09a;font:18px/1 Inter,system-ui,sans-serif;cursor:pointer
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail>p{
+ margin:9px 0 0;color:#96a59f;font:8.5px/1.45 Inter,system-ui,sans-serif
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid{
+ display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid article{
+ min-height:72px;padding:9px;border:1px solid rgba(114,216,196,.08);background:rgba(3,10,8,.68)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid span,
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid strong,
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid small{display:block}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid span{
+ color:#71847d;font:700 7px/1 Inter,system-ui,sans-serif;letter-spacing:.08em
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid strong{
+ margin-top:6px;color:#df7467;font:750 9px/1 Inter,system-ui,sans-serif
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid article+article strong{color:#d6ad70}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid small{
+ margin-top:5px;color:#7c8e87;font:7.5px/1.38 Inter,system-ui,sans-serif
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-actions{
+ display:flex;gap:6px;flex-wrap:wrap;margin-top:9px
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-actions button{
+ min-height:36px;padding:0 11px;border:1px solid rgba(201,155,88,.20);border-radius:0;
+ background:linear-gradient(145deg,rgba(27,18,10,.72),rgba(4,13,10,.84));color:#d8b172;
+ font:750 8px/1 Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;touch-action:manipulation
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-actions button:first-child:not(:only-child){
+ border-color:rgba(114,216,196,.24);color:#9ed9cd;background:linear-gradient(145deg,rgba(7,30,25,.72),rgba(4,13,10,.84))
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail-actions button:focus-visible,
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail>header button:focus-visible{
+ outline:1px solid #72d8c4;outline-offset:2px
+}
+
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint{padding:8px 9px}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint span{font-size:7.5px}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint small{font-size:7.2px}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__detail{scroll-margin-top:58px}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__detail>p{font-size:9px}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid small{font-size:7.8px}
+}
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint{display:block}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__interaction-hint small{display:block;margin-top:4px;text-align:left}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__detail-grid{grid-template-columns:1fr}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__detail-actions button{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article,
+ .v3-app[data-shell="samurai"] .sam-offline-chapter-hit:after{transition:none!important}
+}
