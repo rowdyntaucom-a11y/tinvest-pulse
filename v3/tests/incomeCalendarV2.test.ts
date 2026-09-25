@@ -8,9 +8,8 @@ const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",imp
 
 test("Samurai income adds forward windows and upcoming payout detail",()=>{
  assert.match(view,/sam-income-upcoming/);
- assert.match(panel,/3М/);
- assert.match(panel,/6М/);
- assert.match(panel,/12М/);
+ assert.match(panel,/\[3,6,12\] as IncomeForwardMonths\[\]/);
+ assert.match(panel,/\{value\}М/);
  assert.match(panel,/БЛИЖАЙШИЕ ВЫПЛАТЫ/);
  assert.match(panel,/perSecurity/);
  assert.match(panel,/lastBuyDate/);
