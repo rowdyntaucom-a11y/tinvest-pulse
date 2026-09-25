@@ -29,6 +29,13 @@ test("Home Atlas can navigate to real workspaces",()=>{
  assert.match(prototype,/SamuraiFailClosedAtlas kind="home" onNavigate=\{onNavigate\}/);
 });
 
+test("locked Assets Atlas stays in parity with live equity and bond chapters",()=>{
+ assert.match(atlas,/id:"fundamentals",code:"肆",label:"Акции"/);
+ assert.match(atlas,/GetAssetFundamentals/);
+ assert.match(atlas,/id:"bonds",code:"伍",label:"Облигации"/);
+ assert.match(atlas,/GetMarketValues/);
+});
+
 test("interaction layer has mobile tap/focus treatment",()=>{
  assert.match(css,/cursor:pointer/);
  assert.match(css,/touch-action:manipulation/);
