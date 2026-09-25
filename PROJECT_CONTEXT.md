@@ -241,5 +241,5 @@ Resume point: continue from the approved sharp Cosmos Mix C master and implement
 Implementation checkpoint 2026-09-24: the Cosmos UI language has now been reforged around **Blue Singularity / Sentinel Order** (geometry, materials, chrome, motion and workspace atmosphere) without substituting a new image for Mix C. The exact sharp Mix C bytes are still not durably stored in the repository, so final artwork mounting remains blocked until that original asset is persisted. Do not point the shell at the rejected blurry fal.ai derivative.
 
 ## Latest resume checkpoint — 2026-09-25
-Continue from `progress/2026-09-25-samurai-operations-integrity-v1.md` + current `main`. Samurai now has the first real Snowball+ breadth expansion beyond the fail-closed atlas: executed Operations + explicit Event Integrity. Corporate-action completeness remains source-gated and unverified. Next active gap is **Report + category + currency drill-down**, still Samurai-first.
+Continue from `progress/2026-09-25-samurai-recording-1729-readability.md` + current `main`. The Samsung 1000031729 pass corrected the fail-closed Atlas readability/duplication regression without changing finance logic. Samurai remains the only active Snowball+ reference shell. Next active functional surface: **Report + category + currency drill-down**.
 
