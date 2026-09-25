@@ -10,6 +10,8 @@
 
 Current order: **Assets Depth → Analysis Depth → Income Depth → Goal/main-tab completion → shared cross-shell/mobile polish → DNA WORLD last.** Existing DNA work below is retained as future/historical direction, not as current implementation priority. A DNA change is allowed before then only when required to fix a regression that blocks the rest of the application.
 
+**Deep-workspace rule (2026-09-25):** every ordinary tab in every shell may extend through multiple vertical chapters. First screen = fast answer + atmosphere; deeper chapters = full functionality. Provide visible shell-specific downward cues between major chapters, placed in art-safe zones or normal flow, never over live controls. Product breadth should meet or exceed Snowball as an internal benchmark while preserving QVANIX deterministic/fail-closed methodology and unique shell identity. Pulse/Screenshot mode is the exception and stays one-screen.
+
 ## 1. Product idea
 TInvest Pulse is a mobile-first personal investment dashboard for a long-term T-Bank / Tinkoff Investments portfolio. It should not look like a conventional broker terminal. The core idea is to turn dry portfolio data into an understandable, visual and living system: what is happening now, how capital is structured, what real events matter, how much passive income is generated, and how the investor progresses over years rather than trades day-to-day. The product is designed first for smartphone use and clean screenshots for Tinkoff Pulse.
 
