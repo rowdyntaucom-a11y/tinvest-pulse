@@ -45,6 +45,6 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
       </article>}):<div className="v3-empty">{trusted&&mode==="detailed"?"Нет позиций в выбранном фильтре":"Нет подтверждённых позиций для отображения"}</div>}</section>
     </>}
     {!themedDepth&&mode==="detailed"&&trusted&&view==="explorer"&&<Suspense fallback={<section className="v3-empty">Открываем глубокую структуру портфеля…</section>}><V3HoldingsExplorer positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>}
-    {trusted&&themedDepth&&<Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>}
+    {trusted&&themedDepth&&<Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined} shell={shell}/></Suspense>}
   </main>;
 }
