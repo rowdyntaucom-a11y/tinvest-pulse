@@ -1,6 +1,6 @@
 # CODEX NEXT EPIC — QVANIX UX Architecture + Comprehension
 
-## Current priority lock — 2026-09-24
+## Reference-shell lock — 2026-09-25\n\nThe latest user direction supersedes prior shell-rotation sequencing: **Samurai is the reference implementation for Snowball+ functional parity.** Build and validate the full financial product depth there first. Do not spend implementation time porting each unfinished feature into Cosmos/NORD in parallel. Keep financial engines shared; after Samurai acceptance, transfer the same capabilities to the other shells using shell-specific presentation only.\n\n## Current priority lock — 2026-09-24
 
 **DNA / Living World is frozen and is the lowest-priority area.** Do not implement or polish Pixi/DNA scenes, characters, animations, weather, XP, gamification, world-state systems or DNA-specific visual work in this Epic. Touch DNA only for a blocking regression that prevents the normal financial application from functioning.
 
