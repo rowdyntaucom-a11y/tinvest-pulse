@@ -7,6 +7,7 @@ import{findPayoutEventPosition,payoutEventIsConfirmed}from"../../../v2/src/featu
 import{buildV3IncomeDepth}from"./incomeDepth";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
+import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import type{V3Shell}from"../app/model";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 
@@ -39,6 +40,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const historyMonths=depth?.realizedHistory.months.slice(-12)??[];
   const historyMax=Math.max(0,...historyMonths.map(month=>month.totalNet));
   const selectedCalendar=selectedMonth?depth?.calendarMonths.find(month=>month.key===selectedMonth)??null:null;
+  const showCalendar=samuraiReference||view==="calendar",showHistory=samuraiReference||view==="history",showSources=samuraiReference||view==="sources";
 
   if(loading)return <section className="v3-income-depth"><div className="v3-income-depth-state">Синхронизируем факт и официальное расписание выплат…</div></section>;
   if(!calendar||!depth)return <section className="v3-income-depth"><div className="v3-income-depth-state is-warning">Подробный слой выплат сейчас недоступен. Уже подтверждённый пассивный доход выше не заменяется нулём.</div></section>;
