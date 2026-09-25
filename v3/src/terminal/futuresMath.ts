@@ -8,6 +8,8 @@ export type FuturesScenarioInput={
  daysToExpiry:number|null;
 };
 
+export type FuturesShockPoint={movePct:number;scenarioPrice:number;pnl:number;marginReturnPct:number|null};
+
 export type FuturesScenarioResult={
  notional:number|null;
  totalMargin:number|null;
@@ -41,6 +43,16 @@ export function calculateFuturesScenario(input:FuturesScenarioInput):FuturesScen
  const annualizedBasisPct=basisPct!=null&&days?basisPct*365/days:null;
 
  return{notional,totalMargin,leverage,scenarioPnl,scenarioMarginReturnPct,basisAbsolute,basisPct,annualizedBasisPct};
+}
+
+export function buildFuturesShockGrid(input:FuturesScenarioInput,moves:readonly number[]=[-5,-3,-1,1,3,5]):FuturesShockPoint[]{
+ const price=positive(input.futuresPrice),contracts=positive(input.contracts),pointValue=positive(input.priceValuePerPoint);
+ if(!price||!contracts||!pointValue)return[];
+ const margin=positive(input.marginPerContract),totalMargin=margin?margin*contracts:null;
+ return moves.filter(Number.isFinite).map(movePct=>{
+  const scenarioPrice=price*(1+movePct/100),pnl=(scenarioPrice-price)*contracts*pointValue;
+  return{movePct,scenarioPrice,pnl,marginReturnPct:totalMargin?pnl/totalMargin*100:null};
+ });
 }
 
 export function parseScenarioNumber(raw:string):number|null{
