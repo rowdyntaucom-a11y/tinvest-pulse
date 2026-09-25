@@ -1,0 +1,184 @@
+/* Samurai fail-closed functional atlas.
+   Show product architecture without inventing finance values. */
+.v3-app[data-shell="samurai"] .sam-offline-atlas{
+ position:relative;z-index:3;margin:14px 0 2px;padding:11px 10px 10px;
+ border:1px solid rgba(201,155,88,.13);border-left:2px solid rgba(114,216,196,.30);
+ background:
+ radial-gradient(circle at 86% 15%,rgba(153,38,28,.10),transparent 24%),
+ linear-gradient(145deg,rgba(4,14,12,.97),rgba(3,9,8,.82));
+ clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+ overflow:hidden;
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas:before{
+ content:"";position:absolute;left:11px;right:44%;top:0;height:1px;
+ background:linear-gradient(90deg,#72d8c4,#c99b58,#e34b3b,transparent)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__head{
+ position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:9px;align-items:center;
+ padding:1px 1px 9px;border-bottom:1px solid rgba(114,216,196,.08)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__head span{
+ display:block;color:#c99b58;font:750 5.7px/1 Inter,system-ui,sans-serif;letter-spacing:.14em
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__head strong{
+ display:block;margin-top:5px;color:#edf3f0;font:500 16px/1.05 Georgia,serif
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__head small{
+ display:block;margin-top:4px;color:#73847f;font:6.3px/1.32 Inter,system-ui,sans-serif
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__head>i{
+ display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(201,155,88,.21);
+ color:#d7aa63;background:rgba(22,15,10,.25);font:16px/1 Georgia,serif;font-style:normal;transform:rotate(-2deg)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__body{position:relative;z-index:2;padding-top:9px}
+.v3-app[data-shell="samurai"] .sam-offline-metric{
+ min-height:63px;padding:8px;border:1px solid rgba(114,216,196,.08);background:rgba(3,11,9,.78)
+}
+.v3-app[data-shell="samurai"] .sam-offline-metric span{display:block;color:#7b918a;font:6px/1 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-offline-metric strong{display:block;margin-top:7px;color:#dce6e2;font-size:17px;line-height:1}
+.v3-app[data-shell="samurai"] .sam-offline-metric small{display:block;margin-top:5px;color:#5f726c;font:5.5px/1.2 Inter,system-ui,sans-serif}
+
+/* Home preview */
+.v3-app[data-shell="samurai"] .sam-offline-history{
+ border:1px solid rgba(201,155,88,.10);background:linear-gradient(180deg,rgba(4,13,11,.88),rgba(3,9,8,.64))
+}
+.v3-app[data-shell="samurai"] .sam-offline-history__metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;padding:1px;background:rgba(114,216,196,.045)}
+.v3-app[data-shell="samurai"] .sam-offline-history__chart{position:relative;height:104px;margin:8px 8px 2px;overflow:hidden}
+.v3-app[data-shell="samurai"] .sam-offline-history__chart:before{
+ content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(114,216,196,.03) 0 1px,transparent 1px 24px)
+}
+.v3-app[data-shell="samurai"] .sam-offline-history__chart svg{position:absolute;inset:4px 0 0;width:100%;height:92px;overflow:visible}
+.v3-app[data-shell="samurai"] .sam-offline-history__chart polyline{fill:none;stroke:#e34b3b;stroke-width:1.4;opacity:.58}
+.v3-app[data-shell="samurai"] .sam-offline-history__chart polyline+polyline{stroke:#72d8c4;opacity:.48}
+.v3-app[data-shell="samurai"] .sam-offline-history__chart>i{position:absolute;left:0;right:0;bottom:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,155,88,.18),transparent)}
+.v3-app[data-shell="samurai"] .sam-offline-history__chart>b{position:absolute;right:9px;top:8px;color:rgba(201,155,88,.22);font:22px Georgia,serif}
+.v3-app[data-shell="samurai"] .sam-offline-history footer{
+ display:grid;grid-template-columns:auto 20px auto 1fr minmax(0,2fr);align-items:center;gap:5px;padding:7px 8px 8px;border-top:1px solid rgba(114,216,196,.06)
+}
+.v3-app[data-shell="samurai"] .sam-offline-history footer span{font:5.6px Inter,system-ui,sans-serif;color:#8da19b}
+.v3-app[data-shell="samurai"] .sam-offline-history footer>i{height:1px;background:#e34b3b}
+.v3-app[data-shell="samurai"] .sam-offline-history footer>i:nth-of-type(2){background:#72d8c4}
+.v3-app[data-shell="samurai"] .sam-offline-history footer small{justify-self:end;color:#5c6f69;font:5.3px/1.2 Inter,system-ui,sans-serif;text-align:right}
+
+/* Shared chapter preview */
+.v3-app[data-shell="samurai"] .sam-offline-atlas__chapters{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:7px}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__chapters article{
+ min-height:54px;display:grid;grid-template-columns:23px 1fr;gap:6px;align-items:center;padding:7px;
+ border:1px solid rgba(201,155,88,.08);background:linear-gradient(115deg,rgba(5,15,13,.86),rgba(3,9,8,.58))
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__chapters article>i{
+ display:grid;place-items:center;width:21px;height:21px;border:1px solid rgba(201,155,88,.17);color:#d1a25d;font:9px Georgia,serif;font-style:normal
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__chapters b{display:block;color:#dce5e1;font:700 7.2px/1 Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__chapters small{display:block;margin-top:3px;color:#657872;font:5.4px/1.18 Inter,system-ui,sans-serif}
+
+/* Assets / formation */
+.v3-app[data-shell="samurai"] .sam-offline-formation{display:grid;grid-template-columns:105px minmax(0,1fr);gap:9px}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield{position:relative;min-height:188px;display:grid;place-items:center}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield:before{
+ content:"";position:absolute;inset:8px 11px 13px;clip-path:polygon(50% 0,91% 17%,84% 69%,50% 100%,16% 69%,9% 17%);
+ border:1px solid rgba(201,155,88,.25);background:linear-gradient(145deg,rgba(201,155,88,.05),rgba(114,216,196,.025))
+}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield:after{
+ content:"";position:absolute;inset:22px 25px 29px;clip-path:polygon(50% 0,91% 17%,84% 69%,50% 100%,16% 69%,9% 17%);
+ border:1px solid rgba(114,216,196,.11)
+}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield>i{
+ position:absolute;width:67px;height:1px;background:linear-gradient(90deg,transparent,rgba(114,216,196,.18),transparent)
+}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield>i:nth-child(1){transform:rotate(32deg)}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield>i:nth-child(2){transform:rotate(-32deg)}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield>i:nth-child(3){transform:rotate(90deg)}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield>b{position:relative;z-index:2;color:#d9e4e0;font:18px Georgia,serif}
+.v3-app[data-shell="samurai"] .sam-offline-formation__shield>span{position:absolute;z-index:2;bottom:49px;color:#71847e;font:5.2px Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-offline-formation__rows{display:grid;gap:4px}
+.v3-app[data-shell="samurai"] .sam-offline-formation__rows article{
+ position:relative;min-height:34px;display:grid;grid-template-columns:19px 1fr;gap:5px;align-items:center;padding:5px 6px;overflow:hidden;
+ border:1px solid rgba(114,216,196,.07);background:rgba(3,11,9,.74)
+}
+.v3-app[data-shell="samurai"] .sam-offline-formation__rows article>i{color:#c99b58;font:700 5px Inter,system-ui,sans-serif;font-style:normal}
+.v3-app[data-shell="samurai"] .sam-offline-formation__rows b{display:block;font-size:7px}
+.v3-app[data-shell="samurai"] .sam-offline-formation__rows small{display:block;margin-top:2px;color:#64766f;font-size:5px}
+.v3-app[data-shell="samurai"] .sam-offline-formation__rows em{
+ position:absolute;left:0;bottom:0;width:35%;height:1px;background:linear-gradient(90deg,#e34b3b,#c99b58,#72d8c4,transparent);opacity:.55
+}
+
+/* Analysis / tactical scope */
+.v3-app[data-shell="samurai"] .sam-offline-scope{display:grid;grid-template-columns:115px minmax(0,1fr);gap:9px}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar{
+ position:relative;width:108px;height:108px;margin:5px auto;border:1px solid rgba(201,155,88,.15);border-radius:50%;display:grid;place-items:center;
+ background:radial-gradient(circle,rgba(114,216,196,.04),transparent 67%)
+}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar:after{content:"";position:absolute;inset:20px;border:1px solid rgba(114,216,196,.10);border-radius:50%}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar>i{position:absolute;width:82px;height:1px;background:linear-gradient(90deg,transparent,rgba(114,216,196,.16),transparent)}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar>i:nth-child(2){transform:rotate(45deg)}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar>i:nth-child(3){transform:rotate(90deg)}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar>i:nth-child(4){transform:rotate(135deg)}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar>span{position:absolute;left:50%;top:50%;width:42px;height:1px;transform-origin:left;background:linear-gradient(90deg,#e34b3b,#c99b58,transparent)}
+.v3-app[data-shell="samurai"] .sam-offline-scope__radar>b{position:relative;z-index:2;color:#dce7e3;font:17px Georgia,serif}
+.v3-app[data-shell="samurai"] .sam-offline-scope__metrics{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.v3-app[data-shell="samurai"] .sam-offline-scope__metrics .sam-offline-metric{min-height:62px}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__chapters.is-analysis{grid-template-columns:1fr;margin-top:8px}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__chapters.is-analysis article{min-height:44px}
+
+/* Income / treasury */
+.v3-app[data-shell="samurai"] .sam-offline-treasury__summary{display:grid;grid-template-columns:1fr 1fr;gap:1px;padding:1px;background:rgba(201,155,88,.04)}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__calendar{
+ height:72px;margin-top:7px;display:grid;grid-template-columns:repeat(12,1fr);align-items:end;gap:2px;padding:10px 6px 7px;
+ border-top:1px solid rgba(201,155,88,.08);border-bottom:1px solid rgba(114,216,196,.07);background:rgba(3,11,9,.52)
+}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__calendar span{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__calendar b{color:#63766f;font:4.8px Inter,system-ui,sans-serif}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__calendar i{display:block;width:65%;min-height:7px;background:linear-gradient(180deg,rgba(201,155,88,.58),rgba(114,216,196,.28));opacity:.68}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__flow{position:relative;height:38px;overflow:hidden}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__flow>i{position:absolute;left:-6%;right:-6%;height:1px;background:linear-gradient(90deg,transparent,rgba(114,216,196,.14),rgba(201,155,88,.18),transparent)}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__flow>i:nth-child(1){top:7px}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__flow>i:nth-child(2){top:15px;opacity:.72}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__flow>i:nth-child(3){top:23px;opacity:.5}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__flow>i:nth-child(4){top:31px;opacity:.28}
+.v3-app[data-shell="samurai"] .sam-offline-treasury__flow>b{position:absolute;right:17%;top:9px;color:rgba(201,155,88,.48);font:16px Georgia,serif}
+
+/* Status / source truth */
+.v3-app[data-shell="samurai"] .sam-offline-atlas__status{
+ display:grid;grid-template-columns:auto 1fr minmax(0,2.7fr);gap:6px;align-items:center;margin-top:9px;padding-top:7px;border-top:1px solid rgba(201,155,88,.08)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__status span{color:#df7467;font:5.3px Inter,system-ui,sans-serif;letter-spacing:.12em}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__status>i{height:1px;background:linear-gradient(90deg,rgba(227,75,59,.45),rgba(201,155,88,.18))}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__status small{color:#60736d;font:5.4px/1.25 Inter,system-ui,sans-serif}
+
+/* Trust gate should read: title -> real function map -> source route. */
+.v3-app[data-shell="samurai"] .sam-trust-gate>.sam-offline-atlas{margin-top:15px}
+.v3-app[data-shell="samurai"] .sam-trust-gate>.sam-offline-atlas+.sam-trust-depth-cue{margin-top:11px}
+.v3-app[data-shell="samurai"] .sam-trust-gate__route{scroll-margin-top:58px}
+.v3-app[data-shell="samurai"] .sam-world__analytics-page>.sam-offline-atlas{margin:10px 9px 0}
+.v3-app[data-shell="samurai"] .sam-world__awaiting--compact{margin-top:10px!important;min-height:0!important}
+.v3-app[data-shell="samurai"] .sam-world__awaiting--compact .sam-world__awaiting-art{height:54px!important}
+.v3-app[data-shell="samurai"] .sam-world__awaiting--compact footer{display:none!important}
+
+/* Crucial: fail-closed Samurai is a scrollable product preview, never a locked one-screen canvas. */
+.v3-app[data-shell="samurai"][data-trusted="false"] :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal,.sam-world){
+ overflow:visible!important;max-height:none!important;height:auto!important
+}
+.v3-app[data-shell="samurai"][data-trusted="false"] .sam-trust-gate{max-height:none!important;overflow:visible!important}
+.v3-app[data-shell="samurai"][data-viewport-lock="false"]{overflow-y:auto!important}
+
+/* Give the functional atlas priority on small Samsung widths. */
+@media(max-width:359px){
+ .v3-app[data-shell="samurai"] .sam-offline-history__metrics{grid-template-columns:1fr 1fr}
+ .v3-app[data-shell="samurai"] .sam-offline-history__metrics .sam-offline-metric:last-child{grid-column:1/-1}
+ .v3-app[data-shell="samurai"] .sam-offline-formation,.v3-app[data-shell="samurai"] .sam-offline-scope{grid-template-columns:94px minmax(0,1fr);gap:6px}
+ .v3-app[data-shell="samurai"] .sam-offline-formation__shield{min-height:174px}
+ .v3-app[data-shell="samurai"] .sam-offline-scope__radar{width:90px;height:90px}
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__chapters{grid-template-columns:1fr}
+}
+
+/* Motion communicates instrument type, not fake data. */
+@media(prefers-reduced-motion:no-preference){
+ .v3-app[data-shell="samurai"] .sam-offline-scope__radar>span{animation:samOfflineSweep 5.7s ease-in-out infinite}
+ .v3-app[data-shell="samurai"] .sam-offline-treasury__flow>i{animation:samOfflineFlow 7s ease-in-out infinite alternate}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-app[data-shell="samurai"] .sam-offline-scope__radar>span,.v3-app[data-shell="samurai"] .sam-offline-treasury__flow>i{animation:none!important}
+}
+@keyframes samOfflineSweep{0%,100%{transform:rotate(-48deg);opacity:.42}50%{transform:rotate(38deg);opacity:1}}
+@keyframes samOfflineFlow{0%{transform:translateX(-2%)}100%{transform:translateX(2%)}}
