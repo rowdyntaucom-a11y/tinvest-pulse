@@ -53,7 +53,7 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
        {id:"sam-assets-bonds",code:"肆",label:"Облигации",note:"сроки · эмитенты"},
        {id:"sam-assets-positions",code:"伍",label:"Позиции",note:"карточки инструментов"}
       ]}/>}
-      <Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>
+      <Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined} samuraiReference={shell==="samurai"}/></Suspense>
     </>}
   </main>;
 }
