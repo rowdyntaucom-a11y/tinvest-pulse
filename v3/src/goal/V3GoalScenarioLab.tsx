@@ -5,7 +5,6 @@ import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import type{V3Shell}from"../app/model";
-import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{calculateV3GoalBootstrap,calculateV3GoalScenario,solveV3RequiredMonthlyContribution}from"./goalScenario";
 import"../styles/goalScenarioLab.css";
 
@@ -162,7 +161,6 @@ export function V3GoalScenarioLab({
   const[alternative,setAlternative]=useState(initial.alternative);
   const[goalMode,setGoalMode]=useState<GoalMode>(initial.goalMode);
   const[bootstrapYears,setBootstrapYears]=useState(1);
-  const showScenario=samuraiReference||tab==="scenario",showHistory=samuraiReference||tab==="history";
   const[targetDraft,setTargetDraft]=useState(targetCapitalToday?String(targetCapitalToday):"");
 
   useEffect(()=>{setTargetDraft(targetCapitalToday?String(targetCapitalToday):"")},[targetCapitalToday]);
