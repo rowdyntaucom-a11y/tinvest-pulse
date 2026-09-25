@@ -1,5 +1,7 @@
 # QVANIX — Master Direction and Unified Roadmap
 
+> **Reference-shell decision — 2026-09-25:** implement Snowball-level functional breadth **first in Samurai**. Samurai is the product-depth reference shell: finish connected investor workflows there (Assets → Analysis → Income → Goal → operations/events/calendar → tools/lab/screeners) before porting the proven information architecture into Cosmos, NORD and the remaining shells. Cross-shell work should reuse finance engines and workflow contracts, while each shell keeps its own composition, materials and motion language. Do not parallel-build incomplete parity across multiple shells.
+
 > Canonical strategic direction for QVANIX as of 2026-09-15.
 > This document unifies the current product state, approved UX direction, Snowball benchmark lessons, growth/distribution roadmap, data-honesty constraints and scale architecture.
 > Future ChatGPT/Codex sessions should read this document together with `PROJECT_CONTEXT.md`, current `main`, recent `progress/*.md`, `QVANIX_RESPONSIVE_REQUIREMENTS.md`, `QVANIX_DESIGN_SYSTEM.md` and `PRODUCT_ACCESS_MODEL_V1.md` before making material product changes.
