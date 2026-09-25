@@ -567,14 +567,16 @@ function businessDates(from, to) {
   return out;
 }
 
-async function getMoexHistory(from, to) {
+async function getMoexIndexHistory(secid, from, to) {
   const fromKey = dateKey(from);
   const toKey = dateKey(to);
+  const code = String(secid || '').trim().toUpperCase();
+  if (!/^[A-Z0-9+_-]{2,24}$/.test(code) || !fromKey || !toKey) return [];
 
-  // Prefer MOEX candles: the response is compact and gives the closing value
-  // for each trading day. Fall back to the history endpoint if needed.
+  // Prefer MOEX candles: compact daily closes. Fall back to history when a
+  // particular index does not expose candles for the requested interval.
   const candlesUrl =
-    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/IMOEX/candles.json` +
+    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/${encodeURIComponent(code)}/candles.json` +
     `?iss.meta=off&from=${encodeURIComponent(fromKey)}&till=${encodeURIComponent(toKey)}&interval=24`;
   const candlesResult = await safeFetch(candlesUrl);
   if (candlesResult.ok) {
@@ -589,14 +591,14 @@ async function getMoexHistory(from, to) {
         const parsed = rows.map(r => ({
           date: String(r?.[idxBegin] || '').slice(0, 10),
           value: Number(r?.[idxClose])
-        })).filter(x => x.date && Number.isFinite(x.value));
+        })).filter(x => x.date && Number.isFinite(x.value) && x.value > 0);
         if (parsed.length) return parsed;
       }
     } catch {}
   }
 
   const historyUrl =
-    `${MOEX_BASE}history/engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
+    `${MOEX_BASE}history/engines/stock/markets/index/boards/SNDX/securities/${encodeURIComponent(code)}.json` +
     `?iss.meta=off&iss.only=history&history.columns=TRADEDATE,CLOSE` +
     `&from=${encodeURIComponent(fromKey)}&till=${encodeURIComponent(toKey)}`;
   const result = await safeFetch(historyUrl);
@@ -612,10 +614,14 @@ async function getMoexHistory(from, to) {
     return rows.map(r => ({
       date: String(r?.[idxDate] || ''),
       value: Number(r?.[idxClose])
-    })).filter(x => x.date && Number.isFinite(x.value));
+    })).filter(x => x.date && Number.isFinite(x.value) && x.value > 0);
   } catch {
     return [];
   }
+}
+
+async function getMoexHistory(from, to) {
+  return getMoexIndexHistory('IMOEX', from, to);
 }
 
 function cbrHttpsRequest(url, options = {}) {
@@ -717,6 +723,8 @@ async function getCbrMacro() {
 
 const HISTORY_CACHE = new Map();
 const HISTORY_CACHE_TTL_MS = 5 * 60 * 1000;
+const STRATEGY_LAB_CACHE = { createdAt: 0, data: null };
+const STRATEGY_LAB_CACHE_TTL_MS = 30 * 60 * 1000;
 
 
 function tradePriceValue(op) {
@@ -1400,6 +1408,55 @@ app.get('/api/history-debug', async (req, res) => {
     res.json({ok:true,version:'4.3-cbr-system-ca',positions,history});
   } catch (err) {
     res.status(500).json({ok:false,error:err.message});
+  }
+});
+
+// Public market-history contract for Portfolio Laboratory.
+// Uses official MOEX total-return indices and never requires broker credentials.
+app.get('/api/strategy-lab-history', async (req, res) => {
+  try {
+    if (STRATEGY_LAB_CACHE.data && Date.now() - STRATEGY_LAB_CACHE.createdAt < STRATEGY_LAB_CACHE_TTL_MS) {
+      res.setHeader('Cache-Control', 'public, max-age=300');
+      return res.json(STRATEGY_LAB_CACHE.data);
+    }
+
+    const to = new Date();
+    const from = new Date(to);
+    from.setUTCFullYear(from.getUTCFullYear() - 5);
+
+    const [equityPoints, bondPoints] = await Promise.all([
+      getMoexIndexHistory('MCFTR', from, to),
+      getMoexIndexHistory('RGBITR', from, to)
+    ]);
+
+    const payload = {
+      ok: equityPoints.length > 1 && bondPoints.length > 1,
+      contractVersion: '1.0',
+      fetchedAt: new Date().toISOString(),
+      from: dateKey(from),
+      to: dateKey(to),
+      equity: {
+        code: 'MCFTR',
+        label: 'MOEX Russia Total Return Index',
+        method: 'gross total return',
+        points: equityPoints
+      },
+      bond: {
+        code: 'RGBITR',
+        label: 'Russian Government Bond Index Total Return',
+        method: 'total return',
+        points: bondPoints
+      },
+      reason: equityPoints.length > 1 && bondPoints.length > 1 ? null : 'MOEX total-return history is incomplete.',
+      note: 'Portfolio Lab aligns shared trading dates client-side. This market history is independent from the user portfolio and does not reconstruct actual past holdings.'
+    };
+
+    STRATEGY_LAB_CACHE.createdAt = Date.now();
+    STRATEGY_LAB_CACHE.data = payload;
+    res.setHeader('Cache-Control', 'public, max-age=300');
+    res.json(payload);
+  } catch (err) {
+    res.status(502).json({ok:false,error:err.message});
   }
 });
 

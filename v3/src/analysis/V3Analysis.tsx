@@ -21,6 +21,7 @@ import{NordWorkspaceStage}from"../nord/NordWorkspaceStage";
 import{NordAnalysisTerminal}from"../nord/NordTerminals";
 import"../styles/analysisDepthTransition.css";
 const V3RebalanceWorkspace=lazy(()=>import("./V3RebalanceWorkspace").then(m=>({default:m.V3RebalanceWorkspace})));
+const V3PortfolioLab=lazy(()=>import("./V3PortfolioLab").then(m=>({default:m.V3PortfolioLab})));
 
 const n=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const n2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -52,7 +53,8 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
     {id:"sam-analysis-risk",code:"参",label:"Риск",note:"DD · VaR/CVaR"},
     {id:"sam-analysis-structure",code:"肆",label:"Структура",note:"классы · облигации"},
     {id:"sam-analysis-market",code:"伍",label:"Рынок",note:"IMOEX · beta · TE"},
-    {id:"sam-analysis-rebalance",code:"陸",label:"Ребалансировка",note:"цель · drift · сценарий"}
+    {id:"sam-analysis-rebalance",code:"陸",label:"Ребалансировка",note:"цель · drift · сценарий"},
+    {id:"sam-analysis-lab",code:"漆",label:"Лаборатория",note:"MCFTR · RGBITR · сценарии"}
    ]}/>}
    {!samuraiReference&&mode==="detailed"&&<V3SectionSelector label="Раздел аналитики" value={section} onChange={setSection} options={sectionOptions}/>} 
 
@@ -84,7 +86,9 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
     {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-rebalance" label="ДАЛЬШЕ · РЕБАЛАНСИРОВКА"/>}
    </div>}
 
-   {samuraiReference&&trusted&&<div id="sam-analysis-rebalance" className="sam-reference-chapter"><Suspense fallback={<section className="v3-analysis-note">Открываем сценарий ребалансировки…</section>}><V3RebalanceWorkspace positions={rows}/></Suspense></div>}
+   {samuraiReference&&trusted&&<div id="sam-analysis-rebalance" className="sam-reference-chapter"><Suspense fallback={<section className="v3-analysis-note">Открываем сценарий ребалансировки…</section>}><V3RebalanceWorkspace positions={rows}/></Suspense><SamuraiNextCue targetId="sam-analysis-lab" label="ДАЛЬШЕ · PORTFOLIO LAB"/></div>}
+
+   {samuraiReference&&trusted&&<div id="sam-analysis-lab" className="sam-reference-chapter"><Suspense fallback={<section className="v3-analysis-note">Открываем Portfolio Laboratory…</section>}><V3PortfolioLab positions={rows}/></Suspense></div>}
 
    <section className="v3-analysis-note">Показатели описывают текущую структуру и подтверждённую историю. Они не являются рекомендацией купить, продать или выбрать конкретный актив.</section>
   </section>
