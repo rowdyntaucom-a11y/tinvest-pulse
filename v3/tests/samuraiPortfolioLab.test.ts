@@ -3,15 +3,17 @@ import test from"node:test";
 import{readFileSync}from"node:fs";
 
 const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8");
+const toolbox=readFileSync(new URL("../src/analysis/V3AnalysisToolbox.tsx",import.meta.url),"utf8");
 const lab=readFileSync(new URL("../src/analysis/V3PortfolioLab.tsx",import.meta.url),"utf8");
 const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",import.meta.url),"utf8");
 const api=readFileSync(new URL("../src/analysis/strategyLabApi.ts",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/samuraiPortfolioLab.css",import.meta.url),"utf8");
 
-test("Samurai exposes Portfolio Lab as the next analysis chapter",()=>{
- assert.match(analysis,/sam-analysis-lab/);
- assert.match(analysis,/Portfolio Laboratory/);
- assert.match(atlas,/Лаборатория/);
+test("Samurai exposes Portfolio Lab inside the consolidated professional toolbox",()=>{
+ assert.match(analysis,/sam-analysis-tools/);
+ assert.match(toolbox,/V3PortfolioLab/);
+ assert.match(toolbox,/Лаборатория/);
+ assert.match(atlas,/Инструменты/);
 });
 
 test("Portfolio Lab compares two user-authored strategies without choosing a winner",()=>{

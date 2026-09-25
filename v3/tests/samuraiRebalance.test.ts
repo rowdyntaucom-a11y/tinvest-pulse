@@ -5,12 +5,14 @@ import{readFileSync}from"node:fs";
 const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8");
 const ui=readFileSync(new URL("../src/analysis/V3RebalanceWorkspace.tsx",import.meta.url),"utf8");
 const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",import.meta.url),"utf8");
+const toolbox=readFileSync(new URL("../src/analysis/V3AnalysisToolbox.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/samuraiRebalance.css",import.meta.url),"utf8");
 
-test("Samurai exposes rebalancing as a sixth analysis chapter",()=>{
- assert.match(analysis,/sam-analysis-rebalance/);
- assert.match(analysis,/Ребалансировка/);
- assert.match(atlas,/Ребалансировка/);
+test("Samurai exposes rebalancing inside the consolidated professional toolbox",()=>{
+ assert.match(analysis,/sam-analysis-tools/);
+ assert.match(analysis,/V3AnalysisToolbox/);
+ assert.match(toolbox,/V3RebalanceWorkspace/);
+ assert.match(atlas,/Инструменты/);
 });
 
 test("rebalance target is user-authored and two-class complement is explicit",()=>{
