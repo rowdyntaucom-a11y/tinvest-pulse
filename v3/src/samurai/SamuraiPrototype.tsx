@@ -145,7 +145,7 @@ export function SamuraiPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavig
     {leaders.length?<div>{leaders.map((x,i)=><button key={x.ticker} onClick={()=>onNavigate?.("assets")}><i>{String(i+1).padStart(2,"0")}</i><span>{x.ticker}</span><b>{pct.format(x.weight*100)}%</b><em><i style={{"--rank":i+1} as CSSProperties}/></em></button>)}</div>:<div className="sam-world__formation-empty">Состав появится после подтверждения портфеля</div>}
    </section>
    </>:<>
-   <SamuraiFailClosedAtlas kind="home"/>
+   <SamuraiFailClosedAtlas kind="home" onNavigate={onNavigate}/>
    <section className="sam-world__awaiting sam-world__awaiting--compact" aria-label="Маршрут подтверждения источника">
     <div className="sam-world__awaiting-art" aria-hidden="true"><span>始</span><i/><i/><i/></div>
     <header><span>DATA GATE // FAIL-CLOSED</span><strong>Источник ещё не подтверждён</strong><small>Функциональность видна выше; финансовые значения появятся только после проверки источника.</small></header>
