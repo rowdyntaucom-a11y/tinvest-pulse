@@ -8,8 +8,6 @@ const COPY:Record<NordWorkspaceKind,{code:string;title:string;subtitle:string;ru
  income:{code:"TREASURY // 04",title:"Северная казна",subtitle:"Купоны, дивиденды и фактический поток",rune:"ᚠ",cue:"ОТКРЫТЬ КАЗНУ"},
  goal:{code:"PATH // 05",title:"Путь капитала",subtitle:"Личный ориентир и пользовательские сценарии",rune:"ᛏ",cue:"ОТКРЫТЬ МАРШРУТ"},
 };
-function scrollTo(id:string){const el=document.getElementById(id);if(!el)return;const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})}
-
 export function NordWorkspaceStage({kind,targetId,value,meta,children}:{kind:NordWorkspaceKind;targetId:string;value:ReactNode;meta:ReactNode;children?:ReactNode}){
  const x=COPY[kind];
  return <section className={"nord-stage-v3 nord-stage-v3--"+kind} aria-label={x.title}>
