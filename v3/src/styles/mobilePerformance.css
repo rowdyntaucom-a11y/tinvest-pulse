@@ -2512,7 +2512,6 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
       linear-gradient(180deg,rgba(3,9,15,.02) 0 46%,rgba(3,9,15,.04) 56%,rgba(4,11,18,.28) 72%,rgba(4,11,18,.78) 93%,#040b12 100%),
       linear-gradient(90deg,rgba(4,11,18,.08),transparent 22% 82%,rgba(4,11,18,.05)),
       url("https://v3b.fal.media/files/b/0aabcb73/4T0FNTzQWEBxOn_Nin7Oe_fdiLp0sv.webp") 50% 50%/cover no-repeat!important;
-    filter:saturate(1.04) contrast(1.03)!important;
   }
   .v3-app[data-shell="aurora"][data-workspace="assets"] .nord-gate__world{background-position:47% 50%!important}
   .v3-app[data-shell="aurora"][data-workspace="analysis"] .nord-gate__world{background-position:53% 50%!important}
