@@ -3,6 +3,7 @@ import type{V3Workspace}from"../app/model";
 import type{V3HomeViewModel}from"../home/homeViewModel";
 import{buildV3RelativeDepth}from"../analysis/analysisDepth";
 import{NordOfflineDeck}from"./NordOfflineDeck";
+import{NordScrollCue}from"./NordScrollCue";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
@@ -11,8 +12,6 @@ const money=(value:number|null)=>value==null?"—":rub.format(value)+" ₽";
 const percent=(value:number|null)=>value==null?"—":pct.format(value*100)+"%";
 const percentRaw=(value:number|null)=>value==null?"—":pct.format(value)+"%";
 function dateText(value:string|null){if(!value)return"—";const d=new Date(value);return Number.isNaN(d.getTime())?"—":shortDate.format(d)}
-function scrollTo(id:string){const el=document.getElementById(id);if(!el)return;const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})}
-
 export function NordPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavigate?:(workspace:V3Workspace)=>void}){
  const trusted=home.isTrusted;
  const relative=buildV3RelativeDepth(home.history);
@@ -37,7 +36,7 @@ export function NordPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavigate
      <small>{trusted?<>Результат {money(home.profit)} · {percentRaw(home.profitPct)}</>:"Финансовые значения не подставляются до подтверждения снимка"}</small>
     </div>
     <div className="nord-home-v3__threshold-sigil" aria-hidden="true"><i/><b>ᛟ</b><i/></div>
-    <button type="button" className="nord-home-v3__first-cue" onClick={()=>scrollTo("nord-terminal")} aria-label="Плавно перейти в северный терминал"><span>ВОЙТИ В ТЕРМИНАЛ</span><i aria-hidden="true">⌄</i></button>
+    <NordScrollCue targetId="nord-terminal" label="ВОЙТИ В ТЕРМИНАЛ"/>
    </section>
   </section>
 

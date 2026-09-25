@@ -3051,3 +3051,84 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   }
 }
 
+
+
+/* NORD V6 — persistent first-viewport descent control.
+   Visible above bottom navigation until the target chapter is reached. */
+@media(max-width:430px){
+ .v3-app[data-shell="aurora"] .nord-scroll-cue{
+  position:fixed!important;
+  z-index:180!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:max(68px,calc(60px + env(safe-area-inset-bottom)))!important;
+  top:auto!important;
+  width:auto!important;
+  min-width:154px!important;
+  max-width:210px!important;
+  height:40px!important;
+  min-height:40px!important;
+  margin:0!important;
+  padding:0 13px 0 15px!important;
+  transform:translateX(-50%)!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 13px 13px!important;
+  align-items:center!important;
+  gap:1px!important;
+  border:1px solid rgba(169,244,238,.18)!important;
+  border-left:2px solid rgba(239,178,94,.58)!important;
+  border-radius:0!important;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)!important;
+  background:linear-gradient(180deg,rgba(7,22,31,.94),rgba(4,12,19,.96))!important;
+  color:#d8e9e8!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.34),0 0 0 1px rgba(239,178,94,.025) inset!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+  transition:opacity .24s ease,transform .24s ease!important;
+  -webkit-tap-highlight-color:transparent!important;
+ }
+ .v3-app[data-shell="aurora"] .nord-scroll-cue:before{
+  content:""!important;
+  position:absolute!important;
+  left:10px!important;
+  right:38px!important;
+  top:0!important;
+  height:1px!important;
+  background:linear-gradient(90deg,#efb25e,rgba(169,244,238,.30),transparent)!important;
+  pointer-events:none!important;
+ }
+ .v3-app[data-shell="aurora"] .nord-scroll-cue span{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#bfd4d4!important;
+  font:800 6px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.13em!important;
+  text-align:center!important;
+ }
+ .v3-app[data-shell="aurora"] .nord-scroll-cue i{
+  display:block!important;
+  margin:0!important;
+  color:#a9f4ee!important;
+  font:18px/.7 Inter,system-ui,sans-serif!important;
+  font-style:normal!important;
+  text-align:center!important;
+  text-shadow:0 0 10px rgba(169,244,238,.24)!important;
+ }
+ .v3-app[data-shell="aurora"] .nord-scroll-cue i:last-child{
+  margin-left:-7px!important;
+  opacity:.42!important;
+ }
+ .v3-app[data-shell="aurora"] .nord-scroll-cue.is-hidden{
+  opacity:0!important;
+  transform:translate(-50%,10px)!important;
+  pointer-events:none!important;
+  visibility:hidden!important;
+ }
+ .v3-app[data-shell="aurora"] .nord-scroll-cue:active{
+  transform:translate(-50%,2px)!important;
+  background:linear-gradient(180deg,rgba(12,31,41,.97),rgba(5,15,23,.98))!important;
+ }
+}
