@@ -65,3 +65,118 @@
  .nord-home-v3__terminal{padding-left:28px;padding-right:28px}
  .nord-home-v3__instruments{grid-template-columns:1fr 1fr}
 }
+
+
+/* ========================================================================== */
+/* NORD WORKSPACE TERMINALS V4                                                 */
+/* Same world art. Each tab owns a different instrument grammar below it.      */
+/* ========================================================================== */
+.nord-terminal{
+ position:relative;z-index:6;margin:14px 12px 0;padding:12px;
+ border:1px solid rgba(169,244,238,.10);background:linear-gradient(180deg,#071620,#050e16);
+ color:#eef8f7;overflow:hidden;
+}
+.nord-terminal:before{content:"";position:absolute;left:12px;right:44%;top:0;height:1px;background:linear-gradient(90deg,#efb25e,rgba(169,244,238,.18),transparent)}
+.nord-terminal__head{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:10px;align-items:center;padding:0 0 10px;border-bottom:1px solid rgba(169,244,238,.07)}
+.nord-terminal__head span{display:block;color:#8ca9ac;font:750 5.5px/1 Inter,system-ui,sans-serif;letter-spacing:.15em}
+.nord-terminal__head strong{display:block;margin-top:5px;color:#f0f8f7;font-size:18px;line-height:1}
+.nord-terminal__head small{display:block;margin-top:5px;color:#6f898c;font-size:6.5px;line-height:1.3}
+.nord-terminal__head>i{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(239,178,94,.20);border-radius:50%;color:#efc37e;background:rgba(239,178,94,.02);font:500 15px/1 Georgia,serif;font-style:normal}
+
+/* Assets — shield wall + roster. */
+.nord-terminal--assets{
+ clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+ border-left:2px solid rgba(239,178,94,.30);
+}
+.nord-assets-board{display:grid;grid-template-columns:118px minmax(0,1fr);grid-template-areas:"shield capital" "shield roster";gap:8px 10px;padding-top:11px}
+.nord-assets-board__shield{grid-area:shield;position:relative;align-self:stretch;min-height:176px;display:grid;place-items:center;overflow:hidden}
+.nord-assets-board__shield:before{
+ content:"";position:absolute;inset:4px 8px 10px;
+ clip-path:polygon(50% 0,92% 18%,85% 70%,50% 100%,15% 70%,8% 18%);
+ background:conic-gradient(from -90deg,rgba(239,178,94,.72) 0 var(--nord-concentration),rgba(169,244,238,.07) var(--nord-concentration) 100%);
+}
+.nord-assets-board__shield:after{
+ content:"";position:absolute;inset:12px 16px 18px;
+ clip-path:polygon(50% 0,92% 18%,85% 70%,50% 100%,15% 70%,8% 18%);
+ background:#07141e;border:1px solid rgba(169,244,238,.10);
+}
+.nord-assets-board__shield i{position:absolute;z-index:2;width:70px;height:1px;background:linear-gradient(90deg,transparent,rgba(169,244,238,.18),transparent)}
+.nord-assets-board__shield i:nth-child(1){transform:rotate(34deg)}.nord-assets-board__shield i:nth-child(2){transform:rotate(-34deg)}
+.nord-assets-board__shield b{position:relative;z-index:3;margin-top:8px;color:#f2f8f7;font-size:23px;line-height:1}.nord-assets-board__shield span{position:absolute;z-index:3;bottom:42px;color:#799599;font:750 5px/1 Inter,system-ui,sans-serif;letter-spacing:.14em}
+.nord-assets-board__capital{grid-area:capital;padding:5px 0 9px;border-bottom:1px solid rgba(169,244,238,.07)}
+.nord-assets-board__capital span{color:#88a7a9;font-size:6.5px}.nord-assets-board__capital strong{display:block;margin-top:6px;color:#f1f8f7;font-size:20px;line-height:1}.nord-assets-board__capital small{display:block;margin-top:5px;color:#718a8d;font-size:6px;line-height:1.3}
+.nord-assets-board__roster{grid-area:roster;display:grid;gap:5px}
+.nord-assets-board__roster>div{position:relative;display:grid;grid-template-columns:20px 1fr;gap:6px;min-height:38px;padding:6px 7px;overflow:hidden;border:1px solid rgba(169,244,238,.07);background:rgba(7,20,29,.76)}
+.nord-assets-board__roster>div>i{color:#bd955d;font:700 5.5px/1 Inter,system-ui,sans-serif;font-style:normal}.nord-assets-board__roster span b{display:block;color:#e8f3f2;font-size:8px}.nord-assets-board__roster span small{display:block;margin-top:3px;color:#728b8e;font-size:5.5px}
+.nord-assets-board__roster em{position:absolute;left:0;bottom:0;height:1px;background:linear-gradient(90deg,#efb25e,rgba(169,244,238,.26));opacity:.62}
+.nord-assets-board__roster .is-empty{grid-template-columns:1fr;place-items:center;color:#718a8d;font-size:7px}
+
+/* Analysis — rune compass / scan field. */
+.nord-terminal--analysis{border-top:1px solid rgba(120,223,240,.20);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.nord-analysis-map{position:relative;display:grid;grid-template-columns:126px minmax(0,1fr);gap:10px;min-height:186px;padding-top:12px}
+.nord-analysis-map__scope{position:relative;width:118px;height:118px;margin:5px auto 0;border:1px solid rgba(120,223,240,.18);border-radius:50%;background:radial-gradient(circle,rgba(120,223,240,.04),transparent 66%);display:grid;place-items:center}
+.nord-analysis-map__scope:before{content:"";position:absolute;inset:10px;border:1px solid rgba(169,244,238,.10);border-radius:50%;background:conic-gradient(from -90deg,rgba(239,178,94,.62) 0 var(--nord-risk),transparent var(--nord-risk) 100%)}
+.nord-analysis-map__scope:after{content:"";position:absolute;inset:22px;border:1px solid rgba(169,244,238,.10);border-radius:50%;background:#07131d}
+.nord-analysis-map__scope>i{position:absolute;z-index:2;width:92px;height:1px;background:linear-gradient(90deg,transparent,rgba(120,223,240,.20),transparent)}.nord-analysis-map__scope>i:nth-child(1){transform:rotate(0)}.nord-analysis-map__scope>i:nth-child(2){transform:rotate(45deg)}.nord-analysis-map__scope>i:nth-child(3){transform:rotate(90deg)}
+.nord-analysis-map__scope>span{position:absolute;z-index:3;left:50%;top:50%;width:43px;height:1px;transform-origin:left center;transform:rotate(-36deg);background:linear-gradient(90deg,#efb25e,transparent)}
+.nord-analysis-map__scope>b{position:relative;z-index:4;margin-top:-3px;color:#eef8f7;font-size:20px}.nord-analysis-map__scope>small{position:absolute;z-index:4;bottom:36px;color:#748f92;font:750 5px/1 Inter,system-ui,sans-serif;letter-spacing:.12em}
+.nord-analysis-map__coordinates{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
+.nord-analysis-map__coordinates>div{min-height:70px;padding:9px 8px;border:1px solid rgba(120,223,240,.08);background:linear-gradient(145deg,rgba(6,23,34,.88),rgba(5,15,24,.76));clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+.nord-analysis-map__coordinates span{display:block;color:#78999d;font-size:5.7px}.nord-analysis-map__coordinates strong{display:block;margin-top:8px;color:#edf8f8;font-size:13px;line-height:1}.nord-analysis-map__coordinates small{display:block;margin-top:5px;color:#617c80;font-size:5.3px}
+.nord-analysis-map__scan{position:absolute;left:0;right:0;bottom:0;height:18px;overflow:hidden;pointer-events:none}.nord-analysis-map__scan i{position:absolute;left:-25%;top:5px;width:36%;height:1px;background:linear-gradient(90deg,transparent,rgba(120,223,240,.48),transparent)}.nord-analysis-map__scan i:nth-child(2){top:11px;opacity:.45;animation-delay:-2.1s}
+
+/* Income — one river rather than a card grid. */
+.nord-terminal--income{border-left:2px solid rgba(239,178,94,.28);clip-path:polygon(0 0,calc(100% - 13px) 0,100% 13px,100% 100%,0 100%)}
+.nord-income-current{position:relative;padding-top:12px}
+.nord-income-current__total{padding:5px 0 12px 4px}.nord-income-current__total span{display:block;color:#8ea9aa;font-size:6.5px}.nord-income-current__total strong{display:block;margin-top:6px;color:#f1f8f7;font-size:25px;line-height:1}.nord-income-current__total small{display:block;margin-top:5px;color:#718a8c;font-size:6px}
+.nord-income-current__river{position:relative;height:56px;margin:0 2px 8px;overflow:hidden;border-top:1px solid rgba(239,178,94,.10);border-bottom:1px solid rgba(169,244,238,.07);background:linear-gradient(180deg,rgba(120,223,240,.02),transparent)}
+.nord-income-current__river i{position:absolute;left:-10%;right:-10%;height:1px;background:linear-gradient(90deg,transparent,rgba(120,223,240,.16),rgba(239,178,94,.20),rgba(120,223,240,.16),transparent)}
+.nord-income-current__river i:nth-child(1){top:13px;transform:rotate(-1deg)}.nord-income-current__river i:nth-child(2){top:23px;transform:rotate(1.4deg);opacity:.75}.nord-income-current__river i:nth-child(3){top:34px;transform:rotate(-.7deg);opacity:.55}.nord-income-current__river i:nth-child(4){top:44px;transform:rotate(1.1deg);opacity:.35}
+.nord-income-current__river b{position:absolute;right:16%;top:14px;color:rgba(239,178,94,.48);font:500 18px/1 Georgia,serif}
+.nord-income-current__metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.nord-income-current__metrics>div{min-height:66px;padding:10px;border:1px solid rgba(169,244,238,.08);background:#071721;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,0 100%)}
+.nord-income-current__metrics span{display:block;color:#799598;font-size:5.8px}.nord-income-current__metrics strong{display:block;margin-top:9px;color:#eaf4f3;font-size:13px}
+
+/* Goal — expedition route. */
+.nord-terminal--goal{border-left:2px solid rgba(239,178,94,.32);clip-path:polygon(0 0,calc(100% - 13px) 0,100% 13px,100% 100%,13px 100%,0 calc(100% - 13px))}
+.nord-goal-route{padding-top:12px}
+.nord-goal-route__target{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:4px 2px 11px;border-bottom:1px solid rgba(169,244,238,.07)}
+.nord-goal-route__target span{color:#8aa7aa;font-size:6.5px}.nord-goal-route__target strong{grid-row:2;color:#f1f8f7;font-size:21px;line-height:1}.nord-goal-route__target button{grid-row:1/3;grid-column:2;min-width:92px;min-height:34px;border:1px solid rgba(239,178,94,.20);border-radius:0;background:linear-gradient(180deg,rgba(46,34,22,.74),rgba(20,18,16,.82));color:#efd0a0;font-size:7px}
+.nord-goal-route__track{position:relative;height:105px;margin:13px 2px 7px}
+.nord-goal-route__track:before{content:"";position:absolute;left:8px;right:8px;top:43px;height:1px;background:linear-gradient(90deg,rgba(169,244,238,.16),rgba(169,244,238,.08))}
+.nord-goal-route__track>b{position:absolute;left:8px;top:42px;width:calc((100% - 16px) * var(--nord-progress) / 100);height:2px;background:linear-gradient(90deg,#efb25e,#78dff0);box-shadow:0 0 8px rgba(120,223,240,.12)}
+.nord-goal-route__track>i{position:absolute;top:38px;width:11px;height:11px;border:1px solid rgba(169,244,238,.18);border-radius:50%;background:#07131d}.nord-goal-route__track>i:nth-child(1){left:8px}.nord-goal-route__track>i:nth-child(2){left:33%}.nord-goal-route__track>i:nth-child(3){left:66%}.nord-goal-route__track>i:nth-child(4){right:8px}
+.nord-goal-route__track>em{position:absolute;z-index:2;left:calc(8px + (100% - 16px) * var(--nord-progress) / 100);top:34px;width:18px;height:18px;transform:translateX(-50%);border:1px solid rgba(239,178,94,.50);border-radius:50%;background:radial-gradient(circle,#efb25e 0 22%,#07131d 24%);box-shadow:0 0 14px rgba(239,178,94,.18)}
+.nord-goal-route__track>span{position:absolute;top:60px;display:grid;gap:3px}.nord-goal-route__track>span small{color:#728b8e;font-size:5.5px}.nord-goal-route__track>span strong{color:#dfeceb;font-size:8px}.nord-goal-route__start{left:8px}.nord-goal-route__finish{right:8px;text-align:right}
+.nord-goal-route__facts{display:grid;grid-template-columns:1fr 1fr;gap:6px}.nord-goal-route__facts>div{min-height:58px;padding:9px 10px;border:1px solid rgba(169,244,238,.08);background:#071721}.nord-goal-route__facts span{display:block;color:#789497;font-size:5.8px}.nord-goal-route__facts strong{display:block;margin-top:8px;color:#eaf4f3;font-size:13px}
+.nord-goal-route__editor{padding-top:12px}.nord-goal-editor{padding:10px;border:1px solid rgba(169,244,238,.09);background:#071721}.nord-goal-editor label span{display:block;color:#8aa7aa;font-size:6px}.nord-goal-editor input{width:100%;min-height:42px;margin-top:6px;padding:0 10px;border:1px solid rgba(169,244,238,.12);border-radius:0;background:#04101a;color:#eef8f7;font-size:15px}.nord-goal-editor>div{display:flex;gap:6px;margin-top:7px}.nord-goal-editor button{min-height:36px;padding:0 12px;border:1px solid rgba(239,178,94,.20);border-radius:0;background:rgba(44,33,22,.74);color:#efd0a0;font-size:7px}.nord-goal-editor .is-quiet{border-color:rgba(169,244,238,.10);background:#07131d;color:#9bb1b3}
+
+/* Each art stage gets one subtle, workspace-specific visual behavior. */
+.nord-stage-v3__art:after{content:"";position:absolute;z-index:3;pointer-events:none}
+.nord-stage-v3--assets .nord-stage-v3__art:after{left:14px;right:14px;bottom:44px;height:1px;background:repeating-linear-gradient(90deg,rgba(239,178,94,.24) 0 18px,transparent 18px 34px);opacity:.42}
+.nord-stage-v3--analysis .nord-stage-v3__art:after{right:13%;top:18%;width:96px;height:96px;border:1px solid rgba(120,223,240,.10);border-radius:50%;background:conic-gradient(from 0deg,rgba(120,223,240,.10),transparent 18%,transparent 82%,rgba(120,223,240,.08));opacity:.48}
+.nord-stage-v3--income .nord-stage-v3__art:after{left:10%;right:10%;bottom:34px;height:18px;background:repeating-linear-gradient(180deg,rgba(120,223,240,.10) 0 1px,transparent 1px 6px);opacity:.52}
+.nord-stage-v3--goal .nord-stage-v3__art:after{right:15%;bottom:44px;width:18px;height:18px;border:1px solid rgba(239,178,94,.32);border-radius:50%;background:radial-gradient(circle,#efb25e 0 17%,transparent 19%);box-shadow:0 0 18px rgba(239,178,94,.12)}
+
+@media(max-width:360px){
+ .nord-assets-board,.nord-analysis-map{grid-template-columns:104px minmax(0,1fr)}
+ .nord-assets-board__shield{min-height:165px}
+ .nord-analysis-map__scope{width:100px;height:100px}
+ .nord-analysis-map__coordinates>div{min-height:66px;padding:8px 7px}
+ .nord-home-v3__rune-strip{grid-template-columns:1fr 1fr}
+}
+
+@media(prefers-reduced-motion:no-preference){
+ .nord-analysis-map__scan i{animation:nordAnalysisScan 4.8s ease-in-out infinite}
+ .nord-income-current__river i{animation:nordRiverDrift 6.6s ease-in-out infinite alternate}
+ .nord-goal-route__track>em{animation:nordGoalBeacon 2.8s ease-in-out infinite}
+ .nord-stage-v3--analysis .nord-stage-v3__art:after{animation:nordScopeSweep 9s linear infinite}
+ .nord-stage-v3--goal .nord-stage-v3__art:after{animation:nordGoalBeacon 3.1s ease-in-out infinite}
+}
+@media(prefers-reduced-motion:reduce){
+ .nord-analysis-map__scan i,.nord-income-current__river i,.nord-goal-route__track>em,.nord-stage-v3__art:after{animation:none!important}
+}
+@keyframes nordAnalysisScan{0%,100%{transform:translateX(0);opacity:.18}50%{transform:translateX(320%);opacity:.72}}
+@keyframes nordRiverDrift{0%{transform:translateX(-3%) rotate(-1deg)}100%{transform:translateX(3%) rotate(1deg)}}
+@keyframes nordGoalBeacon{0%,100%{opacity:.54;box-shadow:0 0 8px rgba(239,178,94,.08)}50%{opacity:1;box-shadow:0 0 20px rgba(239,178,94,.22)}}
+@keyframes nordScopeSweep{to{transform:rotate(360deg)}}
