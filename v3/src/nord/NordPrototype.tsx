@@ -12,8 +12,6 @@ const money=(value:number|null)=>value==null?"—":rub.format(value)+" ₽";
 const percent=(value:number|null)=>value==null?"—":pct.format(value*100)+"%";
 const percentRaw=(value:number|null)=>value==null?"—":pct.format(value)+"%";
 function dateText(value:string|null){if(!value)return"—";const d=new Date(value);return Number.isNaN(d.getTime())?"—":shortDate.format(d)}
-function scrollTo(id:string){const el=document.getElementById(id);if(!el)return;const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})}
-
 export function NordPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavigate?:(workspace:V3Workspace)=>void}){
  const trusted=home.isTrusted;
  const relative=buildV3RelativeDepth(home.history);
