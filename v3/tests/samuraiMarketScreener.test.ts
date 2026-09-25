@@ -11,12 +11,13 @@ test("Samurai exposes a ninth public screener chapter",()=>{
  assert.match(analysis,/sam-analysis-screener/);
  assert.match(analysis,/label:"Скринер"/);
  assert.match(atlas,/label:"Скринер"/);
- assert.match(atlas,/targetId:"sam-analysis-screener"/);
+ assert.match(atlas,/id:"screener"/);
 });
 
-test("screener stays accessible even without broker trust",()=>{
- assert.match(analysis,/samuraiReference&&<div id="sam-analysis-screener"/);
- assert.doesNotMatch(analysis,/samuraiReference&&trusted&&<div id="sam-analysis-screener"/);
+test("screener stays accessible without broker trust through the inline Atlas tool",()=>{
+ assert.match(analysis,/inlineTools=\{\{screener:<Suspense/);
+ assert.match(analysis,/samuraiReference&&trusted&&<div id="sam-analysis-screener"/);
+ assert.match(atlas,/inlineTools\?\.\[chapter\.id\]/);
 });
 
 test("screener is descriptive not an attractiveness ranking",()=>{

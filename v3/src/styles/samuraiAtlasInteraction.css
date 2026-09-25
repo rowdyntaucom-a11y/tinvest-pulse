@@ -145,3 +145,23 @@
   scroll-behavior:auto!important;
  }
 }
+
+/* Recording 1000031743: public tools belong to the card that opened them.
+   Keeping the Screener inside the Atlas detail removes the detached bottom
+   mount whose async height change could move the whole Analysis document. */
+.v3-app[data-shell="samurai"] .sam-offline-atlas__tool-slot{
+ margin-top:10px;padding-top:10px;border-top:1px solid rgba(114,216,196,.12);
+ min-height:360px;overflow-anchor:none;contain:layout paint;
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__tool-slot .sam-screener{
+ margin-top:0;min-height:0;padding-bottom:20px;overflow-anchor:none;
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__tool-slot .sam-screener:before{right:28%}
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__tool-slot{
+  min-height:420px;margin-inline:-2px;
+ }
+ .v3-app[data-shell="samurai"] .sam-offline-atlas__tool-slot .sam-screener{
+  min-height:0;padding-bottom:18px;
+ }
+}
