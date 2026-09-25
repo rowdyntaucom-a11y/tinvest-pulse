@@ -74,6 +74,7 @@ function AnalysisPreview(){
    <article><i>参</i><span><b>Структура</b><small>HHI · effective positions · bonds</small></span></article>
    <article><i>肆</i><span><b>Рынок</b><small>IMOEX · beta · corr · TE · IR</small></span></article>
    <article><i>伍</i><span><b>Ребалансировка</b><small>цель · drift · сценарная дельта классов</small></span></article>
+   <article><i>陸</i><span><b>Лаборатория</b><small>MCFTR · RGBITR · исторические сценарии</small></span></article>
   </div>
  </div>;
 }
