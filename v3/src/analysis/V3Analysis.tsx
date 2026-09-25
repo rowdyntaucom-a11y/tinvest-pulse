@@ -15,6 +15,7 @@ import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";
 import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";
 import{CosmosTrustGate}from"../cosmos/CosmosTrustGate";
 import{CosmosWorkspaceStage}from"../cosmos/CosmosWorkspaceStage";
+import{NordTrustGate}from"../nord/NordTrustGate";
 import"../styles/analysisDepthTransition.css";
 
 const n=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -32,7 +33,7 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
  const[historyWindow,setHistoryWindow]=useState<V3HistoryWindow>("all"),relative=useMemo(()=>buildV3RelativeDepth(filterHistoryWindow(trustedHistory,historyWindow)),[trustedHistory,historyWindow]);
  const dd=depth.portfolio.maxDrawdown==null?null:-depth.portfolio.maxDrawdown*100,effective=depth.portfolio.effectivePositions,topPct=ratioToPercent(topRatio)??0,themedDepth=shell==="samurai"||shell==="carbon"||shell==="aurora";
  const scrollToDepth=()=>{const el=document.getElementById("v3-analysis-depth");if(!el)return;const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})};
- if(shell==="carbon"&&!trusted)return <CosmosTrustGate kind="analysis" onRefresh={onRefresh} refreshing={refreshing}/>;
+ if(shell==="carbon"&&!trusted)return <CosmosTrustGate kind="analysis" onRefresh={onRefresh} refreshing={refreshing}/>;if(shell==="aurora"&&!trusted)return <NordTrustGate kind="analysis" onRefresh={onRefresh} refreshing={refreshing}/>;
  return <main className="v3-analysis" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="眼" code="TACTICAL // 03" label="RISK & RETURN"/>{shell==="carbon"&&<CosmosWorkspaceStage/>}
   <header className="v3-page-head"><span>ПОРТФЕЛЬ · ДИАГНОСТИКА</span><h1>Анализ</h1><p>{trusted?"Доходность, риск и структура · без торговых рекомендаций":"Аналитика скрыта до подтверждения данных"}</p></header>
   {shell==="samurai"&&!trusted&&<SamuraiTrustGate kind="analysis" onRefresh={onRefresh} refreshing={refreshing}/>}
