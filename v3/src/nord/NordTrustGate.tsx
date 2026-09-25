@@ -18,6 +18,10 @@ export function NordTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind;o
   <section className="nord-gate__world" aria-hidden="true">
    <div className="nord-gate__crest"><i/><b>{x.rune}</b><span/></div>
    <div className="nord-gate__rune-rail"><i>ᚠ</i><i>ᚱ</i><i>ᛏ</i><i>ᛟ</i><i>ᛉ</i></div>
+   <div className={"nord-gate__instrument nord-gate__instrument--"+kind}>
+    {kind==="assets"?<><span/><span/><span/><span/><span/><i/><b>ᛟ</b></>:kind==="analysis"?<><i/><i/><i/><span/><span/><b>ᚱ</b></>:<><i/><i/><i/><span/><b>ᚠ</b></>}
+   </div>
+   <div className="nord-gate__world-label">{kind==="assets"?"SHIELD WALL":kind==="analysis"?"RUNE COMPASS":"TREASURY CURRENT"}</div>
   </section>
   <section className="nord-gate__answer">
    <div className="nord-gate__chapter"><span>{x.code}</span><b>RUNE GATE</b></div>
