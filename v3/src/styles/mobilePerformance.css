@@ -2833,11 +2833,11 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   .v3-app[data-shell="aurora"] .nord-gate__atmosphere i{
     position:absolute!important;top:-10%!important;width:20%!important;height:72%!important;opacity:.13!important;
     background:linear-gradient(180deg,transparent,rgba(120,223,240,.28) 42%,rgba(128,255,208,.13) 70%,transparent)!important;
-    transform:skewX(-14deg)!important;animation:nordGateAurora 12s ease-in-out infinite alternate!important;
+    transform:skewX(-14deg)!important;
   }
-  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(1){left:18%!important;animation-delay:-4s!important}
-  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(2){left:46%!important;width:15%!important;opacity:.09!important;animation-duration:15s!important}
-  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(3){right:13%!important;width:18%!important;animation-delay:-8s!important}
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(1){left:18%!important}
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(2){left:46%!important;width:15%!important;opacity:.09!important}
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(3){right:13%!important;width:18%!important}
   .v3-app[data-shell="aurora"] .nord-gate__crest{
     right:15px!important;top:auto!important;bottom:22px!important;width:46px!important;height:46px!important;
     opacity:.26!important;border-color:rgba(169,244,238,.10)!important;background:rgba(4,11,18,.10)!important;box-shadow:none!important;
@@ -3051,13 +3051,3 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   }
 }
 
-@media(prefers-reduced-motion:no-preference){
-  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i{animation:nordGateAurora 12s ease-in-out infinite alternate}
-}
-@media(prefers-reduced-motion:reduce){
-  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i{animation:none!important}
-}
-@keyframes nordGateAurora{
-  0%{transform:translateX(-6%) skewX(-14deg) scaleY(.94);opacity:.06}
-  100%{transform:translateX(12%) skewX(-7deg) scaleY(1.04);opacity:.16}
-}
