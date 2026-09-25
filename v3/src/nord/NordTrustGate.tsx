@@ -1,4 +1,4 @@
-import type{MouseEvent}from"react";
+import{NordScrollCue}from"./NordScrollCue";
 type GateKind="assets"|"analysis"|"income";
 
 const COPY:Record<GateKind,{rune:string;code:string;title:string;lead:string;steps:[string,string,string][]}>={
@@ -27,11 +27,6 @@ function Preview({kind}:{kind:GateKind}){
 
 export function NordTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind;onRefresh?:()=>void|Promise<void>;refreshing?:boolean}){
  const x=COPY[kind];
- const scrollToRoute=(event:MouseEvent<HTMLButtonElement>)=>{
-  const route=event.currentTarget.closest(".nord-gate")?.querySelector<HTMLElement>(".nord-gate__route");
-  const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;
-  route?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
- };
  return <main className={"nord-gate nord-gate--"+kind} aria-label={x.title}>
   <section className="nord-gate__world" aria-hidden="true">
    <div className="nord-gate__atmosphere"><i/><i/><i/></div>
@@ -43,9 +38,9 @@ export function NordTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind;o
    <div className="nord-gate__chapter"><span>{x.code}</span><b>RUNE GATE</b></div>
    <header><i aria-hidden="true">{x.rune}</i><div><span>DATA GATE // FAIL-CLOSED</span><strong>{x.title}</strong><p>{x.lead}</p></div></header>
    <div className="nord-gate__source"><i aria-hidden="true">◆</i><span>Источник не подтверждён · значения не подставляются</span></div>
-   <button type="button" className="nord-gate__cue" onClick={scrollToRoute} aria-label="Перейти ниже к маршруту проверки"><span>НИЖЕ · МАРШРУТ ПРОВЕРКИ</span><i aria-hidden="true">⌄</i></button>
+   <NordScrollCue targetId="nord-gate-route" label="НИЖЕ · МАРШРУТ"/>
   </section>
-  <section className="nord-gate__route" aria-label="Маршрут проверки">
+  <section id="nord-gate-route" className="nord-gate__route" aria-label="Маршрут проверки">
    {x.steps.map(([r,title,copy],index)=><article key={r+title}>
     <b aria-hidden="true">{r}</b><div><span>{title}</span><small>{copy}</small></div><i aria-hidden="true">{index<2?"›":"✓"}</i>
    </article>)}
