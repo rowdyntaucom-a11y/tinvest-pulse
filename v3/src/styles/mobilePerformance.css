@@ -2479,3 +2479,253 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   .v3-workspace-loading[data-shell="aurora"] .v3-workspace-loading__panel strong{color:#eef9f8!important}
   .v3-workspace-loading[data-shell="aurora"] .v3-workspace-loading__panel small{color:#95adaf!important}
 }
+
+
+/* ========================================================================== */
+/* NORD CINEMATIC V2 — reset after 1000031710.mp4                             */
+/* Principle: cinematic first screen, one calm answer plaque, then depth.      */
+/* No decorative dashboard clutter over the selected Rune Gate master art.    */
+/* ========================================================================== */
+@media(max-width:430px){
+  /* Global NORD tone */
+  .v3-app[data-shell="aurora"]{
+    --nord-bg:#040b12!important;
+    --nord-panel:#08141e!important;
+    --nord-line:rgba(169,244,238,.12)!important;
+    --nord-amber:#efb25e!important;
+    --nord-text:#eef8f7!important;
+    --nord-muted:#9aafb1!important;
+    background:#040b12!important;
+  }
+
+  /* ---------- FAIL-CLOSED WORKSPACES: clean cinematic story ---------- */
+  .v3-app[data-shell="aurora"][data-trusted="false"] .nord-gate{
+    min-height:100dvh!important;
+    padding:0 0 max(108px,calc(92px + env(safe-area-inset-bottom)))!important;
+    background:#040b12!important;
+    overflow:visible!important;
+  }
+  .v3-app[data-shell="aurora"][data-trusted="false"] .nord-gate__world{
+    height:calc(100svh - 50px)!important;
+    inset:0 0 auto!important;
+    background:
+      linear-gradient(180deg,rgba(3,9,15,.02) 0 46%,rgba(3,9,15,.04) 56%,rgba(4,11,18,.28) 72%,rgba(4,11,18,.78) 93%,#040b12 100%),
+      linear-gradient(90deg,rgba(4,11,18,.08),transparent 22% 82%,rgba(4,11,18,.05)),
+      url("https://v3b.fal.media/files/b/0aabcb73/4T0FNTzQWEBxOn_Nin7Oe_fdiLp0sv.webp") 50% 50%/cover no-repeat!important;
+    filter:saturate(1.04) contrast(1.03)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .nord-gate__world{background-position:47% 50%!important}
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .nord-gate__world{background-position:53% 50%!important}
+  .v3-app[data-shell="aurora"][data-workspace="income"] .nord-gate__world{background-position:50% 52%!important}
+
+  /* Reduce ornamental noise to barely-there world marks. */
+  .v3-app[data-shell="aurora"] .nord-gate__crest{
+    width:62px!important;height:62px!important;right:14px!important;top:17svh!important;
+    opacity:.26!important;border-color:rgba(169,244,238,.12)!important;
+    box-shadow:none!important;background:rgba(4,11,18,.04)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__crest:before{inset:10px!important;border-color:rgba(240,176,93,.18)!important}
+  .v3-app[data-shell="aurora"] .nord-gate__crest:after{inset:20px!important;border-color:rgba(169,244,238,.13)!important}
+  .v3-app[data-shell="aurora"] .nord-gate__crest b{font-size:20px!important}
+  .v3-app[data-shell="aurora"] .nord-gate__crest i,
+  .v3-app[data-shell="aurora"] .nord-gate__crest span{height:62px!important;opacity:.55!important}
+  .v3-app[data-shell="aurora"] .nord-gate__rune-rail{
+    left:12px!important;top:14svh!important;gap:11px!important;font-size:8px!important;opacity:.28!important;
+  }
+
+  /* One answer plaque, not a dashboard sitting on the art. */
+  .v3-app[data-shell="aurora"] .nord-gate__answer{
+    width:calc(100% - 28px)!important;
+    max-width:none!important;
+    margin:58svh 14px 0!important;
+    padding:12px 13px 13px!important;
+    border:1px solid rgba(169,244,238,.10)!important;
+    border-left:2px solid rgba(240,176,93,.55)!important;
+    border-radius:0!important;
+    background:
+      linear-gradient(100deg,rgba(4,13,20,.93),rgba(4,13,20,.78) 76%,rgba(4,13,20,.46))!important;
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))!important;
+    box-shadow:0 16px 36px rgba(0,0,0,.18)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__chapter{
+    margin-bottom:8px!important;padding-bottom:6px!important;
+    border-bottom:1px solid rgba(169,244,238,.07)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__chapter span,
+  .v3-app[data-shell="aurora"] .nord-gate__chapter b{
+    font-size:6px!important;letter-spacing:.13em!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer header{
+    grid-template-columns:30px minmax(0,1fr)!important;gap:9px!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer header>i{
+    width:28px!important;height:28px!important;
+    border-color:rgba(240,176,93,.22)!important;background:rgba(240,176,93,.025)!important;
+    font-size:14px!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer header span{font-size:5.7px!important}
+  .v3-app[data-shell="aurora"] .nord-gate__answer header strong{
+    margin-top:4px!important;font-size:18px!important;line-height:1.03!important;letter-spacing:-.02em!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer header p{
+    margin-top:5px!important;font-size:7.7px!important;line-height:1.35!important;color:#9eb1b3!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__source{
+    margin-top:8px!important;padding-top:7px!important;font-size:6.7px!important;
+  }
+
+  /* Arrow behaves like Samurai/Cosmos chapter transition. */
+  .v3-app[data-shell="aurora"] .nord-gate__cue{
+    width:62%!important;min-height:32px!important;
+    margin:10px auto -29px!important;padding:4px 10px!important;
+    border:1px solid rgba(169,244,238,.11)!important;
+    background:rgba(4,13,20,.86)!important;
+    color:#a5c6c8!important;
+    font-size:5.6px!important;letter-spacing:.14em!important;
+    box-shadow:0 9px 20px rgba(0,0,0,.16)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__cue i{font-size:15px!important}
+
+  /* Deep layer starts as a separate chapter after clean atmospheric space. */
+  .v3-app[data-shell="aurora"] .nord-gate__route{
+    margin-top:24svh!important;
+    padding:15px 12px 18px!important;
+    border-top:1px solid rgba(240,176,93,.11)!important;
+    background:
+      linear-gradient(180deg,rgba(5,15,24,.99),#040b12 92%)!important;
+    scroll-margin-top:52px!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__route:before{
+    content:"RUNE PATH // VERIFIED DEPTH"!important;
+    display:block!important;margin:0 0 10px!important;padding:0 2px 8px!important;
+    border-bottom:1px solid rgba(169,244,238,.07)!important;
+    color:#8daeb0!important;font:700 5.7px/1 Inter,system-ui,sans-serif!important;letter-spacing:.16em!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__route article{
+    min-height:70px!important;margin-top:6px!important;padding:11px 12px!important;
+    grid-template-columns:34px minmax(0,1fr) 14px!important;gap:10px!important;
+    border:1px solid rgba(169,244,238,.10)!important;
+    border-left:2px solid rgba(169,244,238,.22)!important;
+    background:linear-gradient(110deg,rgba(9,24,34,.92),rgba(5,15,24,.88))!important;
+    clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__route article>b{
+    width:31px!important;height:31px!important;font-size:15px!important;border-color:rgba(240,176,93,.20)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__route article span{font-size:10px!important}
+  .v3-app[data-shell="aurora"] .nord-gate__route article small{
+    margin-top:4px!important;font-size:7.3px!important;line-height:1.3!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__action{
+    margin-top:8px!important;padding:11px!important;border-color:rgba(169,244,238,.08)!important;background:#07121b!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__action button{
+    min-height:40px!important;border-radius:0!important;
+    border-color:rgba(240,176,93,.22)!important;
+    background:linear-gradient(180deg,rgba(45,33,21,.70),rgba(18,18,17,.82))!important;
+    font-size:8.5px!important;
+  }
+
+  /* ---------- HOME: fewer visual gimmicks, bigger readable instruments ---------- */
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero{
+    min-height:calc(100svh - 50px)!important;height:calc(100svh - 50px)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero>div:not(.v3-production-theme-art):not(.v3-hero-top){
+    width:calc(100% - 28px)!important;max-width:none!important;
+    margin:58svh 14px 0!important;padding:12px 13px!important;
+    border-left:2px solid rgba(240,176,93,.55)!important;
+    background:linear-gradient(100deg,rgba(4,13,20,.92),rgba(4,13,20,.72) 78%,rgba(4,13,20,.30))!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero h1{
+    font-size:30px!important;line-height:.98!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero p{
+    font-size:8px!important;line-height:1.35!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .nord-home-depth-cue{
+    width:58%!important;bottom:70px!important;min-height:32px!important;
+    background:rgba(4,13,20,.84)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-primary-grid{
+    padding:16px 12px 8px!important;gap:7px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-primary-grid article{
+    min-height:88px!important;padding:11px!important;border-radius:0!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-primary-grid strong{
+    font-size:16px!important;line-height:1!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-primary-grid span{
+    font-size:7px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-primary-grid small{
+    font-size:6.5px!important;line-height:1.3!important;
+  }
+
+  /* ---------- GOAL: art first, compact target plaque, lab clearly separate ---------- */
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-page-head{
+    width:auto!important;max-width:none!important;margin:10px 14px 0!important;padding:7px 9px!important;
+    border-left:1px solid rgba(240,176,93,.32)!important;
+    background:linear-gradient(90deg,rgba(4,13,20,.52),transparent)!important;
+    clip-path:none!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-page-head h1{
+    font-size:22px!important;margin:3px 0!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-page-head p{font-size:6.8px!important}
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero{
+    width:calc(100% - 28px)!important;
+    margin:56svh 14px 0!important;
+    padding:12px 13px!important;
+    min-height:96px!important;
+    border-right:0!important;border-left:2px solid rgba(240,176,93,.52)!important;
+    background:linear-gradient(100deg,rgba(4,13,20,.91),rgba(4,13,20,.70) 77%,rgba(4,13,20,.24))!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-title span{font-size:7px!important}
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-title small{font-size:6.5px!important}
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero>strong{font-size:20px!important}
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero>button{
+    min-width:130px!important;min-height:36px!important;border-radius:0!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .nord-goal-depth-cue{
+    width:56%!important;top:calc(100svh - 165px)!important;min-height:32px!important;
+    background:rgba(4,13,20,.84)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .nord-goal-depth-spacer{
+    min-height:20svh!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-scenario-lab{
+    margin:0 10px 18px!important;
+    padding:11px!important;
+    border-top:1px solid rgba(240,176,93,.16)!important;
+    background:#06101a!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-scenario-lab:before{
+    content:"PATH // SCENARIO LAB"!important;
+    font:700 5.8px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.16em!important;
+    color:#9ab8ba!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-scenario-head:before{
+    display:none!important;content:none!important;
+  }
+
+  /* ---------- ANALYSIS/ASSETS/INCOME: preserve atmosphere, reduce overlay bulk ---------- */
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-hero,
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-hero{
+    width:calc(100% - 28px)!important;margin-left:14px!important;margin-right:14px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-signal{
+    width:calc(100% - 28px)!important;margin-left:14px!important;margin-right:14px!important;
+  }
+  .v3-app[data-shell="aurora"] :is(.v3-assets-depth-cue,.v3-analysis-depth-cue,.nord-income-depth-cue){
+    width:56%!important;min-height:32px!important;
+    background:rgba(4,13,20,.82)!important;
+  }
+
+  /* Motion: only arrows breathe. No glowing decorative widgets. */
+  .v3-app[data-shell="aurora"] :is(
+    .v3-primary-grid article:after,.v3-history-card:after,.v3-home-benchmark:after,
+    .v3-pulse article:after,.v3-goal:after,.v3-goal:before
+  ){display:none!important;content:none!important}
+}
