@@ -3,7 +3,7 @@ import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import type{V3DetailMode,V3Shell}from"../app/model";
 import{ratioToPercent,clampPercent}from"../data/units";
 import{positionAssetClassLabel,assetClassKey}from"../data/assetClasses";
-import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";import{CosmosTrustGate}from"../cosmos/CosmosTrustGate";import{CosmosWorkspaceStage}from"../cosmos/CosmosWorkspaceStage";import{NordTrustGate}from"../nord/NordTrustGate";import{NordWorkspaceStage}from"../nord/NordWorkspaceStage";import{NordAssetsTerminal}from"../nord/NordTerminals";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiChapterNav}from"../samurai/SamuraiChapterNav";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";import{CosmosTrustGate}from"../cosmos/CosmosTrustGate";import{CosmosWorkspaceStage}from"../cosmos/CosmosWorkspaceStage";import{NordTrustGate}from"../nord/NordTrustGate";import{NordWorkspaceStage}from"../nord/NordWorkspaceStage";import{NordAssetsTerminal}from"../nord/NordTerminals";
 
 const V3HoldingsExplorer=lazy(()=>import("./V3HoldingsExplorer").then(m=>({default:m.V3HoldingsExplorer})));
 const V3AssetsDepth=lazy(()=>import("./V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
@@ -45,6 +45,15 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
       </article>}):<div className="v3-empty">{trusted&&mode==="detailed"?"Нет позиций в выбранном фильтре":"Нет подтверждённых позиций для отображения"}</div>}</section>
     </>}
     {!themedDepth&&mode==="detailed"&&trusted&&view==="explorer"&&<Suspense fallback={<section className="v3-empty">Открываем глубокую структуру портфеля…</section>}><V3HoldingsExplorer positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>}
-    {trusted&&themedDepth&&<Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined} shell={shell}/></Suspense>}
+    {trusted&&themedDepth&&<>
+      {shell==="samurai"&&<SamuraiChapterNav label="Активы Samurai" chapters={[
+       {id:"sam-assets-classes",code:"壱",label:"Состав",note:"классы активов"},
+       {id:"sam-assets-pnl",code:"弐",label:"Результат",note:"broker P/L"},
+       {id:"sam-assets-sectors",code:"参",label:"Отрасли",note:"покрытие метаданных"},
+       {id:"sam-assets-bonds",code:"肆",label:"Облигации",note:"сроки · эмитенты"},
+       {id:"sam-assets-positions",code:"伍",label:"Позиции",note:"карточки инструментов"}
+      ]}/>}
+      <Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>
+    </>}
   </main>;
 }
