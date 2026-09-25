@@ -93,6 +93,7 @@ function IncomePreview(){
    <article><i>壱</i><span><b>Календарь</b><small>даты · статус · источник</small></span></article>
    <article><i>弐</i><span><b>Факт</b><small>купоны · дивиденды · месяцы</small></span></article>
    <article><i>参</i><span><b>Источники</b><small>концентрация пассивного дохода</small></span></article>
+   <article><i>肆</i><span><b>Рынок</b><small>дивидендный discovery · отдельно от портфеля</small></span></article>
   </div>
  </div>;
 }
