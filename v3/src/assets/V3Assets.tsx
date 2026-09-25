@@ -19,7 +19,7 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
   const[filter,setFilter]=useState<"all"|"stock"|"bond"|"fund">("all"),[sort,setSort]=useState<"value"|"result">("value"),[open,setOpen]=useState<string|null>(null),[view,setView]=useState<PortfolioView>("overview");
   const base=trusted?[...items]:[],total=base.reduce((s,x)=>s+x.currentValue,0),top3=[...base].sort((a,b)=>b.currentValue-a.currentValue).slice(0,3).reduce((s,x)=>s+x.weight,0)*100,positive=base.filter(x=>x.expectedYield>0).length;
   const rows=useMemo(()=>base.filter(x=>filter==="all"||assetClassKey(x.instrumentType)===(filter==="stock"?"shares":filter==="bond"?"bonds":"funds")).sort((a,b)=>sort==="value"?b.currentValue-a.currentValue:b.expectedYield-a.expectedYield),[items,trusted,filter,sort]);
-  const overview=mode==="simple"||view==="overview",themedDepth=shell==="samurai"||shell==="carbon";
+  const overview=mode==="simple"||view==="overview",themedDepth=shell==="samurai"||shell==="carbon"||shell==="aurora";
   const scrollToDepth=()=>{const el=document.getElementById("v3-assets-depth");if(!el)return;const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})};
   if(shell==="carbon"&&!trusted)return <CosmosTrustGate kind="assets" onRefresh={onRefresh} refreshing={refreshing}/>;
   return <main className="v3-assets" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="陣" code="FORMATION // 02" label="PORTFOLIO ROSTER"/>{shell==="carbon"&&<CosmosWorkspaceStage/>}
