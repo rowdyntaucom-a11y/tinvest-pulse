@@ -69,7 +69,7 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
     {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-structure" label="ДАЛЬШЕ · СТРУКТУРА"/>}
    </div>}
 
-   {((samuraiReference&&trusted)||(mode==="detailed"&&section==="structure"))&&rows.length>0&&<div id="sam-analysis-structure" className={samuraiReference?"sam-reference-chapter":undefined}>
+   {((samuraiReference&&trusted&&rows.length>0)||(mode==="detailed"&&section==="structure"&&rows.length>0))&&<div id="sam-analysis-structure" className={samuraiReference?"sam-reference-chapter":undefined}>
     <V3AllocationDonut items={rows}/>
     {bonds&&<section className="v3-bond-lens"><h2>Облигационный слой</h2><div><span>Вес</span><strong>{n.format(ratioToPercent(bonds.weight)??0)}%</strong></div><div><span>Выпусков</span><strong>{bonds.count}</strong></div><div><span>Флоатеры</span><strong>{n.format(ratioToPercent(bonds.floating)??0)}%</strong></div><div><span>Амортиз.</span><strong>{n.format(ratioToPercent(bonds.amortizing)??0)}%</strong></div><small>{bonds.next?"Ближайшее погашение · "+bonds.next:"Даты погашения недоступны"}</small></section>}
     {classes.length>0&&<section className="v3-class-map"><h2>Классы активов</h2>{classes.map(([label,weight])=>{const weightPct=ratioToPercent(weight)??0;return <div key={label}><span>{label}</span><i><b style={{width:clampPercent(weightPct)+"%"}}/></i><strong>{n.format(weightPct)}%</strong></div>})}</section>}
