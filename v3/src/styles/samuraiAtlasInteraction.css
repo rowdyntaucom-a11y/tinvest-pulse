@@ -11,15 +11,15 @@
  color:#768881;font:7px/1.25 Inter,system-ui,sans-serif;text-align:right
 }
 
-.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article{
+.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows)>article{
  position:relative;isolation:isolate;transition:border-color .18s ease,background .18s ease,transform .18s ease
 }
-.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article.is-selected{
+.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows)>article.is-selected{
  border-color:rgba(114,216,196,.36)!important;
  background:linear-gradient(115deg,rgba(10,31,27,.92),rgba(22,17,10,.70))!important;
  transform:translateY(-1px)
 }
-.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article.is-selected>i{
+.v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows)>article.is-selected>i{
  border-color:rgba(114,216,196,.34);color:#aee6d9
 }
 .v3-app[data-shell="samurai"] .sam-offline-chapter-hit{
@@ -38,7 +38,7 @@
 }
 @media(hover:hover){
  .v3-app[data-shell="samurai"] .sam-offline-chapter-hit:hover:after{color:#e1b978;transform:translate(2px,-50%)}
- .v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article:has(.sam-offline-chapter-hit:hover){
+ .v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows)>article:has(.sam-offline-chapter-hit:hover){
   border-color:rgba(201,155,88,.20)
  }
 }
@@ -50,6 +50,16 @@
  radial-gradient(circle at 94% 10%,rgba(227,75,59,.09),transparent 28%),
  linear-gradient(145deg,rgba(3,13,11,.98),rgba(5,10,8,.94));
  box-shadow:0 14px 28px rgba(0,0,0,.20)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail.is-inline{
+ grid-column:1/-1;width:100%;box-sizing:border-box;margin:0 0 4px;
+ border-top-color:rgba(114,216,196,.28);
+ box-shadow:0 10px 22px rgba(0,0,0,.16)
+}
+.v3-app[data-shell="samurai"] .sam-offline-atlas__detail.is-inline:before{
+ content:"";position:absolute;left:12px;top:-5px;width:8px;height:8px;
+ border-left:1px solid rgba(114,216,196,.42);border-top:1px solid rgba(114,216,196,.42);
+ background:#07110e;transform:rotate(45deg)
 }
 .v3-app[data-shell="samurai"] .sam-offline-atlas__detail:focus{outline:none}
 .v3-app[data-shell="samurai"] .sam-offline-atlas__detail>header{
@@ -118,7 +128,7 @@
  .v3-app[data-shell="samurai"] .sam-offline-atlas__detail-actions button{width:100%}
 }
 @media(prefers-reduced-motion:reduce){
- .v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows) article,
+ .v3-app[data-shell="samurai"] :is(.sam-offline-atlas__chapters,.sam-offline-formation__rows)>article,
  .v3-app[data-shell="samurai"] .sam-offline-chapter-hit:after{transition:none!important}
 }
 
