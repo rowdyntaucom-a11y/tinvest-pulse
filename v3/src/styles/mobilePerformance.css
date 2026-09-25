@@ -2728,3 +2728,326 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     .v3-pulse article:after,.v3-goal:after,.v3-goal:before
   ){display:none!important;content:none!important}
 }
+
+
+/* ========================================================================== */
+/* NORD WORLD V3 FINAL OWNERSHIP — dedicated architecture, not theme paint.    */
+/* ========================================================================== */
+@media(max-width:430px){
+  .v3-app[data-shell="aurora"]{
+    background:#040b12!important;
+    --v3-card:#07131d!important;
+    --v3-line:rgba(169,244,238,.11)!important;
+    --v3-text:#eef8f7!important;
+    --v3-muted:#91aaad!important;
+    --v3-accent:#efb25e!important;
+  }
+
+  /* Global generic chrome stays outside the authored world. */
+  .v3-app[data-shell="aurora"]>.v3-global-world,
+  .v3-app[data-shell="aurora"]>.v3-atmosphere,
+  .v3-app[data-shell="aurora"]>.v3-context-bar,
+  .v3-app[data-shell="aurora"]>.v3-data-state{display:none!important}
+  .v3-app[data-shell="aurora"]>.v3-topbar{
+    position:relative!important;
+    z-index:100!important;
+    width:100%!important;
+    height:50px!important;
+    min-height:50px!important;
+    margin:0!important;
+    padding:7px 10px!important;
+    border:0!important;
+    border-bottom:1px solid rgba(169,244,238,.08)!important;
+    background:#040b12!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"]>.v3-topbar .v3-brand{display:none!important}
+  .v3-app[data-shell="aurora"]>.v3-topbar .v3-controls{width:100%!important;justify-content:flex-end!important}
+  .v3-app[data-shell="aurora"]>.v3-topbar .v3-controls>button{display:none!important}
+  .v3-app[data-shell="aurora"] .v3-world-trigger{
+    min-width:116px!important;height:36px!important;min-height:36px!important;
+    border:1px solid rgba(169,244,238,.13)!important;
+    background:linear-gradient(180deg,#0a1a25,#06111a)!important;
+    color:#e8f4f3!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"] .v3-world-trigger i{
+    background:radial-gradient(circle,#efb25e 0 24%,#78dff0 25% 48%,transparent 49%)!important;
+  }
+
+  /* Dedicated NORD home owns the whole layout. */
+  .v3-app[data-shell="aurora"][data-workspace="home"]>.nord-home-v3{
+    width:100%!important;margin:0!important;padding:0!important;
+  }
+
+  /* Trusted secondary workspaces: scene first, terminal second. */
+  .v3-app[data-shell="aurora"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"],[data-workspace="goal"])
+  :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    position:relative!important;isolation:isolate!important;
+    min-height:100dvh!important;margin:0!important;padding-top:0!important;
+    background:#040b12!important;overflow:visible!important;
+  }
+  .v3-app[data-shell="aurora"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"],[data-workspace="goal"])
+  :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):before,
+  .v3-app[data-shell="aurora"]:is([data-workspace="assets"],[data-workspace="analysis"],[data-workspace="income"],[data-workspace="goal"])
+  :is(.v3-assets,.v3-analysis,.v3-income,.v3-goal):after{
+    display:none!important;content:none!important;
+  }
+
+  .v3-app[data-shell="aurora"] .nord-stage-v3{
+    width:100%!important;margin:0!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-terminal-anchor{
+    display:block!important;height:1px!important;margin:0!important;scroll-margin-top:50px!important;
+  }
+
+  /* --- NORD trust gates: clean artwork first, message after the scene. --- */
+  .v3-app[data-shell="aurora"][data-trusted="false"] .nord-gate{
+    display:block!important;position:relative!important;
+    min-height:100dvh!important;margin:0!important;
+    padding:0 0 max(108px,calc(94px + env(safe-area-inset-bottom)))!important;
+    overflow:visible!important;background:#040b12!important;color:#eef8f7!important;
+  }
+  .v3-app[data-shell="aurora"][data-trusted="false"] .nord-gate__world{
+    display:block!important;position:relative!important;z-index:1!important;
+    inset:auto!important;width:100%!important;height:62svh!important;min-height:440px!important;
+    margin:0!important;overflow:hidden!important;pointer-events:none!important;
+    background:
+      linear-gradient(180deg,rgba(4,11,18,.01) 0 64%,rgba(4,11,18,.14) 83%,rgba(4,11,18,.88) 100%),
+      url("https://v3b.fal.media/files/b/0aabcb73/4T0FNTzQWEBxOn_Nin7Oe_fdiLp0sv.webp") 50% 48%/cover no-repeat!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="assets"][data-trusted="false"] .nord-gate__world{background-position:47% 48%!important}
+  .v3-app[data-shell="aurora"][data-workspace="analysis"][data-trusted="false"] .nord-gate__world{background-position:54% 48%!important}
+  .v3-app[data-shell="aurora"][data-workspace="income"][data-trusted="false"] .nord-gate__world{background-position:50% 51%!important}
+  .v3-app[data-shell="aurora"] .nord-gate__world:after{
+    position:absolute!important;z-index:5!important;left:14px!important;top:14px!important;
+    color:#d2e4e3!important;text-shadow:0 1px 8px #000!important;
+    font:750 6px/1 Inter,system-ui,sans-serif!important;letter-spacing:.17em!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate--assets .nord-gate__world:after{content:"QVANIX · FORMATION // 02"!important}
+  .v3-app[data-shell="aurora"] .nord-gate--analysis .nord-gate__world:after{content:"QVANIX · RISK // 03"!important}
+  .v3-app[data-shell="aurora"] .nord-gate--income .nord-gate__world:after{content:"QVANIX · TREASURY // 04"!important}
+
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere{
+    display:block!important;position:absolute!important;z-index:3!important;inset:0!important;pointer-events:none!important;overflow:hidden!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i{
+    position:absolute!important;top:-10%!important;width:20%!important;height:72%!important;opacity:.13!important;
+    background:linear-gradient(180deg,transparent,rgba(120,223,240,.28) 42%,rgba(128,255,208,.13) 70%,transparent)!important;
+    transform:skewX(-14deg)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(1){left:18%!important}
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(2){left:46%!important;width:15%!important;opacity:.09!important}
+  .v3-app[data-shell="aurora"] .nord-gate__atmosphere i:nth-child(3){right:13%!important;width:18%!important}
+  .v3-app[data-shell="aurora"] .nord-gate__crest{
+    right:15px!important;top:auto!important;bottom:22px!important;width:46px!important;height:46px!important;
+    opacity:.26!important;border-color:rgba(169,244,238,.10)!important;background:rgba(4,11,18,.10)!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__crest:before{inset:8px!important;border-color:rgba(239,178,94,.16)!important}
+  .v3-app[data-shell="aurora"] .nord-gate__crest:after{inset:16px!important;border-color:rgba(169,244,238,.12)!important}
+  .v3-app[data-shell="aurora"] .nord-gate__crest b{font-size:16px!important}
+  .v3-app[data-shell="aurora"] .nord-gate__crest i,
+  .v3-app[data-shell="aurora"] .nord-gate__crest span{height:46px!important}
+  .v3-app[data-shell="aurora"] .nord-gate__rune-rail{display:none!important}
+
+  .v3-app[data-shell="aurora"] .nord-gate__answer{
+    display:block!important;position:relative!important;z-index:4!important;
+    width:100%!important;max-width:none!important;margin:0!important;padding:17px 16px 48px!important;
+    border:0!important;border-top:1px solid rgba(239,178,94,.23)!important;border-radius:0!important;
+    background:linear-gradient(180deg,#07131d,#040b12)!important;
+    clip-path:none!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer:before{
+    content:""!important;position:absolute!important;left:16px!important;right:45%!important;top:8px!important;height:1px!important;
+    background:linear-gradient(90deg,#efb25e,rgba(169,244,238,.16),transparent)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__chapter{
+    margin:0 0 9px!important;padding:0 0 7px!important;border-bottom:1px solid rgba(169,244,238,.07)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer header{
+    display:grid!important;grid-template-columns:31px minmax(0,1fr)!important;gap:9px!important;align-items:start!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer header>i{
+    width:30px!important;height:30px!important;border-color:rgba(239,178,94,.20)!important;background:rgba(239,178,94,.025)!important;font-size:14px!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer header strong{font-size:18px!important;line-height:1.05!important}
+  .v3-app[data-shell="aurora"] .nord-gate__answer header p{font-size:7.5px!important;line-height:1.35!important}
+  .v3-app[data-shell="aurora"] .nord-gate__source{margin-top:8px!important;padding-top:7px!important;font-size:6.6px!important}
+  .v3-app[data-shell="aurora"] .nord-gate__cue{
+    position:absolute!important;z-index:8!important;left:50%!important;bottom:10px!important;
+    width:190px!important;height:33px!important;min-height:33px!important;margin:0!important;padding:4px 9px!important;
+    transform:translateX(-50%)!important;border:1px solid rgba(169,244,238,.11)!important;border-radius:0!important;
+    background:#07131d!important;color:#a7c5c6!important;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)!important;
+    box-shadow:none!important;font-size:5.5px!important;letter-spacing:.14em!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__route{
+    position:relative!important;z-index:4!important;scroll-margin-top:50px!important;
+    margin:16svh 0 0!important;padding:15px 12px 18px!important;
+    border:0!important;border-top:1px solid rgba(239,178,94,.11)!important;
+    background:linear-gradient(180deg,#06111a,#040b12)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__route:before{
+    content:"RUNE PATH // ПРОВЕРКА ИСТОЧНИКА"!important;display:block!important;
+    margin:0 0 10px!important;padding:0 2px 8px!important;border-bottom:1px solid rgba(169,244,238,.07)!important;
+    color:#8ca9ab!important;font:750 5.6px/1 Inter,system-ui,sans-serif!important;letter-spacing:.15em!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__route article{
+    min-height:68px!important;margin-top:6px!important;padding:10px 11px!important;
+    border:1px solid rgba(169,244,238,.09)!important;border-left:2px solid rgba(169,244,238,.20)!important;
+    background:linear-gradient(110deg,rgba(9,24,34,.91),rgba(5,15,24,.88))!important;
+    clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__action{background:#07121b!important;border-color:rgba(169,244,238,.08)!important}
+  .v3-app[data-shell="aurora"] .nord-gate__action button{border-radius:0!important}
+
+  /* --- Terminal chapter: Assets = formation board. --- */
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .nord-terminal-anchor+
+  .v3-assets-hero{
+    width:calc(100% - 24px)!important;min-height:104px!important;margin:14px 12px 0!important;padding:14px 15px!important;
+    border:1px solid rgba(169,244,238,.11)!important;border-left:3px solid rgba(239,178,94,.52)!important;border-radius:0!important;
+    background:linear-gradient(110deg,#0a1d29,#06121b)!important;
+    clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-hero:before{
+    content:"FORMATION BOARD"!important;position:absolute!important;left:14px!important;top:9px!important;
+    color:#7f9fa2!important;font:750 5.5px/1 Inter,system-ui,sans-serif!important;letter-spacing:.14em!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-hero>div{padding-top:12px!important}
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-hero>i{
+    width:42px!important;height:42px!important;border:1px solid rgba(239,178,94,.22)!important;border-radius:50%!important;
+    display:grid!important;place-items:center!important;color:#efc27c!important;background:transparent!important;font-size:14px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-summary{
+    width:calc(100% - 24px)!important;margin:7px 12px 0!important;display:grid!important;grid-template-columns:1.3fr .7fr!important;gap:7px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-summary article{
+    min-height:78px!important;padding:11px!important;border-radius:0!important;
+    border:1px solid rgba(169,244,238,.09)!important;background:#071721!important;
+    clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)!important;
+  }
+
+  /* --- Analysis = tactical rune map, asymmetric instead of card grid. --- */
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .nord-terminal-anchor+
+  .v3-analysis-signal{
+    width:calc(100% - 24px)!important;margin:14px 12px 0!important;display:grid!important;grid-template-columns:1.2fr .8fr!important;gap:7px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-signal>div{
+    min-height:92px!important;padding:12px!important;border-radius:0!important;
+    border:1px solid rgba(120,223,240,.11)!important;border-top:2px solid rgba(120,223,240,.24)!important;
+    background:linear-gradient(150deg,#071b28,#06121c)!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-grid{
+    width:calc(100% - 24px)!important;margin:7px 12px 0!important;display:grid!important;
+    grid-template-columns:1fr 1fr!important;gap:7px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-grid article{
+    min-height:82px!important;padding:11px!important;border-radius:0!important;
+    border:1px solid rgba(169,244,238,.09)!important;background:#071721!important;
+    clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-grid article:nth-child(1){border-left:2px solid rgba(239,178,94,.42)!important}
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-grid article:nth-child(2){border-top-color:rgba(120,223,240,.24)!important}
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-grid article:nth-child(3){border-bottom-color:rgba(239,178,94,.20)!important}
+
+  /* --- Income = treasury river. --- */
+  .v3-app[data-shell="aurora"][data-workspace="income"] .nord-terminal-anchor+
+  .v3-income-hero{
+    width:calc(100% - 24px)!important;min-height:112px!important;margin:14px 12px 0!important;padding:14px 15px!important;
+    border:1px solid rgba(239,178,94,.12)!important;border-left:3px solid rgba(239,178,94,.48)!important;border-radius:0!important;
+    background:
+      linear-gradient(180deg,transparent 0 68%,rgba(120,223,240,.04) 68% 69%,transparent 69% 78%,rgba(120,223,240,.03) 78% 79%,transparent 79%),
+      linear-gradient(110deg,#101b1f,#06131c)!important;
+    clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-hero>i{
+    width:42px!important;height:42px!important;border:1px solid rgba(239,178,94,.20)!important;border-radius:50%!important;
+    background:transparent!important;color:#efc27c!important;display:grid!important;place-items:center!important;font-size:16px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-grid{
+    width:calc(100% - 24px)!important;margin:7px 12px 0!important;display:grid!important;grid-template-columns:.85fr 1.15fr!important;gap:7px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-grid article{
+    min-height:80px!important;padding:11px!important;border-radius:0!important;border:1px solid rgba(169,244,238,.09)!important;
+    background:#071721!important;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-context{
+    width:calc(100% - 24px)!important;margin:10px 12px 0!important;padding:12px!important;border-radius:0!important;
+    border:1px solid rgba(169,244,238,.09)!important;background:#06141d!important;
+  }
+
+  /* --- Goal = expedition path. --- */
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .nord-terminal-anchor+
+  .v3-goal-hero{
+    width:calc(100% - 24px)!important;min-height:112px!important;margin:14px 12px 0!important;padding:14px 15px!important;
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:9px!important;align-items:center!important;
+    border:1px solid rgba(169,244,238,.10)!important;border-left:3px solid rgba(239,178,94,.50)!important;border-right:0!important;
+    border-radius:0!important;background:linear-gradient(110deg,#0b1b22,#06121b)!important;
+    clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero:before{
+    content:"PATH STONE // ORIENTIR"!important;position:absolute!important;left:14px!important;top:9px!important;
+    color:#83a3a5!important;font:750 5.5px/1 Inter,system-ui,sans-serif!important;letter-spacing:.14em!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-title{padding-top:11px!important}
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero>strong{font-size:20px!important;line-height:1!important;text-align:right!important}
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero>button{
+    grid-column:1/-1!important;justify-self:start!important;min-width:142px!important;min-height:38px!important;
+    margin-top:2px!important;padding:0 14px!important;border:1px solid rgba(239,178,94,.20)!important;border-radius:0!important;
+    background:linear-gradient(180deg,rgba(47,35,22,.70),rgba(19,18,16,.82))!important;color:#f0d2a3!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] :is(.v3-goal-progress,.v3-goal-journey){
+    width:calc(100% - 24px)!important;margin:8px 12px 0!important;border-radius:0!important;border-color:rgba(169,244,238,.09)!important;
+    background:#071721!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-facts{
+    width:calc(100% - 24px)!important;margin:7px 12px 0!important;gap:7px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-facts>*{
+    min-height:76px!important;border-radius:0!important;border-color:rgba(169,244,238,.09)!important;background:#071721!important;
+  }
+
+  /* Chapter-to-depth cues are in flow. They are transitions, not floating UI. */
+  .v3-app[data-shell="aurora"] :is(.v3-assets-depth-cue,.v3-analysis-depth-cue,.nord-income-depth-cue,.nord-goal-depth-cue){
+    position:relative!important;z-index:8!important;left:auto!important;top:auto!important;bottom:auto!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;
+    width:176px!important;height:34px!important;min-height:34px!important;margin:14px auto 0!important;padding:4px 9px!important;
+    transform:none!important;border:1px solid rgba(169,244,238,.11)!important;border-radius:0!important;
+    background:#07131d!important;color:#a6c4c5!important;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)!important;
+    box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"] :is(.v3-assets-depth-cue,.v3-analysis-depth-cue):before{
+    content:"ГЛУБЖЕ"!important;margin-right:2px!important;color:#8daeb0!important;font:750 5.5px/1 Inter,system-ui,sans-serif!important;letter-spacing:.14em!important;
+  }
+  .v3-app[data-shell="aurora"] :is(.v3-assets-depth-cue,.v3-analysis-depth-cue,.nord-income-depth-cue,.nord-goal-depth-cue) i{
+    color:#a9f4ee!important;font-size:16px!important;font-style:normal!important;
+  }
+  .v3-app[data-shell="aurora"] :is(.v3-assets-depth-spacer,.v3-analysis-depth-spacer,.nord-income-depth-spacer,.nord-goal-depth-spacer){
+    display:block!important;min-height:72px!important;
+  }
+
+  /* Deep finance surfaces are a quieter stone chamber. */
+  .v3-app[data-shell="aurora"] :is(
+    .v3-assets-depth,.v3-analysis-depth-anchor,#v3-income-depth,.v3-goal-scenario-lab
+  ){
+    position:relative!important;z-index:6!important;margin-left:10px!important;margin-right:10px!important;
+    border-radius:0!important;border:1px solid rgba(169,244,238,.10)!important;
+    background:linear-gradient(180deg,#07151f,#040b12)!important;box-shadow:none!important;
+  }
+  .v3-app[data-shell="aurora"] :is(
+    .v3-assets-depth__block,.v3-assets-depth__metrics article,
+    .v3-analysis-overview-depth,.v3-analysis-quality>div,.v3-breadth>div,
+    .v3-income-detail,.v3-income-ratios article
+  ){
+    border-radius:0!important;border-color:rgba(169,244,238,.09)!important;background:#071721!important;box-shadow:none!important;
+  }
+
+  /* Keep the bottom nav quiet and consistent with the stone hall. */
+  .v3-app[data-shell="aurora"]>.v3-nav{
+    background:linear-gradient(180deg,rgba(4,11,18,.96),#040b12)!important;
+    border-top:1px solid rgba(169,244,238,.10)!important;box-shadow:0 -12px 28px rgba(0,0,0,.24)!important;
+  }
+  .v3-app[data-shell="aurora"]>.v3-nav button.is-active{
+    color:#efc27c!important;background:linear-gradient(180deg,rgba(239,178,94,.08),transparent)!important;
+  }
+}
+

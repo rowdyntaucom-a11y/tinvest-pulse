@@ -3,7 +3,7 @@ import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import type{V3DetailMode,V3Shell}from"../app/model";
 import{ratioToPercent,clampPercent}from"../data/units";
 import{positionAssetClassLabel,assetClassKey}from"../data/assetClasses";
-import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";import{CosmosTrustGate}from"../cosmos/CosmosTrustGate";import{CosmosWorkspaceStage}from"../cosmos/CosmosWorkspaceStage";import{NordTrustGate}from"../nord/NordTrustGate";
+import{V3SectionSelector}from"../navigation/V3SectionSelector";import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";import{SamuraiTrustGate}from"../samurai/SamuraiTrustGate";import{CosmosTrustGate}from"../cosmos/CosmosTrustGate";import{CosmosWorkspaceStage}from"../cosmos/CosmosWorkspaceStage";import{NordTrustGate}from"../nord/NordTrustGate";import{NordWorkspaceStage}from"../nord/NordWorkspaceStage";
 
 const V3HoldingsExplorer=lazy(()=>import("./V3HoldingsExplorer").then(m=>({default:m.V3HoldingsExplorer})));
 const V3AssetsDepth=lazy(()=>import("./V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
@@ -22,10 +22,10 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
   const overview=mode==="simple"||view==="overview",themedDepth=shell==="samurai"||shell==="carbon"||shell==="aurora";
   const scrollToDepth=()=>{const el=document.getElementById("v3-assets-depth");if(!el)return;const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})};
   if(shell==="carbon"&&!trusted)return <CosmosTrustGate kind="assets" onRefresh={onRefresh} refreshing={refreshing}/>;if(shell==="aurora"&&!trusted)return <NordTrustGate kind="assets" onRefresh={onRefresh} refreshing={refreshing}/>;
-  return <main className="v3-assets" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="陣" code="FORMATION // 02" label="PORTFOLIO ROSTER"/>{shell==="carbon"&&<CosmosWorkspaceStage/>}
-    <header className="v3-page-head"><span>ПОРТФЕЛЬ · СОСТАВ</span><h1>Активы</h1><p>{trusted?"Подтверждённый состав · веса и текущий broker P/L":"Состав скрыт до подтверждения данных"}</p></header>
+  return <main className="v3-assets" data-shell={shell} data-trusted={trusted}><SamuraiWorkspaceChrome shell={shell} glyph="陣" code="FORMATION // 02" label="PORTFOLIO ROSTER"/>{shell==="carbon"&&<CosmosWorkspaceStage/>}{shell==="aurora"&&trusted&&<NordWorkspaceStage kind="assets" targetId="nord-assets-terminal" value={rub.format(total)+" ₽"} meta={base.length+" позиций · топ-3 "+num.format(top3)+"% портфеля"}/>} 
+    {shell!=="aurora"&&<header className="v3-page-head"><span>ПОРТФЕЛЬ · СОСТАВ</span><h1>Активы</h1><p>{trusted?"Подтверждённый состав · веса и текущий broker P/L":"Состав скрыт до подтверждения данных"}</p></header>}
     {shell==="samurai"&&!trusted&&<SamuraiTrustGate kind="assets" onRefresh={onRefresh} refreshing={refreshing}/>}
-    {trusted&&<section className="v3-assets-hero"><div><span>Стоимость портфеля</span><strong>{rub.format(total)} ₽</strong><small>{base.length} позиций · текущая подтверждённая стоимость</small></div><i aria-hidden="true">◆</i></section>}
+    {shell==="aurora"&&trusted&&<div id="nord-assets-terminal" className="nord-terminal-anchor" aria-hidden="true"/>}{trusted&&<section className="v3-assets-hero"><div><span>Стоимость портфеля</span><strong>{rub.format(total)} ₽</strong><small>{base.length} позиций · текущая подтверждённая стоимость</small></div><i aria-hidden="true">◆</i></section>}
     {trusted&&<section className="v3-assets-summary"><article><span>Топ-3</span><strong>{num.format(top3)}%</strong><small>капитала</small></article><article><span>В плюсе</span><strong>{positive}/{base.length}</strong><small>по текущему broker P/L</small></article></section>}
     {trusted&&themedDepth&&<button type="button" className="v3-assets-depth-cue" onClick={scrollToDepth} aria-label="Перейти к глубокому разбору активов"><i aria-hidden="true">⌄</i></button>}
     {trusted&&themedDepth&&<div className="v3-assets-depth-spacer" aria-hidden="true"/>}

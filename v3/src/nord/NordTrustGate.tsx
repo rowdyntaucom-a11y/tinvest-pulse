@@ -16,6 +16,7 @@ export function NordTrustGate({kind,onRefresh,refreshing=false}:{kind:GateKind;o
  };
  return <main className={"nord-gate nord-gate--"+kind} aria-label={x.title}>
   <section className="nord-gate__world" aria-hidden="true">
+   <div className="nord-gate__atmosphere"><i/><i/><i/></div>
    <div className="nord-gate__crest"><i/><b>{x.rune}</b><span/></div>
    <div className="nord-gate__rune-rail"><i>ᚠ</i><i>ᚱ</i><i>ᛏ</i><i>ᛟ</i><i>ᛉ</i></div>
   </section>
