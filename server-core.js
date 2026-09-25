@@ -567,14 +567,16 @@ function businessDates(from, to) {
   return out;
 }
 
-async function getMoexHistory(from, to) {
+async function getMoexIndexHistory(secid, from, to) {
   const fromKey = dateKey(from);
   const toKey = dateKey(to);
+  const code = String(secid || '').trim().toUpperCase();
+  if (!/^[A-Z0-9+_-]{2,24}$/.test(code) || !fromKey || !toKey) return [];
 
-  // Prefer MOEX candles: the response is compact and gives the closing value
-  // for each trading day. Fall back to the history endpoint if needed.
+  // Prefer MOEX candles: compact daily closes. Fall back to history when a
+  // particular index does not expose candles for the requested interval.
   const candlesUrl =
-    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/IMOEX/candles.json` +
+    `${MOEX_BASE}engines/stock/markets/index/boards/SNDX/securities/${encodeURIComponent(code)}/candles.json` +
     `?iss.meta=off&from=${encodeURIComponent(fromKey)}&till=${encodeURIComponent(toKey)}&interval=24`;
   const candlesResult = await safeFetch(candlesUrl);
   if (candlesResult.ok) {
@@ -589,14 +591,14 @@ async function getMoexHistory(from, to) {
         const parsed = rows.map(r => ({
           date: String(r?.[idxBegin] || '').slice(0, 10),
           value: Number(r?.[idxClose])
-        })).filter(x => x.date && Number.isFinite(x.value));
+        })).filter(x => x.date && Number.isFinite(x.value) && x.value > 0);
         if (parsed.length) return parsed;
       }
     } catch {}
   }
 
   const historyUrl =
-    `${MOEX_BASE}history/engines/stock/markets/index/boards/SNDX/securities/IMOEX.json` +
+    `${MOEX_BASE}history/engines/stock/markets/index/boards/SNDX/securities/${encodeURIComponent(code)}.json` +
     `?iss.meta=off&iss.only=history&history.columns=TRADEDATE,CLOSE` +
     `&from=${encodeURIComponent(fromKey)}&till=${encodeURIComponent(toKey)}`;
   const result = await safeFetch(historyUrl);
@@ -612,10 +614,14 @@ async function getMoexHistory(from, to) {
     return rows.map(r => ({
       date: String(r?.[idxDate] || ''),
       value: Number(r?.[idxClose])
-    })).filter(x => x.date && Number.isFinite(x.value));
+    })).filter(x => x.date && Number.isFinite(x.value) && x.value > 0);
   } catch {
     return [];
   }
+}
+
+async function getMoexHistory(from, to) {
+  return getMoexIndexHistory('IMOEX', from, to);
 }
 
 function cbrHttpsRequest(url, options = {}) {
