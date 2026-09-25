@@ -43,3 +43,16 @@
 .v3-income-calendar-summary{grid-template-columns:1fr}.v3-income-depth-head{display:grid;grid-template-columns:1fr}.v3-income-depth-status{min-width:0;text-align:left}
 .v3-income-event-row{grid-template-columns:1fr auto}.v3-income-event-row time{grid-column:1/-1}.v3-income-source-row{grid-template-columns:1fr 1fr}.v3-income-source-row>div:first-child{grid-column:1/-1}.v3-income-source-row>div:nth-child(2){text-align:left}
 }
+
+/* Income story transition: atmospheric first viewport -> verified working depth. */
+.v3-income-depth-cue{display:grid;place-items:center;gap:1px;width:max-content;min-width:132px;margin:10px auto 4px;padding:7px 14px 8px;border:1px solid color-mix(in srgb,var(--v3-accent) 38%,var(--v3-line));border-radius:999px;background:color-mix(in srgb,var(--v3-card) 82%,transparent);color:var(--v3-text);font:inherit;box-shadow:0 10px 28px rgba(0,0,0,.12);cursor:pointer}
+.v3-income-depth-cue span{font-size:7px;letter-spacing:.14em;color:var(--v3-muted)}.v3-income-depth-cue i{height:15px;font-size:18px;line-height:12px;font-style:normal;color:var(--v3-accent);animation:v3-income-cue 1.8s ease-in-out infinite}.v3-income-depth-cue small{font-size:7px;color:var(--v3-muted)}
+.v3-income-depth-anchor{scroll-margin-top:12px}
+.v3-app[data-shell="samurai"] .v3-income-depth-cue{border-radius:3px 14px 3px 14px;border-color:rgba(226,173,83,.32);background:linear-gradient(135deg,rgba(21,12,10,.86),rgba(52,20,15,.7));box-shadow:inset 2px 0 rgba(201,48,36,.45),0 12px 34px rgba(0,0,0,.22)}
+.v3-app[data-shell="samurai"] .v3-income-depth{border-radius:5px 22px 5px 22px;background:linear-gradient(145deg,rgba(18,11,10,.93),rgba(42,18,15,.86));border-color:rgba(226,173,83,.18)}
+.v3-app[data-shell="samurai"] .v3-income-depth :is(.v3-income-calendar-summary article,.v3-income-event-row,.v3-income-source-row,.v3-income-history-stats article){border-radius:3px 13px 3px 13px;background:linear-gradient(145deg,rgba(91,28,20,.16),rgba(12,10,10,.45))}
+.v3-app[data-shell="carbon"] .v3-income-depth-cue{border-color:rgba(83,191,255,.3);background:linear-gradient(135deg,rgba(6,18,48,.82),rgba(12,10,38,.72));box-shadow:0 0 28px rgba(41,128,255,.12)}
+.v3-app[data-shell="carbon"] .v3-income-depth{border-color:rgba(83,191,255,.16);background:radial-gradient(circle at 92% 2%,rgba(46,89,255,.12),transparent 30%),rgba(7,10,28,.9)}
+.v3-app[data-shell="carbon"] .v3-income-depth :is(.v3-income-calendar-summary article,.v3-income-event-row,.v3-income-source-row,.v3-income-history-stats article){background:linear-gradient(145deg,rgba(22,37,78,.36),rgba(7,11,30,.48));box-shadow:inset 0 1px rgba(123,207,255,.035)}
+@keyframes v3-income-cue{0%,100%{transform:translateY(0);opacity:.68}50%{transform:translateY(3px);opacity:1}}
+@media(prefers-reduced-motion:reduce){.v3-income-depth-cue i{animation:none}}
