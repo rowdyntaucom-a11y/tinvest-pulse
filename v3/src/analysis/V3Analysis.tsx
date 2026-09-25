@@ -20,7 +20,8 @@ import{NordTrustGate}from"../nord/NordTrustGate";
 import{NordWorkspaceStage}from"../nord/NordWorkspaceStage";
 import{NordAnalysisTerminal}from"../nord/NordTerminals";
 import"../styles/analysisDepthTransition.css";
-const V3RebalanceWorkspace=lazy(()=>import("./V3RebalanceWorkspace").then(m=>({default:m.V3RebalanceWorkspace})));\nconst V3PortfolioLab=lazy(()=>import("./V3PortfolioLab").then(m=>({default:m.V3PortfolioLab})));
+const V3RebalanceWorkspace=lazy(()=>import("./V3RebalanceWorkspace").then(m=>({default:m.V3RebalanceWorkspace})));
+const V3PortfolioLab=lazy(()=>import("./V3PortfolioLab").then(m=>({default:m.V3PortfolioLab})));
 
 const n=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const n2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
