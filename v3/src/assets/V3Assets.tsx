@@ -62,6 +62,7 @@ export function V3Assets({items,trusted,shell,mode,allowAssetWorkspace=true,onOp
       ]}/>}
       <Suspense fallback={<section id="v3-assets-depth" className="v3-empty">Открываем Assets Depth…</section>}><V3AssetsDepth positions={base} onOpenAsset={allowAssetWorkspace?onOpenAsset:undefined}/></Suspense>
       {shell==="samurai"&&allowAssetWorkspace&&<Suspense fallback={<section className="v3-empty">Открываем журнал операций…</section>}><V3OperationsDepth/></Suspense>}
+      {shell==="samurai"&&allowAssetWorkspace&&<Suspense fallback={<section className="v3-empty">Открываем отчёт портфеля…</section>}><V3PortfolioReportDepth positions={base}/></Suspense>}
     </>}
   </main>;
 }
