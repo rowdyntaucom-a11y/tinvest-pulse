@@ -146,8 +146,9 @@ function IncomePreview({chapters,selected,onSelect,renderDetail}:PreviewProps){
 function scrollToTarget(id:string){
  const target=document.getElementById(id);
  if(!target)return;
- const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches??false;
- target.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
+ // Do not leave a long browser smooth-scroll animation running after an
+ // explicit "Open tool" tap. It can fight the next vertical gesture.
+ target.scrollIntoView({behavior:"auto",block:"start"});
 }
 
 function scrollToSourceRoute(node:HTMLElement|null){
