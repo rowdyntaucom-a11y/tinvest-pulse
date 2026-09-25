@@ -239,3 +239,6 @@ This section records the latest explicit user decisions and overrides older Cosm
 Resume point: continue from the approved sharp Cosmos Mix C master and implement the Cosmos shell around it. Do not generate another replacement image unless the user explicitly asks.
 
 Implementation checkpoint 2026-09-24: the Cosmos UI language has now been reforged around **Blue Singularity / Sentinel Order** (geometry, materials, chrome, motion and workspace atmosphere) without substituting a new image for Mix C. The exact sharp Mix C bytes are still not durably stored in the repository, so final artwork mounting remains blocked until that original asset is persisted. Do not point the shell at the rejected blurry fal.ai derivative.
+
+## Latest resume checkpoint — 2026-09-25
+Continue from `progress/2026-09-25-samurai-failclosed-atlas-resume.md` + current `main`. This supersedes the earlier 2026-09-25 resume note for active work. Samurai remains the only active Snowball+ reference shell until the missing functional surfaces are complete.
