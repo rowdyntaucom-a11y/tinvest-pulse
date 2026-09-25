@@ -2114,3 +2114,163 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
     .v3-analysis-signal strong,.v3-income-grid strong,.v3-goal-facts strong
   ){color:#edf8f8!important}
 }
+
+
+/* ========================================================================== */
+/* NORD second real-device polish — recording 1000031705.mp4                  */
+/* Goal: more atmosphere per tab, less dead top space, cleaner fail-closed UI. */
+/* ========================================================================== */
+@media(max-width:430px){
+  /* Secondary tabs should enter the world immediately instead of spending
+     the first ~15% of the screen on an empty black band. */
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head{
+    margin-top:4svh!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-page-head{
+    margin-left:auto!important;
+    margin-right:12px!important;
+    border-left:0!important;
+    border-right:2px solid rgba(169,244,238,.48)!important;
+    background:linear-gradient(260deg,rgba(5,15,24,.91),rgba(5,15,24,.66) 74%,rgba(5,15,24,.08))!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-page-head{
+    margin-left:auto!important;
+    margin-right:12px!important;
+  }
+
+  /* Give the artwork a real breathing zone before the first answer widget. */
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-hero{
+    width:72%!important;
+    margin:47svh 12px 0!important;
+    padding:12px 42px 11px 13px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="assets"] .v3-assets-summary{
+    width:84%!important;
+    margin:6px 12px 25svh auto!important;
+  }
+
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-signal{
+    width:76%!important;
+    margin:43svh 12px 0 auto!important;
+    gap:4px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-signal>div{
+    min-height:68px!important;
+    padding:10px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-grid{
+    width:calc(100% - 24px)!important;
+    margin:6px 12px 23svh!important;
+    gap:4px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-grid article{
+    min-height:68px!important;
+    padding:9px!important;
+  }
+
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-hero{
+    width:72%!important;
+    min-height:86px!important;
+    margin:48svh 12px 0!important;
+    padding:12px 40px 11px 13px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-hero>i{
+    width:44px!important;
+    height:44px!important;
+    font-size:18px!important;
+    opacity:.72!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-grid{
+    width:82%!important;
+    margin:6px 12px 25svh auto!important;
+    gap:4px!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="income"] .v3-income-grid article{
+    min-height:68px!important;
+    padding:10px!important;
+  }
+
+  /* Goal was the weakest screen in the recording: the target copy and CTA
+     fought each other and the card obscured the character/gate. */
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero{
+    width:76%!important;
+    min-height:0!important;
+    margin:49svh 12px 24svh auto!important;
+    padding:12px 13px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:8px 10px!important;
+    align-items:center!important;
+    border-right:2px solid rgba(240,176,93,.58)!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-title{
+    min-width:0!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-title span{
+    display:block!important;
+    color:#d9eeee!important;
+    font-size:8px!important;
+    letter-spacing:.03em!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-title small{
+    display:block!important;
+    max-width:150px!important;
+    margin-top:4px!important;
+    color:#8fa7aa!important;
+    font-size:7px!important;
+    line-height:1.25!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero>strong{
+    max-width:126px!important;
+    color:#f5fbfa!important;
+    font-size:22px!important;
+    line-height:1!important;
+    text-align:right!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+  .v3-app[data-shell="aurora"][data-workspace="goal"] .v3-goal-hero>button{
+    grid-column:1/-1!important;
+    justify-self:start!important;
+    min-width:150px!important;
+    min-height:38px!important;
+    margin-top:1px!important;
+    padding:0 15px!important;
+    border:1px solid rgba(169,244,238,.23)!important;
+    border-radius:12px!important;
+    background:linear-gradient(180deg,rgba(11,33,42,.86),rgba(7,22,31,.86))!important;
+    color:#e8f7f6!important;
+  }
+
+  /* The browser's narrow scrollbar was visually reading as part of the shell. */
+  .v3-app[data-shell="aurora"] :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal){
+    scrollbar-width:none!important;
+    -ms-overflow-style:none!important;
+  }
+  .v3-app[data-shell="aurora"] :is(.v3-home,.v3-assets,.v3-analysis,.v3-income,.v3-goal)::-webkit-scrollbar{
+    width:0!important;
+    height:0!important;
+    display:none!important;
+  }
+
+  /* Make the down cue quieter and visibly part of NORD rather than a generic button. */
+  .v3-app[data-shell="aurora"][data-workspace="home"] .v3-hero:after{
+    width:34px!important;
+    height:30px!important;
+    bottom:74px!important;
+    border-color:rgba(169,244,238,.09)!important;
+    background:rgba(2,9,15,.22)!important;
+    box-shadow:0 0 0 1px rgba(240,176,93,.035),0 0 18px rgba(116,225,235,.08)!important;
+    font-size:23px!important;
+  }
+
+  /* Compact typography over art so title plates never dominate the scene. */
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head h1{
+    font-size:26px!important;
+  }
+  .v3-app[data-shell="aurora"]:not([data-workspace="home"]):not([data-workspace="dna"]) .v3-page-head p{
+    max-width:92%!important;
+    font-size:7px!important;
+    line-height:1.25!important;
+  }
+}
