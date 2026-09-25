@@ -1651,6 +1651,12 @@ require('./payouts')(app, {
   operationCash
 });
 
+// Verified bond analytics: T-Bank BondBy + coupon schedule + market yield.
+require('./bond-analytics')(app, {
+  tbankRequest,
+  buildDashboard
+});
+
 app.get('/api/dashboard', async (req, res) => {
   try {
     const data = await buildDashboard();

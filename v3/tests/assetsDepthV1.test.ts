@@ -33,9 +33,10 @@ test("Assets Depth exposes composition, concentration, P\/L, sectors, bonds and 
  assert.match(depth,/тап → карточка актива/);
 });
 
-test("unverified bond analytics fail closed instead of inventing YTM or duration",()=>{
- assert.match(depth,/YTM, дюрация и НКД здесь намеренно не подставляются/);
- assert.match(depth,/Срок до погашения не называется дюрацией/);
+test("extended bond analytics use a separate verified contract and preserve semantic boundaries",()=>{
+ assert.match(depth,/V3BondYieldDepth/);
+ assert.match(depth,/отдельный проверяемый контракт/);
+ assert.match(depth,/Срок до погашения остаётся самостоятельной метрикой и не называется дюрацией/);
 });
 
 test("shell differences stay in material CSS, not duplicate analytics",()=>{

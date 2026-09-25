@@ -8,6 +8,7 @@ import{calculatePortfolioTopExposure}from"../../../v2/src/features/portfolio/por
 import{assetClassLabel}from"../data/assetClasses";
 import{clampPercent}from"../data/units";
 import{V3HoldingsExplorer}from"./V3HoldingsExplorer";
+import{V3BondYieldDepth}from"./V3BondYieldDepth";
 import"../styles/assetsDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -92,7 +93,8 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    <div className="v3-assets-depth__bond-line"><span>Ближайшее погашение</span><strong>{model.bonds.nearest?model.bonds.nearest.ticker+" · "+dateFmt.format(new Date(model.bonds.nearest.maturityDate)):"—"}</strong></div>
    <div className="v3-assets-depth__bond-line"><span>Эмитент · покрытие</span><strong>{pct.format(model.bondRisk.issuer.coverageRatio*100)}%</strong></div>
    <div className="v3-assets-depth__bond-line"><span>Сектор · покрытие</span><strong>{pct.format(model.bondRisk.sector.coverageRatio*100)}%</strong></div>
-   <p>YTM, дюрация и НКД здесь намеренно не подставляются: текущий подтверждённый контракт не позволяет честно рассчитать их для всех выпусков. Срок до погашения не называется дюрацией.</p>
+   <V3BondYieldDepth/>
+   <p>Расширенный слой YTM и modified duration использует отдельный проверяемый контракт. Срок до погашения остаётся самостоятельной метрикой и не называется дюрацией.</p>
    </>:<div className="v3-assets-depth__empty">Облигаций в текущем подтверждённом составе нет.</div>}
   </section>
 
