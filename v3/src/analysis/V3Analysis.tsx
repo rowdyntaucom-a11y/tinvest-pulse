@@ -1,4 +1,4 @@
-import{useMemo,useState}from"react";
+import{lazy,Suspense,useMemo,useState}from"react";
 import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import type{V3DetailMode,V3Shell}from"../app/model";
 import{filterHistoryWindow,type V3HistoryWindow}from"../history/historyLens";
@@ -20,6 +20,7 @@ import{NordTrustGate}from"../nord/NordTrustGate";
 import{NordWorkspaceStage}from"../nord/NordWorkspaceStage";
 import{NordAnalysisTerminal}from"../nord/NordTerminals";
 import"../styles/analysisDepthTransition.css";
+const V3RebalanceWorkspace=lazy(()=>import("./V3RebalanceWorkspace").then(m=>({default:m.V3RebalanceWorkspace})));
 
 const n=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const n2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -50,7 +51,8 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
     {id:"sam-analysis-return",code:"弐",label:"Доходность",note:"TWR · Sharpe · rolling"},
     {id:"sam-analysis-risk",code:"参",label:"Риск",note:"DD · VaR/CVaR"},
     {id:"sam-analysis-structure",code:"肆",label:"Структура",note:"классы · облигации"},
-    {id:"sam-analysis-market",code:"伍",label:"Рынок",note:"IMOEX · beta · TE"}
+    {id:"sam-analysis-market",code:"伍",label:"Рынок",note:"IMOEX · beta · TE"},
+    {id:"sam-analysis-rebalance",code:"陸",label:"Ребалансировка",note:"цель · drift · сценарий"}
    ]}/>}
    {!samuraiReference&&mode==="detailed"&&<V3SectionSelector label="Раздел аналитики" value={section} onChange={setSection} options={sectionOptions}/>} 
 
@@ -79,7 +81,10 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
 
    {((samuraiReference&&trusted)||(mode==="detailed"&&section==="market"))&&trusted&&<div id="sam-analysis-market" className={samuraiReference?"sam-reference-chapter":undefined}>
     <V3MarketLayer relative={relative} window={historyWindow} onWindowChange={setHistoryWindow} market={market}/>
+    {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-rebalance" label="ДАЛЬШЕ · РЕБАЛАНСИРОВКА"/>}
    </div>}
+
+   {samuraiReference&&trusted&&<div id="sam-analysis-rebalance" className="sam-reference-chapter"><Suspense fallback={<section className="v3-analysis-note">Открываем сценарий ребалансировки…</section>}><V3RebalanceWorkspace positions={rows}/></Suspense></div>}
 
    <section className="v3-analysis-note">Показатели описывают текущую структуру и подтверждённую историю. Они не являются рекомендацией купить, продать или выбрать конкретный актив.</section>
   </section>
