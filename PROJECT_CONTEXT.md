@@ -98,6 +98,10 @@ The user does not want repeated status-only replies. After approval, continue to
 
 The user explicitly trusts the assistant to make implementation decisions within the agreed architecture. Do not stop the project to ask about minor choices that can be resolved safely from context.
 
+
+## Resume checkpoint — 2026-09-25
+Latest active development state is captured in `progress/2026-09-25-samurai-snowball-reference-resume.md`. Continue from that file + current `main` before starting new work. Samurai is the active Snowball+ reference shell; do not spread incomplete parity work across multiple shells.
+
 ## 13. Source-of-truth hierarchy
 New chat: read `PROJECT_CONTEXT.md`; inspect current `main` and recent commits; inspect relevant files; use memory/prior-chat context for product intent. If docs/code disagree on implementation, current `main` wins; this file records intent unless user changed it. Update this file after meaningful decisions/milestones.
 
