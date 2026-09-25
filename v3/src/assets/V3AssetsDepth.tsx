@@ -8,6 +8,7 @@ import{calculatePortfolioTopExposure}from"../../../v2/src/features/portfolio/por
 import{assetClassLabel}from"../data/assetClasses";
 import{clampPercent}from"../data/units";
 import{V3HoldingsExplorer}from"./V3HoldingsExplorer";
+import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import"../styles/assetsDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -18,7 +19,7 @@ const dateFmt=new Intl.DateTimeFormat("ru-RU",{day:"2-digit",month:"short",year:
 function share(value:number,total:number){return total>0?value/total:0}
 function signedMoney(value:number){return(value>0?"+":"")+rub.format(value)+" ₽"}
 
-export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void}){
+export function V3AssetsDepth({positions,onOpenAsset,samuraiReference=false}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void;samuraiReference?:boolean}){
  const model=useMemo(()=>{
   const total=positions.reduce((sum,row)=>sum+Math.max(0,row.currentValue),0);
   const basis=positions.reduce((sum,row)=>sum+Math.max(0,row.costBasis),0);
@@ -52,6 +53,8 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    <div><strong>{rub.format(model.total)} ₽</strong><small>{positions.length} позиций</small></div>
   </header>
 
+  {samuraiReference&&<SamuraiChapterNav label="Активы Samurai" chapters={[{id:"sam-assets-classes",code:"壱",label:"Состав",note:"классы активов"},{id:"sam-assets-pnl",code:"弐",label:"Результат",note:"вклад broker P/L"},{id:"sam-assets-sectors",code:"参",label:"Отрасли",note:"покрытие метаданных"},{id:"sam-assets-bonds",code:"肆",label:"Облигации",note:"сроки и структура"},{id:"sam-assets-positions",code:"伍",label:"Позиции",note:"drill-down по активам"}]}/>} 
+
   <section className="v3-assets-depth__metrics" aria-label="Сводка структуры">
    <article><span>TOP-1</span><strong>{top1==null?"—":pct.format(top1*100)+"%"}</strong><small>крупнейшая позиция</small></article>
    <article><span>TOP-3</span><strong>{top3==null?"—":pct.format(top3*100)+"%"}</strong><small>доля трёх крупнейших</small></article>
@@ -64,6 +67,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    <div className="v3-assets-depth__bars">
     {model.classes.rows.map(row=>{const ratio=share(row.value,model.total);return <article key={row.label}><div><strong>{assetClassLabel(row.label)}</strong><span>{rub.format(row.value)} ₽ · {pct.format(ratio*100)}%</span></div><i aria-hidden="true"><b style={{width:clampPercent(ratio*100)+"%"}}/></i></article>})}
    </div>
+   {samuraiReference&&<SamuraiNextCue targetId="sam-assets-pnl" label="ДАЛЬШЕ · РЕЗУЛЬТАТ"/>}
   </section>
 
   <section id="sam-assets-pnl" className="v3-assets-depth__block v3-assets-depth__pnl">
@@ -73,12 +77,14 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
     {pnlLeaders.map(row=><article key={row.key}><div><strong>{row.ticker}</strong><span>{row.name}</span></div><div><b className={row.direction==="negative"?"is-negative":row.direction==="positive"?"is-positive":""}>{signedMoney(row.pnl)}</b><small>{row.grossPnlShare==null?"—":pct.format(row.grossPnlShare*100)+"% абс. P/L"}</small></div><i aria-hidden="true"><b style={{width:clampPercent((row.grossPnlShare??0)*100)+"%"}}/></i></article>)}
    </div>
    <p>Доля считается от суммы абсолютных broker P/L, поэтому победители и проигравшие не взаимно уничтожают вес. Это накопленный результат позиции, а не дневное изменение и не доходность стратегии.</p>
+   {samuraiReference&&<SamuraiNextCue targetId="sam-assets-sectors" label="ДАЛЬШЕ · ОТРАСЛИ"/>}
   </section>
 
   <section id="sam-assets-sectors" className="v3-assets-depth__block v3-assets-depth__sectors">
    <div className="v3-assets-depth__title"><div><span>03 · ОТРАСЛИ</span><h3>Покрытие метаданных</h3></div><small>{sectorCoverage==null?"—":pct.format(sectorCoverage*100)+"% капитала"}</small></div>
    {model.sectors.rows.length?<div className="v3-assets-depth__bars">{model.sectors.rows.slice(0,6).map(row=>{const ratio=share(row.value,sectorCovered);return <article key={row.label}><div><strong>{row.label}</strong><span>{rub.format(row.value)} ₽ · {pct.format(ratio*100)}% покрытого</span></div><i aria-hidden="true"><b style={{width:clampPercent(ratio*100)+"%"}}/></i></article>})}</div>:<div className="v3-assets-depth__empty">Подтверждённых отраслевых метаданных пока нет.</div>}
    {model.sectors.unclassified>0&&<p>Без подтверждённой отрасли: {rub.format(model.sectors.unclassified)} ₽. QVANIX не угадывает сектор по названию бумаги.</p>}
+   {samuraiReference&&<SamuraiNextCue targetId="sam-assets-bonds" label="ДАЛЬШЕ · ОБЛИГАЦИИ"/>}
   </section>
 
   <section id="sam-assets-bonds" className="v3-assets-depth__block v3-assets-depth__bonds">
@@ -94,6 +100,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    <div className="v3-assets-depth__bond-line"><span>Сектор · покрытие</span><strong>{pct.format(model.bondRisk.sector.coverageRatio*100)}%</strong></div>
    <p>YTM, дюрация и НКД здесь намеренно не подставляются: текущий подтверждённый контракт не позволяет честно рассчитать их для всех выпусков. Срок до погашения не называется дюрацией.</p>
    </>:<div className="v3-assets-depth__empty">Облигаций в текущем подтверждённом составе нет.</div>}
+   {samuraiReference&&<SamuraiNextCue targetId="sam-assets-positions" label="ДАЛЬШЕ · ПОЗИЦИИ"/>}
   </section>
 
   <section id="sam-assets-positions" className="v3-assets-depth__block v3-assets-depth__positions">
