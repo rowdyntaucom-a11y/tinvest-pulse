@@ -27,6 +27,7 @@ export function NordPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavigate
     <div className="nord-home-v3__embers"><i/><i/><i/><i/></div>
     <div className="nord-home-v3__scene-mark"><span>QVANIX</span><b>NORD // 01</b></div>
     <div className="nord-home-v3__scene-line"><i/><span>RUNE GATE</span><i/></div>
+    <NordScrollCue targetId="nord-terminal" label="НИЖЕ · ТЕРМИНАЛ" placement="scene"/>
    </div>
 
    <section className="nord-home-v3__threshold" aria-label="Ключевой ответ">
@@ -36,7 +37,6 @@ export function NordPrototype({home,onNavigate}:{home:V3HomeViewModel;onNavigate
      <small>{trusted?<>Результат {money(home.profit)} · {percentRaw(home.profitPct)}</>:"Финансовые значения не подставляются до подтверждения снимка"}</small>
     </div>
     <div className="nord-home-v3__threshold-sigil" aria-hidden="true"><i/><b>ᛟ</b><i/></div>
-    <NordScrollCue targetId="nord-terminal" label="ВОЙТИ В ТЕРМИНАЛ"/>
    </section>
   </section>
 

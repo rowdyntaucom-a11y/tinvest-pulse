@@ -3132,3 +3132,160 @@ html,body,#root{max-width:100%;margin:0;overflow-x:hidden}
   background:linear-gradient(180deg,rgba(12,31,41,.97),rgba(5,15,23,.98))!important;
  }
 }
+
+
+/* ========================================================================== */
+/* NORD V7 — chapter cues belong to the scene/flow, never float over content.  */
+/* Real-device correction from 1000031716.mp4.                                */
+/* ========================================================================== */
+@media(max-width:430px){
+  .v3-app[data-shell="aurora"] .nord-scroll-cue{
+    z-index:12!important;
+    margin:0!important;
+    border-radius:0!important;
+    box-shadow:0 8px 20px rgba(0,0,0,.22)!important;
+    -webkit-tap-highlight-color:transparent!important;
+  }
+
+  /* First-viewport cue: same idea as Samurai/Cosmos — a small arrow in the
+     artwork safe zone. It never covers finance cards or the bottom nav. */
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--scene{
+    position:absolute!important;
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:12px!important;
+    width:46px!important;
+    min-width:46px!important;
+    max-width:46px!important;
+    height:38px!important;
+    min-height:38px!important;
+    padding:0!important;
+    transform:translateX(-50%)!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:15px 10px!important;
+    place-items:center!important;
+    gap:0!important;
+    border:1px solid rgba(169,244,238,.12)!important;
+    border-top-color:rgba(239,178,94,.28)!important;
+    border-left-width:1px!important;
+    background:rgba(4,13,20,.52)!important;
+    clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%)!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--scene:before{
+    content:""!important;
+    position:absolute!important;
+    left:8px!important;
+    right:8px!important;
+    top:0!important;
+    height:1px!important;
+    background:linear-gradient(90deg,transparent,#efb25e,rgba(169,244,238,.20),transparent)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--scene span{
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    padding:0!important;
+    margin:-1px!important;
+    overflow:hidden!important;
+    clip:rect(0 0 0 0)!important;
+    white-space:nowrap!important;
+    border:0!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--scene i{
+    display:block!important;
+    width:100%!important;
+    margin:0!important;
+    color:#b9efeb!important;
+    font:18px/.72 Inter,system-ui,sans-serif!important;
+    font-style:normal!important;
+    text-align:center!important;
+    text-shadow:0 0 10px rgba(169,244,238,.24)!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--scene i:last-child{
+    margin-top:-7px!important;
+    opacity:.42!important;
+  }
+
+  /* Subsequent chapters may continue indefinitely downward. These controls
+     stay in normal document flow between sections. */
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--inline{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    width:184px!important;
+    min-width:0!important;
+    max-width:calc(100% - 24px)!important;
+    height:36px!important;
+    min-height:36px!important;
+    margin:12px auto 0!important;
+    padding:0 11px!important;
+    transform:none!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 12px 12px!important;
+    align-items:center!important;
+    gap:1px!important;
+    border:1px solid rgba(169,244,238,.11)!important;
+    border-left:2px solid rgba(239,178,94,.36)!important;
+    background:#07131d!important;
+    clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%)!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--inline span{
+    color:#a9c3c4!important;
+    font:800 5.7px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.13em!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--inline i{
+    color:#a9f4ee!important;
+    font:16px/.7 Inter,system-ui,sans-serif!important;
+    font-style:normal!important;
+    text-align:center!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-scroll-cue--inline i:last-child{
+    margin-left:-6px!important;
+    opacity:.38!important;
+  }
+
+  .v3-app[data-shell="aurora"][data-workspace="home"] .nord-home-v3__scene-line{
+    bottom:55px!important;
+  }
+  .v3-app[data-shell="aurora"] .nord-gate__answer{
+    padding-bottom:16px!important;
+  }
+  .v3-app[data-shell="aurora"] :is(
+    [id^="nord-gate-preview-"],#nord-gate-route,#nord-terminal,
+    #nord-assets-terminal,#nord-analysis-terminal,#nord-income-terminal,#nord-goal-terminal
+  ){
+    scroll-margin-top:52px!important;
+  }
+
+  /* Existing trusted-data depth transitions are chapter controls too:
+     in flow, not floating above the interface. */
+  .v3-app[data-shell="aurora"] :is(
+    .v3-assets-depth-cue,.v3-analysis-depth-cue,.nord-income-depth-cue,.nord-goal-depth-cue
+  ){
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:176px!important;
+    min-width:0!important;
+    height:36px!important;
+    min-height:36px!important;
+    margin:14px auto 0!important;
+    z-index:8!important;
+  }
+}

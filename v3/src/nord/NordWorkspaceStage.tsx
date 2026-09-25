@@ -16,12 +16,12 @@ export function NordWorkspaceStage({kind,targetId,value,meta,children}:{kind:Nor
    <div className="nord-stage-v3__mist"><i/><i/></div>
    <div className="nord-stage-v3__snow"><i/><i/><i/><i/><i/><i/></div>
    <div className="nord-stage-v3__mark"><span>QVANIX</span><b>{x.code}</b></div>
+   <NordScrollCue targetId={targetId} label={x.cue} placement="scene"/>
   </div>
   <section className="nord-stage-v3__answer">
    <div className="nord-stage-v3__answer-copy"><span>{x.subtitle}</span><strong>{value}</strong><small>{meta}</small></div>
    <div className="nord-stage-v3__rune" aria-hidden="true"><i/><b>{x.rune}</b><i/></div>
    {children}
   </section>
-  <NordScrollCue targetId={targetId} label={x.cue}/>
  </section>;
 }
