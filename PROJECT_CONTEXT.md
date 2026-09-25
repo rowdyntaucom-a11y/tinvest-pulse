@@ -4,6 +4,20 @@
 > Read this file together with the current `main` branch before changing the project.
 > Never store API tokens, credentials or other secrets here.
 
+## 0A. Latest strategic override — 2026-09-25 evening
+
+**Financial-core sprint to Monday:** Living World / DNA WORLD is frozen for an indefinite period. Preserve it as an isolated optional module that can be added back after the investment product is mature, but do not spend current development time on world art, XP, scenes, characters, animation or gamification.
+
+Until Monday, prioritize deterministic financial engines, verified data contracts, widgets, tabs, charts and professional analytics. Monday review is for **desktop + mobile composition, widget priority and screen hierarchy**, not for discovering basic missing financial capability.
+
+**PC is a first-class product target.** Phone, tablet and desktop share one information architecture but use different compositions. Desktop must become a real cockpit rather than a stretched phone.
+
+**Multi-user target remains mandatory:** users will register and connect their own supported broker through read-only credentials/OAuth. Broker secrets must be encrypted server-side and must never live in frontend/localStorage/repository/logs.
+
+**No-trading hard boundary:** QVANIX may provide equities, bonds, futures, options, screeners, order-book/microstructure/scalping-oriented analytics, scenarios, alerts and research tools, but must never submit/edit/cancel orders or auto-trade. Professional derivatives work begins as read-only deterministic analytics with explicit source/specification gates.
+
+Canonical sprint spec: `QVANIX_FINANCIAL_CORE_SPRINT.md`.
+
 ## 0. Current priority override — 2026-09-24
 
 **Reference-shell lock (2026-09-25):** build Snowball-level-or-greater functional breadth first in **Samurai**. Treat Samurai as the product reference shell until the financial workspaces are complete and accepted on a real phone. Shared data/calculation components remain shell-neutral; Cosmos/NORD/etc. receive accepted functionality afterward with their own layouts/effects. Do not duplicate financial logic per shell.\n\n**Living World / DNA WORLD is frozen and is now the lowest priority.** Preserve what already works, but do not invest active development time in DNA scenes, art, animation, XP/gamification, world events or related polish until the ordinary investment workspaces are finished and accepted.
