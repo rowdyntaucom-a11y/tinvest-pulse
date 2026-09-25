@@ -587,3 +587,14 @@ A successful QVANIX should feel like this:
 - A new investor can still understand the words and navigation.
 - The product can later scale to real users without compromising security or methodology.
 - Distribution, monetization and engagement are built around a strong product rather than used to hide weak fundamentals.
+
+## 21. Samurai Snowball+ active checkpoint — 2026-09-25
+
+Continue from `progress/2026-09-25-samurai-operations-integrity-v1.md` + current `main`.
+
+- Samurai remains the only active Snowball+ reference shell until functional breadth is complete.
+- Operations + Event Integrity are the first completed parity expansion after the fail-closed atlas.
+- Corporate-action completeness is explicitly source-gated and must not be inferred from the operations journal alone.
+- Next active product surface: **Report + category + currency drill-down**.
+- DNA WORLD remains frozen during this functional-breadth phase.
+
