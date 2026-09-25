@@ -7,6 +7,8 @@ import{findPayoutEventPosition,payoutEventIsConfirmed}from"../../../v2/src/featu
 import{buildV3IncomeDepth}from"./incomeDepth";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
+import type{V3Shell}from"../app/model";
+import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 
 type View="calendar"|"history"|"sources";
 const VIEW_OPTIONS=[
@@ -26,8 +28,8 @@ function futureAmount(event:PayoutEvent){return typeof event.gross==="number"&&N
 function monthLabel(key:string){const date=new Date(key+"-01T00:00:00Z");return Number.isNaN(date.getTime())?key:monthFmt.format(date)}
 function sourceIdentity(state:string){return state==="EXACT_FIGI"?"FIGI":state==="AMBIGUOUS_FIGI"?"FIGI неоднозначен":state==="INCOMPLETE_FIGI"?"FIGI неполный":"FIGI нет"}
 
-export function V3IncomeDepth({positions,onOpenAsset}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void}){
-  const[calendar,setCalendar]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>("calendar"),[selectedMonth,setSelectedMonth]=useState<string|null>(null);
+export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void;shell?:V3Shell}){
+  const[calendar,setCalendar]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>("calendar"),[selectedMonth,setSelectedMonth]=useState<string|null>(null),samuraiReference=shell==="samurai";
   useEffect(()=>{let active=true;setLoading(true);void loadPayoutCalendar().then(data=>{if(active){setCalendar(data);setLoadedAt(Date.now());setLoading(false)}}).catch(()=>{if(active){setCalendar(null);setLoadedAt(Date.now());setLoading(false)}});return()=>{active=false}},[]);
   const depth=useMemo(()=>calendar?buildV3IncomeDepth(calendar,positions,loadedAt):null,[calendar,positions,loadedAt]);
   const futureEvents=depth?.trustedIncome.futureEvents??[];
@@ -47,9 +49,14 @@ export function V3IncomeDepth({positions,onOpenAsset}:{positions:PositionSnapsho
 
   return <section className="v3-income-depth">
     <div className="v3-income-depth-head"><div><span>ПОДРОБНЫЙ ДОХОД</span><h2>Факт, календарь и источники</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
-    <V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={VIEW_OPTIONS}/>
+    {samuraiReference&&<SamuraiChapterNav label="Доход Samurai" chapters={[
+      {id:"sam-income-calendar",code:"壱",label:"Календарь",note:"будущие подтверждённые выплаты"},
+      {id:"sam-income-history",code:"弐",label:"Факт",note:"реально полученный доход"},
+      {id:"sam-income-sources",code:"参",label:"Источники",note:"активы · концентрация · YoC"}
+    ]}/>}
+    {!samuraiReference&&<V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={VIEW_OPTIONS}/>} 
 
-    {view==="calendar"&&<div className="v3-income-calendar-depth">
+    {(samuraiReference||view==="calendar")&&<div id="sam-income-calendar" className="v3-income-calendar-depth">
       <div className="v3-income-calendar-summary">
         <article><span>12М · расписание <V3MetricHelp topic="payoutCoverage"/></span><strong>{scheduleReady?money(calendar.forecast.gross):"—"}</strong><small>{scheduleReady?calendar.forecast.count+" событий":"закрыто до полного покрытия"}</small></article>
         <article><span>Следующая выплата</span><strong>{scheduleReady&&next?(next.ticker||next.name):"—"}</strong><small>{scheduleReady&&next?dateFmt.format(new Date(next.date))+" · "+(futureAmount(next)==null?"сумма уточняется":rub2.format(futureAmount(next)!)+" ₽ до налога"):"нет подтверждённого события"}</small></article>
@@ -68,10 +75,10 @@ export function V3IncomeDepth({positions,onOpenAsset}:{positions:PositionSnapsho
           <time>{dateFmt.format(new Date(event.date))}</time><div><strong>{event.ticker||event.name}</strong><small>{eventKind(event)}{confirmed?" · HIGH":" · "+(event.confidence||"статус уточняется")}</small></div><div><strong>{amount==null?"—":rub2.format(amount)+" ₽"}</strong><small>{position?"FIGI → актив":"без точного FIGI"}</small></div>
         </button>
       }):<div className="v3-income-depth-state">{selectedMonth?"В выбранном месяце подтверждённых событий нет.":"Подтверждённые будущие события не найдены."}</div>}</div>}
-      <small className="v3-income-method">Будущие выплаты не складываются с уже полученным фактом. Календарь открывается только при полном проверенном покрытии расписания; HIGH означает подтверждение события источником, а переход в актив разрешён только после точного FIGI-сопоставления.</small>
+      <small className="v3-income-method">Будущие выплаты не складываются с уже полученным фактом. Календарь открывается только при полном проверенном покрытии расписания; HIGH означает подтверждение события источником, а переход в актив разрешён только после точного FIGI-сопоставления.</small>{samuraiReference&&<SamuraiNextCue targetId="sam-income-history" label="ДАЛЬШЕ · ФАКТ"/>}
     </div>}
 
-    {view==="history"&&<div className="v3-income-history-depth">
+    {(samuraiReference||view==="history")&&<div id="sam-income-history" className="v3-income-history-depth">
       <div className="v3-income-calendar-summary">
         <article><span>Наблюдение</span><strong>{depth.realizedHistory.observation.available?depth.realizedHistory.observation.completeMonths+" полн.":"—"}</strong><small>{depth.realizedHistory.observation.partialMonths} частичных месяцев</small></article>
         <article><span>Стабильность <V3MetricHelp topic="incomeStability"/></span><strong>{depth.stability.available?(depth.stability.status==="mature"?"Зрелая":"Предв."):"Gate"}</strong><small>{depth.stability.available?money(depth.stability.averageMonthlyNet)+" / мес.":"нужно ≥3 полных месяца"}</small></article>
@@ -87,10 +94,10 @@ export function V3IncomeDepth({positions,onOpenAsset}:{positions:PositionSnapsho
         <article><span>Вариативность</span><strong>{depth.stability.coefficientOfVariation==null?"—":pct.format(depth.stability.coefficientOfVariation*100)+"%"}</strong><small>CV полного месячного факта</small></article>
       </div>
       {depth.comparable.available&&<div className="v3-income-comparable"><span>Сопоставимые месяцы</span><strong className={(depth.comparable.changeNet??0)>0?"is-positive":(depth.comparable.changeNet??0)<0?"is-negative":"is-neutral"}>{depth.comparable.changeRatio==null?money(depth.comparable.changeNet):((depth.comparable.changeRatio??0)>=0?"+":"")+pct.format((depth.comparable.changeRatio??0)*100)+"%"}</strong><small>{depth.comparable.monthCount} одинаковых полных месяцев · {depth.comparable.currentYear}/{depth.comparable.previousYear} · без годового пересчёта</small></div>}
-      <small className="v3-income-method">Нулём считается только полностью наблюдавшийся календарный месяц. Частичный или отсутствующий месяц не превращается в ноль. Стабильность открывается после 3 полных месяцев; зрелая выборка — после 12.</small>
+      <small className="v3-income-method">Нулём считается только полностью наблюдавшийся календарный месяц. Частичный или отсутствующий месяц не превращается в ноль. Стабильность открывается после 3 полных месяцев; зрелая выборка — после 12.</small>{samuraiReference&&<SamuraiNextCue targetId="sam-income-sources" label="ДАЛЬШЕ · ИСТОЧНИКИ"/>}
     </div>}
 
-    {view==="sources"&&<div className="v3-income-sources-depth">
+    {(samuraiReference||view==="sources")&&<div id="sam-income-sources" className="v3-income-sources-depth">
       <div className="v3-income-calendar-summary">
         <article><span>Источников факта <V3MetricHelp topic="incomeConcentration"/></span><strong>{depth.concentration.sourceCount||"—"}</strong><small>{depth.concentration.effectiveSources==null?"эффективное число —":"эфф. "+depth.concentration.effectiveSources.toLocaleString("ru-RU",{maximumFractionDigits:2})}</small></article>
         <article><span>Главный источник</span><strong>{depth.concentration.topSourceShare==null?"—":pct.format(depth.concentration.topSourceShare*100)+"%"}</strong><small>доля реально полученного net</small></article>

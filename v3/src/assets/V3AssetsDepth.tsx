@@ -59,14 +59,14 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    <article><span>BROKER P/L</span><strong className={model.pnl.netPnl<0?"is-negative":model.pnl.netPnl>0?"is-positive":""}>{signedMoney(model.pnl.netPnl)}</strong><small>{model.pnlPct==null?"к базе —":(model.pnlPct>0?"+":"")+pct.format(model.pnlPct)+"% к cost basis"}</small></article>
   </section>
 
-  <section className="v3-assets-depth__block v3-assets-depth__classes">
+  <section id="sam-assets-classes" className="v3-assets-depth__block v3-assets-depth__classes">
    <div className="v3-assets-depth__title"><div><span>01 · СОСТАВ</span><h3>Классы активов</h3></div><small>по текущей стоимости</small></div>
    <div className="v3-assets-depth__bars">
     {model.classes.rows.map(row=>{const ratio=share(row.value,model.total);return <article key={row.label}><div><strong>{assetClassLabel(row.label)}</strong><span>{rub.format(row.value)} ₽ · {pct.format(ratio*100)}%</span></div><i aria-hidden="true"><b style={{width:clampPercent(ratio*100)+"%"}}/></i></article>})}
    </div>
   </section>
 
-  <section className="v3-assets-depth__block v3-assets-depth__pnl">
+  <section id="sam-assets-pnl" className="v3-assets-depth__block v3-assets-depth__pnl">
    <div className="v3-assets-depth__title"><div><span>02 · РЕЗУЛЬТАТ</span><h3>Вклад позиций в broker P/L</h3></div><small>не TWR-атрибуция</small></div>
    <div className="v3-assets-depth__pnl-summary"><span>Плюс {signedMoney(model.pnl.positivePnl)}</span><span>Минус {signedMoney(model.pnl.negativePnl)}</span><span>Абсолютный P/L {rub.format(model.pnl.grossAbsolutePnl)} ₽</span></div>
    <div className="v3-assets-depth__pnl-list">
@@ -75,13 +75,13 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    <p>Доля считается от суммы абсолютных broker P/L, поэтому победители и проигравшие не взаимно уничтожают вес. Это накопленный результат позиции, а не дневное изменение и не доходность стратегии.</p>
   </section>
 
-  <section className="v3-assets-depth__block v3-assets-depth__sectors">
+  <section id="sam-assets-sectors" className="v3-assets-depth__block v3-assets-depth__sectors">
    <div className="v3-assets-depth__title"><div><span>03 · ОТРАСЛИ</span><h3>Покрытие метаданных</h3></div><small>{sectorCoverage==null?"—":pct.format(sectorCoverage*100)+"% капитала"}</small></div>
    {model.sectors.rows.length?<div className="v3-assets-depth__bars">{model.sectors.rows.slice(0,6).map(row=>{const ratio=share(row.value,sectorCovered);return <article key={row.label}><div><strong>{row.label}</strong><span>{rub.format(row.value)} ₽ · {pct.format(ratio*100)}% покрытого</span></div><i aria-hidden="true"><b style={{width:clampPercent(ratio*100)+"%"}}/></i></article>})}</div>:<div className="v3-assets-depth__empty">Подтверждённых отраслевых метаданных пока нет.</div>}
    {model.sectors.unclassified>0&&<p>Без подтверждённой отрасли: {rub.format(model.sectors.unclassified)} ₽. QVANIX не угадывает сектор по названию бумаги.</p>}
   </section>
 
-  <section className="v3-assets-depth__block v3-assets-depth__bonds">
+  <section id="sam-assets-bonds" className="v3-assets-depth__block v3-assets-depth__bonds">
    <div className="v3-assets-depth__title"><div><span>04 · ОБЛИГАЦИИ</span><h3>Сроки и структура</h3></div><small>{model.bonds.bondCount?rub.format(model.bonds.total)+" ₽":"нет позиций"}</small></div>
    {model.bonds.bondCount?<><div className="v3-assets-depth__bond-grid">
     <article><span>ОФЗ</span><strong>{pct.format(model.bonds.ofzShare*100)}%</strong><small>облигационной части</small></article>
@@ -96,7 +96,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    </>:<div className="v3-assets-depth__empty">Облигаций в текущем подтверждённом составе нет.</div>}
   </section>
 
-  <section className="v3-assets-depth__block v3-assets-depth__positions">
+  <section id="sam-assets-positions" className="v3-assets-depth__block v3-assets-depth__positions">
    <div className="v3-assets-depth__title"><div><span>05 · ПОЗИЦИИ</span><h3>Состав и детализация</h3></div><small>тап → карточка актива</small></div>
    <V3HoldingsExplorer positions={positions} onOpenAsset={onOpenAsset}/>
   </section>
