@@ -9,6 +9,7 @@ import{buildRealizedIncomeHistory,calculateIncomeSourceConcentration,calculateIn
 import{calculateIncomeComparablePeriod}from"../../../v2/src/features/income/incomeComparables";
 import{buildBondIncomeLinkage}from"../../../v2/src/features/income/bondIncomeLinkage";
 import{calculateIncomeQuality}from"./incomeQuality";
+import{buildBondCashflowProfile}from"./bondCashflowProfile";
 
 export function buildV3IncomeDepth(calendar:PayoutCalendar,positions:PositionSnapshot[],nowMs:number){
   const payoutTrust=evaluatePayoutTrust({
@@ -30,5 +31,6 @@ export function buildV3IncomeDepth(calendar:PayoutCalendar,positions:PositionSna
   const comparable=calculateIncomeComparablePeriod(realizedHistory.months);
   const bondLinkage=buildBondIncomeLinkage(positions,trustedIncome.futureEvents);
   const quality=calculateIncomeQuality(trustedIncome.actualEvents,realizedHistory.months);
-  return{payoutTrust,trustedIncome,integrity,calendarMonths,sourceRows,realizedHistory,concentration,stability,comparable,bondLinkage,quality};
+  const bondCashflow=buildBondCashflowProfile(bondLinkage,trustedIncome.futureEvents);
+  return{payoutTrust,trustedIncome,integrity,calendarMonths,sourceRows,realizedHistory,concentration,stability,comparable,bondLinkage,bondCashflow,quality};
 }
