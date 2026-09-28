@@ -6,8 +6,8 @@ type DiscoveryRow = {
   instrumentUid: string
   ticker: string
   name: string
-  dividendYield: number
-  marketCap: number | null
+  dividendYieldDailyTtm: number
+  marketCapitalization: number | null
 }
 
 type DiscoveryCoverage = {
@@ -15,14 +15,16 @@ type DiscoveryCoverage = {
   fundamentals?: number
   matchedFundamentals?: number
   dividendRows?: number
-  missingDividendYield?: number
-  nonPositiveDividendYield?: number
+  missingDividendYieldTtm?: number
+  nonPositiveDividendYieldTtm?: number
 }
 
 type DiscoveryPayload = {
   available: boolean
   rows: DiscoveryRow[]
   coverage?: DiscoveryCoverage
+  yieldField: 'dividend_yield_daily_ttm'
+  yieldSemantics: 'trailing_twelve_months'
 }
 
 const pct = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
@@ -31,7 +33,10 @@ const compact = new Intl.NumberFormat('ru-RU', { notation: 'compact', maximumFra
 function isPayload(value: unknown): value is DiscoveryPayload {
   if (!value || typeof value !== 'object') return false
   const candidate = value as Partial<DiscoveryPayload>
-  return typeof candidate.available === 'boolean' && Array.isArray(candidate.rows)
+  return typeof candidate.available === 'boolean'
+    && Array.isArray(candidate.rows)
+    && candidate.yieldField === 'dividend_yield_daily_ttm'
+    && candidate.yieldSemantics === 'trailing_twelve_months'
 }
 
 export function DividendDiscovery() {
@@ -84,7 +89,8 @@ export function DividendDiscovery() {
 
       <p className="dividend-discovery__lead">
         Аналитический список рынка. Доходность не прогнозируется: используются только положительные значения,
-        полученные из GetAssetFundamentals и связанные с акцией по точному asset UID.
+        TTM, полученные из поля dividend_yield_daily_ttm GetAssetFundamentals и связанные с акцией по точному asset UID.
+        Forward yield не используется.
       </p>
       <input
         className="dividend-discovery__search"
@@ -113,8 +119,8 @@ export function DividendDiscovery() {
           {rows.map(row => (
             <div className="dividend-discovery__row" role="row" key={row.assetUid}>
               <span role="cell"><b>{row.ticker}</b><small>{row.name}</small></span>
-              <strong role="cell">{pct.format(row.dividendYield)}%</strong>
-              <span role="cell">{row.marketCap != null ? compact.format(row.marketCap) : 'нет данных'}</span>
+              <strong role="cell">{pct.format(row.dividendYieldDailyTtm)}%</strong>
+              <span role="cell">{row.marketCapitalization != null ? compact.format(row.marketCapitalization) : 'нет данных'}</span>
             </div>
           ))}
         </div>
@@ -124,7 +130,7 @@ export function DividendDiscovery() {
         <p className="income-method-note">
           Покрытие fundamentals: {coverage?.matchedFundamentals ?? '—'} из {coverage?.shares ?? '—'} акций
           {coverageRatio == null ? '' : ` (${pct.format(coverageRatio)}%)`} · положительная доходность: {coverage?.dividendRows ?? '—'}
-          {' '}· доходность отсутствует: {coverage?.missingDividendYield ?? '—'} · нулевая/отрицательная: {coverage?.nonPositiveDividendYield ?? '—'}.
+          {' '}· TTM-доходность отсутствует: {coverage?.missingDividendYieldTtm ?? '—'} · нулевая/отрицательная: {coverage?.nonPositiveDividendYieldTtm ?? '—'}.
           Сортировка описательная, не рейтинг привлекательности и не сигнал купить или продать.
         </p>
       )}

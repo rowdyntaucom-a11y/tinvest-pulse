@@ -29,6 +29,8 @@ The old branch's two navigation commits were deliberately not replayed: one temp
 - Coverage exposes share count, fundamental identities, exact matches, usable dividend rows, missing yields, non-positive yields and duplicate identities.
 - Duplicate share/fundamental identities are rejected after the first deterministic source record and surfaced in coverage.
 - Upstream failure returns HTTP 502 with an empty unavailable payload. Raw upstream errors are not returned or logged.
+- Blocking review correction: the repository `tbankRequest` boundary only parses upstream JSON and does not rename fields. Discovery therefore consumes the documented `asset_uid`, `market_capitalization` and `dividend_yield_daily_ttm` fields explicitly.
+- Yield semantics are exclusively trailing twelve months (`dividend_yield_daily_ttm`). `forward_annual_dividend_yield` is intentionally ignored so a forward estimate cannot be mixed into descriptive TTM ordering.
 
 ## Product and security guarantees
 

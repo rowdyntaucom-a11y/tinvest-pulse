@@ -42,8 +42,10 @@ function registerDividendDiscovery(app, { tbankRequest }) {
         updatedAt: new Date().toISOString(),
         rows: normalized.rows,
         coverage: { ...normalized.coverage, requestedAssets: assetUids.length },
+        yieldField: 'dividend_yield_daily_ttm',
+        yieldSemantics: 'trailing_twelve_months',
         semantics: 'descriptive_market_discovery',
-        note: 'Reported dividend yield only; exact asset UID joins; no inferred values or trading recommendation.',
+        note: 'Reported trailing-twelve-month dividend yield only; exact asset UID joins; no forward yield, inferred values or trading recommendation.',
       };
 
       cache.payload = payload;

@@ -44,8 +44,8 @@ function normalizeDividendDiscovery(shares, fundamentals) {
   const seenFundamentals = new Set();
   let duplicateFundamentals = 0;
   let matchedFundamentals = 0;
-  let missingDividendYield = 0;
-  let nonPositiveDividendYield = 0;
+  let missingDividendYieldTtm = 0;
+  let nonPositiveDividendYieldTtm = 0;
 
   for (const item of Array.isArray(fundamentals) ? fundamentals : []) {
     const assetUid = text(firstDefined(item, ['assetUid', 'asset_uid', 'assetId', 'asset_id']));
@@ -60,27 +60,40 @@ function normalizeDividendDiscovery(shares, fundamentals) {
     if (!share) continue;
     matchedFundamentals += 1;
 
-    const dividendYield = finite(firstDefined(item, ['dividendYield', 'dividend_yield']));
-    if (dividendYield == null) {
-      missingDividendYield += 1;
+    // tbankRequest returns parsed upstream JSON without transforming its keys.
+    // Use only the documented trailing yield field; do not mix it with the
+    // separate forward_annual_dividend_yield estimate.
+    const dividendYieldDailyTtm = finite(firstDefined(item, [
+      'dividend_yield_daily_ttm',
+      'dividendYieldDailyTtm',
+    ]));
+    if (dividendYieldDailyTtm == null) {
+      missingDividendYieldTtm += 1;
       continue;
     }
-    if (dividendYield <= 0) {
-      nonPositiveDividendYield += 1;
+    // T-Invest documents zero fundamentals as unavailable. Negative yield is
+    // likewise not a usable descriptive dividend-yield observation.
+    if (dividendYieldDailyTtm <= 0) {
+      nonPositiveDividendYieldTtm += 1;
       continue;
     }
 
-    const marketCap = finite(firstDefined(item, ['marketCap', 'market_cap']));
+    const marketCapitalization = finite(firstDefined(item, [
+      'market_capitalization',
+      'marketCapitalization',
+    ]));
     rows.push({
       ...share,
-      dividendYield,
-      marketCap: marketCap != null && marketCap > 0 ? marketCap : null,
+      dividendYieldDailyTtm,
+      marketCapitalization: marketCapitalization != null && marketCapitalization > 0
+        ? marketCapitalization
+        : null,
     });
   }
 
   rows.sort((left, right) => (
-    right.dividendYield - left.dividendYield
-    || (right.marketCap ?? -1) - (left.marketCap ?? -1)
+    right.dividendYieldDailyTtm - left.dividendYieldDailyTtm
+    || (right.marketCapitalization ?? -1) - (left.marketCapitalization ?? -1)
     || left.ticker.localeCompare(right.ticker, 'en')
     || left.assetUid.localeCompare(right.assetUid, 'en')
   ));
@@ -92,8 +105,8 @@ function normalizeDividendDiscovery(shares, fundamentals) {
       fundamentals: seenFundamentals.size,
       matchedFundamentals,
       dividendRows: rows.length,
-      missingDividendYield,
-      nonPositiveDividendYield,
+      missingDividendYieldTtm,
+      nonPositiveDividendYieldTtm,
       duplicateShares,
       duplicateFundamentals,
     },
