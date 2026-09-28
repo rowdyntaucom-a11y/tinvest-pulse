@@ -1,7 +1,7 @@
 import assert from"node:assert/strict";
 import test from"node:test";
 import{readFileSync}from"node:fs";
-import{buildEquityFundamentalCoverage,metricCapitalCoveragePct}from"../src/assets/equityFundamentalsModel.ts";
+import{buildEquityFundamentalCoverage,buildEquityPortfolioDiagnostics,metricCapitalCoveragePct}from"../src/assets/equityFundamentalsModel.ts";
 import{normalizeAssetFundamentals,unavailableAssetFundamentals}from"../../v2/src/features/portfolio/assetFundamentals.ts";
 import type{PositionSnapshot}from"../../v2/src/lib/portfolioApi.ts";
 
@@ -48,4 +48,29 @@ test("equity intelligence keeps local mobile scrolling and responsive grids",()=
  assert.match(css,/overscroll-behavior-inline:contain/);
  assert.match(css,/@media\(max-width:699px\)/);
  assert.match(css,/@media\(max-width:359px\)/);
+});
+
+
+test("equity V2 diagnostics distinguish positive facts from missing coverage",()=>{
+ const profitable=normalizeAssetFundamentals({source:"T_INVEST",assetUid:"asset-a",metrics:{net_income_ttm:100,free_cash_flow_ttm:50,dividend_yield:8}});
+ const loss=normalizeAssetFundamentals({source:"T_INVEST",assetUid:"asset-b",metrics:{net_income_ttm:-10,free_cash_flow_ttm:-5}});
+ const gap=unavailableAssetFundamentals("NO_USABLE_METRICS");
+ const rows=[{position:position("AAA",50),snapshot:profitable},{position:position("BBB",30),snapshot:loss},{position:position("CCC",20),snapshot:gap}];
+ const d=buildEquityPortfolioDiagnostics(rows);
+ assert.equal(d.top1CapitalShare,.5);
+ assert.equal(d.top3CapitalShare,1);
+ assert.equal(d.profitableCapitalShare,.5);
+ assert.equal(d.profitableCoverageShare,.8);
+ assert.equal(d.positiveFcfCapitalShare,.5);
+ assert.equal(d.positiveFcfCoverageShare,.8);
+ assert.equal(d.dividendCapitalShare,.5);
+ assert.equal(d.dividendCoverageShare,.5);
+});
+
+test("equity V2 UI is descriptive and does not collapse ratios into a score",()=>{
+ assert.match(ui,/EQUITY INTELLIGENCE \/\/ V2/);
+ assert.match(ui,/Положительная прибыль TTM/);
+ assert.match(ui,/Положительный FCF TTM/);
+ assert.match(ui,/Отсутствующие метрики не считаются нулём/);
+ assert.match(ui,/не усредняются в один «портфельный балл»/);
 });
