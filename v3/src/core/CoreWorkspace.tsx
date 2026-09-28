@@ -1,4 +1,4 @@
-import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import{CorePortfolioView,CorePerformanceView,CoreIncomeView,CoreStructureView}from"./CoreNativeViews";import{CorePayoutCalendar}from"./CorePayoutCalendar";import{CoreMarketView,CoreRebalanceView}from"./CoreMarketTools";import"./coreWorkspace.css";
+import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import{CorePortfolioView,CorePerformanceView,CoreIncomeView,CoreStructureView}from"./CoreNativeViews";import{CorePayoutCalendar}from"./CorePayoutCalendar";import{CoreMarketView,CoreRebalanceView}from"./CoreMarketTools";import{CoreIncomeHistoryView,CoreRiskView}from"./CoreDeepViews";import"./coreWorkspace.css";
 const V3AssetsDepth=lazy(()=>import("../assets/V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
 const V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
 const V3IncomeDepth=lazy(()=>import("../income/V3IncomeDepth").then(m=>({default:m.V3IncomeDepth})));
@@ -40,7 +40,7 @@ function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<A
  }
  if(area==="income"){
   if(gate)return gate;
-  if(sub==="Обзор")return <CoreIncomeView income={income}/>;if(sub==="Календарь"||sub==="Купоны"||sub==="Дивиденды")return <CorePayoutCalendar/>;
+  if(sub==="Обзор")return <CoreIncomeView income={income}/>;if(sub==="Календарь"||sub==="Купоны"||sub==="Дивиденды")return <CorePayoutCalendar/>;if(sub==="История")return <CoreIncomeHistoryView mode="history"/>;if(sub==="Источники")return <CoreIncomeHistoryView mode="sources"/>;
   return <CoreModule title={sub} note="Факт и будущие выплаты разделены"><Suspense fallback={<Loading/>}><V3IncomeDepth positions={positions}/></Suspense></CoreModule>;
  }
  if(area==="performance"){
@@ -49,7 +49,7 @@ function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<A
  }
  if(area==="analytics"){
   if(gate)return gate;
-  if(sub==="Структура"||sub==="Результат")return <CoreStructureView positions={positions}/>;
+  if(sub==="Структура"||sub==="Результат")return <CoreStructureView positions={positions}/>;if(sub==="Риск")return <CoreRiskView positions={positions} history={history} mode="risk"/>;if(sub==="Корреляция")return <CoreRiskView positions={positions} history={history} mode="correlation"/>;if(sub==="Сценарии")return <CoreRiskView positions={positions} history={history} mode="scenarios"/>;
   return <CoreModule title={sub} note="TWR-first аналитика · риск · benchmark · структура"><Suspense fallback={<Loading/>}><V3Analysis items={positions} history={history} market={{riskFreeRate:null,riskFreeRateDate:null,nextRateMeeting:null}} trusted={trusted} shell="core" mode="detailed" portfolioValue={home.value??0}/></Suspense></CoreModule>;
  }
  if(area==="market"){
