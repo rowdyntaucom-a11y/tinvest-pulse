@@ -6,7 +6,7 @@ import"./coreDecisionCockpit.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
-const money=(v:number)=>rub.format(Math.round(v))+" ₽";
+const money=(v:number|null)=>v==null?"—":rub.format(Math.round(v))+" ₽";
 type Horizon=1|3|5|10;
 
 export function CoreDecisionCockpit({home,positions,income}:{home:V3HomeViewModel;positions:PositionSnapshot[];income:V3IncomeModel}){
