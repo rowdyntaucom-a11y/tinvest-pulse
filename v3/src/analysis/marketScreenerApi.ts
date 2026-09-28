@@ -50,22 +50,26 @@ function row(raw:any):MarketScreenerRow|null{
  };
 }
 
+let marketCache:{value:MarketScreenerPayload;at:number}|null=null;const MARKET_CACHE_TTL=60_000;
 export async function loadMarketScreener(signal?:AbortSignal):Promise<MarketScreenerPayload>{
+ if(marketCache&&Date.now()-marketCache.at<MARKET_CACHE_TTL)return marketCache.value;
  try{
   const response=await fetch("/api/market-screener",{cache:"no-store",signal});
   if(!response.ok)return{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"HTTP "+response.status};
   const raw=await response.json() as any;
   const rows=(Array.isArray(raw?.rows)?raw.rows:[]).map(row).filter((x:MarketScreenerRow|null):x is MarketScreenerRow=>Boolean(x));
-  return{
+  const result={
    available:raw?.ok===true&&rows.length>0,
    fetchedAt:typeof raw?.fetchedAt==="string"?raw.fetchedAt:null,
    source:typeof raw?.source==="string"?raw.source:null,
    board:typeof raw?.board==="string"?raw.board:null,
    rows,
    reason:raw?.ok===true&&rows.length>0?null:String(raw?.reason||"MOEX market screener is unavailable."),
-  };
+  } satisfies MarketScreenerPayload;
+  if(result.available)marketCache={value:result,at:Date.now()};
+  return result;
  }catch(error){
   if(error instanceof DOMException&&error.name==="AbortError")throw error;
-  return{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"MOEX market screener is unavailable."};
+  return marketCache?.value??{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"MOEX market screener is unavailable."};
  }
 }
