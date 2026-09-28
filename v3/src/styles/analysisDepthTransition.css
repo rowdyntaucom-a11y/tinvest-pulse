@@ -14,3 +14,17 @@
 @media(prefers-reduced-motion:reduce){.v3-analysis-depth-cue i{animation:none!important;transform:none!important}}
 
 @media(max-width:430px){.v3-app[data-shell="aurora"][data-workspace="analysis"] .v3-analysis-depth-anchor{border-radius:0;border-color:rgba(169,244,238,.14);background:linear-gradient(180deg,rgba(7,20,29,.98),rgba(4,12,19,.99));clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}}
+
+/* Samurai IA consolidation: the deep layer starts immediately and its chapter map stays locally reachable. */
+@media(max-width:430px){
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-depth-cue{top:auto;bottom:calc(var(--v3-bottom-nav-height,64px) + 10px);position:fixed;width:38px;height:34px;min-height:34px;background:rgba(10,9,9,.82);backdrop-filter:blur(10px)}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-depth-spacer{min-height:18px}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .v3-analysis-depth-anchor{margin-top:0;padding-top:8px}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-chapter-nav{position:sticky;top:6px;z-index:24;margin-bottom:8px;padding:7px;background:rgba(10,9,9,.92);backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(0,0,0,.24)}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-chapter-nav>header{display:none}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-chapter-nav>div{display:flex;gap:5px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;scroll-snap-type:x proximity}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-chapter-nav>div::-webkit-scrollbar{display:none}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-chapter-nav button{flex:0 0 108px;min-height:42px;scroll-snap-align:start;touch-action:manipulation}
+ .v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-analysis-tools-priority{scroll-margin-top:64px}
+}
+@media(min-width:431px){.v3-app[data-shell="samurai"][data-workspace="analysis"] .sam-analysis-tools-priority{margin-top:10px}}
