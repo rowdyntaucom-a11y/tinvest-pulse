@@ -92,6 +92,16 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
         const height=historyMax>0?Math.max(month.totalNet>0?8:2,Math.round(month.totalNet/historyMax*100)):2;
         return <article key={month.key} className={month.partial?"is-partial":month.complete?"is-complete":"is-unobserved"}><div><i style={{height:height+"%"}}/></div><strong>{monthLabel(month.key)}</strong><span>{rub.format(month.totalNet)} ₽</span><small>{month.complete?"полный":month.partial?"частичный":"не подтверждён"}</small></article>
       }):<div className="v3-income-depth-state">Нет подтверждённой помесячной истории выплат.</div>}</div>
+      <div className="v3-income-quality" aria-label="Качество фактического пассивного дохода">
+        <div className="v3-income-quality-head"><div><span>КАЧЕСТВО ФАКТА</span><strong>{depth.quality.available?(depth.quality.status==="mature"?"Зрелая выборка":"Предварительная выборка"):"Недостаточно истории"}</strong></div><small>{depth.quality.available?"только полученный net · без прогноза":"нужно ≥3 полных месяца и положительный факт"}</small></div>
+        <div className="v3-income-quality-grid">
+          <article><span>Регулярность</span><strong>{depth.quality.regularityRatio==null?"—":pct.format(depth.quality.regularityRatio*100)+"%"}</strong><small>{depth.quality.payoutMonths}/{depth.quality.observedMonths} полных месяцев с выплатами</small></article>
+          <article><span>Купоны</span><strong>{depth.quality.couponShare==null?"—":pct.format(depth.quality.couponShare*100)+"%"}</strong><small>{money(depth.quality.couponsNet)} получено net</small></article>
+          <article><span>Дивиденды</span><strong>{depth.quality.dividendShare==null?"—":pct.format(depth.quality.dividendShare*100)+"%"}</strong><small>{money(depth.quality.dividendsNet)} получено net</small></article>
+          <article><span>Прочее</span><strong>{depth.quality.otherShare==null?"—":pct.format(depth.quality.otherShare*100)+"%"}</strong><small>{money(depth.quality.otherNet)} получено net</small></article>
+        </div>
+        <small className="v3-income-method">Состав показывает только уже полученный пассивный доход после налога. Регулярность — доля полностью наблюдавшихся месяцев, в которых была хотя бы одна фактическая выплата; частичные месяцы не ухудшают показатель.</small>
+      </div>
       <div className="v3-income-history-stats">
         <article><span>Месяцев с выплатами</span><strong>{depth.stability.payoutMonths}</strong><small>из {depth.stability.observedMonths} полных</small></article>
         <article><span>Нулевых месяцев</span><strong>{depth.stability.zeroIncomeMonths}</strong><small>только полностью наблюдавшиеся</small></article>
