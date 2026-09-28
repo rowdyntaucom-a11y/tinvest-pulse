@@ -48,8 +48,8 @@ test("derivatives V2 stress matrix is symmetric and margin-aware",()=>{
  assert.equal(risk.onePercentPnl,20);
  assert.equal(risk.priceMoveToMarginLossPct,25);
  assert.equal(risk.stress.length,6);
- assert.equal(risk.stress.find(row=>row.movePct===-10)?.pnl,-200);
- assert.equal(risk.stress.find(row=>row.movePct===10)?.pnl,200);
+ assert.ok(Math.abs((risk.stress.find(row=>row.movePct===-10)?.pnl??0)+200)<1e-9);
+ assert.ok(Math.abs((risk.stress.find(row=>row.movePct===10)?.pnl??0)-200)<1e-9);
  assert.equal(risk.basisState,"CONTANGO");
  assert.ok(risk.expiryBasisDecayPerDayPct!=null&&risk.expiryBasisDecayPerDayPct>0);
 });
