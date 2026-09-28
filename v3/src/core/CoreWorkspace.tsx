@@ -1,4 +1,10 @@
-import{useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import"./coreWorkspace.css";
+import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import"./coreWorkspace.css";
+const V3AssetsDepth=lazy(()=>import("../assets/V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
+const V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
+const V3IncomeDepth=lazy(()=>import("../income/V3IncomeDepth").then(m=>({default:m.V3IncomeDepth})));
+const V3Analysis=lazy(()=>import("../analysis/V3Analysis").then(m=>({default:m.V3Analysis})));
+const V3MarketIntelligenceWorkspace=lazy(()=>import("../analysis/V3MarketIntelligenceWorkspace").then(m=>({default:m.V3MarketIntelligenceWorkspace})));
+const V3AnalysisToolbox=lazy(()=>import("../analysis/V3AnalysisToolbox").then(m=>({default:m.V3AnalysisToolbox})));
 type Area="overview"|"portfolio"|"performance"|"income"|"analytics"|"market"|"tools";type Density="full"|"compact";
 const NAV:[Area,string,string[]][]=[
  ["overview","Обзор",["Сводка","События","Контроль"]],
@@ -23,4 +29,27 @@ export function CoreWorkspace({home,positions,history,income}:{home:V3HomeViewMo
  </main>
  <nav className="qcore-mobile">{NAV.slice(0,5).map(([id,label])=><button key={id} className={area===id?"active":""} onClick={()=>go(id)}><i>{id==="overview"?"⌂":id==="portfolio"?"▦":id==="performance"?"↗":id==="income"?"₽":"⌁"}</i><span>{label}</span></button>)}<button className={area==="market"||area==="tools"?"active":""} onClick={()=>go(area==="market"?"tools":"market")}><i>•••</i><span>{area==="market"?"Инстр.":"Рынок"}</span></button></nav>
  </div>}
-function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<Area,"overview">;sub:string;trusted:boolean;positions:PositionSnapshot[];history:HistoryPoint[];income:V3IncomeModel;home:V3HomeViewModel}){const cards:Record<Exclude<Area,"overview">,[string,string,string][]>={portfolio:[["Стоимость",trusted?m(home.value):"—","подтверждённый капитал"],["Позиций",trusted?String(positions.length):"—","текущий состав"],["Раздел",sub,"рабочая область"]],performance:[["TWR",trusted&&home.twr!=null?p(home.twr*100):"—","time-weighted"],["XIRR",trusted&&home.xirr!=null?p(home.xirr*100):"—","money-weighted"],["CAGR",trusted&&home.cagr!=null?p(home.cagr*100):"—","только при достаточной истории"]],income:[["Получено",trusted?m(income.total):"—","реализованный доход"],["Средний месяц",trusted?m(income.monthly):"—","без пополнений"],["Годовой эквивалент",trusted?m(income.annual):"—","не прогноз"]],analytics:[["История",trusted?history.length+" точек":"—","покрытие расчётов"],["Позиции",trusted?String(positions.length):"—","структура"],["Режим",sub,"без торговых рекомендаций"]],market:[["Рабочая зона",sub,"рынок × портфель"],["Идентичность","Exact ticker / FIGI","без fuzzy join"],["Режим","Read only","сценарии ≠ прогноз"]],tools:[["Инструмент",sub,"финансовая лаборатория"],["Исполнение","Отключено","QVANIX не торгует"],["Данные",trusted?"LIVE":"FAIL-CLOSED","не подменяем отсутствие нулями"]]};return <><div className="qcore-module-kpis">{cards[area].map(x=><article key={x[0]}><span>{x[0]}</span><strong>{x[1]}</strong><small>{x[2]}</small></article>)}</div><article className="qcore-workbench"><header><div><span>{area.toUpperCase()}</span><h2>{sub}</h2></div><em>WORKSPACE V1</em></header><div className="qcore-placeholder"><b>Функциональный модуль подключается к существующему Financial Core</b><p>Каркас уже фиксирует постоянное место функции на ПК, планшете и смартфоне. Следующие вертикальные патчи подключают существующие расчётные движки сюда без длинных Samurai-глав.</p><div><span>1–2 действия до раздела</span><span>FULL / COMPACT</span><span>Desktop / Tablet / Mobile</span><span>Fail-closed</span></div></div></article></>}
+function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<Area,"overview">;sub:string;trusted:boolean;positions:PositionSnapshot[];history:HistoryPoint[];income:V3IncomeModel;home:V3HomeViewModel}){
+ const gate=!trusted?<section className="qcore-data-gate"><strong>Данные не подтверждены</strong><p>Финансовый модуль закрыт fail-closed до получения полного LIVE-снимка. QVANIX не заменяет отсутствующие данные нулями.</p></section>:null;
+ if(area==="portfolio"){
+  if(sub==="Операции")return <CoreModule title="Операции" note="Исполненные события счёта · сделки · доход · внешние потоки"><Suspense fallback={<Loading/>}><V3OperationsDepth/></Suspense></CoreModule>;
+  if(sub==="Цели")return <CoreModule title="Цели" note="Целевой капитал и прогресс"><GoalPanel value={trusted?home.value:null}/></CoreModule>;
+  if(gate)return gate;
+  return <CoreModule title={sub} note="Структура портфеля · единая подтверждённая модель"><Suspense fallback={<Loading/>}><V3AssetsDepth positions={positions}/></Suspense></CoreModule>;
+ }
+ if(area==="income"){
+  if(gate)return gate;
+  return <CoreModule title={sub} note="Факт и будущие выплаты разделены"><Suspense fallback={<Loading/>}><V3IncomeDepth positions={positions}/></Suspense></CoreModule>;
+ }
+ if(area==="performance"||area==="analytics"){
+  if(gate)return gate;
+  return <CoreModule title={sub} note="TWR-first аналитика · риск · benchmark · структура"><Suspense fallback={<Loading/>}><V3Analysis items={positions} history={history} market={{riskFreeRate:null,riskFreeRateDate:null,nextRateMeeting:null}} trusted={trusted} shell="core" mode="detailed" portfolioValue={home.value??0}/></Suspense></CoreModule>;
+ }
+ if(area==="market"){
+  return <CoreModule title={sub} note="Market Intelligence · публичный рынок × текущий портфель"><Suspense fallback={<Loading/>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense></CoreModule>;
+ }
+ return <CoreModule title={sub} note="Read-only профессиональные инструменты · QVANIX не торгует"><Suspense fallback={<Loading/>}><V3AnalysisToolbox positions={positions}/></Suspense></CoreModule>;
+}
+function CoreModule({title,note,children}:{title:string;note:string;children:React.ReactNode}){return <article className="qcore-workbench qcore-live-module"><header><div><span>FINANCIAL CORE</span><h2>{title}</h2><small>{note}</small></div><em>CONNECTED</em></header><div className="qcore-embedded">{children}</div></article>}
+function Loading(){return <div className="qcore-loading">Открываем финансовый модуль…</div>}
+function GoalPanel({value}:{value:number|null}){const[target,setTarget]=useState(1_000_000);const progress=value==null?null:Math.min(100,value/target*100);return <section className="qcore-goal"><div><span>Текущий капитал</span><strong>{m(value)}</strong></div><label>Цель <input type="number" min="1" step="10000" value={target} onChange={e=>setTarget(Math.max(1,Number(e.target.value)||1))}/></label><div className="qcore-goalbar"><i style={{width:(progress??0)+"%"}}/></div><p>{progress==null?"Прогресс недоступен":progress.toFixed(1)+"% цели"} · сценарий не является прогнозом доходности.</p></section>}

@@ -1,0 +1,8 @@
+import assert from"node:assert/strict";import test from"node:test";import{readFileSync}from"node:fs";const ui=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/core/coreWorkspace.css",import.meta.url),"utf8");
+test("Core workspaces connect existing production financial engines",()=>{for(const name of["V3AssetsDepth","V3OperationsDepth","V3IncomeDepth","V3Analysis","V3MarketIntelligenceWorkspace","V3AnalysisToolbox"])assert.match(ui,new RegExp(name))});
+test("portfolio operations are direct local navigation rather than deep scroll",()=>{assert.match(ui,/sub==="Операции"/);assert.match(ui,/<V3OperationsDepth\/?>/);assert.match(ui,/sub==="Цели"/)});
+test("income uses trusted fact and payout engine",()=>{assert.match(ui,/<V3IncomeDepth positions=\{positions\}/);assert.match(ui,/Факт и будущие выплаты разделены/)});
+test("analytics and performance reuse TWR-first production analytics",()=>{assert.match(ui,/area==="performance"\|\|area==="analytics"/);assert.match(ui,/mode="detailed"/);assert.match(ui,/TWR-first аналитика/)});
+test("market and tools are live read-only workspaces",()=>{assert.match(ui,/<V3MarketIntelligenceWorkspace positions=\{positions\}/);assert.match(ui,/<V3AnalysisToolbox positions=\{positions\}/);assert.match(ui,/Read-only профессиональные инструменты/)});
+test("embedded modules remain responsive inside Core",()=>{assert.match(css,/qcore-live-module/);assert.match(css,/qcore-embedded/);assert.match(css,/@media\(max-width:640px\)[\s\S]*qcore-live-module/)});
+test("financial workspaces preserve fail-closed gate",()=>{assert.match(ui,/qcore-data-gate/);assert.match(ui,/не заменяет отсутствующие данные нулями/)});
