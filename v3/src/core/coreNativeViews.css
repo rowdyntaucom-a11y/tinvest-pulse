@@ -19,3 +19,14 @@
 .qn-perf-grid .qn-performance-chart{border:0!important;border-radius:14px!important;background:#0e151d!important;padding:12px!important}.qn-performance-chart svg{height:160px!important}.qn-perf-grid>aside{grid-template-columns:1fr!important}.qn-perf-grid>aside>div{border:0!important;background:#111923!important;border-radius:11px!important;padding:10px 12px!important;grid-template-columns:1fr auto;align-items:center}.qn-perf-grid>aside>div small{grid-column:1/3}.qn-perf-grid aside strong{font-size:14px!important}
 .qn-income-road>div{border:0!important;border-radius:13px!important;background:#111923!important;padding:13px!important}
 }
+
+/* Core V2: portfolio is a working list, not a stack of cards */
+.qn-movers-compact{grid-template-columns:1fr 1fr}.qn-movers-compact>div{display:grid;grid-template-columns:auto 1fr auto;align-items:center}.qn-movers-compact>div span{margin-right:10px}.qn-movers-compact>div small{display:none}
+@media(max-width:700px){
+.qnative{padding:11px!important;background:transparent!important}.qnative>header{margin:0 0 8px!important}.qnative h2{font-size:20px!important}.qnative>header small{font-size:8px!important}.qnative>header>b{font-size:9px!important}
+.qn-cockpit{gap:6px!important}.qn-cockpit article{padding:10px!important;min-height:68px}.qn-cockpit strong{font-size:16px!important}.qn-allocation{margin:7px -2px!important;gap:5px!important}.qn-allocation button{min-width:118px!important;padding:8px!important}
+.qn-movers-compact{gap:6px!important}.qn-movers-compact>div{padding:8px!important}.qn-movers-compact>div span{font-size:8px!important}.qn-movers-compact>div strong{font-size:10px!important}
+.qn-holdings{margin-top:7px!important}.qn-row{grid-template-columns:minmax(78px,1.25fr) minmax(60px,.8fr) minmax(58px,.7fr)!important;padding:11px 8px!important}.qn-row>span:nth-of-type(2){display:none}.qn-row>strong{font-size:10px!important}.qn-row>div b{font-size:11px!important}.qn-detail{padding:0 8px 9px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important}.qn-detail>div{padding:8px!important}.qn-detail>div:nth-child(n+5){display:none}
+.qn-metrics-primary{grid-template-columns:1fr 1fr!important;gap:6px!important}.qn-metrics-primary article{padding:10px!important;min-height:72px!important}.qn-metrics-primary article:first-child{grid-column:span 2}.qn-metrics-primary article:first-child strong{font-size:25px!important}
+.qn-perf-grid{gap:7px!important}.qn-perf-grid .qn-performance-chart{padding:10px!important}.qn-performance-chart svg{height:145px!important}.qn-perf-grid>aside{gap:5px!important}
+}
