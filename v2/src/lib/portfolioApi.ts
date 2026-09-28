@@ -384,4 +384,16 @@ export async function loadPortfolioHistory(): Promise<HistoryPoint[]> {
   }
 }
 
-export async function loadPortfolio(): Promise<PortfolioSnapshot> {\n  try {\n    return await loadDashboard()\n  } catch (dashboardError) {\n    try {\n      return await loadLegacyPortfolio()\n    } catch (portfolioError) {\n      const a=dashboardError instanceof Error?dashboardError.message:'dashboard unavailable'\n      const b=portfolioError instanceof Error?portfolioError.message:'portfolio unavailable'\n      throw new Error(`Broker source unavailable: ${a}; ${b}`)\n    }\n  }\n}
+export async function loadPortfolio(): Promise<PortfolioSnapshot> {
+  try {
+    return await loadDashboard()
+  } catch (dashboardError) {
+    try {
+      return await loadLegacyPortfolio()
+    } catch (portfolioError) {
+      const a = dashboardError instanceof Error ? dashboardError.message : 'dashboard unavailable'
+      const b = portfolioError instanceof Error ? portfolioError.message : 'portfolio unavailable'
+      throw new Error(`Broker source unavailable: ${a}; ${b}`)
+    }
+  }
+}
