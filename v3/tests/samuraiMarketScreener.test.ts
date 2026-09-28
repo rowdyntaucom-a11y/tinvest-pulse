@@ -10,8 +10,8 @@ const css=readFileSync(new URL("../src/styles/samuraiMarketScreener.css",import.
 
 test("Samurai exposes the public screener inside the professional toolbox",()=>{
  assert.match(analysis,/sam-analysis-tools/);
- assert.match(toolbox,/V3MarketScreener/);
- assert.match(toolbox,/Скринер/);
+ assert.match(toolbox,/V3MarketIntelligenceWorkspace/);
+ assert.match(toolbox,/Рынок/);
  assert.match(atlas,/id:"tools"/);
 });
 
