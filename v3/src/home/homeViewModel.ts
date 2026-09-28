@@ -29,11 +29,16 @@ export type V3HomeViewModel={
 };
 
 function latestVerifiedTwr(history:HistoryPoint[]){
- for(let i=history.length-1;i>=0;i--){
-  const value=history[i]?.portfolio;
-  if(typeof value==="number"&&Number.isFinite(value))return value;
- }
- return null;
+ const series=history.map(x=>x.portfolio).filter((x):x is number=>typeof x==="number"&&Number.isFinite(x)&&x>0);
+ if(series.length<2)return null;
+ const base=series[0],latest=series[series.length-1];
+ // History stores a wealth index (normally rebased to 100), not a decimal return.
+ // Convert index growth to the canonical decimal return consumed by Core.
+ if(base<=0||latest<=0)return null;
+ const value=latest/base-1;
+ // A reconstructed series can still be invalid when upstream historical pricing is incomplete.
+ // Do not publish spectacular numbers as verified performance.
+ return Number.isFinite(value)&&value>-0.99&&value<=5?value:null;
 }
 
 export function buildV3HomeViewModel(snapshot:PortfolioSnapshot,isTrusted:boolean):V3HomeViewModel{
