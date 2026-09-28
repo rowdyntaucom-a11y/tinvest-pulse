@@ -281,7 +281,14 @@ const normalizeErrors = (value: unknown) => {
   })
 }
 
-export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
+let payoutCache:{value:PayoutCalendar;at:number}|null=null
+let payoutInFlight:Promise<PayoutCalendar>|null=null
+const PAYOUT_CACHE_TTL=5*60*1000
+
+export async function loadPayoutCalendar(options:{force?:boolean}={}): Promise<PayoutCalendar> {
+  if(!options.force&&payoutCache&&Date.now()-payoutCache.at<PAYOUT_CACHE_TTL)return payoutCache.value
+  if(!options.force&&payoutInFlight)return payoutInFlight
+  const request=(async()=>{
   try {
     const response = await fetch('/api/payouts', { cache: 'no-store' })
     if (!response.ok) return emptyCalendar()
@@ -294,7 +301,7 @@ export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
     const integrity = raw.integrity ?? {}
     const observationAvailable = observation.available === true
 
-    return {
+    const result:PayoutCalendar = {
       available: raw.available !== false,
       version: text(raw.version) ?? undefined,
       generatedAt: isoDate(raw.generatedAt),
@@ -348,7 +355,12 @@ export async function loadPayoutCalendar(): Promise<PayoutCalendar> {
       warning: text(raw.warning),
       note: text(raw.note),
     }
+    payoutCache={value:result,at:Date.now()}
+    return result
   } catch {
-    return emptyCalendar()
+    return payoutCache?.value??emptyCalendar()
   }
+  })()
+  payoutInFlight=request
+  try{return await request}finally{if(payoutInFlight===request)payoutInFlight=null}
 }
