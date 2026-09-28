@@ -1,0 +1,38 @@
+import{useEffect,useMemo,useState}from"react";
+import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
+import{loadMarketScreener,type MarketScreenerPayload}from"./marketScreenerApi";
+import{buildMarketPulse}from"./marketIntelligenceModel";
+import{V3MarketScreener}from"./V3MarketScreener";
+import{V3FallenAssetsDiscovery}from"./V3FallenAssetsDiscovery";
+import"../styles/marketIntelligenceWorkspace.css";
+
+const compact=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDigits:1});
+const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
+type Mode="pulse"|"screener"|"discovery";
+
+export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSnapshot[]}){
+ const[mode,setMode]=useState<Mode>("pulse"),[data,setData]=useState<MarketScreenerPayload|null>(null),[loading,setLoading]=useState(true);
+ useEffect(()=>{const c=new AbortController();void loadMarketScreener(c.signal).then(setData).finally(()=>{if(!c.signal.aborted)setLoading(false)});return()=>c.abort()},[]);
+ const pulse=useMemo(()=>buildMarketPulse(data?.rows??[],positions),[data,positions]);
+ const portfolioRows=useMemo(()=>(data?.rows??[]).filter(row=>pulse.portfolioTickers.has(row.secid.toUpperCase())).sort((a,b)=>b.turnoverRub-a.turnoverRub),[data,pulse.portfolioTickers]);
+ return <section className="v3-market-intelligence" aria-label="Market Intelligence">
+  <header><div><span>MARKET INTELLIGENCE // WORKSPACE</span><h3>Рынок и портфель</h3><p>Публичный TQBR-срез, техническая история текущих позиций и пересечение с портфелем — в одном read-only рабочем пространстве.</p></div><strong>MOEX</strong></header>
+  <nav>{([["pulse","Пульс","рынок · портфель"],["screener","Скринер","фильтры · ликвидность"],["discovery","История","просадки · SMA"]]as const).map(([id,label,note])=><button type="button" key={id} className={mode===id?"is-active":""} onClick={()=>setMode(id)}><strong>{label}</strong><small>{note}</small></button>)}</nav>
+  {mode==="pulse"&&<div className="v3-market-pulse">
+   {loading?<div className="v3-market-pulse__gate">Получаем публичный TQBR-срез…</div>:!data?.available?<div className="v3-market-pulse__gate">Рыночный срез сейчас не подтверждён источником.</div>:<>
+    <div className="v3-market-pulse__metrics">
+     <article><span>Рост / падение</span><strong>{pulse.gainers} / {pulse.losers}</strong><small>{pulse.advancersShare==null?"—":pct.format(pulse.advancersShare*100)+"%"} directional rows растут</small></article>
+     <article><span>Оборот среза</span><strong>{compact.format(pulse.turnover)} ₽</strong><small>{pulse.total} бумаг TQBR</small></article>
+     <article><span>Макс. оборот</span><strong>{pulse.topTurnover?.secid??"—"}</strong><small>{pulse.topTurnover?compact.format(pulse.topTurnover.turnoverRub)+" ₽":"—"}</small></article>
+     <article><span>Макс. |движение|</span><strong>{pulse.largestMove?.secid??"—"}</strong><small>{pulse.largestMove?.dayChangePct==null?"—":pulse.largestMove.dayChangePct.toFixed(2)+"%"}</small></article>
+    </div>
+    <section className="v3-market-portfolio"><header><div><span>PORTFOLIO × MARKET</span><strong>Мои бумаги в текущем срезе</strong></div><small>{pulse.portfolioMatches} совпадений</small></header>
+     {portfolioRows.length?<div>{portfolioRows.map(row=><article key={row.secid}><div><strong>{row.secid}</strong><small>{row.name}</small></div><b className={(row.dayChangePct??0)>0?"is-positive":(row.dayChangePct??0)<0?"is-negative":""}>{row.dayChangePct==null?"—":(row.dayChangePct>0?"+":"")+row.dayChangePct.toFixed(2)+"%"}</b><span>{compact.format(row.turnoverRub)} ₽ оборот</span></article>)}</div>:<p>Текущие тикеры портфеля не совпали с подтверждёнными строками TQBR. QVANIX не подменяет идентичность похожими названиями.</p>}
+    </section>
+    <footer>Пульс описывает только текущий публичный срез. Доля растущих бумаг не является прогнозом направления рынка, а совпадение с портфелем выполняется по точному ticker.</footer>
+   </>}
+  </div>}
+  {mode==="screener"&&<V3MarketScreener/>}
+  {mode==="discovery"&&<V3FallenAssetsDiscovery/>}
+ </section>;
+}
