@@ -1,0 +1,1 @@
+import test from"node:test";test("Core V2 overhaul finalization marker",()=>{});
