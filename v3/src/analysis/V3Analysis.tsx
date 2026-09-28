@@ -55,11 +55,12 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
     {id:"sam-analysis-structure",code:"伍",label:"Структура",note:"классы · облигации"},
     {id:"sam-analysis-market",code:"陸",label:"Benchmark",note:"IMOEX · beta · TE"}
    ]}/>}
-   {samuraiReference&&trusted&&<div id="sam-analysis-tools" className="sam-reference-chapter sam-analysis-tools-priority"><Suspense fallback={<section className="v3-analysis-note">Открываем профессиональные инструменты…</section>}><V3AnalysisToolbox positions={rows}/></Suspense><SamuraiNextCue targetId="sam-analysis-return" label="ДАЛЬШЕ · ДОХОДНОСТЬ"/></div>}\n   {!samuraiReference&&mode==="detailed"&&<V3SectionSelector label="Раздел аналитики" value={section} onChange={setSection} options={sectionOptions}/>} 
+   {samuraiReference&&trusted&&<div id="sam-analysis-tools" className="sam-reference-chapter sam-analysis-tools-priority"><Suspense fallback={<section className="v3-analysis-note">Открываем профессиональные инструменты…</section>}><V3AnalysisToolbox positions={rows}/></Suspense><SamuraiNextCue targetId="sam-analysis-return" label="ДАЛЬШЕ · ДОХОДНОСТЬ"/></div>}
+   {!samuraiReference&&mode==="detailed"&&<V3SectionSelector label="Раздел аналитики" value={section} onChange={setSection} options={sectionOptions}/>} 
 
    {((samuraiReference&&trusted)||(mode==="detailed"&&section==="overview"))&&<div id="sam-analysis-overview" className={samuraiReference?"sam-reference-chapter":undefined}>
     <section className="v3-analysis-overview-depth"><div className="v3-analysis-quality"><div><span>Методика</span><strong>Analytics {depth.portfolio.calcVersion}</strong><small>TWR-first portfolio analytics</small></div><div><span>История</span><strong>{depth.portfolio.historyPoints} точек</strong><small>{depth.portfolio.historyDays} календарных дней</small></div><div><span>Целостность</span><strong className={depth.portfolio.historyIntegrity==="OK"?"is-positive":"is-negative"}>{depth.portfolio.historyIntegrity}</strong><small>{depth.portfolio.conflictingDates?depth.portfolio.conflictingDates+" конфликтных дат":"конфликтов не найдено"}</small></div></div>{rows.length>0&&<section className="v3-breadth"><h2>Ширина текущего broker P/L</h2><div><span>В плюсе</span><strong className="is-positive">{breadth.positive}</strong><small>{n.format(ratioToPercent(breadth.positiveWeight)??0)}% капитала</small></div><div><span>В минусе</span><strong className="is-negative">{breadth.negative}</strong><small>{n.format(ratioToPercent(breadth.negativeWeight)??0)}% капитала</small></div><div><span>Без изменения</span><strong>{breadth.flat}</strong><small>по текущему broker P/L</small></div></section>}<section className="v3-analysis-note">Верхняя просадка считается по TWR-индексу, а не по рыночной стоимости счёта: пополнения и выводы не должны искажать риск-метрику. Текущий broker P/L позиций остаётся отдельным срезом.</section></section>
-    {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-overview" label="К НАЧАЛУ · ОБЗОР"/>}
+    {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-tools" label="ДАЛЬШЕ · ИНСТРУМЕНТЫ"/>}
    </div>}
 
    {((samuraiReference&&trusted)||(mode==="detailed"&&section==="return"))&&trusted&&<div id="sam-analysis-return" className={samuraiReference?"sam-reference-chapter":undefined}>
@@ -82,10 +83,9 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
 
    {((samuraiReference&&trusted)||(mode==="detailed"&&section==="market"))&&trusted&&<div id="sam-analysis-market" className={samuraiReference?"sam-reference-chapter":undefined}>
     <V3MarketLayer relative={relative} window={historyWindow} onWindowChange={setHistoryWindow} market={market}/>
-    {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-tools" label="ДАЛЬШЕ · ИНСТРУМЕНТЫ"/>}
+    {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-overview" label="К НАЧАЛУ · ОБЗОР"/>}
    </div>}
 
-   {samuraiReference&&trusted&&<div id="sam-analysis-tools" className="sam-reference-chapter"><Suspense fallback={<section className="v3-analysis-note">Открываем профессиональные инструменты…</section>}><V3AnalysisToolbox positions={rows}/></Suspense></div>}
 
    <section className="v3-analysis-note">Показатели описывают текущую структуру и подтверждённую историю. Они не являются рекомендацией купить, продать или выбрать конкретный актив.</section>
   </section>
