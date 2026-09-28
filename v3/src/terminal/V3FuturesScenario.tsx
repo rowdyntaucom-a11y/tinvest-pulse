@@ -1,5 +1,5 @@
 import{useMemo,useState}from"react";
-import{calculateFuturesScenario,futuresScenarioWarnings,parseScenarioNumber,type FuturesScenarioInput}from"./futuresMath";
+import{calculateFuturesRiskProfile,calculateFuturesScenario,futuresScenarioWarnings,parseScenarioNumber,type FuturesScenarioInput}from"./futuresMath";
 
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const ratio=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -15,7 +15,7 @@ const FIELDS:Array<{key:FieldKey;label:string;hint:string;placeholder:string}>=[
  {key:"daysToExpiry",label:"Дней до экспирации",hint:"Для annualized basis",placeholder:"необязательно"},
 ];
 
-const empty:FuturesScenarioInput={futuresPrice:null,spotPrice:null,scenarioPrice:null,contracts:null,priceValuePerPoint:null,marginPerContract:null,daysToExpiry:null};
+const empty:FuturesScenarioInput={futuresPrice:null,spotPrice:null,scenarioPrice:null,contracts:null,priceValuePerPoint:null,marginPerContract:null,daysToExpiry:null,direction:"LONG"};
 
 function metric(value:number|null,format:(v:number)=>string){return value==null?"—":format(value)}
 
@@ -23,10 +23,12 @@ export function V3FuturesScenario(){
  const[input,setInput]=useState<FuturesScenarioInput>(empty);
  const result=useMemo(()=>calculateFuturesScenario(input),[input]);
  const warnings=useMemo(()=>futuresScenarioWarnings(input,result),[input,result]);
+ const risk=useMemo(()=>calculateFuturesRiskProfile(input),[input]);
  const update=(key:FieldKey,raw:string)=>setInput(prev=>({...prev,[key]:parseScenarioNumber(raw)}));
 
  return <section className="v3-pro-tool v3-futures-scenario" aria-label="Сценарий по фьючерсу">
   <header><div><span>DERIVATIVES // READ-ONLY</span><h3>Фьючерс · сценарий</h3><p>Расчёт по введённым параметрам. QVANIX ничего не отправляет брокеру и не создаёт заявку.</p></div><strong>WHAT IF</strong></header>
+  <div className="v3-futures-direction" aria-label="Направление сценария"><button type="button" className={risk.direction==="LONG"?"is-active":""} onClick={()=>setInput(prev=>({...prev,direction:"LONG"}))}>LONG <small>рост цены = +P/L</small></button><button type="button" className={risk.direction==="SHORT"?"is-active":""} onClick={()=>setInput(prev=>({...prev,direction:"SHORT"}))}>SHORT <small>падение цены = +P/L</small></button></div>
   <div className="v3-futures-scenario__fields">{FIELDS.map(field=><label key={field.key}><span>{field.label}</span><input inputMode="decimal" placeholder={field.placeholder} onChange={e=>update(field.key,e.target.value)}/><small>{field.hint}</small></label>)}</div>
   <div className="v3-futures-scenario__metrics">
    <article><span>Номинал сценария</span><strong>{metric(result.notional,v=>money.format(v)+" ₽")}</strong><small>цена × контракты × ₽/пункт</small></article>
@@ -36,6 +38,16 @@ export function V3FuturesScenario(){
    <article><span>Basis</span><strong>{metric(result.basisPct,v=>(v>0?"+":"")+ratio.format(v)+"%")}</strong><small>фьючерс к базовому активу</small></article>
    <article><span>Basis годовой</span><strong>{metric(result.annualizedBasisPct,v=>(v>0?"+":"")+ratio.format(v)+"%")}</strong><small>простая annualized оценка, не прогноз</small></article>
   </div>
+  <section className="v3-futures-risk" aria-label="Стресс-профиль фьючерса">
+   <div className="v3-futures-risk__head"><div><span>DERIVATIVES INTELLIGENCE V2</span><strong>Stress matrix</strong></div><small>{risk.complete?"SPEC COMPLETE":"SPEC INCOMPLETE"}</small></div>
+   <div className="v3-futures-risk__summary">
+    <article><span>P/L на 1% цены</span><strong>{metric(risk.onePercentPnl,v=>money.format(v)+" ₽")}</strong><small>абсолютная чувствительность позиции</small></article>
+    <article><span>Ход цены ≈ размер ГО</span><strong>{metric(risk.priceMoveToMarginLossPct,v=>ratio.format(v)+"%")}</strong><small>арифметический ориентир, не liquidation price</small></article>
+    <article><span>Basis regime</span><strong>{risk.basisState}</strong><small>{risk.expiryBasisDecayPerDayPct==null?"нужны spot + expiry":ratio.format(risk.expiryBasisDecayPerDayPct)+" п.п./день до expiry"}</small></article>
+   </div>
+   {risk.stress.length>0&&<div className="v3-futures-stress">{risk.stress.map(row=><article key={row.movePct}><span>{row.movePct>0?"+":""}{row.movePct}%</span><small>{ratio.format(row.scenarioPrice)}</small><strong className={row.pnl==null?"":row.pnl>0?"is-positive":"is-negative"}>{row.pnl==null?"—":(row.pnl>0?"+":"")+money.format(row.pnl)+" ₽"}</strong><b>{row.marginReturnPct==null?"—":(row.marginReturnPct>0?"+":"")+ratio.format(row.marginReturnPct)+"% ГО"}</b></article>)}</div>}
+   <p className="v3-futures-risk__note">Матрица механически двигает цену текущего фьючерса на ±2/5/10%. Это стресс-сценарии, не прогноз вероятности. «Ход цены ≈ ГО» не является ценой ликвидации: реальные требования брокера и биржи могут изменяться.</p>
+  </section>
   {warnings.length>0&&<div className="v3-futures-scenario__warnings">{warnings.map(item=><p key={item}>{item}</p>)}</div>}
   <footer>Не рассчитываются ликвидация, гарантийные требования брокера, вариационная маржа биржи, комиссии, налоги и риск принудительного закрытия без отдельного подтверждённого контракта данных.</footer>
  </section>;
