@@ -18,6 +18,7 @@ The old branch's two navigation commits were deliberately not replayed: one temp
   - History: Sources and Taxes/IIS;
   - Market: Broad-Market Dividend Discovery.
 - Dividend Discovery is lazy-loaded only when Market is selected.
+- Samurai/v3 is the reference integration: its Income Market chapter now loads `/api/dividend-discovery` instead of the disconnected-source placeholder. The independent market module remains visible/fail-closed even when the portfolio payout-calendar request is unavailable.
 - The backend calls the existing server-side T-Invest request boundary for Shares and GetAssetFundamentals. No broker credential or account identity is added to the browser contract.
 
 ## Financial/data contract
