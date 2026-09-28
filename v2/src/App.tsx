@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { QvanixBoard } from "./features/board/QvanixBoard";
+import { BoardLoadingSkeleton } from "./features/board/BoardLoadingSkeleton";
 import { useWorldPhaseClock } from "./features/world/useWorldPhaseClock";
 import { buildWorldRuntimeStateFromQualityInputs } from "./features/dna/worldRuntimeState";
 import { resolveWorldQualityInputs } from "./features/dna/worldQualityPolicy";
@@ -95,7 +96,7 @@ export default function App() {
     </header>
     <section className={`app-view ${selectedAsset ? "asset-view" : `${tab}-view`}`}>
       {workspaceGate === "WORKSPACE" && tab === "dna" ? <DnaWorkspace state={dnaWorldState} /> : workspaceGate === "LOADING" ? (
-        <section className="workspace-loading" aria-live="polite" aria-busy="true"><div className="loading-line loading-line--hero" /><div className="loading-line" /><div className="loading-panel" /><strong>ЗАГРУЖАЕМ ПОРТФЕЛЬ</strong><span>Значения появятся после ответа брокера</span></section>
+        tab === "board" ? <BoardLoadingSkeleton accountName={snapshot.accountName} /> : <section className="workspace-loading" aria-live="polite" aria-busy="true"><div className="loading-line loading-line--hero" /><div className="loading-line" /><div className="loading-panel" /><strong>ЗАГРУЖАЕМ ПОРТФЕЛЬ</strong><span>Значения появятся после ответа брокера</span></section>
       ) : workspaceGate === "UNAVAILABLE" ? (
         <section className="portfolio-empty panel" role="status" aria-live="polite"><span className="eyebrow">ДАННЫЕ НЕ ПОДТВЕРЖДЕНЫ</span><h2>{portfolioStatus === "ERROR" ? "Не удалось загрузить портфель" : "Актуальные данные брокера недоступны"}</h2><p>QVANIX не показывает резервные или отсутствующие значения как реальный пустой портфель. Повторная загрузка произойдёт автоматически.</p></section>
       ) : snapshot.positions === 0 && !allowsConfirmedEmptyPortfolio(portfolioTrust, snapshot.positions) ? (

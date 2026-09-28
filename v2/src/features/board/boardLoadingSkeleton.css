@@ -1,0 +1,137 @@
+/*
+ * Geometry-stable Board cold start.
+ * The loading surface intentionally reuses the production Board containers so
+ * the broker response fills existing geometry instead of replacing the whole
+ * viewport with a differently-sized skeleton.
+ */
+.qv-board--loading {
+  overflow: hidden;
+}
+
+.qv-board--loading .qv-board__hero,
+.qv-board--loading .qv-board__rail article,
+.qv-board--loading .qv-board__modules,
+.qv-board--loading .qv-board-card {
+  pointer-events: none;
+}
+
+.qv-board__hero--loading {
+  isolation: isolate;
+}
+
+.qv-board__hero--loading .qv-board__hero-copy > p {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.qv-board-loading__capital,
+.qv-board-loading__pnl,
+.qv-board-loading__line,
+.qv-board-loading__value {
+  display: block;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      100deg,
+      color-mix(in srgb, var(--mint) 5%, transparent) 18%,
+      color-mix(in srgb, var(--mint) 14%, transparent) 42%,
+      color-mix(in srgb, var(--mint) 5%, transparent) 66%
+    );
+  background-size: 220% 100%;
+}
+
+.qv-board-loading__capital {
+  width: min(420px, 70%);
+  height: clamp(42px, 6vw, 78px);
+  margin-top: 8px;
+}
+
+.qv-board-loading__pnl {
+  width: min(260px, 48%);
+  height: 14px;
+  margin-top: 12px;
+}
+
+.qv-board-loading__line {
+  width: 82%;
+  height: 9px;
+  margin-top: 5px;
+}
+
+.qv-board-loading__line.is-short {
+  width: 58%;
+  height: 7px;
+}
+
+.qv-board-loading__value {
+  width: 58%;
+  height: 27px;
+  margin-top: 8px;
+}
+
+.qv-board-card--loading {
+  cursor: default;
+}
+
+[data-qv-motion="full"] .qv-board--loading :is(
+  .qv-board-loading__capital,
+  .qv-board-loading__pnl,
+  .qv-board-loading__line,
+  .qv-board-loading__value
+) {
+  animation: qv-board-loading-pulse 1.15s ease-in-out infinite;
+}
+
+@keyframes qv-board-loading-pulse {
+  0%, 100% { background-position: 0 0; opacity: .68; }
+  50% { background-position: 100% 0; opacity: 1; }
+}
+
+@media(max-width:620px) {
+  .qv-board--loading {
+    overflow-y: auto;
+  }
+
+  .qv-board-loading__capital {
+    width: 72%;
+    height: clamp(30px, 9vw, 39px);
+    margin-top: 4px;
+  }
+
+  .qv-board-loading__pnl {
+    width: 52%;
+    height: 9px;
+    margin-top: 6px;
+  }
+
+  .qv-board__hero--loading .qv-board__hero-copy > p {
+    margin-top: 5px;
+    font-size: 9px;
+    line-height: 1.25;
+  }
+
+  .qv-board-loading__line {
+    height: 8px;
+    margin-top: 5px;
+  }
+
+  .qv-board-loading__line.is-short {
+    height: 7px;
+  }
+
+  .qv-board-loading__value {
+    height: 24px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .qv-board--loading :is(
+    .qv-board-loading__capital,
+    .qv-board-loading__pnl,
+    .qv-board-loading__line,
+    .qv-board-loading__value
+  ) {
+    animation: none !important;
+  }
+}

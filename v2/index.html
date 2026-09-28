@@ -9,6 +9,27 @@
     <title>QVANIX</title>
   </head>
   <body>
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const defaults = { theme: 'core', density: 'balanced', motion: 'full', detailMode: 'detailed' };
+        const allowed = {
+          theme: new Set(['core', 'horizon', 'carbon', 'aurora', 'minimal', 'amoled']),
+          density: new Set(['compact', 'balanced', 'focus']),
+          motion: new Set(['full', 'reduced', 'off']),
+          detailMode: new Set(['simple', 'detailed']),
+        };
+        let preferences = defaults;
+        try {
+          const raw = localStorage.getItem('qvanix.ui.preferences.v1');
+          if (raw) preferences = { ...defaults, ...JSON.parse(raw) };
+        } catch {}
+        root.dataset.qvTheme = allowed.theme.has(preferences.theme) ? preferences.theme : defaults.theme;
+        root.dataset.qvDensity = allowed.density.has(preferences.density) ? preferences.density : defaults.density;
+        root.dataset.qvMotion = allowed.motion.has(preferences.motion) ? preferences.motion : defaults.motion;
+        root.dataset.qvDetail = allowed.detailMode.has(preferences.detailMode) ? preferences.detailMode : defaults.detailMode;
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
