@@ -2,4 +2,4 @@ import assert from"node:assert/strict";import test from"node:test";import{readFi
 test("Core refreshes on timer and app focus",()=>{assert.match(root,/V3_REFRESH_INTERVAL_MS/);assert.match(root,/visibilitychange/);assert.match(root,/window\.addEventListener\("focus"/)});
 test("Core exposes trust failure instead of silent empty dashboard",()=>{assert.match(root,/setReason/);assert.match(ui,/LIVE-источник недоступен/);assert.match(ui,/ПОВТОРИТЬ/)});
 test("preview proxies api server-side without browser token",()=>{assert.match(server,/QVANIX_API_ORIGIN/);assert.match(server,/req\.url\.startsWith\("\/api\/"\)/);assert.doesNotMatch(root,/TINvest_API_TOKEN|Authorization|Bearer/)});
-test("untrusted snapshots never enter financial engines",()=>{assert.match(root,/if\(ok\)setSnapshot/);assert.match(root,/positions=\{trusted\?snapshot\.positionItems:\[\]\}/)});
+test("untrusted snapshots never enter financial engines",()=>{assert.match(root,/if\(ok\)\{[\s\S]*setSnapshot\(nextSnapshot\)/);assert.match(root,/positions=\{trusted\?snapshot\.positionItems:\[\]\}/)});

@@ -1,4 +1,4 @@
-import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import"./coreWorkspace.css";
+import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import{CorePortfolioView,CorePerformanceView,CoreIncomeView,CoreStructureView}from"./CoreNativeViews";import"./coreWorkspace.css";
 const V3AssetsDepth=lazy(()=>import("../assets/V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
 const V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
 const V3IncomeDepth=lazy(()=>import("../income/V3IncomeDepth").then(m=>({default:m.V3IncomeDepth})));
@@ -17,7 +17,7 @@ const NAV:[Area,string,string[]][]=[
 ];
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0}),pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
 const m=(v:number|null)=>v==null?"—":money.format(v)+" ₽",p=(v:number|null)=>v==null?"—":pct.format(v)+"%";
-export function CoreWorkspace({home,positions,history,income,connection}:{home:V3HomeViewModel;positions:PositionSnapshot[];history:HistoryPoint[];income:V3IncomeModel;connection:{state:string;reason:string|null;refresh:()=>Promise<void>;refreshing:boolean}}){const[area,setArea]=useState<Area>("overview"),[sub,setSub]=useState("Сводка"),[density,setDensity]=useState<Density>("full");const trusted=home.isTrusted,active=NAV.find(x=>x[0]===area)!,top=useMemo(()=>[...positions].sort((a,b)=>b.currentValue-a.currentValue).slice(0,6),[positions]),total=positions.reduce((s,x)=>s+x.currentValue,0),profit=home.profit,profitPct=home.profitPct;const go=(a:Area)=>{setArea(a);setSub(NAV.find(x=>x[0]===a)![2][0])};return <div className="qcore" data-density={density}>
+export function CoreWorkspace({home,positions,history,income,connection}:{home:V3HomeViewModel;positions:PositionSnapshot[];history:HistoryPoint[];income:V3IncomeModel;connection:{state:string;reason:string|null;refresh:()=>Promise<void>;refreshing:boolean}}){const[area,setArea]=useState<Area>("overview"),[sub,setSub]=useState("Сводка"),[density,setDensity]=useState<Density>("full"),[mobileMore,setMobileMore]=useState(false);const trusted=home.isTrusted,active=NAV.find(x=>x[0]===area)!,top=useMemo(()=>[...positions].sort((a,b)=>b.currentValue-a.currentValue).slice(0,6),[positions]),total=positions.reduce((s,x)=>s+x.currentValue,0),profit=home.profit,profitPct=home.profitPct;const go=(a:Area)=>{setArea(a);setSub(NAV.find(x=>x[0]===a)![2][0]);setMobileMore(false)};return <div className="qcore" data-density={density}>
  <aside className="qcore-side"><div className="qcore-logo"><b>Q</b><span>QVANIX</span><small>FINANCIAL CORE</small></div><nav>{NAV.map(([id,label])=><button key={id} className={area===id?"active":""} onClick={()=>go(id)}><i>{id==="overview"?"⌂":id==="portfolio"?"▦":id==="performance"?"↗":id==="income"?"₽":id==="analytics"?"⌁":id==="market"?"◉":"◇"}</i><span>{label}</span></button>)}</nav><footer><span>READ ONLY</span><small>Аналитика без торговли</small></footer></aside>
  <main className="qcore-main"><header className="qcore-top"><div><small>ПОРТФЕЛЬ</small><strong>{home.accountName||"QVANIX"}</strong></div><div className="qcore-mode"><button className={density==="compact"?"active":""} onClick={()=>setDensity("compact")}>COMPACT</button><button className={density==="full"?"active":""} onClick={()=>setDensity("full")}>FULL</button></div><button type="button" className={"qcore-live "+(trusted?"ok":"")} onClick={()=>void connection.refresh()} disabled={connection.refreshing} title={connection.reason??"Обновить данные"}><i/> {trusted?"LIVE":connection.state==="loading"?"SYNC":"OFFLINE"}</button></header>
  <section className="qcore-head"><div><small>QVANIX / {active[1].toUpperCase()}</small><h1>{active[1]}</h1></div><div className="qcore-balance"><span>Капитал</span><strong>{trusted?m(home.value):"—"}</strong><b className={(profit??0)>=0?"pos":"neg"}>{trusted?m(profit)+" · "+p(profitPct):"—"}</b></div></section>
@@ -27,22 +27,29 @@ export function CoreWorkspace({home,positions,history,income,connection}:{home:V
   {area!=="overview"&&<Module area={area as Exclude<Area,"overview">} sub={sub} trusted={trusted} positions={positions} history={history} income={income} home={home}/>}
  </section>
  </main>
- <nav className="qcore-mobile">{NAV.slice(0,5).map(([id,label])=><button key={id} className={area===id?"active":""} onClick={()=>go(id)}><i>{id==="overview"?"⌂":id==="portfolio"?"▦":id==="performance"?"↗":id==="income"?"₽":"⌁"}</i><span>{label}</span></button>)}<button className={area==="market"||area==="tools"?"active":""} onClick={()=>go(area==="market"?"tools":"market")}><i>•••</i><span>{area==="market"?"Инстр.":"Рынок"}</span></button></nav>
+ {mobileMore&&<div className="qcore-more" onClick={()=>setMobileMore(false)}><section onClick={e=>e.stopPropagation()}><b>Разделы</b>{NAV.slice(4).map(([id,label])=><button key={id} onClick={()=>go(id)}><i>{id==="analytics"?"⌁":id==="market"?"◉":"◇"}</i><span>{label}</span><small>→</small></button>)}</section></div>}<nav className="qcore-mobile">{NAV.slice(0,4).map(([id,label])=><button key={id} className={area===id?"active":""} onClick={()=>go(id)}><i>{id==="overview"?"⌂":id==="portfolio"?"▦":id==="performance"?"↗":"₽"}</i><span>{label}</span></button>)}<button className={area==="analytics"||area==="market"||area==="tools"?"active":""} onClick={()=>setMobileMore(v=>!v)}><i>•••</i><span>Ещё</span></button></nav>
  </div>}
 function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<Area,"overview">;sub:string;trusted:boolean;positions:PositionSnapshot[];history:HistoryPoint[];income:V3IncomeModel;home:V3HomeViewModel}){
  const gate=!trusted?<section className="qcore-data-gate"><strong>Данные не подтверждены</strong><p>Финансовый модуль закрыт fail-closed до получения полного LIVE-снимка. QVANIX не заменяет отсутствующие данные нулями.</p></section>:null;
  if(area==="portfolio"){
+  if(gate)return gate;
+  if(sub==="Активы")return <CorePortfolioView positions={positions}/>;
   if(sub==="Операции")return <CoreModule title="Операции" note="Исполненные события счёта · сделки · доход · внешние потоки"><Suspense fallback={<Loading/>}><V3OperationsDepth/></Suspense></CoreModule>;
   if(sub==="Цели")return <CoreModule title="Цели" note="Целевой капитал и прогресс"><GoalPanel value={trusted?home.value:null}/></CoreModule>;
-  if(gate)return gate;
   return <CoreModule title={sub} note="Структура портфеля · единая подтверждённая модель"><Suspense fallback={<Loading/>}><V3AssetsDepth positions={positions}/></Suspense></CoreModule>;
  }
  if(area==="income"){
   if(gate)return gate;
+  if(sub==="Обзор")return <CoreIncomeView income={income}/>;
   return <CoreModule title={sub} note="Факт и будущие выплаты разделены"><Suspense fallback={<Loading/>}><V3IncomeDepth positions={positions}/></Suspense></CoreModule>;
  }
- if(area==="performance"||area==="analytics"){
+ if(area==="performance"){
   if(gate)return gate;
+  return <CorePerformanceView home={home} history={history}/>;
+ }
+ if(area==="analytics"){
+  if(gate)return gate;
+  if(sub==="Структура"||sub==="Результат")return <CoreStructureView positions={positions}/>;
   return <CoreModule title={sub} note="TWR-first аналитика · риск · benchmark · структура"><Suspense fallback={<Loading/>}><V3Analysis items={positions} history={history} market={{riskFreeRate:null,riskFreeRateDate:null,nextRateMeeting:null}} trusted={trusted} shell="core" mode="detailed" portfolioValue={home.value??0}/></Suspense></CoreModule>;
  }
  if(area==="market"){
