@@ -29,11 +29,18 @@ export type V3HomeViewModel={
 };
 
 function latestVerifiedTwr(history:HistoryPoint[]){
- for(let i=history.length-1;i>=0;i--){
-  const value=history[i]?.portfolio;
-  if(typeof value==="number"&&Number.isFinite(value))return value;
- }
- return null;
+ const series=history.map(x=>x.portfolio).filter((x):x is number=>typeof x==="number"&&Number.isFinite(x));
+ if(!series.length)return null;
+ const latest=series[series.length-1];
+ // Two historical contracts exist: legacy decimal TWR and the current rebased wealth index.
+ // Decimal history is already a return. Index history is normalized to its first valid level.
+ if(Math.abs(latest)<2&&series.every(x=>Math.abs(x)<2))return latest;
+ if(series.length<2)return null;
+ const base=series[0];
+ if(base<=0||latest<=0)return null;
+ const value=latest/base-1;
+ // Historical reconstruction with missing prices must fail closed rather than publish an extreme result.
+ return Number.isFinite(value)&&value>-0.99&&value<=5?value:null;
 }
 
 export function buildV3HomeViewModel(snapshot:PortfolioSnapshot,isTrusted:boolean):V3HomeViewModel{
