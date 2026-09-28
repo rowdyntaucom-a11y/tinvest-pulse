@@ -1,6 +1,6 @@
 import test from"node:test";import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const cockpit=readFileSync(new URL("../src/core/CoreDecisionCockpit.tsx",import.meta.url),"utf8");const workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
-test("Core Snowball+ cockpit is connected only to trusted live workspace",()=>{assert.match(workspace,/trusted&&density===\"full\"&&<CoreDecisionCockpit/);assert.match(cockpit,/SNOWBALL\+ CONTROL/);assert.match(cockpit,/LIVE · READ ONLY/)});
+test("Core Snowball+ cockpit is connected only to trusted live workspace",()=>{assert.match(workspace,/trusted&&<CoreDecisionCockpit/);assert.match(cockpit,/SNOWBALL\+ CONTROL/);assert.match(cockpit,/LIVE · READ ONLY/)});
 test("scenario planner is explicit and deterministic, not a forecast",()=>{assert.match(cockpit,/СЦЕНАРНЫЙ ПЛАН/);assert.match(cockpit,/не прогноз/);assert.match(cockpit,/constant|постоянное ежемесячное пополнение/i);assert.match(cockpit,/Math\.pow\(1\+growth\/100,1\/12\)-1/)});
 test("planning controls expose contribution, rate and multiple horizons",()=>{assert.match(cockpit,/Пополнение \/ мес\./);assert.match(cockpit,/Сценарная доходность/);for(const h of["1","3","5","10"])assert.ok(cockpit.includes(h))});
 test("cockpit includes concentration and income controls without trade actions",()=>{assert.match(cockpit,/Топ-1/);assert.match(cockpit,/Топ-3/);assert.match(cockpit,/Пассивный доход/);assert.doesNotMatch(cockpit,/купить|продать|order|trade/i)});
