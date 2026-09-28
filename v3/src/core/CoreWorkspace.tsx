@@ -1,4 +1,4 @@
-import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import{CorePortfolioView,CorePerformanceView,CoreIncomeView,CoreStructureView}from"./CoreNativeViews";import{CorePayoutCalendar}from"./CorePayoutCalendar";import"./coreWorkspace.css";
+import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import{CorePortfolioView,CorePerformanceView,CoreIncomeView,CoreStructureView}from"./CoreNativeViews";import{CorePayoutCalendar}from"./CorePayoutCalendar";import{CoreMarketView,CoreRebalanceView}from"./CoreMarketTools";import"./coreWorkspace.css";
 const V3AssetsDepth=lazy(()=>import("../assets/V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
 const V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
 const V3IncomeDepth=lazy(()=>import("../income/V3IncomeDepth").then(m=>({default:m.V3IncomeDepth})));
@@ -53,8 +53,13 @@ function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<A
   return <CoreModule title={sub} note="TWR-first аналитика · риск · benchmark · структура"><Suspense fallback={<Loading/>}><V3Analysis items={positions} history={history} market={{riskFreeRate:null,riskFreeRateDate:null,nextRateMeeting:null}} trusted={trusted} shell="core" mode="detailed" portfolioValue={home.value??0}/></Suspense></CoreModule>;
  }
  if(area==="market"){
-  return <CoreModule title={sub} note="Market Intelligence · публичный рынок × текущий портфель"><Suspense fallback={<Loading/>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense></CoreModule>;
+  if(gate)return gate;
+  if(sub==="Пульс")return <CoreMarketView positions={positions} mode="pulse"/>;
+  if(sub==="Скринер")return <CoreMarketView positions={positions} mode="screener"/>;
+  return <CoreModule title={sub} note="MOEX · исторические и инструментальные исследования"><Suspense fallback={<Loading/>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense></CoreModule>;
  }
+ if(gate)return gate;
+ if(sub==="Ребалансировка")return <CoreRebalanceView positions={positions}/>;
  return <CoreModule title={sub} note="Read-only профессиональные инструменты · QVANIX не торгует"><Suspense fallback={<Loading/>}><V3AnalysisToolbox positions={positions}/></Suspense></CoreModule>;
 }
 function CoreModule({title,note,children}:{title:string;note:string;children:React.ReactNode}){return <article className="qcore-workbench qcore-live-module"><header><div><span>FINANCIAL CORE</span><h2>{title}</h2><small>{note}</small></div><em>CONNECTED</em></header><div className="qcore-embedded">{children}</div></article>}
