@@ -45,10 +45,3 @@ export function V3IncomeForwardPanel({events,loadedAt}:{events:PayoutEvent[];loa
   <small className="v3-income-method">Это календарь только текущих позиций портфеля. Суммы будущих событий показываются до налога и не смешиваются с уже полученным фактом.</small>
  </section>;
 }
-
-export function V3IncomeMarketDiscovery(){
- return <section id="sam-income-market" className="sam-income-market-gate">
-  <header><span>05 · MARKET DISCOVERY</span><h3>Рыночный календарь</h3><p>Дивидендные события всего рынка — отдельный инструмент поиска, не часть расчёта дохода текущего портфеля.</p></header>
-  <div className="sam-income-market-gate__status"><strong>Источник рынка ещё не подключён</strong><small>QVANIX не смешивает календарь текущего портфеля с рыночным discovery и не создаёт события без отдельного проверяемого рыночного источника.</small></div>
- </section>;
-}

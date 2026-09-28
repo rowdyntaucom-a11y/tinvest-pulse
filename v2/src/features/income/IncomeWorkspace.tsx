@@ -23,6 +23,7 @@ import { DataTrustIndicator } from '../shared/DataTrustIndicator'
 import { separateTrustedIncomeData } from './incomeDataTrust'
 
 const IncomeTaxPanel = lazy(() => import('./IncomeTaxPanel'))
+const DividendDiscovery = lazy(() => import('./DividendDiscovery').then(module => ({ default: module.DividendDiscovery })))
 
 const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
 const money2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
@@ -31,7 +32,9 @@ const pct1 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 })
 const number2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 const dateFmt = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' })
 
-type View = 'overview' | 'calendar' | 'sources' | 'taxes'
+type View = 'overview' | 'history' | 'market'
+type OverviewSection = 'summary' | 'calendar'
+type HistorySection = 'sources' | 'taxes'
 
 type Props = {
   passiveIncome: number
@@ -86,6 +89,8 @@ function incomeSourceIdentityNote(state: ReturnType<typeof buildIncomeSourceRows
 
 export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, startDate, positions, onOpenAsset }: Props) {
   const [view, setView] = useState<View>('overview')
+  const [overviewSection, setOverviewSection] = useState<OverviewSection>('summary')
+  const [historySection, setHistorySection] = useState<HistorySection>('sources')
   const [page, setPage] = useState(0)
   const [calendarMonth, setCalendarMonth] = useState<string | null>(null)
   const [badgePayload, setBadgePayload] = useState<InstrumentBadgePayload | null>(null)
@@ -112,13 +117,13 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
   const selectedCalendarMonth = calendarMonth ? calendarMonths.find(month => month.key === calendarMonth) ?? null : null
 
   useEffect(() => {
-    if (view !== 'calendar' || badgePayload) return
+    if (view !== 'overview' || overviewSection !== 'calendar' || badgePayload) return
     let active = true
     loadInstrumentBadges().then(payload => {
       if (active) setBadgePayload(payload)
     })
     return () => { active = false }
-  }, [view, badgePayload])
+  }, [view, overviewSection, badgePayload])
 
   useEffect(() => {
     if (!calendarMonth) return
@@ -198,6 +203,20 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
       <SectionSelector workspace="Доход" value={view} groups={INCOME_SECTIONS} onChange={setView} aside={<DataTrustIndicator trust={payoutTrust} compact />} />
 
       {view === 'overview' && (
+        <nav className="income-local-navigation" aria-label="Доход: обзор">
+          <button type="button" className={overviewSection === 'summary' ? 'is-active' : ''} aria-current={overviewSection === 'summary' ? 'page' : undefined} onClick={() => setOverviewSection('summary')}>Сводка</button>
+          <button type="button" className={overviewSection === 'calendar' ? 'is-active' : ''} aria-current={overviewSection === 'calendar' ? 'page' : undefined} onClick={() => setOverviewSection('calendar')}>Календарь</button>
+        </nav>
+      )}
+
+      {view === 'history' && (
+        <nav className="income-local-navigation" aria-label="Доход: история">
+          <button type="button" className={historySection === 'sources' ? 'is-active' : ''} aria-current={historySection === 'sources' ? 'page' : undefined} onClick={() => setHistorySection('sources')}>Источники</button>
+          <button type="button" className={historySection === 'taxes' ? 'is-active' : ''} aria-current={historySection === 'taxes' ? 'page' : undefined} onClick={() => setHistorySection('taxes')}>Налоги и ИИС</button>
+        </nav>
+      )}
+
+      {view === 'overview' && overviewSection === 'summary' && (
         <div className="income-overview-grid">
           <section className="income-fact panel">
             <div><span className="eyebrow">ФАКТ · ПОЛУЧЕНО</span><h2>ДИВИДЕНДЫ + КУПОНЫ</h2></div>
@@ -231,7 +250,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
         </div>
       )}
 
-      {view === 'calendar' && (
+      {view === 'overview' && overviewSection === 'calendar' && (
         <section className="panel income-calendar-panel">
           <div className="income-panel-head">
             <div><span className="eyebrow">КАЛЕНДАРЬ · 12 МЕСЯЦЕВ</span><h2>ПОДТВЕРЖДЁННЫЕ ВЫПЛАТЫ</h2></div>
@@ -306,7 +325,7 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
         </section>
       )}
 
-      {view === 'sources' && (
+      {view === 'history' && historySection === 'sources' && (
         <section className="panel income-sources-panel">
           <div className="income-panel-head">
             <div><span className="eyebrow">РАЗБИВКА ПО АКТИВАМ</span><h2>ИСТОЧНИКИ ДОХОДА</h2></div>
@@ -362,9 +381,15 @@ export function IncomeWorkspace({ passiveIncome, averageMonthlyPassiveIncome, st
         </section>
       )}
 
-      {view === 'taxes' && (
+      {view === 'history' && historySection === 'taxes' && (
         <Suspense fallback={<section className="panel"><div className="income-empty">Налоговая аналитика загружается…</div></section>}>
           <IncomeTaxPanel calendar={trustedIncome.taxCalendar} />
+        </Suspense>
+      )}
+
+      {view === 'market' && (
+        <Suspense fallback={<section className="panel"><div className="income-empty">Рыночная аналитика загружается…</div></section>}>
+          <DividendDiscovery />
         </Suspense>
       )}
     </div>

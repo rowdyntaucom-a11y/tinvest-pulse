@@ -9,7 +9,8 @@ import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import type{V3Shell}from"../app/model";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
-import{V3IncomeForwardPanel,V3IncomeMarketDiscovery}from"./V3IncomeCalendarV2";
+import{V3IncomeForwardPanel}from"./V3IncomeCalendarV2";
+import{V3DividendDiscovery}from"./V3DividendDiscovery";
 
 type View="calendar"|"history"|"sources";
 const VIEW_OPTIONS=[
@@ -41,8 +42,8 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const historyMax=Math.max(0,...historyMonths.map(month=>month.totalNet));
   const selectedCalendar=selectedMonth?depth?.calendarMonths.find(month=>month.key===selectedMonth)??null:null;
 
-  if(loading)return <section className="v3-income-depth"><div className="v3-income-depth-state">Синхронизируем факт и официальное расписание выплат…</div></section>;
-  if(!calendar||!depth)return <section className="v3-income-depth"><div className="v3-income-depth-state is-warning">Подробный слой выплат сейчас недоступен. Уже подтверждённый пассивный доход выше не заменяется нулём.</div></section>;
+  if(loading)return <section className="v3-income-depth"><div className="v3-income-depth-state">Синхронизируем факт и официальное расписание выплат…</div>{samuraiReference&&<V3DividendDiscovery/>}</section>;
+  if(!calendar||!depth)return <section className="v3-income-depth"><div className="v3-income-depth-state is-warning">Подробный слой выплат сейчас недоступен. Уже подтверждённый пассивный доход выше не заменяется нулём.</div>{samuraiReference&&<V3DividendDiscovery/>}</section>;
 
   const coverage=depth.integrity.coveragePct;
   const scheduleReady=depth.payoutTrust.safeToCalculate;
@@ -118,6 +119,6 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
       <div className="v3-income-coverage"><span>Покрытие расписания</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>{depth.integrity.resolvedAssets}/{depth.integrity.eligibleAssets||"—"} активов · ошибок {depth.integrity.errors}</small></div>
       <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>
     </div>}
-    {samuraiReference&&<V3IncomeMarketDiscovery/>}
+    {samuraiReference&&<V3DividendDiscovery/>}
   </section>
 }

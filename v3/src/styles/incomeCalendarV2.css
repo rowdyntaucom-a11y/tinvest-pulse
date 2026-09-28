@@ -19,15 +19,6 @@
 .v3-income-nearest-row>div:last-child{text-align:right}
 .v3-income-nearest-row>div:last-child strong{font-size:10px;font-variant-numeric:tabular-nums}
 
-.sam-income-market-gate{margin-top:12px;padding:12px;border:1px dashed rgba(201,155,88,.19);border-left:2px solid rgba(201,155,88,.4);background:linear-gradient(145deg,rgba(12,10,7,.74),rgba(3,10,8,.72))}
-.sam-income-market-gate header span{display:block;color:#c99b58;font:750 8px/1 Inter,system-ui,sans-serif;letter-spacing:.12em}
-.sam-income-market-gate header h3{margin:6px 0 0;color:#edf3f0;font:500 19px/1.05 Georgia,serif}
-.sam-income-market-gate header p{margin:6px 0 0;color:#85958f;font:8px/1.45 Inter,system-ui,sans-serif}
-.sam-income-market-gate__status{margin-top:10px;padding:10px;border:1px solid rgba(201,155,88,.1);background:rgba(4,12,10,.62)}
-.sam-income-market-gate__status strong,.sam-income-market-gate__status small{display:block}
-.sam-income-market-gate__status strong{color:#d6ad70;font:700 10px/1.2 Inter,system-ui,sans-serif}
-.sam-income-market-gate__status small{margin-top:5px;color:#75877f;font:7.5px/1.4 Inter,system-ui,sans-serif}
-
 .v3-app[data-shell="samurai"] .v3-income-forward-window button{border-radius:0;background:rgba(3,10,8,.74)}
 .v3-app[data-shell="samurai"] .v3-income-nearest-row{border-radius:0;background:linear-gradient(100deg,rgba(4,13,11,.92),rgba(3,9,8,.68))}
 .v3-app[data-shell="samurai"] .v3-income-nearest-row>div:last-child strong{color:#d9e5e0}

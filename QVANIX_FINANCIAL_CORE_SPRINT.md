@@ -172,3 +172,13 @@ By Monday the question should no longer be “what functions are missing?” but
 - how each shell expresses the same shared capabilities.
 
 The financial core should remain usable even if DNA is never enabled.
+
+## 11. Broad-Market Dividend Discovery v1 — integrated 2026-09-28
+
+- Canonical location: **Income / Доход → Market / Рынок**; no new primary workspace was added.
+- Income top-level information architecture is **Обзор / История / Рынок**. Calendar remains inside Overview; Sources and Taxes/IIS remain inside History, so no prior Income capability was removed.
+- The deterministic server core joins T-Invest Shares and GetAssetFundamentals only by exact `assetUid`, reads the documented `asset_uid`, `market_capitalization` and `dividend_yield_daily_ttm` response fields, uses stable ordering and publishes explicit coverage/missing-yield counts. Discovery uses trailing-twelve-month yield only; it never mixes in `forward_annual_dividend_yield`.
+- Missing, zero and negative dividend yield remain distinct coverage states and never become synthetic values.
+- Upstream errors return an unavailable fail-closed payload; raw upstream errors and broker credentials are not returned or logged.
+- The module remains read-only descriptive analytics without trading actions, a QVANIX score or buy/sell guidance.
+- Living World / DNA was not changed.
