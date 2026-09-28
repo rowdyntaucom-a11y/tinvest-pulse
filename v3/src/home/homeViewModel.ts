@@ -29,15 +29,17 @@ export type V3HomeViewModel={
 };
 
 function latestVerifiedTwr(history:HistoryPoint[]){
- const series=history.map(x=>x.portfolio).filter((x):x is number=>typeof x==="number"&&Number.isFinite(x)&&x>0);
+ const series=history.map(x=>x.portfolio).filter((x):x is number=>typeof x==="number"&&Number.isFinite(x));
+ if(!series.length)return null;
+ const latest=series[series.length-1];
+ // Two historical contracts exist: legacy decimal TWR and the current rebased wealth index.
+ // Decimal history is already a return. Index history is normalized to its first valid level.
+ if(Math.abs(latest)<2&&series.every(x=>Math.abs(x)<2))return latest;
  if(series.length<2)return null;
- const base=series[0],latest=series[series.length-1];
- // History stores a wealth index (normally rebased to 100), not a decimal return.
- // Convert index growth to the canonical decimal return consumed by Core.
+ const base=series[0];
  if(base<=0||latest<=0)return null;
  const value=latest/base-1;
- // A reconstructed series can still be invalid when upstream historical pricing is incomplete.
- // Do not publish spectacular numbers as verified performance.
+ // Historical reconstruction with missing prices must fail closed rather than publish an extreme result.
  return Number.isFinite(value)&&value>-0.99&&value<=5?value:null;
 }
 
