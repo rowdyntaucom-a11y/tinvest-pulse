@@ -1,4 +1,4 @@
-import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import"./coreWorkspace.css";
+import{lazy,Suspense,useMemo,useState}from"react";import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import type{V3HomeViewModel}from"../home/homeViewModel";import type{V3IncomeModel}from"../income/V3Income";import{V3HistorySparkline}from"../home/V3HistorySparkline";import{CoreDecisionCockpit}from"./CoreDecisionCockpit";import{CorePortfolioView,CorePerformanceView,CoreIncomeView,CoreStructureView}from"./CoreNativeViews";import"./coreWorkspace.css";
 const V3AssetsDepth=lazy(()=>import("../assets/V3AssetsDepth").then(m=>({default:m.V3AssetsDepth})));
 const V3OperationsDepth=lazy(()=>import("../operations/V3OperationsDepth").then(m=>({default:m.V3OperationsDepth})));
 const V3IncomeDepth=lazy(()=>import("../income/V3IncomeDepth").then(m=>({default:m.V3IncomeDepth})));
@@ -32,17 +32,24 @@ export function CoreWorkspace({home,positions,history,income,connection}:{home:V
 function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<Area,"overview">;sub:string;trusted:boolean;positions:PositionSnapshot[];history:HistoryPoint[];income:V3IncomeModel;home:V3HomeViewModel}){
  const gate=!trusted?<section className="qcore-data-gate"><strong>Данные не подтверждены</strong><p>Финансовый модуль закрыт fail-closed до получения полного LIVE-снимка. QVANIX не заменяет отсутствующие данные нулями.</p></section>:null;
  if(area==="portfolio"){
+  if(gate)return gate;
+  if(sub==="Активы")return <CorePortfolioView positions={positions}/>;
   if(sub==="Операции")return <CoreModule title="Операции" note="Исполненные события счёта · сделки · доход · внешние потоки"><Suspense fallback={<Loading/>}><V3OperationsDepth/></Suspense></CoreModule>;
   if(sub==="Цели")return <CoreModule title="Цели" note="Целевой капитал и прогресс"><GoalPanel value={trusted?home.value:null}/></CoreModule>;
-  if(gate)return gate;
   return <CoreModule title={sub} note="Структура портфеля · единая подтверждённая модель"><Suspense fallback={<Loading/>}><V3AssetsDepth positions={positions}/></Suspense></CoreModule>;
  }
  if(area==="income"){
   if(gate)return gate;
+  if(sub==="Обзор")return <CoreIncomeView income={income}/>;
   return <CoreModule title={sub} note="Факт и будущие выплаты разделены"><Suspense fallback={<Loading/>}><V3IncomeDepth positions={positions}/></Suspense></CoreModule>;
  }
- if(area==="performance"||area==="analytics"){
+ if(area==="performance"){
   if(gate)return gate;
+  return <CorePerformanceView home={home} history={history}/>;
+ }
+ if(area==="analytics"){
+  if(gate)return gate;
+  if(sub==="Структура"||sub==="Результат")return <CoreStructureView positions={positions}/>;
   return <CoreModule title={sub} note="TWR-first аналитика · риск · benchmark · структура"><Suspense fallback={<Loading/>}><V3Analysis items={positions} history={history} market={{riskFreeRate:null,riskFreeRateDate:null,nextRateMeeting:null}} trusted={trusted} shell="core" mode="detailed" portfolioValue={home.value??0}/></Suspense></CoreModule>;
  }
  if(area==="market"){
