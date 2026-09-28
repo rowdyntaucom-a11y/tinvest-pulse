@@ -5,15 +5,13 @@ import"../styles/proTools.css";
 
 const V3RebalanceWorkspace=lazy(()=>import("./V3RebalanceWorkspace").then(m=>({default:m.V3RebalanceWorkspace})));
 const V3PortfolioLab=lazy(()=>import("./V3PortfolioLab").then(m=>({default:m.V3PortfolioLab})));
-const V3FallenAssetsDiscovery=lazy(()=>import("./V3FallenAssetsDiscovery").then(m=>({default:m.V3FallenAssetsDiscovery})));
-const V3MarketScreener=lazy(()=>import("./V3MarketScreener").then(m=>({default:m.V3MarketScreener})));
+const V3MarketIntelligenceWorkspace=lazy(()=>import("./V3MarketIntelligenceWorkspace").then(m=>({default:m.V3MarketIntelligenceWorkspace})));
 
-type ToolId="rebalance"|"lab"|"discovery"|"screener"|"futures";
+type ToolId="rebalance"|"lab"|"market"|"futures";
 const TOOLS:Array<{id:ToolId;label:string;note:string}>=[
  {id:"rebalance",label:"Ребаланс",note:"цель · drift · сценарий"},
  {id:"lab",label:"Лаборатория",note:"история стратегий"},
- {id:"discovery",label:"Просадки",note:"high · low · SMA"},
- {id:"screener",label:"Скринер",note:"MOEX · TQBR"},
+ {id:"market",label:"Рынок",note:"pulse · screener · history"},
  {id:"futures",label:"Фьючерсы",note:"WHAT IF · basis · ГО"},
 ];
 
@@ -25,8 +23,7 @@ export function V3AnalysisToolbox({positions}:{positions:PositionSnapshot[]}){
   <div className="v3-pro-tools__stage">
    {tool==="rebalance"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем ребалансировку…</div>}><V3RebalanceWorkspace positions={positions}/></Suspense>}
    {tool==="lab"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем лабораторию…</div>}><V3PortfolioLab positions={positions}/></Suspense>}
-   {tool==="discovery"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем технический discovery…</div>}><V3FallenAssetsDiscovery/></Suspense>}
-   {tool==="screener"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем рыночный скринер…</div>}><V3MarketScreener/></Suspense>}
+   {tool==="market"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем Market Intelligence…</div>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense>}
    {tool==="futures"&&<V3FuturesScenario/>}
   </div>
  </section>;
