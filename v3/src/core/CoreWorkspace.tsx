@@ -48,7 +48,7 @@ function Module({area,sub,trusted,positions,history,income,home}:{area:Exclude<A
  if(area==="market"){
   return <CoreModule title={sub} note="Market Intelligence · публичный рынок × текущий портфель"><Suspense fallback={<Loading/>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense></CoreModule>;
  }
- return <CoreModule title={sub} note="Read-only профессиональные инструменты"><Suspense fallback={<Loading/>}><V3AnalysisToolbox positions={positions}/></Suspense></CoreModule>;
+ return <CoreModule title={sub} note="Read-only профессиональные инструменты · QVANIX не торгует"><Suspense fallback={<Loading/>}><V3AnalysisToolbox positions={positions}/></Suspense></CoreModule>;
 }
 function CoreModule({title,note,children}:{title:string;note:string;children:React.ReactNode}){return <article className="qcore-workbench qcore-live-module"><header><div><span>FINANCIAL CORE</span><h2>{title}</h2><small>{note}</small></div><em>CONNECTED</em></header><div className="qcore-embedded">{children}</div></article>}
 function Loading(){return <div className="qcore-loading">Открываем финансовый модуль…</div>}
