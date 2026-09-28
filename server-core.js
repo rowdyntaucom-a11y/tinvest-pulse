@@ -1657,6 +1657,9 @@ require('./bond-analytics')(app, {
   buildDashboard
 });
 
+// Broad-market dividend discovery: read-only T-Invest instrument/fundamentals data.
+require('./dividend-discovery').registerDividendDiscovery(app, { tbankRequest });
+
 app.get('/api/dashboard', async (req, res) => {
   try {
     const data = await buildDashboard();

@@ -10,6 +10,8 @@ assert.equal(sectionLabel(RISK_SECTIONS, 'tail'), 'Редкие потери')
 assert.equal(sectionLabel(RISK_SECTIONS, 'corr'), 'Связи активов')
 assert.deepEqual(RISK_SECTIONS.flatMap(group => group.options.map(option => option.id)), ['portfolio', 'benchmark', 'rolling', 'stress', 'tail', 'corr'])
 assert.deepEqual(RISK_SECTIONS.flatMap(group => group.options.map(option => option.label)), ['Портфель','Сравнение с IMOEX','История риска','Стресс-тесты','Редкие потери','Связи активов'])
+assert.deepEqual(INCOME_SECTIONS.flatMap(group => group.options.map(option => option.id)), ['overview', 'history', 'market'])
+assert.deepEqual(INCOME_SECTIONS.flatMap(group => group.options.map(option => option.label)), ['Обзор', 'История', 'Рынок'])
 for (const groups of [ANALYTICS_SECTIONS, RISK_SECTIONS, PORTFOLIO_SECTIONS, INCOME_SECTIONS]) {
   for (const option of groups.flatMap(group => group.options)) assert.doesNotMatch(option.label, /Сцен\.|Хвост$/i)
 }
@@ -48,6 +50,10 @@ assert.match(iaCss, /\.subnav\{[^}]*overflow-x:auto/s)
 assert.match(iaCss, /\.subnav button\{[^}]*min-height:44px/s)
 for(const file of ['portfolio/portfolio.css','portfolio/positionInspector.css','portfolio/bondAnalytics.css']) { const source=readFileSync(new URL(`../src/features/${file}`, import.meta.url),'utf8'); assert.ok(source.includes('min-height:44px'), `${file} must retain 44px mobile controls`) }
 for(const file of ['income/incomeCompact.css','income/incomeRealizedHistory.css','income/incomeTax.css']) { const source=readFileSync(new URL(`../src/features/${file}`, import.meta.url),'utf8'); assert.ok(source.includes('min-height:44px'), `${file} must retain 44px mobile controls`) }
+const incomeWorkspaceSource=readFileSync(new URL('../src/features/income/IncomeWorkspace.tsx', import.meta.url),'utf8')
+const incomeCss=readFileSync(new URL('../src/features/income/income.css', import.meta.url),'utf8')
+for (const capability of ['Сводка', 'Календарь', 'Источники', 'Налоги и ИИС', '<DividendDiscovery />']) assert.ok(incomeWorkspaceSource.includes(capability), `Income capability must remain mounted: ${capability}`)
+assert.match(incomeCss, /\.income-local-navigation button \{ min-height: 44px/)
 const goalCss=readFileSync(new URL('../src/features/goals/goalWorkspace.css', import.meta.url),'utf8'); assert.match(goalCss, /\.goal-chart__years button \{ min-width:44px; min-height:44px/)
 const assetCss=readFileSync(new URL('../src/features/asset/assetWorkspace.css', import.meta.url),'utf8'); assert.match(assetCss, /\.asset-back,\.asset-nav button,\.asset-dual button,\.asset-unavailable button\{min-height:44px\}/)
 const boardCss=readFileSync(new URL('../src/features/board/qvanixBoard.css',import.meta.url),'utf8')
