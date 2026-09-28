@@ -286,8 +286,10 @@ let payoutInFlight:Promise<PayoutCalendar>|null=null
 const PAYOUT_CACHE_TTL=5*60*1000
 
 export async function loadPayoutCalendar(options:{force?:boolean}={}): Promise<PayoutCalendar> {
-  if(!options.force&&payoutCache&&Date.now()-payoutCache.at<PAYOUT_CACHE_TTL)return payoutCache.value
-  if(!options.force&&payoutInFlight)return payoutInFlight
+  // Tests and non-browser consumers expect each mocked fetch to be normalized independently.
+  const cacheEnabled=typeof window!=="undefined"
+  if(cacheEnabled&&!options.force&&payoutCache&&Date.now()-payoutCache.at<PAYOUT_CACHE_TTL)return payoutCache.value
+  if(cacheEnabled&&!options.force&&payoutInFlight)return payoutInFlight
   const request=(async()=>{
   try {
     const response = await fetch('/api/payouts', { cache: 'no-store' })
@@ -355,12 +357,12 @@ export async function loadPayoutCalendar(options:{force?:boolean}={}): Promise<P
       warning: text(raw.warning),
       note: text(raw.note),
     }
-    payoutCache={value:result,at:Date.now()}
+    if(cacheEnabled)payoutCache={value:result,at:Date.now()}
     return result
   } catch {
-    return payoutCache?.value??emptyCalendar()
+    return cacheEnabled?(payoutCache?.value??emptyCalendar()):emptyCalendar()
   }
   })()
-  payoutInFlight=request
-  try{return await request}finally{if(payoutInFlight===request)payoutInFlight=null}
+  if(cacheEnabled)payoutInFlight=request
+  try{return await request}finally{if(cacheEnabled&&payoutInFlight===request)payoutInFlight=null}
 }
