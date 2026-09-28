@@ -38,3 +38,15 @@
 .qcore-mobile button{border-radius:14px!important;padding:6px 2px!important}.qcore-mobile button.active{background:#13211f!important}.qcore-mobile button i{font-size:16px!important}.qcore-mobile button span{font-size:8px!important;margin-top:2px}.qcore-mobile button.active i,.qcore-mobile button.active span{color:var(--qc-accent)!important}
 .qcore-more{background:#0009!important;backdrop-filter:blur(8px)}.qcore-more>section{margin:0 10px 8px;width:calc(100% - 20px)!important;border-radius:22px!important;padding:18px 16px calc(84px + env(safe-area-inset-bottom))!important;background:#0c131b!important}.qcore-more>section>b{font-size:18px!important}.qcore-more button{min-height:64px!important}
 }
+
+/* Unified workspace — one adaptive product, no Compact/Full fork */
+.qcore-mode{display:none!important}
+@media(max-width:640px){
+.qcore-head{padding-top:12px!important}.qcore-head h1{font-size:26px!important}
+.qcore-sub-mobile{position:sticky;top:66px;z-index:12;background:#080b10e8;backdrop-filter:blur(14px)}
+.qcore-kpis article:first-child{grid-column:auto!important}.qcore-kpis{grid-template-columns:1fr 1fr!important}.qcore-kpis strong{font-size:20px!important}
+.qcore-grid{display:grid!important}.qcore-chart{order:1}.qcore-focus{order:2}.qcore-holdings{margin-top:10px!important}
+.qcore-chart .v3-history-chart{height:190px!important;min-height:190px!important}
+.qcore-focus{grid-template-columns:1fr 1fr!important}.qcore-focus button{min-height:72px!important}
+.qcore-stage>.qnative,.qcore-stage>.qincome,.qcore-stage>.qanalytics,.qcore-stage>.qcore-workbench{border:0!important;border-radius:16px!important;background:linear-gradient(145deg,#101720,#0b1118)!important}
+}
