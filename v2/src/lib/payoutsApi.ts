@@ -285,14 +285,22 @@ let payoutCache:{value:PayoutCalendar;at:number}|null=null
 let payoutInFlight:Promise<PayoutCalendar>|null=null
 const PAYOUT_CACHE_TTL=5*60*1000
 
-export async function loadPayoutCalendar(options:{force?:boolean}={}): Promise<PayoutCalendar> {
+export async function loadPayoutCalendar(options:{force?:boolean;timeoutMs?:number}={}): Promise<PayoutCalendar> {
   // Tests and non-browser consumers expect each mocked fetch to be normalized independently.
   const cacheEnabled=typeof window!=="undefined"
   if(cacheEnabled&&!options.force&&payoutCache&&Date.now()-payoutCache.at<PAYOUT_CACHE_TTL)return payoutCache.value
   if(cacheEnabled&&!options.force&&payoutInFlight)return payoutInFlight
   const request=(async()=>{
   try {
-    const response = await fetch('/api/payouts', { cache: 'no-store' })
+    const controller=new AbortController()
+    const timeoutMs=Math.max(1000,options.timeoutMs??8000)
+    const timer=typeof window!=="undefined"?window.setTimeout(()=>controller.abort(),timeoutMs):setTimeout(()=>controller.abort(),timeoutMs)
+    let response:Response
+    try{
+      response = await fetch('/api/payouts', { cache: 'no-store', signal:controller.signal })
+    }finally{
+      clearTimeout(timer)
+    }
     if (!response.ok) return emptyCalendar()
     const raw = await response.json() as Record<string, any>
     const actual = raw.actual ?? {}
