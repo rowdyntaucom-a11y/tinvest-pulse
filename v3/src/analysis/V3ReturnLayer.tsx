@@ -24,15 +24,18 @@ export function V3ReturnLayer({portfolio,rolling,riskFreeRate,riskFreeRateDate}:
       </div>
       <div className="v3-analysis-sample"><span>Выборка</span><strong>{portfolio.sampleFrom&&portfolio.sampleTo?dateFmt.format(new Date(portfolio.sampleFrom+"T00:00:00Z"))+" → "+dateFmt.format(new Date(portfolio.sampleTo+"T00:00:00Z")):"Недостаточно истории"}</strong><small>{riskFreeRateDate?"Ставка на "+riskFreeRateDate:"Дата безрисковой ставки недоступна"} · дубликатов схлопнуто {portfolio.duplicateRowsCollapsed}</small></div>
     </>}
-    <section className="v3-rolling-card">
-      <div className="v3-analysis-layer-head is-small"><div><span>Rolling</span><h3>Последнее полное стандартное окно <V3MetricHelp topic="rollingRisk"/></h3></div><b>{active?active.tradingDays+"D":"—"}</b></div>
-      {active?<><div className="v3-analysis-metric-grid is-rolling">
-        <article><span>Доходность</span><strong className={signedClass(active.portfolioReturn)}>{pct(active.portfolioReturn)}</strong></article>
-        <article><span>Волатильность</span><strong>{pct(active.volatility)}</strong></article>
-        <article><span>MaxDD</span><strong className={active.maxDrawdown!=null&&active.maxDrawdown>0?"is-negative":"is-neutral"}>{active.maxDrawdown==null?"—":"-"+p.format(active.maxDrawdown*100)+"%"}</strong></article>
-        <article><span>Худший день</span><strong className={signedClass(active.worstDay)}>{pct(active.worstDay)}</strong></article>
-      </div><div className="v3-rolling-windows" aria-label="Доступные rolling окна">{rolling.windows.map(window=><span key={window.tradingDays} className={window.available?"is-ready":""}>{window.tradingDays}D {window.available?"✓":"·"}</span>)}</div></>:<div className="v3-analysis-gate">{rolling.note}</div>}
-      <small className="v3-analysis-method-note">{rolling.note} Rolling не растягивает короткую историю до года.</small>
-    </section>
+    <details className="v3-analysis-disclosure">
+      <summary><span><b>Rolling-окно</b><small>{active?active.tradingDays+"D · доходность, волатильность и MaxDD":"Недостаточно полной выборки"}</small></span><i aria-hidden="true">⌄</i></summary>
+      <section className="v3-rolling-card">
+       <div className="v3-analysis-layer-head is-small"><div><span>Rolling</span><h3>Последнее полное стандартное окно <V3MetricHelp topic="rollingRisk"/></h3></div><b>{active?active.tradingDays+"D":"—"}</b></div>
+       {active?<><div className="v3-analysis-metric-grid is-rolling">
+         <article><span>Доходность</span><strong className={signedClass(active.portfolioReturn)}>{pct(active.portfolioReturn)}</strong></article>
+         <article><span>Волатильность</span><strong>{pct(active.volatility)}</strong></article>
+         <article><span>MaxDD</span><strong className={active.maxDrawdown!=null&&active.maxDrawdown>0?"is-negative":"is-neutral"}>{active.maxDrawdown==null?"—":"-"+p.format(active.maxDrawdown*100)+"%"}</strong></article>
+         <article><span>Худший день</span><strong className={signedClass(active.worstDay)}>{pct(active.worstDay)}</strong></article>
+       </div><div className="v3-rolling-windows" aria-label="Доступные rolling окна">{rolling.windows.map(window=><span key={window.tradingDays} className={window.available?"is-ready":""}>{window.tradingDays}D {window.available?"✓":"·"}</span>)}</div></>:<div className="v3-analysis-gate">{rolling.note}</div>}
+       <small className="v3-analysis-method-note">{rolling.note} Rolling не растягивает короткую историю до года.</small>
+      </section>
+    </details>
   </section>
 }

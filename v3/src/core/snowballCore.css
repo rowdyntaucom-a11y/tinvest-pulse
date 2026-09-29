@@ -145,3 +145,17 @@
  .sb-no-data b{font-size:10.5px}.sb-no-data span{font-size:9px}
  .sb-no-data button{grid-column:1/-1;width:100%;min-height:40px;font-size:9px}
 }
+
+/* v33 mobile information hierarchy */
+.sb-analytics-context{display:grid;gap:3px;margin:0 0 7px;padding:10px 11px;border:1px solid var(--s-line);border-radius:11px;background:#fff}
+.sb-analytics-context>span{color:var(--s-blue);font-size:7.5px;font-weight:800;letter-spacing:.08em}
+.sb-analytics-context>b{font-size:11px;line-height:1.25}
+.sb-analytics-context>small{color:var(--s-muted);font-size:8px;line-height:1.35}
+.sb-workspace-tabs{position:sticky;z-index:22;top:52px}
+@media(max-width:520px){
+ .sb-workspace-tabs button{min-height:38px;font-size:9px}
+ .sb-analytics-context{padding:11px 12px}
+ .sb-analytics-context>span{font-size:8px}.sb-analytics-context>b{font-size:11.5px}.sb-analytics-context>small{font-size:9px}
+ .sb-analytics .sb-switch{position:sticky;z-index:18;top:95px;background:var(--s-bg);padding:4px 0}
+ .sb-analytics .sb-switch button{min-height:36px;font-size:9px}
+}

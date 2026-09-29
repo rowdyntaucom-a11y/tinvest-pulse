@@ -24,7 +24,7 @@ test("deep analytics receives verified market context from the trusted snapshot"
 
 test("analytics depth is lazy and prefetched only after trusted first paint",()=>{
  assert.match(ui,/CoreAnalyticsDepth=lazy/);
- assert.match(ui,/\[\"depth\",\"Глубина\"\]/);
+ assert.match(ui,/\[\"depth\",\"Профи\"\]/);
  assert.match(root,/import\(\"\.\/CoreAnalyticsDepth\"\)/);
  assert.match(root,/if\(!trusted\)return/);
 });
