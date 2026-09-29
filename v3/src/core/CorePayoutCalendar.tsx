@@ -2,10 +2,42 @@ import{useEffect,useMemo,useRef,useState}from"react";import{loadPayoutCalendar,t
 const money=(v:number|null|undefined)=>typeof v==="number"&&Number.isFinite(v)?new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0}).format(v)+" ₽":"—";
 const monthFmt=new Intl.DateTimeFormat("ru-RU",{month:"short",year:"numeric",timeZone:"UTC"}),dayFmt=new Intl.DateTimeFormat("ru-RU",{day:"2-digit",month:"short",timeZone:"UTC"});
 const monthLabel=(k:string)=>monthFmt.format(new Date(k+"-01T00:00:00Z"));const kind=(e:PayoutEvent)=>String(e.kind).toUpperCase()==="COUPON"?"Купон":"Дивиденд";
-export function CorePayoutCalendar(){const[data,setData]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[selected,setSelected]=useState<string|null>(null),[attempt,setAttempt]=useState(0),[timedOut,setTimedOut]=useState(false),retryRef=useRef(0);useEffect(()=>{let on=true;setLoading(true);setTimedOut(false);const timer=window.setTimeout(()=>{if(on){setTimedOut(true);setLoading(false)}},9000);loadPayoutCalendar({force:attempt>0,timeoutMs:8000}).then(x=>{if(on){clearTimeout(timer);setData(x);retryRef.current=0;setSelected(x.months.find(m=>m.count>0)?.key??null);setLoading(false)}else if(on&&retryRef.current<5){const delay=[3000,7000,15000,30000,60000][retryRef.current++];window.setTimeout(()=>on&&setAttempt(v=>v+1),delay)}}).catch(()=>{if(on&&retryRef.current<5){const delay=[3000,7000,15000,30000,60000][retryRef.current++];window.setTimeout(()=>on&&setAttempt(v=>v+1),delay)}else if(on)setLoading(false)});return()=>{on=false;clearTimeout(timer)}},[attempt]);
+const RETRY_DELAYS=[2500,6000,12000] as const;
+export function CorePayoutCalendar(){
+ const[data,setData]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[selected,setSelected]=useState<string|null>(null),[attempt,setAttempt]=useState(0),[timedOut,setTimedOut]=useState(false),retryRef=useRef(0),retryTimer=useRef<number|null>(null);
+ useEffect(()=>{
+  let on=true;
+  if(retryTimer.current!=null){window.clearTimeout(retryTimer.current);retryTimer.current=null}
+  setLoading(true);setTimedOut(false);
+  const uiTimer=window.setTimeout(()=>{if(on){setTimedOut(true);setLoading(false)}},9000);
+  void loadPayoutCalendar({force:attempt>0,timeoutMs:8000}).then(x=>{
+   if(!on)return;
+   window.clearTimeout(uiTimer);
+   if(x.available){
+    setData(x);retryRef.current=0;setSelected(current=>current??x.months.find(m=>m.count>0)?.key??null);setLoading(false);setTimedOut(false);return;
+   }
+   setData(x);setLoading(false);
+   if(retryRef.current<RETRY_DELAYS.length){
+    const delay=RETRY_DELAYS[retryRef.current++];
+    retryTimer.current=window.setTimeout(()=>on&&setAttempt(v=>v+1),delay);
+   }
+  }).catch(()=>{
+   if(!on)return;
+   window.clearTimeout(uiTimer);setLoading(false);
+   if(retryRef.current<RETRY_DELAYS.length){
+    const delay=RETRY_DELAYS[retryRef.current++];
+    retryTimer.current=window.setTimeout(()=>on&&setAttempt(v=>v+1),delay);
+   }
+  });
+  return()=>{on=false;window.clearTimeout(uiTimer);if(retryTimer.current!=null){window.clearTimeout(retryTimer.current);retryTimer.current=null}};
+ },[attempt]);
+ const manualRetry=()=>{retryRef.current=0;setAttempt(x=>x+1)};
  const months=useMemo(()=>data?.months.filter(m=>m.count>0)??[],[data]),active=months.find(m=>m.key===selected)??months[0],events=(active?.items??[]).filter(e=>e.status!=="FACT").sort((a,b)=>a.date.localeCompare(b.date));
- if(loading)return <section className="qpay qpay-state"><div className="qpay-state-head"><b>Календарь выплат</b><span>Проверяем расписание</span></div><div className="qpay-skeleton"><i/><i/><i/><i/></div><p>Подтверждаем будущие купоны и дивиденды. Уже полученные выплаты остаются отдельным фактом.</p></section>;if(timedOut&&!data)return <section className="qpay qpay-state"><b>Источник отвечает слишком долго</b><p>Core остановил бесконечную загрузку. Неподтверждённые суммы не показываются.</p><button onClick={()=>setAttempt(x=>x+1)}>Повторить</button></section>;if(!data?.available)return <section className="qpay"><header><div><span>CASH FLOW</span><h2>Календарь выплат</h2></div></header><p>Подтверждённое расписание сейчас недоступно. Значения не подменяются оценкой.</p><button className="qpay-retry" onClick={()=>setAttempt(x=>x+1)}>Повторить запрос</button></section>;
+ if(loading)return <section className="qpay qpay-state"><div className="qpay-state-head"><b>Календарь выплат</b><span>{attempt?"Повторная проверка":"Проверяем расписание"}</span></div><div className="qpay-skeleton"><i/><i/><i/><i/></div><p>Подтверждаем будущие купоны и дивиденды. Уже полученные выплаты остаются отдельным фактом.</p></section>;
+ if(timedOut&&!data)return <section className="qpay qpay-state"><b>Источник отвечает слишком долго</b><p>Core остановил загрузку. Неподтверждённые суммы не показываются.</p><button onClick={manualRetry}>Повторить</button></section>;
+ if(!data?.available)return <section className="qpay qpay-state"><div className="qpay-state-head"><b>Календарь пока недоступен</b><span>{retryRef.current<RETRY_DELAYS.length?"Повторяем автоматически":"Нужен ручной повтор"}</span></div><p>Подтверждённое расписание сейчас недоступно. Значения не подменяются оценкой.</p><button className="qpay-retry" onClick={manualRetry}>Повторить сейчас</button></section>;
  return <section className="qpay"><header><div><span>12M CASH FLOW</span><h2>Календарь выплат</h2><small>Будущие купоны и дивиденды · отдельно от фактически полученного дохода</small></div><div><b>{money(data.forecast.gross)}</b><small>{data.forecast.count} событий</small></div></header>
  <div className="qpay-ledger"><article><span>FACT · NET</span><strong>{money(data.actual.totalNet)}</strong><small>уже получено</small></article><i>≠</i><article><span>FUTURE · GROSS</span><strong>{money(data.forecast.gross)}</strong><small>{data.forecast.count} событий</small></article><article><span>Покрытие</span><strong>{Math.round(data.coverage.coverageRatio*100)}%</strong><small>известного расписания</small></article></div><div className="qpay-strip"><span>Ближайшие месяцы</span><b>{months.length} с выплатами</b></div><div className="qpay-months">{months.map(m=><button key={m.key} className={active?.key===m.key?"active":""} onClick={()=>setSelected(m.key)}><span>{monthLabel(m.key)}</span><strong>{money(m.gross)}</strong><small>{m.count} выплат</small></button>)}</div>
  {active&&<><div className="qpay-summary"><div><span>{monthLabel(active.key)}</span><strong>{money(active.gross)}</strong></div><div><span>Событий</span><strong>{active.count}</strong></div><div><span>Покрытие</span><strong>{Math.round(data.coverage.coverageRatio*100)}%</strong></div></div><div className="qpay-events">{events.slice(0,12).map((e,i)=><article key={(e.scheduleId||e.figi||e.ticker)+e.date+i}><time>{dayFmt.format(new Date(e.date))}</time><div><b>{e.ticker}</b><span>{e.name}</span></div><em>{kind(e)}</em><strong>{money(e.gross)}</strong></article>)}{events.length===0&&<p>В этом месяце нет подтверждённых будущих выплат.</p>}</div>{events.length>12&&<p className="qpay-more">Ещё {events.length-12} событий скрыты — месячная сводка остаётся компактной.</p>}</>}
- <footer><span>FACT</span> не смешивается с расписанием. Будущие суммы — gross и не являются гарантией выплаты.{data.stale?" Источник помечен как устаревший.":""}</footer></section>}
+ <footer><span>FACT</span> не смешивается с расписанием. Будущие суммы — gross и не являются гарантией выплаты.{data.stale?" Источник помечен как устаревший.":""}</footer></section>
+}
