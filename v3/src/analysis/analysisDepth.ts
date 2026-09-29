@@ -3,6 +3,7 @@ import{calculatePortfolioAnalytics,type PortfolioAnalytics}from"../../../v2/src/
 import{calculateRelativePerformance,type RelativePerformance}from"../../../v2/src/features/analytics/relativePerformance";
 import{calculateRollingRisk,type RollingRiskResult}from"../../../v2/src/features/analytics/rollingRisk";
 import{calculateTailRisk,type TailRiskResult}from"../../../v2/src/features/analytics/tailRisk";
+import{normalizePortfolioAnalyticsHistory}from"./normalizeAnalyticsHistory";
 
 export type V3AnalysisDepth={
   portfolio:PortfolioAnalytics;
@@ -11,11 +12,11 @@ export type V3AnalysisDepth={
   tail:TailRiskResult;
 };
 
-const analyticsHistory=(history:HistoryPoint[])=>history.map(point=>({
+const analyticsHistory=(history:HistoryPoint[])=>normalizePortfolioAnalyticsHistory(history.map(point=>({
   date:point.date,
   portfolio:point.portfolio,
   imoex:point.imoex,
-}));
+})));
 
 const analyticsPositions=(items:PositionSnapshot[])=>items.map(item=>({
   ticker:item.ticker,

@@ -24,15 +24,17 @@ function changeClass(value:number|null){
 function changeText(value:number|null){return value==null?"—":pct.format(value)+"%"}
 function listingText(value:number|null){return value==null?"—":"L"+value}
 
-export function V3MarketScreener(){
- const[data,setData]=useState<MarketScreenerPayload|null>(null),[loading,setLoading]=useState(true);
+export function V3MarketScreener({sharedData,sharedLoading=false,onRetry}:{sharedData?:MarketScreenerPayload|null;sharedLoading?:boolean;onRetry?:()=>void}={}){
+ const[localData,setLocalData]=useState<MarketScreenerPayload|null>(null),[localLoading,setLocalLoading]=useState(true);
+ const controlled=sharedData!==undefined,data=controlled?sharedData:localData,loading=controlled?sharedLoading:localLoading;
  const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"});
  useEffect(()=>{
+  if(controlled)return;
   const controller=new AbortController();
-  setLoading(true);
-  void loadMarketScreener(controller.signal).then(setData).finally(()=>{if(!controller.signal.aborted)setLoading(false)});
+  setLocalLoading(true);
+  void loadMarketScreener(controller.signal).then(setLocalData).finally(()=>{if(!controller.signal.aborted)setLocalLoading(false)});
   return()=>controller.abort();
- },[]);
+ },[controlled]);
  const rows=useMemo(()=>filterMarketScreener(data?.rows??[],filters),[data,filters]);
  const visible=rows.slice(0,60);
 
@@ -54,7 +56,7 @@ export function V3MarketScreener(){
    <span>Сортировка</span><div>{SORT.map(([value,label])=><button type="button" key={value} className={filters.sort===value?"is-active":""} onClick={()=>setFilters(v=>({...v,sort:value}))}>{label}</button>)}</div>
   </div>
 
-  {loading?<div className="sam-screener__gate">Получаем публичный рыночный срез MOEX…</div>:!data?.available?<div className="sam-screener__gate is-warning"><strong>Скринер временно недоступен</strong><small>{data?.reason??"Источник не подтвердил рыночные строки."}</small></div>:<>
+  {loading?<div className="sam-screener__gate">Получаем публичный рыночный срез MOEX…</div>:!data?.available?<div className="sam-screener__gate is-warning"><strong>Скринер временно недоступен</strong><small>{data?.reason??"Источник не подтвердил рыночные строки."}</small>{onRetry&&<button type="button" onClick={onRetry}>Повторить сейчас</button>}</div>:<>
    <div className="sam-screener__meta"><span>{data.source??"MOEX ISS"} · {data.board??"TQBR"}</span><strong>{rows.length} из {data.rows.length}</strong><small>{data.fetchedAt?"обновлено "+new Date(data.fetchedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):""}</small></div>
    <div className="sam-screener__rows" role="table" aria-label="Результаты скринера">
     <div className="sam-screener__row is-head" role="row"><span>Бумага</span><span>Цена</span><span>День</span><span>Оборот</span><span>Сделки</span></div>

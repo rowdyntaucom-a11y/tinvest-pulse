@@ -12,11 +12,12 @@ import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{V3IncomeForwardPanel}from"./V3IncomeCalendarV2";
 import{V3DividendDiscovery}from"./V3DividendDiscovery";
 
-type View="calendar"|"history"|"sources";
+type View="calendar"|"history"|"sources"|"market";
 const VIEW_OPTIONS=[
   {value:"calendar",label:"Календарь",description:"Подтверждённое 12-месячное расписание будущих выплат."},
   {value:"history",label:"Факт",description:"Реально полученный пассивный доход по полностью наблюдавшимся месяцам."},
   {value:"sources",label:"Источники",description:"Факт и расписание по активам с точной FIGI-связью и покрытием."},
+  {value:"market",label:"Рынок",description:"Отдельный TTM dividend discovery рынка, не доход текущего портфеля."},
 ] as const;
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const rub2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -42,7 +43,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const historyMax=Math.max(0,...historyMonths.map(month=>month.totalNet));
   const selectedCalendar=selectedMonth?depth?.calendarMonths.find(month=>month.key===selectedMonth)??null:null;
 
-  if(loading)return <section className="v3-income-depth"><div className="v3-income-depth-state">Синхронизируем факт и официальное расписание выплат…</div>{samuraiReference&&<V3DividendDiscovery/>}</section>;
+  if(loading)return <section className="v3-income-depth"><div className="v3-income-depth-state">Синхронизируем факт и официальное расписание выплат…</div>{(samuraiReference||view==="market")&&<V3DividendDiscovery/>}</section>;
   if(!calendar||!depth)return <section className="v3-income-depth"><div className="v3-income-depth-state is-warning">Подробный слой выплат сейчас недоступен. Уже подтверждённый пассивный доход выше не заменяется нулём.</div>{samuraiReference&&<V3DividendDiscovery/>}</section>;
 
   const coverage=depth.integrity.coveragePct;
