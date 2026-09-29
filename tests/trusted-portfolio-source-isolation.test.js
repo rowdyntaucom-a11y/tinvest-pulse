@@ -51,3 +51,10 @@ assert.match(core,/if \(cached\?\.inFlight\) return cached\.inFlight/);
 assert.match(core,/QVANIX_OPERATIONS_REFRESHED/);
 assert.match(serverBase,/\}\},1500\);/);
 assert.match(serverBase,/History snapshot v1473 warmed/);
+
+
+assert.match(core,/ACCOUNTS_CACHE_TTL_MS = 60 \* 1000/);
+assert.match(core,/if \(ACCOUNTS_CACHE\.inFlight\) return ACCOUNTS_CACHE\.inFlight/);
+assert.match(core,/PORTFOLIO_CACHE_TTL_MS = 15 \* 1000/);
+assert.match(core,/const PORTFOLIO_CACHE = new Map\(\)/);
+assert.match(core,/if \(cached\?\.inFlight\) return cached\.inFlight/);
