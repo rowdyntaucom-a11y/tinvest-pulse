@@ -33,3 +33,6 @@ test("Derivatives Intelligence V2 exposes directional stress without trading sem
  assert.match(css,/v3-futures-stress/);
  assert.match(css,/@media\(max-width:430px\)/);
 });
+
+
+test("light Core can hide duplicate market entry while keeping shared toolbox reusable",()=>{assert.match(toolbox,/includeMarket=true/);assert.match(toolbox,/TOOLS\.filter\(item=>item\.id!==\"market\"\)/);});
