@@ -15,10 +15,13 @@ export type CoreAnalyticsMarketContext={
 
 type Section="return"|"risk"|"benchmark";
 const SECTIONS:Array<[Section,string,string]>= [
- ["return","Доходность","TWR · rolling · Sharpe"],
- ["risk","Риск","DD · VaR/CVaR · корреляции"],
- ["benchmark","IMOEX","beta · TE · excess"],
+ ["return","Доходность","TWR · скользящие окна · Sharpe"],
+ ["risk","Риск","Просадка · хвостовые риски · связи активов"],
+ ["benchmark","Сравнение с IMOEX","Результат · отклонение · чувствительность"],
 ];
+const signedPct=(value:number|null)=>value==null?"—":new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"}).format(value*100)+"%";
+const plainPct=(value:number|null)=>value==null?"—":new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1}).format(value*100)+"%";
+const ratio=(value:number|null)=>value==null?"—":new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2}).format(value);
 
 export function CoreAnalyticsDepth({
  positions,history,market,totalPortfolioValue,onOpenAsset,
@@ -34,14 +37,34 @@ export function CoreAnalyticsDepth({
  const depth=useMemo(()=>buildV3AnalysisDepth(history,positions,market.riskFreeRate),[history,positions,market.riskFreeRate]);
  const relative=useMemo(()=>buildV3RelativeDepth(filterHistoryWindow(history,window)),[history,window]);
  const integrity=depth.portfolio.historyIntegrity;
+ const sectionMeta=SECTIONS.find(([id])=>id===section)??SECTIONS[0];
+ const decision=section==="return"?{
+  eyebrow:"ГЛАВНЫЙ ОТВЕТ",
+  title:depth.portfolio.twr==null?"Доходность пока не подтверждена":`TWR ${signedPct(depth.portfolio.twr)}`,
+  text:depth.portfolio.twr==null?"Нужна достаточная непротиворечивая история. QVANIX не подставляет ноль вместо отсутствующей метрики.":`Волатильность ${plainPct(depth.portfolio.volatility)} · Sharpe ${ratio(depth.portfolio.sharpe)}. Ниже — выборка и дополнительные окна.`,
+ }:section==="risk"?{
+  eyebrow:"ГЛАВНЫЙ ОТВЕТ",
+  title:depth.portfolio.maxDrawdown==null?"Риск пока ограничен историей":`Max Drawdown −${plainPct(depth.portfolio.maxDrawdown)}`,
+  text:`Эквивалент позиций ${ratio(depth.portfolio.effectivePositions)} · хвостовой риск: ${depth.tail.available?"доступен":"ещё не прошёл gate"}. Ниже — детали только по подтверждённой выборке.`,
+ }:{
+  eyebrow:"ГЛАВНЫЙ ОТВЕТ",
+  title:relative.available?`Относительно IMOEX: ${signedPct(relative.excessReturn)}`:"Сравнение с IMOEX пока недоступно",
+  text:relative.available?`Портфель ${signedPct(relative.portfolioReturn)} · IMOEX ${signedPct(relative.benchmarkReturn)} · общих точек ${relative.overlapPoints}.`:relative.note,
+ };
  return <section className="core-analytics-depth" aria-label="Глубокая аналитика портфеля">
   <header className="core-analytics-depth__head">
    <div><span>ANALYTICS DEPTH // READ-ONLY</span><h2>Глубокая аналитика</h2><p>Каноническая TWR-история, риск и сравнение с IMOEX. Пополнения не выдаются за доходность, а неполные источники остаются закрытыми.</p></div>
    <strong className={integrity==="OK"?"is-ok":"is-warning"}>{integrity}</strong>
   </header>
-  <div className="core-analytics-depth__help"><V3GlossaryHelp terms={["twr","var","cvar","beta","trackingError"]} label="Методика показателей"/></div><nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики">
+  <div className="core-analytics-depth__help"><V3GlossaryHelp terms={["twr","var","cvar","beta","trackingError"]} label="Методика показателей"/></div>
+  <section className="core-analytics-depth__route" aria-label="Текущий раздел аналитики">
+   <span>ПРОФЕССИОНАЛЬНЫЙ СЛОЙ</span><strong>{sectionMeta[1]}</strong><small>{sectionMeta[2]}</small>
+   <label><b>Раздел</b><select value={section} onChange={event=>setSection(event.target.value as Section)} aria-label="Выбрать раздел глубокой аналитики">{SECTIONS.map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label>
+  </section>
+  <nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики">
    {SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
   </nav>
+  <section className="core-analytics-depth__decision" aria-live="polite"><span>{decision.eyebrow}</span><strong>{decision.title}</strong><p>{decision.text}</p></section>
   <div className="core-analytics-depth__stage">
    {section==="return"&&<V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/>}
    {section==="risk"&&<V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/>}
