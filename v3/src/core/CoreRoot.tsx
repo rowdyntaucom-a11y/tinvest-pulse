@@ -5,6 +5,8 @@ import{loadV3Portfolio}from"../data/loadV3Portfolio";
 import{isV3VerifiedLive,toV3LoadState,type V3LoadState}from"../data/loadState";
 import{shouldApplyRefresh,V3_REFRESH_INTERVAL_MS,V3_FOCUS_REFRESH_MIN_AGE_MS}from"../data/refreshPolicy";
 import{loadPortfolioHistory,type PortfolioSnapshot}from"../../../v2/src/lib/portfolioApi";
+import{loadPayoutCalendar}from"../../../v2/src/lib/payoutsApi";
+import{loadMarketScreener}from"../analysis/marketScreenerApi";
 
 const CACHE_KEY="qvanix-core-trusted-snapshot-v1";
 const RETRY_DELAYS=[3000,7000,15000,30000,60000] as const;
@@ -139,6 +141,17 @@ export function CoreRoot(){
    document.removeEventListener("visibilitychange",focus);
   };
  },[cancelRetry]);
+
+ useEffect(()=>{
+  if(!trusted)return;
+  const timer=window.setTimeout(()=>{
+   void Promise.allSettled([
+    loadMarketScreener(),
+    loadPayoutCalendar({timeoutMs:8000}),
+   ]);
+  },450);
+  return()=>window.clearTimeout(timer);
+ },[trusted,snapshot.updatedAt]);
 
  const home=buildV3HomeViewModel(snapshot,trusted);
  return <CoreWorkspace

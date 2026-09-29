@@ -365,7 +365,7 @@ export async function loadPayoutCalendar(options:{force?:boolean;timeoutMs?:numb
       warning: text(raw.warning),
       note: text(raw.note),
     }
-    if(cacheEnabled)payoutCache={value:result,at:Date.now()}
+    if(cacheEnabled&&result.available)payoutCache={value:result,at:Date.now()}
     return result
   } catch {
     return cacheEnabled?(payoutCache?.value??emptyCalendar()):emptyCalendar()

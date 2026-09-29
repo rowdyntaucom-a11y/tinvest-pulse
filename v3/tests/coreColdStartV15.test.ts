@@ -4,3 +4,7 @@ test("trusted recovery continues while a cached snapshot is displayed",()=>{cons
 const preview=readFileSync(new URL("../preview-server.cjs",import.meta.url),"utf8");
 test("preview proxy retries transient Render wake failures for safe reads",()=>{assert.match(preview,/safeRetry=method==="GET"\|\|method==="HEAD"/);assert.match(preview,/retryable=new Set\(\[502,503,504\]\)/);assert.match(preview,/delays=\[0,1200,2600\]/);assert.match(preview,/p\.setTimeout\(18000/)});
 test("preview startup probes only the lightweight version endpoint",()=>{const start=preview.indexOf("function probeUpstream");const end=preview.indexOf("const types=",start);const probe=preview.slice(start,end);assert.match(probe,/const route="\/api\/version"/);assert.doesNotMatch(probe,/\/api\/dashboard/);assert.doesNotMatch(probe,/\/api\/portfolio/)});
+
+const payouts=readFileSync(new URL("../../v2/src/lib/payoutsApi.ts",import.meta.url),"utf8");
+test("trusted Core prewarms slow read-only workspaces without blocking portfolio paint",()=>{assert.match(root,/loadMarketScreener\(\)/);assert.match(root,/loadPayoutCalendar\(\{timeoutMs:8000\}\)/);assert.match(root,/setTimeout\(\(\)=>\{/);assert.match(root,/Promise\.allSettled/)});
+test("unavailable payout responses are not cached as if healthy",()=>{assert.match(payouts,/cacheEnabled&&result\.available/);assert.doesNotMatch(payouts,/if\(cacheEnabled\)payoutCache=\{value:result/)})
