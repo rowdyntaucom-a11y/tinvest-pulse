@@ -1682,11 +1682,22 @@ require('./bond-analytics')(app, {
 require('./dividend-discovery').registerDividendDiscovery(app, { tbankRequest });
 
 app.get('/api/dashboard', async (req, res) => {
+  const requestStartedAt = Date.now();
   try {
     const data = await buildDashboard();
+    console.log('QVANIX_DASHBOARD_OK', JSON.stringify({
+      ms: Date.now() - requestStartedAt,
+      hasAccount: Boolean(data?.account?.id),
+      positions: Array.isArray(data?.portfolio?.positions) ? data.portfolio.positions.length : 0,
+      brokerPortfolio: data?.sourceHealth?.brokerPortfolio === true,
+      operations: data?.sourceHealth?.operations === true,
+      moex: data?.sourceHealth?.moex === true,
+      cbr: data?.sourceHealth?.cbr === true
+    }));
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.json(data);
   } catch (err) {
+    console.error('QVANIX_DASHBOARD_ERROR', JSON.stringify({ms:Date.now()-requestStartedAt,message:err?.message||String(err)}));
     console.error('Dashboard error:', err);
     res.status(502).json({
       error: `T-Bank connection/API failed: ${err.message}`,
