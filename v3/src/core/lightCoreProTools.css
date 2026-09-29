@@ -242,3 +242,14 @@
  .sb .v3-dividend-discovery>header span,.sb .v3-dividend-discovery__method,.sb .v3-dividend-discovery__search,.sb .v3-dividend-discovery__row small,.sb .v3-dividend-discovery__row.is-head,.sb .v3-dividend-discovery>footer{font-size:9px;line-height:1.4}
  .sb .v3-dividend-discovery__row strong{font-size:11px}.sb .v3-dividend-discovery__row>b{font-size:11px}
 }
+
+/* v30 unified light Core deep-surface contract */
+.sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools,.sam-rebalance,.sam-lab,.sam-report-depth,.sam-screener,.sam-fallen){max-width:100%;min-width:0;scroll-margin-top:88px;overflow-x:clip}
+.sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools) :is(article,section,div,button,label){min-width:0}
+.sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools) :is(strong,b,span,small,p){overflow-wrap:anywhere}
+@media(max-width:520px){
+ .sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools,.sam-rebalance,.sam-lab,.sam-report-depth,.sam-screener,.sam-fallen){border-radius:12px}
+ .sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>header,
+ .sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>section{max-width:100%}
+ .sb :is(.v3-equity-fundamentals,.v3-bond-yield-depth,.v3-holdings-explorer){margin-top:10px}
+}

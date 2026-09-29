@@ -20,3 +20,17 @@
 .v3-equity-diagnostics__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:7px}.v3-equity-diagnostics__grid article{min-width:0;padding:8px;border:1px solid rgba(255,255,255,.04);background:rgba(2,8,7,.42)}.v3-equity-diagnostics__grid span,.v3-equity-diagnostics__grid small{display:block;color:#6e8078;font:6.8px/1.25 Inter,system-ui,sans-serif}.v3-equity-diagnostics__grid strong{display:block;margin:5px 0 3px;color:#e3ece8;font:700 11px/1 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums}.v3-equity-diagnostics__note{display:block;margin-top:7px;color:#65766f;font:7px/1.4 Inter,system-ui,sans-serif}
 @media(max-width:699px){.v3-equity-diagnostics__grid{grid-template-columns:1fr 1fr}}
 @media(max-width:359px){.v3-equity-diagnostics__grid{grid-template-columns:1fr}.v3-equity-diagnostics__title{display:grid}.v3-equity-diagnostics__title>small{text-align:left}}
+
+/* v30 light Core override */
+.sb .v3-equity-fundamentals{border-color:var(--s-line);border-radius:14px;background:#fff;color:var(--s-text);box-shadow:none}
+.sb .v3-equity-fundamentals__head span{color:var(--s-blue)}
+.sb .v3-equity-fundamentals__head h3,.sb .v3-equity-fundamentals__companies>article>header strong,.sb .v3-equity-fundamentals__metric-grid strong,.sb .v3-equity-diagnostics__title strong,.sb .v3-equity-diagnostics__grid strong{color:var(--s-text)}
+.sb .v3-equity-fundamentals__head p,.sb .v3-equity-fundamentals__summary span,.sb .v3-equity-fundamentals__summary small,.sb .v3-equity-fundamentals__companies>article>header small,.sb .v3-equity-fundamentals__metric-grid span,.sb .v3-equity-fundamentals__open,.sb .v3-equity-fundamentals__gate,.sb .v3-equity-fundamentals>footer,.sb .v3-equity-diagnostics__title span,.sb .v3-equity-diagnostics__title small,.sb .v3-equity-diagnostics__grid span,.sb .v3-equity-diagnostics__grid small,.sb .v3-equity-diagnostics__note{color:var(--s-muted)}
+.sb .v3-equity-fundamentals__head>strong{color:var(--s-green)}
+.sb .v3-equity-fundamentals__summary article,.sb .v3-equity-fundamentals__companies>article,.sb .v3-equity-fundamentals__metric-grid>div,.sb .v3-equity-diagnostics,.sb .v3-equity-diagnostics__grid article{border-color:var(--s-line);background:#fafbfc}
+.sb .v3-equity-fundamentals__tabs button{border-color:var(--s-line);border-radius:9px;background:#fafbfc;color:var(--s-muted)}
+.sb .v3-equity-fundamentals__tabs button.is-active{border-color:#cfd9ec;background:#eef3fc;color:#244b91}
+.sb .v3-equity-fundamentals__open{border-color:var(--s-line);border-radius:9px;background:#fff}
+.sb .v3-equity-fundamentals__gate{border-color:#cfd4dd;border-radius:10px;background:#fafbfc}
+.sb .v3-equity-fundamentals>footer{border-top-color:var(--s-line)}
+@media(max-width:520px){.sb .v3-equity-fundamentals__head span,.sb .v3-equity-fundamentals__head p,.sb .v3-equity-fundamentals__summary span,.sb .v3-equity-fundamentals__summary small,.sb .v3-equity-fundamentals__tabs button,.sb .v3-equity-fundamentals__companies>article>header small,.sb .v3-equity-fundamentals__metric-grid span,.sb .v3-equity-fundamentals__open,.sb .v3-equity-fundamentals__gate,.sb .v3-equity-fundamentals>footer,.sb .v3-equity-diagnostics__title span,.sb .v3-equity-diagnostics__title small,.sb .v3-equity-diagnostics__grid span,.sb .v3-equity-diagnostics__grid small,.sb .v3-equity-diagnostics__note{font-size:9px;line-height:1.35}.sb .v3-equity-fundamentals__companies>article>header strong{font-size:11px}.sb .v3-equity-fundamentals__metric-grid strong,.sb .v3-equity-diagnostics__grid strong{font-size:10px}}
