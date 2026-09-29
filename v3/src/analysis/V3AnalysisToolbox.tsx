@@ -17,11 +17,12 @@ const TOOLS:Array<{id:ToolId;label:string;note:string}>=[
  {id:"report",label:"Отчёт",note:"классы · валюты · P/L"},
 ];
 
-export function V3AnalysisToolbox({positions}:{positions:PositionSnapshot[]}){
+export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:PositionSnapshot[];includeMarket?:boolean}){
  const[tool,setTool]=useState<ToolId>("rebalance");
+ const tools=includeMarket?TOOLS:TOOLS.filter(item=>item.id!=="market");
  return <section className="v3-pro-tools" aria-label="Профессиональные инструменты аналитики">
   <header><div><span>PRO TOOLBOX</span><h2>Инструменты</h2><p>Один вход в глубокие рабочие модули вместо длинной цепочки отдельных разделов.</p></div><small>READ-ONLY</small></header>
-  <nav className="v3-pro-tools__nav" aria-label="Выбор инструмента">{TOOLS.map(item=><button key={item.id} type="button" className={tool===item.id?"is-active":""} aria-pressed={tool===item.id} onClick={()=>setTool(item.id)}><strong>{item.label}</strong><small>{item.note}</small></button>)}</nav>
+  <nav className="v3-pro-tools__nav" aria-label="Выбор инструмента">{tools.map(item=><button key={item.id} type="button" className={tool===item.id?"is-active":""} aria-pressed={tool===item.id} onClick={()=>setTool(item.id)}><strong>{item.label}</strong><small>{item.note}</small></button>)}</nav>
   <div className="v3-pro-tools__stage">
    {tool==="rebalance"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем ребалансировку…</div>}><V3RebalanceWorkspace positions={positions}/></Suspense>}
    {tool==="lab"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем лабораторию…</div>}><V3PortfolioLab positions={positions}/></Suspense>}
