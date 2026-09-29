@@ -10,7 +10,7 @@ const css=readFileSync(new URL("../src/core/lightCoreProTools.css",import.meta.u
 test("light Core promotes the canonical income depth without replacing quick payout views",()=>{
  assert.match(ui,/V3IncomeDepth=lazy/);
  assert.match(ui,/\[\"overview\",\"Обзор\"\],\[\"calendar\",\"Календарь\"\],\[\"depth\",\"Глубина\"\]/);
- assert.match(ui,/V3IncomeDepth positions=\{positions\} onOpenAsset=\{setAsset\}/);
+ assert.match(ui,/V3IncomeDepth positions=\{positions\} onOpenAsset=\{openAsset\}/);
  assert.match(ui,/CorePayoutCalendar/);
 });
 
