@@ -17,7 +17,7 @@ test("Samurai analysis exposes one professional toolbox entry instead of four pe
 });
 
 test("toolbox contains current professional modules and read-only futures scenarios",()=>{
- for(const token of["Ребаланс","Лаборатория","Рынок","Фьючерсы","READ-ONLY"])assert.match(toolbox,new RegExp(token));
+ for(const token of["Ребаланс","Лаборатория","Рынок","Фьючерсы","Отчёт","READ-ONLY","V3PortfolioReportDepth"])assert.match(toolbox,new RegExp(token));
 });
 
 test("toolbox adapts from local mobile rail to desktop side navigation",()=>{
