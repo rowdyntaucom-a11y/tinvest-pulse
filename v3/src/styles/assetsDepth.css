@@ -78,6 +78,6 @@
 @media(max-width:520px){
  .v3-assets-depth__nav{display:flex;overflow-x:auto;scrollbar-width:none;overscroll-behavior-inline:contain}
  .v3-assets-depth__nav button{flex:0 0 118px;min-height:58px}
- .v3-assets-depth__nav button strong{font-size:10px}.v3-assets-depth__nav button small{font-size:8px}
+ .v3-assets-depth__nav button strong{font-size:10px}.v3-assets-depth__nav button small{font-size:9px}
  .v3-assets-depth__explain summary,.v3-assets-depth__professional-section>header p{font-size:9px}
 }
