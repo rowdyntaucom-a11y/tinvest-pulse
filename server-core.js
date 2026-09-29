@@ -300,7 +300,11 @@ async function getPortfolio(accountId) {
   });
 }
 
-async function getOperations(accountId) {
+const OPERATIONS_CACHE_TTL_MS = 5 * 60 * 1000;
+const OPERATIONS_REFRESH_AFTER_MS = 60 * 1000;
+const OPERATIONS_CACHE = new Map();
+
+async function fetchOperations(accountId) {
   const operations = [];
   let cursor = '';
 
@@ -329,6 +333,44 @@ async function getOperations(accountId) {
   }
 
   return operations;
+}
+
+async function getOperations(accountId) {
+  const key = String(accountId || '');
+  const now = Date.now();
+  const cached = OPERATIONS_CACHE.get(key);
+
+  if (cached?.data && now - cached.fetchedAt < OPERATIONS_CACHE_TTL_MS) {
+    if (now - cached.fetchedAt >= OPERATIONS_REFRESH_AFTER_MS && !cached.inFlight) {
+      cached.inFlight = fetchOperations(accountId)
+        .then(data => {
+          OPERATIONS_CACHE.set(key, { data, fetchedAt: Date.now(), inFlight: null });
+          console.log('QVANIX_OPERATIONS_REFRESHED', JSON.stringify({ rows: data.length }));
+          return data;
+        })
+        .catch(error => {
+          cached.inFlight = null;
+          console.warn('QVANIX_OPERATIONS_REFRESH_FAILED', error?.message || String(error));
+          return cached.data;
+        });
+    }
+    return cached.data;
+  }
+
+  if (cached?.inFlight) return cached.inFlight;
+
+  const entry = cached || { data: null, fetchedAt: 0, inFlight: null };
+  entry.inFlight = fetchOperations(accountId)
+    .then(data => {
+      OPERATIONS_CACHE.set(key, { data, fetchedAt: Date.now(), inFlight: null });
+      return data;
+    })
+    .catch(error => {
+      entry.inFlight = null;
+      throw error;
+    });
+  OPERATIONS_CACHE.set(key, entry);
+  return entry.inFlight;
 }
 
 async function getInstrument(figi) {
