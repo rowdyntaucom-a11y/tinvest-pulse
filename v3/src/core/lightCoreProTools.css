@@ -156,3 +156,16 @@
 .sb .v3-assets-depth__empty{border-color:#cfd4dd;color:var(--s-muted)}
 .sb .v3-holdings-explorer,.sb .v3-holdings-search input,.sb .v3-holdings-toolbar select{color:var(--s-text)}
 @media(max-width:520px){.sb .v3-assets-depth{padding:10px}.sb .v3-assets-depth__metrics{grid-template-columns:1fr 1fr}}
+
+/* v24 review hardening: readable market gates and no mobile microtype. */
+.sb .v3-market-pulse__gate{gap:7px}.sb .v3-market-pulse__gate strong,.sb .v3-market-pulse__gate small{display:block}.sb .v3-market-pulse__gate strong{color:var(--s-text);font-size:10px}.sb .v3-market-pulse__gate small{max-width:320px;color:var(--s-muted);font-size:9px;line-height:1.4}.sb .v3-market-pulse__gate button{min-height:38px;padding:0 12px;border:1px solid #cfd9ec;border-radius:9px;background:#eef3fc;color:#244b91;font-size:9px;font-weight:700}
+@media(max-width:520px){
+ .sb .sam-screener__head span,.sb .sam-screener__filter-block>span,.sb .sam-screener__search label span,.sb .sam-screener__meta span,.sb .sam-screener__meta small,.sb .sam-screener__row.is-head,.sb .sam-screener__row>div:first-child small,.sb .sam-screener__range,.sb .sam-screener__limit,.sb .sam-screener>footer{font-size:9px;line-height:1.35}
+ .sb .sam-screener__row>div:first-child strong{font-size:11px}
+ .sb .sam-screener__row>b{font-size:10px}
+ .sb .sam-screener__filter-block button{font-size:9px;min-height:38px}
+ .sb .sam-screener__search :is(input,select){font-size:10px;min-height:42px}
+ .sb .sam-fallen__head span,.sb .sam-fallen__coverage span,.sb .sam-fallen__coverage small,.sb .sam-fallen__row>header small,.sb .sam-fallen__row>header em,.sb .sam-fallen__metrics span,.sb .sam-fallen__range span,.sb .sam-fallen>footer{font-size:9px;line-height:1.35}
+ .sb .sam-fallen__row>header strong{font-size:11px}
+ .sb .sam-fallen__metrics b{font-size:10px}
+}
