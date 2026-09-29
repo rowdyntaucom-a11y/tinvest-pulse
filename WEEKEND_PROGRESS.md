@@ -411,3 +411,15 @@ Real-device review from the latest Core Preview recording showed that navigation
 - added horizontal snap/rhythm to Market subnavigation;
 - reserved more bottom reading space above the fixed navigation;
 - kept the light Financial Core direction and read-only product boundary unchanged.
+
+
+## 2026-09-29 — V37 Mobile Explainability Layer
+
+Follow-up to the V36 readability pass. The next comprehension bottleneck was terminology: the Core surface exposed advanced metrics correctly, but a user still had to already know TWR/XIRR/CAGR, VaR/CVaR, beta, tracking error, basis, GO and rebalance drift.
+
+- added one reusable, accessible glossary/help sheet instead of scattering question-mark icons beside every label;
+- added concise and expanded explanations for TWR, XIRR, CAGR, P/L, VaR, CVaR, beta, Tracking Error, basis, GO, drift, coverage, YTM and modified duration;
+- surfaced contextual help only at meaningful workspace boundaries: Result, Analytics, Deep Analytics, Rebalance and Futures;
+- Escape closes the modal sheet; controls expose dialog semantics and focus-visible treatment;
+- preserved all financial formulas, source gates, read-only behavior and existing workspace navigation;
+- no recommendation, expected-return ranking or trading execution language was added.
