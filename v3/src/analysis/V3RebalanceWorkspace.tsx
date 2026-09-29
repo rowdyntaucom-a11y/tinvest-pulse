@@ -2,6 +2,7 @@ import{useMemo,useState}from"react";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{calculateAllocationDrift,PERSONAL_STRATEGY_V1,type StrategyConfig}from"../../../v2/src/features/analytics/drift";
 import{calculateRebalanceScenario,type RebalanceScenarioMode}from"../../../v2/src/features/analytics/rebalanceScenarios";
+import{V3GlossaryHelp}from"../help/V3GlossaryHelp";
 import"../styles/samuraiRebalance.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -61,6 +62,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
    <i aria-hidden="true">衡</i>
   </header>
 
+  <div className="sam-rebalance__help"><V3GlossaryHelp terms={["drift","coverage"]} label="Как читать ребаланс"/></div>
   <section className="sam-rebalance__current">
    <article><span>Акции сейчас</span><strong>{percent(equityNow)}</strong><small>{money(current.rows.find(row=>row.key==="equity")?.currentValue)}</small></article>
    <article><span>Облигации сейчас</span><strong>{percent(bondNow)}</strong><small>{money(current.rows.find(row=>row.key==="bond")?.currentValue)}</small></article>
