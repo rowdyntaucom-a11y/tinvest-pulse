@@ -1,22 +1,25 @@
-/* Shared secondary-navigation selector: one clear section control instead of pill forests. */
+/* Shared secondary-navigation selector: QVANIX sheet instead of native system picker. */
 .v3-section-selector{display:grid;gap:5px;margin:8px 0;padding:9px 10px;border:1px solid var(--v3-line);border-radius:14px;background:var(--v3-card)}
 .v3-section-selector>span{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--v3-muted)}
-.v3-section-selector>div{position:relative;min-width:0}
-.v3-section-selector select{box-sizing:border-box;width:100%;height:46px;padding:0 38px 0 12px;border:1px solid var(--v3-line);border-radius:11px;appearance:none;background:rgba(255,255,255,.025);color:var(--v3-text);font:700 12px/1.2 Inter,system-ui,sans-serif;letter-spacing:0}
-.v3-section-selector select option{background:#111618;color:#f5f7f8}
-.v3-section-selector i{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-style:normal;font-size:15px;line-height:1;color:var(--v3-muted);pointer-events:none}
+.v3-section-selector__trigger{box-sizing:border-box;width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid var(--v3-line);border-radius:11px;background:rgba(255,255,255,.025);color:var(--v3-text);text-align:left}
+.v3-section-selector__trigger strong{font:700 12px/1.2 Inter,system-ui,sans-serif}
+.v3-section-selector__trigger i{font-style:normal;font-size:15px;line-height:1;color:var(--v3-muted)}
 .v3-section-selector>small{display:block;min-height:26px;color:var(--v3-muted);font-size:10px;line-height:1.35}
-.v3-section-selector select:focus-visible{outline:2px solid var(--v3-accent);outline-offset:2px}
+.v3-section-selector__trigger:focus-visible,.v3-section-sheet button:focus-visible{outline:2px solid var(--v3-accent);outline-offset:2px}
+.v3-section-sheet{position:fixed;z-index:120;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:16px;background:rgba(9,14,20,.32);backdrop-filter:blur(5px)}
+.v3-section-sheet>section{width:min(100%,520px);max-height:min(76dvh,620px);overflow:auto;border:1px solid var(--v3-line);border-radius:20px;background:var(--v3-card);color:var(--v3-text);box-shadow:0 22px 70px rgba(15,23,42,.22)}
+.v3-section-sheet>section>header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 14px 10px;border-bottom:1px solid var(--v3-line);background:var(--v3-card)}
+.v3-section-sheet>section>header span,.v3-section-sheet>section>header strong{display:block}.v3-section-sheet>section>header span{color:var(--v3-muted);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.v3-section-sheet>section>header strong{margin-top:3px;font-size:15px}
+.v3-section-sheet>section>header button{width:36px;height:36px;border:1px solid var(--v3-line);border-radius:10px;background:transparent;color:var(--v3-text);font-size:20px}
+.v3-section-sheet>section>div{display:grid;padding:7px}
+.v3-section-sheet>section>div>button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;min-height:62px;padding:10px 11px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--v3-text);text-align:left}
+.v3-section-sheet>section>div>button+button{margin-top:3px}
+.v3-section-sheet>section>div>button.is-active{border-color:color-mix(in srgb,var(--v3-accent) 24%,var(--v3-line));background:color-mix(in srgb,var(--v3-accent) 8%,var(--v3-card))}
+.v3-section-sheet>section>div>button span strong,.v3-section-sheet>section>div>button span small{display:block}.v3-section-sheet>section>div>button span strong{font-size:12px}.v3-section-sheet>section>div>button span small{margin-top:4px;color:var(--v3-muted);font-size:10px;line-height:1.35}.v3-section-sheet>section>div>button>i{font-style:normal;color:var(--v3-accent);font-size:16px}
 .v3-app[data-shell="horizon"] .v3-section-selector{background:rgba(255,255,255,.9);border-color:rgba(27,54,69,.1);box-shadow:0 8px 26px rgba(27,54,69,.05)}
-.v3-app[data-shell="horizon"] .v3-section-selector select{background:#fff;color:#172027;border-color:rgba(27,54,69,.12)}
-.v3-app[data-shell="horizon"] .v3-section-selector select option{background:#fff;color:#172027}
+.v3-app[data-shell="horizon"] .v3-section-selector__trigger{background:#fff;color:#172027;border-color:rgba(27,54,69,.12)}
 .v3-app[data-shell="carbon"] .v3-section-selector{background:rgba(13,15,34,.84);border-color:rgba(126,139,255,.2)}
-.v3-app[data-shell="carbon"] .v3-section-selector select{background:rgba(8,9,25,.74)}
-@media(max-width:430px){
-.v3-section-selector{position:sticky;z-index:18;top:75px;margin:6px 0;padding:8px 9px;border-radius:13px;backdrop-filter:blur(14px)}
-.v3-section-selector>span{font-size:9px}.v3-section-selector select{height:48px;font-size:13px}.v3-section-selector>small{font-size:10px;min-height:27px}
-}
-@media(max-width:359px){
-.v3-section-selector{top:78px}.v3-section-selector select{padding-left:10px;font-size:12px}.v3-section-selector>small{font-size:9.5px}
-}
-@media(prefers-reduced-motion:reduce){.v3-section-selector{scroll-behavior:auto}}
+.v3-app[data-shell="carbon"] .v3-section-selector__trigger{background:rgba(8,9,25,.74)}
+.sb .v3-section-selector{border-color:var(--s-line);background:#fff}.sb .v3-section-selector__trigger{border-color:var(--s-line);background:#fafbfc;color:var(--s-text)}.sb .v3-section-selector>span,.sb .v3-section-selector>small{color:var(--s-muted)}.sb .v3-section-sheet>section,.sb .v3-section-sheet>section>header{border-color:var(--s-line);background:#fff;color:var(--s-text)}.sb .v3-section-sheet>section>div>button{color:var(--s-text)}.sb .v3-section-sheet>section>div>button.is-active{border-color:#cfd9ec;background:#eef3fc}.sb .v3-section-sheet>section>div>button span small{color:var(--s-muted)}
+@media(max-width:430px){.v3-section-selector{margin:6px 0;padding:8px 9px;border-radius:13px}.v3-section-selector>span{font-size:9px}.v3-section-selector__trigger{min-height:46px}.v3-section-selector__trigger strong{font-size:12px}.v3-section-selector>small{font-size:9.5px;min-height:0}.v3-section-sheet{padding:0}.v3-section-sheet>section{width:100%;max-height:78dvh;border-radius:20px 20px 0 0;border-bottom:0}.v3-section-sheet>section>div>button{min-height:66px}.v3-section-sheet>section>div>button span strong{font-size:13px}.v3-section-sheet>section>div>button span small{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.v3-section-sheet{scroll-behavior:auto}}
