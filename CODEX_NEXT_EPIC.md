@@ -1,3 +1,5 @@
+> **LATEST PRODUCT CHECKPOINT — 2026-09-29 (USER OVERRIDE):** the active product is the **light QVANIX Financial Core** shown in the 2026-09-28 ~17:00 real-device checkpoint. Continue from that interface and data pipeline. **Do not use Samurai as the current product target or reference shell. Do not restart shell work.** Older Samurai/shell sequencing below is historical context only where it conflicts with this checkpoint. Living World / DNA stays frozen. Current priority is trusted live portfolio recovery, then visible financial depth in the light Core (portfolio, result, income, analytics, market, tools, equities/bonds/futures) with read-only broker architecture and no trade execution. Newer explicit user decisions always override stale roadmap text.
+
 # CODEX NEXT EPIC — QVANIX Financial Core / Pre-Monday Sprint
 
 ## Latest override — 2026-09-25 evening
