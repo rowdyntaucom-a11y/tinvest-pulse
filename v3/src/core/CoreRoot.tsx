@@ -161,6 +161,7 @@ export function CoreRoot(){
     import("../analysis/V3MarketIntelligenceWorkspace"),
     import("../analysis/V3AnalysisToolbox"),
     import("./CoreAnalyticsDepth"),
+    import("../income/V3IncomeDepth"),
    ]);
   },1400);
   return()=>window.clearTimeout(timer);
