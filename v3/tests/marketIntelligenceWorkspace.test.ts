@@ -18,3 +18,6 @@ test("recovered parent market payload is shared with screener instead of spawnin
  assert.match(screener,/controlled=sharedData!==undefined/);
  assert.match(screener,/onRetry&&<button/);
 });
+
+
+test("market errors stay human-readable and MOEX label does not wrap",()=>{const api=readFileSync(new URL("../src/analysis/marketScreenerApi.ts",import.meta.url),"utf8");assert.doesNotMatch(api,/reason:"HTTP "\+response\.status/);assert.match(api,/Не удалось получить данные рынка/);assert.match(css,/white-space:nowrap/);});
