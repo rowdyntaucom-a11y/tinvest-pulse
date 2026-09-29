@@ -160,6 +160,7 @@ export function CoreRoot(){
     import("../assets/V3AssetsDepth"),
     import("../analysis/V3MarketIntelligenceWorkspace"),
     import("../analysis/V3AnalysisToolbox"),
+    import("./CoreAnalyticsDepth"),
    ]);
   },1400);
   return()=>window.clearTimeout(timer);
@@ -170,6 +171,11 @@ export function CoreRoot(){
   home={home}
   positions={trusted?snapshot.positionItems:[]}
   history={trusted?snapshot.history:[]}
+  marketContext={{
+   riskFreeRate:trusted?snapshot.riskFreeRate:null,
+   riskFreeRateDate:trusted?snapshot.riskFreeRateDate:null,
+   nextRateMeeting:trusted?snapshot.nextRateMeeting:null,
+  }}
   income={{
    total:trusted?snapshot.passiveIncome:null,
    monthly:trusted?snapshot.averageMonthlyPassiveIncome:null,
