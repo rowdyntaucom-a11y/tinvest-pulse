@@ -1230,6 +1230,13 @@ app.get('/api/intel', async (req, res) => {
   }
 });
 
+function qvanixDashboardOptional(promise,label,timeoutMs=2500){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' optional source timeout')),timeoutMs))
+  ]);
+}
+
 async function buildDashboard() {
   const accountsResponse = await getAccounts();
   const account = selectAccount(accountsResponse);
@@ -1250,8 +1257,8 @@ async function buildDashboard() {
     getOperations(account.id)
   ]);
   const [moexResult, cbrResult] = await Promise.allSettled([
-    getMoex(),
-    getCbrMacro()
+    qvanixDashboardOptional(getMoex(), 'MOEX'),
+    qvanixDashboardOptional(getCbrMacro(), 'CBR')
   ]);
   const moex = moexResult.status === 'fulfilled'
     ? moexResult.value
