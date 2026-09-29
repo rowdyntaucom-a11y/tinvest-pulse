@@ -362,3 +362,26 @@
  .sb-context-help,.core-analytics-depth__help,.sam-rebalance__help,.v3-futures-help{justify-content:stretch}
  .sb .v3-glossary-help__trigger{width:100%;justify-content:flex-start;min-height:42px;font-size:9.5px}
 }
+
+
+/* v38 analytics progressive depth */
+.sb .core-analytics-depth__route{display:none}
+.sb .core-analytics-depth__decision{display:grid;gap:4px;margin-top:10px;padding:12px;border:1px solid #dce5f1;border-radius:11px;background:linear-gradient(180deg,#f8fbff,#f3f7fc)}
+.sb .core-analytics-depth__decision span{color:var(--s-blue);font-size:8px;font-weight:800;letter-spacing:.09em}
+.sb .core-analytics-depth__decision strong{font-size:17px;line-height:1.15;color:var(--s-text)}
+.sb .core-analytics-depth__decision p{margin:0;color:var(--s-muted);font-size:9px;line-height:1.45}
+@media(max-width:520px){
+ .sb .core-analytics-depth__nav{display:none}
+ .sb .core-analytics-depth__route{display:grid;grid-template-columns:minmax(0,1fr);gap:3px;margin-top:10px;padding:11px;border:1px solid var(--s-line);border-radius:11px;background:#fafbfc}
+ .sb .core-analytics-depth__route>span{color:var(--s-blue);font-size:8px;font-weight:800;letter-spacing:.08em}
+ .sb .core-analytics-depth__route>strong{font-size:15px;line-height:1.15}
+ .sb .core-analytics-depth__route>small{color:var(--s-muted);font-size:9px;line-height:1.35}
+ .sb .core-analytics-depth__route label{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:9px;margin-top:7px;padding-top:8px;border-top:1px solid var(--s-line)}
+ .sb .core-analytics-depth__route label>b{font-size:9px;color:var(--s-muted)}
+ .sb .core-analytics-depth__route select{width:100%;min-height:44px;padding:0 34px 0 11px;border:1px solid #d4dae3;border-radius:9px;background:#fff;color:var(--s-text);font:700 11px/1 system-ui}
+ .sb .core-analytics-depth__decision{margin-top:8px;padding:11px}
+ .sb .core-analytics-depth__decision span{font-size:8.5px}
+ .sb .core-analytics-depth__decision strong{font-size:18px}
+ .sb .core-analytics-depth__decision p{font-size:10px;line-height:1.45}
+ .sb .core-analytics-depth__stage{margin-top:8px}
+}
