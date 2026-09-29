@@ -144,3 +144,15 @@
  .sb .sam-fallen__coverage,.sb .sam-fallen__metrics{grid-template-columns:1fr 1fr}
 }
 @media(max-width:359px){.sb .sam-screener__search{grid-template-columns:1fr}.sb .sam-screener__row{grid-template-columns:1fr auto}.sb .sam-screener__row>div:first-child{grid-row:auto}.sb .sam-screener__row>b{grid-column:2}.sb .sam-fallen__coverage,.sb .sam-fallen__metrics{grid-template-columns:1fr}}
+
+
+/* Full portfolio depth inside light Core */
+.sb .v3-assets-depth{margin-top:0;padding:12px;border-color:var(--s-line);border-radius:14px;background:#fff;color:var(--s-text)}
+.sb .v3-assets-depth__head{border-bottom-color:var(--s-line)}.sb .v3-assets-depth__head p,.sb .v3-assets-depth__head span,.sb .v3-assets-depth__head small,.sb .v3-assets-depth__title span,.sb .v3-assets-depth__title>small{color:var(--s-muted)}
+.sb .v3-assets-depth__metrics article,.sb .v3-assets-depth__block{border-color:var(--s-line);background:#fafbfc}
+.sb .v3-assets-depth__bars i,.sb .v3-assets-depth__pnl-list article>i{background:#e9edf3}.sb .v3-assets-depth__bars i b,.sb .v3-assets-depth__pnl-list article>i b{background:var(--s-blue)}
+.sb .v3-assets-depth__pnl-list article,.sb .v3-assets-depth__bond-grid article{border-color:var(--s-line);background:#fff}
+.sb .v3-assets-depth .is-positive{color:var(--s-green)!important}.sb .v3-assets-depth .is-negative{color:var(--s-red)!important}
+.sb .v3-assets-depth__empty{border-color:#cfd4dd;color:var(--s-muted)}
+.sb .v3-holdings-explorer,.sb .v3-holdings-search input,.sb .v3-holdings-toolbar select{color:var(--s-text)}
+@media(max-width:520px){.sb .v3-assets-depth{padding:10px}.sb .v3-assets-depth__metrics{grid-template-columns:1fr 1fr}}
