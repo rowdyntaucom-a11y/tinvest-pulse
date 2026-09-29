@@ -25,7 +25,7 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
    }
   }).catch(error=>{
    if(controller.signal.aborted)return;
-   setData({available:false,fetchedAt:null,source:null,board:null,rows:[],reason:error instanceof Error?error.message:"MOEX market screener is unavailable."});
+   setData({available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"Не удалось получить данные рынка. QVANIX попробует ещё раз."});
    if(attempt<MARKET_RETRY_DELAYS.length){
     retryTimer=window.setTimeout(()=>setAttempt(value=>value+1),MARKET_RETRY_DELAYS[attempt]);
    }

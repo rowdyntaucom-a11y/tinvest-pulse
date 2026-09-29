@@ -28,6 +28,12 @@ function finite(value:unknown){
  const n=Number(value);
  return Number.isFinite(n)?n:null;
 }
+function marketReason(status?:number){
+ if(status===429)return"Источник рынка временно ограничил частоту запросов. QVANIX попробует ещё раз.";
+ if(status&&status>=500)return"Не удалось получить данные рынка. QVANIX попробует ещё раз.";
+ if(status===404)return"Рыночный источник временно недоступен.";
+ return"Не удалось подтвердить данные рынка.";
+}
 function row(raw:any):MarketScreenerRow|null{
  const secid=String(raw?.secid??"").trim();
  const name=String(raw?.name??"").trim();
@@ -55,7 +61,7 @@ export async function loadMarketScreener(signal?:AbortSignal):Promise<MarketScre
  if(marketCache&&Date.now()-marketCache.at<MARKET_CACHE_TTL)return marketCache.value;
  try{
   const controller=new AbortController(),timer=window.setTimeout(()=>controller.abort(),7000),abort=()=>controller.abort();signal?.addEventListener("abort",abort,{once:true});let response:Response;try{response=await fetch("/api/market-screener",{cache:"no-store",signal:controller.signal})}finally{window.clearTimeout(timer);signal?.removeEventListener("abort",abort)}
-  if(!response.ok)return{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"HTTP "+response.status};
+  if(!response.ok)return{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:marketReason(response.status)};
   const raw=await response.json() as any;
   const rows=(Array.isArray(raw?.rows)?raw.rows:[]).map(row).filter((x:MarketScreenerRow|null):x is MarketScreenerRow=>Boolean(x));
   const result={
@@ -70,6 +76,6 @@ export async function loadMarketScreener(signal?:AbortSignal):Promise<MarketScre
   return result;
  }catch(error){
   if(error instanceof DOMException&&error.name==="AbortError"&&signal?.aborted)throw error;
-  return marketCache?.value??{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:error instanceof DOMException&&error.name==="AbortError"?"MOEX не ответила за 7 секунд.":"MOEX market screener is unavailable."};
+  return marketCache?.value??{available:false,fetchedAt:null,source:null,board:null,rows:[],reason:error instanceof DOMException&&error.name==="AbortError"?"Данные рынка отвечают слишком долго. QVANIX попробует ещё раз.":marketReason()};
  }
 }

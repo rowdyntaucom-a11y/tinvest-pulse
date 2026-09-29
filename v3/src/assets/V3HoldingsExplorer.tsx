@@ -38,9 +38,9 @@ function matches(position:PositionSnapshot,query:string){
   return [position.ticker,position.name,position.instrumentType,position.bond?.issuerName,position.bond?.sector,position.bond?.currency].some(value=>normalized(String(value??"")).includes(q));
 }
 
-export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void}){
+export function V3HoldingsExplorer({positions,onOpenAsset,initialDimension="class",showClassSummary=true}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void;initialDimension?:HoldingDimension;showClassSummary?:boolean}){
   const[filter,setFilter]=useState<AssetClassFilter>("all");
-  const[dimension,setDimension]=useState<HoldingDimension>("class");
+  const[dimension,setDimension]=useState<HoldingDimension>(initialDimension);
   const[preset,setPreset]=useState<HoldingPreset>("compact");
   const[sort,setSort]=useState<HoldingSort>("weight");
   const[query,setQuery]=useState("");
@@ -58,14 +58,14 @@ export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSn
   return <section className="v3-holdings-explorer">
     <div className="v3-holdings-head"><div><span>HOLDINGS EXPLORER</span><h2>Структура портфеля</h2></div><div><strong>{filtered.length}</strong><small>позиций</small></div></div>
 
-    <div className="v3-holdings-class-strip" aria-label="Классы активов">
+    {showClassSummary&&<div className="v3-holdings-class-strip" aria-label="Классы активов">
       {classAggregate.rows.slice(0,6).map(row=>{
         const share=portfolioTotal>0?row.value/portfolioTotal:0;
         return <button key={row.label} type="button" onClick={()=>{const key=row.label as Exclude<AssetClassFilter,"all">;setFilter(key);setDimension("instrument")}}>
-          <span>{assetClassLabel(row.label)}</span><strong>{rub.format(row.value)} ₽</strong><small>{pct.format(share*100)}%</small><i aria-hidden="true"><b style={{width:clampPercent(share*100)+"%"}}/></i>
+          <span>{assetClassLabel(row.label)}</span><strong>{rub.format(row.value)} ₽</strong><small>{pct.format(share*100)}% портфеля</small><i aria-hidden="true"><b style={{width:clampPercent(share*100)+"%"}}/></i>
         </button>
       })}
-    </div>
+    </div>}
 
     <label className="v3-holdings-search"><span>Поиск</span><input type="search" inputMode="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Тикер, название, эмитент, отрасль…"/>{query&&<button type="button" aria-label="Очистить поиск" onClick={()=>setQuery("")}>×</button>}</label>
 
@@ -74,7 +74,12 @@ export function V3HoldingsExplorer({positions,onOpenAsset}:{positions:PositionSn
 
     {instrumentView&&<div className="v3-holdings-toolbar">
       <div className="v3-holdings-rail" role="group" aria-label="Представление списка">{PRESETS.map(([id,label])=><button type="button" key={id} className={preset===id?"is-active":""} aria-pressed={preset===id} onClick={()=>setPreset(id)}>{label}</button>)}</div>
-      <label><span>Сортировка</span><select value={sort} onChange={e=>setSort(e.target.value as HoldingSort)}><option value="weight">По доле</option><option value="value">По стоимости</option><option value="pnl">По P/L</option><option value="name">По названию</option></select></label>
+      <V3SectionSelector label="Сортировка" value={sort} onChange={setSort} options={[
+        {value:"weight",label:"По доле",description:"Сначала позиции с большей долей портфеля."},
+        {value:"value",label:"По стоимости",description:"Сначала позиции с большей текущей стоимостью."},
+        {value:"pnl",label:"По P/L",description:"Сначала позиции с большим накопленным broker P/L."},
+        {value:"name",label:"По названию",description:"Алфавитный порядок по названию инструмента."},
+      ]}/>
     </div>}
 
     {instrumentView?<div className="v3-holdings-instruments">
