@@ -60,3 +60,24 @@
  .sb .v3-assets-depth__pnl-list article{min-height:62px;padding:10px}
  .sb .v3-assets-depth__bond-grid{grid-template-columns:1fr 1fr}
 }
+
+/* v31 progressive disclosure */
+.v3-assets-depth__nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 10px;padding:3px;border-radius:12px;background:#eef1f5}
+.v3-assets-depth__nav button{min-width:0;min-height:54px;padding:8px 9px;border:0;border-radius:9px;background:transparent;color:var(--s-muted);text-align:left}
+.v3-assets-depth__nav button strong,.v3-assets-depth__nav button small{display:block}.v3-assets-depth__nav button strong{font-size:10px}.v3-assets-depth__nav button small{margin-top:4px;font-size:7.5px;line-height:1.2}
+.v3-assets-depth__nav button.is-active{background:#fff;color:var(--s-text);box-shadow:0 1px 4px #0d1b2a12}
+.v3-assets-depth__explain{margin:0 0 10px;border:1px solid var(--s-line);border-radius:10px;background:#fff}
+.v3-assets-depth__explain summary{display:flex;align-items:center;gap:8px;padding:10px 11px;cursor:pointer;list-style:none;color:var(--s-text);font-size:9px;font-weight:700}
+.v3-assets-depth__explain summary::-webkit-details-marker{display:none}.v3-assets-depth__explain summary i{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#eef3fc;color:#244b91;font-style:normal;font-size:9px}
+.v3-assets-depth__explain p{margin:0;padding:0 11px 11px;color:var(--s-muted);font-size:8.5px;line-height:1.5}
+.v3-assets-depth__professional-section{display:grid;gap:10px}
+.v3-assets-depth__professional-section>header{padding:11px 12px;border:1px solid var(--s-line);border-radius:11px;background:#fafbfc}
+.v3-assets-depth__professional-section>header span{color:var(--s-blue);font-size:8px;font-weight:800;letter-spacing:.08em}
+.v3-assets-depth__professional-section>header h3{margin:4px 0 0;color:var(--s-text);font-size:14px}
+.v3-assets-depth__professional-section>header p{margin:6px 0 0;color:var(--s-muted);font-size:8.5px;line-height:1.45}
+@media(max-width:520px){
+ .v3-assets-depth__nav{display:flex;overflow-x:auto;scrollbar-width:none;overscroll-behavior-inline:contain}
+ .v3-assets-depth__nav button{flex:0 0 118px;min-height:58px}
+ .v3-assets-depth__nav button strong{font-size:10px}.v3-assets-depth__nav button small{font-size:8px}
+ .v3-assets-depth__explain summary,.v3-assets-depth__professional-section>header p{font-size:9px}
+}
