@@ -11,11 +11,22 @@ export type V3AnalysisDepth={
   tail:TailRiskResult;
 };
 
-const analyticsHistory=(history:HistoryPoint[])=>history.map(point=>({
-  date:point.date,
-  portfolio:point.portfolio,
-  imoex:point.imoex,
-}));
+const analyticsHistory=(history:HistoryPoint[])=>{
+  const finitePortfolio=history
+    .map(point=>point.portfolio)
+    .filter((value):value is number=>typeof value==="number"&&Number.isFinite(value));
+  const first=finitePortfolio[0]??null;
+  const legacyDecimal=first!=null
+    && Math.abs(first)<0.5
+    && finitePortfolio.every(value=>Math.abs(value)<2);
+  return history.map(point=>({
+    date:point.date,
+    portfolio:typeof point.portfolio==="number"&&Number.isFinite(point.portfolio)
+      ? legacyDecimal?1+point.portfolio:point.portfolio
+      : point.portfolio,
+    imoex:point.imoex,
+  }));
+};
 
 const analyticsPositions=(items:PositionSnapshot[])=>items.map(item=>({
   ticker:item.ticker,
