@@ -399,3 +399,15 @@ This log is maintained by autonomous development runs. Production changes must r
 - Legacy push workflow `v7.16.9 Bond browser last-good` continues to fail independently on ordinary `main` pushes; it is outside the scoped v2 production gate and was not introduced by these analytics changes.
 - Legal publication blocker remains unchanged: no RU/EN offer, privacy-policy or consent wording was published; `LEGAL_REVIEW_2026-09-11.md` remains controlling until P0 items and real operator/provider details are resolved.
 - Next safe focus: review the remaining core/recovery analytics history normalization for the same duplicate-date integrity class before adding more UI; otherwise continue compact Pro-depth work that does not invent expected returns or duplicate existing mobile widgets.
+
+
+## 2026-09-29 — V36 Mobile Deep Readability
+
+Real-device review from the latest Core Preview recording showed that navigation continuity is now stable, but professional workspaces still compress secondary labels too aggressively on a 1080×2340 phone viewport.
+
+- raised mobile microcopy in Market, Pro Toolbox, Futures, Rebalance, Portfolio Lab and Report surfaces;
+- increased tap targets for deep workspace controls and scenario inputs;
+- improved line-height and card spacing without removing analytics;
+- added horizontal snap/rhythm to Market subnavigation;
+- reserved more bottom reading space above the fixed navigation;
+- kept the light Financial Core direction and read-only product boundary unchanged.

@@ -292,3 +292,64 @@
  .sb .v3-pro-tools__groups{margin-bottom:8px}
  .sb .v3-pro-tools__stage{scroll-margin-top:156px}
 }
+
+
+/* v36 real-device deep workspace readability */
+@media(max-width:520px){
+ .sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools,.sam-rebalance,.sam-lab,.sam-report-depth){
+  text-rendering:optimizeLegibility;
+ }
+ .sb :is(.v3-market-intelligence,.v3-pro-tools)>header p,
+ .sb :is(.sam-rebalance__head,.sam-lab__head,.sam-report-depth__head) p{
+  font-size:10px;line-height:1.5;
+ }
+ .sb .v3-market-intelligence>nav{gap:7px;scroll-snap-type:x proximity;padding-bottom:1px}
+ .sb .v3-market-intelligence>nav button{flex-basis:124px;min-height:52px;padding:9px 10px;scroll-snap-align:start}
+ .sb .v3-market-intelligence>nav strong{font-size:10px}
+ .sb .v3-market-intelligence>nav small{font-size:9px;line-height:1.3}
+ .sb .v3-market-pulse__metrics span,.sb .v3-market-pulse__metrics small,
+ .sb .v3-market-portfolio>header span,.sb .v3-market-portfolio>header small,
+ .sb .v3-market-portfolio article small,.sb .v3-market-portfolio article span,
+ .sb .v3-market-pulse>footer,.sb .v3-market-portfolio p{
+  font-size:9px;line-height:1.4;
+ }
+ .sb .v3-market-portfolio article{min-height:58px;padding:10px}
+ .sb .v3-market-portfolio article strong,.sb .v3-market-portfolio article b{font-size:10px}
+ .sb .v3-pro-tools__groups button{min-height:60px;padding:10px}
+ .sb .v3-pro-tools__groups button strong{font-size:11px}
+ .sb .v3-pro-tools__groups button small{font-size:9px;line-height:1.35}
+ .sb .v3-pro-tools__focus>p{font-size:9.5px;line-height:1.45}
+ .sb .v3-pro-tools__focus>button{min-height:44px;padding-inline:12px;font-size:9.5px}
+ .sb .v3-pro-tool>header p{font-size:9.5px;line-height:1.5}
+ .sb .v3-futures-direction button{min-height:52px;font-size:10px}
+ .sb .v3-futures-direction button small,
+ .sb .v3-futures-scenario__fields span,.sb .v3-futures-scenario__fields small,
+ .sb .v3-futures-scenario__metrics span,.sb .v3-futures-scenario__metrics small,
+ .sb .v3-futures-risk__summary span,.sb .v3-futures-risk__summary small,
+ .sb .v3-futures-risk__head span,.sb .v3-futures-risk__head small,
+ .sb .v3-futures-stress small,.sb .v3-futures-stress b,
+ .sb .v3-futures-risk__note,.sb .v3-futures-scenario>footer{
+  font-size:9px;line-height:1.35;
+ }
+ .sb .v3-futures-scenario__fields input,.sb .sam-rebalance input,.sb .sam-lab__inputs input{min-height:44px;font-size:12px}
+ .sb .v3-futures-scenario__metrics strong,.sb .v3-futures-risk__summary strong{font-size:12px}
+ .sb .v3-futures-stress span{font-size:9.5px}.sb .v3-futures-stress strong{font-size:10.5px}
+ .sb .sam-rebalance__current span,.sb .sam-rebalance__current small,.sb .sam-rebalance__scenario-summary span,
+ .sb .sam-rebalance label span,.sb .sam-rebalance__derived span,
+ .sb .sam-rebalance__section-title>strong,.sb .sam-rebalance__section-title>small,
+ .sb .sam-rebalance__rows small,.sb .sam-rebalance__rows span,
+ .sb .sam-rebalance__deltas small,.sb .sam-rebalance__deltas span,
+ .sb .sam-rebalance__warning,.sb .sam-rebalance>footer,
+ .sb .sam-lab__inputs span,.sb .sam-lab__inputs small,.sb .sam-lab__title>small,
+ .sb .sam-lab article>div span,.sb .sam-lab article>small,.sb .sam-lab__method,
+ .sb .sam-report-depth__summary span,.sb .sam-report-depth__summary small,
+ .sb .sam-report-depth__warning,.sb .sam-report-depth__method,.sb .sam-report-depth__title>small,
+ .sb .sam-report-depth__coverage span,.sb .sam-report-depth__coverage small,
+ .sb .sam-report-depth__row small,.sb .sam-report-depth__row span,
+ .sb .sam-report-depth__unknown small,.sb .sam-report-depth__empty{
+  font-size:9px;line-height:1.4;
+ }
+ .sb .sam-rebalance__rows article,.sb .sam-rebalance__deltas article,.sb .sam-report-depth__row{min-height:62px;padding-block:10px}
+ .sb .sam-rebalance__modes button,.sb .sam-lab__windows button{min-height:42px;font-size:9.5px}
+ .sb .sam-report-depth__summary article,.sb .sam-report-depth__coverage{padding:11px}
+}
