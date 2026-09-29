@@ -20,17 +20,23 @@ export function V3RiskLayer({portfolio,tail,positions,totalPortfolioValue,onOpen
       <article><span>Экв. позиций <V3MetricHelp topic="effectivePositions"/></span><strong>{portfolio.effectivePositions==null?"—":n.format(portfolio.effectivePositions)}</strong><small>1 / HHI капитала</small></article>
       <article><span>Классов активов</span><strong>{portfolio.assetClassCount||"—"}</strong><small>по подтверждённому составу</small></article>
     </div>
-    <section className="v3-tail-card">
-      <div className="v3-analysis-layer-head is-small"><div><span>Хвост распределения</span><h3>Исторический дневной tail risk <V3MetricHelp topic="tailRisk"/></h3></div><b>{tail.returns}/{tail.minimumReturns}</b></div>
-      <div className="v3-analysis-metric-grid is-tail">
-        <article><span>VaR 95%</span><strong className={tail.var95Loss!=null?"is-negative":"is-neutral"}>{lossPct(tail.var95Loss)}</strong><small>исторический порог</small></article>
-        <article><span>CVaR 95%</span><strong className={tail.cvar95Loss!=null?"is-negative":"is-neutral"}>{lossPct(tail.cvar95Loss)}</strong><small>среднее худшего хвоста</small></article>
-        <article><span>Худший день</span><strong className={tail.worstDay!=null&&tail.worstDay<0?"is-negative":"is-neutral"}>{tail.worstDay==null?"—":p.format(tail.worstDay*100)+"%"}</strong><small>фактический TWR день</small></article>
-        <article><span>Доля минусовых дней</span><strong>{pct(tail.downsideFrequency)}</strong><small>{tail.returns} доходностей</small></article>
-      </div>
-      {!tail.available&&<div className={"v3-analysis-gate"+(tail.status==="invalid_history"?" is-danger":"")}>{tail.note}</div>}
-      {tail.available&&<small className="v3-analysis-method-note">{tail.note} VaR/CVaR описывают прошлую выборку и не являются пределом будущего убытка.</small>}
-    </section>
-    <V3RiskContributionPanel positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/>
+    <details className="v3-analysis-disclosure">
+      <summary><span><b>Хвостовой риск</b><small>VaR/CVaR · худший день · частота минусов</small></span><i aria-hidden="true">⌄</i></summary>
+      <section className="v3-tail-card">
+       <div className="v3-analysis-layer-head is-small"><div><span>Хвост распределения</span><h3>Исторический дневной tail risk <V3MetricHelp topic="tailRisk"/></h3></div><b>{tail.returns}/{tail.minimumReturns}</b></div>
+       <div className="v3-analysis-metric-grid is-tail">
+         <article><span>VaR 95%</span><strong className={tail.var95Loss!=null?"is-negative":"is-neutral"}>{lossPct(tail.var95Loss)}</strong><small>исторический порог</small></article>
+         <article><span>CVaR 95%</span><strong className={tail.cvar95Loss!=null?"is-negative":"is-neutral"}>{lossPct(tail.cvar95Loss)}</strong><small>среднее худшего хвоста</small></article>
+         <article><span>Худший день</span><strong className={tail.worstDay!=null&&tail.worstDay<0?"is-negative":"is-neutral"}>{tail.worstDay==null?"—":p.format(tail.worstDay*100)+"%"}</strong><small>фактический TWR день</small></article>
+         <article><span>Доля минусовых дней</span><strong>{pct(tail.downsideFrequency)}</strong><small>{tail.returns} доходностей</small></article>
+       </div>
+       {!tail.available&&<div className={"v3-analysis-gate"+(tail.status==="invalid_history"?" is-danger":"")}>{tail.note}</div>}
+       {tail.available&&<small className="v3-analysis-method-note">{tail.note} VaR/CVaR описывают прошлую выборку и не являются пределом будущего убытка.</small>}
+      </section>
+    </details>
+    <details className="v3-analysis-disclosure">
+      <summary><span><b>Вклад активов в риск</b><small>концентрация · корреляции · вклад позиций</small></span><i aria-hidden="true">⌄</i></summary>
+      <V3RiskContributionPanel positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/>
+    </details>
   </section>
 }
