@@ -276,10 +276,25 @@ async function tbankRequest(method, body) {
   return data;
 }
 
+const ACCOUNTS_CACHE_TTL_MS = 60 * 1000;
+let ACCOUNTS_CACHE = { data: null, fetchedAt: 0, inFlight: null };
+
 async function getAccounts() {
-  return tbankRequest('tinkoff.public.invest.api.contract.v1.UsersService/GetAccounts', {
+  const now = Date.now();
+  if (ACCOUNTS_CACHE.data && now - ACCOUNTS_CACHE.fetchedAt < ACCOUNTS_CACHE_TTL_MS) {
+    return ACCOUNTS_CACHE.data;
+  }
+  if (ACCOUNTS_CACHE.inFlight) return ACCOUNTS_CACHE.inFlight;
+  ACCOUNTS_CACHE.inFlight = tbankRequest('tinkoff.public.invest.api.contract.v1.UsersService/GetAccounts', {
     status: 'ACCOUNT_STATUS_OPEN'
+  }).then(data => {
+    ACCOUNTS_CACHE = { data, fetchedAt: Date.now(), inFlight: null };
+    return data;
+  }).catch(error => {
+    ACCOUNTS_CACHE.inFlight = null;
+    throw error;
   });
+  return ACCOUNTS_CACHE.inFlight;
 }
 
 function selectAccount(accounts) {
@@ -293,11 +308,29 @@ function selectAccount(accounts) {
   );
 }
 
+const PORTFOLIO_CACHE_TTL_MS = 15 * 1000;
+const PORTFOLIO_CACHE = new Map();
+
 async function getPortfolio(accountId) {
-  return tbankRequest('tinkoff.public.invest.api.contract.v1.OperationsService/GetPortfolio', {
+  const key = String(accountId || '');
+  const now = Date.now();
+  const cached = PORTFOLIO_CACHE.get(key);
+  if (cached?.data && now - cached.fetchedAt < PORTFOLIO_CACHE_TTL_MS) return cached.data;
+  if (cached?.inFlight) return cached.inFlight;
+
+  const entry = cached || { data: null, fetchedAt: 0, inFlight: null };
+  entry.inFlight = tbankRequest('tinkoff.public.invest.api.contract.v1.OperationsService/GetPortfolio', {
     accountId,
     currency: 'RUB'
+  }).then(data => {
+    PORTFOLIO_CACHE.set(key, { data, fetchedAt: Date.now(), inFlight: null });
+    return data;
+  }).catch(error => {
+    entry.inFlight = null;
+    throw error;
   });
+  PORTFOLIO_CACHE.set(key, entry);
+  return entry.inFlight;
 }
 
 const OPERATIONS_CACHE_TTL_MS = 5 * 60 * 1000;
