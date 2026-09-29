@@ -159,3 +159,13 @@
  .sb-analytics .sb-switch{position:sticky;z-index:18;top:95px;background:var(--s-bg);padding:4px 0}
  .sb-analytics .sb-switch button{min-height:36px;font-size:9px}
 }
+
+/* v34 keyboard-safe mobile workspace */
+.qv-input-active .sb-nav{opacity:0;pointer-events:none;transform:translateY(calc(100% + 18px));transition:opacity .12s ease,transform .12s ease}
+.qv-input-active .sb main{padding-bottom:calc(28px + var(--qv-keyboard-inset,0px))!important}
+.sb :is(input,textarea,select){scroll-margin-top:118px;scroll-margin-bottom:calc(28px + var(--qv-keyboard-inset,0px))}
+@media(max-width:520px){
+ .qv-input-active .sb-top{box-shadow:0 1px 0 var(--s-line)}
+ .qv-input-active .sb-workspace-tabs{position:static!important}
+ .qv-input-active .sb .v3-pro-tools__focus{position:sticky;top:54px;z-index:24}
+}
