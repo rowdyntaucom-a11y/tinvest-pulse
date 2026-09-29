@@ -1241,12 +1241,26 @@ async function buildDashboard() {
     };
   }
 
-  const [portfolio, operations, moex, cbr] = await Promise.all([
+  // Portfolio + operations are the broker truth required for the financial core.
+  // Public macro sources are auxiliary and must never make a healthy broker
+  // portfolio disappear from the app.
+  const dashboardStartedAt = Date.now();
+  const [portfolio, operations] = await Promise.all([
     getPortfolio(account.id),
-    getOperations(account.id),
+    getOperations(account.id)
+  ]);
+  const [moexResult, cbrResult] = await Promise.allSettled([
     getMoex(),
     getCbrMacro()
   ]);
+  const moex = moexResult.status === 'fulfilled'
+    ? moexResult.value
+    : { available: false, source: 'MOEX', error: 'market context unavailable' };
+  const cbr = cbrResult.status === 'fulfilled'
+    ? cbrResult.value
+    : { available: false, rate: null, rateDate: null, nextMeeting: null, error: 'CBR context unavailable' };
+  if (moexResult.status === 'rejected') console.warn('Dashboard optional MOEX source unavailable:', moexResult.reason?.message || moexResult.reason);
+  if (cbrResult.status === 'rejected') console.warn('Dashboard optional CBR source unavailable:', cbrResult.reason?.message || cbrResult.reason);
 
   const positions = (portfolio?.positions || []).map(p => ({
     figi: p.figi,
@@ -1352,6 +1366,13 @@ async function buildDashboard() {
 
   return {
     updatedAt: new Date().toISOString(),
+    sourceHealth: {
+      brokerPortfolio: true,
+      operations: true,
+      moex: moexResult.status === 'fulfilled',
+      cbr: cbrResult.status === 'fulfilled',
+      elapsedMs: Date.now() - dashboardStartedAt
+    },
     account: {
       id: account.id,
       name: account.name || account.type || 'T-Invest account'
