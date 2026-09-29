@@ -1,4 +1,5 @@
 import{useMemo,useState}from"react";
+import{V3GlossaryHelp}from"../help/V3GlossaryHelp";
 import{calculateFuturesRiskProfile,calculateFuturesScenario,futuresScenarioWarnings,parseScenarioNumber,type FuturesScenarioInput}from"./futuresMath";
 
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -28,6 +29,7 @@ export function V3FuturesScenario(){
 
  return <section className="v3-pro-tool v3-futures-scenario" aria-label="Сценарий по фьючерсу">
   <header><div><span>DERIVATIVES // READ-ONLY</span><h3>Фьючерс · сценарий</h3><p>Расчёт по введённым параметрам. QVANIX ничего не отправляет брокеру и не создаёт заявку.</p></div><strong>WHAT IF</strong></header>
+  <div className="v3-futures-help"><V3GlossaryHelp terms={["basis","margin","pnl"]} label="Что такое Basis и ГО"/></div>
   <div className="v3-futures-direction" aria-label="Направление сценария"><button type="button" className={risk.direction==="LONG"?"is-active":""} onClick={()=>setInput(prev=>({...prev,direction:"LONG"}))}>LONG <small>рост цены = +P/L</small></button><button type="button" className={risk.direction==="SHORT"?"is-active":""} onClick={()=>setInput(prev=>({...prev,direction:"SHORT"}))}>SHORT <small>падение цены = +P/L</small></button></div>
   <div className="v3-futures-scenario__fields">{FIELDS.map(field=><label key={field.key}><span>{field.label}</span><input inputMode="decimal" placeholder={field.placeholder} onChange={e=>update(field.key,e.target.value)}/><small>{field.hint}</small></label>)}</div>
   <div className="v3-futures-scenario__metrics">
