@@ -5,14 +5,24 @@ import {
 } from '../src/lib/portfolioApi.ts'
 
 let dashboardPayload: Record<string, unknown> = {}
+let dashboardStatus = 200
+let legacyPortfolioPayload: Record<string, unknown> | null = null
 
 ;(globalThis as { fetch: typeof fetch }).fetch = async input => {
   const url = String(input)
-  if (url !== '/api/dashboard') throw new Error(`unexpected fetch ${url}`)
-  return new Response(JSON.stringify(dashboardPayload), {
-    status: 200,
-    headers: { 'content-type': 'application/json' },
-  })
+  if (url === '/api/dashboard') {
+    return new Response(JSON.stringify(dashboardPayload), {
+      status: dashboardStatus,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+  if (url === '/api/portfolio' && legacyPortfolioPayload) {
+    return new Response(JSON.stringify(legacyPortfolioPayload), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+  throw new Error(`unexpected fetch ${url}`)
 }
 
 function close(actual: number | null, expected: number, tolerance = 1e-12) {
@@ -252,6 +262,37 @@ close(conflictGuard.history[2].portfolio, 1.3)
 close(conflictGuard.history[2].imoex, 2.4)
 assert.equal(conflictGuard.history[2].value, null)
 assert.equal(conflictGuard.history[2].invested, null)
+
+// A transient full-dashboard failure may fall back to the independently verified
+// read-only broker portfolio route. The reduced contract stays visibly reduced:
+// no history, XIRR or benchmark values are invented.
+dashboardStatus = 503
+legacyPortfolioPayload = {
+  totalValue: 1250,
+  profit: 50,
+  positions: [
+    {
+      ticker: 'FALLBACK',
+      name: 'Verified broker fallback',
+      instrumentType: 'share',
+      quantity: 2,
+      averagePrice: 500,
+      currentPrice: 625,
+      currentValue: 1250,
+      expectedYield: 250,
+    },
+  ],
+}
+const recoveredLegacy = await loadPortfolio()
+assert.equal(recoveredLegacy.source, 'portfolio')
+close(recoveredLegacy.value, 1250)
+assert.equal(recoveredLegacy.positions, 1)
+assert.equal(recoveredLegacy.positionItems[0].ticker, 'FALLBACK')
+assert.equal(recoveredLegacy.history.length, 0)
+assert.equal(recoveredLegacy.xirr, null)
+assert.equal(recoveredLegacy.riskFreeRate, null)
+dashboardStatus = 200
+legacyPortfolioPayload = null
 
 console.log('portfolio API normalization regression: ok')
 

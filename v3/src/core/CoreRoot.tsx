@@ -86,9 +86,15 @@ export function CoreRoot(){
     cached.current=nextSnapshot;
     writeCache(nextSnapshot);
     setTrusted(true);
-    setReason(null);
-    retryStep.current=0;
-    cancelRetry();
+    if(nextSnapshot.source==="portfolio"){
+     setReason("Основной dashboard временно недоступен. Загружен подтверждённый брокерский портфель; история и расширенные расчёты догружаются отдельно.");
+     retryStep.current=Math.max(retryStep.current,3);
+     scheduleRetry();
+    }else{
+     setReason(null);
+     retryStep.current=0;
+     cancelRetry();
+    }
    }else{
     setReason(result.trust.shortReason??"Источник не прошёл проверку доверия.");
     if(cached.current){
@@ -184,6 +190,6 @@ export function CoreRoot(){
    portfolioValue:trusted?snapshot.value:null,
    trusted
   }}
-  connection={{state,reason,refresh,refreshing}}
+  connection={{state,reason,refresh,refreshing,source:trusted?snapshot.source:null}}
  />;
 }

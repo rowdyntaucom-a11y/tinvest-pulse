@@ -331,7 +331,17 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
 }
 
 async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
-  const response = await fetch('/api/portfolio', { cache: 'no-store' })
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 8_000)
+  let response: Response
+  try {
+    response = await fetch('/api/portfolio', { cache: 'no-store', signal: controller.signal })
+  } catch (error) {
+    if ((error as { name?: string } | null)?.name === 'AbortError') throw new Error('portfolio timeout')
+    throw error
+  } finally {
+    clearTimeout(timer)
+  }
   if (!response.ok) throw new Error(`portfolio ${response.status}`)
   const raw = await response.json() as Record<string, unknown>
   const portfolio = (raw.portfolio ?? raw) as Record<string, unknown>
@@ -375,17 +385,19 @@ export async function loadPortfolio(): Promise<PortfolioSnapshot> {
     return await loadDashboard()
   } catch (dashboardError) {
     const a = dashboardError instanceof Error ? dashboardError.message : 'dashboard unavailable'
-    // The current live contract is /api/dashboard. A transient 5xx during Render wake
-    // should be retried by the recovery loop instead of immediately spending another
-    // request on an optional legacy route that may not exist in this deployment.
-    if (isTransientDashboardFailure(dashboardError)) {
-      throw new Error(`Broker source temporarily unavailable: ${a}`)
-    }
+    // /api/dashboard is the preferred full-fidelity contract, but a transient
+    // dashboard composition failure must not hide an independently healthy
+    // read-only broker portfolio. The bounded legacy read carries real broker
+    // positions/value only; missing history/income/benchmark fields remain
+    // unavailable and are never fabricated.
     try {
       return await loadLegacyPortfolio()
     } catch (portfolioError) {
       const b = portfolioError instanceof Error ? portfolioError.message : 'portfolio unavailable'
-      throw new Error(`Broker source unavailable: ${a}; ${b}`)
+      const transient = isTransientDashboardFailure(dashboardError)
+      throw new Error(transient
+        ? `Broker sources temporarily unavailable: ${a}; ${b}`
+        : `Broker source unavailable: ${a}; ${b}`)
     }
   }
 }

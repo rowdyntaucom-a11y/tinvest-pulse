@@ -10,3 +10,6 @@ test("trusted Core prewarms slow read-only workspaces without blocking portfolio
 test("unavailable payout responses are not cached as if healthy",()=>{assert.match(payouts,/cacheEnabled&&result\.available/);assert.doesNotMatch(payouts,/if\(cacheEnabled\)payoutCache=\{value:result/)})
 
 test("deep financial chunks prefetch only after trusted first paint",()=>{assert.match(root,/import\(\"\.\.\/assets\/V3AssetsDepth\"\)/);assert.match(root,/import\(\"\.\.\/analysis\/V3MarketIntelligenceWorkspace\"\)/);assert.match(root,/import\(\"\.\.\/analysis\/V3AnalysisToolbox\"\)/);assert.match(root,/1400/)});
+
+
+test("verified legacy broker fallback stays visible while Core retries the full dashboard",()=>{assert.match(root,/nextSnapshot\.source==="portfolio"/);assert.match(root,/Основной dashboard временно недоступен/);assert.match(root,/retryStep\.current=Math\.max\(retryStep\.current,3\)/);assert.match(root,/scheduleRetry\(\)/)});
