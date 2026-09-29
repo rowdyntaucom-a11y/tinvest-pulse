@@ -1,4 +1,4 @@
-export const PORTFOLIO_NORMALIZATION_VERSION = '1.3' as const
+export const PORTFOLIO_NORMALIZATION_VERSION = '1.4' as const
 
 export type HistoryPoint = {
   date: string
@@ -157,34 +157,6 @@ const normaliseAccountContext = (value: unknown): AccountContext => {
   }
 }
 
-const ACCOUNT_CONTEXT_TTL_MS = 15 * 60_000
-let accountContextCache: { accountId: string; expiresAt: number; value: AccountContext } | null = null
-
-async function loadAccountContext(accountId: string | null): Promise<AccountContext> {
-  if (!accountId) return unavailableAccountContext()
-  const now = Date.now()
-  if (accountContextCache?.accountId === accountId && accountContextCache.expiresAt > now) {
-    return accountContextCache.value
-  }
-
-  try {
-    const response = await fetch('/api/accounts', { cache: 'no-store' })
-    if (!response.ok) throw new Error(`accounts ${response.status}`)
-    const raw = await response.json() as unknown
-    const root = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {}
-    const rows = Array.isArray(root.accounts) ? root.accounts : Array.isArray(raw) ? raw : []
-    const selected = rows.find(item => {
-      if (!item || typeof item !== 'object') return false
-      return String((item as Record<string, unknown>).id ?? '') === accountId
-    })
-    const value = selected ? normaliseAccountContext(selected) : unavailableAccountContext()
-    accountContextCache = { accountId, expiresAt: now + ACCOUNT_CONTEXT_TTL_MS, value }
-    return value
-  } catch {
-    return unavailableAccountContext()
-  }
-}
-
 type HistoryNumericField = 'portfolio' | 'imoex' | 'value' | 'invested'
 
 const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
@@ -312,7 +284,17 @@ const fallbackSnapshot = (): PortfolioSnapshot => ({
 })
 
 async function loadDashboard(): Promise<PortfolioSnapshot> {
-  const response = await fetch('/api/dashboard', { cache: 'no-store' })
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 20_000)
+  let response: Response
+  try {
+    response = await fetch('/api/dashboard', { cache: 'no-store', signal: controller.signal })
+  } catch (error) {
+    if ((error as { name?: string } | null)?.name === 'AbortError') throw new Error('dashboard timeout')
+    throw error
+  } finally {
+    clearTimeout(timer)
+  }
   if (!response.ok) throw new Error(`dashboard ${response.status}`)
   const raw = await response.json() as Record<string, unknown>
   const portfolio = (raw.portfolio ?? {}) as Record<string, unknown>
@@ -323,8 +305,7 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
   if (value == null || value < 0) throw new Error('dashboard portfolio value missing')
   const positionsRaw = portfolio.positions ?? portfolio.assets ?? raw.assets
   const positionItems = normalisePositions(positionsRaw, value)
-  const accountId = nullableString(account.id)
-  const accountContext = await loadAccountContext(accountId)
+  const accountContext = normaliseAccountContext(account)
 
   return {
     accountName: String(account.name || 'Кряхтящий фонд'),
