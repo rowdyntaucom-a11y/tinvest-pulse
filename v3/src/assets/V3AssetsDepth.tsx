@@ -92,7 +92,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
 
   {mode==="equity"&&<section className="v3-assets-depth__professional-section"><header><div><span>АКЦИИ</span><h3>Фундаментальные показатели</h3></div><p>Мультипликаторы и денежные потоки показаны только там, где источник подтверждён. Это справочный слой, а не рейтинг бумаг.</p></header><V3EquityFundamentalsDepth positions={positions} onOpenAsset={onOpenAsset}/></section>}
 
-  {mode==="bonds"&&<section className="v3-assets-depth__professional-section"><header><div><span>ОБЛИГАЦИИ</span><h3>Доходность и сроки</h3></div><p>YTM — оценка доходности к погашению при заданных условиях. Modified duration показывает чувствительность цены к изменению ставок, а не срок до погашения.</p></header>
+  {mode==="bonds"&&<section className="v3-assets-depth__professional-section"><header><div><span>ОБЛИГАЦИИ</span><h3>Доходность и сроки</h3></div><p>YTM — оценка доходности к погашению при заданных условиях. Modified duration показывает чувствительность цены к изменению ставок, а не срок до погашения. Расширенный слой YTM и modified duration использует только отдельный проверяемый источник.</p></header>
    {model.bonds.bondCount?<section id="sam-assets-bonds" className="v3-assets-depth__block v3-assets-depth__bonds"><div className="v3-assets-depth__bond-grid">
     <article><span>ОФЗ</span><strong>{pct.format(model.bonds.ofzShare*100)}%</strong><small>облигационной части</small></article>
     <article><span>До погашения</span><strong>{model.bonds.weightedYearsToMaturity==null?"—":num.format(model.bonds.weightedYearsToMaturity)+" г."}</strong><small>взвешенный срок</small></article>
