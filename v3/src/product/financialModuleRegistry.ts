@@ -114,7 +114,7 @@ export function compositionFor(
    if(item.blocked&&!options.includeBlocked)return false;
    return true;
   })
-  .sort((a,b)=>a.priority-b.priority-(0)||(originalIndex.get(a.module.id)??0)-(originalIndex.get(b.module.id)??0));
+  .sort((a,b)=>(a.priority-b.priority)||((originalIndex.get(a.module.id)??0)-(originalIndex.get(b.module.id)??0)));
 }
 
 export function assertReadOnlyProductInvariant(){
