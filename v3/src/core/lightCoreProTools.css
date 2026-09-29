@@ -213,3 +213,32 @@
  .sb .v3-correlation-summary span,.sb .v3-correlation-summary small,.sb .v3-correlation-pairs small{font-size:9px}
  .sb .v3-correlation-assets button{min-height:38px;font-size:9px}
 }
+
+
+/* v25 full income depth in light Core */
+.sb .v3-income-depth{margin-top:0;padding:12px;border-color:var(--s-line);border-radius:14px;background:#fff;color:var(--s-text)}
+.sb .v3-income-depth-head h2,.sb .v3-income-calendar-summary strong,.sb .v3-income-calendar-selection strong,.sb .v3-income-event-row strong,.sb .v3-income-source-row strong,.sb .v3-income-history-stats strong,.sb .v3-income-comparable strong,.sb .v3-income-quality-head strong,.sb .v3-income-quality-grid strong,.sb .v3-income-bond-link strong,.sb .v3-income-coverage strong{color:var(--s-text)}
+.sb .v3-income-depth-head>div:first-child span,.sb .v3-income-depth-status small,.sb .v3-income-calendar-summary span,.sb .v3-income-calendar-summary small,.sb .v3-income-calendar-selection span,.sb .v3-income-calendar-selection small,.sb .v3-income-event-row time,.sb .v3-income-event-row small,.sb .v3-income-method,.sb .v3-income-history-stats span,.sb .v3-income-history-stats small,.sb .v3-income-comparable span,.sb .v3-income-comparable small,.sb .v3-income-source-row span,.sb .v3-income-source-row small,.sb .v3-income-bond-link span,.sb .v3-income-bond-link small,.sb .v3-income-coverage span,.sb .v3-income-coverage small,.sb .v3-income-quality-head span,.sb .v3-income-quality-head small,.sb .v3-income-quality-grid span,.sb .v3-income-quality-grid small,.sb .v3-income-bond-months span,.sb .v3-income-bond-months small{color:var(--s-muted)}
+.sb .v3-income-calendar-summary article,.sb .v3-income-event-row,.sb .v3-income-source-row,.sb .v3-income-calendar-selection,.sb .v3-income-history-stats article,.sb .v3-income-comparable,.sb .v3-income-bond-link,.sb .v3-income-coverage,.sb .v3-income-quality,.sb .v3-income-quality-grid article{border-color:var(--s-line);background:#fafbfc}
+.sb .v3-income-month-ribbon button{border-color:var(--s-line);background:#fafbfc;color:var(--s-text)}
+.sb .v3-income-month-ribbon button.is-active{border-color:#cfd9ec;background:#eef3fc}
+.sb .v3-income-month-ribbon i,.sb .v3-income-bond-link>i,.sb .v3-income-bond-months i{background:#e9edf3}
+.sb .v3-income-bond-cashflow{border-color:#eadfc9;background:#fffbf4}
+.sb .v3-income-depth-state,.sb .v3-income-depth-gate{background:#fafbfc;border-color:#cfd4dd;color:var(--s-muted)}
+.sb .v3-income-depth-state.is-warning,.sb .v3-income-depth-gate{border-color:#e5cfaa;color:#84652f;background:#fff9ed}
+
+/* Dividend discovery is part of the financial product, not an old shell material. */
+.sb .v3-dividend-discovery{margin-top:10px;border:1px solid var(--s-line);border-left:3px solid var(--s-blue);border-radius:12px;background:#fff;color:var(--s-text)}
+.sb .v3-dividend-discovery>header span{color:var(--s-blue)}.sb .v3-dividend-discovery>header h3{color:var(--s-text);font-family:Inter,system-ui,sans-serif;font-weight:700}.sb .v3-dividend-discovery>header p,.sb .v3-dividend-discovery>footer{color:var(--s-muted)}
+.sb .v3-dividend-discovery>header>strong{color:#244b91}.sb .v3-dividend-discovery__method{border-color:var(--s-line);background:#fafbfc;color:var(--s-muted)}.sb .v3-dividend-discovery__method code{color:#244b91}
+.sb .v3-dividend-discovery__search{color:var(--s-muted)}.sb .v3-dividend-discovery__search input{border-color:var(--s-line);border-radius:9px;background:#fff;color:var(--s-text)}
+.sb .v3-dividend-discovery__row{border-color:var(--s-line);background:#fafbfc}.sb .v3-dividend-discovery__row>b{color:#244b91}.sb .v3-dividend-discovery__row small{color:var(--s-muted)}.sb .v3-dividend-discovery__row.is-head{color:var(--s-muted);background:#f3f5f7}.sb .v3-dividend-discovery__state{border-color:#cfd4dd;color:var(--s-muted);background:#fafbfc}
+
+@media(max-width:520px){
+ .sb .v3-income-depth-head>div:first-child span,.sb .v3-income-depth-status strong,.sb .v3-income-depth-status small,.sb .v3-income-calendar-summary span,.sb .v3-income-calendar-summary small,.sb .v3-income-calendar-selection span,.sb .v3-income-calendar-selection small,.sb .v3-income-event-row time,.sb .v3-income-event-row small,.sb .v3-income-method,.sb .v3-income-history-stats span,.sb .v3-income-history-stats small,.sb .v3-income-comparable span,.sb .v3-income-comparable small,.sb .v3-income-source-row span,.sb .v3-income-source-row small,.sb .v3-income-bond-link span,.sb .v3-income-bond-link small,.sb .v3-income-coverage span,.sb .v3-income-coverage small,.sb .v3-income-quality-head span,.sb .v3-income-quality-head small,.sb .v3-income-quality-grid span,.sb .v3-income-quality-grid small,.sb .v3-income-bond-months span,.sb .v3-income-bond-months small{font-size:9px;line-height:1.35}
+ .sb .v3-income-event-row strong,.sb .v3-income-source-row>div:first-child strong{font-size:11px}
+ .sb .v3-income-history-bars strong,.sb .v3-income-history-bars span,.sb .v3-income-history-bars small{font-size:9px}
+ .sb .v3-income-month-ribbon span,.sb .v3-income-month-ribbon small{font-size:9px}
+ .sb .v3-dividend-discovery>header span,.sb .v3-dividend-discovery__method,.sb .v3-dividend-discovery__search,.sb .v3-dividend-discovery__row small,.sb .v3-dividend-discovery__row.is-head,.sb .v3-dividend-discovery>footer{font-size:9px;line-height:1.4}
+ .sb .v3-dividend-discovery__row strong{font-size:11px}.sb .v3-dividend-discovery__row>b{font-size:11px}
+}
