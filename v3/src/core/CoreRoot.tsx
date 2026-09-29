@@ -153,6 +153,18 @@ export function CoreRoot(){
   return()=>window.clearTimeout(timer);
  },[trusted,snapshot.updatedAt]);
 
+ useEffect(()=>{
+  if(!trusted)return;
+  const timer=window.setTimeout(()=>{
+   void Promise.allSettled([
+    import("../assets/V3AssetsDepth"),
+    import("../analysis/V3MarketIntelligenceWorkspace"),
+    import("../analysis/V3AnalysisToolbox"),
+   ]);
+  },1400);
+  return()=>window.clearTimeout(timer);
+ },[trusted]);
+
  const home=buildV3HomeViewModel(snapshot,trusted);
  return <CoreWorkspace
   home={home}

@@ -8,3 +8,5 @@ test("preview startup probes only the lightweight version endpoint",()=>{const s
 const payouts=readFileSync(new URL("../../v2/src/lib/payoutsApi.ts",import.meta.url),"utf8");
 test("trusted Core prewarms slow read-only workspaces without blocking portfolio paint",()=>{assert.match(root,/loadMarketScreener\(\)/);assert.match(root,/loadPayoutCalendar\(\{timeoutMs:8000\}\)/);assert.match(root,/setTimeout\(\(\)=>\{/);assert.match(root,/Promise\.allSettled/)});
 test("unavailable payout responses are not cached as if healthy",()=>{assert.match(payouts,/cacheEnabled&&result\.available/);assert.doesNotMatch(payouts,/if\(cacheEnabled\)payoutCache=\{value:result/)})
+
+test("deep financial chunks prefetch only after trusted first paint",()=>{assert.match(root,/import\(\"\.\.\/assets\/V3AssetsDepth\"\)/);assert.match(root,/import\(\"\.\.\/analysis\/V3MarketIntelligenceWorkspace\"\)/);assert.match(root,/import\(\"\.\.\/analysis\/V3AnalysisToolbox\"\)/);assert.match(root,/1400/)});

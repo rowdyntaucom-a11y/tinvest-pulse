@@ -17,7 +17,7 @@ test("Samurai analysis exposes one professional toolbox entry instead of four pe
 });
 
 test("toolbox contains current professional modules and read-only futures scenarios",()=>{
- for(const token of["Ребаланс","Лаборатория","Рынок","Фьючерсы","READ-ONLY"])assert.match(toolbox,new RegExp(token));
+ for(const token of["Ребаланс","Лаборатория","Рынок","Фьючерсы","Отчёт","READ-ONLY","V3PortfolioReportDepth"])assert.match(toolbox,new RegExp(token));
 });
 
 test("toolbox adapts from local mobile rail to desktop side navigation",()=>{
@@ -33,3 +33,6 @@ test("Derivatives Intelligence V2 exposes directional stress without trading sem
  assert.match(css,/v3-futures-stress/);
  assert.match(css,/@media\(max-width:430px\)/);
 });
+
+
+test("light Core can hide duplicate market entry while keeping shared toolbox reusable",()=>{assert.match(toolbox,/includeMarket=true/);assert.match(toolbox,/TOOLS\.filter\(item=>item\.id!==\"market\"\)/);});
