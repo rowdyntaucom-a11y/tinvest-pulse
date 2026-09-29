@@ -17,6 +17,19 @@ Second tranche of the large light-Core financial-depth pass. This builds on the 
 - Deep analytics keeps asset drill-down where exact identity exists.
 - Mobile typography overrides remove the old 7px analytical microtype from risk/correlation rows.
 
+## Income depth added in the same product tranche
+- Income gets a third **Глубина** mode while retaining the compact overview and fast calendar.
+- Full canonical income workspace is reused:
+  - trusted 12M payout schedule;
+  - realized FACT/NET monthly history;
+  - income stability and quality;
+  - source concentration and exact-FIGI source rows;
+  - bond schedule linkage and 12M bond cash-flow profile;
+  - separate market TTM dividend discovery.
+- Dividend discovery is explicitly available in the light Core and remains separate from current-portfolio income.
+- Deep income chunk is prefetched only after trusted first paint.
+- Old dark material and 6.5–7px mobile labels are overridden with the light Core material and 9px+ mobile information floors.
+
 ## Review hardening carried from v24
 - Promoted Market Intelligence owns bounded automatic recovery (2.5s / 6s) plus explicit manual retry.
 - Mobile screener/discovery identity and financial context are raised to readable 9–11px floors.
