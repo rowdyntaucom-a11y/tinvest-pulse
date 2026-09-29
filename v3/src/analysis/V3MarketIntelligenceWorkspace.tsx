@@ -52,7 +52,7 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
     <footer>Пульс описывает только текущий публичный срез. Доля растущих бумаг не является прогнозом направления рынка, а совпадение с портфелем выполняется по точному ticker.</footer>
    </>}
   </div>}
-  {mode==="screener"&&<V3MarketScreener/>}
+  {mode==="screener"&&<V3MarketScreener sharedData={data} sharedLoading={loading} onRetry={manualRetry}/>}
   {mode==="discovery"&&<V3FallenAssetsDiscovery/>}
  </section>;
 }
