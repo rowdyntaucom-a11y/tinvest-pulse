@@ -1375,7 +1375,11 @@ async function buildDashboard() {
     },
     account: {
       id: account.id,
-      name: account.name || account.type || 'T-Invest account'
+      name: account.name || account.type || 'T-Invest account',
+      type: account.type || null,
+      status: account.status || null,
+      openedDate: account.openedDate || account.openDate || null,
+      accessLevel: account.accessLevel || null
     },
     portfolio: {
       value: portfolioValue,
@@ -1685,6 +1689,10 @@ app.get('/api/dashboard', async (req, res) => {
   const requestStartedAt = Date.now();
   try {
     const data = await buildDashboard();
+    if (data?.error) {
+      console.warn('QVANIX_DASHBOARD_UNAVAILABLE', JSON.stringify({ms:Date.now()-requestStartedAt,reason:'BROKER_ACCOUNT_UNAVAILABLE'}));
+      return res.status(503).json({error:data.error,code:'BROKER_ACCOUNT_UNAVAILABLE'});
+    }
     console.log('QVANIX_DASHBOARD_OK', JSON.stringify({
       ms: Date.now() - requestStartedAt,
       hasAccount: Boolean(data?.account?.id),
