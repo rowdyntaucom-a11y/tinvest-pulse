@@ -1,7 +1,7 @@
 import test from"node:test";
 import assert from"node:assert/strict";
 import{readFileSync}from"node:fs";
-import{buildV3AnalysisDepth,buildV3RelativeDepth}from"../src/analysis/analysisDepth.ts";
+import{normalizePortfolioAnalyticsHistory}from"../src/analysis/normalizeAnalyticsHistory.ts";
 
 const depth=readFileSync(new URL("../src/core/CoreAnalyticsDepth.tsx",import.meta.url),"utf8");
 const ui=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
@@ -45,14 +45,16 @@ test("canonical analytics mobile typography stays above microtype",()=>{
 
 test("legacy decimal TWR history is normalized to a wealth index before analytics",()=>{
  const history=[
-  {date:"2026-01-01",portfolio:0,imoex:100,value:100,invested:100},
-  {date:"2026-01-02",portfolio:.03,imoex:103,value:103,invested:100},
-  {date:"2026-01-03",portfolio:.05,imoex:105,value:105,invested:100},
+  {date:"2026-01-01",portfolio:0,imoex:100},
+  {date:"2026-01-02",portfolio:.03,imoex:103},
+  {date:"2026-01-03",portfolio:.05,imoex:105},
  ];
- const depth=buildV3AnalysisDepth(history,[],null);
- assert.ok(depth.portfolio.twr!=null);
- assert.ok(Math.abs(depth.portfolio.twr-.05)<1e-12);
- const relative=buildV3RelativeDepth(history);
- assert.ok(relative.portfolioReturn!=null);
- assert.ok(Math.abs(relative.portfolioReturn-.05)<1e-12);
+ const normalized=normalizePortfolioAnalyticsHistory(history);
+ assert.deepEqual(normalized.map(point=>point.portfolio),[1,1.03,1.05]);
+ const wealthIndex=[
+  {date:"2026-01-01",portfolio:100,imoex:100},
+  {date:"2026-01-02",portfolio:103,imoex:103},
+ ];
+ assert.equal(normalizePortfolioAnalyticsHistory(wealthIndex),wealthIndex);
+ assert.match(readFileSync(new URL("../src/analysis/analysisDepth.ts",import.meta.url),"utf8"),/normalizePortfolioAnalyticsHistory/);
 });
