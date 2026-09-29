@@ -8,6 +8,7 @@ const repoRoot=path.join(__dirname,'..');
 const core=fs.readFileSync(path.join(repoRoot,'server-core.js'),'utf8');
 const portfolioApi=fs.readFileSync(path.join(repoRoot,'v2/src/lib/portfolioApi.ts'),'utf8');
 const preview=fs.readFileSync(path.join(repoRoot,'v3/preview-server.cjs'),'utf8');
+const serverBase=fs.readFileSync(path.join(repoRoot,'server-base.js'),'utf8');
 
 assert.match(core,/const \[portfolio, operations\] = await Promise\.all/);
 assert.match(core,/qvanixDashboardOptional\(getMoex\(\), 'MOEX'\)/);
@@ -34,5 +35,10 @@ assert.match(preview,/isDashboard=req\.url\.split\("\?"\)\[0\]==="\/api\/dashboa
 assert.match(preview,/delays=isDashboard\?\[0,900\]/);
 assert.match(preview,/attemptTimeoutMs=isDashboard\?12000:18000/);
 assert.match(preview,/QVANIX_DASHBOARD_PROXY/);
+
+assert.match(serverBase,/QVANIX_DASHBOARD_WARMUP/);
+assert.match(serverBase,/const d=await buildDashboard\(\)/);
+assert.match(serverBase,/brokerPortfolio:d\?\.sourceHealth\?\.brokerPortfolio===true/);
+assert.doesNotMatch(serverBase,/QVANIX_DASHBOARD_WARMUP[^\n]*portfolio\.value[^\n]*JSON\.stringify\(\{[^}]*value:/);
 
 console.log('trusted portfolio source isolation regression: ok');

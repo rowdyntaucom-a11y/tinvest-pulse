@@ -15,6 +15,7 @@ on:
       - 'dividend-discovery.js'
       - 'dividend-discovery-core.js'
       - 'server-core.js'
+      - 'server-base.js'
       - 'production-v158.js'
       - 'production-v159.js'
       - 'production-v160.js'
@@ -36,6 +37,7 @@ on:
       - 'dividend-discovery.js'
       - 'dividend-discovery-core.js'
       - 'server-core.js'
+      - 'server-base.js'
       - 'production-v158.js'
       - 'production-v159.js'
       - 'production-v160.js'
@@ -73,6 +75,7 @@ jobs:
       - run: node ../tests/asset-history-core.test.js
       - run: node --check ../payouts-core.js
       - run: node --check ../server-core.js
+      - run: node --check ../server-base.js
       - run: node --check ../production-v158.js
       - run: node --check ../production-v159.js
       - run: node --check ../production-v160.js
