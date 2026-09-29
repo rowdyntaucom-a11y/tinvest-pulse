@@ -253,3 +253,28 @@
  .sb :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>section{max-width:100%}
  .sb :is(.v3-equity-fundamentals,.v3-bond-yield-depth,.v3-holdings-explorer){margin-top:10px}
 }
+
+/* v33 grouped tools workbench */
+.sb .v3-pro-tools__focus{display:grid;gap:4px;margin:10px 0;padding:12px;border:1px solid #dce4ef;border-radius:12px;background:#f6f9fd}
+.sb .v3-pro-tools__focus>span{color:var(--s-blue);font-size:8px;font-weight:800;letter-spacing:.08em}
+.sb .v3-pro-tools__focus>strong{font-size:15px;line-height:1.15;color:var(--s-text)}
+.sb .v3-pro-tools__focus>p{margin:0;color:var(--s-muted);font-size:8.5px;line-height:1.45}
+.sb .v3-pro-tools__groups{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}
+.sb .v3-pro-tools__groups>section{min-width:0;padding:9px;border:1px solid var(--s-line);border-radius:11px;background:#fff}
+.sb .v3-pro-tools__groups>section>header{margin-bottom:6px;color:var(--s-muted);font-size:8px;font-weight:800;letter-spacing:.06em}
+.sb .v3-pro-tools__groups nav{display:grid;gap:5px}
+.sb .v3-pro-tools__groups button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;min-height:48px;padding:8px 9px;border:1px solid var(--s-line);border-radius:9px;background:#fafbfc;color:var(--s-text);text-align:left}
+.sb .v3-pro-tools__groups button strong,.sb .v3-pro-tools__groups button small{display:block}
+.sb .v3-pro-tools__groups button strong{font-size:9px}.sb .v3-pro-tools__groups button small{margin-top:4px;color:var(--s-muted);font-size:7.5px;line-height:1.25}
+.sb .v3-pro-tools__groups button>i{grid-column:2;grid-row:1/3;color:var(--s-muted);font-style:normal}
+.sb .v3-pro-tools__groups button.is-active{border-color:#cfd9ec;background:#eef3fc;color:#244b91}
+.sb .v3-pro-tools__groups button.is-active>i{color:var(--s-blue)}
+@media(max-width:520px){
+ .sb .v3-pro-tools__groups{grid-template-columns:1fr}
+ .sb .v3-pro-tools__groups>section{padding:8px}
+ .sb .v3-pro-tools__groups nav{grid-template-columns:1fr 1fr}
+ .sb .v3-pro-tools__groups button{min-height:56px}
+ .sb .v3-pro-tools__groups button strong{font-size:10px}.sb .v3-pro-tools__groups button small{font-size:8.5px}
+ .sb .v3-pro-tools__focus>strong{font-size:16px}.sb .v3-pro-tools__focus>p{font-size:9px}
+}
+@media(max-width:359px){.sb .v3-pro-tools__groups nav{grid-template-columns:1fr}}
