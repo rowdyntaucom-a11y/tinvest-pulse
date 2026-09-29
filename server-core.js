@@ -1230,6 +1230,13 @@ app.get('/api/intel', async (req, res) => {
   }
 });
 
+function qvanixDashboardOptional(promise,label,timeoutMs=2500){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' optional source timeout')),timeoutMs))
+  ]);
+}
+
 async function buildDashboard() {
   const accountsResponse = await getAccounts();
   const account = selectAccount(accountsResponse);
@@ -1241,12 +1248,26 @@ async function buildDashboard() {
     };
   }
 
-  const [portfolio, operations, moex, cbr] = await Promise.all([
+  // Portfolio + operations are the broker truth required for the financial core.
+  // Public macro sources are auxiliary and must never make a healthy broker
+  // portfolio disappear from the app.
+  const dashboardStartedAt = Date.now();
+  const [portfolio, operations] = await Promise.all([
     getPortfolio(account.id),
-    getOperations(account.id),
-    getMoex(),
-    getCbrMacro()
+    getOperations(account.id)
   ]);
+  const [moexResult, cbrResult] = await Promise.allSettled([
+    qvanixDashboardOptional(getMoex(), 'MOEX'),
+    qvanixDashboardOptional(getCbrMacro(), 'CBR')
+  ]);
+  const moex = moexResult.status === 'fulfilled'
+    ? moexResult.value
+    : { available: false, source: 'MOEX', error: 'market context unavailable' };
+  const cbr = cbrResult.status === 'fulfilled'
+    ? cbrResult.value
+    : { available: false, rate: null, rateDate: null, nextMeeting: null, error: 'CBR context unavailable' };
+  if (moexResult.status === 'rejected') console.warn('Dashboard optional MOEX source unavailable:', moexResult.reason?.message || moexResult.reason);
+  if (cbrResult.status === 'rejected') console.warn('Dashboard optional CBR source unavailable:', cbrResult.reason?.message || cbrResult.reason);
 
   const positions = (portfolio?.positions || []).map(p => ({
     figi: p.figi,
@@ -1352,9 +1373,20 @@ async function buildDashboard() {
 
   return {
     updatedAt: new Date().toISOString(),
+    sourceHealth: {
+      brokerPortfolio: true,
+      operations: true,
+      moex: moexResult.status === 'fulfilled',
+      cbr: cbrResult.status === 'fulfilled',
+      elapsedMs: Date.now() - dashboardStartedAt
+    },
     account: {
       id: account.id,
-      name: account.name || account.type || 'T-Invest account'
+      name: account.name || account.type || 'T-Invest account',
+      type: account.type || null,
+      status: account.status || null,
+      openedDate: account.openedDate || account.openDate || null,
+      accessLevel: account.accessLevel || null
     },
     portfolio: {
       value: portfolioValue,
@@ -1661,11 +1693,26 @@ require('./bond-analytics')(app, {
 require('./dividend-discovery').registerDividendDiscovery(app, { tbankRequest });
 
 app.get('/api/dashboard', async (req, res) => {
+  const requestStartedAt = Date.now();
   try {
     const data = await buildDashboard();
+    if (data?.error) {
+      console.warn('QVANIX_DASHBOARD_UNAVAILABLE', JSON.stringify({ms:Date.now()-requestStartedAt,reason:'BROKER_ACCOUNT_UNAVAILABLE'}));
+      return res.status(503).json({error:data.error,code:'BROKER_ACCOUNT_UNAVAILABLE'});
+    }
+    console.log('QVANIX_DASHBOARD_OK', JSON.stringify({
+      ms: Date.now() - requestStartedAt,
+      hasAccount: Boolean(data?.account?.id),
+      positions: Array.isArray(data?.portfolio?.positions) ? data.portfolio.positions.length : 0,
+      brokerPortfolio: data?.sourceHealth?.brokerPortfolio === true,
+      operations: data?.sourceHealth?.operations === true,
+      moex: data?.sourceHealth?.moex === true,
+      cbr: data?.sourceHealth?.cbr === true
+    }));
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.json(data);
   } catch (err) {
+    console.error('QVANIX_DASHBOARD_ERROR', JSON.stringify({ms:Date.now()-requestStartedAt,message:err?.message||String(err)}));
     console.error('Dashboard error:', err);
     res.status(502).json({
       error: `T-Bank connection/API failed: ${err.message}`,

@@ -20,7 +20,7 @@ function close(actual: number | null, expected: number, tolerance = 1e-12) {
   assert.ok(Math.abs((actual as number) - expected) <= tolerance, `expected ${expected}, got ${actual}`)
 }
 
-assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.3')
+assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.4')
 
 dashboardPayload = {
   portfolio: {
@@ -63,7 +63,7 @@ dashboardPayload = {
     averageMonthly: '12,5',
     averageAnnual: '150',
   },
-  account: { name: 'Кряхтящий фонд' },
+  account: { id: 'acc-1', name: 'Кряхтящий фонд', type: 'ACCOUNT_TYPE_TINKOFF_IIS', status: 'ACCOUNT_STATUS_OPEN', openedDate: '2026-07-26T00:00:00.000Z', accessLevel: 'ACCOUNT_ACCESS_LEVEL_READ_ONLY' },
   cbr: {
     rate: 'Infinity',
     rateDate: '2026-09-12',
@@ -103,6 +103,11 @@ assert.equal(invalidNullable.nextRateMeeting, '2026-10-23')
 assert.equal(invalidNullable.startDate, '2026-07-26T12:34:56.000Z')
 assert.equal(invalidNullable.updatedAt, '2026-09-12T08:00:00.000Z')
 assert.equal(invalidNullable.positions, 1)
+assert.equal(invalidNullable.accountContext?.available, true)
+assert.equal(invalidNullable.accountContext?.type, 'ACCOUNT_TYPE_TINKOFF_IIS')
+assert.equal(invalidNullable.accountContext?.status, 'ACCOUNT_STATUS_OPEN')
+assert.equal(invalidNullable.accountContext?.openedDate, '2026-07-26T00:00:00.000Z')
+assert.equal(invalidNullable.accountContext?.accessLevel, 'ACCOUNT_ACCESS_LEVEL_READ_ONLY')
 
 const bondPosition = invalidNullable.positionItems[0]
 close(bondPosition.quantity, 2)
