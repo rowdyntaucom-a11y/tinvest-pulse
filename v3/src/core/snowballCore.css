@@ -169,3 +169,13 @@
  .qv-input-active .sb-workspace-tabs{position:static!important}
  .qv-input-active .sb .v3-pro-tools__focus{position:sticky;top:54px;z-index:24}
 }
+
+
+/* v35 navigation continuity */
+.sb main{overflow-anchor:none}
+.sb-asset{scroll-margin-top:96px}
+@media(max-width:520px){
+ .sb-workspace-tabs,.sb-switch{overscroll-behavior-x:contain}
+ .sb :is(.sb-workspace-tabs,.sb-switch) button{touch-action:manipulation}
+ .sb-asset{scroll-margin-top:86px}
+}
