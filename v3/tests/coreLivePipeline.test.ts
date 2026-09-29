@@ -3,3 +3,6 @@ test("Core refreshes on timer and app focus",()=>{assert.match(root,/V3_REFRESH_
 test("Core exposes trust failure instead of silent empty dashboard",()=>{assert.match(root,/setReason/);assert.match(ui,/Нет подтверждённых данных/);assert.match(ui,/Обновить/)});
 test("preview proxies api server-side without browser token",()=>{assert.match(server,/QVANIX_API_ORIGIN/);assert.match(server,/req\.url\.startsWith\("\/api\/"\)/);assert.doesNotMatch(root,/TINvest_API_TOKEN|Authorization|Bearer/)});
 test("untrusted snapshots never enter financial engines",()=>{assert.match(root,/if\(ok\)\{[\s\S]*setSnapshot\(nextSnapshot\)/);assert.match(root,/positions=\{trusted\?snapshot\.positionItems:\[\]\}/)});
+
+const entry=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
+test("light Core is the default product entry and shells are legacy-only",()=>{assert.match(entry,/const Root=isDemoRoute\(\)\?DemoRoot:isLegacyShellRoute\(\)\?LiveRoot:CoreRoot/);assert.match(entry,/legacy-shell/);assert.doesNotMatch(entry,/const Root=isCoreRoute\(\)\?CoreRoot:isDemoRoute\(\)\?DemoRoot:LiveRoot/)})
