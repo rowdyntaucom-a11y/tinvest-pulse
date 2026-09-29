@@ -20,10 +20,11 @@ test("toolbox contains current professional modules and read-only futures scenar
  for(const token of["Ребаланс","Лаборатория","Рынок","Фьючерсы","Отчёт","READ-ONLY","V3PortfolioReportDepth"])assert.match(toolbox,new RegExp(token));
 });
 
-test("toolbox adapts from local mobile rail to desktop side navigation",()=>{
- assert.match(css,/overflow-x:auto/);
- assert.match(css,/@media\(min-width:1280px\)/);
- assert.match(css,/grid-template-areas:"head stage" "nav stage"/);
+test("toolbox groups modules by user task instead of one flat rail",()=>{
+ assert.match(toolbox,/Управление портфелем/);
+ assert.match(toolbox,/Сценарии и исследование/);
+ assert.match(toolbox,/v3-pro-tools__focus/);
+ assert.match(toolbox,/v3-pro-tools__groups/);
 });
 
 
