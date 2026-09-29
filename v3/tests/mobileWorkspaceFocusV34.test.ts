@@ -14,7 +14,7 @@ test("tool chooser collapses after selecting a workspace and can be reopened",()
  assert.match(toolbox,/setCatalogOpen\(false\)/);
  assert.match(toolbox,/Сменить инструмент/);
  assert.match(toolbox,/Скрыть выбор/);
- assert.match(toolbox,/scrollIntoView\(\{block:"start",behavior:"auto"\}\)/);
+ assert.match(toolbox,/scrollIntoView\(\{block:"nearest",behavior:"auto"\}\)/);
 });
 
 test("mobile keyboard handling keeps inputs visible and hides competing bottom nav",()=>{
