@@ -54,3 +54,20 @@
 .sb .v3-bond-yield-gate{border-color:#cfd4dd;border-radius:10px;background:#fafbfc}
 .sb .v3-bond-yield-gate.is-warning{border-color:#e3b5ad;background:#fff7f5;color:#8b5149}
 @media(max-width:520px){.sb .v3-bond-yield-depth>header span,.sb .v3-bond-yield-summary span,.sb .v3-bond-yield-summary small,.sb .v3-bond-yield-title span,.sb .v3-bond-yield-title>small,.sb .v3-bond-rate-scenarios article span,.sb .v3-bond-rate-scenarios article small,.sb .v3-bond-maturity-bars span,.sb .v3-bond-yield-issues article>header small,.sb .v3-bond-yield-issue-grid span,.sb .v3-bond-yield-issue-grid small,.sb .v3-bond-yield-warning,.sb .v3-bond-yield-depth>footer,.sb .v3-bond-yield-gate{font-size:9px;line-height:1.35}.sb .v3-bond-yield-issues article>header strong,.sb .v3-bond-yield-issue-grid b{font-size:10px}}
+
+/* v34 mobile bond hierarchy */
+.sb .v3-bond-yield-disclosure{margin-top:8px;border:1px solid var(--s-line);border-radius:11px;background:#fff;overflow:hidden}
+.sb .v3-bond-yield-disclosure>summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-height:52px;padding:10px 11px;cursor:pointer;list-style:none}
+.sb .v3-bond-yield-disclosure>summary::-webkit-details-marker{display:none}
+.sb .v3-bond-yield-disclosure>summary span b,.sb .v3-bond-yield-disclosure>summary span small{display:block}
+.sb .v3-bond-yield-disclosure>summary b{font-size:10px;color:var(--s-text)}
+.sb .v3-bond-yield-disclosure>summary small{margin-top:4px;color:var(--s-muted);font-size:8.5px;line-height:1.3}
+.sb .v3-bond-yield-disclosure>summary>i{font-style:normal;color:var(--s-muted);font-size:15px;transition:transform .15s ease}
+.sb .v3-bond-yield-disclosure[open]>summary>i{transform:rotate(180deg)}
+.sb .v3-bond-yield-disclosure>section{margin:0;padding:10px 11px 11px;border-top:1px solid var(--s-line)}
+@media(max-width:520px){
+ .sb .v3-bond-yield-summary{grid-template-columns:1fr 1fr}
+ .sb .v3-bond-yield-disclosure>summary{min-height:58px;padding:11px 12px}
+ .sb .v3-bond-yield-disclosure>summary b{font-size:11px}
+ .sb .v3-bond-yield-disclosure>summary small{font-size:9px}
+}

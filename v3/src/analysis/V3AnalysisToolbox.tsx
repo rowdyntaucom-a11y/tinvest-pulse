@@ -20,6 +20,7 @@ const TOOLS:ToolDef[]=[
 
 export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:PositionSnapshot[];includeMarket?:boolean}){
  const[tool,setTool]=useState<ToolId>("rebalance");
+ const[catalogOpen,setCatalogOpen]=useState(true);
  const tools=useMemo(()=>includeMarket?TOOLS:TOOLS.filter(item=>item.id!=="market"),[includeMarket]);
  const selected=tools.find(item=>item.id===tool)??tools[0];
  const groups=[
@@ -28,12 +29,13 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
  ] as const;
  return <section className="v3-pro-tools" aria-label="Профессиональные инструменты аналитики">
   <header><div><span>PRO TOOLBOX</span><h2>Инструменты</h2><p>Рабочие модули сгруппированы по задаче. Открыт только выбранный инструмент, остальные не перегружают экран.</p></div><small>READ-ONLY</small></header>
-  <section className="v3-pro-tools__focus">
-   <span>СЕЙЧАС</span><strong>{selected?.label??"Инструмент"}</strong><p>{selected?.hero}</p>
+  <section className={"v3-pro-tools__focus"+(catalogOpen?" is-catalog-open":" is-focused")}>
+   <div><span>СЕЙЧАС</span><strong>{selected?.label??"Инструмент"}</strong><p>{selected?.hero}</p></div>
+   <button type="button" onClick={()=>setCatalogOpen(open=>!open)}>{catalogOpen?"Скрыть выбор":"Сменить инструмент"}</button>
   </section>
-  <div className="v3-pro-tools__groups">
-   {groups.map(group=><section key={group.id}><header>{group.label}</header><nav aria-label={group.label}>{group.items.map(item=><button key={item.id} type="button" className={tool===item.id?"is-active":""} aria-pressed={tool===item.id} onClick={()=>setTool(item.id)}><strong>{item.label}</strong><small>{item.note}</small><i aria-hidden="true">{tool===item.id?"●":"›"}</i></button>)}</nav></section>)}
-  </div>
+  {catalogOpen&&<div className="v3-pro-tools__groups">
+   {groups.map(group=><section key={group.id}><header>{group.label}</header><nav aria-label={group.label}>{group.items.map(item=><button key={item.id} type="button" className={tool===item.id?"is-active":""} aria-pressed={tool===item.id} onClick={()=>{setTool(item.id);setCatalogOpen(false);window.requestAnimationFrame(()=>document.querySelector(".v3-pro-tools__stage")?.scrollIntoView({block:"start",behavior:"auto"}))}}><strong>{item.label}</strong><small>{item.note}</small><i aria-hidden="true">{tool===item.id?"●":"›"}</i></button>)}</nav></section>)}
+  </div>}
   <div className="v3-pro-tools__stage">
    {tool==="rebalance"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем ребалансировку…</div>}><V3RebalanceWorkspace positions={positions}/></Suspense>}
    {tool==="lab"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем лабораторию…</div>}><V3PortfolioLab positions={positions}/></Suspense>}
