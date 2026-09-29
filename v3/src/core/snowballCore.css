@@ -114,3 +114,17 @@
   .sb-native-gate b{font-size:10px!important}
   .sb-native-gate span{font-size:8.5px!important}
 }
+
+/* v31 portfolio semantics */
+.sb-portfolio-structure{min-height:0!important;height:auto!important}
+.sb-asset>em{display:grid;gap:2px;color:var(--s-text)}
+.sb-asset>em>b{font-size:9px;font-weight:700;color:var(--s-text)}
+.sb-asset>em>small{font-size:6.5px;color:var(--s-muted);white-space:nowrap}
+.sb-structure article>strong{color:var(--s-muted);font-weight:600;white-space:nowrap}
+@media(max-width:520px){
+ .sb-asset>em>b{font-size:9.5px!important}
+ .sb-asset>em>small{font-size:7px!important}
+ .sb-structure article{grid-template-columns:minmax(0,1fr) auto!important}
+ .sb-structure article>b{grid-column:2;text-align:right}
+ .sb-structure article>strong{grid-column:1/-1;text-align:left;font-size:8.5px!important}
+}
