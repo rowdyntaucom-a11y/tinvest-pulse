@@ -278,3 +278,17 @@
  .sb .v3-pro-tools__focus>strong{font-size:16px}.sb .v3-pro-tools__focus>p{font-size:9px}
 }
 @media(max-width:359px){.sb .v3-pro-tools__groups nav{grid-template-columns:1fr}}
+
+/* v34 workspace focus mode */
+.sb .v3-pro-tools__focus{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.sb .v3-pro-tools__focus>div{display:grid;gap:4px;min-width:0}
+.sb .v3-pro-tools__focus>button{min-height:36px;padding:0 10px;border:1px solid var(--s-line);border-radius:9px;background:#fff;color:var(--s-text);font:700 8.5px/1 system-ui;white-space:nowrap}
+.sb .v3-pro-tools__focus.is-focused{margin-bottom:8px;background:#fff}
+.sb .v3-pro-tools__stage{scroll-margin-top:108px}
+@media(max-width:520px){
+ .sb .v3-pro-tools__focus{position:sticky;top:96px;z-index:19;margin-inline:-1px;box-shadow:0 7px 18px #1e293b0b}
+ .sb .v3-pro-tools__focus>strong{font-size:15px}
+ .sb .v3-pro-tools__focus>button{min-height:40px;font-size:9px}
+ .sb .v3-pro-tools__groups{margin-bottom:8px}
+ .sb .v3-pro-tools__stage{scroll-margin-top:156px}
+}
