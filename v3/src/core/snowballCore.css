@@ -179,3 +179,16 @@
  .sb :is(.sb-workspace-tabs,.sb-switch) button{touch-action:manipulation}
  .sb-asset{scroll-margin-top:86px}
 }
+
+
+/* v36 real-device reading rhythm */
+@media(max-width:520px){
+ .sb main{padding-bottom:72px}
+ .sb-title{padding-top:2px}
+ .sb-title h1{font-size:24px;line-height:1.08}
+ .sb-title span{display:block;margin-top:4px;font-size:9px;line-height:1.35}
+ .sb-workspace-tabs button{min-height:38px;font-size:9.5px}
+ .sb-switch button{min-height:36px;font-size:9px}
+ .sb-nav button{min-height:56px;touch-action:manipulation}
+ .sb-nav span{font-size:8px}
+}
