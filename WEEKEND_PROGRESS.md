@@ -423,3 +423,15 @@ Follow-up to the V36 readability pass. The next comprehension bottleneck was ter
 - Escape closes the modal sheet; controls expose dialog semantics and focus-visible treatment;
 - preserved all financial formulas, source gates, read-only behavior and existing workspace navigation;
 - no recommendation, expected-return ranking or trading execution language was added.
+
+
+## 2026-09-29 — V38 Analytics Progressive Depth
+
+After V36 readability and V37 explainability, the remaining friction in professional analytics was structural: mobile still showed the depth navigation as another permanent row before the user reached the actual answer.
+
+- replaced the three-button deep-analytics row on narrow phones with one explicit native section selector;
+- kept the broader three-section navigation on tablet/desktop;
+- renamed technical navigation notes into full human-readable language instead of DD/TE-style shorthand;
+- added a compact “Главный ответ” bridge for Return, Risk and IMOEX sections using only metrics already calculated by the existing deterministic models;
+- no new financial formula, ranking, forecast or recommendation was introduced;
+- the detailed canonical layers remain unchanged below the summary, so progressive disclosure reduces cognitive load without deleting depth.
