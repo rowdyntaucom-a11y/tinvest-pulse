@@ -6,11 +6,8 @@ const assets=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),
 const depth=readFileSync(new URL("../src/assets/V3AssetsDepth.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/assetsDepth.css",import.meta.url),"utf8");
 
-test("Assets Depth v1 is the shared deep workspace for Samurai and Cosmos",()=>{
+test("Assets Depth v1 remains the shared shell-independent deep workspace",()=>{
  assert.match(assets,/themedDepth=shell==="samurai"\|\|shell==="carbon"/);
- assert.match(assets,/v3-assets-depth-cue/);
- assert.match(assets,/scrollToDepth/);
- assert.match(assets,/<V3AssetsDepth positions=\{base\}/);
  assert.match(depth,/id="v3-assets-depth"/);
  assert.doesNotMatch(depth,/shell===/);
 });
@@ -24,25 +21,25 @@ test("Assets Depth reuses canonical deterministic portfolio models",()=>{
  assert.match(depth,/V3HoldingsExplorer/);
 });
 
-test("Assets Depth exposes composition, concentration, P\/L, sectors, bonds and asset drilldown",()=>{
- for(const token of["01 · СОСТАВ","02 · РЕЗУЛЬТАТ","03 · ОТРАСЛИ","05 · ОБЛИГАЦИИ","06 · ПОЗИЦИИ"])assert.match(depth,new RegExp(token));
+test("professional analytics uses progressive disclosure instead of one long feed",()=>{
+ for(const token of["ПРОФЕССИОНАЛЬНАЯ АНАЛИТИКА","Обзор","Акции","Облигации","Позиции","Кто формирует текущий P/L","Что означают эти показатели?"])assert.match(depth,new RegExp(token));
+ assert.match(depth,/useState<DepthMode>\("overview"\)/);
+ assert.match(depth,/mode==="equity"/);
+ assert.match(depth,/mode==="bonds"/);
+ assert.match(depth,/mode==="positions"/);
  assert.match(depth,/V3EquityFundamentalsDepth/);
- assert.match(depth,/TOP-1/);
- assert.match(depth,/TOP-3/);
- assert.match(depth,/1 \/ HHI/);
- assert.match(depth,/абс\. P\/L/);
- assert.match(depth,/тап → карточка актива/);
-});
-
-test("extended bond analytics use a separate verified contract and preserve semantic boundaries",()=>{
  assert.match(depth,/V3BondYieldDepth/);
- assert.match(depth,/отдельный проверяемый контракт/);
- assert.match(depth,/Срок до погашения остаётся самостоятельной метрикой и не называется дюрацией/);
+ assert.match(depth,/initialDimension="instrument" showClassSummary=\{false\}/);
+ assert.doesNotMatch(depth,/01 · СОСТАВ/);
 });
 
-test("shell differences stay in material CSS, not duplicate analytics",()=>{
- assert.match(css,/data-shell="carbon"/);
- assert.match(css,/data-shell="samurai"/);
- assert.match(css,/v3-assets-depth-cue/);
- assert.match(css,/v3-assets-depth-spacer/);
+test("bond jargon is gated and explained in plain language",()=>{
+ assert.match(depth,/YTM — оценка доходности к погашению/);
+ assert.match(depth,/Modified duration показывает чувствительность цены/);
+});
+
+test("mobile progressive disclosure has a dedicated local nav",()=>{
+ assert.match(css,/v3-assets-depth__nav/);
+ assert.match(css,/overflow-x:auto/);
+ assert.match(css,/v3-assets-depth__professional-section/);
 });
