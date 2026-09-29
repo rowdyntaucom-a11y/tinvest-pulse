@@ -1,0 +1,17 @@
+.v3-glossary-help__trigger{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 10px;border:1px solid var(--s-line,#dfe3e8);border-radius:9px;background:#fff;color:var(--s-text,#171a1f);font:700 9px/1.2 Inter,system-ui,sans-serif}
+.v3-glossary-help__trigger>i{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#eef3fc;color:#315b9d;font-style:normal;font-size:10px}
+.v3-glossary-help__backdrop{position:fixed;z-index:120;inset:0;display:grid;align-items:end;background:rgba(17,24,39,.26);backdrop-filter:blur(2px)}
+.v3-glossary-help{width:min(100%,560px);max-height:min(78dvh,720px);margin:0 auto;padding:14px;border:1px solid #dfe3e8;border-radius:18px 18px 0 0;background:#f8f9fb;color:#171a1f;box-shadow:0 -20px 55px rgba(15,23,42,.18);overflow:auto;overscroll-behavior:contain}
+.v3-glossary-help>header{position:sticky;top:-14px;z-index:2;display:flex;justify-content:space-between;gap:12px;margin:-14px -14px 10px;padding:14px;border-bottom:1px solid #e5e8ed;background:rgba(248,249,251,.96);backdrop-filter:blur(10px)}
+.v3-glossary-help>header span,.v3-glossary-help>header small{display:block;color:#7a828d;font-size:9px}.v3-glossary-help>header span{color:#4e77c8;font-weight:800;letter-spacing:.08em}
+.v3-glossary-help>header strong{display:block;margin-top:4px;font-size:17px}.v3-glossary-help>header small{margin-top:4px;line-height:1.35}
+.v3-glossary-help>header button{flex:none;width:42px;height:42px;border:1px solid #dfe3e8;border-radius:12px;background:#fff;font-size:22px}
+.v3-glossary-help__list{display:grid;gap:7px}.v3-glossary-help__list details{border:1px solid #e2e5ea;border-radius:12px;background:#fff;overflow:hidden}
+.v3-glossary-help__list summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;min-height:58px;padding:10px 11px;cursor:pointer;list-style:none}.v3-glossary-help__list summary::-webkit-details-marker{display:none}
+.v3-glossary-help__list summary b,.v3-glossary-help__list summary small{display:block}.v3-glossary-help__list summary b{font-size:11px}.v3-glossary-help__list summary small{margin-top:4px;color:#6f7782;font-size:9.5px;line-height:1.35}
+.v3-glossary-help__list summary>i{font-style:normal;color:#7a828d;transition:transform .15s ease}.v3-glossary-help__list details[open] summary>i{transform:rotate(180deg)}
+.v3-glossary-help__list p{margin:0;padding:10px 11px 12px;border-top:1px solid #eceef1;color:#5f6873;font-size:10px;line-height:1.5}
+.v3-glossary-help>footer{padding:12px 2px 4px;color:#7a828d;font-size:9px;line-height:1.45}
+.v3-glossary-help__trigger:focus-visible,.v3-glossary-help button:focus-visible,.v3-glossary-help summary:focus-visible{outline:2px solid #4e77c8;outline-offset:2px}
+@media(min-width:700px){.v3-glossary-help__backdrop{align-items:center}.v3-glossary-help{border-radius:18px}}
+@media(prefers-reduced-motion:reduce){.v3-glossary-help__list summary>i{transition:none}}
