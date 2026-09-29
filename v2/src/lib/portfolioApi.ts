@@ -384,14 +384,25 @@ export async function loadPortfolioHistory(): Promise<HistoryPoint[]> {
   }
 }
 
+const isTransientDashboardFailure = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error ?? '')
+  return /dashboard (?:5\\d\\d)|upstream unavailable|fetch failed|timeout/i.test(message)
+}
+
 export async function loadPortfolio(): Promise<PortfolioSnapshot> {
   try {
     return await loadDashboard()
   } catch (dashboardError) {
+    const a = dashboardError instanceof Error ? dashboardError.message : 'dashboard unavailable'
+    // The current live contract is /api/dashboard. A transient 5xx during Render wake
+    // should be retried by the recovery loop instead of immediately spending another
+    // request on an optional legacy route that may not exist in this deployment.
+    if (isTransientDashboardFailure(dashboardError)) {
+      throw new Error(`Broker source temporarily unavailable: ${a}`)
+    }
     try {
       return await loadLegacyPortfolio()
     } catch (portfolioError) {
-      const a = dashboardError instanceof Error ? dashboardError.message : 'dashboard unavailable'
       const b = portfolioError instanceof Error ? portfolioError.message : 'portfolio unavailable'
       throw new Error(`Broker source unavailable: ${a}; ${b}`)
     }
