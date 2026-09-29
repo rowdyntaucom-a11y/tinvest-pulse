@@ -42,3 +42,12 @@ assert.match(serverBase,/brokerPortfolio:d\?\.sourceHealth\?\.brokerPortfolio===
 assert.doesNotMatch(serverBase,/QVANIX_DASHBOARD_WARMUP[^\n]*portfolio\.value[^\n]*JSON\.stringify\(\{[^}]*value:/);
 
 console.log('trusted portfolio source isolation regression: ok');
+
+
+assert.match(core,/OPERATIONS_CACHE_TTL_MS = 5 \* 60 \* 1000/);
+assert.match(core,/OPERATIONS_REFRESH_AFTER_MS = 60 \* 1000/);
+assert.match(core,/const OPERATIONS_CACHE = new Map\(\)/);
+assert.match(core,/if \(cached\?\.inFlight\) return cached\.inFlight/);
+assert.match(core,/QVANIX_OPERATIONS_REFRESHED/);
+assert.match(serverBase,/\}\},1500\);/);
+assert.match(serverBase,/History snapshot v1473 warmed/);
