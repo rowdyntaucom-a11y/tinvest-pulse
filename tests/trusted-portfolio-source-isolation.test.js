@@ -10,7 +10,9 @@ const portfolioApi=fs.readFileSync(path.join(repoRoot,'v2/src/lib/portfolioApi.t
 const preview=fs.readFileSync(path.join(repoRoot,'v3/preview-server.cjs'),'utf8');
 
 assert.match(core,/const \[portfolio, operations\] = await Promise\.all/);
-assert.match(core,/Promise\.allSettled\(\[\s*getMoex\(\),\s*getCbrMacro\(\)/);
+assert.match(core,/qvanixDashboardOptional\(getMoex\(\), 'MOEX'\)/);
+assert.match(core,/qvanixDashboardOptional\(getCbrMacro\(\), 'CBR'\)/);
+assert.match(core,/timeoutMs=2500/);
 assert.doesNotMatch(core,/const \[portfolio, operations, moex, cbr\] = await Promise\.all/);
 assert.match(core,/sourceHealth:\s*\{/);
 assert.match(core,/brokerPortfolio: true/);
