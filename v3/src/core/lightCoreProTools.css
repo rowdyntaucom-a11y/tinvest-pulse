@@ -353,3 +353,12 @@
  .sb .sam-rebalance__modes button,.sb .sam-lab__windows button{min-height:42px;font-size:9.5px}
  .sb .sam-report-depth__summary article,.sb .sam-report-depth__coverage{padding:11px}
 }
+
+
+/* v37 explainability placement */
+.sb-context-help,.core-analytics-depth__help,.sam-rebalance__help,.v3-futures-help{display:flex;justify-content:flex-end;margin:0 0 8px}
+.sb .v3-glossary-help__trigger{border-color:var(--s-line);background:#fff;color:var(--s-text)}
+@media(max-width:520px){
+ .sb-context-help,.core-analytics-depth__help,.sam-rebalance__help,.v3-futures-help{justify-content:stretch}
+ .sb .v3-glossary-help__trigger{width:100%;justify-content:flex-start;min-height:42px;font-size:9.5px}
+}
