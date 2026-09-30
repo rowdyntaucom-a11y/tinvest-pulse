@@ -66,6 +66,7 @@ export function CoreRoot(){
 
  const refresh=useCallback(async()=>{
   if(running.current)return;
+  cancelRetry();
   running.current=true;
   setRefreshing(true);
   lastAttempt.current=Date.now();
@@ -140,9 +141,12 @@ export function CoreRoot(){
   void refresh();
   const timer=window.setInterval(()=>void refreshRef.current(),V3_REFRESH_INTERVAL_MS);
   const focus=()=>{
-   if(Date.now()-lastAttempt.current>=V3_FOCUS_REFRESH_MIN_AGE_MS)void refreshRef.current();
+   if(document.visibilityState==="hidden")return;
+   if(!cached.current||Date.now()-lastAttempt.current>=V3_FOCUS_REFRESH_MIN_AGE_MS)void refreshRef.current();
   };
+  const online=()=>void refreshRef.current();
   window.addEventListener("focus",focus);
+  window.addEventListener("online",online);
   document.addEventListener("visibilitychange",focus);
   return()=>{
    active.current=false;
@@ -150,6 +154,7 @@ export function CoreRoot(){
    cancelRetry();
    window.clearInterval(timer);
    window.removeEventListener("focus",focus);
+   window.removeEventListener("online",online);
    document.removeEventListener("visibilitychange",focus);
   };
  },[cancelRetry]);
