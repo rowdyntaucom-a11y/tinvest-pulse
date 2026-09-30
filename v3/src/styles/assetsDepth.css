@@ -120,3 +120,10 @@
  .sb .v3-assets-depth__answer>p{font-size:11px}
  .sb .v3-assets-depth__answer>small{font-size:9px}
 }
+
+.v3-assets-depth__pnl-identity{display:flex!important;align-items:center;gap:7px;min-width:0}
+.v3-assets-depth__pnl-identity>span{display:grid;min-width:0}
+.v3-assets-depth__pnl-identity strong{font-size:9px}
+.v3-assets-depth__pnl-identity small{color:var(--s-muted);font-size:7.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:520px){.v3-assets-depth__pnl-identity{gap:6px}.v3-assets-depth__pnl-identity strong{font-size:10px}.v3-assets-depth__pnl-identity small{font-size:8px}}
+@media(min-width:1200px){.v3-assets-depth__pnl-identity strong{font-size:12px}.v3-assets-depth__pnl-identity small{font-size:10px}}
