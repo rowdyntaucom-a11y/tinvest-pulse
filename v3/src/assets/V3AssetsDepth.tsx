@@ -9,6 +9,7 @@ import{clampPercent}from"../data/units";
 import{V3HoldingsExplorer}from"./V3HoldingsExplorer";
 import{V3BondYieldDepth}from"./V3BondYieldDepth";
 import{V3EquityFundamentalsDepth}from"./V3EquityFundamentalsDepth";
+import{localizeFinancialLabel}from"../i18n/financialTerms";
 import"../styles/assetsDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -46,7 +47,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
  const pnlLeaders=model.pnl.positions.slice(0,6);
  const nav:readonly[DepthMode,string,string][]=[
   ["overview","Обзор","концентрация · P/L"],
-  ["equity","Акции","fundamentals"],
+  ["equity","Акции","фундаментальные данные"],
   ["bonds","Облигации","YTM · сроки"],
   ["positions","Позиции","поиск · срезы"],
  ];
@@ -66,12 +67,12 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
     <article><span>Крупнейшая позиция</span><strong>{top1==null?"—":pct.format(top1*100)+"%"}</strong><small>доля капитала в одной бумаге</small></article>
     <article><span>Три крупнейшие</span><strong>{top3==null?"—":pct.format(top3*100)+"%"}</strong><small>доля капитала в топ-3</small></article>
     <article><span>Эффективное число</span><strong>{model.effectiveCount==null?"—":num.format(model.effectiveCount)}</strong><small>насколько портфель распределён по весам</small></article>
-    <article><span>Broker P/L</span><strong className={model.pnl.netPnl<0?"is-negative":model.pnl.netPnl>0?"is-positive":""}>{signedMoney(model.pnl.netPnl)}</strong><small>{model.pnlPct==null?"к базе —":(model.pnlPct>0?"+":"")+pct.format(model.pnlPct)+"% к себестоимости"}</small></article>
+    <article><span>P/L открытых позиций</span><strong className={model.pnl.netPnl<0?"is-negative":model.pnl.netPnl>0?"is-positive":""}>{signedMoney(model.pnl.netPnl)}</strong><small>{model.pnlPct==null?"к базе —":(model.pnlPct>0?"+":"")+pct.format(model.pnlPct)+"% к себестоимости"}</small></article>
    </section>
 
    <details className="v3-assets-depth__explain">
     <summary><i>i</i><span>Что означают эти показатели?</span></summary>
-    <p><b>Эффективное число</b> показывает, насколько капитал распределён между позициями: чем число выше, тем меньше портфель зависит от нескольких крупнейших бумаг. <b>Broker P/L</b> — накопленный результат открытых позиций у брокера, а не TWR и не дневная доходность.</p>
+    <p><b>Эффективное число</b> показывает, насколько капитал распределён между позициями: чем число выше, тем меньше портфель зависит от нескольких крупнейших бумаг. <b>P/L открытых позиций</b> — накопленный результат текущих позиций по данным брокера, а не TWR и не дневная доходность.</p>
    </details>
 
    <section id="sam-assets-pnl" className="v3-assets-depth__block v3-assets-depth__pnl">
@@ -80,12 +81,12 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
     <div className="v3-assets-depth__pnl-list">
      {pnlLeaders.map(row=><article key={row.key}><div><strong>{row.ticker}</strong><span>{row.name}</span></div><div><b className={row.direction==="negative"?"is-negative":row.direction==="positive"?"is-positive":""}>{signedMoney(row.pnl)}</b><small>{row.grossPnlShare==null?"—":pct.format(row.grossPnlShare*100)+"% абс. P/L"}</small></div><i aria-hidden="true"><b style={{width:clampPercent((row.grossPnlShare??0)*100)+"%"}}/></i></article>)}
     </div>
-    <p>Доля считается от суммы абсолютных broker P/L. Это накопленный результат позиции, а не дневное изменение и не доходность стратегии.</p>
+    <p>Доля считается от суммы абсолютных P/L открытых позиций. Это накопленный результат позиции, а не дневное изменение и не доходность стратегии.</p>
    </section>
 
    <section id="sam-assets-sectors" className="v3-assets-depth__block v3-assets-depth__sectors">
     <div className="v3-assets-depth__title"><div><span>ОТРАСЛИ</span><h3>Покрытие метаданных</h3></div><small>{sectorCoverage==null?"—":pct.format(sectorCoverage*100)+"% капитала"}</small></div>
-    {model.sectors.rows.length?<div className="v3-assets-depth__bars">{model.sectors.rows.slice(0,6).map(row=>{const ratio=share(row.value,sectorCovered);return <article key={row.label}><div><strong>{row.label}</strong><span>{rub.format(row.value)} ₽ · {pct.format(ratio*100)}% покрытого</span></div><i aria-hidden="true"><b style={{width:clampPercent(ratio*100)+"%"}}/></i></article>})}</div>:<div className="v3-assets-depth__empty">Подтверждённых отраслевых метаданных пока нет.</div>}
+    {model.sectors.rows.length?<div className="v3-assets-depth__bars">{model.sectors.rows.slice(0,6).map(row=>{const ratio=share(row.value,sectorCovered);return <article key={row.label}><div><strong>{localizeFinancialLabel(row.label)}</strong><span>{rub.format(row.value)} ₽ · {pct.format(ratio*100)}% покрытого</span></div><i aria-hidden="true"><b style={{width:clampPercent(ratio*100)+"%"}}/></i></article>})}</div>:<div className="v3-assets-depth__empty">Подтверждённых отраслевых метаданных пока нет.</div>}
     {model.sectors.unclassified>0&&<p>Без подтверждённой отрасли: {rub.format(model.sectors.unclassified)} ₽. QVANIX не угадывает сектор по названию бумаги.</p>}
    </section>
   </>}

@@ -43,7 +43,7 @@
 .sb .v3-market-portfolio>div{display:grid;gap:5px;margin-top:8px}.sb .v3-market-portfolio article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:8px;border:1px solid var(--s-line);border-radius:8px;background:#fff}
 .sb .v3-market-portfolio article strong{color:var(--s-text);font-size:9px}.sb .v3-market-portfolio article small,.sb .v3-market-portfolio article span{display:block;color:var(--s-muted);font-size:7px}.sb .v3-market-portfolio article b{font-size:9px}.sb .v3-market-portfolio article b.is-positive{color:var(--s-green)}.sb .v3-market-portfolio article b.is-negative{color:var(--s-red)}
 .sb .v3-market-pulse>footer,.sb .v3-market-portfolio p{color:var(--s-muted);font-size:8px;line-height:1.45}.sb .v3-market-pulse>footer{margin-top:9px;padding-top:8px;border-top:1px solid var(--s-line)}
-.sb .v3-market-pulse__gate{min-height:120px;display:grid;place-items:center;color:var(--s-muted);font-size:9px;text-align:center}
+.sb .v3-market-pulse__gate{min-height:0;display:grid;place-items:center;gap:8px;padding:18px 12px;color:var(--s-muted);font-size:9px;text-align:center}
 
 /* Futures */
 .sb .v3-pro-tool{padding:14px;border:1px solid var(--s-line);border-radius:14px;background:#fff}
@@ -376,9 +376,24 @@
  .sb .core-analytics-depth__route>span{color:var(--s-blue);font-size:8px;font-weight:800;letter-spacing:.08em}
  .sb .core-analytics-depth__route>strong{font-size:15px;line-height:1.15}
  .sb .core-analytics-depth__route>small{color:var(--s-muted);font-size:9px;line-height:1.35}
- .sb .core-analytics-depth__route label{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:9px;margin-top:7px;padding-top:8px;border-top:1px solid var(--s-line)}
- .sb .core-analytics-depth__route label>b{font-size:9px;color:var(--s-muted)}
- .sb .core-analytics-depth__route select{width:100%;min-height:44px;padding:0 34px 0 11px;border:1px solid #d4dae3;border-radius:9px;background:#fff;color:var(--s-text);font:700 11px/1 system-ui}
+ .sb .core-analytics-depth__picker-control{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:9px;margin-top:7px;padding-top:8px;border-top:1px solid var(--s-line)}
+ .sb .core-analytics-depth__picker-control>b{font-size:9px;color:var(--s-muted)}
+ .sb .core-analytics-depth__picker-control>button{min-height:44px;padding:0 11px;border:1px solid #d4dae3;border-radius:9px;background:#fff;color:var(--s-text);font:700 11px/1 system-ui;display:flex;align-items:center;justify-content:space-between;gap:10px}
+ .sb .core-analytics-depth__picker-control>button i{font-style:normal;color:var(--s-muted);font-size:13px}
+ .sb .core-analytics-depth__picker-backdrop{position:fixed;z-index:90;inset:0;display:flex;align-items:flex-end;background:#0e17242e;backdrop-filter:blur(2px)}
+ .sb .core-analytics-depth__picker{width:100%;max-height:min(72dvh,560px);padding:12px 12px calc(12px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -12px 40px #13203324;overflow:auto}
+ .sb .core-analytics-depth__picker>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 2px 10px}
+ .sb .core-analytics-depth__picker>header span{display:block;color:var(--s-blue);font-size:8px;font-weight:800;letter-spacing:.09em}
+ .sb .core-analytics-depth__picker>header strong{display:block;margin-top:4px;font-size:17px}
+ .sb .core-analytics-depth__picker>header button{width:38px;height:38px;border:1px solid var(--s-line);border-radius:10px;background:#f7f8fa;font-size:22px;line-height:1}
+ .sb .core-analytics-depth__picker nav{display:grid;gap:7px}
+ .sb .core-analytics-depth__picker nav>button{min-height:60px;padding:10px 12px;border:1px solid var(--s-line);border-radius:12px;background:#fafbfc;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left}
+ .sb .core-analytics-depth__picker nav>button span{display:grid;gap:4px}
+ .sb .core-analytics-depth__picker nav>button strong{font-size:11px;color:var(--s-text)}
+ .sb .core-analytics-depth__picker nav>button small{font-size:9px;line-height:1.3;color:var(--s-muted)}
+ .sb .core-analytics-depth__picker nav>button i{font-style:normal;color:var(--s-muted)}
+ .sb .core-analytics-depth__picker nav>button.is-active{border-color:#b9cae7;background:#eef4ff}
+ .sb .core-analytics-depth__picker nav>button.is-active i{color:var(--s-blue)}
  .sb .core-analytics-depth__decision{margin-top:8px;padding:11px}
  .sb .core-analytics-depth__decision span{font-size:8.5px}
  .sb .core-analytics-depth__decision strong{font-size:18px}

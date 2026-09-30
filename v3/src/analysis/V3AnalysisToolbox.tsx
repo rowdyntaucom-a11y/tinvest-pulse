@@ -11,11 +11,11 @@ const V3PortfolioReportDepth=lazy(()=>import("../report/V3PortfolioReportDepth")
 type ToolId="rebalance"|"lab"|"market"|"futures"|"report";
 type ToolDef={id:ToolId;label:string;note:string;group:"portfolio"|"scenario";hero:string};
 const TOOLS:ToolDef[]=[
- {id:"rebalance",label:"Ребаланс",note:"цель · drift · сценарий",group:"portfolio",hero:"Проверить отклонение структуры и смоделировать выравнивание без заявок."},
- {id:"report",label:"Отчёт",note:"классы · валюты · P/L",group:"portfolio",hero:"Собрать состав, валюты и накопленный результат в одном read-only отчёте."},
+ {id:"rebalance",label:"Ребаланс",note:"цель · отклонение · сценарий",group:"portfolio",hero:"Проверить отклонение структуры и смоделировать выравнивание без заявок."},
+ {id:"report",label:"Отчёт",note:"классы · валюты · P/L",group:"portfolio",hero:"Собрать состав, валюты и накопленный результат в одном отчёте только для чтения."},
  {id:"lab",label:"Лаборатория",note:"история стратегий",group:"scenario",hero:"Сравнить сценарии на подтверждённой истории без подмены результата прогнозом."},
- {id:"futures",label:"Фьючерсы",note:"WHAT IF · basis · ГО",group:"scenario",hero:"Посчитать сценарий фьючерса, basis и нагрузку ГО без отправки приказов брокеру."},
- {id:"market",label:"Рынок",note:"pulse · screener · history",group:"scenario",hero:"Открыть публичный рыночный контекст и историю без торговых сигналов."},
+ {id:"futures",label:"Фьючерсы",note:"сценарий · базис · ГО",group:"scenario",hero:"Посчитать сценарий фьючерса, базис и нагрузку ГО без отправки приказов брокеру."},
+ {id:"market",label:"Рынок",note:"пульс · скринер · история",group:"scenario",hero:"Открыть публичный рыночный контекст и историю без торговых сигналов."},
 ];
 
 export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:PositionSnapshot[];includeMarket?:boolean}){
@@ -28,7 +28,7 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
   {id:"scenario",label:"Сценарии и исследование",items:tools.filter(item=>item.group==="scenario")},
  ] as const;
  return <section className="v3-pro-tools" aria-label="Профессиональные инструменты аналитики">
-  <header><div><span>PRO TOOLBOX</span><h2>Инструменты</h2><p>Рабочие модули сгруппированы по задаче. Открыт только выбранный инструмент, остальные не перегружают экран.</p></div><small>READ-ONLY</small></header>
+  <header><div><span>ПРОФЕССИОНАЛЬНЫЕ ИНСТРУМЕНТЫ</span><h2>Инструменты</h2><p>Рабочие модули сгруппированы по задаче. Открыт только выбранный инструмент, остальные не перегружают экран.</p></div><small>ТОЛЬКО ЧТЕНИЕ</small></header>
   <section className={"v3-pro-tools__focus"+(catalogOpen?" is-catalog-open":" is-focused")}>
    <div><span>СЕЙЧАС</span><strong>{selected?.label??"Инструмент"}</strong><p>{selected?.hero}</p></div>
    <button type="button" onClick={()=>setCatalogOpen(open=>!open)}>{catalogOpen?"Скрыть выбор":"Сменить инструмент"}</button>
@@ -39,7 +39,7 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
   <div className="v3-pro-tools__stage">
    {tool==="rebalance"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем ребалансировку…</div>}><V3RebalanceWorkspace positions={positions}/></Suspense>}
    {tool==="lab"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем лабораторию…</div>}><V3PortfolioLab positions={positions}/></Suspense>}
-   {tool==="market"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем Market Intelligence…</div>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense>}
+   {tool==="market"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем рыночную аналитику…</div>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense>}
    {tool==="futures"&&<V3FuturesScenario/>}
    {tool==="report"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем отчёт…</div>}><V3PortfolioReportDepth positions={positions}/></Suspense>}
   </div>

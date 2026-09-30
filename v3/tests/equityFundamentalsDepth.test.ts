@@ -68,7 +68,7 @@ test("equity V2 diagnostics distinguish positive facts from missing coverage",()
 });
 
 test("equity V2 UI is descriptive and does not collapse ratios into a score",()=>{
- assert.match(ui,/EQUITY INTELLIGENCE \/\/ V2/);
+ assert.match(ui,/АНАЛИТИКА АКЦИЙ \/\/ V2/);
  assert.match(ui,/Положительная прибыль TTM/);
  assert.match(ui,/Положительный FCF TTM/);
  assert.match(ui,/Отсутствующие метрики не считаются нулём/);

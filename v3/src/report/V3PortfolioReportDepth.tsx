@@ -17,7 +17,7 @@ function Row({row}:{row:PortfolioReportRow}){
   <div><strong>{row.label}</strong><small>{row.positionCount} поз.</small></div>
   <div><span>Текущая</span><b>{rub.format(row.currentValue)} ₽</b></div>
   <div><span>Вложено</span><b>{rub.format(row.costBasis)} ₽</b></div>
-  <div><span>Broker P/L</span><b className={row.pnl>0?"is-positive":row.pnl<0?"is-negative":""}>{signedMoney(row.pnl)}</b></div>
+  <div><span>P/L открытых позиций</span><b className={row.pnl>0?"is-positive":row.pnl<0?"is-negative":""}>{signedMoney(row.pnl)}</b></div>
   <i aria-hidden="true"><b style={{width:clampPercent(row.share*100)+"%"}}/></i>
   <em>{pct.format(row.share*100)}%</em>
  </article>;
@@ -50,16 +50,16 @@ export function V3PortfolioReportDepth({positions}:{positions:PositionSnapshot[]
  return <section className="sam-report-depth" aria-label="Отчёт, категории и валюты">
   <section id="sam-assets-report" className="sam-report-depth__block">
    <header className="sam-report-depth__head">
-    <div><span>08 · REPORT</span><h3>Отчёт портфеля</h3><p>Текущая стоимость, вложенная база и накопленный broker P/L. Это отчёт по текущему составу, а не TWR и не дневная доходность.</p></div>
+    <div><span>08 · ОТЧЁТ</span><h3>Отчёт портфеля</h3><p>Текущая стоимость, вложенная база и накопленный P/L открытых позиций. Это отчёт по текущему составу, а не TWR и не дневная доходность.</p></div>
     <i aria-hidden="true">帳</i>
    </header>
    <div className="sam-report-depth__summary">
     <article><span>Текущая стоимость</span><strong>{rub.format(model.totalValue)} ₽</strong><small>{model.totalPositions} позиций</small></article>
-    <article><span>Cost basis</span><strong>{rub.format(model.totalCostBasis)} ₽</strong><small>по доступной средней цене</small></article>
-    <article><span>Broker P/L</span><strong className={model.totalPnl>0?"is-positive":model.totalPnl<0?"is-negative":""}>{signedMoney(model.totalPnl)}</strong><small>накопленный контекст позиций</small></article>
-    <article><span>Сверка базы</span><strong>{reconciled?"OK":"РАСХОЖДЕНИЕ"}</strong><small>{reconciled?"P/L согласуется с value − basis":"Δ "+signedMoney(reconciliationDelta)}</small></article>
+    <article><span>Вложенная база</span><strong>{rub.format(model.totalCostBasis)} ₽</strong><small>по доступной средней цене</small></article>
+    <article><span>P/L открытых позиций</span><strong className={model.totalPnl>0?"is-positive":model.totalPnl<0?"is-negative":""}>{signedMoney(model.totalPnl)}</strong><small>накопленный контекст позиций</small></article>
+    <article><span>Сверка базы</span><strong>{reconciled?"OK":"РАСХОЖДЕНИЕ"}</strong><small>{reconciled?"P/L согласуется: стоимость − база":"Δ "+signedMoney(reconciliationDelta)}</small></article>
    </div>
-   {!reconciled&&<p className="sam-report-depth__warning">Broker P/L и разница «текущая стоимость − cost basis» расходятся. QVANIX показывает оба факта и не подменяет один другим.</p>}
+   {!reconciled&&<p className="sam-report-depth__warning">P/L открытых позиций и разница «текущая стоимость − вложенная база» расходятся. QVANIX показывает оба факта и не подменяет один другим.</p>}
    <p className="sam-report-depth__method">Отчёт не использует предположения о пропущенных операциях, налогах или корпоративных действиях. Историческая доходность остаётся в TWR/XIRR, а здесь — текущий срез состава.</p>
   </section>
 

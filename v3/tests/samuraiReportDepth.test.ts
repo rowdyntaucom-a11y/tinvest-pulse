@@ -10,7 +10,7 @@ const main=readFileSync(new URL("../src/main.tsx",import.meta.url),"utf8");
 
 test("Samurai adds explicit Report, Categories and Currencies chapters",()=>{
  for(const id of["sam-assets-report","sam-assets-categories","sam-assets-currencies"]) assert.ok(assets.includes(id));
- assert.match(ui,/08 · REPORT/);
+ assert.match(ui,/08 · ОТЧЁТ/);
  assert.match(ui,/09 · КАТЕГОРИИ/);
  assert.match(ui,/10 · ВАЛЮТЫ/);
 });
