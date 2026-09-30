@@ -44,7 +44,7 @@ function close(actual: number | null, expected: number, tolerance = 1e-12) {
   assert.ok(Math.abs((actual as number) - expected) <= tolerance, `expected ${expected}, got ${actual}`)
 }
 
-assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.5')
+assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.6')
 
 dashboardPayload = {
   portfolio: {
@@ -64,6 +64,12 @@ dashboardPayload = {
         currentPrice: '125,5',
         currentValue: '',
         expectedYield: '51,2',
+        brand: {
+          logoName: 'TEST.png',
+          logoBaseColor: '#111111',
+          textColor: '#ffffff',
+          logoUrl: 'https://invest-brands.cdn-tinkoff.ru/TESTx160.png',
+        },
         bond: {
           maturityDate: '2030-02-30',
           nominal: 'NaN',
@@ -153,6 +159,10 @@ assert.equal(bondPosition.bond?.countryOfRiskName, 'Россия')
 assert.equal(bondPosition.bond?.sector, 'Государственный')
 assert.equal(bondPosition.bond?.issuerUid, 'issuer-1')
 assert.equal(bondPosition.bond?.issuerName, 'Минфин')
+assert.equal(bondPosition.brand?.logoName, 'TEST.png')
+assert.equal(bondPosition.brand?.logoBaseColor, '#111111')
+assert.equal(bondPosition.brand?.textColor, '#ffffff')
+assert.equal(bondPosition.brand?.logoUrl, 'https://invest-brands.cdn-tinkoff.ru/TESTx160.png')
 
 assert.deepEqual(invalidNullable.history.map(point => point.date), ['2026-09-01', '2026-09-02'])
 const firstHistory = invalidNullable.history[0]
