@@ -752,3 +752,63 @@
  .sb-pulse-asset b{font-size:14px}
  .sb-pulse-attribution>button>strong{font-size:13px}
 }
+
+
+/* v55 — real-device polish from 2026-09-30 Samsung recording */
+.sb-data-status{min-width:92px!important;justify-content:flex-start!important;gap:7px!important;padding:5px 8px!important;border:1px solid var(--s-line)!important;border-radius:10px!important;background:#fff!important}
+.sb-data-status>i{flex:0 0 auto}
+.sb-data-status>span{display:grid!important;gap:1px!important;min-width:0}
+.sb-data-status>span>b{font-size:9px!important;line-height:1!important;letter-spacing:.06em!important}
+.sb-data-status>span>small{font-size:7px!important;line-height:1.1!important;white-space:nowrap}
+.sb-data-status.live{border-color:#cfe5db!important;background:#f7fcf9!important}
+.sb-data-status.live>span>b{color:#23885f!important}
+
+@media(max-width:520px){
+ .sb-top{gap:8px!important}
+ .sb-top>button:first-child{min-width:0!important;flex:1 1 auto!important}
+ .sb-top>button:first-child>span{min-width:0!important}
+ .sb-top>button:first-child small{max-width:88px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+ .sb-top-actions{flex:0 0 auto!important;gap:6px!important}
+ .sb-experience-toggle{min-width:76px!important;padding:6px 8px!important}
+ .sb-tour-button{width:34px!important;height:34px!important}
+ .sb-data-status{min-width:58px!important;width:58px!important;padding:5px!important;justify-content:center!important}
+ .sb-data-status>span{justify-items:center!important}
+ .sb-data-status>span>b{font-size:9px!important}
+ .sb-data-status>span>small{display:none!important}
+
+ /* Primary segmented controls must always fit the phone; never leave a half-visible tab. */
+ .sb-switch{width:100%!important;max-width:100%!important;display:grid!important;grid-auto-flow:column!important;grid-auto-columns:minmax(0,1fr)!important;gap:4px!important}
+ .sb-switch button{min-width:0!important;width:100%!important;padding:9px 5px!important;font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+
+ /* Professional portfolio depth was clipping the fourth tab in the recording. */
+ .sb .v3-assets-depth__nav{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;overflow:visible!important}
+ .sb .v3-assets-depth__nav>button{min-width:0!important;min-height:54px!important;width:auto!important;padding:9px 10px!important;text-align:left!important}
+ .sb .v3-assets-depth__nav strong{font-size:10px!important;white-space:normal!important}
+ .sb .v3-assets-depth__nav small{font-size:8px!important;line-height:1.25!important;white-space:normal!important}
+
+ /* The top answer should read before secondary controls on a phone. */
+ .sb .v3-assets-depth__head{padding:11px!important}
+ .sb .v3-assets-depth__head h2{font-size:18px!important;line-height:1.1!important}
+ .sb .v3-assets-depth__head p{font-size:9px!important;line-height:1.4!important}
+ .sb .v3-assets-depth__answer{padding:12px!important}
+ .sb .v3-assets-depth__answer>strong{font-size:17px!important;line-height:1.18!important}
+ .sb .v3-assets-depth__answer>p{font-size:9.5px!important;line-height:1.42!important}
+
+ /* Bottom navigation: larger hit area and stronger selected state without increasing height. */
+ .sb-nav button{min-width:0!important;min-height:58px!important;gap:3px!important}
+ .sb-nav i{font-size:17px!important;line-height:1!important}
+ .sb-nav span{font-size:8px!important;line-height:1!important}
+ .sb-nav button.active{font-weight:700!important}
+ .sb-nav button.active:after{content:"";width:18px;height:2px;border-radius:99px;background:var(--s-green);position:absolute;margin-top:-43px}
+ .sb-nav button{position:relative!important}
+
+ /* Avoid content feeling trapped against the fixed dock. */
+ .sb main{padding-bottom:58px!important}
+}
+
+@media(max-width:390px){
+ .sb-experience-toggle{min-width:68px!important}
+ .sb-tour-button{width:32px!important;height:32px!important}
+ .sb-data-status{width:52px!important;min-width:52px!important}
+ .sb .v3-assets-depth__nav>button{padding-inline:8px!important}
+}
