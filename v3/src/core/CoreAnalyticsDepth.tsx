@@ -35,6 +35,7 @@ export function CoreAnalyticsDepth({
  const[section,setSection]=useState<Section>("return");
  const[window,setWindow]=useState<V3HistoryWindow>("all");
  const[pickerOpen,setPickerOpen]=useState(false);
+ const[plainOpen,setPlainOpen]=useState(false);
  const pickerRef=useRef<HTMLDivElement|null>(null);
  useEffect(()=>{
   if(!pickerOpen)return;
@@ -46,6 +47,16 @@ export function CoreAnalyticsDepth({
  const relative=useMemo(()=>buildV3RelativeDepth(filterHistoryWindow(history,window)),[history,window]);
  const integrity=depth.portfolio.historyIntegrity;
  const sectionMeta=SECTIONS.find(([id])=>id===section)??SECTIONS[0];
+ const plain=section==="return"?{
+  title:"Что это значит простыми словами",
+  text:depth.portfolio.twr==null?"Сейчас истории недостаточно, чтобы честно оценить доходность стратегии отдельно от пополнений. Поэтому QVANIX оставляет показатель пустым.":`TWR показывает, как работал сам портфель без эффекта ваших пополнений и выводов. Волатильность описывает силу колебаний, а Sharpe — сколько исторической доходности приходилось на единицу риска.`,
+ }:section==="risk"?{
+  title:"Что это значит простыми словами",
+  text:depth.portfolio.maxDrawdown==null?"Истории пока мало для устойчивого вывода о глубине прошлых просадок.":`Max Drawdown показывает самую глубокую подтверждённую просадку в доступной истории. Чем меньше эффективных позиций, тем сильнее результат может зависеть от нескольких крупных активов.`,
+ }:{
+  title:"Что это значит простыми словами",
+  text:relative.available?`Здесь портфель сравнивается с IMOEX на одном и том же подтверждённом временном отрезке. Положительное относительное значение означает, что за этот отрезок портфель вырос сильнее индекса; отрицательное — слабее.`:"Для честного сравнения портфеля с IMOEX пока недостаточно общей подтверждённой истории.",
+ };
  const decision=section==="return"?{
   eyebrow:"ГЛАВНЫЙ ОТВЕТ",
   title:depth.portfolio.twr==null?"Доходность пока не подтверждена":`TWR ${signedPct(depth.portfolio.twr)}`,
@@ -64,7 +75,8 @@ export function CoreAnalyticsDepth({
    <div><span>ГЛУБОКАЯ АНАЛИТИКА // ТОЛЬКО ЧТЕНИЕ</span><h2>Глубокая аналитика</h2><p>Каноническая TWR-история, риск и сравнение с IMOEX. Пополнения не выдаются за доходность, а неполные источники остаются закрытыми.</p></div>
    <strong className={integrity==="OK"?"is-ok":"is-warning"}>{integrity}</strong>
   </header>
-  <div className="core-analytics-depth__help"><V3GlossaryHelp terms={["twr","var","cvar","beta","trackingError"]} label="Методика показателей"/></div>
+  <div className="core-analytics-depth__help"><V3GlossaryHelp terms={["twr","var","cvar","beta","trackingError"]} label="Методика показателей"/><button type="button" className={plainOpen?"is-active":""} onClick={()=>setPlainOpen(v=>!v)}>{plainOpen?"Скрыть простое объяснение":"Объяснить простыми словами"}</button></div>
+  {plainOpen&&<section className="core-analytics-depth__plain"><span>БЕЗ ЖАРГОНА</span><strong>{plain.title}</strong><p>{plain.text}</p><small>Это пояснение смысла метрик, а не инвестиционный вывод или прогноз.</small></section>}
   <section className="core-analytics-depth__route" aria-label="Текущий раздел аналитики">
    <span>ПРОФЕССИОНАЛЬНЫЙ СЛОЙ</span><strong>{sectionMeta[1]}</strong><small>{sectionMeta[2]}</small>
    <div className="core-analytics-depth__picker-anchor">
