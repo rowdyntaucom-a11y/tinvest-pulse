@@ -8,9 +8,15 @@ export function filterAssetHistoryWindow(points:AssetHistoryPoint[],window:V3His
   const dated=points.map(point=>({point,t:time(point.date)})).filter((x):x is{point:AssetHistoryPoint;t:number}=>x.t!=null);
   if(dated.length<2)return points;
   const anchor=Math.max(...dated.map(x=>x.t));
-  const days=DAYS[window];
-  const cutoff=window==="ytd"?Date.UTC(new Date(anchor).getUTCFullYear(),0,1):days?anchor-days*86_400_000:null;
-  if(cutoff==null)return points;
+  let cutoff:number;
+  if(window==="ytd"){
+    const d=new Date(anchor);
+    cutoff=Date.UTC(d.getUTCFullYear(),0,1);
+  }else{
+    const days=DAYS[window];
+    if(!days)return points;
+    cutoff=anchor-days*86_400_000;
+  }
   const filtered=dated.filter(x=>x.t>=cutoff).map(x=>x.point);
   return filtered.length>=2?filtered:dated.slice(-2).map(x=>x.point);
 }
