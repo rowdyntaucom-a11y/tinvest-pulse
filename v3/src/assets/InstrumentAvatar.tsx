@@ -1,4 +1,4 @@
-import{useState}from"react";
+import{useState}from"react";import type{CSSProperties}from"react";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import"./instrumentAvatar.css";
 
@@ -9,7 +9,7 @@ export function InstrumentAvatar({position,size="md"}:{position:Pick<PositionSna
  const style={
   "--instrument-brand-bg":position.brand?.logoBaseColor||undefined,
   "--instrument-brand-text":position.brand?.textColor||undefined,
- }as React.CSSProperties;
+ }as CSSProperties;
  return <span className={"instrument-avatar is-"+size} style={style} aria-hidden="true">
   {logo?<img src={logo} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={()=>setFailed(true)}/>:<b>{fallback}</b>}
  </span>;
