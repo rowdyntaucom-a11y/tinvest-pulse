@@ -1412,6 +1412,7 @@ async function buildDashboard() {
   // must never hide a healthy broker position or change financial values.
   await enrichPositionsIdentity(positions);
 
+  // Live dashboard stays lightweight; history owns its own refresh.
   const portfolioValue =
     moneyValue(portfolio?.totalAmountPortfolio) ||
     positions.reduce((sum, p) => sum + p.currentValue, 0);
