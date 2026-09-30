@@ -17,7 +17,8 @@ test("result screen distinguishes portfolio result, open-position P/L and payout
 
 test("portfolio sorting and rows label broker position P/L explicitly",()=>{
   assert.match(core,/По P\/L позиций/);
-  assert.match(core,/>P\/L \{x\.expectedYield>0/);
+  assert.match(core,/sb-asset-pnl/);
+  assert.match(core,/P\/L позиции/);
   assert.doesNotMatch(core,/>Текущий P\/L</);
 });
 

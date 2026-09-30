@@ -400,3 +400,13 @@
  .sb .core-analytics-depth__decision p{font-size:10px;line-height:1.45}
  .sb .core-analytics-depth__stage{margin-top:8px}
 }
+
+
+/* v44: the same analytics chooser becomes a bottom sheet on phone/tablet and an anchored popover on desktop. */
+.sb .core-analytics-depth__picker-anchor{position:relative}
+.sb[data-layout="desktop"] .core-analytics-depth__picker-backdrop{position:absolute;z-index:85;inset:auto 0 auto auto;top:calc(100% + 6px);width:380px;display:block;background:transparent;backdrop-filter:none;pointer-events:none}
+.sb[data-layout="desktop"] .core-analytics-depth__picker{width:380px;max-height:520px;margin:0;padding:10px;border:1px solid var(--s-line);border-radius:14px;box-shadow:0 18px 48px #13203324;pointer-events:auto}
+.sb[data-layout="desktop"] .core-analytics-depth__picker>header{padding:4px 4px 9px}
+.sb[data-layout="desktop"] .core-analytics-depth__picker nav>button{min-height:54px}
+.sb[data-layout="desktop"] .core-analytics-depth__picker-control{grid-template-columns:80px minmax(240px,360px);justify-content:start}
+.sb[data-layout="desktop"] .core-analytics-depth__picker-control>button:hover{border-color:#aebedb;background:#fbfdff}

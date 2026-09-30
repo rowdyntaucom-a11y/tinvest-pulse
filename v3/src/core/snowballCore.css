@@ -199,3 +199,44 @@
 }
 
 @media(max-width:520px){.sb-portfolio-structure__next{align-items:flex-start;flex-direction:column}.sb-portfolio-structure__next>div{width:100%}.sb-portfolio-structure__next button{flex:1;min-height:38px;font-size:9px}}
+
+
+/* v44 responsive foundation: one runtime layout tier owns Core composition. */
+.sb[data-layout="tablet"],.sb[data-layout="desktop"]{padding-bottom:28px}
+.sb-asset-table-head{display:none}
+.sb-asset-pnl{font-size:8px;text-align:right;white-space:nowrap}
+.sb[data-layout="phone"] .sb-asset{grid-template-columns:minmax(0,1fr) 44px 88px;grid-template-areas:"identity weight value" "identity weight pnl";row-gap:2px}
+.sb[data-layout="phone"] .sb-asset>span{grid-area:identity;align-self:center}
+.sb[data-layout="phone"] .sb-asset>em{grid-area:weight;align-self:center}
+.sb[data-layout="phone"] .sb-asset>strong{grid-area:value}
+.sb[data-layout="phone"] .sb-asset-pnl{grid-area:pnl;align-self:start;font-size:8px}
+.sb[data-layout="phone"] .sb-asset>strong small{display:none}
+
+.sb[data-layout="tablet"] .sb-nav{left:50%;right:auto;bottom:14px;width:min(620px,calc(100% - 40px));height:64px;transform:translateX(-50%);border:1px solid var(--s-line);border-radius:18px;overflow:hidden;box-shadow:0 10px 35px #17202b12}
+.sb[data-layout="tablet"] main{width:min(calc(100% - 40px),1180px);padding:28px 0 96px}
+.sb[data-layout="tablet"] .sb-asset-table-head,.sb[data-layout="desktop"] .sb-asset-table-head{display:grid;grid-template-columns:minmax(220px,2fr) minmax(90px,.7fr) minmax(130px,1fr) minmax(120px,.9fr);gap:14px;padding:4px 0 8px;border-bottom:1px solid var(--s-line);color:var(--s-muted);font-size:8px;font-weight:700}
+.sb[data-layout="tablet"] .sb-asset-table-head span:not(:first-child),.sb[data-layout="desktop"] .sb-asset-table-head span:not(:first-child){text-align:right}
+.sb[data-layout="tablet"] .sb-asset,.sb[data-layout="desktop"] .sb-asset{grid-template-columns:minmax(220px,2fr) minmax(90px,.7fr) minmax(130px,1fr) minmax(120px,.9fr);gap:14px;padding:12px 0}
+.sb[data-layout="tablet"] .sb-asset>em,.sb[data-layout="desktop"] .sb-asset>em{text-align:right}
+.sb[data-layout="tablet"] .sb-asset>strong,.sb[data-layout="desktop"] .sb-asset>strong{text-align:right}
+.sb[data-layout="tablet"] .sb-asset>strong small,.sb[data-layout="desktop"] .sb-asset>strong small{display:block;margin-top:3px;color:var(--s-muted);font-weight:500}
+.sb[data-layout="tablet"] .sb-asset-pnl,.sb[data-layout="desktop"] .sb-asset-pnl{font-size:10px;align-self:center}
+
+.sb[data-layout="desktop"]{min-height:100dvh;padding-bottom:0}
+.sb[data-layout="desktop"] .sb-top{padding-left:max(24px,calc((100vw - 1280px)/2));padding-right:max(24px,calc((100vw - 1280px)/2))}
+.sb[data-layout="desktop"] main{width:min(calc(100% - 48px),1280px);margin:0 auto;padding:30px 0 56px 226px}
+.sb[data-layout="desktop"] .sb-nav{position:fixed;z-index:35;top:74px;bottom:24px;left:max(24px,calc((100vw - 1280px)/2));right:auto;width:196px;height:auto;transform:none;padding:10px;border:1px solid var(--s-line);border-radius:16px;background:#fff;display:flex;flex-direction:column;gap:4px;box-shadow:0 12px 36px #17202b0d}
+.sb[data-layout="desktop"] .sb-nav button{min-height:48px;display:grid;grid-template-columns:28px minmax(0,1fr);align-items:center;justify-items:start;gap:9px;padding:0 12px;border-radius:10px}
+.sb[data-layout="desktop"] .sb-nav button:hover{background:#f4f6f9}
+.sb[data-layout="desktop"] .sb-nav button.active{background:#eef4ff;color:#203e75}
+.sb[data-layout="desktop"] .sb-nav i{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:#f4f5f7;font-size:14px}
+.sb[data-layout="desktop"] .sb-nav button.active i{background:#dfeafe;color:#315fae}
+.sb[data-layout="desktop"] .sb-nav span{font-size:10px;font-weight:700}
+.sb[data-layout="desktop"] .sb-balance{grid-template-columns:minmax(0,1fr) auto}
+.sb[data-layout="desktop"] .sb-chart .v3-history-chart{height:300px!important;min-height:300px!important}
+.sb[data-layout="desktop"] .sb-full{padding:14px 16px 6px}
+.sb[data-layout="desktop"] .sb-title h1{font-size:30px}
+
+@media(max-width:699px){
+ .sb-asset-table-head{display:none!important}
+}

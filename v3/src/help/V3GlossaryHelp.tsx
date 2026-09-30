@@ -26,7 +26,7 @@ export function V3GlossaryHelp({terms,label="Что означают показ�
  const entries=useMemo(()=>terms.map(key=>({key,...V3_GLOSSARY[key]})),[terms]);
  useEffect(()=>{if(!open)return;const onKey=(e:KeyboardEvent)=>{if(e.key==="Escape")setOpen(false)};window.addEventListener("keydown",onKey);return()=>window.removeEventListener("keydown",onKey)},[open]);
  return <>
-  <button type="button" className="v3-glossary-help__trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)}><i aria-hidden="true">i</i><span>{label}</span></button>
+  <button type="button" className="v3-glossary-help__trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)}><i aria-hidden="true">i</i><span>{label}</span><span className="v3-glossary-help__hovercard" aria-hidden="true">{entries.slice(0,2).map(entry=><span key={entry.key}><b>{entry.title}</b><small>{entry.simple}</small></span>)}</span></button>
   {open&&<div className="v3-glossary-help__backdrop" role="presentation" onClick={()=>setOpen(false)}>
    <section className="v3-glossary-help" role="dialog" aria-modal="true" aria-label="Пояснения к показателям" onClick={e=>e.stopPropagation()}>
     <header><div><span>QVANIX EXPLAIN</span><strong>Показатели без жаргона</strong><small>Короткое объяснение сверху, методика — ниже.</small></div><button type="button" aria-label="Закрыть пояснения" onClick={()=>setOpen(false)}>×</button></header>
