@@ -72,7 +72,7 @@ export function CoreAnalyticsDepth({
  };
  return <section className="core-analytics-depth" aria-label="Профессиональная аналитика портфеля">
   <header className="core-analytics-depth__head">
-   <div><span>ГЛУБОКАЯ АНАЛИТИКА // ТОЛЬКО ЧТЕНИЕ</span><h2>Профессиональная аналитика</h2><p>Каноническая TWR-история, риск и сравнение с IMOEX. Пополнения не выдаются за доходность, а неполные источники остаются закрытыми.</p></div>
+   <div><span>ПРОФЕССИОНАЛЬНАЯ АНАЛИТИКА // ТОЛЬКО ЧТЕНИЕ</span><h2>Профессиональная аналитика</h2><p>Каноническая TWR-история, риск и сравнение с IMOEX. Пополнения не выдаются за доходность, а неполные источники остаются закрытыми.</p></div>
    <strong className={integrity==="OK"?"is-ok":"is-warning"}>{integrity}</strong>
   </header>
   <div className="core-analytics-depth__help"><V3GlossaryHelp terms={["twr","var","cvar","beta","trackingError"]} label="Методика показателей"/><button type="button" className={plainOpen?"is-active":""} onClick={()=>setPlainOpen(v=>!v)}>{plainOpen?"Скрыть простое объяснение":"Объяснить простыми словами"}</button></div>
