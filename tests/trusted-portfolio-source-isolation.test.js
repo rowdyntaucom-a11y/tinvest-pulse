@@ -24,7 +24,7 @@ assert.match(core,/BROKER_ACCOUNT_UNAVAILABLE/);
 assert.match(core,/openedDate: account\.openedDate \|\| account\.openDate \|\| null/);
 assert.match(core,/accessLevel: account\.accessLevel \|\| null/);
 
-assert.match(portfolioApi,/PORTFOLIO_NORMALIZATION_VERSION = '1\.4'/);
+assert.match(portfolioApi,/PORTFOLIO_NORMALIZATION_VERSION = '1\\.5'/);
 assert.match(portfolioApi,/normaliseAccountContext\(account\)/);
 assert.doesNotMatch(portfolioApi,/loadAccountContext\(/);
 assert.match(portfolioApi,/AbortController/);
