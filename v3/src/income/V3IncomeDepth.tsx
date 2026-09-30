@@ -128,7 +128,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
       }):<div className="v3-income-depth-state">Нет подтверждённых источников для разбивки.</div>}</div>
       {depth.bondLinkage.eligibleBondCount>0&&<div className="v3-income-bond-link"><div><span>Облигации → расписание</span><strong>{depth.bondLinkage.linkedBondCount}/{depth.bondLinkage.eligibleBondCount}</strong></div><i><b style={{width:Math.round(depth.bondLinkage.valueCoverage*100)+"%"}}/></i><small>{pct.format(depth.bondLinkage.valueCoverage*100)}% стоимости облигаций связано по FIGI · {depth.bondLinkage.couponEvents} купонных событий · {money(depth.bondLinkage.scheduledGross)} до налога</small></div>}
       {depth.bondCashflow.available&&<section className="v3-income-bond-cashflow" aria-label="Купонный поток облигаций">
-        <div className="v3-income-quality-head"><div><span>КУПОННЫЙ ПОТОК · 12М</span><strong>Календарный профиль купонов</strong></div><small>scheduled gross · exact FIGI</small></div>
+        <div className="v3-income-quality-head"><div><span>КУПОННЫЙ ПОТОК · 12М</span><strong>Календарный профиль купонов</strong></div><small>расписание до налога · точный FIGI</small></div>
         <div className="v3-income-quality-grid">
           <article><span>Поток 12М</span><strong>{money(depth.bondCashflow.scheduledGross)}</strong><small>{depth.bondCashflow.couponEvents} событий</small></article>
           <article><span>Активные месяцы</span><strong>{depth.bondCashflow.activeMonths}/12</strong><small>месяцев с купоном</small></article>
