@@ -812,3 +812,51 @@
  .sb-data-status{width:52px!important;min-width:52px!important}
  .sb .v3-assets-depth__nav>button{padding-inline:8px!important}
 }
+
+
+/* v56 — Snowball+ asset drill-down: answer -> impact -> broker facts */
+.sb-asset-answer{margin:0 0 8px;padding:13px;border:1px solid #dce5f1;border-radius:12px;background:linear-gradient(180deg,#f8fbff,#f3f7fc);display:grid;gap:4px}
+.sb-asset-answer>span{font-size:7px;font-weight:900;letter-spacing:.09em;color:var(--s-blue)}
+.sb-asset-answer>strong{font-size:16px;line-height:1.18}
+.sb-asset-answer>p{margin:0;font-size:9px;line-height:1.45;color:#435062}
+.sb-asset-answer>small{font-size:7px;line-height:1.35;color:var(--s-muted)}
+.sb-asset-impact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 8px}
+.sb-asset-impact>div{min-width:0;padding:10px;border:1px solid var(--s-line);border-radius:10px;background:#fff;display:grid;gap:4px}
+.sb-asset-impact span,.sb-asset-impact small{font-size:7px;color:var(--s-muted)}
+.sb-asset-impact strong{font-size:14px;line-height:1.1}
+.sb-asset-impact i{height:4px;border-radius:99px;background:#edf0f4;overflow:hidden}
+.sb-asset-impact i>b{display:block;height:100%;border-radius:inherit;background:var(--s-blue)}
+.sb-asset-math{margin-bottom:8px}
+.sb-asset-hero{position:relative;overflow:hidden}
+.sb-asset-hero:after{content:"";position:absolute;right:-24px;bottom:-42px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#eaf1ff 0,#eaf1ff00 68%);pointer-events:none}
+
+@media(max-width:520px){
+ .sb-asset-detail{display:grid;gap:0}
+ .sb-asset-detail>.sb-back{min-height:38px;width:max-content;padding-right:12px;font-size:9px}
+ .sb-asset-hero{padding:12px!important}
+ .sb-asset-detail h1{font-size:20px!important}
+ .sb-asset-hero>b{font-size:23px!important;margin-top:11px!important}
+ .sb-asset-hero>em{font-size:10px!important}
+ .sb-asset-answer{padding:12px;margin-bottom:7px}
+ .sb-asset-answer>span{font-size:8px}
+ .sb-asset-answer>strong{font-size:17px}
+ .sb-asset-answer>p{font-size:9.5px}
+ .sb-asset-answer>small{font-size:8px}
+ .sb-asset-impact{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:7px}
+ .sb-asset-impact>div{padding:9px 7px}
+ .sb-asset-impact span,.sb-asset-impact small{font-size:7.5px}
+ .sb-asset-impact strong{font-size:13px}
+ .sb-asset-detail>.sb-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important;margin-bottom:7px}
+ .sb-asset-detail>.sb-detail-grid article{padding:9px!important}
+ .sb-asset-detail>.sb-detail-grid span{font-size:7.5px!important}
+ .sb-asset-detail>.sb-detail-grid strong{font-size:10px!important}
+ .sb-asset-math{margin-bottom:7px}
+ .sb-detail-note{font-size:7.5px!important;line-height:1.45!important;padding-bottom:8px!important}
+}
+@media(min-width:760px){
+ .sb-asset-detail{max-width:900px;margin-inline:auto}
+ .sb-asset-answer{padding:16px}
+ .sb-asset-answer>strong{font-size:20px}
+ .sb-asset-impact>div{padding:13px}
+ .sb-asset-impact strong{font-size:17px}
+}
