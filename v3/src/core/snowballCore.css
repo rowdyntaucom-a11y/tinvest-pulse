@@ -596,3 +596,51 @@
  .sb-alert-cached{margin:5px 10px 0;padding:6px 8px}
  .sb-alert-cached span{display:none}
 }
+
+
+/* v50 mobile deep-flow: professional depth should not sit under sticky quick controls. */
+.sb-depth-exit{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;padding:8px 10px;border:1px solid var(--s-line);border-radius:10px;background:#fff}
+.sb-depth-exit button{min-height:34px;padding:0 10px;border:1px solid #cfd9ec;border-radius:9px;background:#eef4ff;color:#315fae;font-size:8px;font-weight:800}
+.sb-depth-exit span{color:var(--s-muted);font-size:8px;text-align:right}
+.sb-income-context{display:grid;gap:8px;margin:8px 0;padding:11px;border:1px solid var(--s-line);border-radius:12px;background:#fff}
+.sb-income-context>header{display:grid;gap:3px}
+.sb-income-context>header span{color:var(--s-blue);font-size:7px;font-weight:900;letter-spacing:.08em}
+.sb-income-context>header b{font-size:10px}
+.sb-income-context>div{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sb-income-context article{padding:10px;border:1px solid #edf0f4;border-radius:10px;background:#fafbfc}
+.sb-income-context article span,.sb-income-context article strong,.sb-income-context article small{display:block}
+.sb-income-context article span{color:var(--s-muted);font-size:8px}
+.sb-income-context article strong{margin-top:5px;font-size:14px}
+.sb-income-context article small{margin-top:4px;color:var(--s-muted);font-size:7.5px;line-height:1.35}
+
+@media(max-width:520px){
+ .sb-analytics.is-depth .sb-context-help{display:none}
+ .sb-analytics.is-depth .sb-switch{position:static!important}
+ .sb-analytics.is-depth{padding-top:0}
+ .sb-depth-exit{position:sticky;z-index:17;top:95px;margin-bottom:7px;padding:7px 8px;background:color-mix(in srgb,var(--s-bg) 94%,#fff 6%)}
+ .sb-depth-exit button{min-height:36px;font-size:9px}
+ .sb-depth-exit span{font-size:8px}
+ .sb-income-context{padding:10px}
+ .sb-income-context>header span{font-size:8px}
+ .sb-income-context>header b{font-size:11px}
+ .sb-income-context article{padding:9px}
+ .sb-income-context article span{font-size:8.5px}
+ .sb-income-context article strong{font-size:15px}
+ .sb-income-context article small{font-size:8px}
+}
+@media(max-width:370px){
+ .sb-depth-exit{align-items:flex-start;flex-direction:column}
+ .sb-depth-exit span{text-align:left}
+ .sb-income-context>div{grid-template-columns:1fr}
+}
+@media(min-width:1200px){
+ .sb-depth-exit{padding:12px 14px}
+ .sb-depth-exit button{min-height:42px;font-size:10px}
+ .sb-depth-exit span{font-size:10px}
+ .sb-income-context{padding:15px}
+ .sb-income-context>header span{font-size:9px}
+ .sb-income-context>header b{font-size:13px}
+ .sb-income-context article span{font-size:10px}
+ .sb-income-context article strong{font-size:19px}
+ .sb-income-context article small{font-size:9px}
+}
