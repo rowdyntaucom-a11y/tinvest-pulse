@@ -410,3 +410,28 @@
 .sb[data-layout="desktop"] .core-analytics-depth__picker nav>button{min-height:54px}
 .sb[data-layout="desktop"] .core-analytics-depth__picker-control{grid-template-columns:80px minmax(240px,360px);justify-content:start}
 .sb[data-layout="desktop"] .core-analytics-depth__picker-control>button:hover{border-color:#aebedb;background:#fbfdff}
+
+
+/* v45 desktop workbench density — wide screens should use width, not simply enlarge a phone column. */
+.sb[data-layout="desktop"] .core-analytics-depth__nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sb[data-layout="desktop"] .core-analytics-depth__nav button{min-height:62px;padding:11px 12px}
+.sb[data-layout="desktop"] .core-analytics-depth__nav strong{font-size:11px}
+.sb[data-layout="desktop"] .core-analytics-depth__nav small{font-size:9px;line-height:1.35}
+.sb[data-layout="desktop"] .core-analytics-depth__decision{padding:16px}
+.sb[data-layout="desktop"] .core-analytics-depth__decision span{font-size:9px}
+.sb[data-layout="desktop"] .core-analytics-depth__decision strong{font-size:20px}
+.sb[data-layout="desktop"] .core-analytics-depth__decision p{font-size:10px}
+.sb[data-layout="desktop"] .v3-market-intelligence>nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;overflow:visible}
+.sb[data-layout="desktop"] .v3-market-intelligence>nav button{min-height:64px;padding:11px 12px}
+.sb[data-layout="desktop"] .v3-market-intelligence>nav strong{font-size:11px}
+.sb[data-layout="desktop"] .v3-market-intelligence>nav small{font-size:9px}
+.sb[data-layout="desktop"] .v3-pro-tools__groups{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sb[data-layout="desktop"] .v3-pro-tools__groups>section{padding:12px}
+.sb[data-layout="desktop"] .v3-pro-tools__groups>section>header{font-size:9px}
+.sb[data-layout="desktop"] .v3-pro-tools__groups button{min-height:62px;padding:10px 11px}
+.sb[data-layout="desktop"] .v3-pro-tools__groups button strong{font-size:10px}
+.sb[data-layout="desktop"] .v3-pro-tools__groups button small{font-size:8.5px}
+.sb[data-layout="desktop"] .v3-pro-tools__focus{padding:16px}
+.sb[data-layout="desktop"] .v3-pro-tools__focus>strong,.sb[data-layout="desktop"] .v3-pro-tools__focus>div>strong{font-size:18px}
+.sb[data-layout="desktop"] .v3-pro-tools__focus>p,.sb[data-layout="desktop"] .v3-pro-tools__focus>div>p{font-size:9.5px}
+.sb[data-layout="desktop"] .v3-pro-tools__stage{max-width:none}
