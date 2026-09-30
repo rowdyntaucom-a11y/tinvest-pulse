@@ -1752,7 +1752,6 @@ app.get('/api/portfolio', async (req, res) => {
       currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice),
       brand: null
     }));
-    await enrichPositionsIdentity(positions);
     const totalValue = moneyValue(portfolio?.totalAmountPortfolio) ||
       positions.reduce((sum, position) => sum + position.currentValue, 0);
 
