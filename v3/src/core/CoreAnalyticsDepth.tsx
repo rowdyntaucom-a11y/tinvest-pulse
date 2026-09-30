@@ -93,6 +93,7 @@ export function CoreAnalyticsDepth({
    {SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
   </nav>
   <section className="core-analytics-depth__decision" aria-live="polite"><span>{decision.eyebrow}</span><strong>{decision.title}</strong><p>{decision.text}</p></section>
+  <section className="core-analytics-depth__evidence" aria-label="Основа расчёта"><span>ОСНОВА РАСЧЁТА</span><div><article><b>{history.length}</b><small>точек истории</small></article><article><b>{positions.length}</b><small>текущих позиций</small></article><article><b>{relative.available?relative.overlapPoints:"—"}</b><small>общих точек с IMOEX</small></article></div><p>{integrity==="OK"?"История прошла проверку целостности.":"История ограничена: недоступные метрики остаются пустыми."}</p></section>
   <div className="core-analytics-depth__stage">
    {section==="return"&&<V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/>}
    {section==="risk"&&<V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/>}
