@@ -7,6 +7,8 @@ import {
 let dashboardPayload: Record<string, unknown> = {}
 let dashboardStatus = 200
 let legacyPortfolioPayload: Record<string, unknown> | null = null
+let operationsSummaryPayload: Record<string, unknown> | null = null
+let accountsPayload: Record<string, unknown> | null = null
 
 ;(globalThis as { fetch: typeof fetch }).fetch = async input => {
   const url = String(input)
@@ -22,6 +24,18 @@ let legacyPortfolioPayload: Record<string, unknown> | null = null
       headers: { 'content-type': 'application/json' },
     })
   }
+  if (url === '/api/operations-summary' && operationsSummaryPayload) {
+    return new Response(JSON.stringify(operationsSummaryPayload), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+  if (url === '/api/accounts' && accountsPayload) {
+    return new Response(JSON.stringify(accountsPayload), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
   throw new Error(`unexpected fetch ${url}`)
 }
 
@@ -30,7 +44,7 @@ function close(actual: number | null, expected: number, tolerance = 1e-12) {
   assert.ok(Math.abs((actual as number) - expected) <= tolerance, `expected ${expected}, got ${actual}`)
 }
 
-assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.4')
+assert.equal(PORTFOLIO_NORMALIZATION_VERSION, '1.5')
 
 dashboardPayload = {
   portfolio: {
@@ -269,7 +283,15 @@ assert.equal(conflictGuard.history[2].invested, null)
 dashboardStatus = 503
 legacyPortfolioPayload = {
   totalValue: 1250,
-  profit: 50,
+  expectedYield: 250,
+  fetchedAt: '2026-09-30T03:00:00.000Z',
+  account: {
+    name: 'Recovery IIS',
+    type: 'ACCOUNT_TYPE_TINKOFF_IIS',
+    status: 'ACCOUNT_STATUS_OPEN',
+    openedDate: '2026-07-26T00:00:00.000Z',
+    accessLevel: 'ACCOUNT_ACCESS_LEVEL_READ_ONLY',
+  },
   positions: [
     {
       ticker: 'FALLBACK',
@@ -283,16 +305,42 @@ legacyPortfolioPayload = {
     },
   ],
 }
+operationsSummaryPayload = {
+  passiveIncomeTotal: 120,
+  coverage: { possiblyTruncated: false, observedFrom: '2026-07-26T00:00:00.000Z' },
+  operations: [
+    { date: '2026-07-27T10:00:00.000Z', payment: 1000, isExternalCash: true },
+    { date: '2026-08-10T10:00:00.000Z', payment: 60, isIncome: true },
+  ],
+}
 const recoveredLegacy = await loadPortfolio()
 assert.equal(recoveredLegacy.source, 'portfolio')
 close(recoveredLegacy.value, 1250)
+close(recoveredLegacy.profit, 250)
 assert.equal(recoveredLegacy.positions, 1)
 assert.equal(recoveredLegacy.positionItems[0].ticker, 'FALLBACK')
+assert.equal(recoveredLegacy.accountName, 'Recovery IIS')
+assert.equal(recoveredLegacy.accountContext?.available, true)
+assert.equal(recoveredLegacy.accountContext?.type, 'ACCOUNT_TYPE_TINKOFF_IIS')
+assert.equal(recoveredLegacy.startDate, '2026-07-27T10:00:00.000Z')
+close(recoveredLegacy.passiveIncome, 120)
+assert.ok(recoveredLegacy.averageMonthlyPassiveIncome > 0)
+assert.ok(recoveredLegacy.averageAnnualPassiveIncome > 0)
+assert.deepEqual(recoveredLegacy.recoveryContext, {
+  brokerPortfolio: true,
+  account: true,
+  operations: true,
+  passiveIncomeComplete: true,
+})
 assert.equal(recoveredLegacy.history.length, 0)
 assert.equal(recoveredLegacy.xirr, null)
+assert.equal(recoveredLegacy.cagr, null)
 assert.equal(recoveredLegacy.riskFreeRate, null)
+assert.equal(recoveredLegacy.updatedAt, '2026-09-30T03:00:00.000Z')
 dashboardStatus = 200
 legacyPortfolioPayload = null
+operationsSummaryPayload = null
+accountsPayload = null
 
 console.log('portfolio API normalization regression: ok')
 

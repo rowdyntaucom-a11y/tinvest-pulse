@@ -1686,6 +1686,69 @@ app.get('/api/accounts', async (req, res) => {
   }
 });
 
+// Isolated broker fallback for the light QVANIX Core. This route intentionally
+// avoids operations/history/market composition so a slow secondary source cannot
+// hide a healthy read-only broker portfolio.
+app.get('/api/portfolio', async (req, res) => {
+  const startedAt = Date.now();
+  try {
+    const accountsResponse = await getAccounts();
+    const account = selectAccount(accountsResponse);
+    if (!account?.id) {
+      return res.status(404).json({
+        ok: false,
+        error: 'No open T-Bank investment account was returned for this token.'
+      });
+    }
+
+    const portfolio = await getPortfolio(account.id);
+    const positions = (Array.isArray(portfolio?.positions) ? portfolio.positions : []).map(p => ({
+      figi: p.figi || null,
+      instrumentUid: p.instrumentUid || null,
+      ticker: p.ticker || p.instrumentUid || p.figi || null,
+      name: p.name || p.ticker || p.figi || p.instrumentUid || 'Актив',
+      instrumentType: p.instrumentType || '',
+      quantity: moneyValue(p.quantity),
+      averagePrice: moneyValue(p.averagePositionPrice),
+      currentPrice: moneyValue(p.currentPrice),
+      expectedYield: moneyValue(p.expectedYield),
+      currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice)
+    }));
+    const totalValue = moneyValue(portfolio?.totalAmountPortfolio) ||
+      positions.reduce((sum, position) => sum + position.currentValue, 0);
+
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.json({
+      ok: true,
+      contractVersion: '1.0',
+      fetchedAt: new Date().toISOString(),
+      source: 'tbank-portfolio',
+      sourceHealth: { brokerAccounts: true, brokerPortfolio: true, elapsedMs: Date.now() - startedAt },
+      account: {
+        id: account.id,
+        name: account.name || account.type || 'T-Invest account',
+        type: account.type || null,
+        status: account.status || null,
+        openedDate: account.openedDate || account.openDate || null,
+        accessLevel: account.accessLevel || null
+      },
+      totalValue,
+      expectedYield: moneyValue(portfolio?.expectedYield),
+      positions
+    });
+  } catch (err) {
+    console.warn('QVANIX_PORTFOLIO_FALLBACK_ERROR', JSON.stringify({
+      ms: Date.now() - startedAt,
+      message: err?.message || String(err)
+    }));
+    res.status(502).json({
+      ok: false,
+      error: 'Verified broker portfolio temporarily unavailable',
+      ...errorInfo(err)
+    });
+  }
+});
+
 app.get('/api/version', (req, res) => {
   res.json({ ok: true, version: '6.0-reactor-pulse-hud' });
 });

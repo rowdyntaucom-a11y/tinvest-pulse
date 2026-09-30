@@ -87,7 +87,13 @@ export function CoreRoot(){
     writeCache(nextSnapshot);
     setTrusted(true);
     if(nextSnapshot.source==="portfolio"){
-     setReason("Основной dashboard временно недоступен. Загружен подтверждённый брокерский портфель; история и расширенные расчёты догружаются отдельно.");
+     const recovery=nextSnapshot.recoveryContext;
+     const recoveredParts=[
+      recovery?.account?"счёт":null,
+      recovery?.operations&&recovery?.passiveIncomeComplete?"пассивный доход":null,
+     ].filter(Boolean);
+     const suffix=recoveredParts.length?"; дополнительно подтверждены "+recoveredParts.join(" и "):"";
+     setReason("Основной dashboard временно недоступен. Загружен подтверждённый брокерский портфель"+suffix+". История, XIRR/CAGR и рыночный контекст догружаются отдельно.");
      retryStep.current=Math.max(retryStep.current,3);
      scheduleRetry();
     }else{
