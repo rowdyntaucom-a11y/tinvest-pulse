@@ -3,7 +3,9 @@ import assert from"node:assert/strict";
 import{readFileSync}from"node:fs";
 
 const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
-const css=readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");\nconst analytics=readFileSync(new URL("../src/core/CoreAnalyticsDepth.tsx",import.meta.url),"utf8");\nconst income=readFileSync(new URL("../src/income/V3IncomeDepth.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+const analytics=readFileSync(new URL("../src/core/CoreAnalyticsDepth.tsx",import.meta.url),"utf8");
+const income=readFileSync(new URL("../src/income/V3IncomeDepth.tsx",import.meta.url),"utf8");
 
 test("primary return workspace is named Доходность rather than generic Результат",()=>{
  assert.match(core,/Title title="Доходность"/);
@@ -28,4 +30,10 @@ test("hard untrusted state keeps the full alert treatment",()=>{
 });
 
 
-test("professional surfaces use one naming system",()=>{\n assert.match(core,/Аналитика портфеля/);\n assert.match(core,/>Портфель<\/button>/);\n assert.match(analytics,/Профессиональная аналитика/);\n assert.match(income,/ПРОФЕССИОНАЛЬНЫЙ ДОХОД/);\n assert.match(income,/КУПОННЫЙ ПОТОК · 12М/);\n});\n
+test("professional surfaces use one naming system",()=>{
+ assert.match(core,/Аналитика портфеля/);
+ assert.match(core,/>Портфель<\/button>/);
+ assert.match(analytics,/Профессиональная аналитика/);
+ assert.match(income,/ПРОФЕССИОНАЛЬНЫЙ ДОХОД/);
+ assert.match(income,/КУПОННЫЙ ПОТОК · 12М/);
+});
