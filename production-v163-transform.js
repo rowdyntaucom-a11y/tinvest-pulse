@@ -1,7 +1,8 @@
 'use strict';
 
-const DASHBOARD_IDENTITY_MARKER = "    figi: p.figi,\n    ticker: p.ticker || p.instrumentUid || p.figi,";
-const DASHBOARD_IDENTITY_REPLACEMENT = "    figi: p.figi,\n    instrumentUid: p.instrumentUid || null,\n    ticker: p.ticker || p.instrumentUid || p.figi,";
+const LEGACY_DASHBOARD_IDENTITY_MARKER = "    figi: p.figi,\n    ticker: p.ticker || p.instrumentUid || p.figi,";
+const DASHBOARD_IDENTITY_MARKER = "    figi: p.figi || null,\n    instrumentUid: p.instrumentUid || null,\n    ticker: p.ticker || p.instrumentUid || p.figi,";
+const DASHBOARD_IDENTITY_REPLACEMENT = DASHBOARD_IDENTITY_MARKER;
 
 const ASSET_FUNDAMENTALS_TEMPLATE_MARKER = "const assetFundamentalsInjectedCode=String.raw`\nconst assetFundamentalsMarker=";
 
@@ -11,7 +12,7 @@ function injectDashboardInstrumentUid(source) {
   }
 
   const prelude = [
-    'const dashboardIdentityMarker=' + JSON.stringify(DASHBOARD_IDENTITY_MARKER) + ';',
+    'const dashboardIdentityMarker=' + JSON.stringify(LEGACY_DASHBOARD_IDENTITY_MARKER) + ';',
     "if(!core.includes(dashboardIdentityMarker))throw new Error('QVANIX v2: dashboard identity marker changed');",
     'core=core.replace(dashboardIdentityMarker,' + JSON.stringify(DASHBOARD_IDENTITY_REPLACEMENT) + ');',
   ].join('\n');
@@ -24,6 +25,7 @@ function injectDashboardInstrumentUid(source) {
 
 module.exports = {
   ASSET_FUNDAMENTALS_TEMPLATE_MARKER,
+  LEGACY_DASHBOARD_IDENTITY_MARKER,
   DASHBOARD_IDENTITY_MARKER,
   DASHBOARD_IDENTITY_REPLACEMENT,
   injectDashboardInstrumentUid,
