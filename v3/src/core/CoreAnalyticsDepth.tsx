@@ -67,13 +67,15 @@ export function CoreAnalyticsDepth({
   <div className="core-analytics-depth__help"><V3GlossaryHelp terms={["twr","var","cvar","beta","trackingError"]} label="Методика показателей"/></div>
   <section className="core-analytics-depth__route" aria-label="Текущий раздел аналитики">
    <span>ПРОФЕССИОНАЛЬНЫЙ СЛОЙ</span><strong>{sectionMeta[1]}</strong><small>{sectionMeta[2]}</small>
-   <div className="core-analytics-depth__picker-control"><b>Раздел</b><button type="button" aria-haspopup="dialog" aria-expanded={pickerOpen} onClick={()=>setPickerOpen(true)}><span>{sectionMeta[1]}</span><i aria-hidden="true">⌄</i></button></div>
-   {pickerOpen&&<div className="core-analytics-depth__picker-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setPickerOpen(false)}}>
-    <div ref={pickerRef} className="core-analytics-depth__picker" role="dialog" aria-modal="true" aria-label="Выбрать раздел глубокой аналитики">
-     <header><div><span>АНАЛИТИКА</span><strong>Выберите срез</strong></div><button type="button" aria-label="Закрыть" onClick={()=>setPickerOpen(false)}>×</button></header>
-     <nav>{SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>{setSection(id);setPickerOpen(false)}}><span><strong>{label}</strong><small>{note}</small></span><i aria-hidden="true">{section===id?"✓":"›"}</i></button>)}</nav>
-    </div>
-   </div>}
+   <div className="core-analytics-depth__picker-anchor">
+    <div className="core-analytics-depth__picker-control"><b>Раздел</b><button type="button" aria-haspopup="dialog" aria-expanded={pickerOpen} onClick={()=>setPickerOpen(true)}><span>{sectionMeta[1]}</span><i aria-hidden="true">⌄</i></button></div>
+    {pickerOpen&&<div className="core-analytics-depth__picker-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setPickerOpen(false)}}>
+     <div ref={pickerRef} className="core-analytics-depth__picker" role="dialog" aria-modal="true" aria-label="Выбрать раздел глубокой аналитики">
+      <header><div><span>АНАЛИТИКА</span><strong>Выберите срез</strong></div><button type="button" aria-label="Закрыть" onClick={()=>setPickerOpen(false)}>×</button></header>
+      <nav>{SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>{setSection(id);setPickerOpen(false)}}><span><strong>{label}</strong><small>{note}</small></span><i aria-hidden="true">{section===id?"✓":"›"}</i></button>)}</nav>
+     </div>
+    </div>}
+   </div>
   </section>
   <nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики">
    {SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
