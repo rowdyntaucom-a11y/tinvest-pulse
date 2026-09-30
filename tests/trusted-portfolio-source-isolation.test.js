@@ -31,7 +31,7 @@ assert.match(portfolioApi,/AbortController/);
 assert.match(portfolioApi,/32_000/);
 assert.match(portfolioApi,/dashboard timeout/);
 
-assert.match(preview,/isDashboard=req\.url\.split\("\?"\)\[0\]==="\/api\/dashboard"/);
+assert.match(preview,/routePath=req\.url\.split\("\?"\)\[0\],isDashboard=routePath==="\/api\/dashboard"/);
 assert.match(preview,/delays=isDashboard\?\[0,1200,2500,4500,6500\]/);
 assert.match(preview,/isBrokerRecovery=\["\/api\/portfolio","\/api\/accounts","\/api\/operations-summary"\]/);
 assert.match(preview,/attemptTimeoutMs=isDashboard\?4500:isBrokerRecovery\?3500:18000/);
