@@ -4,6 +4,8 @@ import{readFileSync}from"node:fs";
 
 const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+const market=readFileSync(new URL("../src/analysis/V3MarketIntelligenceWorkspace.tsx",import.meta.url),"utf8");
+const marketCss=readFileSync(new URL("../src/styles/marketIntelligenceWorkspace.css",import.meta.url),"utf8");
 
 test("professional analytics exits the sticky quick-layer stack on mobile",()=>{
  assert.match(core,/sb-analytics"\+\(mode==="depth"\?" is-depth":""\)/);
@@ -22,6 +24,13 @@ test("income overview uses existing verified values for deterministic context",(
  assert.match(core,/12М эквивалент \/ капитал/);
  assert.match(core,/не доходность и не прогноз будущих выплат/);
  assert.match(css,/sb-income-context/);
+});
+
+test("market loading explains the verified source boundary without fake prices",()=>{
+ assert.match(market,/ПОДТВЕРЖДАЕМ РЫНОЧНЫЙ СРЕЗ/);
+ assert.match(market,/MOEX TQBR/);
+ assert.match(market,/позиций для сопоставления/);
+ assert.match(marketCss,/v3-market-pulse__gate\.is-loading/);
 });
 
 test("v50 adds no new market data or trading capability",()=>{
