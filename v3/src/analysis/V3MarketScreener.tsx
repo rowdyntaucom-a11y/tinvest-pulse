@@ -24,10 +24,10 @@ function changeClass(value:number|null){
 function changeText(value:number|null){return value==null?"—":pct.format(value)+"%"}
 function listingText(value:number|null){return value==null?"—":"L"+value}
 
-export function V3MarketScreener({sharedData,sharedLoading=false,onRetry}:{sharedData?:MarketScreenerPayload|null;sharedLoading?:boolean;onRetry?:()=>void}={}){
+export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfolioTickers}:{sharedData?:MarketScreenerPayload|null;sharedLoading?:boolean;onRetry?:()=>void;portfolioTickers?:Set<string>}={}){
  const[localData,setLocalData]=useState<MarketScreenerPayload|null>(null),[localLoading,setLocalLoading]=useState(true);
  const controlled=sharedData!==undefined,data=controlled?sharedData:localData,loading=controlled?sharedLoading:localLoading;
- const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"});
+ const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false);
  useEffect(()=>{
   if(controlled)return;
   const controller=new AbortController();
@@ -35,7 +35,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry}:{share
   void loadMarketScreener(controller.signal).then(setLocalData).finally(()=>{if(!controller.signal.aborted)setLocalLoading(false)});
   return()=>controller.abort();
  },[controlled]);
- const rows=useMemo(()=>filterMarketScreener(data?.rows??[],filters),[data,filters]);
+ const rows=useMemo(()=>filterMarketScreener((data?.rows??[]).filter(row=>!portfolioOnly||portfolioTickers?.has(row.secid.toUpperCase())),filters),[data,filters,portfolioOnly,portfolioTickers]);
  const visible=rows.slice(0,60);
 
  return <section className="sam-screener" aria-label="Рыночный скринер">
@@ -46,6 +46,9 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry}:{share
    <label><span>Уровень листинга</span><select value={filters.listingLevel} onChange={e=>setFilters(v=>({...v,listingLevel:e.target.value==="all"?"all":Number(e.target.value) as 1|2|3}))}><option value="all">Все</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
   </div>
 
+  <div className="sam-screener__portfolio-filter">
+   <button type="button" className={portfolioOnly?"is-active":""} disabled={!portfolioTickers?.size} aria-pressed={portfolioOnly} onClick={()=>setPortfolioOnly(v=>!v)}><b>{portfolioOnly?"Только мой портфель":"Показать только мой портфель"}</b><small>{portfolioTickers?.size?portfolioTickers.size+" тикеров для точного сопоставления":"портфельные тикеры недоступны"}</small></button>
+  </div>
   <div className="sam-screener__filter-block">
    <span>Движение дня</span><div>{MOVE.map(([value,label])=><button type="button" key={value} className={filters.move===value?"is-active":""} onClick={()=>setFilters(v=>({...v,move:value}))}>{label}</button>)}</div>
   </div>

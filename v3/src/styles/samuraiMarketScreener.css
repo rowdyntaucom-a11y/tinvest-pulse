@@ -59,3 +59,15 @@
   padding-bottom:calc(104px + env(safe-area-inset-bottom));
  }
 }
+
+.sam-screener__portfolio-filter{margin-top:9px}
+.sam-screener__portfolio-filter button{width:100%;min-height:44px;padding:8px 10px;border:1px solid rgba(114,216,196,.14);background:rgba(114,216,196,.035);color:#83958e;text-align:left}
+.sam-screener__portfolio-filter button b,.sam-screener__portfolio-filter button small{display:block}
+.sam-screener__portfolio-filter button b{font:700 8px/1.2 Inter,system-ui,sans-serif}
+.sam-screener__portfolio-filter button small{margin-top:4px;font:6.5px/1.3 Inter,system-ui,sans-serif;color:#667971}
+.sam-screener__portfolio-filter button.is-active{border-color:rgba(114,216,196,.38);background:rgba(114,216,196,.09);color:#e5efeb}
+.sam-screener__portfolio-filter button:disabled{opacity:.45}
+.sb .sam-screener__portfolio-filter button{border-color:var(--s-line);border-radius:10px;background:#fafbfc;color:var(--s-text)}
+.sb .sam-screener__portfolio-filter button small{color:var(--s-muted)}
+.sb .sam-screener__portfolio-filter button.is-active{border-color:#c7d5ed;background:#eef4ff;color:#315fae}
+@media(max-width:520px){.sb .sam-screener__portfolio-filter button{min-height:48px}.sb .sam-screener__portfolio-filter button b{font-size:9.5px}.sb .sam-screener__portfolio-filter button small{font-size:8px}}

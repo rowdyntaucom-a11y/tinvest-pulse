@@ -42,7 +42,7 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
    {tool==="rebalance"&&<Suspense fallback={<ToolLoading label="Открываем ребалансировку…"/>}><V3RebalanceWorkspace positions={positions}/></Suspense>}
    {tool==="lab"&&<Suspense fallback={<ToolLoading label="Открываем лабораторию…"/>}><V3PortfolioLab positions={positions}/></Suspense>}
    {tool==="market"&&<Suspense fallback={<ToolLoading label="Открываем рыночную аналитику…"/>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense>}
-   {tool==="futures"&&<V3FuturesScenario/>}
+   {tool==="futures"&&<V3FuturesScenario positions={positions}/>}
    {tool==="report"&&<Suspense fallback={<ToolLoading label="Открываем отчёт…"/>}><V3PortfolioReportDepth positions={positions}/></Suspense>}
   </div>
  </section>;
