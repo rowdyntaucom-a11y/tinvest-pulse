@@ -403,32 +403,17 @@ async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
   const profitPct = invested > 0 ? profit / invested * 100 : 0
 
   const routeAccount = raw.account && typeof raw.account === 'object' ? raw.account as Record<string, unknown> : null
-  let account = routeAccount
-  let operations: RecoveryOperationsContext | null = null
-  let accountRecovered = Boolean(routeAccount)
-  let operationsRecovered = false
+  const operationsPromise = fetchJsonWithDeadline('/api/operations-summary', 6_000, 'operations summary')
+    .then(normaliseRecoveryOperations)
+  const accountPromise = routeAccount
+    ? Promise.resolve(routeAccount)
+    : fetchJsonWithDeadline('/api/accounts', 4_000, 'accounts').then(selectRecoveryAccount)
 
-  const contextReads: Promise<void>[] = [
-    fetchJsonWithDeadline('/api/operations-summary', 6_000, 'operations summary')
-      .then(payload => {
-        operations = normaliseRecoveryOperations(payload)
-        operationsRecovered = true
-      })
-      .catch(() => undefined),
-  ]
-
-  if (!account) {
-    contextReads.push(
-      fetchJsonWithDeadline('/api/accounts', 4_000, 'accounts')
-        .then(payload => {
-          account = selectRecoveryAccount(payload)
-          accountRecovered = Boolean(account)
-        })
-        .catch(() => undefined),
-    )
-  }
-
-  await Promise.allSettled(contextReads)
+  const [operationsRead, accountRead] = await Promise.allSettled([operationsPromise, accountPromise])
+  const operations = operationsRead.status === 'fulfilled' ? operationsRead.value : null
+  const account = accountRead.status === 'fulfilled' ? accountRead.value : routeAccount
+  const accountRecovered = Boolean(account)
+  const operationsRecovered = operationsRead.status === 'fulfilled'
   const accountContext = normaliseAccountContext(account)
   const passiveIncome = operations?.passiveIncome ?? 0
 
