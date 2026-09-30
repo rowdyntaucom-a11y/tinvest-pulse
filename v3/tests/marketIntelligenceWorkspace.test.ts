@@ -7,7 +7,7 @@ test("market workspace consolidates pulse screener and history under one toolbox
 test("market workspace preserves descriptive trust boundaries and responsive local navigation",()=>{assert.match(ui,/не является прогнозом/);assert.match(ui,/точному тикеру/);assert.match(css,/overscroll-behavior-inline:contain/);assert.match(css,/@media\(max-width:430px\)/)});
 
 
-test("promoted market workspace keeps bounded automatic recovery and manual retry",()=>{assert.match(ui,/MARKET_RETRY_DELAYS=\[2500,6000\]/);assert.match(ui,/attempt<MARKET_RETRY_DELAYS\.length/);assert.match(ui,/Повторить сейчас/);assert.match(ui,/Пробуем ещё раз автоматически/i)});
+test("promoted market workspace keeps bounded automatic recovery and manual retry",()=>{assert.match(ui,/MARKET_RETRY_DELAYS=\[2500,6000\]/);assert.match(ui,/attempt<MARKET_RETRY_DELAYS\.length/);assert.match(ui,/Повторить сейчас/);assert.match(ui,/пробуем ещё раз автоматически/i)});
 const lightCss=readFileSync(new URL("../src/core/lightCoreProTools.css",import.meta.url),"utf8");
 test("light Core market tools avoid mobile microtype",()=>{assert.match(lightCss,/@media\(max-width:520px\)/);assert.match(lightCss,/sam-screener__row>div:first-child small[^}]*font-size:9px/);assert.match(lightCss,/sam-screener__range[^}]*font-size:9px/);assert.match(lightCss,/sam-fallen__metrics span[^}]*font-size:9px/)});
 
