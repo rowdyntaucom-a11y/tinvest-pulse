@@ -15,3 +15,13 @@
 .v3-glossary-help__trigger:focus-visible,.v3-glossary-help button:focus-visible,.v3-glossary-help summary:focus-visible{outline:2px solid #4e77c8;outline-offset:2px}
 @media(min-width:700px){.v3-glossary-help__backdrop{align-items:center}.v3-glossary-help{border-radius:18px}}
 @media(prefers-reduced-motion:reduce){.v3-glossary-help__list summary>i{transition:none}}
+
+.v3-glossary-help__trigger{position:relative}
+.v3-glossary-help__hovercard{display:none}
+@media(hover:hover) and (pointer:fine){
+ .v3-glossary-help__trigger:hover .v3-glossary-help__hovercard,
+ .v3-glossary-help__trigger:focus-visible .v3-glossary-help__hovercard{position:absolute;z-index:80;display:grid;gap:7px;left:0;top:calc(100% + 7px);width:min(340px,60vw);padding:10px;border:1px solid #dfe3e8;border-radius:11px;background:#fff;box-shadow:0 14px 38px rgba(15,23,42,.16);text-align:left}
+ .v3-glossary-help__hovercard>span{display:grid;gap:3px}
+ .v3-glossary-help__hovercard b{font-size:9px;color:#171a1f}
+ .v3-glossary-help__hovercard small{font-size:8px;line-height:1.35;color:#6f7782}
+}
