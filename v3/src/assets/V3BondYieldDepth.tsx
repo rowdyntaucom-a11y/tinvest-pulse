@@ -55,7 +55,7 @@ export function V3BondYieldDepth(){
   </details>}
 
   <details className="v3-bond-yield-disclosure">
-   <summary><span><b>Разбор выпусков</b><small>{items.length} выпусков · YTM · duration · НКД</small></span><i aria-hidden="true">⌄</i></summary>
+   <summary><span><b>Разбор выпусков</b><small>{items.length} выпусков · YTM · дюрация · НКД</small></span><i aria-hidden="true">⌄</i></summary>
    <section className="v3-bond-yield-issues">
     <div className="v3-bond-yield-title"><div><span>ВЫПУСКИ</span><h5>Проверенный слой</h5></div><small>{data.coverage?data.coverage.resolved+"/"+data.coverage.requested:""}</small></div>
     <div>{items.map(item=><article key={item.ticker}>
