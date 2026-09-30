@@ -18,6 +18,8 @@ const TOOLS:ToolDef[]=[
  {id:"market",label:"Рынок",note:"пульс · скринер · история",group:"scenario",hero:"Открыть публичный рыночный контекст и историю без торговых сигналов."},
 ];
 
+function ToolLoading({label}:{label:string}){return <div className="v3-pro-tools__loading" aria-live="polite"><i/><div><strong>{label}</strong><small>Модуль подключается к текущим подтверждённым данным.</small><span aria-hidden="true"><b/><b/><b/></span></div></div>}
+
 export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:PositionSnapshot[];includeMarket?:boolean}){
  const[tool,setTool]=useState<ToolId>("rebalance");
  const[catalogOpen,setCatalogOpen]=useState(true);
@@ -37,11 +39,11 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
    {groups.map(group=><section key={group.id}><header>{group.label}</header><nav aria-label={group.label}>{group.items.map(item=><button key={item.id} type="button" className={tool===item.id?"is-active":""} aria-pressed={tool===item.id} onClick={()=>{setTool(item.id);setCatalogOpen(false);window.requestAnimationFrame(()=>document.querySelector(".v3-pro-tools__stage")?.scrollIntoView({block:"nearest",behavior:"auto"}))}}><strong>{item.label}</strong><small>{item.note}</small><i aria-hidden="true">{tool===item.id?"●":"›"}</i></button>)}</nav></section>)}
   </div>}
   <div className="v3-pro-tools__stage">
-   {tool==="rebalance"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем ребалансировку…</div>}><V3RebalanceWorkspace positions={positions}/></Suspense>}
-   {tool==="lab"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем лабораторию…</div>}><V3PortfolioLab positions={positions}/></Suspense>}
-   {tool==="market"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем рыночную аналитику…</div>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense>}
+   {tool==="rebalance"&&<Suspense fallback={<ToolLoading label="Открываем ребалансировку…"/>}><V3RebalanceWorkspace positions={positions}/></Suspense>}
+   {tool==="lab"&&<Suspense fallback={<ToolLoading label="Открываем лабораторию…"/>}><V3PortfolioLab positions={positions}/></Suspense>}
+   {tool==="market"&&<Suspense fallback={<ToolLoading label="Открываем рыночную аналитику…"/>}><V3MarketIntelligenceWorkspace positions={positions}/></Suspense>}
    {tool==="futures"&&<V3FuturesScenario/>}
-   {tool==="report"&&<Suspense fallback={<div className="v3-pro-tools__loading">Открываем отчёт…</div>}><V3PortfolioReportDepth positions={positions}/></Suspense>}
+   {tool==="report"&&<Suspense fallback={<ToolLoading label="Открываем отчёт…"/>}><V3PortfolioReportDepth positions={positions}/></Suspense>}
   </div>
  </section>;
 }
