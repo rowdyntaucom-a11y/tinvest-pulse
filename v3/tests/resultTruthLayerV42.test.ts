@@ -11,7 +11,7 @@ test("result screen distinguishes portfolio result, open-position P/L and payout
   assert.match(core,/Общий результат/);
   assert.match(core,/Получено выплат/);
   assert.match(core,/стоимость минус чистые внешние денежные потоки/);
-  assert.match(core,/broker expectedYield/);
+  assert.match(core,/брокерского P\/L по текущим позициям/);
   assert.match(core,/не обязаны складываться/);
 });
 
