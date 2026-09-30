@@ -19,3 +19,7 @@
  .v3-market-pulse__gate.is-loading article b{font-size:11px}
  .v3-market-pulse__gate.is-loading article small{font-size:8px}
 }
+
+.v3-market-pulse__metrics{grid-template-columns:repeat(5,minmax(0,1fr))}
+.v3-market-portfolio__gaps{margin:7px 0 0;padding:8px;border:1px dashed #d8dee7;border-radius:9px;background:#fafbfc}
+@media(max-width:699px){.v3-market-pulse__metrics{grid-template-columns:1fr 1fr}}
