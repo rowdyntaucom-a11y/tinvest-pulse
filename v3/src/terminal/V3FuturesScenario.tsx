@@ -1,5 +1,6 @@
 import{useMemo,useState}from"react";
 import{V3GlossaryHelp}from"../help/V3GlossaryHelp";
+import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{calculateFuturesRiskProfile,calculateFuturesScenario,futuresScenarioWarnings,parseScenarioNumber,type FuturesScenarioInput}from"./futuresMath";
 
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -20,16 +21,24 @@ const empty:FuturesScenarioInput={futuresPrice:null,spotPrice:null,scenarioPrice
 
 function metric(value:number|null,format:(v:number)=>string){return value==null?"—":format(value)}
 
-export function V3FuturesScenario(){
+export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}){
  const[input,setInput]=useState<FuturesScenarioInput>(empty);
  const result=useMemo(()=>calculateFuturesScenario(input),[input]);
  const warnings=useMemo(()=>futuresScenarioWarnings(input,result),[input,result]);
  const risk=useMemo(()=>calculateFuturesRiskProfile(input),[input]);
  const update=(key:FieldKey,raw:string)=>setInput(prev=>({...prev,[key]:parseScenarioNumber(raw)}));
+ const currentFutures=useMemo(()=>positions.filter(position=>String(position.instrumentType||"").toLowerCase().includes("future")),[positions]);
+ const currentContracts=currentFutures.reduce((sum,position)=>sum+Math.abs(position.quantity||0),0);
+ const currentPnl=currentFutures.reduce((sum,position)=>sum+(position.expectedYield||0),0);
 
  return <section className="v3-pro-tool v3-futures-scenario" aria-label="Сценарий по фьючерсу">
   <header><div><span>DERIVATIVES // READ-ONLY</span><h3>Фьючерс · сценарий</h3><p>Расчёт по введённым параметрам. QVANIX ничего не отправляет брокеру и не создаёт заявку.</p></div><strong>WHAT IF</strong></header>
   <div className="v3-futures-help"><V3GlossaryHelp terms={["basis","margin","pnl"]} label="Что такое Basis и ГО"/></div>
+  <section className="v3-futures-current" aria-label="Текущие фьючерсные позиции">
+   <span>ТЕКУЩИЙ ПОРТФЕЛЬ</span>
+   <div><article><b>{currentFutures.length}</b><small>фьючерсных позиций</small></article><article><b>{ratio.format(currentContracts)}</b><small>контрактов по модулю количества</small></article><article><b className={currentPnl>0?"is-positive":currentPnl<0?"is-negative":""}>{(currentPnl>0?"+":"")+money.format(currentPnl)} ₽</b><small>P/L открытых фьючерсных позиций</small></article></div>
+   {currentFutures.length?<p>{currentFutures.slice(0,6).map(position=>position.ticker).join(" · ")}{currentFutures.length>6?" · …":""}</p>:<p>В подтверждённом составе сейчас нет фьючерсных позиций. Сценарий ниже остаётся ручным WHAT IF.</p>}
+  </section>
   <div className="v3-futures-direction" aria-label="Направление сценария"><button type="button" className={risk.direction==="LONG"?"is-active":""} onClick={()=>setInput(prev=>({...prev,direction:"LONG"}))}>LONG <small>рост цены = +P/L</small></button><button type="button" className={risk.direction==="SHORT"?"is-active":""} onClick={()=>setInput(prev=>({...prev,direction:"SHORT"}))}>SHORT <small>падение цены = +P/L</small></button></div>
   <div className="v3-futures-scenario__fields">{FIELDS.map(field=><label key={field.key}><span>{field.label}</span><input inputMode="decimal" placeholder={field.placeholder} onChange={e=>update(field.key,e.target.value)}/><small>{field.hint}</small></label>)}</div>
   <div className="v3-futures-scenario__metrics">
