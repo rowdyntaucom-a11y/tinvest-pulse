@@ -17,6 +17,8 @@ const transformedV162 = injectDashboardInstrumentUid(v162);
 assert.notEqual(transformedV162, v162, 'v163 must alter the v162 runtime composition source');
 assert.match(transformedV162, /dashboardIdentityMarker/);
 assert.match(transformedV162, /instrumentUid: p\.instrumentUid \|\| null/);
+assert.match(transformedV162, /dashboardIdentityNative/);
+assert.match(transformedV162, /else if\(!core\.includes\(dashboardIdentityNative\)\)/);
 new vm.Script(transformedV162, { filename: 'production-v162-v163-transformed.js' });
 
 const core = fs.readFileSync(path.join(repoRoot, 'server-core.js'), 'utf8');
