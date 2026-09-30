@@ -10,6 +10,7 @@ import{V3HoldingsExplorer}from"./V3HoldingsExplorer";
 import{V3BondYieldDepth}from"./V3BondYieldDepth";
 import{V3EquityFundamentalsDepth}from"./V3EquityFundamentalsDepth";
 import{localizeFinancialLabel}from"../i18n/financialTerms";
+import{InstrumentAvatar}from"./InstrumentAvatar";
 import"../styles/assetsDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -45,6 +46,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
  const top1=model.exposure.topPositions[0]?.weight??null;
  const top3=model.exposure.topWeight;
  const pnlLeaders=model.pnl.positions.slice(0,6);
+ const positionByTicker=useMemo(()=>new Map(positions.map(position=>[position.ticker.toUpperCase(),position])),[positions]);
  const nav:readonly[DepthMode,string,string][]=[
   ["overview","Обзор","концентрация · P/L"],
   ["equity","Акции","фундаментальные данные"],
@@ -86,7 +88,7 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
     <div className="v3-assets-depth__title"><div><span>РЕЗУЛЬТАТ</span><h3>Кто формирует текущий P/L</h3></div><small>не TWR-атрибуция</small></div>
     <div className="v3-assets-depth__pnl-summary"><span>Плюс {signedMoney(model.pnl.positivePnl)}</span><span>Минус {signedMoney(model.pnl.negativePnl)}</span><span>Абсолютный P/L {rub.format(model.pnl.grossAbsolutePnl)} ₽</span></div>
     <div className="v3-assets-depth__pnl-list">
-     {pnlLeaders.map(row=><article key={row.key}><div><strong>{row.ticker}</strong><span>{row.name}</span></div><div><b className={row.direction==="negative"?"is-negative":row.direction==="positive"?"is-positive":""}>{signedMoney(row.pnl)}</b><small>{row.grossPnlShare==null?"—":pct.format(row.grossPnlShare*100)+"% абс. P/L"}</small></div><i aria-hidden="true"><b style={{width:clampPercent((row.grossPnlShare??0)*100)+"%"}}/></i></article>)}
+     {pnlLeaders.map(row=>{const position=positionByTicker.get(row.ticker.toUpperCase());return <article key={row.key}><div className="v3-assets-depth__pnl-identity">{position&&<InstrumentAvatar position={position} size="sm"/>}<span><strong>{row.ticker}</strong><small>{row.name}</small></span></div><div><b className={row.direction==="negative"?"is-negative":row.direction==="positive"?"is-positive":""}>{signedMoney(row.pnl)}</b><small>{row.grossPnlShare==null?"—":pct.format(row.grossPnlShare*100)+"% абс. P/L"}</small></div><i aria-hidden="true"><b style={{width:clampPercent((row.grossPnlShare??0)*100)+"%"}}/></i></article>})}
     </div>
     <p>Доля считается от суммы абсолютных P/L открытых позиций. Это накопленный результат позиции, а не дневное изменение и не доходность стратегии.</p>
    </section>

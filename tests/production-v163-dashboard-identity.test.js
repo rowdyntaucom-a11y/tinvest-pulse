@@ -20,9 +20,9 @@ assert.match(transformedV162, /instrumentUid: p\.instrumentUid \|\| null/);
 new vm.Script(transformedV162, { filename: 'production-v162-v163-transformed.js' });
 
 const core = fs.readFileSync(path.join(repoRoot, 'server-core.js'), 'utf8');
-assert.ok(core.includes(DASHBOARD_IDENTITY_MARKER), 'server-core dashboard projection marker must still match');
-const generatedCore = core.replace(DASHBOARD_IDENTITY_MARKER, DASHBOARD_IDENTITY_REPLACEMENT);
-assert.ok(generatedCore.includes('instrumentUid: p.instrumentUid || null'), 'generated dashboard projection must preserve broker instrumentUid');
-new vm.Script(generatedCore, { filename: 'server-core-v163-generated.js' });
+assert.match(core, /instrumentUid: p\.instrumentUid \|\| null/, 'server-core dashboard must preserve broker instrumentUid');
+assert.match(core, /brand: null/, 'server-core dashboard must expose additive verified brand identity');
+assert.match(core, /await enrichPositionsIdentity\(positions\)/, 'server-core dashboard must enrich identity through the canonical metadata boundary');
+new vm.Script(core, { filename: 'server-core-current.js' });
 
 console.log('production v163 dashboard identity regression: ok');

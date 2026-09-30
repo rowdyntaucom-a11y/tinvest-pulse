@@ -577,10 +577,19 @@ function securityQuantityDelta(op) {
   return 0;
 }
 
+const INSTRUMENT_META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const INSTRUMENT_META_CACHE = new Map();
+
 async function getInstrumentMeta(figi, instrumentType) {
+  const key = String(figi || '');
+  const cached = INSTRUMENT_META_CACHE.get(key);
+  if (cached?.data && Date.now() - cached.fetchedAt < INSTRUMENT_META_CACHE_TTL_MS) return cached.data;
+  if (cached?.inFlight) return cached.inFlight;
+
   const id = { idType: 'INSTRUMENT_ID_TYPE_FIGI', id: figi };
   const type = String(instrumentType || '').toUpperCase();
-  try {
+  const entry = cached || { data: null, fetchedAt: 0, inFlight: null };
+  entry.inFlight = (async () => {
     let data;
     if (type.includes('BOND')) {
       data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/BondBy', id);
@@ -588,16 +597,57 @@ async function getInstrumentMeta(figi, instrumentType) {
       data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/ShareBy', id);
     } else if (type.includes('ETF')) {
       data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/EtfBy', id);
+    } else if (type.includes('FUTURE')) {
+      data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/FutureBy', id);
     } else if (type.includes('CURRENCY')) {
       data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/CurrencyBy', id);
     } else {
       data = await tbankRequest('tinkoff.public.invest.api.contract.v1.InstrumentsService/GetInstrumentBy', id);
     }
-    return data?.instrument || data?.instrument_short || data || {};
-  } catch (err) {
+    const meta = data?.instrument || data?.instrument_short || data || {};
+    INSTRUMENT_META_CACHE.set(key, { data: meta, fetchedAt: Date.now(), inFlight: null });
+    return meta;
+  })().catch(err => {
+    INSTRUMENT_META_CACHE.delete(key);
     console.warn(`Instrument metadata failed for ${figi}: ${err.message}`);
     return {};
+  });
+  INSTRUMENT_META_CACHE.set(key, entry);
+  return entry.inFlight;
+}
+
+function brandLogoUrl(logoName) {
+  const raw = String(logoName || '').trim();
+  if (!raw) return null;
+  const base = raw.replace(/\.png$/i, '');
+  return `https://invest-brands.cdn-tinkoff.ru/${base}x160.png`;
+}
+
+async function enrichPositionsIdentity(positions, limit = 30) {
+  const rows = Array.isArray(positions) ? positions : [];
+  const target = rows.slice(0, limit);
+  for (let i = 0; i < target.length; i += 4) {
+    const batch = target.slice(i, i + 4);
+    await Promise.all(batch.map(async position => {
+      if (!position?.figi) return;
+      const meta = await getInstrumentMeta(position.figi, position.instrumentType);
+      if (!meta || typeof meta !== 'object') return;
+      position.instrumentUid = position.instrumentUid || meta.uid || meta.instrumentUid || null;
+      position.ticker = meta.ticker || position.ticker;
+      position.name = meta.name || position.name;
+      position.instrumentType = position.instrumentType || meta.instrumentType || meta.type || '';
+      const brand = meta.brand && typeof meta.brand === 'object' ? meta.brand : null;
+      if (brand?.logoName) {
+        position.brand = {
+          logoName: String(brand.logoName),
+          logoBaseColor: brand.logoBaseColor || null,
+          textColor: brand.textColor || null,
+          logoUrl: brandLogoUrl(brand.logoName)
+        };
+      }
+    }));
   }
+  return rows;
 }
 
 async function getDailyCandles(instrumentId, from, to) {
@@ -1345,7 +1395,8 @@ async function buildDashboard() {
   if (cbrResult.status === 'rejected') console.warn('Dashboard optional CBR source unavailable:', cbrResult.reason?.message || cbrResult.reason);
 
   const positions = (portfolio?.positions || []).map(p => ({
-    figi: p.figi,
+    figi: p.figi || null,
+    instrumentUid: p.instrumentUid || null,
     ticker: p.ticker || p.instrumentUid || p.figi,
     name: p.name || p.ticker || p.figi,
     instrumentType: p.instrumentType || '',
@@ -1353,27 +1404,13 @@ async function buildDashboard() {
     averagePrice: moneyValue(p.averagePositionPrice),
     currentPrice: moneyValue(p.currentPrice),
     expectedYield: moneyValue(p.expectedYield),
-    currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice)
+    currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice),
+    brand: null
   }));
 
-  // Enrich a small number of positions with instrument names.
-  for (const position of positions.slice(0, 30)) {
-    if (position.figi && (!position.name || position.name === position.figi)) {
-      try {
-        const instrument = await getInstrument(position.figi);
-        position.name =
-          instrument?.instrument?.name ||
-          instrument?.instrument?.ticker ||
-          position.name;
-        position.ticker =
-          instrument?.instrument?.ticker ||
-          position.ticker;
-        position.instrumentType = position.instrumentType || instrument?.instrument?.instrumentType || instrument?.instrument?.type || '';
-      } catch {
-        // Keep the portfolio response usable if one instrument lookup fails.
-      }
-    }
-  }
+  // Read-only instrument identity is optional enrichment. A metadata/logo failure
+  // must never hide a healthy broker position or change financial values.
+  await enrichPositionsIdentity(positions);
 
   const portfolioValue =
     moneyValue(portfolio?.totalAmountPortfolio) ||
@@ -1712,7 +1749,8 @@ app.get('/api/portfolio', async (req, res) => {
       averagePrice: moneyValue(p.averagePositionPrice),
       currentPrice: moneyValue(p.currentPrice),
       expectedYield: moneyValue(p.expectedYield),
-      currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice)
+      currentValue: moneyValue(p.quantity) * moneyValue(p.currentPrice),
+      brand: null
     }));
     const totalValue = moneyValue(portfolio?.totalAmountPortfolio) ||
       positions.reduce((sum, position) => sum + position.currentValue, 0);

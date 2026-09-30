@@ -644,3 +644,57 @@
  .sb-income-context article strong{font-size:19px}
  .sb-income-context article small{font-size:9px}
 }
+
+
+/* v52 visual analytics + verified instrument identity */
+.sb-allocation-donut-wrap{display:grid;grid-template-columns:72px 1fr;align-items:center;gap:10px;margin:2px 0 12px}
+.sb-allocation-donut{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;box-shadow:inset 0 0 0 1px rgba(20,32,46,.05)}
+.sb-allocation-donut>div{width:48px;height:48px;border-radius:50%;background:var(--s-card);display:grid;place-items:center;align-content:center;text-align:center}
+.sb-allocation-donut b{font-size:12px;line-height:1}
+.sb-allocation-donut small{margin-top:3px;color:var(--s-muted);font-size:7px}
+.sb-allocation-donut-wrap>span{color:var(--s-muted);font-size:8px;line-height:1.35}
+
+.sb-asset-identity{display:flex!important;align-items:center;gap:9px;min-width:0}
+.sb-asset-identity>span{display:grid;min-width:0}
+.sb-asset-identity>span b{font-size:10px}
+.sb-asset-identity>span small{font-size:8px;color:var(--s-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-analytic-asset{display:flex!important;align-items:center;gap:6px;min-width:0}
+.sb-analytic-asset>b{font-size:8px}
+.sb-market-asset{display:flex!important;align-items:center;gap:7px;min-width:0}
+.sb-market-asset>span{display:grid;min-width:0}
+.sb-market-asset>span b{font-size:8px}
+.sb-market-asset>span small{font-size:6.5px;color:var(--s-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-asset-detail>header>div>.instrument-avatar{border-radius:50%}
+
+.sb .v3-history-mode{margin-bottom:1px}
+.sb .v3-history-window{padding-bottom:2px}
+.sb .v3-history-window button{min-width:40px}
+.sb .v3-chart.is-performance .v3-chart-primary{stroke:var(--s-green)}
+.sb .v3-chart.is-performance .v3-chart-secondary{stroke:var(--s-blue)}
+.sb .v3-chart.is-value .v3-chart-primary{stroke:var(--s-blue)}
+.sb .v3-chart.is-value .v3-chart-secondary{stroke:#a4adb8}
+
+@media(max-width:520px){
+ .sb-allocation-donut-wrap{grid-template-columns:64px 1fr}
+ .sb-allocation-donut{width:64px;height:64px}
+ .sb-allocation-donut>div{width:43px;height:43px}
+ .sb-allocation-donut b{font-size:11px}
+ .sb-asset-identity{gap:7px}
+ .sb-market-asset{gap:5px}
+ .sb .v3-history-window button{height:32px!important;min-width:42px!important;font-size:8px!important;padding:0 7px!important}
+ .sb .v3-history-mode button{height:34px!important;font-size:8.5px!important}
+ .sb .v3-history-axis{top:76px!important}
+ .sb-result-focus .v3-history-figure .v3-chart{height:145px!important;min-height:145px!important;max-height:145px!important}
+}
+@media(min-width:1200px){
+ .sb-allocation-donut-wrap{grid-template-columns:94px 1fr;gap:14px}
+ .sb-allocation-donut{width:94px;height:94px}
+ .sb-allocation-donut>div{width:62px;height:62px}
+ .sb-allocation-donut b{font-size:16px}
+ .sb-allocation-donut small{font-size:9px}
+ .sb-allocation-donut-wrap>span{font-size:10px}
+ .sb-asset-identity{gap:11px}
+ .sb-analytic-asset>b{font-size:11px}
+ .sb-market-asset>span b{font-size:13px}
+ .sb-market-asset>span small{font-size:11px}
+}

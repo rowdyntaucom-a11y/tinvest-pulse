@@ -1,15 +1,17 @@
 import type{AssetHistoryPoint}from"../../../v2/src/lib/assetHistoryApi";import type{V3HistoryWindow}from"../history/historyLens";
 
-const DAYS:Record<V3HistoryWindow,number|null>={"90d":90,"180d":180,"365d":365,all:null};
+const DAYS:Record<V3HistoryWindow,number|null>={"7d":7,"30d":30,"90d":90,"180d":180,ytd:null,"365d":365,"5y":1826,all:null};
 const time=(value:string)=>{const n=new Date(value+"T00:00:00Z").getTime();return Number.isFinite(n)?n:null};
 
 export function filterAssetHistoryWindow(points:AssetHistoryPoint[],window:V3HistoryWindow){
   if(window==="all"||points.length<2)return points;
-  const days=DAYS[window];
-  if(!days)return points;
   const dated=points.map(point=>({point,t:time(point.date)})).filter((x):x is{point:AssetHistoryPoint;t:number}=>x.t!=null);
   if(dated.length<2)return points;
-  const anchor=Math.max(...dated.map(x=>x.t)),cutoff=anchor-days*86_400_000,filtered=dated.filter(x=>x.t>=cutoff).map(x=>x.point);
+  const anchor=Math.max(...dated.map(x=>x.t));
+  const days=DAYS[window];
+  const cutoff=window==="ytd"?Date.UTC(new Date(anchor).getUTCFullYear(),0,1):days?anchor-days*86_400_000:null;
+  if(cutoff==null)return points;
+  const filtered=dated.filter(x=>x.t>=cutoff).map(x=>x.point);
   return filtered.length>=2?filtered:dated.slice(-2).map(x=>x.point);
 }
 

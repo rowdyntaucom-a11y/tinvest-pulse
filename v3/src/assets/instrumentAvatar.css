@@ -1,0 +1,7 @@
+.instrument-avatar{--instrument-brand-bg:#eef1f5;--instrument-brand-text:#27313d;display:grid;place-items:center;flex:0 0 auto;overflow:hidden;border:1px solid rgba(30,43,56,.08);border-radius:50%;background:var(--instrument-brand-bg);color:var(--instrument-brand-text);box-shadow:0 1px 4px rgba(16,24,40,.06)}
+.instrument-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.instrument-avatar b{font-weight:800;line-height:1;letter-spacing:-.04em}
+.instrument-avatar.is-sm{width:26px;height:26px}.instrument-avatar.is-sm b{font-size:8px}
+.instrument-avatar.is-md{width:34px;height:34px}.instrument-avatar.is-md b{font-size:10px}
+.instrument-avatar.is-lg{width:48px;height:48px}.instrument-avatar.is-lg b{font-size:13px}
+@media(min-width:1200px){.instrument-avatar.is-sm{width:30px;height:30px}.instrument-avatar.is-md{width:40px;height:40px}.instrument-avatar.is-lg{width:58px;height:58px}}
