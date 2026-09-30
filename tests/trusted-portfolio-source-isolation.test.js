@@ -23,6 +23,7 @@ assert.match(core,/QVANIX_DASHBOARD_OK/);
 assert.match(core,/BROKER_ACCOUNT_UNAVAILABLE/);
 assert.match(core,/openedDate: account\.openedDate \|\| account\.openDate \|\| null/);
 assert.match(core,/accessLevel: account\.accessLevel \|\| null/);
+assert.match(core,/\/\/ Live dashboard stays lightweight; history owns its own refresh\./);
 
 assert.match(portfolioApi,/PORTFOLIO_NORMALIZATION_VERSION = '1\.6'/);
 assert.match(portfolioApi,/normaliseAccountContext\(account\)/);
