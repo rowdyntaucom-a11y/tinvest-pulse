@@ -25,7 +25,7 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
    }
   }).catch(error=>{
    if(controller.signal.aborted)return;
-   setData({available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"Не удалось получить данные рынка — пробуем ещё раз автоматически."});
+   setData({available:false,fetchedAt:null,source:null,board:null,rows:[],reason:"Не удалось получить данные рынка"});
    if(attempt<MARKET_RETRY_DELAYS.length){
     retryTimer=window.setTimeout(()=>setAttempt(value=>value+1),MARKET_RETRY_DELAYS[attempt]);
    }
@@ -39,9 +39,9 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
   <header><div><span>РЫНОЧНАЯ АНАЛИТИКА // РАБОЧАЯ ОБЛАСТЬ</span><h3>Рынок и портфель</h3><p>Публичный TQBR-срез, техническая история текущих позиций и пересечение с портфелем — в одном режиме только чтения.</p></div><strong>MOEX</strong></header>
   <nav>{([["pulse","Пульс","рынок · портфель"],["screener","Скринер","фильтры · ликвидность"],["discovery","История","просадки · SMA"]]as const).map(([id,label,note])=><button type="button" key={id} className={mode===id?"is-active":""} onClick={()=>setMode(id)}><strong>{label}</strong><small>{note}</small></button>)}</nav>
   {mode==="pulse"&&<div className="v3-market-pulse">
-   {loading?<div className="v3-market-pulse__gate">Получаем публичный TQBR-срез{attempt?". Повторяем автоматически…":"…"}</div>:!data?.available?<div className="v3-market-pulse__gate"><strong>Рыночный срез сейчас не подтверждён источником.</strong><small>{data?.reason??"Источник не подтвердил рыночные строки."}{attempt<MARKET_RETRY_DELAYS.length?" Пробуем ещё раз автоматически.":""}</small><button type="button" onClick={manualRetry}>Повторить сейчас</button></div>:<>
+   {loading?<div className="v3-market-pulse__gate">Получаем публичный TQBR-срез{attempt?". Повторяем автоматически…":"…"}</div>:!data?.available?<div className="v3-market-pulse__gate"><strong>Рыночный срез сейчас не подтверждён источником.</strong><small>{data?.reason??"Источник не подтвердил рыночные строки"}{attempt<MARKET_RETRY_DELAYS.length?" — пробуем ещё раз автоматически.":"."}</small><button type="button" onClick={manualRetry}>Повторить сейчас</button></div>:<>
     <div className="v3-market-pulse__metrics">
-     <article><span>Рост / падение</span><strong>{pulse.gainers} / {pulse.losers}</strong><small>{pulse.advancersShare==null?"—":pct.format(pulse.advancersShare*100)+"%"} directional rows растут</small></article>
+     <article><span>Рост / падение</span><strong>{pulse.gainers} / {pulse.losers}</strong><small>{pulse.advancersShare==null?"—":pct.format(pulse.advancersShare*100)+"%"} наблюдаемых бумаг растут</small></article>
      <article><span>Оборот среза</span><strong>{compact.format(pulse.turnover)} ₽</strong><small>{pulse.total} бумаг TQBR</small></article>
      <article><span>Макс. оборот</span><strong>{pulse.topTurnover?.secid??"—"}</strong><small>{pulse.topTurnover?compact.format(pulse.topTurnover.turnoverRub)+" ₽":"—"}</small></article>
      <article><span>Макс. |движение|</span><strong>{pulse.largestMove?.secid??"—"}</strong><small>{pulse.largestMove?.dayChangePct==null?"—":pulse.largestMove.dayChangePct.toFixed(2)+"%"}</small></article>
