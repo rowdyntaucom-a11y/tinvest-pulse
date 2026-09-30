@@ -11,7 +11,7 @@ const V3PortfolioReportDepth=lazy(()=>import("../report/V3PortfolioReportDepth")
 type ToolId="rebalance"|"lab"|"market"|"futures"|"report";
 type ToolDef={id:ToolId;label:string;note:string;group:"portfolio"|"scenario";hero:string};
 const TOOLS:ToolDef[]=[
- {id:"rebalance",label:"Ребаланс",note:"цель · drift · сценарий",group:"portfolio",hero:"Проверить отклонение структуры и смоделировать выравнивание без заявок."},
+ {id:"rebalance",label:"Ребаланс",note:"цель · отклонение · сценарий",group:"portfolio",hero:"Проверить отклонение структуры и смоделировать выравнивание без заявок."},
  {id:"report",label:"Отчёт",note:"классы · валюты · P/L",group:"portfolio",hero:"Собрать состав, валюты и накопленный результат в одном отчёте только для чтения."},
  {id:"lab",label:"Лаборатория",note:"история стратегий",group:"scenario",hero:"Сравнить сценарии на подтверждённой истории без подмены результата прогнозом."},
  {id:"futures",label:"Фьючерсы",note:"сценарий · базис · ГО",group:"scenario",hero:"Посчитать сценарий фьючерса, базис и нагрузку ГО без отправки приказов брокеру."},
