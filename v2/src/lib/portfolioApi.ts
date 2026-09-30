@@ -1,4 +1,4 @@
-export const PORTFOLIO_NORMALIZATION_VERSION = '1.5' as const
+export const PORTFOLIO_NORMALIZATION_VERSION = '1.6' as const
 
 export type HistoryPoint = {
   date: string
@@ -33,6 +33,13 @@ export type AccountContext = {
   source: 'accounts' | 'unavailable'
 }
 
+export type InstrumentBrand = {
+  logoName: string | null
+  logoBaseColor: string | null
+  textColor: string | null
+  logoUrl: string | null
+}
+
 export type PositionSnapshot = {
   figi: string | null
   instrumentUid: string | null
@@ -46,6 +53,7 @@ export type PositionSnapshot = {
   currentValue: number
   expectedYield: number
   weight: number
+  brand: InstrumentBrand | null
   bond: BondMetadata | null
 }
 
@@ -216,6 +224,20 @@ const normaliseHistory = (historyRaw: unknown): HistoryPoint[] => {
   return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date))
 }
 
+const normaliseBrand = (value: unknown): InstrumentBrand | null => {
+  if (!value || typeof value !== 'object') return null
+  const row = value as Record<string, unknown>
+  const logoName = nullableString(row.logoName)
+  const logoUrl = nullableString(row.logoUrl)
+  if (!logoName && !logoUrl) return null
+  return {
+    logoName,
+    logoBaseColor: nullableString(row.logoBaseColor),
+    textColor: nullableString(row.textColor),
+    logoUrl,
+  }
+}
+
 const normaliseBond = (value: unknown): BondMetadata | null => {
   if (!value || typeof value !== 'object') return null
   const row = value as Record<string, unknown>
@@ -259,6 +281,7 @@ const normalisePositions = (rawPositions: unknown, portfolioValue: number): Posi
       currentValue,
       expectedYield: n(row.expectedYield),
       weight: 0,
+      brand: normaliseBrand(row.brand),
       bond: normaliseBond(row.bond),
     }
   }).filter(row => Number.isFinite(row.currentValue) && row.currentValue > 0)
