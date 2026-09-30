@@ -51,7 +51,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const statusClass=depth.integrity.state==="verified"?"is-positive":depth.integrity.state==="stale"||depth.integrity.state==="partial"?"is-warning":"is-neutral";
 
   return <section className="v3-income-depth">
-    <div className="v3-income-depth-head"><div><span>ПОДРОБНЫЙ ДОХОД</span><h2>Факт, календарь и источники</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
+    <div className="v3-income-depth-head"><div><span>ПРОФЕССИОНАЛЬНЫЙ ДОХОД</span><h2>Факт, календарь и источники</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
     {samuraiReference&&<SamuraiChapterNav label="Доход Samurai" chapters={[
       {id:"sam-income-upcoming",code:"壱",label:"Ближайшие",note:"3М · 6М · 12М"},
       {id:"sam-income-calendar",code:"弐",label:"Календарь",note:"будущие подтверждённые выплаты"},
@@ -128,7 +128,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
       }):<div className="v3-income-depth-state">Нет подтверждённых источников для разбивки.</div>}</div>
       {depth.bondLinkage.eligibleBondCount>0&&<div className="v3-income-bond-link"><div><span>Облигации → расписание</span><strong>{depth.bondLinkage.linkedBondCount}/{depth.bondLinkage.eligibleBondCount}</strong></div><i><b style={{width:Math.round(depth.bondLinkage.valueCoverage*100)+"%"}}/></i><small>{pct.format(depth.bondLinkage.valueCoverage*100)}% стоимости облигаций связано по FIGI · {depth.bondLinkage.couponEvents} купонных событий · {money(depth.bondLinkage.scheduledGross)} до налога</small></div>}
       {depth.bondCashflow.available&&<section className="v3-income-bond-cashflow" aria-label="Купонный поток облигаций">
-        <div className="v3-income-quality-head"><div><span>BOND CASHFLOW · 12М</span><strong>Календарный профиль купонов</strong></div><small>scheduled gross · exact FIGI</small></div>
+        <div className="v3-income-quality-head"><div><span>КУПОННЫЙ ПОТОК · 12М</span><strong>Календарный профиль купонов</strong></div><small>расписание до налога · точный FIGI</small></div>
         <div className="v3-income-quality-grid">
           <article><span>Поток 12М</span><strong>{money(depth.bondCashflow.scheduledGross)}</strong><small>{depth.bondCashflow.couponEvents} событий</small></article>
           <article><span>Активные месяцы</span><strong>{depth.bondCashflow.activeMonths}/12</strong><small>месяцев с купоном</small></article>
@@ -136,7 +136,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
           <article><span>Крупнейший выпуск</span><strong>{depth.bondCashflow.topIssueShare==null?"—":pct.format(depth.bondCashflow.topIssueShare*100)+"%"}</strong><small>{money(depth.bondCashflow.topIssueGross)}</small></article>
         </div>
         <div className="v3-income-bond-months">{depth.bondCashflow.months.map(row=><article key={row.key}><span>{row.key}</span><i><b style={{width:Math.max(3,(row.gross/(depth.bondCashflow.largestMonthGross||1))*100)+"%"}}/></i><strong>{rub2.format(row.gross)} ₽</strong><small>{row.issues} вып. · {row.events} событий</small></article>)}</div>
-        <small className="v3-income-method">Это будущий купонный график до налога, а не уже полученный доход. В профиль входят только доверенные scheduled-события текущих облигаций, связанных по точному FIGI; FACT здесь никогда не суммируется повторно.</small>
+        <small className="v3-income-method">Это будущий купонный график до налога, а не уже полученный доход. В профиль входят только доверенные scheduled-события текущих облигаций, связанных по точному FIGI; Факт здесь никогда не суммируется повторно.</small>
       </section>}
       <div className="v3-income-coverage"><span>Покрытие расписания</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>{depth.integrity.resolvedAssets}/{depth.integrity.eligibleAssets||"—"} активов · ошибок {depth.integrity.errors}</small></div>
       <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>

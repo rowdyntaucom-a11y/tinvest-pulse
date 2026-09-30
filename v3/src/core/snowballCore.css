@@ -573,3 +573,26 @@
  .sb-onboarding-modes button span{font-size:11px}
  .sb-onboarding>footer button{min-height:44px;font-size:11px}
 }
+
+
+/* v48 source signal hierarchy + navigation readability */
+.sb-alert-cached{
+ max-width:1040px;
+ margin:8px auto 0;
+ padding:7px 10px;
+ grid-template-columns:minmax(0,1fr) auto;
+ border-radius:10px;
+ background:#fffaf0;
+}
+.sb-alert-cached b{font-size:9px}
+.sb-alert-cached span{font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-alert-cached button{padding:5px 8px}
+@media(min-width:900px){
+ .sb-alert-cached{max-width:calc(min(100% - 56px,1560px) - 282px);margin-left:calc(max(32px,(100vw - 1560px)/2) + 282px);margin-right:max(32px,calc((100vw - 1560px)/2))}
+ .sb-alert-cached b{font-size:10px}
+ .sb-alert-cached span{font-size:8px}
+}
+@media(max-width:520px){
+ .sb-alert-cached{margin:5px 10px 0;padding:6px 8px}
+ .sb-alert-cached span{display:none}
+}
