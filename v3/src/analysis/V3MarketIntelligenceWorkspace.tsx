@@ -44,15 +44,15 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
      <article><span>Рост / падение</span><strong>{pulse.gainers} / {pulse.losers}</strong><small>{pulse.advancersShare==null?"—":pct.format(pulse.advancersShare*100)+"%"} наблюдаемых бумаг растут</small></article>
      <article><span>Оборот среза</span><strong>{compact.format(pulse.turnover)} ₽</strong><small>{pulse.total} бумаг TQBR</small></article>
      <article><span>Макс. оборот</span><strong>{pulse.topTurnover?.secid??"—"}</strong><small>{pulse.topTurnover?compact.format(pulse.topTurnover.turnoverRub)+" ₽":"—"}</small></article>
-     <article><span>Макс. |движение|</span><strong>{pulse.largestMove?.secid??"—"}</strong><small>{pulse.largestMove?.dayChangePct==null?"—":pulse.largestMove.dayChangePct.toFixed(2)+"%"}</small></article>
+     <article><span>Макс. |движение|</span><strong>{pulse.largestMove?.secid??"—"}</strong><small>{pulse.largestMove?.dayChangePct==null?"—":pulse.largestMove.dayChangePct.toFixed(2)+"%"}</small></article><article><span>Покрытие портфеля TQBR</span><strong>{pulse.portfolioCapitalCoverage==null?"—":pct.format(pulse.portfolioCapitalCoverage*100)+"%"}</strong><small>{pulse.portfolioMatches} точных совпадений</small></article>
     </div>
-    <section className="v3-market-portfolio"><header><div><span>ПОРТФЕЛЬ × РЫНОК</span><strong>Мои бумаги в текущем срезе</strong></div><small>{pulse.portfolioMatches} совпадений</small></header>
-     {portfolioRows.length?<div>{portfolioRows.map(row=><article key={row.secid}><div><strong>{row.secid}</strong><small>{row.name}</small></div><b className={(row.dayChangePct??0)>0?"is-positive":(row.dayChangePct??0)<0?"is-negative":""}>{row.dayChangePct==null?"—":(row.dayChangePct>0?"+":"")+row.dayChangePct.toFixed(2)+"%"}</b><span>{compact.format(row.turnoverRub)} ₽ оборот</span></article>)}</div>:<p>Текущие тикеры портфеля не совпали с подтверждёнными строками TQBR. QVANIX не подменяет идентичность похожими названиями.</p>}
+    <section className="v3-market-portfolio"><header><div><span>ПОРТФЕЛЬ × РЫНОК</span><strong>Мои бумаги в текущем срезе</strong></div><small>{pulse.portfolioMatches} совпадений · {pulse.portfolioCapitalCoverage==null?"—":pct.format(pulse.portfolioCapitalCoverage*100)+"% капитала"}</small></header>
+     {portfolioRows.length?<><div>{portfolioRows.map(row=><article key={row.secid}><div><strong>{row.secid}</strong><small>{row.name}</small></div><b className={(row.dayChangePct??0)>0?"is-positive":(row.dayChangePct??0)<0?"is-negative":""}>{row.dayChangePct==null?"—":(row.dayChangePct>0?"+":"")+row.dayChangePct.toFixed(2)+"%"}</b><span>{compact.format(row.turnoverRub)} ₽ оборот</span></article>)}</div>{pulse.unmatchedPortfolioTickers.length>0&&<p className="v3-market-portfolio__gaps">Вне TQBR-среза: {pulse.unmatchedPortfolioTickers.slice(0,6).join(", ")}{pulse.unmatchedPortfolioTickers.length>6?" и ещё "+(pulse.unmatchedPortfolioTickers.length-6):""}. Это не пропажа позиции: текущий публичный срез охватывает только подтверждённые строки TQBR.</p>}</>:<p>Текущие тикеры портфеля не совпали с подтверждёнными строками TQBR. QVANIX не подменяет идентичность похожими названиями.</p>}
     </section>
     <footer>Пульс описывает только текущий публичный срез. Доля растущих бумаг не является прогнозом направления рынка, а совпадение с портфелем выполняется по точному тикеру.</footer>
    </>}
   </div>}
-  {mode==="screener"&&<V3MarketScreener sharedData={data} sharedLoading={loading} onRetry={manualRetry}/>}
+  {mode==="screener"&&<V3MarketScreener sharedData={data} sharedLoading={loading} onRetry={manualRetry} portfolioTickers={pulse.portfolioTickers}/>}
   {mode==="discovery"&&<V3FallenAssetsDiscovery/>}
  </section>;
 }
