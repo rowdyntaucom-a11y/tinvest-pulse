@@ -12,8 +12,9 @@ function injectDashboardInstrumentUid(source) {
 
   const prelude = [
     'const dashboardIdentityMarker=' + JSON.stringify(DASHBOARD_IDENTITY_MARKER) + ';',
-    "if(!core.includes(dashboardIdentityMarker))throw new Error('QVANIX v2: dashboard identity marker changed');",
-    'core=core.replace(dashboardIdentityMarker,' + JSON.stringify(DASHBOARD_IDENTITY_REPLACEMENT) + ');',
+    'const dashboardIdentityNative="    instrumentUid: p.instrumentUid || null,";',
+    "if(core.includes(dashboardIdentityMarker)){core=core.replace(dashboardIdentityMarker," + JSON.stringify(DASHBOARD_IDENTITY_REPLACEMENT) + ");}",
+    "else if(!core.includes(dashboardIdentityNative))throw new Error('QVANIX v2: dashboard identity marker changed');",
   ].join('\n');
 
   return source.replace(
