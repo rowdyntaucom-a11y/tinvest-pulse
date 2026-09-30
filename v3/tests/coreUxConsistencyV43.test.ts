@@ -33,7 +33,8 @@ test("audit terminology is localized consistently",()=>{
 });
 
 test("market retry copy is single and automatic",()=>{
- assert.match(market,/reason:"Не удалось получить данные рынка"/);\n assert.match(market,/— пробуем ещё раз автоматически/);
+ assert.match(market,/reason:"Не удалось получить данные рынка"/);
+ assert.match(market,/— пробуем ещё раз автоматически/);
  assert.doesNotMatch(market,/QVANIX попробует ещё раз/);
  assert.doesNotMatch(market,/QVANIX повторит запрос автоматически/);
 });
