@@ -70,7 +70,7 @@ export function CoreAnalyticsDepth({
   title:relative.available?`Относительно IMOEX: ${signedPct(relative.excessReturn)}`:"Сравнение с IMOEX пока недоступно",
   text:relative.available?`Портфель ${signedPct(relative.portfolioReturn)} · IMOEX ${signedPct(relative.benchmarkReturn)} · общих точек ${relative.overlapPoints}.`:relative.note,
  };
- return <section className="core-analytics-depth" aria-label="Глубокая аналитика портфеля">
+ return <section className="core-analytics-depth" aria-label="Профессиональная аналитика портфеля">
   <header className="core-analytics-depth__head">
    <div><span>ГЛУБОКАЯ АНАЛИТИКА // ТОЛЬКО ЧТЕНИЕ</span><h2>Профессиональная аналитика</h2><p>Каноническая TWR-история, риск и сравнение с IMOEX. Пополнения не выдаются за доходность, а неполные источники остаются закрытыми.</p></div>
    <strong className={integrity==="OK"?"is-ok":"is-warning"}>{integrity}</strong>
