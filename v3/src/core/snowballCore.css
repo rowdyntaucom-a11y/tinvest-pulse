@@ -860,3 +860,24 @@
  .sb-asset-impact>div{padding:13px}
  .sb-asset-impact strong{font-size:17px}
 }
+
+
+/* v57 — compact decision scales for position drill-down */
+.sb-asset-detail .sb-asset-impact>div{transition:border-color .16s ease,box-shadow .16s ease}
+.sb-asset-detail .sb-asset-impact>div:focus-within{border-color:#c6d5ec;box-shadow:0 0 0 2px #edf4ff}
+.sb-asset-detail .sb-detail-grid article{min-width:0}
+.sb-asset-detail .sb-detail-grid strong{overflow-wrap:anywhere}
+@media(max-width:520px){
+ .sb-asset-impact{grid-template-columns:1fr 1fr!important}
+ .sb-asset-impact>div:first-child{grid-column:1/-1;grid-template-columns:1fr auto;align-items:center}
+ .sb-asset-impact>div:first-child i{grid-column:1/-1}
+ .sb-asset-impact>div{min-height:68px}
+ .sb-asset-impact>div:first-child{min-height:58px}
+ .sb-asset-math>div{gap:12px}
+ .sb-asset-math>div span{max-width:64%;line-height:1.35}
+ .sb-asset-math>div b{text-align:right}
+}
+@media(min-width:760px){
+ .sb-asset-detail>.sb-detail-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .sb-asset-detail>.sb-detail-grid article{min-height:74px}
+}
