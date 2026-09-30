@@ -1,4 +1,4 @@
-import{useMemo,useState}from"react";
+import{useEffect,useMemo,useRef,useState}from"react";
 import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{buildV3AnalysisDepth,buildV3RelativeDepth}from"../analysis/analysisDepth";
 import{V3ReturnLayer}from"../analysis/V3ReturnLayer";
@@ -34,6 +34,14 @@ export function CoreAnalyticsDepth({
 }){
  const[section,setSection]=useState<Section>("return");
  const[window,setWindow]=useState<V3HistoryWindow>("all");
+ const[pickerOpen,setPickerOpen]=useState(false);
+ const pickerRef=useRef<HTMLDivElement|null>(null);
+ useEffect(()=>{
+  if(!pickerOpen)return;
+  const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape")setPickerOpen(false)};
+  document.addEventListener("keydown",onKey);
+  return()=>document.removeEventListener("keydown",onKey);
+ },[pickerOpen]);
  const depth=useMemo(()=>buildV3AnalysisDepth(history,positions,market.riskFreeRate),[history,positions,market.riskFreeRate]);
  const relative=useMemo(()=>buildV3RelativeDepth(filterHistoryWindow(history,window)),[history,window]);
  const integrity=depth.portfolio.historyIntegrity;
@@ -45,7 +53,7 @@ export function CoreAnalyticsDepth({
  }:section==="risk"?{
   eyebrow:"ГЛАВНЫЙ ОТВЕТ",
   title:depth.portfolio.maxDrawdown==null?"Риск пока ограничен историей":`Max Drawdown −${plainPct(depth.portfolio.maxDrawdown)}`,
-  text:`Эквивалент позиций ${ratio(depth.portfolio.effectivePositions)} · хвостовой риск: ${depth.tail.available?"доступен":"ещё не прошёл gate"}. Ниже — детали только по подтверждённой выборке.`,
+  text:`Эквивалент позиций ${ratio(depth.portfolio.effectivePositions)} · хвостовой риск: ${depth.tail.available?"доступен":"ещё не прошёл проверку качества данных"}. Ниже — детали только по подтверждённой выборке.`,
  }:{
   eyebrow:"ГЛАВНЫЙ ОТВЕТ",
   title:relative.available?`Относительно IMOEX: ${signedPct(relative.excessReturn)}`:"Сравнение с IMOEX пока недоступно",
@@ -53,13 +61,19 @@ export function CoreAnalyticsDepth({
  };
  return <section className="core-analytics-depth" aria-label="Глубокая аналитика портфеля">
   <header className="core-analytics-depth__head">
-   <div><span>ANALYTICS DEPTH // READ-ONLY</span><h2>Глубокая аналитика</h2><p>Каноническая TWR-история, риск и сравнение с IMOEX. Пополнения не выдаются за доходность, а неполные источники остаются закрытыми.</p></div>
+   <div><span>ГЛУБОКАЯ АНАЛИТИКА // ТОЛЬКО ЧТЕНИЕ</span><h2>Глубокая аналитика</h2><p>Каноническая TWR-история, риск и сравнение с IMOEX. Пополнения не выдаются за доходность, а неполные источники остаются закрытыми.</p></div>
    <strong className={integrity==="OK"?"is-ok":"is-warning"}>{integrity}</strong>
   </header>
   <div className="core-analytics-depth__help"><V3GlossaryHelp terms={["twr","var","cvar","beta","trackingError"]} label="Методика показателей"/></div>
   <section className="core-analytics-depth__route" aria-label="Текущий раздел аналитики">
    <span>ПРОФЕССИОНАЛЬНЫЙ СЛОЙ</span><strong>{sectionMeta[1]}</strong><small>{sectionMeta[2]}</small>
-   <label><b>Раздел</b><select value={section} onChange={event=>setSection(event.target.value as Section)} aria-label="Выбрать раздел глубокой аналитики">{SECTIONS.map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label>
+   <div className="core-analytics-depth__picker-control"><b>Раздел</b><button type="button" aria-haspopup="dialog" aria-expanded={pickerOpen} onClick={()=>setPickerOpen(true)}><span>{sectionMeta[1]}</span><i aria-hidden="true">⌄</i></button></div>
+   {pickerOpen&&<div className="core-analytics-depth__picker-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setPickerOpen(false)}}>
+    <div ref={pickerRef} className="core-analytics-depth__picker" role="dialog" aria-modal="true" aria-label="Выбрать раздел глубокой аналитики">
+     <header><div><span>АНАЛИТИКА</span><strong>Выберите срез</strong></div><button type="button" aria-label="Закрыть" onClick={()=>setPickerOpen(false)}>×</button></header>
+     <nav>{SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>{setSection(id);setPickerOpen(false)}}><span><strong>{label}</strong><small>{note}</small></span><i aria-hidden="true">{section===id?"✓":"›"}</i></button>)}</nav>
+    </div>
+   </div>}
   </section>
   <nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики">
    {SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
