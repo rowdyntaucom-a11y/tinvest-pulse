@@ -58,6 +58,13 @@ export function V3AssetsDepth({positions,onOpenAsset}:{positions:PositionSnapsho
    <div><strong>{rub.format(model.total)} ₽</strong><small>{positions.length} позиций</small></div>
   </header>
 
+  <section className="v3-assets-depth__answer" aria-label="Главный вывод по портфелю">
+   <span>ГЛАВНЫЙ ВЫВОД</span>
+   <strong>{top3==null?"Структура пока не подтверждена":top3>=.65?"Портфель заметно зависит от трёх крупнейших позиций":"Концентрация распределена между несколькими позициями"}</strong>
+   <p>{top3==null?"Нужен подтверждённый состав портфеля.":`Топ-3 занимают ${pct.format(top3*100)}% капитала · P/L открытых позиций ${signedMoney(model.pnl.netPnl)}.`}</p>
+   <small>Это описание текущей структуры, а не оценка качества портфеля и не рекомендация.</small>
+  </section>
+
   <nav className="v3-assets-depth__nav" aria-label="Разделы профессиональной аналитики">
    {nav.map(([id,label,note])=><button type="button" key={id} className={mode===id?"is-active":""} onClick={()=>setMode(id)}><strong>{label}</strong><small>{note}</small></button>)}
   </nav>
