@@ -57,7 +57,7 @@ export function V3PortfolioReportDepth({positions}:{positions:PositionSnapshot[]
     <article><span>Текущая стоимость</span><strong>{rub.format(model.totalValue)} ₽</strong><small>{model.totalPositions} позиций</small></article>
     <article><span>Вложенная база</span><strong>{rub.format(model.totalCostBasis)} ₽</strong><small>по доступной средней цене</small></article>
     <article><span>P/L открытых позиций</span><strong className={model.totalPnl>0?"is-positive":model.totalPnl<0?"is-negative":""}>{signedMoney(model.totalPnl)}</strong><small>накопленный контекст позиций</small></article>
-    <article><span>Сверка базы</span><strong>{reconciled?"OK":"РАСХОЖДЕНИЕ"}</strong><small>{reconciled?"P/L согласуется с стоимость − база":"Δ "+signedMoney(reconciliationDelta)}</small></article>
+    <article><span>Сверка базы</span><strong>{reconciled?"OK":"РАСХОЖДЕНИЕ"}</strong><small>{reconciled?"P/L согласуется: стоимость − база":"Δ "+signedMoney(reconciliationDelta)}</small></article>
    </div>
    {!reconciled&&<p className="sam-report-depth__warning">P/L открытых позиций и разница «текущая стоимость − вложенная база» расходятся. QVANIX показывает оба факта и не подменяет один другим.</p>}
    <p className="sam-report-depth__method">Отчёт не использует предположения о пропущенных операциях, налогах или корпоративных действиях. Историческая доходность остаётся в TWR/XIRR, а здесь — текущий срез состава.</p>
