@@ -53,7 +53,7 @@ export type PositionSnapshot = {
   currentValue: number
   expectedYield: number
   weight: number
-  brand: InstrumentBrand | null
+  brand?: InstrumentBrand | null
   bond: BondMetadata | null
 }
 
