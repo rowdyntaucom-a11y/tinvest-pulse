@@ -81,3 +81,42 @@
  .v3-assets-depth__nav button strong{font-size:10px}.v3-assets-depth__nav button small{font-size:9px}
  .v3-assets-depth__explain summary,.v3-assets-depth__professional-section>header p{font-size:9px}
 }
+
+
+/* v49 first-answer hierarchy for professional portfolio depth */
+.sb .v3-assets-depth__answer{display:grid;gap:4px;padding:11px 12px;border:1px solid #cfdbea;border-radius:11px;background:#f6f9fe}
+.sb .v3-assets-depth__answer>span{color:#5274aa;font-size:7px;font-weight:900;letter-spacing:.08em}
+.sb .v3-assets-depth__answer>strong{font-size:13px;line-height:1.25;color:var(--s-text)}
+.sb .v3-assets-depth__answer>p{margin:0;color:#465568;font-size:9px;line-height:1.4}
+.sb .v3-assets-depth__answer>small{color:var(--s-muted);font-size:7.5px;line-height:1.4}
+@media(max-width:520px){
+ .sb .v3-assets-depth{gap:8px;padding:9px}
+ .sb .v3-assets-depth__head{padding-bottom:8px}
+ .sb .v3-assets-depth__head h2{font-size:16px}
+ .sb .v3-assets-depth__head p{font-size:8.5px;line-height:1.4}
+ .sb .v3-assets-depth__answer{padding:11px}
+ .sb .v3-assets-depth__answer>span{font-size:8px}
+ .sb .v3-assets-depth__answer>strong{font-size:14px}
+ .sb .v3-assets-depth__answer>p{font-size:9.5px}
+ .sb .v3-assets-depth__answer>small{font-size:8px}
+ .sb .v3-assets-depth__nav{margin-bottom:2px}
+ .sb .v3-assets-depth__nav button{flex-basis:104px;min-height:50px;padding:7px 8px}
+ .sb .v3-assets-depth__nav button strong{font-size:9.5px}
+ .sb .v3-assets-depth__nav button small{font-size:8px}
+ .sb .v3-assets-depth__metrics article{min-height:70px;padding:9px}
+ .sb .v3-assets-depth__metrics span{font-size:8px}
+ .sb .v3-assets-depth__metrics strong{font-size:14px}
+ .sb .v3-assets-depth__metrics small{font-size:8px}
+ .sb .v3-assets-depth__block{padding:9px}
+ .sb .v3-assets-depth__title h3{font-size:12.5px}
+ .sb .v3-assets-depth__professional-section>header{padding:10px}
+ .sb .v3-assets-depth__professional-section>header h3{font-size:13px}
+ .sb .v3-assets-depth__professional-section>header p{font-size:8.5px}
+}
+@media(min-width:1200px){
+ .sb .v3-assets-depth__answer{padding:15px}
+ .sb .v3-assets-depth__answer>span{font-size:10px}
+ .sb .v3-assets-depth__answer>strong{font-size:18px}
+ .sb .v3-assets-depth__answer>p{font-size:11px}
+ .sb .v3-assets-depth__answer>small{font-size:9px}
+}
