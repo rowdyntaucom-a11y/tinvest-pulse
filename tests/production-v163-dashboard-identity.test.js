@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const {
+  LEGACY_DASHBOARD_IDENTITY_MARKER,
   DASHBOARD_IDENTITY_MARKER,
   DASHBOARD_IDENTITY_REPLACEMENT,
   injectDashboardInstrumentUid,
@@ -16,6 +17,7 @@ const transformedV162 = injectDashboardInstrumentUid(v162);
 
 assert.notEqual(transformedV162, v162, 'v163 must alter the v162 runtime composition source');
 assert.match(transformedV162, /dashboardIdentityMarker/);
+assert.ok(v162.includes(LEGACY_DASHBOARD_IDENTITY_MARKER), 'legacy v162 marker must remain transformable');
 assert.match(transformedV162, /instrumentUid: p\.instrumentUid \|\| null/);
 new vm.Script(transformedV162, { filename: 'production-v162-v163-transformed.js' });
 
