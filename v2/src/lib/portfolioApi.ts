@@ -294,7 +294,7 @@ const fallbackSnapshot = (): PortfolioSnapshot => ({
 
 async function loadDashboard(): Promise<PortfolioSnapshot> {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 20_000)
+  const timer = setTimeout(() => controller.abort(), 32_000)
   let response: Response
   try {
     response = await fetch('/api/dashboard', { cache: 'no-store', signal: controller.signal })
