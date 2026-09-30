@@ -618,3 +618,24 @@
  .sb .core-analytics-depth__evidence b{font-size:17px}
  .sb .core-analytics-depth__evidence small,.sb .core-analytics-depth__evidence>p{font-size:10px}
 }
+
+
+/* v49 compact professional-tool loading */
+.sb .v3-pro-tools__loading{min-height:0!important;display:grid!important;grid-template-columns:36px minmax(0,1fr)!important;place-items:initial!important;align-items:center!important;gap:10px!important;padding:12px 13px!important;border:1px solid var(--s-line)!important;border-radius:11px!important;background:#fff!important;text-align:left!important}
+.sb .v3-pro-tools__loading>i{width:36px;height:36px;border:2px solid #dce3ee;border-top-color:var(--s-blue);border-radius:50%;animation:sbDeepSpin .8s linear infinite}
+.sb .v3-pro-tools__loading>div{display:grid;gap:4px}
+.sb .v3-pro-tools__loading strong{font-size:9px;color:var(--s-text)}
+.sb .v3-pro-tools__loading small{font-size:8px;line-height:1.35;color:var(--s-muted)}
+.sb .v3-pro-tools__loading span{display:flex;gap:4px;margin-top:2px}
+.sb .v3-pro-tools__loading span b{width:20px;height:3px;border-radius:99px;background:#dfe5ef}
+.sb .v3-pro-tools__loading span b:first-child{background:#8aa8d8}
+@media(max-width:520px){
+ .sb .v3-pro-tools>header{margin-bottom:8px;padding:11px}
+ .sb .v3-pro-tools>header h2{font-size:16px}
+ .sb .v3-pro-tools>header p{font-size:8.5px}
+ .sb .v3-pro-tools__focus{padding:10px}
+ .sb .v3-pro-tools__groups{gap:7px}
+ .sb .v3-pro-tools__groups>section{padding:9px}
+ .sb .v3-pro-tools__groups button{min-height:54px}
+ .sb .v3-pro-tools__stage{margin-top:7px}
+}
