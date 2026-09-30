@@ -1,4 +1,4 @@
-export const PORTFOLIO_NORMALIZATION_VERSION = '1.4' as const
+export const PORTFOLIO_NORMALIZATION_VERSION = '1.5' as const
 
 export type HistoryPoint = {
   date: string
@@ -49,9 +49,17 @@ export type PositionSnapshot = {
   bond: BondMetadata | null
 }
 
+export type RecoveryContext = {
+  brokerPortfolio: boolean
+  account: boolean
+  operations: boolean
+  passiveIncomeComplete: boolean
+}
+
 export type PortfolioSnapshot = {
   accountName: string
   accountContext?: AccountContext
+  recoveryContext?: RecoveryContext
   value: number
   profit: number
   profitPct: number
@@ -264,6 +272,7 @@ const normalisePositions = (rawPositions: unknown, portfolioValue: number): Posi
 const fallbackSnapshot = (): PortfolioSnapshot => ({
   accountName: 'Кряхтящий фонд',
   accountContext: unavailableAccountContext(),
+  recoveryContext: { brokerPortfolio: false, account: false, operations: false, passiveIncomeComplete: false },
   value: 0,
   profit: 0,
   profitPct: 0,
@@ -330,20 +339,61 @@ async function loadDashboard(): Promise<PortfolioSnapshot> {
   }
 }
 
-async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
+type RecoveryOperationsContext = {
+  passiveIncome: number | null
+  startDate: string | null
+  averageMonthlyPassiveIncome: number | null
+  averageAnnualPassiveIncome: number | null
+  complete: boolean
+}
+
+const fetchJsonWithDeadline = async (url: string, timeoutMs: number, label: string): Promise<Record<string, unknown>> => {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 8_000)
-  let response: Response
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
-    response = await fetch('/api/portfolio', { cache: 'no-store', signal: controller.signal })
+    const response = await fetch(url, { cache: 'no-store', signal: controller.signal })
+    if (!response.ok) throw new Error(`${label} ${response.status}`)
+    return await response.json() as Record<string, unknown>
   } catch (error) {
-    if ((error as { name?: string } | null)?.name === 'AbortError') throw new Error('portfolio timeout')
+    if ((error as { name?: string } | null)?.name === 'AbortError') throw new Error(`${label} timeout`)
     throw error
   } finally {
     clearTimeout(timer)
   }
-  if (!response.ok) throw new Error(`portfolio ${response.status}`)
-  const raw = await response.json() as Record<string, unknown>
+}
+
+const selectRecoveryAccount = (raw: Record<string, unknown>): Record<string, unknown> | null => {
+  const rows = Array.isArray(raw.accounts) ? raw.accounts as Record<string, unknown>[] : []
+  if (!rows.length) return null
+  return rows.find(row => String(row.status ?? '').toUpperCase().includes('OPEN')) ?? rows[0] ?? null
+}
+
+const normaliseRecoveryOperations = (raw: Record<string, unknown>): RecoveryOperationsContext => {
+  const coverage = raw.coverage && typeof raw.coverage === 'object' ? raw.coverage as Record<string, unknown> : {}
+  const truncated = coverage.possiblyTruncated === true
+  const rows = Array.isArray(raw.operations) ? raw.operations as Record<string, unknown>[] : []
+  const firstPositiveExternal = rows
+    .filter(row => row.isExternalCash === true && (nullableNumber(row.payment) ?? 0) > 0)
+    .map(row => normaliseDate(row.date))
+    .filter((value): value is string => Boolean(value))
+    .sort()[0] ?? null
+  const passiveIncome = truncated ? null : nullableNumber(raw.passiveIncomeTotal)
+  const startDate = firstPositiveExternal ?? normaliseDate(coverage.observedFrom)
+  if (passiveIncome == null || !startDate) {
+    return { passiveIncome, startDate, averageMonthlyPassiveIncome: null, averageAnnualPassiveIncome: null, complete: !truncated && passiveIncome != null }
+  }
+  const elapsedDays = Math.max(1, (Date.now() - Date.parse(startDate)) / 86_400_000)
+  return {
+    passiveIncome,
+    startDate,
+    averageMonthlyPassiveIncome: passiveIncome / Math.max(1, elapsedDays / 30.4375),
+    averageAnnualPassiveIncome: passiveIncome / Math.max(1, elapsedDays / 365.25),
+    complete: true,
+  }
+}
+
+async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
+  const raw = await fetchJsonWithDeadline('/api/portfolio', 8_000, 'portfolio')
   const portfolio = (raw.portfolio ?? raw) as Record<string, unknown>
   const value = finiteNumber(raw.totalValue ?? raw.portfolioValue ?? portfolio.totalAmountPortfolio)
   if (value == null || value < 0) throw new Error('portfolio value missing')
@@ -352,14 +402,56 @@ async function loadLegacyPortfolio(): Promise<PortfolioSnapshot> {
   const invested = value - profit
   const profitPct = invested > 0 ? profit / invested * 100 : 0
 
+  const routeAccount = raw.account && typeof raw.account === 'object' ? raw.account as Record<string, unknown> : null
+  let account = routeAccount
+  let operations: RecoveryOperationsContext | null = null
+  let accountRecovered = Boolean(routeAccount)
+  let operationsRecovered = false
+
+  const contextReads: Promise<void>[] = [
+    fetchJsonWithDeadline('/api/operations-summary', 6_000, 'operations summary')
+      .then(payload => {
+        operations = normaliseRecoveryOperations(payload)
+        operationsRecovered = true
+      })
+      .catch(() => undefined),
+  ]
+
+  if (!account) {
+    contextReads.push(
+      fetchJsonWithDeadline('/api/accounts', 4_000, 'accounts')
+        .then(payload => {
+          account = selectRecoveryAccount(payload)
+          accountRecovered = Boolean(account)
+        })
+        .catch(() => undefined),
+    )
+  }
+
+  await Promise.allSettled(contextReads)
+  const accountContext = normaliseAccountContext(account)
+  const passiveIncome = operations?.passiveIncome ?? 0
+
   return {
     ...fallbackSnapshot(),
+    accountName: nullableString(account?.name) ?? 'Кряхтящий фонд',
+    accountContext,
+    recoveryContext: {
+      brokerPortfolio: true,
+      account: accountRecovered,
+      operations: operationsRecovered,
+      passiveIncomeComplete: operations?.complete === true,
+    },
     value,
     profit,
     profitPct,
-    passiveIncome: n(raw.passiveIncomeTotal ?? raw.passiveIncome),
+    passiveIncome,
+    averageMonthlyPassiveIncome: operations?.averageMonthlyPassiveIncome ?? 0,
+    averageAnnualPassiveIncome: operations?.averageAnnualPassiveIncome ?? 0,
     positions: positionItems.length,
     positionItems,
+    startDate: operations?.startDate ?? accountContext.openedDate,
+    updatedAt: normaliseDate(raw.fetchedAt ?? raw.updatedAt),
     source: 'portfolio',
   }
 }
