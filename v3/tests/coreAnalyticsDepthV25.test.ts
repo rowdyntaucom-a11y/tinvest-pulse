@@ -11,7 +11,7 @@ const css=readFileSync(new URL("../src/core/lightCoreProTools.css",import.meta.u
 
 test("light Core composes canonical return risk and benchmark engines",()=>{
  for(const token of["buildV3AnalysisDepth","buildV3RelativeDepth","V3ReturnLayer","V3RiskLayer","V3MarketLayer"])assert.match(depth,new RegExp(token));
- for(const token of["Доходность","Риск","IMOEX","ANALYTICS DEPTH // READ-ONLY"])assert.match(depth,new RegExp(token));
+ for(const token of["Доходность","Риск","IMOEX","ГЛУБОКАЯ АНАЛИТИКА // ТОЛЬКО ЧТЕНИЕ"])assert.match(depth,new RegExp(token));
  assert.match(depth,/filterHistoryWindow/);
 });
 
