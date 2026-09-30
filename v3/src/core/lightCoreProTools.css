@@ -435,3 +435,98 @@
 .sb[data-layout="desktop"] .v3-pro-tools__focus>strong,.sb[data-layout="desktop"] .v3-pro-tools__focus>div>strong{font-size:18px}
 .sb[data-layout="desktop"] .v3-pro-tools__focus>p,.sb[data-layout="desktop"] .v3-pro-tools__focus>div>p{font-size:9.5px}
 .sb[data-layout="desktop"] .v3-pro-tools__stage{max-width:none}
+
+
+/* v46 desktop legibility for deep financial workspaces. */
+@media(min-width:1200px){
+ .sb[data-layout="desktop"] :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools,.sam-rebalance,.sam-lab,.sam-report-depth,.sam-screener,.sam-fallen){
+  font-size:1.22em;
+ }
+ .sb[data-layout="desktop"] :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>header{
+  padding:18px 18px 14px;
+ }
+ .sb[data-layout="desktop"] :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>header span{
+  font-size:11px;
+ }
+ .sb[data-layout="desktop"] :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>header h2,
+ .sb[data-layout="desktop"] :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>header h3{
+  font-size:24px;
+  line-height:1.15;
+ }
+ .sb[data-layout="desktop"] :is(.v3-assets-depth,.core-analytics-depth,.v3-income-depth,.v3-market-intelligence,.v3-pro-tools)>header p{
+  font-size:12px;
+  line-height:1.55;
+ }
+ .sb[data-layout="desktop"] .core-analytics-depth__nav button,
+ .sb[data-layout="desktop"] .v3-market-intelligence>nav button{
+  min-height:74px;
+  padding:13px 14px;
+ }
+ .sb[data-layout="desktop"] .core-analytics-depth__nav strong,
+ .sb[data-layout="desktop"] .v3-market-intelligence>nav strong{
+  font-size:13px;
+ }
+ .sb[data-layout="desktop"] .core-analytics-depth__nav small,
+ .sb[data-layout="desktop"] .v3-market-intelligence>nav small{
+  font-size:11px;
+  line-height:1.4;
+ }
+ .sb[data-layout="desktop"] .core-analytics-depth__decision{padding:18px}
+ .sb[data-layout="desktop"] .core-analytics-depth__decision span{font-size:11px}
+ .sb[data-layout="desktop"] .core-analytics-depth__decision strong{font-size:24px}
+ .sb[data-layout="desktop"] .core-analytics-depth__decision p{font-size:12px;line-height:1.55}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker-control>b{font-size:11px}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker-control>button{min-height:48px;font-size:13px}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker{width:440px}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker>header span{font-size:10px}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker>header strong{font-size:19px}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker nav>button{min-height:66px}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker nav>button strong{font-size:13px}
+ .sb[data-layout="desktop"] .core-analytics-depth__picker nav>button small{font-size:11px}
+
+ .sb[data-layout="desktop"] .v3-pro-tools__groups{gap:12px}
+ .sb[data-layout="desktop"] .v3-pro-tools__groups>section{padding:14px}
+ .sb[data-layout="desktop"] .v3-pro-tools__groups>section>header{font-size:11px}
+ .sb[data-layout="desktop"] .v3-pro-tools__groups button{min-height:74px;padding:12px 13px}
+ .sb[data-layout="desktop"] .v3-pro-tools__groups button strong{font-size:13px}
+ .sb[data-layout="desktop"] .v3-pro-tools__groups button small{font-size:10.5px;line-height:1.4}
+ .sb[data-layout="desktop"] .v3-pro-tools__focus{padding:18px}
+ .sb[data-layout="desktop"] .v3-pro-tools__focus>span{font-size:10px}
+ .sb[data-layout="desktop"] .v3-pro-tools__focus>strong,
+ .sb[data-layout="desktop"] .v3-pro-tools__focus>div>strong{font-size:22px}
+ .sb[data-layout="desktop"] .v3-pro-tools__focus>p,
+ .sb[data-layout="desktop"] .v3-pro-tools__focus>div>p{font-size:12px;line-height:1.5}
+ .sb[data-layout="desktop"] .v3-pro-tools__focus>button{min-height:44px;font-size:11px}
+
+ .sb[data-layout="desktop"] .v3-market-pulse__metrics,
+ .sb[data-layout="desktop"] .v3-market-portfolio__metrics,
+ .sb[data-layout="desktop"] .v3-income-calendar-summary,
+ .sb[data-layout="desktop"] .v3-income-history-stats{
+  gap:10px;
+ }
+ .sb[data-layout="desktop"] .v3-market-pulse__metrics article,
+ .sb[data-layout="desktop"] .v3-market-portfolio article,
+ .sb[data-layout="desktop"] .v3-income-calendar-summary article,
+ .sb[data-layout="desktop"] .v3-income-history-stats article{
+  padding:14px;
+ }
+ .sb[data-layout="desktop"] .v3-market-pulse__metrics span,
+ .sb[data-layout="desktop"] .v3-market-pulse__metrics small,
+ .sb[data-layout="desktop"] .v3-market-portfolio span,
+ .sb[data-layout="desktop"] .v3-market-portfolio small,
+ .sb[data-layout="desktop"] .v3-income-depth span,
+ .sb[data-layout="desktop"] .v3-income-depth small{
+  font-size:11px;
+  line-height:1.4;
+ }
+ .sb[data-layout="desktop"] .v3-market-pulse__metrics strong,
+ .sb[data-layout="desktop"] .v3-market-portfolio strong,
+ .sb[data-layout="desktop"] .v3-income-depth strong{
+  font-size:14px;
+ }
+ .sb[data-layout="desktop"] .v3-glossary-help__trigger{
+  min-height:44px;
+  padding:0 12px;
+  font-size:11px;
+ }
+}
