@@ -1,9 +1,9 @@
 import fs from"node:fs";import assert from"node:assert/strict";
 const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
 const css=fs.readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
-assert.match(core,/filterAssetHistoryWindow(assetHistory?.points??[],historyWindow)/);
-assert.match(core,/summarizeAssetHistory(visibleAssetHistory)/);
-assert.match(core,/summarizeAssetRisk(visibleAssetHistory)/);
+assert.ok(core.includes("filterAssetHistoryWindow(assetHistory?.points??[],historyWindow)"));
+assert.ok(core.includes("summarizeAssetHistory(visibleAssetHistory)"));
+assert.ok(core.includes("summarizeAssetRisk(visibleAssetHistory)"));
 assert.match(core,/function AssetPeriodCockpit/);
 assert.match(core,/ВЫБРАННЫЙ ПЕРИОД/);
 assert.match(core,/ИЗМЕНЕНИЕ ЦЕНЫ ЗА ОКНО/);
