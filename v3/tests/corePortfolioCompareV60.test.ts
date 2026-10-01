@@ -1,0 +1,17 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.match(core,/\["compare","Сравнить"\]/,"Pro portfolio tabs must expose compare mode");
+assert.match(core,/function PortfolioCompare/,"compare workspace must exist");
+assert.match(core,/До трёх бумаг из текущего портфеля/);
+assert.match(core,/Только подтверждённый снимок брокера\. Это не рейтинг и не рекомендация\./);
+assert.match(core,/P\/L к себестоимости/);
+assert.match(core,/Цена к средней/);
+assert.match(core,/Себестоимость/);
+assert.match(core,/Текущая цена/);
+assert.match(core,/current\.length>=3\?current/,"selection must cap at three positions");
+assert.match(css,/v60 · trusted portfolio compare/);
+assert.match(css,/\.sb-compare-grid\{display:grid;grid-template-columns:repeat\(3/);
+assert.match(css,/@media\(max-width:699px\)[\s\S]*\.sb-compare-grid\{grid-template-columns:1fr/);
+assert.doesNotMatch(core,/победител|лучша(я|ий)|рекомендую|покупать|продавать/iu);
+console.log("corePortfolioCompareV60: ok");

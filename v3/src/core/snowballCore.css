@@ -956,3 +956,50 @@
  .sb-asset-history .v3-asset-history-plot{min-height:128px!important}
  .sb-asset-history .v3-asset-history-chart{height:128px!important}
 }
+
+
+/* v60 · trusted portfolio compare */
+.sb-compare{background:#fff;border:1px solid var(--s-line);border-radius:16px;padding:14px;margin-bottom:10px}
+.sb-compare>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.sb-compare>header>div{display:grid;gap:2px}
+.sb-compare>header span{font-size:7px;letter-spacing:.12em;color:var(--s-muted)}
+.sb-compare>header h2{font-size:13px;margin:0}
+.sb-compare>header small{font-size:7px;line-height:1.4;color:var(--s-muted)}
+.sb-compare>header>b{font-size:10px;color:var(--s-muted)}
+.sb-compare-picker{display:flex;gap:6px;overflow-x:auto;padding:1px 0 9px;scrollbar-width:none}
+.sb-compare-picker::-webkit-scrollbar{display:none}
+.sb-compare-picker>button{flex:0 0 auto;min-width:84px;border:1px solid var(--s-line);border-radius:10px;background:#fafbfc;padding:7px 8px;display:flex;align-items:center;gap:7px;text-align:left;color:var(--s-text)}
+.sb-compare-picker>button.active{border-color:#a9c3e8;background:#f3f7fd;box-shadow:inset 0 0 0 1px #d8e5f7}
+.sb-compare-picker>button:disabled{opacity:.42}
+.sb-compare-picker>button>span{display:grid;gap:1px}
+.sb-compare-picker>button b{font-size:9px}.sb-compare-picker>button small{font-size:7px;color:var(--s-muted)}
+.sb-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sb-compare-grid>article{min-width:0;border:1px solid #e8ebef;border-radius:13px;background:#fbfcfd;padding:10px}
+.sb-compare-head{width:100%;border:0;background:transparent;padding:0 0 9px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;text-align:left}
+.sb-compare-head>span{min-width:0;display:grid}.sb-compare-head b{font-size:11px}.sb-compare-head small{font-size:7px;color:var(--s-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sb-compare-head i{font-style:normal;color:var(--s-muted);font-size:15px}
+.sb-compare-kpi{display:grid;gap:2px;padding:8px 0;border-top:1px solid var(--s-line);border-bottom:1px solid var(--s-line)}
+.sb-compare-kpi span,.sb-compare-kpi small{font-size:7px;color:var(--s-muted)}.sb-compare-kpi strong{font-size:14px}
+.sb-compare-rail{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:7px;align-items:center;padding-top:8px}
+.sb-compare-rail>span{font-size:7px;color:var(--s-muted)}.sb-compare-rail>i{height:5px;border-radius:999px;background:#eceff3;overflow:hidden}.sb-compare-rail>i>b{display:block;height:100%;background:var(--s-blue);border-radius:inherit}.sb-compare-rail>i>b.up{background:#32ad7d}.sb-compare-rail>i>b.down{background:#d16b71}.sb-compare-rail>strong{font-size:8px;text-align:right}
+.sb-compare dl{margin:9px 0 0;display:grid;gap:0}.sb-compare dl>div{display:flex;justify-content:space-between;gap:9px;padding:6px 0;border-top:1px solid var(--s-line)}.sb-compare dt{font-size:7px;color:var(--s-muted)}.sb-compare dd{margin:0;font-size:8px;font-weight:700;text-align:right}
+.sb-compare-note{margin:9px 1px 0;font-size:7px;line-height:1.45;color:var(--s-muted)}
+.sb-compare-empty{min-height:100px;display:grid;place-items:center;border:1px dashed var(--s-line);border-radius:12px;color:var(--s-muted);font-size:8px}
+@media(max-width:699px){
+ .sb-compare{padding:11px;border-radius:13px}
+ .sb-compare>header h2{font-size:12px}.sb-compare>header small{font-size:7.5px}
+ .sb-compare-picker{margin-inline:-2px}
+ .sb-compare-picker>button{min-width:80px;padding:7px}
+ .sb-compare-grid{grid-template-columns:1fr;gap:7px}
+ .sb-compare-grid>article{padding:10px}
+ .sb-compare-head b{font-size:10.5px}.sb-compare-head small{font-size:8px}
+ .sb-compare-kpi{grid-template-columns:1fr auto;align-items:end}.sb-compare-kpi span{grid-column:1}.sb-compare-kpi strong{grid-column:1;font-size:15px}.sb-compare-kpi small{grid-column:2;grid-row:1/3;align-self:center;font-size:8px}
+ .sb-compare dl{grid-template-columns:1fr 1fr;gap:0 12px}.sb-compare dl>div{min-width:0}.sb-compare dt{font-size:7.5px}.sb-compare dd{font-size:8.5px}
+ .sb-switch{max-width:100%}
+}
+@media(min-width:1000px){
+ .sb-compare{padding:18px}.sb-compare>header h2{font-size:16px}.sb-compare>header small{font-size:9px}
+ .sb-compare-picker>button{min-width:102px}
+ .sb-compare-grid{gap:12px}.sb-compare-grid>article{padding:14px}
+ .sb-compare-head b{font-size:13px}.sb-compare-head small{font-size:9px}.sb-compare-kpi strong{font-size:18px}
+ .sb-compare dt{font-size:9px}.sb-compare dd{font-size:10px}.sb-compare-note{font-size:9px}
+}
