@@ -183,3 +183,19 @@
  .qpay-structure-grid--full,.qpay-structure--compact .qpay-structure-grid{grid-template-columns:1fr 1fr}
  .qpay-structure-bars>div{grid-template-columns:55px 1fr 32px}
 }
+
+
+/* v76 · source horizon matrix */
+.qpay-source-horizon{margin-top:9px;padding:10px;border:1px solid #e3e8ef;border-radius:10px;background:#fff}
+.qpay-source-horizon>header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}.qpay-source-horizon>header>div{display:grid;gap:2px}.qpay-source-horizon>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-source-horizon>header b{font-size:11px}.qpay-source-horizon>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-source-horizon-head{display:grid;grid-template-columns:minmax(110px,1.3fr) repeat(4,minmax(62px,.8fr));gap:4px;padding:0 8px 4px;color:#8a929d;font-size:6.4px;text-transform:uppercase}.qpay-source-horizon-head span:not(:first-child){text-align:right}
+.qpay-source-horizon-list{display:grid;gap:4px}.qpay-source-horizon-row{display:grid;grid-template-columns:minmax(110px,1.3fr) repeat(4,minmax(62px,.8fr)) 18px;gap:4px;align-items:center;width:100%;padding:7px 8px;border:1px solid #e7ebf0;border-radius:8px;background:#f8fafc;color:inherit;text-align:left}.qpay-source-horizon-row>span{display:grid;min-width:0}.qpay-source-horizon-row>span b{font-size:9px}.qpay-source-horizon-row>span small{font-size:6.5px;color:#7a828d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qpay-source-horizon-row i{display:grid;gap:1px;text-align:right;font-style:normal}.qpay-source-horizon-row i em{display:none;font-size:6px;color:#8a929d;font-style:normal}.qpay-source-horizon-row i strong{font-size:8px;white-space:nowrap}.qpay-source-horizon-row u{text-decoration:none;color:#8090a4;text-align:right}.qpay-source-horizon-row:active{background:#eef3f9}.qpay-source-horizon>footer{margin-top:6px;padding-top:6px}
+.qpay-source-horizon--compact{padding:8px;margin-top:6px}.qpay-source-horizon--compact .qpay-source-horizon-row{grid-template-columns:minmax(84px,1.1fr) repeat(3,minmax(54px,.8fr)) 14px;padding:6px}.qpay-source-horizon--compact .qpay-source-horizon-row i em{display:block}.qpay-source-horizon--compact .qpay-source-horizon-row>span b{font-size:8.5px}.qpay-source-horizon--compact .qpay-source-horizon-row>span small{font-size:6px}
+@media(max-width:640px){
+ .qpay-source-horizon{padding:8px}.qpay-source-horizon-head{display:none}.qpay-source-horizon-row{grid-template-columns:minmax(86px,1.1fr) repeat(4,minmax(46px,.75fr)) 14px;padding:6px;gap:3px}.qpay-source-horizon-row i em{display:block}.qpay-source-horizon-row i strong{font-size:7.3px}.qpay-source-horizon-row>span b{font-size:8.5px}
+ .qpay-source-horizon--compact .qpay-source-horizon-row{grid-template-columns:minmax(78px,1fr) repeat(3,minmax(44px,.72fr)) 12px}.qpay-source-horizon--compact .qpay-source-horizon-row i strong{font-size:7px}
+}
+@media(max-width:359px){
+ .qpay-source-horizon-row{grid-template-columns:minmax(78px,1fr) repeat(2,minmax(48px,.72fr)) 14px}.qpay-source-horizon-row i:nth-of-type(3),.qpay-source-horizon-row i:nth-of-type(4){display:none}
+ .qpay-source-horizon--compact .qpay-source-horizon-row{grid-template-columns:minmax(72px,1fr) repeat(2,minmax(46px,.72fr)) 12px}.qpay-source-horizon--compact .qpay-source-horizon-row i:nth-of-type(3){display:none}
+}
