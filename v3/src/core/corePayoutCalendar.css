@@ -272,3 +272,15 @@
 #qpay-tax-section{scroll-margin-top:102px}
 @media(max-width:640px){.qpay-tax{padding:8px}.qpay-tax>header{margin-bottom:5px}.qpay-tax>header b{font-size:10px}.qpay-tax-lead{grid-template-columns:1fr 1fr;gap:4px}.qpay-tax-grid--full{grid-template-columns:1fr 1fr}.qpay-tax-kinds{grid-template-columns:1fr 1fr}.qpay-tax-sources>button{grid-template-columns:minmax(82px,1fr) repeat(3,minmax(54px,.7fr)) 12px;gap:4px;padding:6px}.qpay-tax-sources>button>i:nth-of-type(4){display:none}.qpay-tax--compact .qpay-tax-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:359px){.qpay-tax-sources>button{grid-template-columns:minmax(76px,1fr) repeat(2,minmax(50px,.72fr)) 12px}.qpay-tax-sources>button>i:nth-of-type(3){display:none}}
+
+
+/* v81 · income data audit */
+.qpay-audit{margin-top:9px;padding:10px;border:1px solid #dce4ed;border-radius:10px;background:linear-gradient(180deg,#fff,#f7fafc)}
+.qpay-audit>header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}.qpay-audit>header>div{display:grid;gap:2px}.qpay-audit>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-audit>header b{font-size:11px}.qpay-audit>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-audit-lead{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:6px}.qpay-audit-lead article,.qpay-audit-grid article{display:grid;gap:2px;padding:8px;border-radius:8px;background:#f1f5f9;min-width:0}.qpay-audit-lead span,.qpay-audit-lead small,.qpay-audit-grid span,.qpay-audit-grid small{font-size:6.6px;color:#7a828d}.qpay-audit-lead strong,.qpay-audit-grid strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-audit-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.qpay-audit-grid--full{grid-template-columns:repeat(4,minmax(0,1fr))}
+.qpay-audit-notes{display:grid;gap:4px;margin-top:7px;padding:7px 8px;border-radius:8px;background:#f5f7fa}.qpay-audit-notes p{margin:0;font-size:6.6px;line-height:1.4;color:#657284}.qpay-audit-notes b{color:#39485b}
+.qpay-audit>footer{margin-top:7px;padding-top:6px}.qpay-audit--compact{padding:8px;margin-top:6px}.qpay-audit--compact .qpay-audit-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.qpay-audit--compact .qpay-audit-grid article{padding:6px 5px}.qpay-audit--compact .qpay-audit-grid strong{font-size:9px}
+#qpay-audit-section{scroll-margin-top:102px}
+@media(max-width:640px){.qpay-audit{padding:8px}.qpay-audit>header{margin-bottom:5px}.qpay-audit>header b{font-size:10px}.qpay-audit-lead{grid-template-columns:1fr 1fr;gap:4px}.qpay-audit-grid--full{grid-template-columns:1fr 1fr}.qpay-audit--compact .qpay-audit-grid{grid-template-columns:1fr 1fr}.qpay-audit--compact .qpay-audit-grid article{padding:6px}}
+@media(max-width:359px){.qpay-audit-lead{grid-template-columns:1fr}.qpay-audit-grid--full{grid-template-columns:1fr}}
