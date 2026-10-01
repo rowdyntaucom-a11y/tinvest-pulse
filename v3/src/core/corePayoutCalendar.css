@@ -206,3 +206,27 @@
 .qpay-section-nav::-webkit-scrollbar{display:none}.qpay-section-nav button{flex:0 0 auto;min-height:32px;padding:0 10px;border:0;border-radius:7px;background:#fff;color:#617087;font-size:7.5px;font-weight:800;box-shadow:inset 0 0 0 1px #e6ebf1}.qpay-section-nav button:active{background:#eef3f9;color:#243247}
 #qpay-structure-section,#qpay-source-section,#qpay-runway-section,#qpay-attribution-section,#qpay-months-section{scroll-margin-top:102px}
 @media(max-width:640px){.qpay-section-nav{top:48px;margin:6px 0;padding:3px}.qpay-section-nav button{min-height:30px;padding:0 9px;font-size:7px}}
+
+
+/* v76 · income structure cockpit */
+.qpay-structure{margin-top:9px;padding:10px;border:1px solid #dfe6ee;border-radius:10px;background:linear-gradient(180deg,#fff,#f7f9fc)}
+.qpay-structure>header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px}
+.qpay-structure>header>div{display:grid;gap:2px}.qpay-structure>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-structure>header b{font-size:11px}.qpay-structure>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-structure-lead{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:6px}
+.qpay-structure-lead article,.qpay-structure-grid article{display:grid;gap:2px;min-width:0;padding:8px;border-radius:8px;background:#f2f5f8}
+.qpay-structure-lead span,.qpay-structure-lead small,.qpay-structure-grid span,.qpay-structure-grid small{font-size:6.7px;color:#7a828d}
+.qpay-structure-lead strong,.qpay-structure-grid strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-structure-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.qpay-structure-grid--full{grid-template-columns:repeat(4,minmax(0,1fr))}
+.qpay-structure>footer{margin-top:6px;padding-top:6px}
+.qpay-structure--compact{padding:8px;margin-top:6px}.qpay-structure--compact .qpay-structure-grid article{padding:6px}.qpay-structure--compact .qpay-structure-grid strong{font-size:9px}
+@media(max-width:640px){
+ .qpay-structure{padding:8px}.qpay-structure>header{margin-bottom:5px}.qpay-structure>header b{font-size:10px}
+ .qpay-structure-lead{gap:4px}.qpay-structure-lead article{padding:7px 6px}
+ .qpay-structure-grid--full{grid-template-columns:1fr 1fr}.qpay-structure-grid--full article{padding:7px 6px}
+ .qpay-structure--compact .qpay-structure-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.qpay-structure--compact .qpay-structure-grid article{padding:5px 4px}.qpay-structure--compact .qpay-structure-grid small{display:none}
+}
+@media(max-width:359px){
+ .qpay-structure-lead{grid-template-columns:1fr 1fr}.qpay-structure-lead article:first-child{grid-column:1/-1}
+ .qpay-structure--compact .qpay-structure-grid{grid-template-columns:1fr 1fr}
+}
