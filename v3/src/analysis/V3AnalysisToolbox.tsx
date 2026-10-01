@@ -22,7 +22,7 @@ function ToolLoading({label}:{label:string}){return <div className="v3-pro-tools
 
 export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:PositionSnapshot[];includeMarket?:boolean}){
  const[tool,setTool]=useState<ToolId>("rebalance");
- const[catalogOpen,setCatalogOpen]=useState(true);
+ const[catalogOpen,setCatalogOpen]=useState(false);
  const tools=useMemo(()=>includeMarket?TOOLS:TOOLS.filter(item=>item.id!=="market"),[includeMarket]);
  const selected=tools.find(item=>item.id===tool)??tools[0];
  const groups=[
