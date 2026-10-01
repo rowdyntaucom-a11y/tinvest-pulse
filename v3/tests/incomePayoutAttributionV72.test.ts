@@ -1,4 +1,4 @@
-import assert from"node:assert/strict";import{buildPayoutAttribution}from"../../v2/src/features/income/incomeCalendarEventView.ts";
+import assert from"node:assert/strict";import{buildPayoutAttribution}from"../src/income/payoutAttribution.ts";
 const positions:any[]=[
  {figi:"FIGI_A",ticker:"AAA",currentValue:60000},
  {figi:"FIGI_B",ticker:"BBB",currentValue:40000}
