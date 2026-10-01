@@ -12,7 +12,7 @@ assert.match(core,/Положение последней свечи в диап�
 assert.match(core,/Последняя свеча → цена брокера/);
 assert.match(core,/Худшая просадка окна/);
 assert.match(core,/пик → минимум эпизода/);
-assert.match(core,/Разница между ними не называется дневной доходностью/);
+assert.match(core,/Разница между ними не является показателем доходности за день/);
 assert.match(core,/rangePosition=summary&&summary\.max>summary\.min/);
 assert.match(css,/v66 · asset price map \+ drawdown context/);
 assert.match(css,/\.sb-asset-period__bridge/);
