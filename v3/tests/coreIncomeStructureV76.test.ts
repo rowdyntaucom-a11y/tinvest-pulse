@@ -1,0 +1,3 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8"),css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(core,/buildPayoutStructure/);assert.match(core,/qpay-structure/);assert.match(core,/СТРУКТУРА ПОДТВЕРЖДЁННОГО ПОТОКА/);assert.match(core,/Эффективных источников/);assert.match(core,/HHI/);assert.match(core,/Связано по FIGI/);assert.match(core,/не рейтинг/iu);assert.match(css,/v76 · income structure cockpit/);assert.match(css,/\.qpay-structure-grid/);assert.match(css,/\.qpay-structure--compact/);console.log("coreIncomeStructureV76: ok");
