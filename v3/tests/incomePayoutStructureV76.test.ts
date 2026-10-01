@@ -1,0 +1,8 @@
+import assert from"node:assert/strict";import{buildPayoutStructure}from"../src/income/payoutStructure.ts";
+const p=(figi:string,ticker:string)=>({figi,ticker,name:ticker,currentValue:100,expectedYield:0,quantity:1,averagePrice:100,currentPrice:100,costBasis:100} as any);
+const e=(date:string,gross:number,figi:string,kind="COUPON")=>({date,gross,figi,ticker:figi,name:figi,status:"FORECAST",confidence:"HIGH",kind} as any);
+const events=[e("2026-10-10",100,"A"),e("2026-11-10",100,"A"),e("2027-01-10",200,"B","DIVIDEND"),e("2027-05-10",100,"C"),e("2027-07-10",100,"X")];
+const x=buildPayoutStructure(events,[p("A","AAA"),p("B","BBB"),p("C","CCC")],"2026-10-01","2026-10-01","2027-09-30");
+assert.equal(x.confirmedCount,5);assert.equal(x.confirmedGross,600);assert.equal(x.linkedCount,4);assert.equal(x.linkedGross,500);assert.equal(Math.round(x.linkedGrossShare??0),83);assert.equal(Math.round(x.top1Share??0),40);assert.equal(Math.round(x.top3Share??0),100);assert.equal(x.sourceCount,3);assert.equal(Math.round(x.hhi??0),3600);assert.equal(Number((x.effectiveSources??0).toFixed(2)),2.78);assert.equal(x.totalMonths,12);assert.ok(x.activeMonths>0);assert.equal(Math.round((x.couponShare??0)+(x.dividendShare??0)),100);assert.ok((x.first90Share??0)>0);assert.ok((x.weightedDay??0)>0);
+const z=buildPayoutStructure([],[],"2026-10-01","2026-10-01","2027-09-30");assert.equal(z.confirmedCount,0);assert.equal(z.top1Share,null);assert.equal(z.hhi,null);
+console.log("incomePayoutStructureV76: ok");
