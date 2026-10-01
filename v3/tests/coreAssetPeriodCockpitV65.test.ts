@@ -1,0 +1,18 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.ok(core.includes("filterAssetHistoryWindow(assetHistory?.points??[],historyWindow)"));
+assert.ok(core.includes("summarizeAssetHistory(visibleAssetHistory)"));
+assert.ok(core.includes("summarizeAssetRisk(visibleAssetHistory)"));
+assert.match(core,/function AssetPeriodCockpit/);
+assert.match(core,/ВЫБРАННЫЙ ПЕРИОД/);
+assert.match(core,/ИЗМЕНЕНИЕ ЦЕНЫ ЗА ОКНО/);
+assert.match(core,/Это изменение цены подтверждённых свечей, не P\/L позиции и не доходность портфеля/);
+assert.match(core,/текущая цена позиции, не свеча/);
+assert.match(core,/последняя свеча может отличаться от текущей цены позиции/);
+assert.match(core,/Макс. просадка периода/);
+assert.match(core,/по выбранному окну/);
+assert.match(css,/v65 · asset selected-period cockpit/);
+assert.match(css,/\.sb-asset-period__metrics/);
+assert.doesNotMatch(core.slice(core.indexOf("function AssetPeriodCockpit"),core.indexOf("function ResultPeriodCockpit")),/рекомендую|купить|продать/iu);
+console.log("coreAssetPeriodCockpitV65: ok");
