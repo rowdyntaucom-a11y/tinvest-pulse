@@ -639,3 +639,30 @@
  .sb .v3-pro-tools__groups button{min-height:54px}
  .sb .v3-pro-tools__stage{margin-top:7px}
 }
+
+
+/* v68 · direct-to-calculation professional mobile flow */
+@media(max-width:699px){
+ .sb .v3-pro-tools>header{margin:0 0 7px;padding:9px 10px}
+ .sb .v3-pro-tools>header h2{font-size:15px;margin-top:3px}
+ .sb .v3-pro-tools>header p{display:none}
+ .sb .v3-pro-tools__focus{margin-bottom:7px!important;padding:9px 10px!important;min-height:0!important}
+ .sb .v3-pro-tools__focus>div p{margin-top:3px!important;font-size:8px!important;line-height:1.3!important}
+ .sb .v3-pro-tools__focus>button{min-height:32px!important;padding:0 9px!important}
+ .sb .v3-pro-tools__groups{margin-bottom:7px!important}
+ .sb .v3-pro-tools__groups>section{padding:8px!important}
+ .sb .v3-pro-tools__groups nav button{min-height:42px!important;padding:7px 8px!important}
+ .sb .v3-pro-tools__stage{margin-top:0}
+ .sb .sam-rebalance,.sb .sam-lab,.sb .v3-pro-tool{padding:10px}
+ .sb .sam-rebalance__head h2,.sb .sam-lab__head h2,.sb .v3-pro-tool>header h3{font-size:15px}
+ .sb .sam-rebalance__head p,.sb .sam-lab__head p,.sb .v3-pro-tool>header p{font-size:8px;line-height:1.35}
+ .sb .v3-market-intelligence{padding:10px}
+ .sb .v3-market-intelligence>header p{display:none}
+ .sb .v3-market-intelligence>header h3{font-size:14px;margin-top:3px}
+ .sb .v3-market-intelligence>nav{margin-top:7px}
+ .sb .v3-market-intelligence>nav button{min-height:38px;padding:7px 8px}
+ .sb .v3-market-pulse{margin-top:6px}
+ .sb .v3-market-pulse__metrics{gap:5px}
+ .sb .v3-market-pulse__metrics article{padding:8px}
+ .sb .v3-market-portfolio{margin-top:6px;padding:8px}
+}
