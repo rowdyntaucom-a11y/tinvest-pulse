@@ -258,3 +258,21 @@
  .qpay-timeline{padding:8px}.qpay-timeline>header b{font-size:10px}.qpay-timeline-axis{grid-template-columns:1fr;gap:5px}.qpay-timeline-axis .now{min-height:34px;border:0;border-top:1px dashed #cfd8e4;border-bottom:1px dashed #cfd8e4}.qpay-timeline-axis button{grid-template-columns:50px 1fr 64px 10px;padding:6px}.qpay-timeline-axis .future{margin-top:2px}
  .qpay-timeline-mini{grid-template-columns:1fr}.qpay-timeline-mini>i{min-height:26px;border:0;border-top:1px dashed #cfd8e4;border-bottom:1px dashed #cfd8e4}.qpay-timeline-mini button{grid-template-columns:42px 1fr 54px}
 }
+
+
+/* v80 · confirmed payout event explorer */
+.qpay-explorer{margin-top:9px;padding:10px;border:1px solid #dfe6ee;border-radius:10px;background:linear-gradient(180deg,#fff,#f8fafc)}
+.qpay-explorer>header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}.qpay-explorer>header>div{display:grid;gap:2px}.qpay-explorer>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-explorer>header b{font-size:11px}.qpay-explorer>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-explorer-controls{display:grid;gap:5px}.qpay-explorer-controls>div{display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none}.qpay-explorer-controls>div::-webkit-scrollbar{display:none}.qpay-explorer-controls span{min-width:58px;font-size:6.5px;color:#7a828d}.qpay-explorer-controls button{flex:0 0 auto;min-height:28px;padding:0 8px;border:1px solid #e1e6ed;border-radius:7px;background:#fff;color:#657388;font-size:6.7px;font-weight:800}.qpay-explorer-controls button.active{background:#edf3fc;color:#315f9f;border-color:#cfdcf0}
+.qpay-explorer-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:7px}.qpay-explorer-summary article{display:grid;gap:2px;padding:7px;border-radius:8px;background:#f1f5f9}.qpay-explorer-summary span{font-size:6.4px;color:#7a828d}.qpay-explorer-summary strong{font-size:9px}
+.qpay-explorer-list{display:grid;gap:4px;margin-top:7px}.qpay-explorer-list button{display:grid;grid-template-columns:58px minmax(100px,1fr) 48px 76px 56px;gap:5px;align-items:center;padding:7px;border:1px solid #e5eaf0;border-radius:8px;background:#f8fafc;color:inherit;text-align:left}.qpay-explorer-list button:disabled{opacity:.7}.qpay-explorer-list time{font-size:7px;color:#7a828d}.qpay-explorer-list span{display:grid;min-width:0}.qpay-explorer-list b{font-size:8.5px}.qpay-explorer-list small{font-size:6.2px;color:#7a828d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qpay-explorer-list em{font-style:normal;font-size:7px;color:#7a828d;text-align:right}.qpay-explorer-list strong{font-size:8px;text-align:right}.qpay-explorer-list i{font-style:normal;font-size:6.5px;color:#4e77c8;text-align:right}
+.qpay-explorer>footer{margin-top:7px;padding-top:6px}.qpay-explorer--compact{padding:8px;margin-top:6px}.qpay-explorer-mini{display:grid;gap:4px}.qpay-explorer-mini button{display:grid;grid-template-columns:46px 1fr 62px 30px;gap:5px;align-items:center;padding:6px;border:1px solid #e5eaf0;border-radius:8px;background:#f8fafc;color:inherit;text-align:left}.qpay-explorer-mini time{font-size:6.5px;color:#7a828d}.qpay-explorer-mini span{display:grid;min-width:0}.qpay-explorer-mini b,.qpay-explorer-mini strong{font-size:7.5px}.qpay-explorer-mini small{font-size:5.8px;color:#7a828d}.qpay-explorer-mini i{font-style:normal;font-size:5.8px;color:#8090a4;text-align:right}
+#qpay-explorer-section{scroll-margin-top:102px}
+@media(max-width:640px){
+ .qpay-explorer{padding:8px}.qpay-explorer>header b{font-size:10px}.qpay-explorer-summary{grid-template-columns:1fr 1fr}.qpay-explorer-controls span{min-width:52px}
+ .qpay-explorer-list button{grid-template-columns:48px minmax(82px,1fr) 42px 62px 46px;padding:6px}.qpay-explorer-list b{font-size:8px}.qpay-explorer-list small{font-size:5.8px}.qpay-explorer-list strong{font-size:7.5px}.qpay-explorer-list i{font-size:6px}
+ .qpay-explorer-mini button{grid-template-columns:42px 1fr 56px 26px}
+}
+@media(max-width:359px){
+ .qpay-explorer-list button{grid-template-columns:44px minmax(76px,1fr) 56px}.qpay-explorer-list em,.qpay-explorer-list i{display:none}
+}
