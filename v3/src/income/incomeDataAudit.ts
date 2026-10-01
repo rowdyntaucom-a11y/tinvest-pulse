@@ -11,7 +11,8 @@ export type IncomeDataAudit={
  highCount:number;highGross:number;highFigiCount:number;highFigiEventShare:number|null;highExactPositionCount:number;highExactPositionShare:number|null;highExactPositionGross:number;highExactPositionGrossShare:number|null;
  forecastDeclaredGross:number;forecastVsHighGrossDelta:number;generatedAt:string|null;warning:string|null;note:string|null;
 };
-export function buildIncomeDataAudit(calendar:PayoutCalendar,positions:PositionSnapshot[]):IncomeDataAudit{
+export function buildIncomeDataAudit(calendar:PayoutCalendar|null|undefined,positions:PositionSnapshot[]):IncomeDataAudit{
+ if(!calendar)return{available:false,stale:false,integrityComplete:false,minimumCoverage:0,scheduleCoverage:0,eligibleAssets:0,resolvedAssets:0,coverageErrors:0,couponIdentityCoverage:null,couponScheduleEvents:0,couponScheduleIdentified:0,actualCount:0,actualObservedNet:0,actualDeclaredNet:0,actualNetDelta:0,actualFigiCount:0,actualFigiEventShare:null,actualFigiNet:0,actualFigiNetShare:null,observationAvailable:false,observationCompleteMonths:0,observationPartialMonths:0,observationTotalMonths:0,observationCompleteShare:null,highCount:0,highGross:0,highFigiCount:0,highFigiEventShare:null,highExactPositionCount:0,highExactPositionShare:null,highExactPositionGross:0,highExactPositionGrossShare:null,forecastDeclaredGross:0,forecastVsHighGrossDelta:0,generatedAt:null,warning:null,note:null};
  const actual=calendar.actual.items??[],future=(calendar.events??[]).filter(high);
  const actualObservedNet=actual.reduce((s,e)=>s+finite(e.net),0),actualFigi=actual.filter(e=>clean(e.figi)),actualFigiNet=actualFigi.reduce((s,e)=>s+finite(e.net),0);
  const unique=new Map<string,PositionSnapshot|null>();for(const p of positions){const f=clean(p.figi);if(!f)continue;if(unique.has(f))unique.set(f,null);else unique.set(f,p)}
