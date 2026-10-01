@@ -81,3 +81,35 @@
  .qpay-attribution--compact .qpay-attribution-kpis{grid-template-columns:1fr 1fr}
  .qpay-attribution--compact .qpay-attribution-kpis article:first-child{grid-column:1/-1}
 }
+
+
+/* v73 · confirmed 12m payout runway */
+.qpay-runway{margin-top:9px;padding:10px;border:1px solid #e3e8ef;border-radius:10px;background:linear-gradient(180deg,#fbfcfe,#f7f9fc)}
+.qpay-runway>header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.qpay-runway>header>div{display:grid;gap:2px;min-width:0}.qpay-runway>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-runway>header b{font-size:11px}.qpay-runway>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-runway-bars{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;height:92px;align-items:end}
+.qpay-runway-bars>div,.qpay-runway-bars>button{display:grid;grid-template-rows:1fr auto;gap:3px;height:100%;min-width:0;padding:0;border:0;background:transparent;color:#161a1f;text-align:center}
+.qpay-runway-bars i{display:flex;align-items:flex-end;justify-content:center;height:100%;min-height:40px;border-radius:6px;background:#edf1f6;overflow:hidden}
+.qpay-runway-bars i>b{display:block;width:100%;min-height:0;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#7fa1d6,#4e77c8)}
+.qpay-runway-bars span{font-size:6.5px;color:#7a828d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-runway-bars--full{height:118px}.qpay-runway-bars--full>button{grid-template-rows:1fr auto auto;padding:2px;border-radius:6px}.qpay-runway-bars--full>button.active{background:#edf3fc}.qpay-runway-bars--full>button:not(:disabled):active{background:#e8f0fb}.qpay-runway-bars--full>button:disabled{opacity:.52}.qpay-runway-bars--full small{font-size:6px;color:#9aa2ad}
+.qpay-runway-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:7px}.qpay-runway-kpis article{display:grid;gap:2px;min-width:0;padding:7px;border-radius:8px;background:#f0f3f7}.qpay-runway-kpis span,.qpay-runway-kpis small{font-size:6.7px;color:#7a828d}.qpay-runway-kpis strong{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-runway-split{display:grid;gap:5px;margin-top:7px}.qpay-runway-split>div{display:grid;grid-template-columns:70px 1fr 34px;align-items:center;gap:6px}.qpay-runway-split span,.qpay-runway-split strong{font-size:7px}.qpay-runway-split strong{text-align:right}.qpay-runway-split i{height:5px;border-radius:999px;background:#e5eaf0;overflow:hidden}.qpay-runway-split i>b{display:block;height:100%;border-radius:inherit;background:#4e77c8}
+.qpay-runway--compact{padding:8px;margin-top:6px}.qpay-runway--compact .qpay-runway-bars{height:62px;gap:3px}.qpay-runway--compact .qpay-runway-bars i{min-height:28px}.qpay-runway--compact .qpay-runway-kpis{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:5px}.qpay-runway--compact .qpay-runway-kpis article{padding:6px}
+@media(max-width:640px){
+ .qpay-runway{padding:8px}
+ .qpay-runway>header{margin-bottom:6px}
+ .qpay-runway>header b{font-size:10px}
+ .qpay-runway-bars{gap:2px;height:76px}
+ .qpay-runway-bars i{min-height:34px;border-radius:4px}.qpay-runway-bars span{font-size:5.8px}
+ .qpay-runway-bars--full{height:96px}.qpay-runway-bars--full small{font-size:5.5px}
+ .qpay-runway-kpis{grid-template-columns:1fr 1fr;gap:4px}
+ .qpay-runway-kpis article{padding:6px}
+ .qpay-runway-split>div{grid-template-columns:56px 1fr 30px;gap:5px}
+ .qpay-runway--compact .qpay-runway-bars{height:54px}.qpay-runway--compact .qpay-runway-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:359px){
+ .qpay-runway-bars{gap:1px}.qpay-runway-bars span{font-size:5.2px}
+ .qpay-runway--compact .qpay-runway-kpis{grid-template-columns:1fr 1fr}
+ .qpay-runway--compact .qpay-runway-kpis article:first-child{grid-column:1/-1}
+}
