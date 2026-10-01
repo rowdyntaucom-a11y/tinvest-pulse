@@ -11,6 +11,7 @@ import{loadMarketScreener}from"../analysis/marketScreenerApi";
 const CACHE_KEY="qvanix-core-trusted-snapshot-v2";
 const CACHE_MAX_AGE_MS=24*60*60_000;
 const RETRY_DELAYS=[2000,5000,10000,20000,30000,60000] as const;
+// Previous cold-start profile: 3000 / 7000 / 15000 / 30000 / 60000 ms; v67 begins recovery sooner.
 
 const readCache=():PortfolioSnapshot|null=>{
  try{
