@@ -1,4 +1,4 @@
-import type{PayoutEvent}from"../../../v2/src/lib/payoutsApi";import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import{buildPayoutAttribution}from"./payoutAttribution";import{buildPayoutRunway}from"./payoutRunway";import{buildPayoutLadder}from"./payoutLadder";
+import type{PayoutEvent}from"../../../v2/src/lib/payoutsApi";import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import{buildPayoutAttribution}from"./payoutAttribution.ts";import{buildPayoutRunway}from"./payoutRunway.ts";import{buildPayoutLadder}from"./payoutLadder.ts";
 
 export type PayoutStructure={
  available:boolean;
