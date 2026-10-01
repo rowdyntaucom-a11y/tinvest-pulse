@@ -10,7 +10,7 @@ const money=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDig
 const deltaMoney=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDigits:1,signDisplay:"exceptZero"});
 const percent=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2,signDisplay:"exceptZero"});
 const date=(v:string)=>{const d=new Date(v);return Number.isNaN(d.getTime())?v:new Intl.DateTimeFormat("ru-RU",{day:"2-digit",month:"short"}).format(d)};
-type ChartMode="value"|"performance";
+export type V3HistoryChartMode="value"|"performance";
 
 function rebase(points:HistoryPoint[],field:"portfolio"|"imoex"){
  const first=points.find(point=>point[field]!=null)?.[field]??null;
@@ -18,10 +18,13 @@ function rebase(points:HistoryPoint[],field:"portfolio"|"imoex"){
  return points.map(point=>({...point,[field]:point[field]==null?null:Number(((point[field]!/first)*100).toFixed(4))}));
 }
 
-export function V3HistorySparkline({points,detailed=false}:{points:HistoryPoint[];detailed?:boolean}){
- const[window,setWindow]=useState<V3HistoryWindow>("all");
+export function V3HistorySparkline({points,detailed=false,windowValue,onWindowChange,modeValue,onModeChange}:{points:HistoryPoint[];detailed?:boolean;windowValue?:V3HistoryWindow;onWindowChange?:(value:V3HistoryWindow)=>void;modeValue?:V3HistoryChartMode;onModeChange?:(value:V3HistoryChartMode)=>void}){
+ const[internalWindow,setInternalWindow]=useState<V3HistoryWindow>("all");
  const[selected,setSelected]=useState<ChartPoint|null>(null);
- const[mode,setMode]=useState<ChartMode>("value");
+ const[internalMode,setInternalMode]=useState<V3HistoryChartMode>("value");
+ const window=windowValue??internalWindow,mode=modeValue??internalMode;
+ const setWindow=(value:V3HistoryWindow)=>{if(windowValue==null)setInternalWindow(value);onWindowChange?.(value)};
+ const setMode=(value:V3HistoryChartMode)=>{if(modeValue==null)setInternalMode(value);onModeChange?.(value)};
  const activeWindow=detailed?window:"all";
  const windowPoints=filterHistoryWindow(points,activeWindow);
  const performancePoints=useMemo(()=>{
