@@ -6,7 +6,7 @@ assert.ok(core.includes('CorePayoutCalendar compact positions={positions} onOpen
 assert.match(core,/Будущее расписание выше показывается отдельно и только из подтверждённого календаря/);
 assert.match(calendar,/compact=false,onOpenCalendar/);
 assert.match(calendar,/qpay qpay-compact/);
-assert.match(calendar,/БЛИЖАЙШИЕ ВЫПЛАТЫ/);
+assert.match(calendar,/БЛИЖАЙШАЯ ВЫПЛАТА/);
 assert.match(calendar,/12М расписание/);
 assert.match(calendar,/официального расписания/);
 assert.match(calendar,/FUTURE · GROSS/);
