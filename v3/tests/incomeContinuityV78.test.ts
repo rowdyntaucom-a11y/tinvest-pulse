@@ -1,0 +1,9 @@
+import assert from"node:assert/strict";import{buildIncomeContinuity}from"../src/income/incomeContinuity.ts";
+const p=(figi:string,ticker:string)=>({figi,ticker,name:ticker,currentValue:100,expectedYield:0,quantity:1,averagePrice:100,currentPrice:100,costBasis:100} as any);
+const a=(date:string,net:number,figi:string,kind="COUPON")=>({date,net,gross:net+10,tax:10,figi,ticker:figi,name:figi,status:"FACT",confidence:"HIGH",kind} as any);
+const f=(date:string,gross:number,figi:string,kind="COUPON")=>({date,gross,figi,ticker:figi,name:figi,status:"FORECAST",confidence:"HIGH",kind} as any);
+const obs={available:true,from:"2026-07-01",to:"2026-09-30",completeMonths:["2026-07","2026-08"],partialMonths:["2026-09"]} as any;
+const x=buildIncomeContinuity([a("2026-08-10",90,"A"),a("2026-09-15",180,"B","DIVIDEND"),a("2026-09-20",45,"X")],[f("2026-10-10",100,"A"),f("2026-11-10",200,"B","DIVIDEND"),f("2027-01-10",300,"C")],[p("A","AAA"),p("B","BBB"),p("C","CCC")],obs,"2026-10-01","2027-09-30");
+assert.equal(x.actualNet,315);assert.equal(x.futureGross,600);assert.equal(x.continuingSources,2);assert.equal(x.actualOnlySources,1);assert.equal(x.futureOnlySources,1);assert.equal(x.continuingActualNet,270);assert.equal(x.continuingFutureGross,300);assert.equal(Math.round(x.continuingActualShare??0),86);assert.equal(Math.round(x.continuingFutureShare??0),50);assert.equal(x.lastActualDate,"2026-09-20");assert.equal(x.nextFutureDate,"2026-10-10");assert.equal(x.bridgeDays,20);assert.equal(x.rows.length,4);assert.equal(x.rows.filter(r=>r.position).length,3);
+const z=buildIncomeContinuity([],[],[],undefined,undefined,undefined);assert.equal(z.available,false);assert.equal(z.bridgeDays,null);assert.equal(z.continuingSources,0);
+console.log("incomeContinuityV78: ok");
