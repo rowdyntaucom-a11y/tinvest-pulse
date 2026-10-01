@@ -1,0 +1,3 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8"),css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(core,/buildActualTaxLedger/);assert.match(core,/qpay-tax/);assert.match(core,/ФАКТИЧЕСКИЙ НАЛОГОВЫЙ СЛЕД/);assert.match(core,/Удержано\/зафиксировано/);assert.match(core,/Сверка gross − net − tax/);assert.match(core,/не прогнозирует налог/iu);assert.match(core,/Налог/);assert.match(css,/v80 · actual tax ledger/);assert.match(css,/\.qpay-tax-grid/);assert.match(css,/\.qpay-tax--compact/);console.log("coreActualTaxLedgerV80: ok");
