@@ -15,7 +15,7 @@ test("Core experience mode persists independently of financial data",()=>{
  assert.match(experience,/localStorage\.getItem/);
  assert.match(experience,/localStorage\.setItem/);
  assert.match(core,/data-experience=\{experience\.mode\}/);
- assert.match(core,/aria-label="Режим интерфейса"/);
+ assert.match(core,/Включить профессиональный режим: открыть глубокую аналитику/);assert.match(core,/Включить простой режим: скрыть глубокую аналитику/);
 });
 
 test("simple mode keeps professional depth reachable instead of deleting it",()=>{

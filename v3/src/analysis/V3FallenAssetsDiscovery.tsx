@@ -31,15 +31,15 @@ export function V3FallenAssetsDiscovery(){
 
  return <section className="sam-fallen" aria-label="Технический поиск просевших позиций">
   <header className="sam-fallen__head">
-   <div><span>08 · TECHNICAL DISCOVERY</span><h2>Просадки и восстановление</h2><p>Фактический скан доступной истории текущих позиций. Сортировка идёт по глубине отклонения от максимума выбранного окна и не является сигналом к покупке.</p></div>
-   <i aria-hidden="true">落</i>
+   <div><span>08 · ТЕХНИЧЕСКАЯ ИСТОРИЯ</span><h2>Просадки и восстановление</h2><p>Фактический скан доступной истории текущих позиций. Сортировка идёт по глубине отклонения от максимума выбранного окна и не является сигналом к покупке.</p></div>
+   <i className="sam-fallen__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 7h14M7 11l4 4 6-7M5 19h14"/></svg></i>
   </header>
 
   <div className="sam-fallen__windows" role="group" aria-label="Окно технического сканера">
    {([3,6,12] as DiscoveryWindow[]).map(value=><button type="button" key={value} className={window===value?"is-active":""} onClick={()=>setWindow(value)}>{value}М</button>)}
   </div>
 
-  {loading?<div className="sam-fallen__gate">Получаем подтверждённую историю позиций…</div>:!payload?.available?<div className="sam-fallen__gate is-warning"><strong>История позиций недоступна</strong><small>QVANIX не строит технический discovery без подтверждённых ценовых рядов.</small></div>:<>
+  {loading?<div className="sam-fallen__gate">Получаем подтверждённую историю позиций…</div>:!payload?.available?<div className="sam-fallen__gate is-warning"><strong>История позиций недоступна</strong><small>QVANIX не строит технический разбор без подтверждённых ценовых рядов.</small></div>:<>
    <div className="sam-fallen__coverage">
     <article><span>Запрошено рядов</span><strong>{payload.requested}</strong><small>{payload.source??"источник не указан"}</small></article>
     <article><span>Доступно</span><strong>{payload.availableSeries}</strong><small>{payload.from??"—"} → {payload.to??"—"}</small></article>
@@ -61,6 +61,6 @@ export function V3FallenAssetsDiscovery(){
    </div>
   </>}
 
-  <footer>Discovery v1 работает только по ценовой истории, которую вернул текущий broker-history источник. Он не оценивает фундаментальную стоимость, новости, ликвидность или «дешевизну» бумаги и не выдаёт команды купить/продать.</footer>
+  <footer>Разбор работает только по ценовой истории, которую вернул текущий источник истории брокера. Он не оценивает фундаментальную стоимость, новости, ликвидность или «дешевизну» бумаги и не выдаёт команды купить/продать.</footer>
  </section>;
 }
