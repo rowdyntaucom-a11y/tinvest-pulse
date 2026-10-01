@@ -1,0 +1,3 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8"),css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(core,/buildPayoutLadder/);assert.match(core,/qpay-ladder/);assert.match(core,/ВРЕМЕННАЯ СТРУКТУРА ВЫПЛАТ/);assert.match(core,/0–30/);assert.match(core,/первые 90 дней/iu);assert.match(core,/не прогноз/iu);assert.match(css,/v75 · payout timing ladder/);assert.match(css,/\.qpay-ladder-bands/);assert.match(css,/\.qpay-ladder--compact/);console.log("coreIncomeLadderV75: ok");
