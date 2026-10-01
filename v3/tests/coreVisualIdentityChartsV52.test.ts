@@ -45,7 +45,7 @@ test("history controls expose Snowball-parity periods including YTD and five yea
 });
 
 test("detailed history can switch between value and rebased TWR versus IMOEX",()=>{
- assert.match(chart,/type ChartMode="value"\|"performance"/);
+ assert.match(chart,/type V3HistoryChartMode="value"\|"performance"/);
  assert.match(chart,/TWR vs IMOEX/);
  assert.match(chart,/rebase\(windowPoints,"portfolio"\)/);
  assert.match(chart,/rebase\(windowPoints,"imoex"\)/);
