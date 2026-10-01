@@ -1,0 +1,12 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const root=fs.readFileSync(new URL("../src/core/CoreRoot.tsx",import.meta.url),"utf8");
+const preview=fs.readFileSync(new URL("../preview-server.cjs",import.meta.url),"utf8");
+assert.match(root,/qvanix-core-trusted-snapshot-v2/);
+assert.match(root,/CACHE_MAX_AGE_MS=24\*60\*60_000/);
+assert.match(root,/localStorage\.getItem\(CACHE_KEY\)/);
+assert.match(root,/localStorage\.setItem\(CACHE_KEY/);
+assert.match(root,/RETRY_DELAYS=\[2000,5000,10000,20000,30000,60000\]/);
+assert.match(root,/последний подтверждённый снимок с этого устройства/);
+assert.match(preview,/const route="\/api\/version"/);
+assert.match(preview,/const keepAlive=setInterval\(\(\)=>void probeUpstream\(\),60_000\)/);
+console.log("coreRuntimeResilienceV67: ok");
