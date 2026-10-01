@@ -2,7 +2,7 @@ import fs from"node:fs";import assert from"node:assert/strict";
 const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
 const calendar=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8");
 const css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
-assert.match(core,/CorePayoutCalendar compact onOpenCalendar={()=>setIncomeMode("calendar")}/);
+assert.ok(core.includes('CorePayoutCalendar compact onOpenCalendar={()=>setIncomeMode("calendar")}'));
 assert.match(core,/Будущее расписание выше показывается отдельно и только из подтверждённого календаря/);
 assert.match(calendar,/compact=false,onOpenCalendar/);
 assert.match(calendar,/qpay qpay-compact/);
