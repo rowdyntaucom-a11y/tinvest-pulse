@@ -141,3 +141,24 @@
  .qpay-horizon-lead{grid-template-columns:1fr 1fr}.qpay-horizon-lead article:first-child{grid-column:1/-1}
  .qpay-horizon--compact .qpay-horizon-grid{grid-template-columns:1fr 1fr}
 }
+
+
+/* v75 · payout timing ladder */
+.qpay-ladder{margin-top:9px;padding:10px;border:1px solid #e3e8ef;border-radius:10px;background:linear-gradient(180deg,#fff,#f8fafc)}
+.qpay-ladder>header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}
+.qpay-ladder>header>div{display:grid;gap:2px}.qpay-ladder>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-ladder>header b{font-size:11px}.qpay-ladder>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-ladder-lead{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:6px}
+.qpay-ladder-lead article{display:grid;gap:2px;padding:8px;border-radius:8px;background:#f2f5f8}.qpay-ladder-lead span,.qpay-ladder-lead small{font-size:6.7px;color:#7a828d}.qpay-ladder-lead strong{font-size:10px}
+.qpay-ladder-bands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.qpay-ladder-bands article{display:grid;grid-template-columns:1fr;gap:3px;padding:7px;border-radius:8px;background:#f3f6f9;min-width:0}.qpay-ladder-bands span,.qpay-ladder-bands small{font-size:6.5px;color:#7a828d}.qpay-ladder-bands strong{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qpay-ladder-bands i{height:4px;border-radius:99px;background:#e3e9f2;overflow:hidden}.qpay-ladder-bands i b{display:block;height:100%;border-radius:inherit;background:#4e77c8}
+.qpay-ladder>footer{margin-top:6px;padding-top:6px}
+.qpay-ladder--compact{padding:8px;margin-top:6px}.qpay-ladder--compact .qpay-ladder-bands article{padding:5px}.qpay-ladder--compact .qpay-ladder-bands strong{font-size:8.5px}
+@media(max-width:640px){
+ .qpay-ladder{padding:8px}.qpay-ladder>header{margin-bottom:5px}.qpay-ladder>header b{font-size:10px}
+ .qpay-ladder-lead{gap:4px}.qpay-ladder-lead article{padding:7px 6px}
+ .qpay-ladder-bands--full{grid-template-columns:1fr 1fr}.qpay-ladder-bands--full article{padding:7px}
+ .qpay-ladder--compact .qpay-ladder-bands{gap:3px}.qpay-ladder--compact .qpay-ladder-bands article{padding:4px}.qpay-ladder--compact .qpay-ladder-bands small{display:none}
+}
+@media(max-width:359px){
+ .qpay-ladder-lead{grid-template-columns:1fr 1fr}.qpay-ladder-lead article:first-child{grid-column:1/-1}
+ .qpay-ladder--compact .qpay-ladder-bands{grid-template-columns:1fr 1fr}
+}
