@@ -1,0 +1,17 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.match(core,/\["map","Карта"\]/,"Pro portfolio tabs must expose contribution map");
+assert.match(core,/function PortfolioContributionMap/);
+assert.match(core,/Вес капитала × вклад открытого P\/L/);
+assert.match(core,/impact:total>0\?x\.expectedYield\/total\*100:0/,"impact must be open-position P\/L divided by current portfolio value");
+assert.match(core,/plPct:x\.costBasis>0\?x\.expectedYield\/x\.costBasis\*100:null/);
+assert.match(core,/Вклад P\/L = открытый P\/L позиции \/ текущая стоимость портфеля/);
+assert.match(core,/Это не доходность стратегии, не дневное изменение и не прогноз/);
+assert.match(core,/aria-label="Карта веса позиций и вклада открытого P\/L в текущий портфель"/);
+assert.match(core,/onOpenAsset\(x\)/,"map points and rows must drill down to exact current position");
+assert.match(css,/v62 · portfolio contribution map/);
+assert.match(css,/\.sb-contribution-map__plot svg/);
+assert.match(css,/@media\(max-width:699px\)[\s\S]*\.sb-contribution-map__plot svg\{height:170px\}/);
+assert.doesNotMatch(core,/рекомендую|лучша(я|ий)|покупать|продавать/iu);
+console.log("coreContributionMapV62: ok");
