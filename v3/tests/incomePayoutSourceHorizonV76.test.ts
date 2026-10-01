@@ -1,0 +1,6 @@
+import assert from"node:assert/strict";import{buildPayoutSourceHorizon}from"../src/income/payoutSourceHorizon.ts";
+const p=(figi:string,ticker:string)=>({figi,ticker,name:ticker} as any),e=(date:string,gross:number,figi:string)=>({date,gross,figi,status:"FORECAST",confidence:"HIGH",kind:"COUPON"} as any);
+const x=buildPayoutSourceHorizon([e("2026-10-11",100,"A"),e("2026-11-20",200,"A"),e("2027-02-10",300,"B"),e("2027-08-01",400,"B"),e("2026-10-15",500,"X")],[p("A","AAA"),p("B","BBB")],"2026-10-01");
+assert.equal(x.available,true);assert.equal(x.rows.length,2);assert.equal(x.matchedGross,1000);assert.equal(x.unmatchedGross,500);assert.equal(x.matchedCount,4);assert.equal(x.unmatchedCount,1);assert.equal(x.rows[0]!.position.ticker,"BBB");assert.deepEqual([x.rows[1]!.gross30,x.rows[1]!.gross90,x.rows[1]!.gross180,x.rows[1]!.gross365],[100,300,300,300]);assert.deepEqual([x.rows[0]!.gross30,x.rows[0]!.gross90,x.rows[0]!.gross180,x.rows[0]!.gross365],[0,0,300,700]);
+const bad=buildPayoutSourceHorizon([],[],"bad");assert.equal(bad.available,false);
+console.log("incomePayoutSourceHorizonV76: ok");
