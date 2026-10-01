@@ -8,19 +8,20 @@ import{loadPortfolioHistory,type PortfolioSnapshot}from"../../../v2/src/lib/port
 import{loadPayoutCalendar}from"../../../v2/src/lib/payoutsApi";
 import{loadMarketScreener}from"../analysis/marketScreenerApi";
 
-const CACHE_KEY="qvanix-core-trusted-snapshot-v1";
-const RETRY_DELAYS=[3000,7000,15000,30000,60000] as const;
+const CACHE_KEY="qvanix-core-trusted-snapshot-v2";
+const CACHE_MAX_AGE_MS=24*60*60_000;
+const RETRY_DELAYS=[2000,5000,10000,20000,30000,60000] as const;
 
 const readCache=():PortfolioSnapshot|null=>{
  try{
-  const raw=sessionStorage.getItem(CACHE_KEY);
+  const raw=localStorage.getItem(CACHE_KEY);
   if(!raw)return null;
   const x=JSON.parse(raw) as {savedAt:number;snapshot:PortfolioSnapshot};
-  return Date.now()-x.savedAt<=30*60_000?x.snapshot:null;
+  return Date.now()-x.savedAt<=CACHE_MAX_AGE_MS?x.snapshot:null;
  }catch{return null}
 };
 const writeCache=(snapshot:PortfolioSnapshot)=>{
- try{sessionStorage.setItem(CACHE_KEY,JSON.stringify({savedAt:Date.now(),snapshot}))}catch{}
+ try{localStorage.setItem(CACHE_KEY,JSON.stringify({savedAt:Date.now(),snapshot}))}catch{}
 };
 const EMPTY={
  accountName:"QVANIX",value:0,profit:0,profitPct:0,passiveIncome:0,
@@ -42,7 +43,7 @@ export function CoreRoot(){
  const[snapshot,setSnapshot]=useState<PortfolioSnapshot>(cached.current??EMPTY);
  const[trusted,setTrusted]=useState(Boolean(cached.current));
  const[state,setState]=useState<V3LoadState>(cached.current?"stale":"loading");
- const[reason,setReason]=useState<string|null>(cached.current?"Показан последний подтверждённый снимок этой сессии. Проверяем свежие данные…":null);
+ const[reason,setReason]=useState<string|null>(cached.current?"Показан последний подтверждённый снимок с этого устройства. Проверяем свежие брокерские данные…":null);
  const[refreshing,setRefreshing]=useState(false);
  const running=useRef(false),req=useRef(0),active=useRef(true),lastAttempt=useRef(0),retryTimer=useRef<number|null>(null),retryStep=useRef(0);
  const refreshRef=useRef<()=>Promise<void>>(async()=>{});
@@ -108,7 +109,7 @@ export function CoreRoot(){
      setSnapshot(cached.current);
      setTrusted(true);
      setState("stale");
-     setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок этой сессии; повторяем загрузку автоматически.");
+     setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок с этого устройства; повторяем загрузку автоматически.");
     }else{
      setTrusted(false);
     }
@@ -120,7 +121,7 @@ export function CoreRoot(){
     setSnapshot(cached.current);
     setTrusted(true);
     setState("stale");
-    setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок этой сессии; повторяем загрузку автоматически.");
+    setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок с этого устройства; повторяем загрузку автоматически.");
    }else{
     setTrusted(false);
     setState("error");
