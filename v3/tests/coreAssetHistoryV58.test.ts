@@ -1,0 +1,14 @@
+import assert from"node:assert/strict";import fs from"node:fs";
+const source=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.match(source,/loadAssetHistory/,"Core asset drill-down must use the verified asset-history API");
+assert.match(source,/matchCoreAssetHistory/,"Core asset history must pass through exact identity matching");
+assert.match(source,/row\.integrity==="VALID"&&row\.points\.length>=2/,"Invalid or too-short series must fail closed");
+assert.match(source,/V3AssetHistoryChart/,"Core asset drill-down must reuse the canonical interactive history chart");
+assert.match(source,/summarizeAssetRisk/,"Core asset drill-down must reuse verified historical risk math");
+assert.match(source,/QVANIX не строит синтетический график/,"Missing history must fail closed instead of fabricating a chart");
+assert.match(source,/не дневное изменение цены/,"Open-position P\/L semantics must remain distinct from daily price movement");
+assert.match(source,/ретроспектива, а не прогноз или торговый сигнал/,"History must not be presented as a forecast");
+assert.match(css,/v58 · verified asset history \+ risk drill-down/,"v58 responsive history styling must be present");
+assert.match(css,/@media\(max-width:520px\).*sb-asset-history/s,"Asset history must have a phone-specific layout");
+console.log("coreAssetHistoryV58: ok");
