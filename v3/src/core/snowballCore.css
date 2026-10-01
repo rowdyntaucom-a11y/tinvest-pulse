@@ -860,3 +860,12 @@
  .sb-asset-impact>div{padding:13px}
  .sb-asset-impact strong{font-size:17px}
 }
+
+/* v57 asset portfolio context */
+.sb-asset-context>header{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}
+.sb-asset-context>header>div{display:grid;gap:3px}.sb-asset-context>header span{font-size:7px;font-weight:900;color:var(--s-blue)}.sb-asset-context>header h2{margin:0}.sb-asset-context>header small{font-size:7px;color:var(--s-muted)}
+.sb-asset-context__metrics{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;border:0!important;padding:0!important}
+.sb-asset-context__metrics article{padding:9px;border:1px solid var(--s-line);border-radius:9px;background:#fafbfc;display:grid;gap:3px}.sb-asset-context__metrics article span,.sb-asset-context__metrics article small{font-size:7px;color:var(--s-muted)}.sb-asset-context__metrics article strong{font-size:12px}
+.sb-asset-context__peers{display:grid!important;border:0!important;padding:11px 0 0!important;margin-top:10px!important;border-top:1px solid var(--s-line)!important}.sb-asset-context__peers>span{margin-bottom:4px;font-size:8px!important;font-weight:800;color:var(--s-text)!important}
+.sb-asset-context__peers button{width:100%;border:0;border-top:1px solid var(--s-line);background:transparent;padding:9px 0;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:8px;text-align:left}.sb-asset-context__peers button>span{display:grid;gap:2px}.sb-asset-context__peers button>span b{font-size:9px}.sb-asset-context__peers button>span small{font-size:7px;color:var(--s-muted)}.sb-asset-context__peers button>strong{font-size:9px}.sb-asset-context__peers button>i{font-style:normal;color:var(--s-muted);font-size:15px}.sb-asset-context>p{margin:9px 0 0;color:var(--s-muted);font-size:7px;line-height:1.45}
+@media(max-width:520px){.sb-asset-context__metrics{grid-template-columns:1fr 1fr!important}.sb-asset-context__metrics article:first-child{grid-column:1/-1}.sb-asset-context__metrics article{padding:10px}.sb-asset-context__metrics article strong{font-size:14px}.sb-asset-context__peers button{min-height:54px}.sb-asset-context__peers button>span b,.sb-asset-context__peers button>strong{font-size:10px}.sb-asset-context__peers button>span small,.sb-asset-context>p{font-size:8px}}
