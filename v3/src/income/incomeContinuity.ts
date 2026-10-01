@@ -1,4 +1,4 @@
-import type{PayoutEvent,PayoutObservation}from"../../../v2/src/lib/payoutsApi";import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import{buildActualIncomeHistory}from"./actualIncomeHistory";import{buildPayoutAttribution}from"./payoutAttribution";import{buildPayoutRunway}from"./payoutRunway";
+import type{PayoutEvent,PayoutObservation}from"../../../v2/src/lib/payoutsApi";import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import{buildActualIncomeHistory}from"./actualIncomeHistory.ts";import{buildPayoutAttribution}from"./payoutAttribution.ts";import{buildPayoutRunway}from"./payoutRunway.ts";
 
 const clean=(v:unknown)=>String(v??"").trim();
 const futureHigh=(e:PayoutEvent)=>String(e.status||"").toUpperCase()!=="FACT"&&String(e.confidence||"").toUpperCase()==="HIGH";
