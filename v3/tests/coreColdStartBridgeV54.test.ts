@@ -5,7 +5,7 @@ import{readFileSync}from"node:fs";
 const preview=readFileSync(new URL("../preview-server.cjs",import.meta.url),"utf8");
 
 test("preview keeps the live API warm while the preview service is active",()=>{
- assert.match(preview,/setInterval\(\(\)=>void probeUpstream\(\),8\*60_000\)/);
+ assert.match(preview,/setInterval\(\(\)=>void probeUpstream\(\),60_000\)/);
  assert.match(preview,/keepAlive\.unref\?\.\(\)/);
  assert.match(preview,/return new Promise\(resolve=>/);
 });
