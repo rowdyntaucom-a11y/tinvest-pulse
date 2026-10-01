@@ -860,3 +860,6 @@
  .sb-asset-impact>div{padding:13px}
  .sb-asset-impact strong{font-size:17px}
 }
+
+/* v57 performance evidence hierarchy */
+.sb-result-evidence{margin:0 0 10px;padding:12px;border:1px solid var(--s-line);border-radius:12px;background:#fff}.sb-result-evidence header{display:grid;gap:3px}.sb-result-evidence header span{font-size:7px;font-weight:900;letter-spacing:.08em;color:var(--s-blue)}.sb-result-evidence header b{font-size:12px}.sb-result-evidence p{margin:7px 0 0;font-size:8px;line-height:1.5;color:var(--s-muted)}
