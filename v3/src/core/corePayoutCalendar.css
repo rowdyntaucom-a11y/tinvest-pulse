@@ -225,3 +225,27 @@
  .qpay-actual-mini-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.qpay-actual--compact .qpay-actual-mini-kpis small{display:none}
 }
 @media(max-width:359px){.qpay-actual-events>div{grid-template-columns:44px minmax(58px,1fr) 58px}.qpay-actual-events em{display:none}.qpay-actual-sources>div{grid-template-columns:minmax(58px,1fr) 1fr 56px}.qpay-actual-sources small{display:none}}
+
+
+/* v78 · income continuity bridge */
+.qpay-continuity{margin-top:9px;padding:10px;border:1px solid #dfe6ee;border-radius:10px;background:linear-gradient(180deg,#fff,#f7fafc)}
+.qpay-continuity>header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}.qpay-continuity>header>div{display:grid;gap:2px}.qpay-continuity>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-continuity>header b{font-size:11px}.qpay-continuity>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-continuity-lead{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:6px}
+.qpay-continuity-lead article,.qpay-continuity-grid article{display:grid;gap:2px;padding:8px;border-radius:8px;background:#f1f5f9;min-width:0}.qpay-continuity-lead span,.qpay-continuity-lead small,.qpay-continuity-grid span,.qpay-continuity-grid small{font-size:6.6px;color:#7a828d}.qpay-continuity-lead strong,.qpay-continuity-grid strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-continuity-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.qpay-continuity-grid--full{grid-template-columns:repeat(4,minmax(0,1fr))}
+.qpay-continuity-list{margin-top:8px;border:1px solid #e4e9ef;border-radius:9px;overflow:hidden;background:#fff}.qpay-continuity-list>header{display:flex;justify-content:space-between;gap:8px;padding:7px 8px;background:#f7f9fc}.qpay-continuity-list>header span{font-size:6.7px;letter-spacing:.06em;color:#4e77c8}.qpay-continuity-list>header small{font-size:6.5px;color:#7a828d}
+.qpay-continuity-row{display:grid;grid-template-columns:minmax(110px,1.2fr) minmax(76px,.8fr) minmax(88px,.9fr) 16px;align-items:center;gap:6px;width:100%;padding:8px;border:0;border-top:1px solid #edf0f4;background:#fff;color:#202833;text-align:left}.qpay-continuity-row:disabled{cursor:default}.qpay-continuity-row:not(:disabled):active{background:#eef3f9}.qpay-continuity-row>span{display:grid;min-width:0}.qpay-continuity-row>span b{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qpay-continuity-row>span small{font-size:6.4px;color:#7a828d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qpay-continuity-row i{display:grid;min-width:0;font-style:normal}.qpay-continuity-row i em{font-size:5.8px;color:#8a95a4;font-style:normal}.qpay-continuity-row i strong{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qpay-continuity-row u{text-decoration:none;color:#8b97a6;text-align:right}
+.qpay-continuity>footer{margin-top:7px;padding-top:6px}
+.qpay-continuity--compact{padding:8px;margin-top:6px}.qpay-continuity--compact .qpay-continuity-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.qpay-continuity--compact .qpay-continuity-grid article{padding:6px 5px}.qpay-continuity--compact .qpay-continuity-grid strong{font-size:9px}.qpay-continuity-split{margin-top:5px;padding:6px 7px;border-radius:7px;background:#f5f7fa}.qpay-continuity-split span{font-size:6.5px;color:#6f7a88;line-height:1.35}
+#qpay-continuity-section{scroll-margin-top:102px}
+@media(max-width:640px){
+ .qpay-continuity{padding:8px}.qpay-continuity>header{margin-bottom:5px}.qpay-continuity>header b{font-size:10px}
+ .qpay-continuity-lead{gap:4px}.qpay-continuity-lead article{padding:7px 6px}
+ .qpay-continuity-grid--full{grid-template-columns:1fr 1fr}.qpay-continuity-grid--full article{padding:7px 6px}
+ .qpay-continuity-row{grid-template-columns:minmax(88px,1fr) minmax(64px,.75fr) minmax(72px,.8fr) 12px;gap:4px;padding:7px 6px}.qpay-continuity-row>span b{font-size:8.3px}.qpay-continuity-row>span small{font-size:6px}.qpay-continuity-row i strong{font-size:7.2px}
+ .qpay-continuity--compact .qpay-continuity-grid{grid-template-columns:1fr 1fr}.qpay-continuity--compact .qpay-continuity-grid article{padding:6px}
+}
+@media(max-width:359px){
+ .qpay-continuity-lead{grid-template-columns:1fr 1fr}.qpay-continuity-lead article:first-child{grid-column:1/-1}
+ .qpay-continuity-row{grid-template-columns:minmax(84px,1fr) minmax(68px,.8fr) 12px}.qpay-continuity-row i:nth-of-type(2){display:none}
+}
