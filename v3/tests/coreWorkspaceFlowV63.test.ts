@@ -16,6 +16,6 @@ assert.match(core,/data-count=\{items\.length\}/);
 assert.match(css,/v63 · Snowball\+ workspace flow/);
 assert.match(css,/\.sb-workspace-guide__routes/);
 assert.match(css,/\.sb-switch\[data-count="5"\]/);
-assert.match(css,/\.sb-asset-next\{position:sticky/);
+assert.match(css,/\.sb-asset-commandbar\{display:flex/);
 assert.doesNotMatch(core,/рекомендую|покупать|продавать/iu);
 console.log("coreWorkspaceFlowV63: ok");
