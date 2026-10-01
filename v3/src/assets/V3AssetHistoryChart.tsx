@@ -51,6 +51,8 @@ export function V3AssetHistoryChart({position,points,window,onWindowChange,meta}
   if(!summary||!geometry)return null;
 
   const first=visible[0],middle=visible[Math.floor((visible.length-1)/2)],last=visible.at(-1)!;
+  const averageLine=position.averagePrice>0&&position.averagePrice>=geometry.min&&position.averagePrice<=geometry.max?42-((position.averagePrice-geometry.min)/Math.max(1e-9,geometry.max-geometry.min))*34:null;
+  const brokerLine=position.currentPrice>0&&position.currentPrice>=geometry.min&&position.currentPrice<=geometry.max?42-((position.currentPrice-geometry.min)/Math.max(1e-9,geometry.max-geometry.min))*34:null;
   const sourceRange=meta.from&&meta.to?`${shortDateFmt.format(new Date(meta.from+"T00:00:00Z"))} — ${shortDateFmt.format(new Date(meta.to+"T00:00:00Z"))}`:null;
 
   return <div className="v3-asset-history-explorer">
@@ -69,11 +71,14 @@ export function V3AssetHistoryChart({position,points,window,onWindowChange,meta}
         <line x1="4" y1="25" x2="96" y2="25"/>
         <line x1="4" y1="42" x2="96" y2="42"/>
         <polygon points={geometry.area}/>
+        {averageLine!=null&&<line className="v3-asset-history-entry" x1="4" y1={averageLine} x2="96" y2={averageLine}/>} 
+        {brokerLine!=null&&<line className="v3-asset-history-broker" x1="4" y1={brokerLine} x2="96" y2={brokerLine}/>} 
         <polyline points={geometry.line}/>
         {selectedCoord&&<><line className="v3-asset-history-guide" x1={selectedCoord.x} y1="6" x2={selectedCoord.x} y2="44"/><circle className="v3-asset-history-selected-dot" cx={selectedCoord.x} cy={selectedCoord.y} r="1.8"/></>}
       </svg>
     </div>
     <div className="v3-asset-history-axis" aria-hidden="true"><span>{shortDateFmt.format(new Date(first.date+"T00:00:00Z"))}</span><span>{shortDateFmt.format(new Date(middle.date+"T00:00:00Z"))}</span><span>{shortDateFmt.format(new Date(last.date+"T00:00:00Z"))}</span></div>
+    <div className="v3-asset-history-legend" aria-label="Ориентиры графика"><span><i className="is-series"/>Свечи T‑Invest</span>{position.averagePrice>0&&<span><i className="is-entry"/>Средняя позиции · {quote(position,position.averagePrice)}</span>}{position.currentPrice>0&&<span><i className="is-broker"/>Текущая цена брокера · {quote(position,position.currentPrice)}</span>}</div>
     <input className="v3-asset-history-scrubber" type="range" min={0} max={Math.max(0,visible.length-1)} step={1} value={selectedIndex} aria-label={"Выбор точки истории "+position.ticker} onChange={event=>setSelectedIndex(Number(event.currentTarget.value))}/>
     <div className="v3-asset-history-caption"><span>{dateFmt.format(new Date(summary.startDate+"T00:00:00Z"))} · {quote(position,summary.first)}</span><strong className={summary.change!=null&&summary.change<0?"is-negative":summary.change!=null&&summary.change>0?"is-positive":""}>{summary.change==null?"—":pct.format(summary.change)+"%"}</strong><span>{dateFmt.format(new Date(summary.endDate+"T00:00:00Z"))} · {quote(position,summary.last)}</span></div>
     <div className="v3-asset-history-stats"><article><span>Мин.</span><strong>{quote(position,summary.min)}</strong></article><article><span>Макс.</span><strong>{quote(position,summary.max)}</strong></article><article><span>Точек</span><strong>{summary.points}</strong></article></div>
