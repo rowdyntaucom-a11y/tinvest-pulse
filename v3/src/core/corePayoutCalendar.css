@@ -162,3 +162,24 @@
  .qpay-ladder-lead{grid-template-columns:1fr 1fr}.qpay-ladder-lead article:first-child{grid-column:1/-1}
  .qpay-ladder--compact .qpay-ladder-bands{grid-template-columns:1fr 1fr}
 }
+
+
+/* v76 · income structure cockpit */
+.qpay-structure{margin-top:9px;padding:10px;border:1px solid #e3e8ef;border-radius:10px;background:linear-gradient(180deg,#fbfdff,#f5f8fc)}
+.qpay-structure>header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}
+.qpay-structure>header>div{display:grid;gap:2px}.qpay-structure>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-structure>header b{font-size:11px}.qpay-structure>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-structure-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.qpay-structure-grid article{display:grid;gap:2px;padding:8px;border-radius:8px;background:#f1f5f9;min-width:0}.qpay-structure-grid span,.qpay-structure-grid small{font-size:6.6px;color:#7a828d}.qpay-structure-grid strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-structure-grid--full{grid-template-columns:repeat(4,minmax(0,1fr))}
+.qpay-structure-bars{display:grid;gap:5px;margin-top:7px}.qpay-structure-bars>div{display:grid;grid-template-columns:74px 1fr 36px;align-items:center;gap:6px}.qpay-structure-bars span,.qpay-structure-bars strong{font-size:7px}.qpay-structure-bars strong{text-align:right}.qpay-structure-bars i{height:5px;border-radius:99px;background:#e2e8f0;overflow:hidden}.qpay-structure-bars i b{display:block;height:100%;border-radius:inherit;background:#4e77c8}
+.qpay-structure>footer{margin-top:7px;padding-top:6px}
+.qpay-structure--compact{padding:8px;margin-top:6px}.qpay-structure--compact .qpay-structure-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.qpay-structure--compact .qpay-structure-grid article{padding:5px 4px}.qpay-structure--compact .qpay-structure-grid strong{font-size:9px}.qpay-structure--compact .qpay-structure-bars>div{grid-template-columns:58px 1fr 30px}
+@media(max-width:640px){
+ .qpay-structure{padding:8px}.qpay-structure>header{margin-bottom:5px}.qpay-structure>header b{font-size:10px}
+ .qpay-structure-grid--full{grid-template-columns:1fr 1fr;gap:4px}.qpay-structure-grid--full article{padding:7px}
+ .qpay-structure--compact .qpay-structure-grid{grid-template-columns:1fr 1fr}.qpay-structure--compact .qpay-structure-grid article{padding:6px}.qpay-structure--compact .qpay-structure-grid small{display:none}
+ .qpay-structure-bars>div{grid-template-columns:64px 1fr 34px}
+}
+@media(max-width:359px){
+ .qpay-structure-grid--full,.qpay-structure--compact .qpay-structure-grid{grid-template-columns:1fr 1fr}
+ .qpay-structure-bars>div{grid-template-columns:55px 1fr 32px}
+}
