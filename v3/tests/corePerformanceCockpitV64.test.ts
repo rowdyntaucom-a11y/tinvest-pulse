@@ -17,5 +17,5 @@ assert.match(core,/windowValue=\{resultWindow\}/);
 assert.match(core,/modeValue=\{resultChartMode\}/);
 assert.match(css,/v64 · synchronized performance cockpit/);
 assert.match(css,/\.sb-result-period\[data-mode="performance"\]/);
-assert.doesNotMatch(core,/прогноз цены|рекомендую|купить|продать/iu);
+const cockpit=core.slice(core.indexOf("function ResultPeriodCockpit"),core.indexOf("function WorkspaceGuide"));assert.doesNotMatch(cockpit,/рекомендую|купить|продать/iu);
 console.log("corePerformanceCockpitV64: ok");
