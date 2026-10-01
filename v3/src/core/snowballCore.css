@@ -1003,3 +1003,16 @@
  .sb-compare-head b{font-size:13px}.sb-compare-head small{font-size:9px}.sb-compare-kpi strong{font-size:18px}
  .sb-compare dt{font-size:9px}.sb-compare dd{font-size:10px}.sb-compare-note{font-size:9px}
 }
+
+
+/* v61 · consistency polish from council audit */
+.sb-experience-toggle{min-width:96px!important;padding:7px 11px!important;border-width:1.5px!important;box-shadow:0 2px 8px rgba(28,49,82,.06)!important;transition:transform .16s ease,box-shadow .16s ease,background .16s ease,border-color .16s ease}
+.sb-experience-toggle:active{transform:scale(.98)}
+.sb[data-experience="pro"] .sb-experience-toggle{border-color:#9fb8df!important;background:#eaf2ff!important;box-shadow:0 3px 12px rgba(49,95,174,.14)!important}
+.sb[data-experience="simple"] .sb-experience-toggle{background:#fff!important;border-color:#d5dce6!important}
+.sb .sam-fallen__icon{display:grid;place-items:center}
+.sb .sam-fallen__icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:520px){
+ .sb-experience-toggle{min-width:82px!important;padding:6px 8px!important}
+ .sb-experience-toggle>small{font-size:6.5px!important}
+}
