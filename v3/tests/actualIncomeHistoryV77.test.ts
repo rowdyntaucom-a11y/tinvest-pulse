@@ -1,0 +1,7 @@
+import assert from"node:assert/strict";import{buildActualIncomeHistory}from"../src/income/actualIncomeHistory.ts";
+const e=(date:string,net:number,figi:string|null,kind="COUPON",tax=0)=>({date,net,gross:net+tax,tax,figi,ticker:figi||"?",name:figi||"?",kind,status:"FACT"} as any);
+const obs={available:true,from:"2026-01-01T00:00:00Z",to:"2026-04-30T00:00:00Z",completeMonths:["2026-01","2026-02","2026-03"],partialMonths:["2026-04"],basis:"test"} as any;
+const x=buildActualIncomeHistory([e("2026-01-10",100,"A"),e("2026-01-20",50,"A","DIVIDEND",10),e("2026-03-02",200,"B"),e("2026-04-01",25,null)],obs);
+assert.equal(x.available,true);assert.equal(x.months.length,4);assert.equal(x.completeMonths,3);assert.equal(x.partialMonths,1);assert.equal(x.zeroCompleteMonths,1);assert.equal(x.activeMonths,3);assert.equal(x.totalNet,375);assert.equal(x.totalGross,385);assert.equal(x.totalTax,10);assert.equal(x.averageCompleteMonthNet,350/3);assert.equal(x.medianActiveMonthNet,150);assert.equal(x.sources.length,2);assert.equal(x.sources[0]!.label,"B");assert.equal(x.identifiedNet,350);assert.equal(x.unidentifiedNet,25);assert.equal(Math.round(x.identityShare??0),93);assert.equal(x.latest[0]!.date,"2026-04-01");
+const z=buildActualIncomeHistory([],undefined);assert.equal(z.available,false);assert.equal(z.months.length,0);
+console.log("actualIncomeHistoryV77: ok");
