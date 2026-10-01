@@ -1,0 +1,13 @@
+import type{PayoutEvent}from"../../../v2/src/lib/payoutsApi";import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
+const clean=(x:unknown)=>String(x??"").trim(),finite=(x:unknown)=>typeof x==="number"&&Number.isFinite(x)?x:0,isHigh=(e:PayoutEvent)=>String(e.status||"").toUpperCase()!=="FACT"&&String(e.confidence||"").toUpperCase()==="HIGH";
+export type IncomeContinuityRow={position:PositionSnapshot;actualNet:number;actualCount:number;latestActual:string|null;futureGross:number;futureCount:number;nextFuture:string|null;state:"both"|"actual-only"|"future-only"|"none"};
+export type IncomeContinuity={rows:IncomeContinuityRow[];both:number;actualOnly:number;futureOnly:number;none:number;legacyActualNet:number;legacyActualCount:number;unmatchedFutureGross:number;unmatchedFutureCount:number};
+export function buildIncomeContinuity(actual:PayoutEvent[],future:PayoutEvent[],positions:PositionSnapshot[]):IncomeContinuity{
+ const byFigi=new Map<string,IncomeContinuityRow>();
+ for(const p of positions){const f=clean(p.figi);if(!f)continue;byFigi.set(f,{position:p,actualNet:0,actualCount:0,latestActual:null,futureGross:0,futureCount:0,nextFuture:null,state:"none"})}
+ let legacyActualNet=0,legacyActualCount=0,unmatchedFutureGross=0,unmatchedFutureCount=0;
+ for(const e of actual){const f=clean(e.figi),row=f?byFigi.get(f):undefined,n=finite(e.net);if(!row){legacyActualNet+=n;legacyActualCount++;continue}row.actualNet+=n;row.actualCount++;if(!row.latestActual||e.date>row.latestActual)row.latestActual=e.date}
+ for(const e of future.filter(isHigh)){const f=clean(e.figi),row=f?byFigi.get(f):undefined,g=Math.max(0,finite(e.gross));if(!row){unmatchedFutureGross+=g;unmatchedFutureCount++;continue}row.futureGross+=g;row.futureCount++;if(!row.nextFuture||e.date<row.nextFuture)row.nextFuture=e.date}
+ const rows=[...byFigi.values()].map(r=>({...r,state:(r.actualCount&&r.futureCount?"both":r.actualCount?"actual-only":r.futureCount?"future-only":"none") as IncomeContinuityRow["state"]})).sort((a,b)=>b.futureGross-a.futureGross||b.actualNet-a.actualNet||a.position.ticker.localeCompare(b.position.ticker));
+ return{rows,both:rows.filter(r=>r.state==="both").length,actualOnly:rows.filter(r=>r.state==="actual-only").length,futureOnly:rows.filter(r=>r.state==="future-only").length,none:rows.filter(r=>r.state==="none").length,legacyActualNet,legacyActualCount,unmatchedFutureGross,unmatchedFutureCount};
+}

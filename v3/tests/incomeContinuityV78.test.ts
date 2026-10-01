@@ -1,0 +1,5 @@
+import assert from"node:assert/strict";import{buildIncomeContinuity}from"../src/income/incomeContinuity.ts";
+const p=(figi:string,ticker:string)=>({figi,ticker,name:ticker,currentValue:100} as any),a=(figi:string,net:number,date:string)=>({figi,net,date,status:"FACT"} as any),f=(figi:string,gross:number,date:string,confidence="HIGH")=>({figi,gross,date,status:"FORECAST",confidence} as any);
+const x=buildIncomeContinuity([a("A",100,"2026-09-01"),a("A",50,"2026-09-20"),a("X",70,"2026-09-10")],[f("A",200,"2026-10-10"),f("B",300,"2026-11-01"),f("Y",90,"2026-12-01"),f("B",999,"2026-11-02","LOW")],[p("A","AAA"),p("B","BBB"),p("C","CCC")]);
+assert.equal(x.both,1);assert.equal(x.futureOnly,1);assert.equal(x.none,1);assert.equal(x.actualOnly,0);assert.equal(x.legacyActualNet,70);assert.equal(x.unmatchedFutureGross,90);assert.equal(x.rows.find(r=>r.position.ticker==="AAA")!.actualNet,150);assert.equal(x.rows.find(r=>r.position.ticker==="BBB")!.futureGross,300);
+console.log("incomeContinuityV78: ok");
