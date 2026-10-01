@@ -1,0 +1,18 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const calendar=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(calendar,/findPayoutEventPosition/);
+assert.match(calendar,/payoutEventIsConfirmed/);
+assert.match(calendar,/positions=\[\],onOpenAsset/);
+assert.match(calendar,/qpay-event-row/);
+assert.match(calendar,/HIGH · подтверждено/);
+assert.match(calendar,/FIGI —/);
+assert.match(calendar,/qpay-next-event/);
+assert.match(calendar,/Открыть актив ›/);
+assert.ok(core.includes('<CorePayoutCalendar compact positions={positions} onOpenAsset={openAsset} onOpenCalendar={()=>setIncomeMode("calendar")}/>'));
+assert.ok(core.includes('incomeMode==="calendar"?<CorePayoutCalendar positions={positions} onOpenAsset={openAsset}/>'));
+assert.match(css,/v71 · payout event → asset drilldown/);
+assert.match(css,/\.qpay-next-event/);
+assert.match(css,/\.qpay-event-row:not\(:disabled\):active/);
+console.log("coreIncomeAssetLinksV71: ok");
