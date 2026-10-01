@@ -22,10 +22,10 @@ export function V3MarketLayer({relative,window,onWindowChange,market}:{relative:
       <article><span>Разница с IMOEX</span><strong className={cls(relative.excessReturn)}>{pct(relative.excessReturn)}</strong><small>портфель − IMOEX</small></article>
       <article><span>Парных доходностей</span><strong>{relative.pairedReturns}</strong><small>минимум {relative.minimumReturns} · зрелая выборка {relative.matureReturns}</small></article>
     </div>
-    {advanced?<details className="v3-analysis-disclosure"><summary><span><b>Относительные коэффициенты</b><small>Tracking Error · Information Ratio · beta · корреляция</small></span><i aria-hidden="true">⌄</i></summary><div className="v3-relative-advanced">
+    {advanced?<details className="v3-analysis-disclosure"><summary><span><b>Относительные коэффициенты</b><small>Ошибка слежения · информационное отношение · бета · корреляция</small></span><i aria-hidden="true">⌄</i></summary><div className="v3-relative-advanced">
       <article><span>Ошибка слежения <V3MetricHelp topic="trackingError"/></span><strong>{pct(relative.trackingError)}</strong></article>
       <article><span>Информационное отношение</span><strong className={cls(relative.informationRatio)}>{ratio(relative.informationRatio)}</strong></article>
-      <article><span>Beta <V3MetricHelp topic="beta"/></span><strong>{ratio(relative.beta)}</strong></article>
+      <article><span>Бета <V3MetricHelp topic="beta"/></span><strong>{ratio(relative.beta)}</strong></article>
       <article><span>Корреляция</span><strong>{ratio(relative.correlation)}</strong></article>
     </div></details>:<div className="v3-analysis-gate">{relative.note}</div>}
     <div className="v3-analysis-sample"><span>Общая выборка</span><strong>{relative.sampleFrom&&relative.sampleTo?dateFmt.format(new Date(relative.sampleFrom+"T00:00:00Z"))+" → "+dateFmt.format(new Date(relative.sampleTo+"T00:00:00Z")):"—"}</strong><small>{relative.overlapPoints} общих точек · дубликатов схлопнуто {relative.duplicateRowsCollapsed}</small></div></>:<div className={"v3-analysis-gate"+(relative.status==="invalid_history"?" is-danger":"")}>{relative.note}</div>}
