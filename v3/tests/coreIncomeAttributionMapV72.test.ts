@@ -1,0 +1,17 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const calendar=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(calendar,/buildPayoutAttribution/);
+assert.match(calendar,/ПОДТВЕРЖДЁННЫЙ ПОТОК ПО ПОЗИЦИЯМ/);
+assert.match(calendar,/Кто формирует будущие выплаты/);
+assert.match(calendar,/Крупнейший вклад/);
+assert.match(calendar,/Топ-3/);
+assert.match(calendar,/Не связано/);
+assert.match(calendar,/без догадок/);
+assert.match(calendar,/только HIGH-события и только точное совпадение FIGI/);
+assert.match(calendar,/qpay-attribution--compact/);
+assert.match(calendar,/onOpenAsset\?\.\(row\.position\)/);
+assert.match(css,/v72 · confirmed payout attribution map/);
+assert.match(css,/\.qpay-attribution-kpis/);
+assert.match(css,/\.qpay-attribution-list/);
+console.log("coreIncomeAttributionMapV72: ok");

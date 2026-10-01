@@ -43,3 +43,41 @@
  .qpay-next-event>i{font-size:6.5px}
  .qpay-event-row small{display:none}
 }
+
+
+/* v72 · confirmed payout attribution map */
+.qpay-attribution{margin-top:9px;padding:10px;border:1px solid #e4e8ee;border-radius:10px;background:#fbfcfd}
+.qpay-attribution>header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px}
+.qpay-attribution>header>div{display:grid;gap:2px}.qpay-attribution>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-attribution>header b{font-size:11px}.qpay-attribution>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-attribution-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.qpay-attribution-kpis article{min-width:0;padding:8px;border-radius:8px;background:#f3f5f7;display:grid;gap:2px}
+.qpay-attribution-kpis span,.qpay-attribution-kpis small{font-size:6.8px;color:#7a828d}.qpay-attribution-kpis strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-attribution-list{display:grid;margin-top:7px}
+.qpay-attribution-list button{display:grid;grid-template-columns:minmax(90px,1fr) minmax(70px,1.2fr) 78px 36px;gap:7px;align-items:center;width:100%;padding:7px 2px;border:0;border-top:1px solid #e7e9ed;background:transparent;color:#161a1f;text-align:left}
+.qpay-attribution-list button>span{display:grid;min-width:0}.qpay-attribution-list button>span b{font-size:9px}.qpay-attribution-list button>span small{font-size:6.8px;color:#7a828d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-attribution-list button>i{height:5px;border-radius:999px;background:#e8edf3;overflow:hidden}.qpay-attribution-list button>i>b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#93a7c5,#4e77c8)}
+.qpay-attribution-list button>strong{font-size:9px;text-align:right}.qpay-attribution-list button>em{font-style:normal;font-size:8px;color:#4e77c8;text-align:right}
+.qpay-attribution-list button:active{background:#f5f8fc}
+.qpay-attribution>footer{margin-top:6px;padding-top:6px}
+.qpay-attribution--compact{padding:8px;margin-top:6px}
+.qpay-attribution--compact .qpay-attribution-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+.qpay-attribution--compact .qpay-attribution-list button{grid-template-columns:minmax(82px,1fr) minmax(64px,1fr) 74px}
+.qpay-attribution--compact .qpay-attribution-list button>em{display:none}
+@media(max-width:640px){
+ .qpay-attribution{padding:8px}
+ .qpay-attribution>header{margin-bottom:5px}
+ .qpay-attribution>header b{font-size:10px}
+ .qpay-attribution-kpis{grid-template-columns:1fr 1fr;gap:4px}
+ .qpay-attribution-kpis article{padding:7px}
+ .qpay-attribution-list{margin-top:5px}
+ .qpay-attribution-list button{grid-template-columns:minmax(74px,1fr) minmax(54px,.9fr) 64px 28px;gap:5px;padding:6px 1px}
+ .qpay-attribution-list button>span b{font-size:8.5px}.qpay-attribution-list button>span small{font-size:6.3px}
+ .qpay-attribution-list button>strong{font-size:8px}.qpay-attribution-list button>em{font-size:7px}
+ .qpay-attribution--compact .qpay-attribution-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .qpay-attribution--compact .qpay-attribution-kpis article{padding:6px 5px}
+ .qpay-attribution--compact .qpay-attribution-list button{grid-template-columns:minmax(72px,1fr) minmax(50px,.8fr) 62px}
+}
+@media(max-width:359px){
+ .qpay-attribution--compact .qpay-attribution-kpis{grid-template-columns:1fr 1fr}
+ .qpay-attribution--compact .qpay-attribution-kpis article:first-child{grid-column:1/-1}
+}
