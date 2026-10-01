@@ -1,0 +1,18 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const calendar=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(core,/CorePayoutCalendar compact onOpenCalendar={()=>setIncomeMode("calendar")}/);
+assert.match(core,/Будущее расписание выше показывается отдельно и только из подтверждённого календаря/);
+assert.match(calendar,/compact=false,onOpenCalendar/);
+assert.match(calendar,/qpay qpay-compact/);
+assert.match(calendar,/БЛИЖАЙШИЕ ВЫПЛАТЫ/);
+assert.match(calendar,/12М расписание/);
+assert.match(calendar,/официального расписания/);
+assert.match(calendar,/FUTURE · GROSS/);
+assert.match(calendar,/не уже полученный доход и не гарантия выплаты/);
+assert.match(calendar,/Открыть полный календарь →/);
+assert.match(css,/v70 · compact income command-center preview/);
+assert.match(css,/\.qpay-compact-kpis/);
+assert.match(css,/\.qpay-compact-months/);
+console.log("coreIncomeCommandCenterV70: ok");
