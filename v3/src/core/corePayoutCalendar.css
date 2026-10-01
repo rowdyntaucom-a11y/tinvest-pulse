@@ -199,3 +199,10 @@
  .qpay-source-horizon-row{grid-template-columns:minmax(78px,1fr) repeat(2,minmax(48px,.72fr)) 14px}.qpay-source-horizon-row i:nth-of-type(3),.qpay-source-horizon-row i:nth-of-type(4){display:none}
  .qpay-source-horizon--compact .qpay-source-horizon-row{grid-template-columns:minmax(72px,1fr) repeat(2,minmax(46px,.72fr)) 12px}.qpay-source-horizon--compact .qpay-source-horizon-row i:nth-of-type(3){display:none}
 }
+
+
+/* v76 · payout section navigation */
+.qpay-section-nav{position:sticky;top:54px;z-index:18;display:flex;gap:4px;overflow-x:auto;margin:8px 0;padding:4px;border:1px solid #e2e7ee;border-radius:10px;background:rgba(250,252,255,.94);backdrop-filter:blur(10px);box-shadow:0 5px 14px rgba(20,31,46,.05);scrollbar-width:none;overscroll-behavior-x:contain}
+.qpay-section-nav::-webkit-scrollbar{display:none}.qpay-section-nav button{flex:0 0 auto;min-height:32px;padding:0 10px;border:0;border-radius:7px;background:#fff;color:#617087;font-size:7.5px;font-weight:800;box-shadow:inset 0 0 0 1px #e6ebf1}.qpay-section-nav button:active{background:#eef3f9;color:#243247}
+#qpay-structure-section,#qpay-source-section,#qpay-runway-section,#qpay-attribution-section,#qpay-months-section{scroll-margin-top:102px}
+@media(max-width:640px){.qpay-section-nav{top:48px;margin:6px 0;padding:3px}.qpay-section-nav button{min-height:30px;padding:0 9px;font-size:7px}}
