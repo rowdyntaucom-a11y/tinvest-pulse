@@ -1016,3 +1016,32 @@
  .sb-experience-toggle{min-width:82px!important;padding:6px 8px!important}
  .sb-experience-toggle>small{font-size:6.5px!important}
 }
+
+
+/* v62 · portfolio contribution map */
+.sb-contribution-map{background:#fff;border:1px solid var(--s-line);border-radius:16px;padding:14px;margin-bottom:10px}
+.sb-contribution-map>header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+.sb-contribution-map>header>div{display:grid;gap:3px}.sb-contribution-map>header span{font-size:7px;letter-spacing:.11em;color:var(--s-blue);font-weight:800}.sb-contribution-map>header h2{margin:0;font-size:14px}.sb-contribution-map>header small{font-size:7.5px;color:var(--s-muted);line-height:1.4}.sb-contribution-map>header>b{font-size:9px;color:var(--s-muted)}
+.sb-contribution-map__plot{border:1px solid #e7ebf0;border-radius:13px;background:linear-gradient(#fbfcfe,#f7f9fb);padding:8px 8px 5px}
+.sb-contribution-map__plot svg{display:block;width:100%;height:220px;overflow:visible}
+.sb-contribution-map__plot .axis{stroke:#cfd6df;stroke-width:.45}.sb-contribution-map__plot .grid{stroke:#e7ebf0;stroke-width:.32;stroke-dasharray:2 2}
+.sb-contribution-map__plot g{cursor:pointer;outline:none}.sb-contribution-map__plot g circle{stroke:#fff;stroke-width:.7;vector-effect:non-scaling-stroke}.sb-contribution-map__plot g.up circle{fill:#32ad7d}.sb-contribution-map__plot g.down circle{fill:#d16b71}.sb-contribution-map__plot g.flat circle{fill:#8d99a8}
+.sb-contribution-map__plot g:focus circle,.sb-contribution-map__plot g:hover circle{stroke:#1e3a5f;stroke-width:1.2}.sb-contribution-map__plot text{font-size:3.2px;font-weight:800;fill:#394658;text-anchor:middle;pointer-events:none}
+.sb-contribution-map__labels{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:3px;color:var(--s-muted);font-size:7px}.sb-contribution-map__labels span:last-child{text-align:right}.sb-contribution-map__labels b{font-weight:600;color:#8a95a3}
+.sb-contribution-map__summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:8px}.sb-contribution-map__summary article{padding:9px;border:1px solid var(--s-line);border-radius:10px;background:#fafbfc}.sb-contribution-map__summary span,.sb-contribution-map__summary small{display:block;color:var(--s-muted);font-size:7px}.sb-contribution-map__summary strong{display:block;margin:4px 0 2px;font-size:12px}
+.sb-contribution-map__table{margin-top:9px;border-top:1px solid var(--s-line)}.sb-contribution-map__table>header,.sb-contribution-map__table>button{display:grid;grid-template-columns:minmax(130px,1.6fr) minmax(60px,.65fr) minmax(74px,.75fr) minmax(90px,.9fr);gap:8px;align-items:center}.sb-contribution-map__table>header{padding:8px 2px 5px;color:var(--s-muted);font-size:7px}.sb-contribution-map__table>header span:not(:first-child){text-align:right}.sb-contribution-map__table>button{width:100%;padding:8px 2px;border:0;border-top:1px solid #edf0f3;background:transparent;color:var(--s-text);text-align:left}.sb-contribution-map__table>button:hover{background:#fafbfc}.sb-contribution-map__table>button>strong,.sb-contribution-map__table>button>em,.sb-contribution-map__table>button>i{font-size:8px;font-style:normal;font-weight:800;text-align:right}
+.sb-contribution-map__note{margin:9px 1px 0;color:var(--s-muted);font-size:7.5px;line-height:1.45}
+@media(max-width:699px){
+ .sb-contribution-map{padding:11px;border-radius:13px}
+ .sb-contribution-map>header h2{font-size:12px}.sb-contribution-map>header small{font-size:7.5px}
+ .sb-contribution-map__plot{padding:6px 5px 4px}.sb-contribution-map__plot svg{height:170px}.sb-contribution-map__plot text{font-size:3.5px}
+ .sb-contribution-map__summary{grid-template-columns:1fr 1fr 1fr;gap:5px}.sb-contribution-map__summary article{padding:8px 6px}.sb-contribution-map__summary strong{font-size:10px}
+ .sb-contribution-map__table>header{display:none}.sb-contribution-map__table>button{grid-template-columns:minmax(118px,1.4fr) 50px 62px 70px;gap:6px;padding:8px 0}.sb-contribution-map__table>button .sb-market-asset small{display:none}.sb-contribution-map__table>button>strong,.sb-contribution-map__table>button>em,.sb-contribution-map__table>button>i{font-size:7.5px}
+ .sb-contribution-map__note{font-size:7.5px}
+}
+@media(min-width:1000px){
+ .sb-contribution-map{padding:18px}.sb-contribution-map>header h2{font-size:16px}.sb-contribution-map>header small{font-size:9px}
+ .sb-contribution-map__plot svg{height:300px}.sb-contribution-map__plot text{font-size:2.7px}
+ .sb-contribution-map__summary article{padding:12px}.sb-contribution-map__summary span,.sb-contribution-map__summary small{font-size:8px}.sb-contribution-map__summary strong{font-size:15px}
+ .sb-contribution-map__table>header{font-size:8px}.sb-contribution-map__table>button>strong,.sb-contribution-map__table>button>em,.sb-contribution-map__table>button>i{font-size:9px}
+}
