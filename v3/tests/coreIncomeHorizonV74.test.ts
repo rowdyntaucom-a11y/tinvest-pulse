@@ -1,0 +1,15 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const calendar=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(calendar,/buildPayoutHorizon/);
+assert.match(calendar,/ГОРИЗОНТ ПОДТВЕРЖДЁННЫХ СОБЫТИЙ/);
+assert.match(calendar,/30 \/ 90 \/ 180 \/ 365 дней/);
+assert.match(calendar,/Ближайшее событие/);
+assert.match(calendar,/HIGH-событий/);
+assert.match(calendar,/HIGH gross/);
+assert.match(calendar,/Это описание подтверждённого расписания, а не ожидаемая доходность/);
+assert.match(calendar,/qpay-horizon--compact/);
+assert.match(css,/v74 · confirmed payout horizon/);
+assert.match(css,/\.qpay-horizon-grid/);
+assert.match(css,/\.qpay-horizon-lead/);
+console.log("coreIncomeHorizonV74: ok");

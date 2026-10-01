@@ -113,3 +113,31 @@
  .qpay-runway--compact .qpay-runway-kpis{grid-template-columns:1fr 1fr}
  .qpay-runway--compact .qpay-runway-kpis article:first-child{grid-column:1/-1}
 }
+
+
+/* v74 · confirmed payout horizon */
+.qpay-horizon{margin-top:9px;padding:10px;border:1px solid #e3e8ef;border-radius:10px;background:linear-gradient(180deg,#fcfdff,#f7f9fc)}
+.qpay-horizon>header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}
+.qpay-horizon>header>div{display:grid;gap:2px}.qpay-horizon>header span{font-size:7px;letter-spacing:.08em;color:#4e77c8}.qpay-horizon>header b{font-size:11px}.qpay-horizon>header small{font-size:7px;color:#7a828d;text-align:right}
+.qpay-horizon-lead{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:6px}
+.qpay-horizon-lead article,.qpay-horizon-grid article{display:grid;gap:2px;min-width:0;padding:8px;border-radius:8px;background:#f2f5f8}
+.qpay-horizon-lead span,.qpay-horizon-lead small,.qpay-horizon-grid span,.qpay-horizon-grid small{font-size:6.7px;color:#7a828d}
+.qpay-horizon-lead strong,.qpay-horizon-grid strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-horizon-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.qpay-horizon>footer{margin-top:6px;padding-top:6px}
+.qpay-horizon--compact{padding:8px;margin-top:6px}
+.qpay-horizon--compact .qpay-horizon-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.qpay-horizon--compact .qpay-horizon-grid article{padding:6px}
+@media(max-width:640px){
+ .qpay-horizon{padding:8px}.qpay-horizon>header{margin-bottom:5px}.qpay-horizon>header b{font-size:10px}
+ .qpay-horizon-lead{gap:4px}.qpay-horizon-lead article{padding:7px 6px}
+ .qpay-horizon-grid{grid-template-columns:1fr 1fr;gap:4px}.qpay-horizon-grid article{padding:7px}
+ .qpay-horizon--compact .qpay-horizon-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+ .qpay-horizon--compact .qpay-horizon-grid article{padding:5px 4px}
+ .qpay-horizon--compact .qpay-horizon-grid strong{font-size:9px}
+ .qpay-horizon--compact .qpay-horizon-grid small{display:none}
+}
+@media(max-width:359px){
+ .qpay-horizon-lead{grid-template-columns:1fr 1fr}.qpay-horizon-lead article:first-child{grid-column:1/-1}
+ .qpay-horizon--compact .qpay-horizon-grid{grid-template-columns:1fr 1fr}
+}
