@@ -1,0 +1,3 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8"),css=fs.readFileSync(new URL("../src/core/corePayoutCalendar.css",import.meta.url),"utf8");
+assert.match(core,/buildIncomeContinuity/);assert.match(core,/qpay-continuity/);assert.match(core,/ФАКТ ↔ ПОДТВЕРЖДЁННОЕ БУДУЩЕЕ/);assert.match(core,/FACT NET/);assert.match(core,/FUTURE GROSS/);assert.match(core,/не складываются/iu);assert.match(core,/qpay-continuity-section/);assert.match(css,/v78 · income continuity workspace/);assert.match(css,/\.qpay-continuity-table/);assert.match(css,/\.qpay-continuity--compact/);console.log("coreIncomeContinuityV78: ok");
