@@ -1,0 +1,16 @@
+import fs from"node:fs";import assert from"node:assert/strict";
+const core=fs.readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const css=fs.readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.match(core,/compact=\{layout==="phone"\}/,"phone layout must compact PortfolioPulse");
+assert.match(core,/data-compact=\{compact\?"true":"false"\}/,"PortfolioPulse must expose compact state");
+assert.match(core,/aria-label="Навигация по бумаге"/,"asset drill-down must expose jump navigation");
+assert.match(core,/id="asset-position"/);
+assert.match(core,/id="asset-context"/);
+assert.match(core,/id="asset-history"/);
+assert.doesNotMatch(core,/дневн(ая|ой) доходност/iu,"v59 must not relabel broker open-position P\/L as daily return");
+assert.match(css,/v59 · mobile decision flow/);
+assert.match(css,/\.sb-asset-jump\{position:sticky/);
+assert.match(css,/\.sb\[data-layout="desktop"\] \.sb-asset-detail\{display:grid/);
+assert.match(css,/\.sb-portfolio-pulse\[data-compact="true"\]/);
+assert.match(css,/\.sb-home-brief small\{display:none\}/);
+console.log("coreMobileDecisionFlowV59: ok");
