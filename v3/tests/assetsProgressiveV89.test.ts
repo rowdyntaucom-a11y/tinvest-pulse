@@ -1,0 +1,9 @@
+import assert from"node:assert/strict";
+import{readFileSync}from"node:fs";
+import{buildAssetsWorkspaceSummary}from"../src/assets/assetsWorkspaceSummary.ts";
+const p=(ticker:string,value:number,basis:number,pnl:number)=>({ticker,name:ticker,currentValue:value,costBasis:basis,expectedYield:pnl,weight:0,quantity:1,currentPrice:value,instrumentType:"share",figi:"FIGI-"+ticker,instrumentUid:"UID-"+ticker}) as any;
+const model=buildAssetsWorkspaceSummary([p("AAA",60,50,10),p("BBB",30,40,-10),p("CCC",10,10,0)]);
+assert.equal(model.total,100);assert.equal(model.basis,100);assert.equal(model.pnl,0);assert.equal(model.positionCount,3);assert.equal(model.positiveCount,1);assert.equal(model.negativeCount,1);assert.equal(model.flatCount,1);assert.equal(model.top1,.6);assert.equal(model.top3,1);assert.ok(model.effectiveCount&&model.effectiveCount>2);assert.equal(model.largest?.ticker,"AAA");assert.equal(model.mosaic.length,3);
+const view=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/assetsProgressiveV89.css",import.meta.url),"utf8");
+assert.match(view,/buildAssetsWorkspaceSummary/);assert.match(view,/value:"summary"/);assert.match(view,/value:"positions"/);assert.match(view,/value:"structure"/);assert.match(view,/value:"pro"/);assert.match(view,/КАРТА КАПИТАЛА/);assert.match(view,/размер ≈ доля капитала/);assert.match(view,/это не рейтинг и не торговый сигнал/);assert.match(view,/mode==="simple"\|\|view==="summary"/);assert.match(view,/view==="pro"/);assert.match(view,/onOpenAsset\?\.\(item\)/);assert.match(css,/v3-assets-capital-map__mosaic/);assert.match(css,/max-width:430px/);assert.doesNotMatch(view,/Math\.random|прогноз доходности|купить|продать/i);
+console.log("v3 Assets progressive visual workspace v89: ok");
