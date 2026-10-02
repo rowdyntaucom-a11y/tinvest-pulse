@@ -1,0 +1,175 @@
+/* QVANIX v90 — Mobile Product Polish
+   Product-level cleanup for the light Core shell after real-device recording.
+   No financial calculations live here; this file only changes hierarchy, density
+   and progressive disclosure of already available information. */
+
+/* The Core header remains sticky, but uses less vertical space on phones. */
+@media(max-width:620px){
+  .sb .sb-top{
+    height:46px;
+    min-height:46px;
+    padding:0 10px;
+    box-shadow:0 1px 0 rgba(22,26,31,.04);
+  }
+  .sb .sb-top>button:first-child{gap:7px}
+  .sb .sb-top>button:first-child>i{width:28px;height:28px;border-radius:8px}
+  .sb .sb-top>button:first-child span small{display:none}
+  .sb .sb-top b{font-size:10px}
+  .sb .sb-top-actions{gap:5px}
+  .sb .sb-experience-toggle{min-height:34px!important;padding:4px 8px!important}
+  .sb .sb-experience-toggle small{display:none!important}
+  .sb .sb-tour-button{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important}
+  .sb .sb-data-status{min-height:34px!important;padding:4px 7px!important}
+  .sb .sb-data-status small{display:none!important}
+  .sb main{padding-top:8px}
+  .sb .sb-title{padding:2px 2px 8px}
+  .sb .sb-title h1{font-size:21px;line-height:1.05}
+  .sb .sb-title span{font-size:7.5px}
+}
+
+/* Portfolio navigator: treat it as orientation, not another dashboard wall. */
+.sb .sb-workspace-guide{
+  margin:0 0 9px;
+  padding:11px 12px;
+  border:1px solid var(--s-line);
+  border-radius:13px;
+  background:linear-gradient(180deg,#fff,#fbfcfd);
+}
+.sb .sb-workspace-guide>header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.sb .sb-workspace-guide>header span{display:block;color:var(--s-blue);font-size:7px;font-weight:800;letter-spacing:.09em}
+.sb .sb-workspace-guide>header b{display:block;margin-top:3px;font-size:10px;line-height:1.2}
+.sb .sb-workspace-guide>header>small{color:var(--s-muted);font-size:7px}
+.sb .sb-workspace-guide__signals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.sb .sb-workspace-guide__signals article{min-width:0;padding:8px;border:1px solid #edf0f4;border-radius:9px;background:#fff}
+.sb .sb-workspace-guide__signals span,.sb .sb-workspace-guide__signals small{display:block;color:var(--s-muted);font-size:7px;line-height:1.2}
+.sb .sb-workspace-guide__signals strong{display:block;margin:4px 0 2px;font-size:11px;line-height:1.1}
+.sb .sb-workspace-guide__routes{display:flex;gap:5px;margin-top:7px;overflow-x:auto;scrollbar-width:none}
+.sb .sb-workspace-guide__routes::-webkit-scrollbar{display:none}
+.sb .sb-workspace-guide__routes button{flex:0 0 auto;min-height:38px;padding:7px 10px;border:1px solid var(--s-line);border-radius:999px;background:#f8f9fb;font-size:8px;font-weight:800;text-align:left}
+.sb .sb-workspace-guide__routes button small{display:inline;margin-left:5px;color:var(--s-muted);font-size:7px;font-weight:500}
+@media(max-width:430px){
+  .sb .sb-workspace-guide{padding:9px 10px}
+  .sb .sb-workspace-guide__signals{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+  .sb .sb-workspace-guide__signals::-webkit-scrollbar{display:none}
+  .sb .sb-workspace-guide__signals article{flex:0 0 118px}
+  .sb .sb-workspace-guide__routes button small{display:none}
+}
+
+/* Income overview must answer quickly. Diagnostic/accounting layers stay out of
+   the compact overview; they remain available in full calendar/depth routes. */
+.sb .qpay.qpay-compact .qpay-tax--compact,
+.sb .qpay.qpay-compact .qpay-continuity--compact{
+  display:none!important;
+}
+.sb .qpay.qpay-compact{padding:12px!important}
+.sb .qpay.qpay-compact>header{margin-bottom:8px!important}
+.sb .qpay.qpay-compact .qpay-compact-kpis{gap:5px!important}
+.sb .qpay.qpay-compact .qpay-compact-kpis article{padding:8px!important}
+.sb .qpay.qpay-compact .qpay-actual--compact{margin-top:9px!important;padding-top:9px!important}
+
+/* FACT history: stronger chart, quieter audit labels. Complete vs partial months
+   remain explicit through border/fill treatment and text. */
+.sb .v3-income-history-bars,
+.sb .qpay-actual-bars{
+  align-items:end;
+  gap:5px!important;
+}
+.sb .v3-income-history-bars article,
+.sb .qpay-actual-bars>div{
+  min-width:0;
+}
+.sb .v3-income-history-bars article>div,
+.sb .qpay-actual-bars>div>i{
+  min-height:74px!important;
+  border-radius:8px 8px 3px 3px!important;
+  background:linear-gradient(180deg,#f7f9fc,#eef2f6)!important;
+  overflow:hidden;
+}
+.sb .v3-income-history-bars article>div>i,
+.sb .qpay-actual-bars>div>i>b{
+  border-radius:6px 6px 2px 2px!important;
+  background:linear-gradient(180deg,#6f91d2,#4e77c8)!important;
+}
+.sb .v3-income-history-bars article.is-partial>div>i,
+.sb .qpay-actual-bars>div[data-observation="partial"]>i>b{
+  opacity:.42!important;
+  background:repeating-linear-gradient(135deg,#8ba2c8 0 5px,#b9c6da 5px 10px)!important;
+}
+.sb .v3-income-history-bars article>strong,
+.sb .qpay-actual-bars>div>span{font-size:7px!important;color:var(--s-muted)!important}
+.sb .v3-income-history-bars article>span{font-size:8px!important;font-weight:800!important}
+.sb .v3-income-history-bars article>small{font-size:6.5px!important;color:#9aa1aa!important}
+@media(max-width:430px){
+  .sb .v3-income-history-bars{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+  .sb .qpay-actual-bars{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+  .sb .v3-income-history-bars article:nth-child(-n+6),
+  .sb .qpay-actual-bars>div:nth-child(-n+6){margin-bottom:6px}
+}
+
+/* Data Trust is professional diagnostics. Keep it readable but visually secondary
+   to actual income and confirmed calendar. */
+.sb .v3-income-trust{
+  border-color:#edf0f4!important;
+  background:#fbfcfd!important;
+  box-shadow:none!important;
+}
+.sb .v3-income-trust>header h3{font-size:15px!important}
+.sb .v3-income-trust>header span{font-size:7px!important;letter-spacing:.08em!important}
+.sb .v3-income-trust-grid{gap:5px!important}
+.sb .v3-income-trust-grid article{padding:8px!important;background:#fff!important}
+.sb .v3-income-trust-grid article strong{font-size:11px!important}
+.sb .v3-income-trust-reconcile{opacity:.76}
+.sb .v3-income-trust>footer{font-size:7px!important;color:#9aa1aa!important}
+
+/* Full tax ledger remains available, but reads as an accounting diagnostic rather
+   than a primary payout card. Missing gross now produces a dash from the model,
+   never a fabricated negative reconciliation. */
+.sb .qpay-tax:not(.qpay-tax--compact){
+  border-style:dashed!important;
+  border-color:#dfe3e9!important;
+  background:#fbfcfd!important;
+}
+.sb .qpay-tax:not(.qpay-tax--compact)>header span{color:#8b939e!important;font-size:7px!important}
+.sb .qpay-tax:not(.qpay-tax--compact) .qpay-tax-grid article{background:#fff!important}
+
+/* Market screener: show the current descriptive snapshot first, then let filters
+   behave like compact controls instead of another card wall. */
+.sb .sam-screener__snapshot{
+  margin:0 0 10px;
+  padding:11px;
+  border:1px solid var(--s-line);
+  border-radius:12px;
+  background:linear-gradient(180deg,#fff,#f8fafc);
+}
+.sb .sam-screener__snapshot>header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.sb .sam-screener__snapshot>header span{display:block;color:var(--s-blue);font-size:7px;font-weight:800;letter-spacing:.09em}
+.sb .sam-screener__snapshot>header strong{display:block;margin-top:3px;font-size:11px}
+.sb .sam-screener__snapshot>header small{color:var(--s-muted);font-size:7px}
+.sb .sam-screener__snapshot>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:8px}
+.sb .sam-screener__snapshot article{min-width:0;padding:8px;border:1px solid #edf0f4;border-radius:9px;background:#fff}
+.sb .sam-screener__snapshot article span,.sb .sam-screener__snapshot article small{display:block;color:var(--s-muted);font-size:7px;line-height:1.25}
+.sb .sam-screener__snapshot article strong{display:flex;align-items:center;gap:4px;margin:4px 0 2px;font-size:12px}
+.sb .sam-screener__snapshot article strong em{color:#b1b6bd;font-style:normal;font-size:9px}
+.sb .sam-screener__snapshot .is-positive{color:var(--s-green)!important}
+.sb .sam-screener__snapshot .is-negative{color:var(--s-red)!important}
+.sb .sam-screener__snapshot>footer{margin-top:8px;padding-top:7px;border-top:1px solid #edf0f4;color:var(--s-muted);font-size:7px;line-height:1.4}
+.sb .sam-screener__filter-block>div{display:flex!important;gap:5px!important;overflow-x:auto!important;scrollbar-width:none!important}
+.sb .sam-screener__filter-block>div::-webkit-scrollbar{display:none}
+.sb .sam-screener__filter-block button{flex:0 0 auto!important;min-height:34px!important;padding:7px 10px!important;border-radius:999px!important}
+@media(max-width:430px){
+  .sb .sam-screener__snapshot>div{display:flex;overflow-x:auto;scrollbar-width:none}
+  .sb .sam-screener__snapshot>div::-webkit-scrollbar{display:none}
+  .sb .sam-screener__snapshot article{flex:0 0 132px}
+  .sb .sam-screener__search{grid-template-columns:1fr!important}
+}
+
+/* Deep Income selector and method copy are still present, but no longer dominate
+   a phone viewport before the user reaches the data itself. */
+@media(max-width:520px){
+  .sb .v3-income-depth-head{margin-bottom:8px!important}
+  .sb .v3-income-depth-head h2{font-size:16px!important}
+  .sb .v3-income-depth-status{padding:6px 8px!important}
+  .sb .v3-income-method{font-size:7px!important;line-height:1.35!important;color:#9299a2!important}
+  .sb .v3-income-quality-grid,.sb .v3-income-history-stats{gap:5px!important}
+  .sb .v3-income-quality-grid article,.sb .v3-income-history-stats article{padding:8px!important}
+}
