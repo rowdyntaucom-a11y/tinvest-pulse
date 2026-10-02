@@ -12,5 +12,7 @@ assert.match(app,/void loadV3Analysis\(\);void loadV3AssetWorkspace\(\);void loa
 assert.doesNotMatch(app,/setTimeout\(\(\)=>\{void loadV3Analysis/);
 for(const fn of["calculatePortfolioAnalytics","calculateRelativePerformance","calculateRollingRisk","calculateTailRisk"])assert.match(depth,new RegExp(fn));
 for(const layer of["V3ReturnLayer","V3RiskLayer","V3MarketLayer"])assert.match(analysis,new RegExp(layer));
-assert.match(analysis,/useState<"overview"\|"return"\|"risk"\|"structure"\|"market">/);
+assert.match(analysis,/type AnalysisSection="summary"\|"overview"\|"tools"\|"return"\|"risk"\|"structure"\|"market"/);
+assert.match(analysis,/useState<AnalysisSection>\("summary"\)/);
+assert.match(analysis,/V3AnalysisToolbox=lazy/);
 console.log("v3 preloaded analytics engine contracts: ok");

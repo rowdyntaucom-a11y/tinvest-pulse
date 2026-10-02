@@ -3,6 +3,7 @@ import{calculatePortfolioAnalytics}from"../../v2/src/features/analytics/metrics.
 import{calculateRelativePerformance}from"../../v2/src/features/analytics/relativePerformance.ts";
 import{calculateRollingRisk}from"../../v2/src/features/analytics/rollingRisk.ts";
 import{calculateTailRisk}from"../../v2/src/features/analytics/tailRisk.ts";
+import{buildAnalysisWorkspaceSummary}from"../src/analysis/analysisWorkspaceSummary.ts";
 
 const start=Date.UTC(2025,0,1);
 const history=Array.from({length:300},(_,i)=>({
@@ -11,8 +12,8 @@ const history=Array.from({length:300},(_,i)=>({
   imoex:100*Math.pow(1.0005,i),
 }));
 const positions=[
-  {ticker:"A",name:"A",instrumentType:"share",currentValue:60},
-  {ticker:"B",name:"B",instrumentType:"bond",currentValue:40},
+  {ticker:"A",name:"A",instrumentType:"share",currentValue:60,weight:.6,expectedYield:5},
+  {ticker:"B",name:"B",instrumentType:"bond",currentValue:40,weight:.4,expectedYield:-2},
 ];
 const portfolio=calculatePortfolioAnalytics(history,positions,10);
 assert.equal(portfolio.historyIntegrity,"OK");
@@ -33,4 +34,13 @@ assert.equal(tail.returns,299);
 const conflict=[history[0],{...history[0],portfolio:999},...history.slice(1,5)];
 assert.equal(calculatePortfolioAnalytics(conflict,positions,10).historyIntegrity,"CONFLICT");
 assert.equal(calculateRelativePerformance(conflict).status,"invalid_history");
+const summary=buildAnalysisWorkspaceSummary({positions:positions as any,maxDrawdown:-.12,effectivePositions:1.92,historyPoints:300,historyDays:299,historyIntegrity:"OK"});
+assert.equal(summary.positionCount,2);
+assert.equal(summary.positiveCount,1);
+assert.equal(summary.negativeCount,1);
+assert.equal(summary.flatCount,0);
+assert.equal(summary.top3Weight,1);
+assert.equal(summary.largest?.ticker,"A");
+assert.equal(summary.maxDrawdownPct,12);
+assert.equal(summary.historyIntegrity,"OK");
 console.log("v3 canonical portfolio analytics depth: ok");
