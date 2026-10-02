@@ -17,12 +17,18 @@ const TOOLS:ToolDef[]=[
  {id:"futures",label:"Фьючерсы",note:"сценарий · базис · ГО",group:"scenario",hero:"Посчитать сценарий фьючерса, базис и нагрузку ГО без отправки приказов брокеру."},
  {id:"market",label:"Рынок",note:"пульс · скринер · история",group:"scenario",hero:"Открыть публичный рыночный контекст и историю без торговых сигналов."},
 ];
+const TERMS=[
+ {term:"Drift",copy:"Отклонение текущей доли класса или позиции от выбранной целевой доли."},
+ {term:"Basis / базис",copy:"Разница между ценой фьючерса и базовым активом в выбранный момент."},
+ {term:"ГО",copy:"Гарантийное обеспечение: сумма, которую биржа требует под фьючерсную позицию; это не стоимость контракта."},
+ {term:"WHAT IF",copy:"Сценарный расчёт: показывает результат заданного пользователем допущения, а не прогноз рынка."},
+]as const;
 
 function ToolLoading({label}:{label:string}){return <div className="v3-pro-tools__loading" aria-live="polite"><i/><div><strong>{label}</strong><small>Модуль подключается к текущим подтверждённым данным.</small><span aria-hidden="true"><b/><b/><b/></span></div></div>}
 
 export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:PositionSnapshot[];includeMarket?:boolean}){
  const[tool,setTool]=useState<ToolId>("rebalance");
- const[catalogOpen,setCatalogOpen]=useState(false);
+ const[catalogOpen,setCatalogOpen]=useState(false),[glossaryOpen,setGlossaryOpen]=useState(false);
  const tools=useMemo(()=>includeMarket?TOOLS:TOOLS.filter(item=>item.id!=="market"),[includeMarket]);
  const selected=tools.find(item=>item.id===tool)??tools[0];
  const groups=[
@@ -31,6 +37,7 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
  ] as const;
  return <section className="v3-pro-tools" aria-label="Профессиональные инструменты аналитики">
   <header><div><span>ПРОФЕССИОНАЛЬНЫЕ ИНСТРУМЕНТЫ</span><h2>Инструменты</h2><p>Рабочие модули сгруппированы по задаче. Открыт только выбранный инструмент, остальные не перегружают экран.</p></div><small>ТОЛЬКО ЧТЕНИЕ</small></header>
+  <section className="v3-pro-tools__glossary"><button type="button" aria-expanded={glossaryOpen} onClick={()=>setGlossaryOpen(open=>!open)}><span>Что означают термины на этой странице</span><strong>{glossaryOpen?"Скрыть":"Открыть глоссарий"}</strong></button>{glossaryOpen&&<div>{TERMS.map(item=><article key={item.term}><strong>{item.term}</strong><p>{item.copy}</p></article>)}</div>}</section>
   <section className={"v3-pro-tools__focus"+(catalogOpen?" is-catalog-open":" is-focused")}>
    <div><span>СЕЙЧАС</span><strong>{selected?.label??"Инструмент"}</strong><p>{selected?.hero}</p></div>
    <button type="button" onClick={()=>setCatalogOpen(open=>!open)}>{catalogOpen?"Скрыть выбор":"Сменить инструмент"}</button>

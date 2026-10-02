@@ -1,5 +1,6 @@
 import{useEffect,useMemo,useState}from"react";
 import"../styles/incomeDepth.css";
+import"../styles/visualComplexityV88.css";
 import{loadPayoutCalendar,type PayoutCalendar,type PayoutEvent}from"../../../v2/src/lib/payoutsApi";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{filterIncomeCalendarEvents}from"../../../v2/src/features/income/incomeCalendarVisual";
@@ -8,20 +9,23 @@ import{buildV3IncomeDepth}from"./incomeDepth";
 import{buildIncomeWorkspaceSummary}from"./incomeWorkspaceSummary";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
-import type{V3Shell}from"../app/model";
+import type{V3DetailMode,V3Shell}from"../app/model";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{V3IncomeForwardPanel}from"./V3IncomeCalendarV2";
 import{V3DividendDiscovery}from"./V3DividendDiscovery";
 import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
 
 type View="overview"|"calendar"|"history"|"sources"|"trust"|"market";
-const VIEW_OPTIONS=[
+const BASIC_VIEW_OPTIONS=[
   {value:"overview",label:"Сводка",description:"Короткий ответ: факт, ближайшая выплата и подтверждённые горизонты."},
   {value:"calendar",label:"Календарь",description:"Подтверждённое 12-месячное расписание будущих выплат."},
   {value:"history",label:"Факт",description:"Реально полученный пассивный доход по полностью наблюдавшимся месяцам."},
-  {value:"sources",label:"Источники",description:"Факт и расписание по активам с точной FIGI-связью и покрытием."},
-  {value:"trust",label:"Данные",description:"Проверка покрытия, FIGI-связности и сверка агрегатов FACT/FUTURE."},
-  {value:"market",label:"Рынок",description:"Отдельный TTM dividend discovery рынка, не доход текущего портфеля."},
+  {value:"sources",label:"Источники",description:"Факт и расписание по активам с точной FIGI-связью."},
+] as const;
+const PRO_VIEW_OPTIONS=[
+  ...BASIC_VIEW_OPTIONS,
+  {value:"trust",label:"Данные",description:"Профи: покрытие, FIGI-связность и сверка агрегатов FACT/FUTURE."},
+  {value:"market",label:"Рынок",description:"Профи: отдельный TTM dividend discovery рынка, не доход текущего портфеля."},
 ] as const;
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const rub2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -35,9 +39,11 @@ function futureAmount(event:PayoutEvent){return typeof event.gross==="number"&&N
 function monthLabel(key:string){const date=new Date(key+"-01T00:00:00Z");return Number.isNaN(date.getTime())?key:monthFmt.format(date)}
 function sourceIdentity(state:string){return state==="EXACT_FIGI"?"FIGI":state==="AMBIGUOUS_FIGI"?"FIGI неоднозначен":state==="INCOMPLETE_FIGI"?"FIGI неполный":"FIGI нет"}
 
-export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void;shell?:V3Shell}){
-  const[calendar,setCalendar]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>("overview"),[selectedMonth,setSelectedMonth]=useState<string|null>(null),samuraiReference=shell==="samurai";
+export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void;shell?:V3Shell;mode?:V3DetailMode}){
+  const[calendar,setCalendar]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>("overview"),[selectedMonth,setSelectedMonth]=useState<string|null>(null),samuraiReference=shell==="samurai",proMode=mode==="detailed";
+  const viewOptions=proMode?PRO_VIEW_OPTIONS:BASIC_VIEW_OPTIONS;
   useEffect(()=>{let active=true;setLoading(true);void loadPayoutCalendar().then(data=>{if(active){setCalendar(data);setLoadedAt(Date.now());setLoading(false)}}).catch(()=>{if(active){setCalendar(null);setLoadedAt(Date.now());setLoading(false)}});return()=>{active=false}},[]);
+  useEffect(()=>{if(!proMode&&(view==="trust"||view==="market"))setView("overview")},[proMode,view]);
   const depth=useMemo(()=>calendar?buildV3IncomeDepth(calendar,positions,loadedAt):null,[calendar,positions,loadedAt]);
   const futureEvents=depth?.trustedIncome.futureEvents??[];
   const workspaceSummary=useMemo(()=>buildIncomeWorkspaceSummary(futureEvents,calendar?.generatedAt??calendar?.period.from),[futureEvents,calendar?.generatedAt,calendar?.period.from]);
@@ -48,8 +54,8 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const historyMax=Math.max(0,...historyMonths.map(month=>month.totalNet));
   const selectedCalendar=selectedMonth?depth?.calendarMonths.find(month=>month.key===selectedMonth)??null:null;
 
-  if(loading)return <section className="v3-income-depth"><div className="v3-income-depth-state">Синхронизируем факт и официальное расписание выплат…</div>{(samuraiReference||view==="market")&&<V3DividendDiscovery/>}</section>;
-  if(!calendar||!depth)return <section className="v3-income-depth"><div className="v3-income-depth-state is-warning">Подробный слой выплат сейчас недоступен. Уже подтверждённый пассивный доход выше не заменяется нулём.</div>{samuraiReference&&<V3DividendDiscovery/>}</section>;
+  if(loading)return <section className="v3-income-depth"><div className="v3-income-depth-state">Синхронизируем факт и официальное расписание выплат…</div>{proMode&&(samuraiReference||view==="market")&&<V3DividendDiscovery/>}</section>;
+  if(!calendar||!depth)return <section className="v3-income-depth"><div className="v3-income-depth-state is-warning">Подробный слой выплат сейчас недоступен. Уже подтверждённый пассивный доход выше не заменяется нулём.</div>{proMode&&samuraiReference&&<V3DividendDiscovery/>}</section>;
 
   const coverage=depth.integrity.coveragePct;
   const scheduleReady=depth.payoutTrust.safeToCalculate;
@@ -57,17 +63,16 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const actualNet=calendar.actual.totalNet;
   const overviewNext=workspaceSummary.next;
 
-  return <section className="v3-income-depth">
-    <div className="v3-income-depth-head"><div><span>ПРОФЕССИОНАЛЬНЫЙ ДОХОД</span><h2>{!samuraiReference&&view==="overview"?"Сводка денежного потока":"Факт, календарь и источники"}</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
+  return <section className="v3-income-depth" data-detail-mode={mode}>
+    <div className="v3-income-depth-head"><div><span>{proMode?"ПРОФЕССИОНАЛЬНЫЙ ДОХОД":"ДОХОД · ПРОСТО"}</span><h2>{!samuraiReference&&view==="overview"?"Сводка денежного потока":"Факт, календарь и источники"}</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
     {samuraiReference&&<SamuraiChapterNav label="Доход Samurai" chapters={[
       {id:"sam-income-upcoming",code:"壱",label:"Ближайшие",note:"3М · 6М · 12М"},
       {id:"sam-income-calendar",code:"弐",label:"Календарь",note:"будущие подтверждённые выплаты"},
       {id:"sam-income-history",code:"参",label:"Факт",note:"реально полученный доход"},
       {id:"sam-income-sources",code:"肆",label:"Источники",note:"активы · концентрация · YoC"},
-      {id:"sam-income-trust",code:"伍",label:"Данные",note:"покрытие · FIGI · сверка"},
-      {id:"sam-income-market",code:"陸",label:"Рынок",note:"отдельный dividend discovery"}
+      ...(proMode?[{id:"sam-income-trust",code:"伍",label:"Данные",note:"покрытие · FIGI · сверка"},{id:"sam-income-market",code:"陸",label:"Рынок",note:"отдельный dividend discovery"}]:[])
     ]}/>}
-    {!samuraiReference&&<V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={VIEW_OPTIONS}/>} 
+    {!samuraiReference&&<V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={viewOptions}/>} 
 
     {!samuraiReference&&view==="overview"&&<section className="v3-income-overview" aria-label="Сводка дохода">
       <div className="v3-income-overview-lead">
@@ -79,7 +84,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
         <button type="button" onClick={()=>setView("calendar")}><span>Календарь</span><strong>Даты и события</strong><small>Месяцы, суммы и переход к активу</small></button>
         <button type="button" onClick={()=>setView("history")}><span>Факт</span><strong>{money(actualNet)}</strong><small>История уже полученных выплат</small></button>
         <button type="button" onClick={()=>setView("sources")}><span>Источники</span><strong>{depth.concentration.sourceCount||"—"}</strong><small>Позиции и структура денежного потока</small></button>
-        <button type="button" onClick={()=>setView("trust")}><span>Данные</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>Покрытие, FIGI и сверка</small></button>
+        {proMode&&<button type="button" onClick={()=>setView("trust")}><span>Данные · Профи</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>Покрытие, FIGI и сверка</small></button>}
       </div>
       <small className="v3-income-method">Сводка показывает только уже полученный факт и подтверждённые HIGH-события текущего расписания. Будущие суммы остаются gross и не складываются с FACT net.</small>
     </section>}
@@ -91,6 +96,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
         <article><span>Следующая выплата</span><strong>{scheduleReady&&next?(next.ticker||next.name):"—"}</strong><small>{scheduleReady&&next?dateFmt.format(new Date(next.date))+" · "+(futureAmount(next)==null?"сумма уточняется":rub2.format(futureAmount(next)!)+" ₽ до налога"):"нет подтверждённого события"}</small></article>
       </div>
       {!scheduleReady&&<div className="v3-income-depth-gate">{depth.payoutTrust.shortReason}. Будущий календарь fail-closed: неполное или устаревшее расписание не выдаётся за подтверждённый прогноз.</div>}
+      {scheduleReady&&depth.calendarMonths.length>0&&<div className="v3-income-month-heatmap" aria-label="Тепловая карта подтверждённых выплат на 12 месяцев">{depth.calendarMonths.map(month=>{const level=Math.max(0,Math.min(4,Math.round(month.intensity*4)));return <button type="button" key={month.key} className={(selectedMonth===month.key?"is-active ":"")+(month.count===0?"is-empty ":"")+"heat-"+level} aria-pressed={selectedMonth===month.key} onClick={()=>setSelectedMonth(selectedMonth===month.key?null:month.key)}><span>{month.label}</span><strong>{month.grossAvailable?rub.format(month.gross)+" ₽":"—"}</strong><small>{month.count?month.count+" событий":"нет HIGH"}</small></button>})}</div>}
       {scheduleReady&&depth.calendarMonths.length>0&&<div className="v3-income-month-ribbon" aria-label="12-месячный календарь выплат">
         <button type="button" className={selectedMonth==null?"is-active":""} aria-pressed={selectedMonth==null} onClick={()=>setSelectedMonth(null)}><span>Все</span><strong>{futureEvents.length}</strong><small>событий</small></button>
         {depth.calendarMonths.map(month=><button type="button" key={month.key} className={(selectedMonth===month.key?"is-active ":"")+(month.count===0?"is-empty":"")} aria-pressed={selectedMonth===month.key} onClick={()=>setSelectedMonth(month.key)}>
@@ -104,7 +110,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
           <time>{dateFmt.format(new Date(event.date))}</time><div><strong>{event.ticker||event.name}</strong><small>{eventKind(event)}{confirmed?" · HIGH":" · "+(event.confidence||"статус уточняется")}</small></div><div><strong>{amount==null?"—":rub2.format(amount)+" ₽"}</strong><small>{position?"FIGI → актив":"без точного FIGI"}</small></div>
         </button>
       }):<div className="v3-income-depth-state">{selectedMonth?"В выбранном месяце подтверждённых событий нет.":"Подтверждённые будущие события не найдены."}</div>}</div>}
-      <small className="v3-income-method">Будущие выплаты не складываются с уже полученным фактом. Календарь открывается только при полном проверенном покрытии расписания; HIGH означает подтверждение события источником, а переход в актив разрешён только после точного FIGI-сопоставления.</small>{samuraiReference&&<SamuraiNextCue targetId="sam-income-history" label="ДАЛЬШЕ · ФАКТ"/>}
+      <small className="v3-income-method">Тепловая карта кодирует только подтверждённую сумму текущего 12М расписания: чем интенсивнее блок, тем больше gross внутри этого окна. Это не прогноз за пределами известных HIGH-событий.</small>{samuraiReference&&<SamuraiNextCue targetId="sam-income-history" label="ДАЛЬШЕ · ФАКТ"/>}
     </div>}
 
     {(samuraiReference||view==="history")&&<div id="sam-income-history" className="v3-income-history-depth">
@@ -162,10 +168,10 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
         <small className="v3-income-method">Это будущий купонный график до налога, а не уже полученный доход. В профиль входят только доверенные scheduled-события текущих облигаций, связанных по точному FIGI; Факт здесь никогда не суммируется повторно.</small>
       </section>}
       <div className="v3-income-coverage"><span>Покрытие расписания</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>{depth.integrity.resolvedAssets}/{depth.integrity.eligibleAssets||"—"} активов · ошибок {depth.integrity.errors}</small></div>
-      <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>{samuraiReference&&<SamuraiNextCue targetId="sam-income-trust" label="ДАЛЬШЕ · ДАННЫЕ"/>}
+      <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>{samuraiReference&&proMode&&<SamuraiNextCue targetId="sam-income-trust" label="ДАЛЬШЕ · ДАННЫЕ"/>}
     </div>}
-    {(samuraiReference||view==="trust")&&<div id="sam-income-trust"><V3IncomeDataTrust calendar={calendar} positions={positions} loadedAt={loadedAt}/>{samuraiReference&&<SamuraiNextCue targetId="sam-income-market" label="ДАЛЬШЕ · РЫНОК"/>}</div>}
-    {samuraiReference&&<V3DividendDiscovery/>}
-    {!samuraiReference&&view==="market"&&<V3DividendDiscovery/>}
+    {proMode&&(samuraiReference||view==="trust")&&<div id="sam-income-trust"><V3IncomeDataTrust calendar={calendar} positions={positions} loadedAt={loadedAt}/>{samuraiReference&&<SamuraiNextCue targetId="sam-income-market" label="ДАЛЬШЕ · РЫНОК"/>}</div>}
+    {proMode&&samuraiReference&&<V3DividendDiscovery/>}
+    {proMode&&!samuraiReference&&view==="market"&&<V3DividendDiscovery/>}
   </section>
 }

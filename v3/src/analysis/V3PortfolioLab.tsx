@@ -21,6 +21,11 @@ function strategy(name:string,input:string):StrategyConfig|null{
   relativeTolerance:PERSONAL_STRATEGY_V1.relativeTolerance,
  };
 }
+function userFacingHistoryReason(reason:string|null|undefined){
+ if(!reason)return"Источник не подтвердил данные.";
+ if(/[A-Za-z]{4,}/.test(reason))return"Источник не подтвердил полную историю индексов для выбранного расчёта.";
+ return reason;
+}
 function HistoryCard({label,result}:{label:string;result:StrategyLabScenarioResult|null}){
  const weights=result?.available?pct.format(result.equityWeight*100)+" / "+pct.format(result.bondWeight*100):"—";
  const range=result?.metrics?result.metrics.startDate+" → "+result.metrics.endDate+" · "+result.metrics.points+" торговых точек":result?.reason??"Введите валидную структуру";
@@ -70,7 +75,7 @@ export function V3PortfolioLab({positions}:{positions:PositionSnapshot[]}){
   <section className="sam-lab__history">
    <div className="sam-lab__title"><div><span>02 · ИСТОРИЯ</span><h3>Одинаковая рыночная выборка</h3></div><small>{source?.equityCode??"MCFTR"} + {source?.bondCode??"RGBITR"}</small></div>
    <div className="sam-lab__windows" role="group" aria-label="Историческое окно">{([1,3,5] as LabWindow[]).map(value=><button type="button" key={value} className={windowYears===value?"is-active":""} onClick={()=>setWindowYears(value)}>{value}Г</button>)}</div>
-   {loading?<div className="sam-lab__gate">Получаем историю индексов Московской биржи…</div>:!source?.available?<div className="sam-lab__gate is-warning"><strong>Исторический слой недоступен</strong><small>{source?.reason??"Источник не подтвердил данные."}</small></div>:<div className="sam-lab__history-grid"><HistoryCard label="Сценарий A" result={ha}/><HistoryCard label="Сценарий B" result={hb}/></div>}
+   {loading?<div className="sam-lab__gate">Получаем историю индексов Московской биржи…</div>:!source?.available?<div className="sam-lab__gate is-warning"><strong>Исторический слой недоступен</strong><small>{userFacingHistoryReason(source?.reason)}</small>{source?.reason&&/[A-Za-z]{4,}/.test(source.reason)&&<details><summary>Техническая деталь</summary><code>{source.reason}</code></details>}</div>:<div className="sam-lab__history-grid"><HistoryCard label="Сценарий A" result={ha}/><HistoryCard label="Сценарий B" result={hb}/></div>}
    <p className="sam-lab__method">Методика v1: рублёвые total-return индексы MCFTR (акции, gross dividends) и RGBITR (ОФЗ total return), пересечение торговых дат, ежемесячное восстановление целевых весов, без комиссий, налогов и проскальзывания. Это историческая модель классов, а не реконструкция фактического портфеля пользователя.</p>
   </section>
  </section>;

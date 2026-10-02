@@ -1,12 +1,13 @@
 import assert from"node:assert/strict";import{readFileSync}from"node:fs";
 const app=readFileSync(new URL("../src/app/V3App.tsx",import.meta.url),"utf8");
 const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8");
+const impact=readFileSync(new URL("../src/analysis/V3ImpactTreemap.tsx",import.meta.url),"utf8");
 const risk=readFileSync(new URL("../src/analysis/V3RiskContributionPanel.tsx",import.meta.url),"utf8");
 const adapter=readFileSync(new URL("../src/analysis/riskHistoryAdapter.ts",import.meta.url),"utf8");
 const asset=readFileSync(new URL("../src/assets/V3AssetWorkspace.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/analysisDepth.css",import.meta.url),"utf8");
 assert.match(app,/V3Analysis[^>]+onOpenAsset={demo\?undefined:setSelectedAsset}/);assert.match(app,/backLabel={active\.label}/);
-assert.match(analysis,/onOpenAsset\?\:\(position:PositionSnapshot\)=>void/);assert.match(analysis,/onClick=\{\(\)=>onOpenAsset\?\.\(item\)\}/);assert.match(analysis,/V3RiskLayer[^>]+onOpenAsset={onOpenAsset}/);
+assert.match(analysis,/onOpenAsset\?\:\(position:PositionSnapshot\)=>void/);assert.match(analysis,/V3ImpactTreemap positions={rows} onOpenAsset={onOpenAsset}/);assert.match(impact,/onClick=\{\(\)=>onOpenAsset\?\.\(cell\.position\)\}/);assert.match(analysis,/V3RiskLayer[^>]+onOpenAsset={onOpenAsset}/);
 assert.match(risk,/resolvePositionByKey\(positions,row\.key\)/);assert.match(risk,/resolvePositionByKey\(positions,pair\.aKey\)/);assert.match(risk,/resolvePositionByKey\(positions,pair\.bKey\)/);assert.match(risk,/идентичность не подтверждена/);
 assert.match(adapter,/aKey:cell\.a/);assert.match(adapter,/bKey:cell\.b/);assert.match(adapter,/clean\(position\.instrumentUid\)\|\|clean\(position\.figi\)\|\|position\.ticker/);
 assert.match(asset,/backLabel\|\|"Активы"/);assert.match(asset,/V3SectionSelector label="Раздел актива"/);
