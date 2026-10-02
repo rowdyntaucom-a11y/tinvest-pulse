@@ -14,9 +14,10 @@ test("light Core promotes the canonical income depth without replacing quick pay
  assert.match(ui,/CorePayoutCalendar/);
 });
 
-test("income depth exposes fact calendar sources bonds and market discovery",()=>{
- for(const token of["Календарь","Факт","Источники","Рынок","КУПОННЫЙ ПОТОК · 12М","V3DividendDiscovery"])assert.match(income,new RegExp(token));
- assert.match(income,/type View="calendar"\|"history"\|"sources"\|"market"/);
+test("income depth exposes fact calendar sources data trust bonds and market discovery",()=>{
+ for(const token of["Календарь","Факт","Источники","Данные","Рынок","КУПОННЫЙ ПОТОК · 12М","V3IncomeDataTrust","V3DividendDiscovery"])assert.match(income,new RegExp(token));
+ assert.match(income,/type View="calendar"\|"history"\|"sources"\|"trust"\|"market"/);
+ assert.match(income,/view===\"trust\"/);
  assert.match(income,/view===\"market\"/);
  assert.match(income,/точного FIGI/);
  assert.match(income,/fail-closed/);

@@ -11,12 +11,14 @@ import type{V3Shell}from"../app/model";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{V3IncomeForwardPanel}from"./V3IncomeCalendarV2";
 import{V3DividendDiscovery}from"./V3DividendDiscovery";
+import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
 
-type View="calendar"|"history"|"sources"|"market";
+type View="calendar"|"history"|"sources"|"trust"|"market";
 const VIEW_OPTIONS=[
   {value:"calendar",label:"Календарь",description:"Подтверждённое 12-месячное расписание будущих выплат."},
   {value:"history",label:"Факт",description:"Реально полученный пассивный доход по полностью наблюдавшимся месяцам."},
   {value:"sources",label:"Источники",description:"Факт и расписание по активам с точной FIGI-связью и покрытием."},
+  {value:"trust",label:"Данные",description:"Проверка покрытия, FIGI-связности и сверка агрегатов FACT/FUTURE."},
   {value:"market",label:"Рынок",description:"Отдельный TTM dividend discovery рынка, не доход текущего портфеля."},
 ] as const;
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -57,7 +59,8 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
       {id:"sam-income-calendar",code:"弐",label:"Календарь",note:"будущие подтверждённые выплаты"},
       {id:"sam-income-history",code:"参",label:"Факт",note:"реально полученный доход"},
       {id:"sam-income-sources",code:"肆",label:"Источники",note:"активы · концентрация · YoC"},
-      {id:"sam-income-market",code:"伍",label:"Рынок",note:"отдельный dividend discovery"}
+      {id:"sam-income-trust",code:"伍",label:"Данные",note:"покрытие · FIGI · сверка"},
+      {id:"sam-income-market",code:"陸",label:"Рынок",note:"отдельный dividend discovery"}
     ]}/>}
     {!samuraiReference&&<V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={VIEW_OPTIONS}/>} 
 
@@ -139,8 +142,10 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
         <small className="v3-income-method">Это будущий купонный график до налога, а не уже полученный доход. В профиль входят только доверенные scheduled-события текущих облигаций, связанных по точному FIGI; Факт здесь никогда не суммируется повторно.</small>
       </section>}
       <div className="v3-income-coverage"><span>Покрытие расписания</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>{depth.integrity.resolvedAssets}/{depth.integrity.eligibleAssets||"—"} активов · ошибок {depth.integrity.errors}</small></div>
-      <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>
+      <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>{samuraiReference&&<SamuraiNextCue targetId="sam-income-trust" label="ДАЛЬШЕ · ДАННЫЕ"/>}
     </div>}
+    {(samuraiReference||view==="trust")&&<div id="sam-income-trust"><V3IncomeDataTrust calendar={calendar} positions={positions} loadedAt={loadedAt}/>{samuraiReference&&<SamuraiNextCue targetId="sam-income-market" label="ДАЛЬШЕ · РЫНОК"/>}</div>}
     {samuraiReference&&<V3DividendDiscovery/>}
+    {!samuraiReference&&view==="market"&&<V3DividendDiscovery/>}
   </section>
 }
