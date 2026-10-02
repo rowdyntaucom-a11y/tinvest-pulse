@@ -16,7 +16,8 @@ test("Samurai adds explicit Report, Categories and Currencies chapters",()=>{
 });
 
 test("report is mounted after operations only for the Samurai reference shell",()=>{
- assert.match(assets,/shell==="samurai"&&allowAssetWorkspace&&<Suspense[\s\S]*?<V3PortfolioReportDepth positions=\{base\}/);
+ assert.match(assets,/trusted&&samuraiReference&&<>[\s\S]*?<V3OperationsDepth\/>[\s\S]*?allowAssetWorkspace&&<Suspense[\s\S]*?<V3PortfolioReportDepth positions=\{base\}/);
+ assert.ok(assets.indexOf("<V3OperationsDepth/>")<assets.indexOf("<V3PortfolioReportDepth positions={base}"));
 });
 
 test("fail-closed Atlas advertises the new breadth without values",()=>{
