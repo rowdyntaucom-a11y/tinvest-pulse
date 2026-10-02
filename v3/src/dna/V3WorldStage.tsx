@@ -225,8 +225,8 @@ function WorldPixiStage({ snapshot, focus }: PixiProps) {
     }
 
     const boot = async () => {
-      const {app:next,pixi}=await createDnaWorldRoot(host)
-      const {Container,Graphics,Sprite}=pixi
+      const next=await createDnaWorldRoot(host)
+      const {Container,Graphics,Sprite}=DNA_PIXI_CONSTRUCTORS
       if (disposed){next.destroy(true);return}
       const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
 
