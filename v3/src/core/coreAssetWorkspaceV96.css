@@ -1,0 +1,48 @@
+/* v96 · Asset Workspace
+   Keep the broker snapshot visible, reveal position context/history/method details by task. */
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-commandbar{display:flex;gap:0;margin:0 0 7px;padding:0;border:0;background:transparent;box-shadow:none;overflow:visible}
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-commandbar>button:not(.sb-asset-commandbar__back){display:none!important}
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-commandbar>.sb-asset-commandbar__back{min-height:34px;padding:6px 9px;border:1px solid #e0e4ea;border-radius:9px;background:#fff;color:#58616c;font-size:8px;font-weight:750}
+.sb-asset-workspace-host-v96{position:sticky;top:79px;z-index:18;margin:7px -2px 8px;padding:4px 2px;background:linear-gradient(180deg,#f5f6f8 76%,rgba(245,246,248,.94));box-shadow:0 7px 10px rgba(245,246,248,.9)}
+.sb-asset-workspace-v96{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding:1px 0 3px}.sb-asset-workspace-v96::-webkit-scrollbar{display:none}
+.sb-asset-workspace-v96 button{flex:1 0 112px;min-width:112px;min-height:43px;padding:6px 8px;border:1px solid #e1e5eb;border-radius:9px;background:#fff;color:#232a33;text-align:left}
+.sb-asset-workspace-v96 button b,.sb-asset-workspace-v96 button small{display:block}.sb-asset-workspace-v96 button b{font-size:8.5px;line-height:1.15}.sb-asset-workspace-v96 button small{margin-top:2px;color:#7b838e;font-size:6.4px;line-height:1.25}
+.sb-asset-workspace-v96 button.active{border-color:#a9bde2;background:#edf3fc;color:#28528d}.sb-asset-workspace-v96 button.active small{color:#60769a}.sb-asset-workspace-v96 button:focus-visible{outline:2px solid #4e77c8;outline-offset:1px}
+
+/* Task gating: hero remains visible as identity/context anchor. */
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-answer,
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-impact,
+.sb-asset-detail[data-asset-workspace-v96]>.sb-detail-grid,
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-math,
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-context,
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-history,
+.sb-asset-detail[data-asset-workspace-v96]>[data-asset-detail-v96="instrument"],
+.sb-asset-detail[data-asset-workspace-v96]>.sb-detail-note{display:none}
+
+.sb-asset-detail[data-asset-workspace-v96="summary"]>.sb-asset-answer,
+.sb-asset-detail[data-asset-workspace-v96="summary"]>.sb-asset-impact,
+.sb-asset-detail[data-asset-workspace-v96="summary"]>.sb-detail-grid{display:grid}
+.sb-asset-detail[data-asset-workspace-v96="summary"]>.sb-asset-answer{display:block}
+
+.sb-asset-detail[data-asset-workspace-v96="context"]>.sb-asset-context{display:block}
+.sb-asset-detail[data-asset-workspace-v96="context"]>.sb-asset-impact{display:grid}
+
+.sb-asset-detail[data-asset-workspace-v96="history"]>.sb-asset-history{display:block}
+
+.sb-asset-detail[data-asset-workspace-v96="details"]>.sb-asset-math,
+.sb-asset-detail[data-asset-workspace-v96="details"]>[data-asset-detail-v96="instrument"]{display:block}
+.sb-asset-detail[data-asset-workspace-v96="details"]>.sb-detail-note{display:block}
+
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-context,
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-history,
+.sb-asset-detail[data-asset-workspace-v96]>.sb-asset-math,
+.sb-asset-detail[data-asset-workspace-v96]>[data-asset-detail-v96="instrument"]{content-visibility:auto;contain-intrinsic-size:1px 360px}
+
+@media(max-width:640px){
+ .sb-asset-workspace-host-v96{top:76px;margin:6px -4px 7px;padding:4px}
+ .sb-asset-workspace-v96{gap:4px}.sb-asset-workspace-v96 button{flex-basis:98px;min-width:98px;min-height:40px;padding:5px 7px}.sb-asset-workspace-v96 button b{font-size:8px}.sb-asset-workspace-v96 button small{font-size:6px}
+ .sb-asset-detail[data-asset-workspace-v96]>.sb-asset-commandbar>.sb-asset-commandbar__back{min-height:32px}
+}
+@media(max-width:359px){
+ .sb-asset-workspace-host-v96{top:73px}.sb-asset-workspace-v96 button{flex-basis:82px;min-width:82px}.sb-asset-workspace-v96 button small{display:none}
+}
