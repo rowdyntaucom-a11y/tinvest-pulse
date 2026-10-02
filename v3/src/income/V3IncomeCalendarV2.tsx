@@ -2,6 +2,7 @@ import{useEffect,useMemo,useState}from"react";
 import type{PayoutEvent}from"../../../v2/src/lib/payoutsApi";
 import{buildIncomeForwardWindow,daysUntilPayout,type IncomeForwardMonths}from"./incomeForwardWindow";
 import{buildIncomeForwardCadence}from"./incomeForwardCadence";
+import{V3IncomeMonthSourceComposition}from"./V3IncomeMonthSourceComposition";
 import"../styles/incomeCalendarV2.css";import"../styles/incomeForwardCadence.css";
 
 const rub2=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
@@ -44,6 +45,7 @@ export function V3IncomeForwardPanel({events,loadedAt}:{events:PayoutEvent[];loa
    </div>
    <div className="v3-forward-cadence-split"><div><span>Купоны</span><i><b style={{width:(cadence.couponShare??0)*100+"%"}}/></i><strong>{cadence.couponShare==null?"—":pct.format(cadence.couponShare*100)+"%"}</strong></div><div><span>Дивиденды</span><i><b style={{width:(cadence.dividendShare??0)*100+"%"}}/></i><strong>{cadence.dividendShare==null?"—":pct.format(cadence.dividendShare*100)+"%"}</strong></div></div>
    {selected&&<div className="v3-forward-month-detail"><header><div><span>{monthLabel(selected.key)}</span><strong>{money(selected.gross)}</strong></div><small>{selected.count} событий · {selected.coupons} куп. / {selected.dividends} див.</small></header><div><article><span>Купоны gross</span><strong>{money(selected.couponGross)}</strong></article><article><span>Дивиденды gross</span><strong>{money(selected.dividendGross)}</strong></article><article><span>Сумма известна</span><strong>{selected.count?pct.format(selected.amountKnown/selected.count*100)+"%":"—"}</strong></article></div></div>}
+   {selected&&<V3IncomeMonthSourceComposition events={events} monthKey={selected.key}/>} 
    <small className="v3-income-method">Ритм описывает только подтверждённые HIGH-события в выбранном окне. HHI и эффективное число месяцев показывают распределение gross по времени и не являются оценкой качества или прогнозом.</small>
   </div>}
   <div className="v3-income-nearest-caption"><span>{selected?"СОБЫТИЯ В МЕСЯЦЕ":"БЛИЖАЙШИЕ СОБЫТИЯ"}</span><strong>{selected?selected.count:forward.nearest.length}</strong></div>
