@@ -9,7 +9,7 @@ export type ActualTaxMonth={key:string;gross:number;net:number;tax:number;count:
 export type ActualTaxKind={kind:"COUPON"|"DIVIDEND"|"OTHER";gross:number;net:number;tax:number;count:number;taxRate:number|null};
 export type ActualTaxSource={figi:string;label:string;position:PositionSnapshot|null;gross:number;net:number;tax:number;count:number;taxRate:number|null};
 export type ActualTaxLedger={
- available:boolean;gross:number;net:number;tax:number;count:number;taxRate:number|null;netRetention:number|null;reconciliationDelta:number;
+ available:boolean;gross:number;net:number;tax:number;count:number;taxRate:number|null;netRetention:number|null;reconciliationDelta:number|null;reconciliationAvailable:boolean;grossCoverage:number|null;
  taxedEvents:number;zeroTaxEvents:number;grossEvents:number;completeMonths:number;partialMonths:number;
  months:ActualTaxMonth[];kinds:ActualTaxKind[];sources:ActualTaxSource[];
 };
@@ -23,5 +23,6 @@ export function buildActualTaxLedger(items:PayoutEvent[],positions:PositionSnaps
  const byFigi=new Map<string,{label:string;gross:number;net:number;tax:number;count:number}>();for(const e of items){const id=figi(e.figi);if(!id)continue;const row=byFigi.get(id)??{label:e.ticker||e.name||id,gross:0,net:0,tax:0,count:0};row.gross+=n(e.gross);row.net+=n(e.net);row.tax+=n(e.tax);row.count++;byFigi.set(id,row)}
  const sources=[...byFigi.entries()].map(([id,row])=>({figi:id,label:row.label,position:uniquePositions.get(id)??null,gross:row.gross,net:row.net,tax:row.tax,count:row.count,taxRate:rate(row.tax,row.gross)})).sort((a,b)=>b.tax-a.tax||b.gross-a.gross||a.label.localeCompare(b.label));
  const taxedEvents=items.filter(e=>n(e.tax)>0).length,zeroTaxEvents=items.filter(e=>n(e.tax)===0).length,grossEvents=items.filter(e=>n(e.gross)>0).length;
- return{available:Boolean(items.length||observation?.available),gross,net,tax,count:items.length,taxRate:rate(tax,gross),netRetention:gross>0?net/gross*100:null,reconciliationDelta:gross-net-tax,taxedEvents,zeroTaxEvents,grossEvents,completeMonths:obsComplete.size,partialMonths:obsPartial.size,months,kinds:kindRows,sources};
+ const grossCoverage=items.length?grossEvents/items.length:null,reconciliationAvailable=items.length>0&&grossEvents===items.length;
+ return{available:Boolean(items.length||observation?.available),gross,net,tax,count:items.length,taxRate:rate(tax,gross),netRetention:gross>0?net/gross*100:null,reconciliationDelta:reconciliationAvailable?gross-net-tax:null,reconciliationAvailable,grossCoverage,taxedEvents,zeroTaxEvents,grossEvents,completeMonths:obsComplete.size,partialMonths:obsPartial.size,months,kinds:kindRows,sources};
 }
