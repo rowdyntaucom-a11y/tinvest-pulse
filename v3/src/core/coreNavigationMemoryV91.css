@@ -1,0 +1,12 @@
+/* v91 Core Navigation Memory — keep long mobile workspaces oriented without
+   turning navigation into another card wall. */
+.sb-scroll-top-v91{position:fixed;z-index:45;right:max(12px,env(safe-area-inset-right));bottom:max(76px,calc(66px + env(safe-area-inset-bottom)));width:46px;height:46px;padding:0;border:1px solid #dfe3e9;border-radius:16px;background:rgba(255,255,255,.94);box-shadow:0 8px 26px rgba(24,31,42,.12);display:grid;place-items:center;align-content:center;gap:0;color:#39424d;cursor:pointer;animation:sbNavMemoryIn .14s ease-out}.sb-scroll-top-v91 span{font-size:17px;line-height:16px}.sb-scroll-top-v91 small{font-size:5px;line-height:7px;font-weight:800;letter-spacing:.06em;color:#8b929b}.sb-scroll-top-v91:focus-visible{outline:2px solid #4e77c8;outline-offset:2px}@keyframes sbNavMemoryIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(max-width:520px){
+ .sb .sb-switch,.sb .sb-workspace-tabs{position:sticky;top:43px;z-index:24;margin-left:-3px;margin-right:-3px;padding:4px 3px;background:linear-gradient(180deg,var(--s-bg) 76%,rgba(245,246,248,.88));box-shadow:0 5px 10px rgba(245,246,248,.92)}
+ .sb .sb-switch{width:calc(100% + 6px);overflow-x:auto;scrollbar-width:none}.sb .sb-switch::-webkit-scrollbar{display:none}.sb .sb-switch button{flex:0 0 auto;min-height:34px;padding:7px 12px}
+ .sb .sb-workspace-tabs{top:43px;border-radius:0 0 10px 10px}
+ .sb-scroll-top-v91{right:10px;bottom:max(73px,calc(64px + env(safe-area-inset-bottom)));width:40px;height:40px;border-radius:14px;box-shadow:0 6px 20px rgba(24,31,42,.1)}
+ .qv-input-active .sb-scroll-top-v91{display:none}
+}
+@media(min-width:760px){.sb-scroll-top-v91{right:max(24px,calc((100vw - 1120px)/2));bottom:24px}}
+@media(prefers-reduced-motion:reduce){.sb-scroll-top-v91{animation:none;scroll-behavior:auto}}
