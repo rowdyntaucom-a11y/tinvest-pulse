@@ -23,6 +23,11 @@ function changeClass(value:number|null){
 }
 function changeText(value:number|null){return value==null?"—":pct.format(value)+"%"}
 function listingText(value:number|null){return value==null?"—":"L"+value}
+function median(values:number[]){
+ if(!values.length)return null;
+ const sorted=[...values].sort((a,b)=>a-b),mid=Math.floor(sorted.length/2);
+ return sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2;
+}
 
 export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfolioTickers}:{sharedData?:MarketScreenerPayload|null;sharedLoading?:boolean;onRetry?:()=>void;portfolioTickers?:Set<string>}={}){
  const[localData,setLocalData]=useState<MarketScreenerPayload|null>(null),[localLoading,setLocalLoading]=useState(true);
@@ -35,11 +40,29 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   void loadMarketScreener(controller.signal).then(setLocalData).finally(()=>{if(!controller.signal.aborted)setLocalLoading(false)});
   return()=>controller.abort();
  },[controlled]);
- const rows=useMemo(()=>filterMarketScreener((data?.rows??[]).filter(row=>!portfolioOnly||portfolioTickers?.has(row.secid.toUpperCase())),filters),[data,filters,portfolioOnly,portfolioTickers]);
+ const sourceRows=data?.rows??[];
+ const marketSnapshot=useMemo(()=>{
+  const changes=sourceRows.map(row=>row.dayChangePct).filter((value):value is number=>typeof value==="number"&&Number.isFinite(value));
+  const advancing=changes.filter(value=>value>0).length,declining=changes.filter(value=>value<0).length,flat=changes.length-advancing-declining;
+  const turnover=sourceRows.reduce((sum,row)=>sum+(Number.isFinite(row.turnoverRub)?row.turnoverRub:0),0);
+  const trades=sourceRows.reduce((sum,row)=>sum+(Number.isFinite(row.trades)?row.trades:0),0);
+  return{advancing,declining,flat,observed:changes.length,medianChange:median(changes),turnover,trades};
+ },[sourceRows]);
+ const rows=useMemo(()=>filterMarketScreener(sourceRows.filter(row=>!portfolioOnly||portfolioTickers?.has(row.secid.toUpperCase())),filters),[sourceRows,filters,portfolioOnly,portfolioTickers]);
  const visible=rows.slice(0,60);
 
  return <section className="sam-screener" aria-label="Рыночный скринер">
   <header className="sam-screener__head"><div><span>09 · SCREENER</span><h2>Рыночный скринер</h2><p>Публичный TQBR-срез MOEX. Фильтры сортируют наблюдаемые рыночные параметры и не являются рейтингом инвестиционной привлекательности.</p></div><i aria-hidden="true">篩</i></header>
+
+  {!loading&&data?.available&&<section className="sam-screener__snapshot" aria-label="Сводка текущего рынка">
+   <header><div><span>СЕЙЧАС · TQBR</span><strong>Короткий срез перед фильтрами</strong></div><small>{data.fetchedAt?new Date(data.fetchedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):"время источника —"}</small></header>
+   <div>
+    <article><span>Рост / падение</span><strong><b className="is-positive">{marketSnapshot.advancing}</b><em>/</em><b className="is-negative">{marketSnapshot.declining}</b></strong><small>{marketSnapshot.flat} без изменения · {marketSnapshot.observed} наблюдений</small></article>
+    <article><span>Медиана дня</span><strong className={changeClass(marketSnapshot.medianChange)}>{changeText(marketSnapshot.medianChange)}</strong><small>медианное изменение доступных бумаг</small></article>
+    <article><span>Оборот среза</span><strong>{compact.format(marketSnapshot.turnover)} ₽</strong><small>{compact.format(marketSnapshot.trades)} сделок</small></article>
+   </div>
+   <footer>Сводка описывает только текущие строки публичного TQBR-среза и не является оценкой направления рынка или прогнозом.</footer>
+  </section>}
 
   <div className="sam-screener__search">
    <label><span>Поиск</span><input type="search" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название"/></label>
