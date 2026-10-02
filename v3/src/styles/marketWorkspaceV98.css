@@ -1,0 +1,19 @@
+/* v98 · Market workspace continuity and deferred depth */
+.v3-market-intelligence__nav{position:sticky;top:79px;z-index:17;margin:9px -3px 0!important;padding:4px 3px;background:linear-gradient(180deg,rgba(245,246,248,.98) 78%,rgba(245,246,248,.9));box-shadow:0 6px 10px rgba(245,246,248,.9)}
+.v3-market-intelligence__nav button:focus-visible{outline:2px solid #4e77c8;outline-offset:1px}
+.v3-market-intelligence__stage{min-width:0;margin-top:8px}
+.v3-market-mode[hidden]{display:none!important}
+.v3-market-mode:not([hidden]){display:block;animation:v3MarketStageIn .12s ease-out}
+.v3-market-mode:not([hidden])>.sam-screener,.v3-market-mode:not([hidden])>.sam-fallen{content-visibility:auto;contain-intrinsic-size:1px 620px}
+.v3-market-stage-loading{min-height:180px;display:grid;place-items:center;align-content:center;gap:7px;padding:18px;border:1px solid #e2e6ec;border-radius:12px;background:#fff;color:#68717c;text-align:center}
+.v3-market-stage-loading i{width:25px;height:25px;border:2px solid #d9dee7;border-top-color:#4e77c8;border-radius:50%;animation:v3MarketSpin .75s linear infinite}
+.v3-market-stage-loading strong{font-size:10px;color:#252b33}.v3-market-stage-loading small{max-width:290px;font-size:8px;line-height:1.4}
+@keyframes v3MarketStageIn{from{opacity:.55;transform:translateY(3px)}to{opacity:1;transform:none}}@keyframes v3MarketSpin{to{transform:rotate(360deg)}}
+@media(max-width:520px){
+ .v3-market-intelligence__nav{top:76px;margin-left:-5px!important;margin-right:-5px!important;padding-left:5px;padding-right:5px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none}.v3-market-intelligence__nav::-webkit-scrollbar{display:none}
+ .v3-market-intelligence__nav button{flex:0 0 104px!important;min-height:42px!important}
+ .v3-market-intelligence__stage{margin-top:6px}
+ .v3-market-stage-loading{min-height:150px;padding:14px}.v3-market-stage-loading strong{font-size:11px}.v3-market-stage-loading small{font-size:9px}
+}
+@media(max-width:359px){.v3-market-intelligence__nav button{flex-basis:88px!important}.v3-market-intelligence__nav button small{display:none}}
+@media(prefers-reduced-motion:reduce){.v3-market-mode:not([hidden]){animation:none}.v3-market-stage-loading i{animation:none}}
