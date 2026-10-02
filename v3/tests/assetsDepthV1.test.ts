@@ -7,7 +7,9 @@ const depth=readFileSync(new URL("../src/assets/V3AssetsDepth.tsx",import.meta.u
 const css=readFileSync(new URL("../src/styles/assetsDepth.css",import.meta.url),"utf8");
 
 test("Assets Depth v1 remains the shared shell-independent deep workspace",()=>{
- assert.match(assets,/themedDepth=shell==="samurai"\|\|shell==="carbon"/);
+ assert.match(assets,/themedShell=samuraiReference\|\|shell==="carbon"\|\|shell==="aurora"/);
+ assert.match(assets,/view==="pro"&&<Suspense/);
+ assert.match(assets,/samuraiReference&&<>/);
  assert.match(depth,/id="v3-assets-depth"/);
  assert.doesNotMatch(depth,/shell===/);
 });
