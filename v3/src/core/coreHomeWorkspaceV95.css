@@ -1,0 +1,13 @@
+/* v95 · Home Workspace Progressive Disclosure */
+.sb-home-workspace-host-v95{position:sticky;top:79px;z-index:18;margin:8px 0 9px;padding:4px 0;background:linear-gradient(180deg,#f5f6f8 78%,rgba(245,246,248,.92));box-shadow:0 6px 12px rgba(245,246,248,.94)}
+.sb-home-workspace-v95{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}.sb-home-workspace-v95::-webkit-scrollbar{display:none}
+.sb-home-workspace-v95 button{flex:1 0 118px;min-width:118px;min-height:44px;padding:6px 8px;border:1px solid var(--s-line);border-radius:10px;background:#fff;color:var(--s-text);text-align:left}.sb-home-workspace-v95 button b,.sb-home-workspace-v95 button small{display:block}.sb-home-workspace-v95 button b{font-size:8.5px;line-height:1.15}.sb-home-workspace-v95 button small{margin-top:2px;color:var(--s-muted);font-size:6.5px;line-height:1.25}.sb-home-workspace-v95 button.active{border-color:#c8d5ec;background:#eef3fb;color:#244b91}.sb-home-workspace-v95 button.active small{color:#617394}.sb-home-workspace-v95 button:focus-visible{outline:2px solid #4e77c8;outline-offset:1px}
+.sb main[data-home-workspace-v95]>.sb-home-cockpit,.sb main[data-home-workspace-v95]>.sb-portfolio-pulse,.sb main[data-home-workspace-v95]>.sb-home-assets{display:none}
+.sb main[data-home-workspace-v95="summary"]>.sb-home-cockpit{display:grid}
+.sb main[data-home-workspace-v95="pulse"]>.sb-portfolio-pulse{display:block}
+.sb main[data-home-workspace-v95="assets"]>.sb-home-assets{display:block}
+.sb main[data-home-workspace-v95="all"]>.sb-home-cockpit{display:grid}.sb main[data-home-workspace-v95="all"]>.sb-portfolio-pulse,.sb main[data-home-workspace-v95="all"]>.sb-home-assets{display:block}
+.sb main[data-home-workspace-v95="summary"]>.sb-home-cockpit{margin-top:0}
+.sb main[data-home-workspace-v95="pulse"]>.sb-portfolio-pulse,.sb main[data-home-workspace-v95="assets"]>.sb-home-assets{margin-top:0}
+@media(max-width:640px){.sb-home-workspace-host-v95{top:74px;margin:6px 0 8px}.sb-home-workspace-v95{gap:4px}.sb-home-workspace-v95 button{flex-basis:98px;min-width:98px;min-height:41px;padding:5px 7px}.sb-home-workspace-v95 button b{font-size:8px}.sb-home-workspace-v95 button small{font-size:6px}}
+@media(max-width:359px){.sb-home-workspace-host-v95{top:71px}.sb-home-workspace-v95 button{flex-basis:84px;min-width:84px}.sb-home-workspace-v95 button small{display:none}}
