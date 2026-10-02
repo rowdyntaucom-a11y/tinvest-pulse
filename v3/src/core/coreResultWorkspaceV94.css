@@ -1,0 +1,41 @@
+/* v94 · Result Workspace
+   Keep performance semantics intact while turning the long mobile result page
+   into three explicit tasks: summary, period inspection, and methodology. */
+.sb-result-workspace-host-v94{position:sticky;top:47px;z-index:23;margin:0 0 9px;padding:4px 0;background:linear-gradient(180deg,var(--s-bg) 78%,rgba(245,246,248,.9));box-shadow:0 7px 12px rgba(245,246,248,.9)}
+.sb-result-workspace-v94{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.sb-result-workspace-v94 button{min-width:0;min-height:51px;padding:8px 9px;border:1px solid var(--s-line);border-radius:11px;background:#fff;color:var(--s-text);text-align:left;display:grid;gap:2px;align-content:center}
+.sb-result-workspace-v94 button b{font-size:9px;line-height:1.1}.sb-result-workspace-v94 button small{font-size:6.6px;line-height:1.25;color:var(--s-muted)}
+.sb-result-workspace-v94 button.active{border-color:#aabce0;background:#eef3fc;color:#244b91;box-shadow:0 2px 8px rgba(45,82,145,.08)}
+.sb-result-workspace-v94 button.active small{color:#64799b}.sb-result-workspace-v94 button:focus-visible{outline:2px solid var(--s-blue);outline-offset:2px}
+main[data-result-workspace-v94]>.sb-context-help,
+main[data-result-workspace-v94]>.sb-result-lead,
+main[data-result-workspace-v94]>.sb-result-truth,
+main[data-result-workspace-v94]>.sb-result-method,
+main[data-result-workspace-v94]>.sb-result-head,
+main[data-result-workspace-v94]>.sb-result-period,
+main[data-result-workspace-v94]>.sb-result-chart{display:none}
+main[data-result-workspace-v94="summary"]>.sb-result-lead,
+main[data-result-workspace-v94="summary"]>.sb-result-truth,
+main[data-result-workspace-v94="summary"]>.sb-result-method{display:grid}
+main[data-result-workspace-v94="summary"]>.sb-result-method{display:block}
+main[data-result-workspace-v94="period"]>.sb-result-period,
+main[data-result-workspace-v94="period"]>.sb-result-chart{display:block}
+main[data-result-workspace-v94="method"]>.sb-context-help,
+main[data-result-workspace-v94="method"]>.sb-result-truth,
+main[data-result-workspace-v94="method"]>.sb-result-method,
+main[data-result-workspace-v94="method"]>.sb-result-head{display:grid}
+main[data-result-workspace-v94="method"]>.sb-context-help,
+main[data-result-workspace-v94="method"]>.sb-result-method{display:block}
+main[data-result-workspace-v94="period"]>.sb-result-period{margin-top:0}
+main[data-result-workspace-v94="period"]>.sb-result-chart{margin-top:8px}
+main[data-result-workspace-v94="method"]>.sb-result-truth{margin-top:0}
+main[data-result-workspace-v94="method"]>.sb-result-head{margin-top:8px}
+@media(max-width:520px){
+ .sb-result-workspace-host-v94{top:43px;margin-left:-3px;margin-right:-3px;padding:4px 3px}
+ .sb-result-workspace-v94{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}.sb-result-workspace-v94::-webkit-scrollbar{display:none}
+ .sb-result-workspace-v94 button{flex:0 0 104px;min-width:104px;min-height:45px;padding:6px 7px}.sb-result-workspace-v94 button b{font-size:8.5px}.sb-result-workspace-v94 button small{font-size:6.2px}
+ main[data-result-workspace-v94="summary"]>.sb-result-truth{grid-template-columns:1fr}
+ main[data-result-workspace-v94="method"]>.sb-result-truth{grid-template-columns:1fr}
+}
+@media(max-width:359px){.sb-result-workspace-v94 button{flex-basis:92px;min-width:92px}.sb-result-workspace-v94 button small{display:none}}
+@media(prefers-reduced-motion:reduce){.sb-result-workspace-v94 button{scroll-behavior:auto}}
