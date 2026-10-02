@@ -54,7 +54,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const coverage=depth.integrity.coveragePct;
   const scheduleReady=depth.payoutTrust.safeToCalculate;
   const statusClass=depth.integrity.state==="verified"?"is-positive":depth.integrity.state==="stale"||depth.integrity.state==="partial"?"is-warning":"is-neutral";
-  const actualNet=depth.realizedHistory.totalNet;
+  const actualNet=calendar.actual.totalNet;
   const overviewNext=workspaceSummary.next;
 
   return <section className="v3-income-depth">
