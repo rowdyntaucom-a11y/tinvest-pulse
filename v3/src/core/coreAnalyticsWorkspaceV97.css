@@ -1,0 +1,42 @@
+/* v97 · Analytics Workspace
+   Progressive disclosure for the professional analytics surface without touching
+   TWR/risk/benchmark math or changing the internal analytical section router. */
+.core-analytics-workspace-host-v97{position:sticky;top:79px;z-index:21;margin:8px -2px 9px;padding:4px 2px;background:linear-gradient(180deg,#f5f6f8 78%,rgba(245,246,248,.93));box-shadow:0 7px 12px rgba(245,246,248,.92)}
+.core-analytics-workspace-v97{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.core-analytics-workspace-v97 button{min-width:0;min-height:45px;padding:7px 8px;border:1px solid #dfe4ea;border-radius:10px;background:#fff;color:#252b33;text-align:left}
+.core-analytics-workspace-v97 button b,.core-analytics-workspace-v97 button small{display:block}.core-analytics-workspace-v97 button b{font-size:8.5px;line-height:1.15}.core-analytics-workspace-v97 button small{margin-top:2px;color:#7b838e;font-size:6.3px;line-height:1.25}
+.core-analytics-workspace-v97 button.active{border-color:#a8bae0;background:#edf3fc;color:#28518d}.core-analytics-workspace-v97 button.active small{color:#60769a}.core-analytics-workspace-v97 button:focus-visible{outline:2px solid #4e77c8;outline-offset:1px}
+
+.core-analytics-depth[data-analytics-workspace-v97]>.core-analytics-depth__help,
+.core-analytics-depth[data-analytics-workspace-v97]>.core-analytics-depth__plain,
+.core-analytics-depth[data-analytics-workspace-v97]>.core-analytics-depth__route,
+.core-analytics-depth[data-analytics-workspace-v97]>.core-analytics-depth__nav,
+.core-analytics-depth[data-analytics-workspace-v97]>.core-analytics-depth__decision,
+.core-analytics-depth[data-analytics-workspace-v97]>.core-analytics-depth__evidence,
+.core-analytics-depth[data-analytics-workspace-v97]>.core-analytics-depth__stage,
+.core-analytics-depth[data-analytics-workspace-v97]>footer{display:none}
+
+.core-analytics-depth[data-analytics-workspace-v97="summary"]>.core-analytics-depth__decision,
+.core-analytics-depth[data-analytics-workspace-v97="summary"]>.core-analytics-depth__evidence{display:block}
+
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__route,
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__nav,
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__stage{display:block}
+
+.core-analytics-depth[data-analytics-workspace-v97="method"]>.core-analytics-depth__help,
+.core-analytics-depth[data-analytics-workspace-v97="method"]>.core-analytics-depth__plain,
+.core-analytics-depth[data-analytics-workspace-v97="method"]>footer{display:block}
+
+.core-analytics-depth[data-analytics-workspace-v97="summary"]>.core-analytics-depth__decision{margin-top:0}
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__route{margin-top:0}
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__stage{margin-top:8px}
+.core-analytics-depth[data-analytics-workspace-v97="method"]>.core-analytics-depth__help{margin-top:0}
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__stage{content-visibility:auto;contain-intrinsic-size:1px 560px}
+
+@media(max-width:640px){
+ .core-analytics-workspace-host-v97{top:76px;margin:7px -4px 8px;padding:4px}
+ .core-analytics-workspace-v97{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}.core-analytics-workspace-v97::-webkit-scrollbar{display:none}
+ .core-analytics-workspace-v97 button{flex:0 0 104px;min-width:104px;min-height:41px;padding:5px 7px}.core-analytics-workspace-v97 button b{font-size:8px}.core-analytics-workspace-v97 button small{font-size:6px}
+}
+@media(max-width:359px){.core-analytics-workspace-host-v97{top:73px}.core-analytics-workspace-v97 button{flex-basis:88px;min-width:88px}.core-analytics-workspace-v97 button small{display:none}}
+@media(prefers-reduced-motion:reduce){.core-analytics-workspace-v97{scroll-behavior:auto}}
