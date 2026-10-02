@@ -5,6 +5,7 @@ import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{filterIncomeCalendarEvents}from"../../../v2/src/features/income/incomeCalendarVisual";
 import{findPayoutEventPosition,payoutEventIsConfirmed}from"../../../v2/src/features/income/incomeCalendarEventView";
 import{buildV3IncomeDepth}from"./incomeDepth";
+import{buildIncomeWorkspaceSummary}from"./incomeWorkspaceSummary";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import type{V3Shell}from"../app/model";
@@ -13,8 +14,9 @@ import{V3IncomeForwardPanel}from"./V3IncomeCalendarV2";
 import{V3DividendDiscovery}from"./V3DividendDiscovery";
 import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
 
-type View="calendar"|"history"|"sources"|"trust"|"market";
+type View="overview"|"calendar"|"history"|"sources"|"trust"|"market";
 const VIEW_OPTIONS=[
+  {value:"overview",label:"Сводка",description:"Короткий ответ: факт, ближайшая выплата и подтверждённые горизонты."},
   {value:"calendar",label:"Календарь",description:"Подтверждённое 12-месячное расписание будущих выплат."},
   {value:"history",label:"Факт",description:"Реально полученный пассивный доход по полностью наблюдавшимся месяцам."},
   {value:"sources",label:"Источники",description:"Факт и расписание по активам с точной FIGI-связью и покрытием."},
@@ -34,10 +36,11 @@ function monthLabel(key:string){const date=new Date(key+"-01T00:00:00Z");return 
 function sourceIdentity(state:string){return state==="EXACT_FIGI"?"FIGI":state==="AMBIGUOUS_FIGI"?"FIGI неоднозначен":state==="INCOMPLETE_FIGI"?"FIGI неполный":"FIGI нет"}
 
 export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void;shell?:V3Shell}){
-  const[calendar,setCalendar]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>("calendar"),[selectedMonth,setSelectedMonth]=useState<string|null>(null),samuraiReference=shell==="samurai";
+  const[calendar,setCalendar]=useState<PayoutCalendar|null>(null),[loading,setLoading]=useState(true),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>("overview"),[selectedMonth,setSelectedMonth]=useState<string|null>(null),samuraiReference=shell==="samurai";
   useEffect(()=>{let active=true;setLoading(true);void loadPayoutCalendar().then(data=>{if(active){setCalendar(data);setLoadedAt(Date.now());setLoading(false)}}).catch(()=>{if(active){setCalendar(null);setLoadedAt(Date.now());setLoading(false)}});return()=>{active=false}},[]);
   const depth=useMemo(()=>calendar?buildV3IncomeDepth(calendar,positions,loadedAt):null,[calendar,positions,loadedAt]);
   const futureEvents=depth?.trustedIncome.futureEvents??[];
+  const workspaceSummary=useMemo(()=>buildIncomeWorkspaceSummary(futureEvents,calendar?.generatedAt??calendar?.period.from),[futureEvents,calendar?.generatedAt,calendar?.period.from]);
   const monthEvents=useMemo(()=>filterIncomeCalendarEvents(futureEvents,selectedMonth),[futureEvents,selectedMonth]);
   useEffect(()=>{if(selectedMonth&&depth&&!depth.calendarMonths.some(month=>month.key===selectedMonth))setSelectedMonth(null)},[selectedMonth,depth]);
   const next=depth?.trustedIncome.taxCalendar.next??null;
@@ -51,9 +54,11 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
   const coverage=depth.integrity.coveragePct;
   const scheduleReady=depth.payoutTrust.safeToCalculate;
   const statusClass=depth.integrity.state==="verified"?"is-positive":depth.integrity.state==="stale"||depth.integrity.state==="partial"?"is-warning":"is-neutral";
+  const actualNet=calendar.actual.totalNet;
+  const overviewNext=workspaceSummary.next;
 
   return <section className="v3-income-depth">
-    <div className="v3-income-depth-head"><div><span>ПРОФЕССИОНАЛЬНЫЙ ДОХОД</span><h2>Факт, календарь и источники</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
+    <div className="v3-income-depth-head"><div><span>ПРОФЕССИОНАЛЬНЫЙ ДОХОД</span><h2>{!samuraiReference&&view==="overview"?"Сводка денежного потока":"Факт, календарь и источники"}</h2></div><div className={"v3-income-depth-status "+statusClass}><strong>{depth.integrity.label}</strong><small>{coverage==null?"покрытие —":pct.format(coverage)+"% покрытия"}</small></div></div>
     {samuraiReference&&<SamuraiChapterNav label="Доход Samurai" chapters={[
       {id:"sam-income-upcoming",code:"壱",label:"Ближайшие",note:"3М · 6М · 12М"},
       {id:"sam-income-calendar",code:"弐",label:"Календарь",note:"будущие подтверждённые выплаты"},
@@ -63,6 +68,21 @@ export function V3IncomeDepth({positions,onOpenAsset,shell}:{positions:PositionS
       {id:"sam-income-market",code:"陸",label:"Рынок",note:"отдельный dividend discovery"}
     ]}/>}
     {!samuraiReference&&<V3SectionSelector label="Раздел дохода" value={view} onChange={setView} options={VIEW_OPTIONS}/>} 
+
+    {!samuraiReference&&view==="overview"&&<section className="v3-income-overview" aria-label="Сводка дохода">
+      <div className="v3-income-overview-lead">
+        <article><span>Получено фактически</span><strong>{money(actualNet)}</strong><small>уже полученный net · отдельно от будущего</small></article>
+        <article><span>Ближайшая подтверждённая</span><strong>{scheduleReady&&overviewNext?(overviewNext.ticker||overviewNext.name):"—"}</strong><small>{scheduleReady&&overviewNext?dateFmt.format(new Date(overviewNext.date))+(workspaceSummary.nextDays==null?"":" · через "+workspaceSummary.nextDays+" дн."):"нет подтверждённого HIGH-события"}</small></article>
+      </div>
+      <div className="v3-income-overview-horizons">{workspaceSummary.buckets.map(row=><article key={row.days}><span>{row.days} дней</span><strong>{scheduleReady?money(row.gross):"—"}</strong><small>{scheduleReady?row.count+" подтверждённых событий":"расписание закрыто"}</small></article>)}</div>
+      <div className="v3-income-overview-actions">
+        <button type="button" onClick={()=>setView("calendar")}><span>Календарь</span><strong>Даты и события</strong><small>Месяцы, суммы и переход к активу</small></button>
+        <button type="button" onClick={()=>setView("history")}><span>Факт</span><strong>{money(actualNet)}</strong><small>История уже полученных выплат</small></button>
+        <button type="button" onClick={()=>setView("sources")}><span>Источники</span><strong>{depth.concentration.sourceCount||"—"}</strong><small>Позиции и структура денежного потока</small></button>
+        <button type="button" onClick={()=>setView("trust")}><span>Данные</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>Покрытие, FIGI и сверка</small></button>
+      </div>
+      <small className="v3-income-method">Сводка показывает только уже полученный факт и подтверждённые HIGH-события текущего расписания. Будущие суммы остаются gross и не складываются с FACT net.</small>
+    </section>}
 
     {samuraiReference&&scheduleReady&&<V3IncomeForwardPanel events={futureEvents} loadedAt={loadedAt}/>}
     {(samuraiReference||view==="calendar")&&<div id="sam-income-calendar" className="v3-income-calendar-depth">
