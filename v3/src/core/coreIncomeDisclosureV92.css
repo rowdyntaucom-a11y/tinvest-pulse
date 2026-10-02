@@ -1,0 +1,84 @@
+/* v92 · Core compact income progressive disclosure
+   The compact Income card is a first-answer surface, not a duplicate of the full calendar.
+   Keep FACT net + confirmed HIGH horizons visible; move the deep analytical stack behind
+   the existing “Открыть полный календарь” action. */
+
+.qpay-compact .qpay-tax--compact,
+.qpay-compact .qpay-continuity--compact,
+.qpay-compact .qpay-timeline--compact,
+.qpay-compact .qpay-explorer--compact,
+.qpay-compact .qpay-source-month--compact,
+.qpay-compact .qpay-attribution--compact,
+.qpay-compact .qpay-structure--compact,
+.qpay-compact .qpay-source-horizon--compact,
+.qpay-compact .qpay-ladder--compact,
+.qpay-compact .qpay-runway--compact,
+.qpay-compact .qpay-compact-months{display:none!important}
+
+.qpay-compact .qpay-actual--compact{margin:7px 0 0;padding:8px 9px;border:1px solid #e6e9ee;border-radius:10px;background:#fafbfd}
+.qpay-compact .qpay-actual--compact>header{margin:0;align-items:center}
+.qpay-compact .qpay-actual--compact>header>div{gap:2px}
+.qpay-compact .qpay-actual--compact>header span{font-size:6.8px;letter-spacing:.06em}
+.qpay-compact .qpay-actual--compact>header b{font-size:11px}
+.qpay-compact .qpay-actual--compact>header small{font-size:6.8px}
+.qpay-compact .qpay-actual--compact .qpay-actual-mini-kpis,
+.qpay-compact .qpay-actual--compact .qpay-actual-bars,
+.qpay-compact .qpay-actual--compact>footer{display:none!important}
+
+.qpay-compact .qpay-horizon--compact{margin:7px 0 0;padding:8px 9px;border:1px solid #e4e9f1;border-radius:10px;background:linear-gradient(180deg,#fbfcfe,#f6f8fb)}
+.qpay-compact .qpay-horizon--compact>header{margin:0 0 6px;align-items:center}
+.qpay-compact .qpay-horizon--compact>header span{font-size:6.8px;letter-spacing:.06em}
+.qpay-compact .qpay-horizon--compact>header b{font-size:9.5px}
+.qpay-compact .qpay-horizon--compact>header small{font-size:6.5px}
+.qpay-compact .qpay-horizon--compact .qpay-horizon-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.qpay-compact .qpay-horizon--compact .qpay-horizon-grid article{min-width:0;padding:7px 5px;background:#fff;border:1px solid #e8ebef;border-radius:8px}
+.qpay-compact .qpay-horizon--compact .qpay-horizon-grid article span,
+.qpay-compact .qpay-horizon--compact .qpay-horizon-grid article small{font-size:6.3px}
+.qpay-compact .qpay-horizon--compact .qpay-horizon-grid article strong{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpay-compact .qpay-horizon--compact>footer{display:none!important}
+
+.qpay-compact>footer{margin-top:7px;padding:7px 1px 0;line-height:1.35}
+.qpay-compact-open{margin-top:7px;min-height:38px;font-size:8px;letter-spacing:.01em}
+
+/* Full calendar stays deep, but the chapter rail is now a persistent orientation tool. */
+.qpay:not(.qpay-compact) .qpay-section-nav{position:sticky;top:86px;z-index:18;display:flex;gap:5px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;margin:9px -4px 5px;padding:6px 4px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid rgba(231,233,237,.9);border-bottom:1px solid rgba(231,233,237,.9)}
+.qpay:not(.qpay-compact) .qpay-section-nav::-webkit-scrollbar{display:none}
+.qpay:not(.qpay-compact) .qpay-section-nav button{flex:0 0 auto;scroll-snap-align:start;min-height:30px;padding:6px 9px;border:1px solid #e1e5eb;border-radius:9px;background:#f8f9fb;color:#5a6470;font-size:7px;font-weight:750;white-space:nowrap}
+.qpay:not(.qpay-compact) .qpay-section-nav button:focus-visible{outline:2px solid #4e77c8;outline-offset:1px}
+.qpay:not(.qpay-compact) [id^="qpay-"][id$="-section"]{scroll-margin-top:132px}
+
+/* Long analytical chapters below the fold do not need eager paint on Chromium mobile. */
+@supports(content-visibility:auto){
+ .qpay:not(.qpay-compact)>.qpay-explorer,
+ .qpay:not(.qpay-compact)>.qpay-timeline,
+ .qpay:not(.qpay-compact)>.qpay-continuity,
+ .qpay:not(.qpay-compact)>.qpay-actual,
+ .qpay:not(.qpay-compact)>.qpay-tax,
+ .qpay:not(.qpay-compact)>.qpay-structure,
+ .qpay:not(.qpay-compact)>.qpay-source-horizon,
+ .qpay:not(.qpay-compact)>.qpay-source-month,
+ .qpay:not(.qpay-compact)>.qpay-ladder,
+ .qpay:not(.qpay-compact)>.qpay-horizon,
+ .qpay:not(.qpay-compact)>.qpay-runway,
+ .qpay:not(.qpay-compact)>.qpay-attribution{content-visibility:auto;contain-intrinsic-size:220px}
+}
+
+@media(max-width:520px){
+ .qpay-compact{padding:9px!important}
+ .qpay-compact>header{gap:7px}
+ .qpay-compact>header>div:last-child{min-width:72px}
+ .qpay-compact-kpis{margin-top:7px}
+ .qpay-compact-kpis article{padding:7px 6px}
+ .qpay-compact .qpay-horizon--compact .qpay-horizon-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .qpay:not(.qpay-compact) .qpay-section-nav{top:82px;margin-left:-7px;margin-right:-7px;padding-left:7px;padding-right:7px}
+}
+
+@media(max-width:359px){
+ .qpay-compact .qpay-horizon--compact .qpay-horizon-grid{grid-template-columns:1fr 1fr}
+ .qpay-compact .qpay-actual--compact>header{display:grid;gap:3px}
+ .qpay-compact .qpay-actual--compact>header small{text-align:left}
+}
+
+@media(prefers-reduced-motion:reduce){
+ .qpay:not(.qpay-compact) .qpay-section-nav{scroll-behavior:auto}
+}
