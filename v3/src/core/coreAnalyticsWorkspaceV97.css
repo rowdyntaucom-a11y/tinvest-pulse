@@ -20,8 +20,8 @@
 .core-analytics-depth[data-analytics-workspace-v97="summary"]>.core-analytics-depth__evidence{display:block}
 
 .core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__route,
-.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__nav,
 .core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__stage{display:block}
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__nav{display:grid}
 
 .core-analytics-depth[data-analytics-workspace-v97="method"]>.core-analytics-depth__help,
 .core-analytics-depth[data-analytics-workspace-v97="method"]>.core-analytics-depth__plain,
@@ -29,14 +29,14 @@
 
 .core-analytics-depth[data-analytics-workspace-v97="summary"]>.core-analytics-depth__decision{margin-top:0}
 .core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__route{margin-top:0}
-.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__stage{margin-top:8px}
+.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__stage{margin-top:8px;content-visibility:auto;contain-intrinsic-size:1px 560px}
 .core-analytics-depth[data-analytics-workspace-v97="method"]>.core-analytics-depth__help{margin-top:0}
-.core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__stage{content-visibility:auto;contain-intrinsic-size:1px 560px}
 
 @media(max-width:640px){
  .core-analytics-workspace-host-v97{top:76px;margin:7px -4px 8px;padding:4px}
  .core-analytics-workspace-v97{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}.core-analytics-workspace-v97::-webkit-scrollbar{display:none}
  .core-analytics-workspace-v97 button{flex:0 0 104px;min-width:104px;min-height:41px;padding:5px 7px}.core-analytics-workspace-v97 button b{font-size:8px}.core-analytics-workspace-v97 button small{font-size:6px}
+ .core-analytics-depth[data-analytics-workspace-v97="analysis"]>.core-analytics-depth__nav{display:flex;overflow-x:auto;scrollbar-width:none}
 }
 @media(max-width:359px){.core-analytics-workspace-host-v97{top:73px}.core-analytics-workspace-v97 button{flex-basis:88px;min-width:88px}.core-analytics-workspace-v97 button small{display:none}}
 @media(prefers-reduced-motion:reduce){.core-analytics-workspace-v97{scroll-behavior:auto}}
