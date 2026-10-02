@@ -1,0 +1,61 @@
+/* v93 · Full Income Workspace Router
+   The full calendar keeps every diagnostic module, but exposes them by task
+   instead of rendering one continuous wall on mobile. */
+.qpay-workspace-host-v93{position:sticky;top:84px;z-index:19;margin:9px -2px 8px;padding:4px 2px;background:linear-gradient(180deg,#fff 78%,rgba(255,255,255,.92));box-shadow:0 7px 12px rgba(255,255,255,.94)}
+.qpay-workspace-v93{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding:1px 0 3px}.qpay-workspace-v93::-webkit-scrollbar{display:none}
+.qpay-workspace-v93 button{flex:1 0 112px;min-width:112px;min-height:43px;border:1px solid #e2e6ec;border-radius:9px;background:#f8f9fb;color:#222831;padding:6px 8px;text-align:left;display:grid;gap:1px}.qpay-workspace-v93 button b{font-size:8.5px}.qpay-workspace-v93 button small{font-size:6.4px;line-height:1.25;color:#7a828d}.qpay-workspace-v93 button.active{border-color:#8aa6df;background:#eef3fb;color:#254f8d}.qpay-workspace-v93 button.active small{color:#5c7090}.qpay-workspace-v93 button:focus-visible{outline:2px solid #4e77c8;outline-offset:1px}
+.qpay[data-income-workspace-v93]>.qpay-section-nav{display:none!important}
+.qpay[data-income-workspace-v93]>.qpay-explorer,
+.qpay[data-income-workspace-v93]>.qpay-timeline,
+.qpay[data-income-workspace-v93]>.qpay-continuity,
+.qpay[data-income-workspace-v93]>.qpay-actual,
+.qpay[data-income-workspace-v93]>.qpay-tax,
+.qpay[data-income-workspace-v93]>.qpay-structure,
+.qpay[data-income-workspace-v93]>.qpay-source-horizon,
+.qpay[data-income-workspace-v93]>.qpay-source-month,
+.qpay[data-income-workspace-v93]>.qpay-ladder,
+.qpay[data-income-workspace-v93]>.qpay-horizon,
+.qpay[data-income-workspace-v93]>.qpay-runway,
+.qpay[data-income-workspace-v93]>.qpay-attribution{display:none}
+.qpay[data-income-workspace-v93="summary"]>.qpay-horizon,
+.qpay[data-income-workspace-v93="summary"]>.qpay-runway{display:block}
+.qpay[data-income-workspace-v93="fact"]>.qpay-actual,
+.qpay[data-income-workspace-v93="fact"]>.qpay-tax,
+.qpay[data-income-workspace-v93="fact"]>.qpay-continuity,
+.qpay[data-income-workspace-v93="fact"]>.qpay-timeline{display:block}
+.qpay[data-income-workspace-v93="events"]>.qpay-explorer,
+.qpay[data-income-workspace-v93="events"]>.qpay-ladder,
+.qpay[data-income-workspace-v93="events"]>.qpay-horizon,
+.qpay[data-income-workspace-v93="events"]>.qpay-runway{display:block}
+.qpay[data-income-workspace-v93="sources"]>.qpay-structure,
+.qpay[data-income-workspace-v93="sources"]>.qpay-source-horizon,
+.qpay[data-income-workspace-v93="sources"]>.qpay-source-month,
+.qpay[data-income-workspace-v93="sources"]>.qpay-attribution{display:block}
+.qpay[data-income-workspace-v93="pro"]>.qpay-explorer,
+.qpay[data-income-workspace-v93="pro"]>.qpay-timeline,
+.qpay[data-income-workspace-v93="pro"]>.qpay-continuity,
+.qpay[data-income-workspace-v93="pro"]>.qpay-actual,
+.qpay[data-income-workspace-v93="pro"]>.qpay-tax,
+.qpay[data-income-workspace-v93="pro"]>.qpay-structure,
+.qpay[data-income-workspace-v93="pro"]>.qpay-source-horizon,
+.qpay[data-income-workspace-v93="pro"]>.qpay-source-month,
+.qpay[data-income-workspace-v93="pro"]>.qpay-ladder,
+.qpay[data-income-workspace-v93="pro"]>.qpay-horizon,
+.qpay[data-income-workspace-v93="pro"]>.qpay-runway,
+.qpay[data-income-workspace-v93="pro"]>.qpay-attribution{display:block}
+.qpay[data-income-workspace-v93="fact"]>.qpay-strip,.qpay[data-income-workspace-v93="fact"]>.qpay-months,.qpay[data-income-workspace-v93="fact"]>.qpay-summary,.qpay[data-income-workspace-v93="fact"]>.qpay-events,.qpay[data-income-workspace-v93="fact"]>.qpay-more,
+.qpay[data-income-workspace-v93="sources"]>.qpay-strip,.qpay[data-income-workspace-v93="sources"]>.qpay-months,.qpay[data-income-workspace-v93="sources"]>.qpay-summary,.qpay[data-income-workspace-v93="sources"]>.qpay-events,.qpay[data-income-workspace-v93="sources"]>.qpay-more{display:none}
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-explorer,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-timeline,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-continuity,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-actual,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-tax,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-structure,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-source-horizon,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-source-month,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-ladder,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-horizon,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-runway,
+.qpay[data-income-workspace-v93]:not([data-income-workspace-v93="pro"])>.qpay-attribution{margin-top:7px}
+@media(max-width:640px){.qpay-workspace-host-v93{top:80px;margin:7px -4px 7px;padding:4px}.qpay-workspace-v93{gap:4px}.qpay-workspace-v93 button{flex-basis:96px;min-width:96px;min-height:40px;padding:5px 7px}.qpay-workspace-v93 button b{font-size:8px}.qpay-workspace-v93 button small{font-size:6px}}
+@media(max-width:359px){.qpay-workspace-host-v93{top:77px}.qpay-workspace-v93 button{flex-basis:88px;min-width:88px}.qpay-workspace-v93 button small{display:none}}
