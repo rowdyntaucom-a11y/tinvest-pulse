@@ -23,8 +23,8 @@ export function CoreNavigationMemory(){
   const sync=()=>setShowTop(shouldShowCoreScrollTop(window.scrollY,document.documentElement.classList.contains("qv-input-active")));
   const onClick=(event:MouseEvent)=>{
    const target=event.target instanceof Element?event.target:null;
-   const navButton=target?.closest(".sb-nav button");
-   const brandButton=target?.closest(".sb-top>button:first-child");
+   const navButton=target?.closest(".sb-nav button")??null;
+   const brandButton=target?.closest(".sb-top>button:first-child")??null;
    if(!navButton&&!brandButton)return;
    const current=activeNavLabel(),next=brandButton?"Обзор":navLabel(navButton);
    if(!next||next===current)return;
