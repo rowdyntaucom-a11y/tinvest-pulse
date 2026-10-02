@@ -10,12 +10,14 @@ const assets=readFileSync(new URL("../src/assets/V3Assets.tsx",import.meta.url),
 const home=readFileSync(new URL("../src/home/V3Home.tsx",import.meta.url),"utf8");
 const donut=readFileSync(new URL("../src/analysis/V3AllocationDonut.tsx",import.meta.url),"utf8");
 const analysis=readFileSync(new URL("../src/analysis/V3Analysis.tsx",import.meta.url),"utf8");
+const impact=readFileSync(new URL("../src/analysis/impactMap.ts",import.meta.url),"utf8");
 const workspace=readFileSync(new URL("../src/assets/V3AssetWorkspace.tsx",import.meta.url),"utf8");
 assert.match(assets,/ratioToPercent\(x\.weight\)/);
 assert.match(assets,/reduce\(\(s,x\)=>s\+x\.weight,0\)\*100/);
 assert.match(home,/ratioToPercent\(x\.weight\)/);
 assert.match(donut,/ratioToPercent\(w\)/);
 assert.match(analysis,/ratioToPercent\(topRatio\)/);
-assert.match(analysis,/ratioToPercent\(item\.weight\)/);
+assert.match(analysis,/V3ImpactTreemap/);
+assert.match(impact,/weightPct:weight\*100/);
 assert.match(workspace,/ratioToPercent\(position\.weight\)/);
 console.log("v3 normalized weight-unit contracts: ok");
