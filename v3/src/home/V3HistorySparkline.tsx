@@ -33,8 +33,8 @@ export function V3HistorySparkline({points,detailed=false,windowValue,onWindowCh
   return portfolio.map((point,index)=>({...point,imoex:imoex[index]?.imoex??null}));
  },[windowPoints]);
  const valueSummary=summarizeHistoryValue(windowPoints);
- const valueRows=windowPoints.filter(x=>x.value!=null);
- const performanceRows=performancePoints.filter(x=>x.portfolio!=null);
+ const valueRows=windowPoints.filter(x=>x.value!=null&&Number.isFinite(x.value));
+ const performanceRows=performancePoints.filter(x=>x.portfolio!=null&&Number.isFinite(x.portfolio));
  const hasPerformance=performanceRows.length>=2;
  const activeMode=detailed&&mode==="performance"&&hasPerformance?"performance":"value";
  if(activeMode==="value"&&(!valueSummary||valueRows.length<2))return <div className="v3-chart-empty">История появится после подтверждения данных</div>;
@@ -42,7 +42,7 @@ export function V3HistorySparkline({points,detailed=false,windowValue,onWindowCh
  const numeric=activeMode==="value"
   ?windowPoints.flatMap(x=>[x.value,x.invested]).filter((x):x is number=>x!=null&&Number.isFinite(x))
   :performancePoints.flatMap(x=>[x.portfolio,x.imoex]).filter((x):x is number=>x!=null&&Number.isFinite(x));
- const min=Math.min(...numeric),max=Math.max(...numeric),span=max-min||1;
+ const min=Math.min(...numeric),max=Math.max(...numeric),span=max-min||1,mid=min+span/2;
  const sourcePoints=activeMode==="value"?windowPoints:performancePoints;
  const primarySegments=buildHistorySegments(sourcePoints,activeMode==="value"?"value":"portfolio",min,max);
  const secondarySegments=buildHistorySegments(sourcePoints,activeMode==="value"?"invested":"imoex",min,max);
@@ -55,6 +55,12 @@ export function V3HistorySparkline({points,detailed=false,windowValue,onWindowCh
  const baselineY=activeMode==="performance"&&min<=100&&max>=100?44-((100-min)/span)*36:null;
  const firstDate=(activeMode==="value"?valueRows[0]?.date:performanceRows[0]?.date)??null;
  const lastDate=(activeMode==="value"?valueRows.at(-1)?.date:performanceRows.at(-1)?.date)??null;
+ const valueMaxRow=valueRows.reduce((best,row)=>row.value!>(best?.value??-Infinity)?row:best,valueRows[0]);
+ const valueMinRow=valueRows.reduce((best,row)=>row.value!<(best?.value??Infinity)?row:best,valueRows[0]);
+ const finalValue=valueRows.at(-1)?.value??null,finalInvested=valueRows.at(-1)?.invested??null;
+ const axis=(v:number)=>activeMode==="value"?money.format(v)+" ₽":percent.format(v-100)+"%";
+ const selectedPrimary=selected?selected.value:null;
+ const selectedSecondary=selectedRow?(activeMode==="value"?selectedRow.invested:selectedRow.imoex):null;
 
  const select=(event:PointerEvent<SVGSVGElement>)=>{
   if(!detailed)return;
@@ -70,21 +76,36 @@ export function V3HistorySparkline({points,detailed=false,windowValue,onWindowCh
    </div>
    <V3HistoryWindowControl value={window} onChange={v=>{setWindow(v);setSelected(null)}}/>
   </div>}
-  {detailed&&<div className="v3-history-axis" aria-hidden="true"><span>{activeMode==="value"?money.format(max)+" ₽":percent.format(max-100)+"%"}</span><span>{activeMode==="value"?money.format(min)+" ₽":percent.format(min-100)+"%"}</span></div>}
-  <svg className={`v3-chart is-${activeMode}${detailed?" is-interactive":""}`} viewBox="0 0 100 48" preserveAspectRatio="none" role="img" aria-label={activeMode==="value"?"История стоимости портфеля. Пропуски данных не соединяются.":"TWR портфеля и IMOEX, перебазированные к 100 в выбранном периоде."} onPointerDown={select} onPointerMove={e=>e.pointerType==="mouse"&&select(e)}>
-   {detailed&&[8,20,32,44].map(y=><line key={y} className="v3-chart-grid" x1="0" x2="100" y1={y} y2={y}/>)}
-   {detailed&&baselineY!=null&&<line className="v3-chart-baseline" x1="0" x2="100" y1={baselineY} y2={baselineY}/>}
-   {detailed&&primarySegments.map((segment,i)=>segment.length>1?<polygon key={`a${i}`} className="v3-chart-area" points={`${segment[0].x},44 ${segment.map(p=>`${p.x},${p.y}`).join(" ")} ${segment.at(-1)!.x},44`}/>:null)}
-   {primarySegments.map((segment,i)=>segment.length>1?<polyline key={`p${i}`} className="v3-chart-primary" points={segment.map(p=>`${p.x},${p.y}`).join(" ")}/>:null)}
-   {secondarySegments.map((segment,i)=>segment.length>1?<polyline key={`s${i}`} className="v3-chart-secondary" points={segment.map(p=>`${p.x},${p.y}`).join(" ")}/>:null)}
-   <circle className="v3-chart-end" cx={last.x} cy={last.y} r="1.5"/>
-   {detailed&&selected&&<><line className="v3-chart-cursor" x1={selected.x} y1="4" x2={selected.x} y2="46"/><circle className="v3-chart-selected" cx={selected.x} cy={selected.y} r="2"/></>}
-  </svg>
+  <div className="v3-history-chart-stage">
+   {detailed&&<div className="v3-history-axis v3-history-yaxis" aria-hidden="true"><span>{axis(max)}</span><span>{axis(mid)}</span><span>{axis(min)}</span></div>}
+   <svg className={`v3-chart is-${activeMode}${detailed?" is-interactive":""}`} viewBox="0 0 100 48" preserveAspectRatio="none" role="img" aria-label={activeMode==="value"?"История стоимости портфеля. Пропуски данных не соединяются.":"TWR портфеля и IMOEX, перебазированные к 100 в выбранном периоде."} onPointerDown={select} onPointerMove={e=>(e.pointerType==="mouse"||e.buttons===1)&&select(e)}>
+    {detailed&&[8,20,32,44].map(y=><line key={y} className="v3-chart-grid" x1="0" x2="100" y1={y} y2={y}/>)}
+    {detailed&&baselineY!=null&&<line className="v3-chart-baseline" x1="0" x2="100" y1={baselineY} y2={baselineY}/>}
+    {detailed&&primarySegments.map((segment,i)=>segment.length>1?<polygon key={`a${i}`} className="v3-chart-area" points={`${segment[0].x},44 ${segment.map(p=>`${p.x},${p.y}`).join(" ")} ${segment.at(-1)!.x},44`}/>:null)}
+    {primarySegments.map((segment,i)=>segment.length>1?<polyline key={`p${i}`} className="v3-chart-primary" points={segment.map(p=>`${p.x},${p.y}`).join(" ")}/>:null)}
+    {secondarySegments.map((segment,i)=>segment.length>1?<polyline key={`s${i}`} className="v3-chart-secondary" points={segment.map(p=>`${p.x},${p.y}`).join(" ")}/>:null)}
+    <circle className="v3-chart-end" cx={last.x} cy={last.y} r="1.5"/>
+    {detailed&&selected&&<><line className="v3-chart-cursor" x1={selected.x} y1="4" x2={selected.x} y2="46"/><circle className="v3-chart-selected" cx={selected.x} cy={selected.y} r="2"/></>}
+   </svg>
+  </div>
   {detailed&&firstDate&&lastDate&&<div className="v3-history-range" aria-hidden="true"><span>{date(firstDate)}</span><strong>{activeMode==="value"?`${valueRows.length} точек`:`${performanceRows.length} точек`}</strong><span>{date(lastDate)}</span></div>}
+  {detailed&&<div className="v3-history-series-summary" aria-label="Ключевые значения выбранного периода">
+   {activeMode==="value"?<>
+    <span><small>Конец периода</small><b>{finalValue==null?"—":money.format(finalValue)+" ₽"}</b></span>
+    <span><small>Внесено</small><b>{finalInvested==null?"—":money.format(finalInvested)+" ₽"}</b></span>
+    <span><small>Максимум</small><b>{valueMaxRow?.value==null?"—":money.format(valueMaxRow.value)+" ₽"}</b><em>{valueMaxRow?.date?date(valueMaxRow.date):""}</em></span>
+    <span><small>Минимум</small><b>{valueMinRow?.value==null?"—":money.format(valueMinRow.value)+" ₽"}</b><em>{valueMinRow?.date?date(valueMinRow.date):""}</em></span>
+   </>:<>
+    <span><small>TWR</small><b>{portfolioDelta==null?"—":percent.format(portfolioDelta)+"%"}</b></span>
+    <span><small>IMOEX</small><b>{benchmarkDelta==null?"—":percent.format(benchmarkDelta)+"%"}</b></span>
+    <span><small>Разница</small><b>{portfolioDelta==null||benchmarkDelta==null?"—":percent.format(portfolioDelta-benchmarkDelta)+" п.п."}</b></span>
+    <span><small>База</small><b>0%</b><em>перебазировано</em></span>
+   </>}
+  </div>}
   {detailed&&selected&&<div className="v3-history-point" role="status">
    <span>{date(selected.date)}</span>
-   <strong>{activeMode==="value"?money.format(selected.value)+" ₽":percent.format(selected.value-100)+"%"}</strong>
-   <small>{activeMode==="value"?(selectedRow?.invested==null?"стоимость портфеля":"внесено · "+money.format(selectedRow.invested)+" ₽"):(selectedRow?.imoex==null?"TWR · IMOEX —":"TWR · IMOEX "+percent.format(selectedRow.imoex-100)+"%")}</small>
+   <strong>{selectedPrimary==null?"—":activeMode==="value"?money.format(selectedPrimary)+" ₽":percent.format(selectedPrimary-100)+"%"}</strong>
+   <small>{activeMode==="value"?(selectedSecondary==null?"Внесено —":"Внесено · "+money.format(selectedSecondary)+" ₽"):(selectedSecondary==null?"IMOEX —":"IMOEX · "+percent.format(selectedSecondary-100)+"%")}</small>
   </div>}
   {detailed&&<div className="v3-history-legend" aria-label="Легенда графика">
    <span><i/>{activeMode==="value"?"Стоимость":"TWR портфеля"}</span>
