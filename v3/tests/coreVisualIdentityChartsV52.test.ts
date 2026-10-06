@@ -18,6 +18,8 @@ const portfolioVisual=readFileSync(new URL("../src/core/CorePortfolioVisualIntel
 const riskVisual=readFileSync(new URL("../src/core/CoreRiskVisualIntelligenceV107.tsx",import.meta.url),"utf8");
 const assetPosition=readFileSync(new URL("../src/core/CoreAssetPositionCockpitV113.tsx",import.meta.url),"utf8");
 const assetPositionCss=readFileSync(new URL("../src/core/coreAssetPositionV113.css",import.meta.url),"utf8");
+const decision=readFileSync(new URL("../src/core/CorePortfolioDecisionMatrixV114.tsx",import.meta.url),"utf8");
+const decisionCss=readFileSync(new URL("../src/core/corePortfolioDecisionMatrixV114.css",import.meta.url),"utf8");
 
 test("server enriches dashboard identity from verified T-Bank instrument metadata",()=>{
  assert.match(server,/INSTRUMENT_META_CACHE_TTL_MS = 24 \* 60 \* 60 \* 1000/);
@@ -103,4 +105,18 @@ test("asset detail mounts an exact collision-free position cockpit",()=>{
  assert.match(assetPositionCss,/grid-template-columns:1fr 1fr/);
  assert.match(assetPositionCss,/49\.5% 50\.5%/);
  assert.match(assetPositionCss,/data-asset-workspace-v96="summary"/);
+});
+
+test("portfolio compare and impact map are replaced by exact collision-free v114 workspaces",()=>{
+ assert.match(workspace,/CorePortfolioDecisionMatrixV114/);
+ assert.match(decision,/Вес и вклад позиций без пересечений/);
+ assert.match(decision,/Точный вклад в капитал/);
+ assert.match(decision,/Матрица веса и знака P\/L/);
+ assert.match(decision,/Сравнение на общих шкалах/);
+ assert.match(decision,/expectedYield\/total\*100/);
+ assert.match(decision,/expectedYield\/costBasis\*100/);
+ assert.doesNotMatch(decision,/<svg|<circle/);
+ assert.match(decisionCss,/sb-contribution-map\[data-qv114-replaced="true"\]/);
+ assert.match(decisionCss,/grid-template-columns:1fr 1fr/);
+ assert.match(decisionCss,/left:49\.5%/);
 });
