@@ -1,0 +1,23 @@
+/* v99 result period cockpit polish */
+main[data-result-workspace-v94="period"]>.sb-result-period{position:relative;overflow:hidden}
+main[data-result-workspace-v94="period"]>.sb-result-period:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#8aa6d8}
+main[data-result-workspace-v94="period"]>.sb-result-chart{content-visibility:auto;contain-intrinsic-size:1px 520px}
+main[data-result-workspace-v94="period"] .v3-history-toolbar{position:sticky;top:103px;z-index:16;padding:6px;margin:0 -4px 6px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid #edf0f4}
+main[data-result-workspace-v94="period"] .v3-history-mode{display:flex;gap:4px}
+main[data-result-workspace-v94="period"] .v3-history-mode button{min-height:34px}
+main[data-result-workspace-v94="period"] .v3-history-figure{min-width:0}
+main[data-result-workspace-v94="period"] .v3-chart.is-interactive{touch-action:pan-y;cursor:crosshair}
+main[data-result-workspace-v94="period"] .v3-history-point{box-shadow:0 5px 18px rgba(32,49,72,.12)}
+main[data-result-workspace-v94="period"] .v3-history-depth{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+main[data-result-workspace-v94="period"] .v3-history-depth>div{min-width:0}
+main[data-result-workspace-v94="period"] .v3-history-depth strong{overflow-wrap:anywhere}
+@media(max-width:520px){
+ main[data-result-workspace-v94="period"] .v3-history-toolbar{top:94px;display:grid;gap:5px}
+ main[data-result-workspace-v94="period"] .v3-history-mode{display:grid;grid-template-columns:1fr 1fr}
+ main[data-result-workspace-v94="period"] .v3-history-mode button{min-height:36px}
+ main[data-result-workspace-v94="period"] .v3-history-depth{grid-template-columns:1fr}
+ main[data-result-workspace-v94="period"] .v3-history-depth>div{display:grid;grid-template-columns:1fr auto;align-items:center;gap:3px 8px}
+ main[data-result-workspace-v94="period"] .v3-history-depth>div small{grid-column:1/-1}
+}
+@media(max-width:359px){main[data-result-workspace-v94="period"] .v3-history-toolbar{top:90px}}
+@media(prefers-reduced-motion:reduce){main[data-result-workspace-v94="period"] .v3-chart.is-interactive{scroll-behavior:auto}}
