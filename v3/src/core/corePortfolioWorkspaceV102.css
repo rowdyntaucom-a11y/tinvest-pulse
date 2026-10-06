@@ -1,0 +1,14 @@
+/* v102 · portfolio task continuity without changing portfolio math */
+.sb-switch[data-portfolio-workspace-v102-source="true"]{display:none!important}
+.sb-portfolio-workspace-host-v102{min-width:0;scroll-margin-top:88px}
+.sb-portfolio-workspace-v102{position:sticky;top:76px;z-index:18;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:6px 0 10px;padding:5px;border:1px solid #e0e5ec;border-radius:13px;background:rgba(248,249,251,.96);box-shadow:0 7px 18px rgba(33,43,54,.08);backdrop-filter:blur(10px)}
+.sb-portfolio-workspace-v102 button{min-width:0;min-height:48px;padding:7px 9px;border:1px solid transparent;border-radius:9px;background:transparent;color:#606a76;text-align:left;cursor:pointer}
+.sb-portfolio-workspace-v102 button b,.sb-portfolio-workspace-v102 button small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-portfolio-workspace-v102 button b{font-size:11px;line-height:1.15;color:#313842}
+.sb-portfolio-workspace-v102 button small{margin-top:3px;font-size:8px;line-height:1.2;color:#7e8792}
+.sb-portfolio-workspace-v102 button.active{border-color:#cad7ed;background:#fff;box-shadow:0 2px 8px rgba(50,71,100,.08)}
+.sb-portfolio-workspace-v102 button.active b{color:#315f9f}
+.sb-portfolio-workspace-v102 button:focus-visible{outline:2px solid #4e77c8;outline-offset:1px}
+@media(max-width:700px){.sb-portfolio-workspace-v102{top:72px;display:flex;gap:5px;margin-left:-3px;margin-right:-3px;padding:4px 3px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;scrollbar-width:none}.sb-portfolio-workspace-v102::-webkit-scrollbar{display:none}.sb-portfolio-workspace-v102 button{flex:0 0 114px;min-height:45px;padding:6px 8px;scroll-snap-align:start}.sb-portfolio-workspace-v102 button b{font-size:11px}.sb-portfolio-workspace-v102 button small{font-size:8.5px}}
+@media(max-width:359px){.sb-portfolio-workspace-v102 button{flex-basis:96px}.sb-portfolio-workspace-v102 button small{display:none}}
+@media(prefers-reduced-motion:reduce){.sb-portfolio-workspace-v102{scroll-behavior:auto}}
