@@ -21,11 +21,15 @@ export function V3RebalanceVisualBridgeV119({drift,scenario}:Props){
    deltaMagnitude:Math.abs(row.deltaValue),
   }));
   const absoluteDelta=rows.reduce((sum,row)=>sum+row.deltaMagnitude,0);
+  const displayedMovement=scenario.mode==="REBALANCE_EXISTING"?absoluteDelta/2:absoluteDelta;
+  const displayedMovementLabel=scenario.mode==="REBALANCE_EXISTING"?"внутренний перенос":"Σ |дельт|";
   const maxDelta=Math.max(1,...rows.map(row=>row.deltaMagnitude));
   const minimum=scenario.minimumFlowForExactTarget;
   const thresholdMax=scenario.mode==="REBALANCE_EXISTING"?1:Math.max(1,scenario.requestedFlow,minimum??0);
+  const thresholdGap=scenario.mode==="REBALANCE_EXISTING"||minimum==null?null:scenario.requestedFlow-minimum;
   const directionConflict=rows.filter(row=>scenario.mode==="ADD_CAPITAL"?row.deltaValue<0:scenario.mode==="WITHDRAW_CAPITAL"?row.deltaValue>0:false);
-  return{rows,absoluteDelta,maxDelta,minimum,thresholdMax,directionConflict};
+  const coverage=Math.max(0,Math.min(1,1-scenario.unassignedWeight));
+  return{rows,absoluteDelta,displayedMovement,displayedMovementLabel,maxDelta,minimum,thresholdMax,thresholdGap,directionConflict,coverage};
  },[drift,scenario]);
  if(!model)return null;
  return <section className="v3-rebalance-bridge-v119" aria-label="Визуальная проверка сценария ребалансировки">
@@ -34,15 +38,15 @@ export function V3RebalanceVisualBridgeV119({drift,scenario}:Props){
    <article><span>Капитал классов до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
    <i aria-hidden="true">→</i>
    <article><span>После заданного потока</span><strong>{money(scenario.assignedValueAfter)}</strong></article>
-   <article><span>Вне модели</span><strong>{percent(scenario.unassignedWeight)}</strong><small>не меняется сценарием</small></article>
+   <article><span>Охват модели</span><strong>{percent(model.coverage)}</strong><small>вне модели {percent(scenario.unassignedWeight)}</small></article>
   </div>
-  <section className="v3-rebalance-bridge-v119__classes"><header><div><span>КЛАССЫ</span><strong>Текущая доля и цель</strong></div><small>шкала 0–100%</small></header>{model.rows.map(row=><article key={row.key}>
+  <section className="v3-rebalance-bridge-v119__classes"><header><div><span>КЛАССЫ</span><strong>Текущая доля и цель</strong></div><small>доля внутри двухклассовой части · 0–100%</small></header>{model.rows.map(row=><article key={row.key}>
    <div className="v3-rebalance-bridge-v119__row-head"><strong>{row.label}</strong><span>сейчас {percent(row.currentShare)} · цель {percent(row.targetShare)}</span></div>
    <div className="v3-rebalance-bridge-v119__rail" aria-label={`${row.label}: сейчас ${percent(row.currentShare)}, цель ${percent(row.targetShare)}`}><i style={{width:`${Math.min(100,Math.max(0,row.currentShare*100))}%`}}/><b style={{left:`${Math.min(100,Math.max(0,row.targetShare*100))}%`}}/></div>
    <div className="v3-rebalance-bridge-v119__row-values"><span>{money(row.currentValue)} → {money(row.targetValue)}</span><strong className={row.deltaValue>0?"is-positive":row.deltaValue<0?"is-negative":""}>{signed(row.deltaValue)}</strong></div>
   </article>)}</section>
-  <section className="v3-rebalance-bridge-v119__delta"><header><div><span>ТРЕБУЕМАЯ ДЕЛЬТА</span><strong>Масштаб изменений по классам</strong></div><small>абсолютно {money(model.absoluteDelta)}</small></header>{model.rows.map(row=><article key={row.key}><div><strong>{row.label}</strong><span>{row.direction==="INCREASE"?"увеличить":row.direction==="DECREASE"?"уменьшить":"без изменения"}</span></div><i><b style={{width:`${row.deltaMagnitude/model.maxDelta*100}%`}}/></i><small>{signed(row.deltaValue)}</small></article>)}</section>
-  {scenario.mode!=="REBALANCE_EXISTING"&&<section className="v3-rebalance-bridge-v119__threshold"><header><div><span>ПОТОК</span><strong>Задано и минимум для точной цели</strong></div><small>{scenario.exactTargetPossible?"цель достижима":"есть конфликт направления"}</small></header><div><article><span>Заданный поток</span><i><b style={{width:`${Math.min(100,scenario.requestedFlow/model.thresholdMax*100)}%`}}/></i><strong>{money(scenario.requestedFlow)}</strong></article><article><span>Минимум</span><i><b style={{width:`${Math.min(100,(model.minimum??0)/model.thresholdMax*100)}%`}}/></i><strong>{money(model.minimum)}</strong></article></div>{model.directionConflict.length>0&&<p>При выбранном направлении потока точная цель требует противоположного изменения класса: {model.directionConflict.map(row=>row.label).join(", ")}. QVANIX показывает конфликт и не превращает его в инструкцию по сделкам.</p>}</section>}
+  <section className="v3-rebalance-bridge-v119__delta"><header><div><span>ТРЕБУЕМАЯ ДЕЛЬТА</span><strong>Масштаб изменений по классам</strong></div><small>{model.displayedMovementLabel} {money(model.displayedMovement)}</small></header>{model.rows.map(row=><article key={row.key}><div><strong>{row.label}</strong><span>{row.direction==="INCREASE"?"увеличить":row.direction==="DECREASE"?"уменьшить":"без изменения"}</span></div><i><b style={{width:`${row.deltaMagnitude/model.maxDelta*100}%`}}/></i><small>{signed(row.deltaValue)}</small></article>)}</section>
+  {scenario.mode!=="REBALANCE_EXISTING"&&<section className="v3-rebalance-bridge-v119__threshold"><header><div><span>ПОТОК</span><strong>Задано и минимум для точной цели</strong></div><small>{scenario.exactTargetPossible?"цель достижима":"есть конфликт направления"}</small></header><div><article><span>Заданный поток</span><i><b style={{width:`${Math.min(100,scenario.requestedFlow/model.thresholdMax*100)}%`}}/></i><strong>{money(scenario.requestedFlow)}</strong></article><article><span>Минимум</span><i><b style={{width:`${Math.min(100,(model.minimum??0)/model.thresholdMax*100)}%`}}/></i><strong>{money(model.minimum)}</strong></article>{model.thresholdGap!=null&&<article className="v3-rebalance-bridge-v119__gap"><span>Разница к минимуму</span><strong className={model.thresholdGap>=0?"is-positive":"is-negative"}>{signed(model.thresholdGap)}</strong><small>{model.thresholdGap>=0?"поток не ниже рассчитанного минимума":"поток ниже рассчитанного минимума"}</small></article>}</div>{model.directionConflict.length>0&&<p>При выбранном направлении потока точная цель требует противоположного изменения класса: {model.directionConflict.map(row=>row.label).join(", ")}. QVANIX показывает конфликт и не превращает его в инструкцию по сделкам.</p>}</section>}
   <footer>Сверка описывает только пользовательский сценарий на уровне классов. Это не предложение изменить портфель и не список операций с конкретными бумагами.</footer>
  </section>;
 }
