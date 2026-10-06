@@ -1,0 +1,20 @@
+import type{PortfolioSnapshot,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
+
+const num=(value:unknown):number|null=>{if(typeof value==="number")return Number.isFinite(value)?value:null;if(typeof value==="string"){const parsed=Number(value.replace(/\s/g,"").replace(",","."));return Number.isFinite(parsed)?parsed:null}if(value&&typeof value==="object"){const row=value as Record<string,unknown>;if("units"in row){const units=num(row.units),nano=row.nano==null?0:num(row.nano);return units==null||nano==null?null:units+nano/1e9}if("value"in row)return num(row.value)}return null};
+const n=(value:unknown)=>num(value)??0;
+const text=(value:unknown)=>value==null?null:String(value).trim()||null;
+const date=(value:unknown)=>{const raw=text(value);if(!raw)return null;const ms=Date.parse(raw);return Number.isFinite(ms)?new Date(ms).toISOString():null};
+const deadline=async(url:string,ms:number,label:string)=>{const controller=new AbortController(),timer=window.setTimeout(()=>controller.abort(),ms);try{const response=await fetch(url,{cache:"no-store",signal:controller.signal});if(!response.ok)throw new Error(`${label} ${response.status}`);return await response.json() as Record<string,unknown>}catch(error){if((error as{name?:string}|null)?.name==="AbortError")throw new Error(`${label} timeout`);throw error}finally{window.clearTimeout(timer)}};
+
+function normalisePositions(raw:unknown,total:number):PositionSnapshot[]{if(!Array.isArray(raw))return[];return raw.map(item=>{const row=(item??{})as Record<string,unknown>,quantity=n(row.quantity),averagePrice=n(row.averagePrice??row.averagePositionPrice),currentPrice=n(row.currentPrice),currentValue=n(row.currentValue)||quantity*currentPrice,costBasis=averagePrice>0&&quantity>0?averagePrice*quantity:0;return{figi:text(row.figi),instrumentUid:text(row.instrumentUid),ticker:String(row.ticker||row.figi||row.instrumentUid||"—"),name:String(row.name||row.ticker||row.figi||"Актив"),instrumentType:String(row.instrumentType||row.type||""),quantity,averagePrice,costBasis,currentPrice,currentValue,expectedYield:n(row.expectedYield),weight:0,bond:null}}).filter(row=>Number.isFinite(row.currentValue)&&row.currentValue>0).map(row=>({...row,weight:total>0?row.currentValue/total:0})).sort((a,b)=>b.currentValue-a.currentValue)}
+
+export async function loadFastPortfolioRecovery():Promise<PortfolioSnapshot>{
+ const [portfolioRead,accountRead]=await Promise.allSettled([deadline("/api/portfolio",6500,"portfolio"),deadline("/api/accounts",3500,"accounts")]);
+ if(portfolioRead.status!=="fulfilled")throw portfolioRead.reason;
+ const raw=portfolioRead.value,portfolio=(raw.portfolio??raw)as Record<string,unknown>;
+ const value=num(raw.totalValue??raw.portfolioValue??portfolio.totalAmountPortfolio);
+ if(value==null||value<0)throw new Error("portfolio value missing");
+ const profit=n(raw.profit??raw.expectedYield??portfolio.expectedYield),items=normalisePositions(raw.positions??portfolio.positions,value),invested=value-profit;
+ const accountPayload=accountRead.status==="fulfilled"?accountRead.value:null,accounts=accountPayload&&Array.isArray(accountPayload.accounts)?accountPayload.accounts as Record<string,unknown>[]:[],account=accounts.find(row=>String(row.status??"").toUpperCase().includes("OPEN"))??accounts[0]??null,opened=date(account?.openedDate??account?.openDate??account?.createdAt??account?.createdDate);
+ return{accountName:text(account?.name)??"Кряхтящий фонд",accountContext:{available:Boolean(account),type:text(account?.type??account?.accountType),status:text(account?.status),openedDate:opened,accessLevel:text(account?.accessLevel),source:account?"accounts":"unavailable"},recoveryContext:{brokerPortfolio:true,account:Boolean(account),operations:false,passiveIncomeComplete:false},value,profit,profitPct:invested>0?profit/invested*100:0,passiveIncome:0,averageMonthlyPassiveIncome:0,averageAnnualPassiveIncome:0,positions:items.length,positionItems:items,xirr:null,cagr:null,riskFreeRate:null,riskFreeRateDate:null,nextRateMeeting:null,startDate:opened,updatedAt:date(raw.fetchedAt??raw.updatedAt),history:[],source:"portfolio"}
+}
