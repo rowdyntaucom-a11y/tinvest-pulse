@@ -22,8 +22,19 @@ test("visual bridge reads the existing deterministic scenario instead of recalcu
  assert.match(bridge,/scenario\.unassignedWeight/);
  assert.match(bridge,/До → целевая структура/);
  assert.match(bridge,/После заданного потока/);
+ assert.match(bridge,/Охват модели/);
  assert.match(bridge,/Текущая доля и цель/);
  assert.match(bridge,/Масштаб изменений по классам/);
+});
+
+test("movement magnitude distinguishes internal transfer from absolute flow deltas",()=>{
+ assert.match(bridge,/scenario\.mode==="REBALANCE_EXISTING"\?absoluteDelta\/2:absoluteDelta/);
+ assert.match(bridge,/"внутренний перенос":"Σ \|дельт\|"/);
+ assert.match(bridge,/thresholdGap=scenario\.mode==="REBALANCE_EXISTING"\|\|minimum==null\?null:scenario\.requestedFlow-minimum/);
+ assert.match(bridge,/Разница к минимуму/);
+ assert.match(bridge,/поток не ниже рассчитанного минимума/);
+ assert.match(bridge,/поток ниже рассчитанного минимума/);
+ assert.match(css,/v3-rebalance-bridge-v119__gap/);
 });
 
 test("direction constraints stay explicit for add and withdraw scenarios",()=>{
