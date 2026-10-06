@@ -10,9 +10,11 @@ Large professional-tools readability pass for deterministic class-level rebalanc
 
 - shared 0–100% rail comparing current sleeve share with the user-defined target for equities and bonds;
 - exact current value → target value bridge for each class with signed scenario delta;
-- assigned capital before / after user-supplied flow plus explicit unassigned sleeve share;
+- assigned capital before / after user-supplied flow plus explicit model coverage and unassigned sleeve share;
 - common-scale class delta magnitudes derived from existing scenario rows;
-- add/withdraw threshold view comparing user-supplied flow with `minimumFlowForExactTarget`;
+- for existing-capital rebalance, movement is shown as one-way internal transfer (`Σ |delta| / 2`) instead of double-counting both class legs;
+- for add/withdraw modes, absolute class deltas remain explicitly labelled `Σ |delta|`;
+- add/withdraw threshold view comparing user-supplied flow with `minimumFlowForExactTarget`, including signed gap to that threshold;
 - explicit direction-conflict detection when add-only would require reducing a class or withdraw-only would require increasing one;
 - fail-closed mounting only after both drift and scenario calculations are available;
 - deterministic mobile layouts at <=760px and <=430px, no bubble/circle visualizations;
