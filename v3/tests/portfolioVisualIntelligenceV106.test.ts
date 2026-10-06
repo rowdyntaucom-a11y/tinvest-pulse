@@ -1,0 +1,16 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/CorePortfolioVisualIntelligenceV106.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/core/corePortfolioVisualV106.css",import.meta.url),"utf8"),workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
+assert.match(workspace,/CorePortfolioVisualIntelligenceV106 positions=\{props\.positions\}/);
+assert.match(core,/Визуальная карта капитала/);
+assert.match(core,/Кривая концентрации/);
+assert.match(core,/Классы активов/);
+assert.match(core,/Капитал по знаку P\/L/);
+assert.match(core,/Это не прогноз, рейтинг или рекомендация/);
+assert.match(core,/MutationObserver/);
+assert.match(core,/createPortal/);
+assert.match(css,/content-visibility:auto/);
+assert.match(css,/@media\(max-width:520px\)/);
+assert.match(css,/height:176px/);
+assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.doesNotMatch(core,/fetch\(|axios|POST|PUT|DELETE/);
+console.log("v106 portfolio visual intelligence contracts: ok");
