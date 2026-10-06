@@ -1,0 +1,9 @@
+/* v101 · persistent lazy portfolio-depth workspace */
+.v3-assets-depth__nav{position:sticky;top:62px;z-index:18;background:linear-gradient(180deg,var(--s-bg,#f5f6f8) 74%,color-mix(in srgb,var(--s-bg,#f5f6f8) 90%,transparent));box-shadow:0 7px 12px color-mix(in srgb,var(--s-bg,#f5f6f8) 88%,transparent)}
+.v3-assets-depth__stage[hidden]{display:none!important}
+.v3-assets-depth__stage{content-visibility:auto;contain-intrinsic-size:1px 720px;min-width:0}
+.v3-assets-depth__loading{min-height:180px;display:grid;place-items:center;border:1px dashed var(--v3-line);border-radius:14px;background:color-mix(in srgb,var(--v3-card) 96%,#000 4%);color:var(--v3-muted);font-size:9px;text-align:center;padding:20px}
+.v3-assets-depth__loading span{display:grid;gap:7px;justify-items:center}.v3-assets-depth__loading i{width:24px;height:24px;border:2px solid color-mix(in srgb,var(--v3-accent) 24%,transparent);border-top-color:var(--v3-accent);border-radius:50%;animation:v3AssetsDepthV101Spin .8s linear infinite}.v3-assets-depth__loading b{font-size:10px;color:var(--s-text,var(--v3-text))}.v3-assets-depth__loading small{font-size:8px;line-height:1.4}
+@keyframes v3AssetsDepthV101Spin{to{transform:rotate(360deg)}}
+@media(max-width:520px){.v3-assets-depth__nav{top:55px;margin-left:-2px;margin-right:-2px;padding:4px 3px}.v3-assets-depth__stage{contain-intrinsic-size:1px 920px}.v3-assets-depth__loading{min-height:150px}}
+@media(prefers-reduced-motion:reduce){.v3-assets-depth__loading i{animation:none}}
