@@ -11,7 +11,6 @@ import{loadMarketScreener}from"../analysis/marketScreenerApi";
 const CACHE_KEY="qvanix-core-trusted-snapshot-v2";
 const CACHE_MAX_AGE_MS=24*60*60_000;
 const RETRY_DELAYS=[2000,5000,10000,20000,30000,60000] as const;
-// Previous cold-start profile: 3000 / 7000 / 15000 / 30000 / 60000 ms; v67 begins recovery sooner.
 
 const readCache=():PortfolioSnapshot|null=>{
  try{
@@ -33,10 +32,10 @@ const EMPTY={
 
 function friendlyLoadError(error:unknown){
  const message=error instanceof Error?error.message:"Ошибка загрузки данных";
- if(/\b(502|503|504)\b|upstream unavailable|fetch failed|timeout/i.test(message)){
-  return"Сервер данных запускается. QVANIX повторит загрузку автоматически.";
+ if(/\b(502|503|504)\b|upstream unavailable|fetch failed|timeout|temporarily unavailable|portfolio unavailable/i.test(message)){
+  return"Брокерский источник пока не ответил. QVANIX продолжает автоматическое восстановление; неподтверждённые значения не показываются.";
  }
- return message;
+ return"Не удалось подтвердить брокерские данные. QVANIX повторит загрузку автоматически.";
 }
 
 export function CoreRoot(){
@@ -50,20 +49,13 @@ export function CoreRoot(){
  const refreshRef=useRef<()=>Promise<void>>(async()=>{});
 
  const cancelRetry=useCallback(()=>{
-  if(retryTimer.current!=null){
-   window.clearTimeout(retryTimer.current);
-   retryTimer.current=null;
-  }
+  if(retryTimer.current!=null){window.clearTimeout(retryTimer.current);retryTimer.current=null}
  },[]);
 
  const scheduleRetry=useCallback(()=>{
   if(!active.current||retryTimer.current!=null)return;
   const delay=RETRY_DELAYS[Math.min(retryStep.current,RETRY_DELAYS.length-1)];
-  retryTimer.current=window.setTimeout(()=>{
-   retryTimer.current=null;
-   retryStep.current++;
-   void refreshRef.current();
-  },delay);
+  retryTimer.current=window.setTimeout(()=>{retryTimer.current=null;retryStep.current++;void refreshRef.current()},delay);
  },[]);
 
  const refresh=useCallback(async()=>{
@@ -73,7 +65,7 @@ export function CoreRoot(){
   setRefreshing(true);
   lastAttempt.current=Date.now();
   const id=++req.current;
-  if(!trusted)setState("loading");
+  if(!trusted){setState("loading");setReason("Подключаем брокерские данные. Если полный dashboard отвечает медленно, QVANIX автоматически переключится на независимый read-only портфель.")}
   try{
    const result=await loadV3Portfolio();
    if(!shouldApplyRefresh(id,req.current,active.current))return;
@@ -81,22 +73,17 @@ export function CoreRoot(){
    setState(next);
    if(ok){
     let nextSnapshot=result.snapshot;
-    if(nextSnapshot.history.length<2){
-     const recovered=await loadPortfolioHistory();
-     if(recovered.length>=2)nextSnapshot={...nextSnapshot,history:recovered};
-    }
+    if(nextSnapshot.history.length<2){const recovered=await loadPortfolioHistory();if(recovered.length>=2)nextSnapshot={...nextSnapshot,history:recovered}}
     setSnapshot(nextSnapshot);
     cached.current=nextSnapshot;
     writeCache(nextSnapshot);
     setTrusted(true);
     if(nextSnapshot.source==="portfolio"){
      const recovery=nextSnapshot.recoveryContext;
-     const recoveredParts=[
-      recovery?.account?"счёт":null,
-      recovery?.operations&&recovery?.passiveIncomeComplete?"пассивный доход":null,
-     ].filter(Boolean);
-     const suffix=recoveredParts.length?"; дополнительно подтверждены "+recoveredParts.join(" и "):"";
-     setReason("Основной dashboard временно недоступен. Загружен подтверждённый брокерский портфель"+suffix+". История, XIRR/CAGR и рыночный контекст догружаются отдельно.");
+     const recoveredParts=[recovery?.account?"счёт":null,recovery?.operations&&recovery?.passiveIncomeComplete?"выплаты":null].filter(Boolean);
+     const suffix=recoveredParts.length?" Дополнительно подтверждены: "+recoveredParts.join(" и ")+".":"";
+     const incomeNote=recovery?.passiveIncomeComplete?"":" Выплаты пока не подтверждены и не выдаются за ноль.";
+     setReason("Полный dashboard отвечает медленно. Уже загружены подтверждённые стоимость и позиции из независимого read-only брокерского маршрута."+suffix+incomeNote+" История, XIRR/CAGR и рыночный контекст догружаются отдельно.");
      retryStep.current=Math.max(retryStep.current,3);
      scheduleRetry();
     }else{
@@ -105,35 +92,23 @@ export function CoreRoot(){
      cancelRetry();
     }
    }else{
-    setReason(result.trust.shortReason??"Источник не прошёл проверку доверия.");
     if(cached.current){
-     setSnapshot(cached.current);
-     setTrusted(true);
-     setState("stale");
-     setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок с этого устройства; повторяем загрузку автоматически.");
+     setSnapshot(cached.current);setTrusted(true);setState("stale");setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок с этого устройства; повторяем загрузку автоматически.")
     }else{
-     setTrusted(false);
+     setTrusted(false);setReason(result.trust.shortReason??"Источник не прошёл проверку доверия.")
     }
     scheduleRetry();
    }
   }catch(error){
    if(!active.current)return;
    if(cached.current){
-    setSnapshot(cached.current);
-    setTrusted(true);
-    setState("stale");
-    setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок с этого устройства; повторяем загрузку автоматически.");
+    setSnapshot(cached.current);setTrusted(true);setState("stale");setReason("Свежий источник временно недоступен. Показан последний подтверждённый снимок с этого устройства; повторяем загрузку автоматически.")
    }else{
-    setTrusted(false);
-    setState("error");
-    setReason(friendlyLoadError(error));
+    setTrusted(false);setState("error");setReason(friendlyLoadError(error))
    }
    scheduleRetry();
   }finally{
-   if(id===req.current){
-    running.current=false;
-    if(active.current)setRefreshing(false);
-   }
+   if(id===req.current){running.current=false;if(active.current)setRefreshing(false)}
   }
  },[cancelRetry,scheduleRetry,trusted]);
  refreshRef.current=refresh;
@@ -142,67 +117,32 @@ export function CoreRoot(){
   active.current=true;
   void refresh();
   const timer=window.setInterval(()=>void refreshRef.current(),V3_REFRESH_INTERVAL_MS);
-  const focus=()=>{
-   if(document.visibilityState==="hidden")return;
-   if(!cached.current||Date.now()-lastAttempt.current>=V3_FOCUS_REFRESH_MIN_AGE_MS)void refreshRef.current();
-  };
+  const focus=()=>{if(document.visibilityState==="hidden")return;if(!cached.current||Date.now()-lastAttempt.current>=V3_FOCUS_REFRESH_MIN_AGE_MS)void refreshRef.current()};
   const online=()=>void refreshRef.current();
-  window.addEventListener("focus",focus);
-  window.addEventListener("online",online);
-  document.addEventListener("visibilitychange",focus);
-  return()=>{
-   active.current=false;
-   req.current++;
-   cancelRetry();
-   window.clearInterval(timer);
-   window.removeEventListener("focus",focus);
-   window.removeEventListener("online",online);
-   document.removeEventListener("visibilitychange",focus);
-  };
+  window.addEventListener("focus",focus);window.addEventListener("online",online);document.addEventListener("visibilitychange",focus);
+  return()=>{active.current=false;req.current++;cancelRetry();window.clearInterval(timer);window.removeEventListener("focus",focus);window.removeEventListener("online",online);document.removeEventListener("visibilitychange",focus)};
  },[cancelRetry]);
 
  useEffect(()=>{
   if(!trusted)return;
-  const timer=window.setTimeout(()=>{
-   void Promise.allSettled([
-    loadMarketScreener(),
-    loadPayoutCalendar({timeoutMs:8000}),
-   ]);
-  },450);
+  const timer=window.setTimeout(()=>{void Promise.allSettled([loadMarketScreener(),loadPayoutCalendar({timeoutMs:8000})])},450);
   return()=>window.clearTimeout(timer);
  },[trusted,snapshot.updatedAt]);
 
  useEffect(()=>{
   if(!trusted)return;
-  const timer=window.setTimeout(()=>{
-   void Promise.allSettled([
-    import("../assets/V3AssetsDepth"),
-    import("../analysis/V3MarketIntelligenceWorkspace"),
-    import("../analysis/V3AnalysisToolbox"),
-    import("./CoreAnalyticsDepth"),
-    import("../income/V3IncomeDepth"),
-   ]);
-  },1400);
+  const timer=window.setTimeout(()=>{void Promise.allSettled([import("../assets/V3AssetsDepth"),import("../analysis/V3MarketIntelligenceWorkspace"),import("../analysis/V3AnalysisToolbox"),import("./CoreAnalyticsDepth"),import("../income/V3IncomeDepth")])},1400);
   return()=>window.clearTimeout(timer);
  },[trusted]);
 
  const home=buildV3HomeViewModel(snapshot,trusted);
+ const incomeTrusted=trusted&&(snapshot.source==="dashboard"||snapshot.recoveryContext?.passiveIncomeComplete===true);
  return <CoreWorkspace
   home={home}
   positions={trusted?snapshot.positionItems:[]}
   history={trusted?snapshot.history:[]}
-  marketContext={{
-   riskFreeRate:trusted?snapshot.riskFreeRate:null,
-   riskFreeRateDate:trusted?snapshot.riskFreeRateDate:null,
-   nextRateMeeting:trusted?snapshot.nextRateMeeting:null,
-  }}
-  income={{
-   total:trusted?snapshot.passiveIncome:null,
-   monthly:trusted?snapshot.averageMonthlyPassiveIncome:null,
-   annual:trusted?snapshot.averageAnnualPassiveIncome:null,
-   portfolioValue:trusted?snapshot.value:null,
-   trusted
-  }}
+  marketContext={{riskFreeRate:trusted?snapshot.riskFreeRate:null,riskFreeRateDate:trusted?snapshot.riskFreeRateDate:null,nextRateMeeting:trusted?snapshot.nextRateMeeting:null}}
+  income={{total:incomeTrusted?snapshot.passiveIncome:null,monthly:incomeTrusted?snapshot.averageMonthlyPassiveIncome:null,annual:incomeTrusted?snapshot.averageAnnualPassiveIncome:null,portfolioValue:trusted?snapshot.value:null,trusted:incomeTrusted}}
   connection={{state,reason,refresh,refreshing,source:trusted?snapshot.source:null}}
  />;
 }
