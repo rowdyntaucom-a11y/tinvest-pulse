@@ -6,6 +6,7 @@ import{filterHistoryWindow,V3_HISTORY_WINDOWS}from"../src/history/historyLens.ts
 const server=readFileSync(new URL("../../server-core.js",import.meta.url),"utf8");
 const api=readFileSync(new URL("../../v2/src/lib/portfolioApi.ts",import.meta.url),"utf8");
 const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
 const avatar=readFileSync(new URL("../src/assets/InstrumentAvatar.tsx",import.meta.url),"utf8");
 const chart=readFileSync(new URL("../src/home/V3HistorySparkline.tsx",import.meta.url),"utf8");
 const chartCss=readFileSync(new URL("../src/history/historyInteraction.css",import.meta.url),"utf8");
@@ -15,6 +16,8 @@ const command=readFileSync(new URL("../src/core/CoreCommandCenterV110.tsx",impor
 const commandCss=readFileSync(new URL("../src/core/coreCommandCenterV110.css",import.meta.url),"utf8");
 const portfolioVisual=readFileSync(new URL("../src/core/CorePortfolioVisualIntelligenceV106.tsx",import.meta.url),"utf8");
 const riskVisual=readFileSync(new URL("../src/core/CoreRiskVisualIntelligenceV107.tsx",import.meta.url),"utf8");
+const assetPosition=readFileSync(new URL("../src/core/CoreAssetPositionCockpitV113.tsx",import.meta.url),"utf8");
+const assetPositionCss=readFileSync(new URL("../src/core/coreAssetPositionV113.css",import.meta.url),"utf8");
 
 test("server enriches dashboard identity from verified T-Bank instrument metadata",()=>{
  assert.match(server,/INSTRUMENT_META_CACHE_TTL_MS = 24 \* 60 \* 60 \* 1000/);
@@ -24,7 +27,6 @@ test("server enriches dashboard identity from verified T-Bank instrument metadat
  assert.match(server,/brand\.logoName/);
  assert.match(server,/invest-brands\.cdn-tinkoff\.ru/);
  assert.match(server,/await enrichPositionsIdentity\(positions\)/);
- // Isolated broker fallback remains intentionally free of metadata latency.
  const fallback=server.slice(server.indexOf("app.get('/api/portfolio'"),server.indexOf("app.get('/api/version'"));
  assert.doesNotMatch(fallback,/enrichPositionsIdentity/);
 });
@@ -87,4 +89,18 @@ test("concentration and drawdown panels expose exact readable context",()=>{
  assert.match(riskVisual,/Макс\. просадка/);
  assert.match(riskVisual,/До пика/);
  assert.match(riskVisual,/maxPoint/);
+});
+
+test("asset detail mounts an exact collision-free position cockpit",()=>{
+ assert.match(workspace,/CoreAssetPositionCockpitV113/);
+ assert.match(assetPosition,/Позиционный профиль/);
+ assert.match(assetPosition,/Себестоимость → текущая стоимость/);
+ assert.match(assetPosition,/Вклад P\/L в портфель/);
+ assert.match(assetPosition,/Соседи по размеру позиции/);
+ assert.match(assetPosition,/pnl\/total\*100/);
+ assert.match(assetPosition,/expectedYield\)\/finite\(row\.costBasis\)\*100/);
+ assert.doesNotMatch(assetPosition,/<svg|<circle/);
+ assert.match(assetPositionCss,/grid-template-columns:1fr 1fr/);
+ assert.match(assetPositionCss,/49\.5% 50\.5%/);
+ assert.match(assetPositionCss,/data-asset-workspace-v96="summary"/);
 });
