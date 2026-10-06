@@ -35,7 +35,7 @@ export function buildRebalanceVisualBridgeModelV119(drift:DriftResult,scenario:R
  const minimum=scenario.minimumFlowForExactTarget;
  const thresholdMax=scenario.mode==="REBALANCE_EXISTING"?1:Math.max(1,scenario.requestedFlow,minimum??0);
  const thresholdGap=scenario.mode==="REBALANCE_EXISTING"||minimum==null?null:scenario.requestedFlow-minimum;
- const directionConflict=rows.filter(row=>scenario.mode==="ADD_CAPITAL"?row.deltaValue<0:scenario.mode==="WITHDRAW_CAPITAL"?row.deltaValue>0:false);
+ const directionConflict=rows.filter(row=>scenario.mode==="ADD_CAPITAL"?row.direction==="DECREASE":scenario.mode==="WITHDRAW_CAPITAL"?row.direction==="INCREASE":false);
  const coverage=Math.max(0,Math.min(1,1-scenario.unassignedWeight));
  return{rows,absoluteDelta,displayedMovement,displayedMovementLabel,maxDelta,minimum,thresholdMax,thresholdGap,directionConflict,coverage};
 }
