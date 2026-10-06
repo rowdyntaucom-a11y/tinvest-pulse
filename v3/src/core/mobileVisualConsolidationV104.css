@@ -1,0 +1,198 @@
+/* QVANIX v104 — mobile visual consolidation.
+   Visual-only layer: no portfolio math, data trust or read-only behavior changes. */
+
+@media (max-width: 640px){
+  .sb{
+    --qv-mobile-card-radius:16px;
+    --qv-mobile-gap:10px;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .sb main{
+    width:calc(100% - 20px);
+    padding-top:10px;
+    padding-bottom:56px;
+  }
+
+  .sb-title{
+    padding:8px 2px 12px;
+  }
+  .sb-title h1{
+    font-size:25px;
+    line-height:1.05;
+    letter-spacing:-.045em;
+  }
+  .sb-title span{
+    display:block;
+    margin-top:4px;
+    font-size:9px;
+    line-height:1.35;
+  }
+
+  .sb-chart,.sb-block,.sb-menu{
+    border-radius:var(--qv-mobile-card-radius);
+    margin-bottom:var(--qv-mobile-gap);
+    box-shadow:0 1px 0 rgba(16,24,40,.02),0 8px 24px rgba(16,24,40,.035);
+  }
+  .sb-chart,.sb-block{padding:14px}
+
+  .sb-chart>header,.sb-block>header{
+    margin-bottom:11px;
+    gap:10px;
+  }
+  .sb-chart header b,.sb-block header b{font-size:13px;line-height:1.2}
+  .sb-chart header small,.sb-block header small{font-size:8.5px;line-height:1.35}
+  .sb-chart header button,.sb-block header button{font-size:9px;min-height:32px;padding:5px 0}
+
+  /* Charts get enough vertical space to be readable on real phones. */
+  .sb-chart .v3-history-chart,
+  .sb-result-chart .v3-history-chart,
+  .sb-hero-chart .v3-history-chart{
+    height:196px!important;
+    min-height:196px!important;
+    border-radius:12px;
+    touch-action:pan-y;
+  }
+  .sb .v3-history-chart svg{
+    width:100%!important;
+    max-width:100%;
+    overflow:visible;
+  }
+  .sb .v3-history-chart text{
+    font-size:10px;
+  }
+
+  .sb-balance{
+    padding:10px 2px 17px;
+  }
+  .sb-balance>span{font-size:11px}
+  .sb-balance>strong{
+    font-size:38px;
+    line-height:1.04;
+    margin:7px 0 8px;
+  }
+  .sb-balance-result-label{font-size:8px;line-height:1.35}
+  .sb-balance>b{font-size:12px}
+  .sb-balance>div{
+    gap:28px;
+    margin-top:16px;
+  }
+  .sb-balance>div span{font-size:9px}
+  .sb-balance>div b{font-size:16px}
+
+  /* Improve hierarchy in dense metric clusters instead of shrinking everything. */
+  .sb-result-head,.sb-income-head{
+    gap:7px;
+  }
+  .sb-result-head article,.sb-income-head article,.sb-result-truth article{
+    min-width:0;
+    border-radius:14px;
+    padding:12px;
+  }
+  .sb-result-head span,.sb-income-head span,.sb-result-truth span{font-size:8.5px;line-height:1.25}
+  .sb-result-head strong,.sb-income-head strong{font-size:18px;line-height:1.1}
+  .sb-result-truth strong{font-size:16px;line-height:1.1}
+  .sb-result-head small,.sb-income-head small,.sb-result-truth small{font-size:7.5px;line-height:1.4}
+
+  .sb-asset{
+    grid-template-columns:minmax(0,1fr) 48px 92px;
+    min-height:56px;
+    padding:10px 0;
+    gap:8px;
+  }
+  .sb-asset>span b{font-size:11px;line-height:1.25}
+  .sb-asset>span small{font-size:8.5px;line-height:1.25}
+  .sb-asset>em{font-size:9px}
+  .sb-asset>strong{font-size:11px;line-height:1.25}
+  .sb-asset>strong small{font-size:8px}
+
+  .sb-switch{
+    max-width:100%;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+    padding:4px;
+    gap:4px;
+  }
+  .sb-switch::-webkit-scrollbar{display:none}
+  .sb-switch button{
+    flex:0 0 auto;
+    min-height:38px;
+    padding:8px 13px;
+    font-size:9px;
+    white-space:nowrap;
+  }
+
+  .sb-home-cockpit,.sb-home-side{
+    gap:var(--qv-mobile-gap);
+  }
+  .sb-home-brief>div{
+    gap:8px;
+  }
+  .sb-home-brief button{
+    min-height:74px;
+  }
+
+  .sb-hubgrid{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+  .sb-hubgrid button{
+    min-height:70px;
+    padding:12px 13px;
+    border-radius:14px;
+  }
+  .sb-hubgrid b{font-size:11px}
+  .sb-hubgrid small{font-size:8.5px;line-height:1.35}
+
+  /* Bottom dock must not compete with floating controls/content. */
+  .sb-nav{
+    height:68px;
+    padding:4px 4px calc(4px + env(safe-area-inset-bottom));
+    box-shadow:0 -8px 28px rgba(16,24,40,.07);
+  }
+  .sb-nav button{
+    min-width:0;
+    border-radius:12px;
+    gap:3px;
+  }
+  .sb-nav i{font-size:16px}
+  .sb-nav span{font-size:8px;font-weight:650}
+
+  /* Heavy secondary workspaces should paint as they enter the viewport. */
+  .sb [class*="depth"],
+  .sb [class*="workspace"]{
+    content-visibility:auto;
+    contain-intrinsic-size:1px 560px;
+  }
+
+  /* Keep native controls comfortably tappable. */
+  .sb button,.sb input,.sb select{
+    -webkit-tap-highlight-color:transparent;
+  }
+  .sb button:focus-visible,.sb input:focus-visible,.sb select:focus-visible{
+    outline:2px solid color-mix(in srgb,var(--s-blue) 72%,white);
+    outline-offset:2px;
+  }
+}
+
+@media (max-width: 390px){
+  .sb-balance>strong{font-size:35px}
+  .sb-chart .v3-history-chart,
+  .sb-result-chart .v3-history-chart,
+  .sb-hero-chart .v3-history-chart{
+    height:182px!important;
+    min-height:182px!important;
+  }
+  .sb-result-head{grid-template-columns:1fr 1fr}
+  .sb-result-head article:first-child{grid-column:1/-1}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .sb *, .sb *::before, .sb *::after{
+    scroll-behavior:auto!important;
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+}

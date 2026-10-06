@@ -1,0 +1,14 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/core/mobileVisualConsolidationV104.css",import.meta.url),"utf8");
+assert.match(workspace,/mobileVisualConsolidationV104\.css/);
+assert.match(css,/@media \(max-width: 640px\)/);
+assert.match(css,/\.sb-chart \.v3-history-chart/);
+assert.match(css,/height:196px!important/);
+assert.match(css,/touch-action:pan-y/);
+assert.match(css,/\.sb-switch\{[\s\S]*overflow-x:auto/);
+assert.match(css,/\.sb-nav\{[\s\S]*env\(safe-area-inset-bottom\)/);
+assert.match(css,/content-visibility:auto/);
+assert.match(css,/prefers-reduced-motion: reduce/);
+assert.doesNotMatch(css,/display:\s*none[^;}]*\.v3-history-chart/);
+console.log("v104 mobile visual consolidation contracts: ok");
