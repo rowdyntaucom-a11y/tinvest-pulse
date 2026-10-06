@@ -28,6 +28,16 @@ test("strategy comparison uses exact existing curves and descriptive path diagno
  assert.match(compare,/не вероятность будущего/);
 });
 
+test("comparison exposes a readable common scale with 100 baseline and date anchors",()=>{
+ assert.match(compare,/baseY:min<=1&&max>=1/);
+ assert.match(compare,/className="is-baseline"/);
+ assert.match(compare,/middle:a\.curve\[midIndex\]/);
+ assert.match(compare,/v3-strategy-compare-v118__dates/);
+ assert.match(compare,/fmtDate\(model\.middle\)/);
+ assert.match(css,/line\.is-baseline/);
+ assert.match(css,/v3-strategy-compare-v118__dates/);
+});
+
 test("comparison is collision-free and keeps lines on a common readable scale",()=>{
  assert.match(compare,/<polyline className="is-a"/);
  assert.match(compare,/<polyline className="is-b"/);
