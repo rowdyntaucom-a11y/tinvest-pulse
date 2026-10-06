@@ -1,0 +1,17 @@
+/* v100 · persistent professional tools workspace */
+.v3-pro-tools__stage-pane[hidden]{display:none}
+.v3-pro-tools__stage-pane{min-width:0;content-visibility:auto;contain-intrinsic-size:1px 720px}
+.v3-pro-tools__stage-pane>.v3-pro-tools__loading{min-height:180px}
+.v3-pro-tools__focus{scroll-margin-top:96px}
+.v3-pro-tools__stage{scroll-margin-top:116px}
+@media(max-width:520px){
+ .v3-pro-tools__focus{position:sticky;top:78px;z-index:18;margin-left:-4px;margin-right:-4px;padding:8px;background:rgba(245,246,248,.96);backdrop-filter:blur(10px);box-shadow:0 7px 14px rgba(36,48,65,.08)}
+ .v3-pro-tools__focus>div{min-width:0}
+ .v3-pro-tools__focus>div p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ .v3-pro-tools__focus>button{min-height:38px;touch-action:manipulation}
+ .v3-pro-tools__groups{max-height:min(52vh,430px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+ .v3-pro-tools__stage{margin-top:7px;scroll-margin-top:132px}
+ .v3-pro-tools__stage-pane{contain-intrinsic-size:1px 900px}
+}
+@media(max-width:359px){.v3-pro-tools__focus{top:74px}.v3-pro-tools__stage{scroll-margin-top:124px}}
+@media(prefers-reduced-motion:reduce){.v3-pro-tools__groups{scroll-behavior:auto}}
