@@ -1,0 +1,17 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/CoreRiskVisualIntelligenceV107.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/core/coreRiskVisualV107.css",import.meta.url),"utf8"),workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
+assert.match(workspace,/CoreRiskVisualIntelligenceV107 positions=\{props\.positions\} history=\{props\.history\}/);
+assert.match(core,/Профиль просадки/);
+assert.match(core,/Историческая просадка/);
+assert.match(core,/Вклад P\/L по позициям/);
+assert.match(core,/Капитал в позициях с отрицательным P\/L/);
+assert.match(core,/Math\.min\(0,\.\.\.drawdowns\.map/);
+assert.match(core,/x\.expectedYield\/total\*100/);
+assert.match(core,/MutationObserver/);
+assert.match(core,/createPortal/);
+assert.match(core,/не заменяет VaR\/CVaR/);
+assert.match(css,/content-visibility:auto/);
+assert.match(css,/height:188px/);
+assert.match(css,/@media\(max-width:520px\)/);
+assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+console.log("v107 risk visual intelligence contracts: ok");
