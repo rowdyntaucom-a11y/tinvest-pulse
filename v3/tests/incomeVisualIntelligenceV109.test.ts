@@ -1,0 +1,18 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/CoreIncomeVisualIntelligenceV109.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/core/coreIncomeVisualV109.css",import.meta.url),"utf8"),workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
+assert.match(workspace,/CoreIncomeVisualIntelligenceV109 positions=\{props\.positions\}/);
+assert.match(core,/Карта денежного потока/);
+assert.match(core,/Фактический поток/);
+assert.match(core,/Календарь 12М/);
+assert.match(core,/Крупнейшие источники/);
+assert.match(core,/calendar\.integrity\.complete&&!calendar\.stale/);
+assert.match(core,/Фактический net и будущее gross не складываются/);
+assert.match(core,/loadPayoutCalendar/);
+assert.match(core,/MutationObserver/);
+assert.match(core,/createPortal/);
+assert.match(css,/content-visibility:auto/);
+assert.match(css,/@media\(max-width:520px\)/);
+assert.match(css,/height:132px/);
+assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.doesNotMatch(core,/recommendation|trade|order|broker write/i);
+console.log("v109 income visual intelligence contracts: ok");
