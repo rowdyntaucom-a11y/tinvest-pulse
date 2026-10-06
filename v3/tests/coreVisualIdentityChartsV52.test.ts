@@ -9,6 +9,10 @@ const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),
 const avatar=readFileSync(new URL("../src/assets/InstrumentAvatar.tsx",import.meta.url),"utf8");
 const chart=readFileSync(new URL("../src/home/V3HistorySparkline.tsx",import.meta.url),"utf8");
 const chartCss=readFileSync(new URL("../src/history/historyInteraction.css",import.meta.url),"utf8");
+const breadth=readFileSync(new URL("../src/core/CoreBreadthVisualIntelligenceV108.tsx",import.meta.url),"utf8");
+const breadthCss=readFileSync(new URL("../src/core/coreBreadthVisualV108.css",import.meta.url),"utf8");
+const command=readFileSync(new URL("../src/core/CoreCommandCenterV110.tsx",import.meta.url),"utf8");
+const commandCss=readFileSync(new URL("../src/core/coreCommandCenterV110.css",import.meta.url),"utf8");
 
 test("server enriches dashboard identity from verified T-Bank instrument metadata",()=>{
  assert.match(server,/INSTRUMENT_META_CACHE_TTL_MS = 24 \* 60 \* 60 \* 1000/);
@@ -54,4 +58,17 @@ test("detailed history can switch between value and rebased TWR versus IMOEX",()
  assert.match(chartCss,/v3-history-mode/);
  assert.match(chartCss,/v3-chart-primary/);
  assert.match(chartCss,/v3-chart-secondary/);
+});
+
+test("core analytical maps use collision-free zero-centered rails instead of bubble clouds",()=>{
+ assert.doesNotMatch(breadth,/<circle/);
+ assert.match(breadth,/Доходность крупных позиций/);
+ assert.match(breadth,/core-breadth-visual-v108__center-rail/);
+ assert.match(breadthCss,/grid-template-columns:1fr 1fr/);
+ assert.match(breadthCss,/49\.5% 50\.5%/);
+ assert.doesNotMatch(command,/allocation-ring/);
+ assert.match(command,/allocation-stack/);
+ assert.match(command,/ВКЛАД В P\/L/);
+ assert.match(commandCss,/core-command-center-v110__impact-axis/);
+ assert.match(commandCss,/grid-template-columns:1fr 1fr/);
 });
