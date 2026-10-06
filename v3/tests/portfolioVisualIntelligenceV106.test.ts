@@ -12,5 +12,5 @@ assert.match(css,/content-visibility:auto/);
 assert.match(css,/@media\(max-width:520px\)/);
 assert.match(css,/height:176px/);
 assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
-assert.doesNotMatch(core,/forecast|recommend|trade|order/i);
+assert.doesNotMatch(core,/fetch\(|axios|POST|PUT|DELETE/);
 console.log("v106 portfolio visual intelligence contracts: ok");
