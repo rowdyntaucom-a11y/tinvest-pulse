@@ -1,0 +1,15 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const chart=readFileSync(new URL("../src/home/V3HistorySparkline.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/styles/historyVisualCockpitV105.css",import.meta.url),"utf8"),workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
+assert.match(workspace,/historyVisualCockpitV105\.css/);
+assert.match(chart,/v3-chart-grid/);
+assert.match(chart,/v3-chart-area/);
+assert.match(chart,/v3-chart-baseline/);
+assert.match(chart,/v3-history-range/);
+assert.match(chart,/selectedRow\?\.invested/);
+assert.match(chart,/touch-action|onPointerDown/);
+assert.match(css,/min-height:214px/);
+assert.match(css,/position:sticky;top:55px/);
+assert.match(css,/grid-template-columns:1fr!important/);
+assert.match(css,/prefers-reduced-motion/);
+assert.doesNotMatch(chart,/forecast|recommendation|order/i);
+console.log("v105 history visual cockpit contracts: ok");
