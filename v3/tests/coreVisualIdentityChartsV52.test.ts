@@ -97,7 +97,7 @@ test("asset detail mounts an exact collision-free position cockpit",()=>{
  assert.match(assetPosition,/Себестоимость → текущая стоимость/);
  assert.match(assetPosition,/Вклад P\/L в портфель/);
  assert.match(assetPosition,/Соседи по размеру позиции/);
- assert.match(assetPosition,/expectedYield\/total\*100/);
+ assert.match(assetPosition,/pnl\/total\*100/);
  assert.match(assetPosition,/expectedYield\)\/finite\(row\.costBasis\)\*100/);
  assert.doesNotMatch(assetPosition,/<svg|<circle/);
  assert.match(assetPositionCss,/grid-template-columns:1fr 1fr/);
