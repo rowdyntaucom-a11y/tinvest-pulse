@@ -1,0 +1,18 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/CoreBreadthVisualIntelligenceV108.tsx",import.meta.url),"utf8"),css=readFileSync(new URL("../src/core/coreBreadthVisualV108.css",import.meta.url),"utf8"),workspace=readFileSync(new URL("../src/core/CoreWorkspace.tsx",import.meta.url),"utf8");
+assert.match(workspace,/CoreBreadthVisualIntelligenceV108 positions=\{props\.positions\}/);
+assert.match(core,/P\/L breadth/);
+assert.match(core,/Gross плюс/);
+assert.match(core,/Gross минус/);
+assert.match(core,/Карта доходности позиций/);
+assert.match(core,/Самый сильный вклад/);
+assert.match(core,/0% по центру/);
+assert.match(core,/Это описательный срез текущего нереализованного P\/L/);
+assert.match(core,/MutationObserver/);
+assert.match(core,/createPortal/);
+assert.match(css,/content-visibility:auto/);
+assert.match(css,/height:194px/);
+assert.match(css,/@media\(max-width:520px\)/);
+assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.doesNotMatch(core,/forecast|recommendation|trade|order/i);
+console.log("v108 breadth visual intelligence contracts: ok");
