@@ -13,6 +13,8 @@ const breadth=readFileSync(new URL("../src/core/CoreBreadthVisualIntelligenceV10
 const breadthCss=readFileSync(new URL("../src/core/coreBreadthVisualV108.css",import.meta.url),"utf8");
 const command=readFileSync(new URL("../src/core/CoreCommandCenterV110.tsx",import.meta.url),"utf8");
 const commandCss=readFileSync(new URL("../src/core/coreCommandCenterV110.css",import.meta.url),"utf8");
+const portfolioVisual=readFileSync(new URL("../src/core/CorePortfolioVisualIntelligenceV106.tsx",import.meta.url),"utf8");
+const riskVisual=readFileSync(new URL("../src/core/CoreRiskVisualIntelligenceV107.tsx",import.meta.url),"utf8");
 
 test("server enriches dashboard identity from verified T-Bank instrument metadata",()=>{
  assert.match(server,/INSTRUMENT_META_CACHE_TTL_MS = 24 \* 60 \* 60 \* 1000/);
@@ -55,9 +57,14 @@ test("detailed history can switch between value and rebased TWR versus IMOEX",()
  assert.match(chart,/rebase\(windowPoints,"imoex"\)/);
  assert.match(chart,/денежные потоки нейтрализованы/);
  assert.match(chart,/не прогноз и не рейтинг/);
+ assert.match(chart,/v3-history-yaxis/);
+ assert.match(chart,/v3-history-series-summary/);
+ assert.match(chart,/Максимум/);
+ assert.match(chart,/Минимум/);
  assert.match(chartCss,/v3-history-mode/);
  assert.match(chartCss,/v3-chart-primary/);
  assert.match(chartCss,/v3-chart-secondary/);
+ assert.match(chartCss,/grid-template-rows:repeat\(3,1fr\)/);
 });
 
 test("core analytical maps use collision-free zero-centered rails instead of bubble clouds",()=>{
@@ -71,4 +78,13 @@ test("core analytical maps use collision-free zero-centered rails instead of bub
  assert.match(command,/ВКЛАД В P\/L/);
  assert.match(commandCss,/core-command-center-v110__impact-axis/);
  assert.match(commandCss,/grid-template-columns:1fr 1fr/);
+});
+
+test("concentration and drawdown panels expose exact readable context",()=>{
+ assert.match(portfolioVisual,/Крупнейшие позиции/);
+ assert.match(portfolioVisual,/core-portfolio-visual-v106__ranking/);
+ assert.match(portfolioVisual,/rank\.slice\(0,5\)/);
+ assert.match(riskVisual,/Макс\. просадка/);
+ assert.match(riskVisual,/До пика/);
+ assert.match(riskVisual,/maxPoint/);
 });
