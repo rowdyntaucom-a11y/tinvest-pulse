@@ -2,10 +2,11 @@ import{loadPortfolio,type PortfolioSnapshot}from"../../../v2/src/lib/portfolioAp
 export type V3PortfolioLoad={snapshot:PortfolioSnapshot;trust:DataTrustSnapshot};
 const RECOVERY_HEDGE_MS=1800;
 const sleep=(ms:number)=>new Promise<void>(resolve=>window.setTimeout(resolve,ms));
+function firstSuccessful<T>(tasks:Promise<T>[]):Promise<T>{return new Promise((resolve,reject)=>{let pending=tasks.length;const errors:unknown[]=[];tasks.forEach((task,index)=>task.then(resolve,error=>{errors[index]=error;pending--;if(!pending)reject(errors[0]??new Error("broker sources unavailable"))}))})}
 async function loadResilientSnapshot(){
  const primary=loadPortfolio();
  const recovery=(async()=>{await sleep(RECOVERY_HEDGE_MS);return loadFastPortfolioRecovery()})();
- try{return await Promise.any([primary,recovery])}catch(error){if(error instanceof AggregateError&&error.errors.length)throw error.errors[0];throw error}
+ return firstSuccessful([primary,recovery]);
 }
 /**
  * A successful broker HTTP read is fresh at the time we receive it even when
