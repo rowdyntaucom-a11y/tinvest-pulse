@@ -11,6 +11,7 @@ import{loadMarketScreener}from"../analysis/marketScreenerApi";
 const CACHE_KEY="qvanix-core-trusted-snapshot-v2";
 const CACHE_MAX_AGE_MS=24*60*60_000;
 const RETRY_DELAYS=[2000,5000,10000,20000,30000,60000] as const;
+// Previous cold-start profile: 3000 / 7000 / 15000 / 30000 / 60000 ms; v67 begins recovery sooner.
 
 const readCache=():PortfolioSnapshot|null=>{
  try{
@@ -83,7 +84,7 @@ export function CoreRoot(){
      const recoveredParts=[recovery?.account?"счёт":null,recovery?.operations&&recovery?.passiveIncomeComplete?"выплаты":null].filter(Boolean);
      const suffix=recoveredParts.length?" Дополнительно подтверждены: "+recoveredParts.join(" и ")+".":"";
      const incomeNote=recovery?.passiveIncomeComplete?"":" Выплаты пока не подтверждены и не выдаются за ноль.";
-     setReason("Полный dashboard отвечает медленно. Уже загружены подтверждённые стоимость и позиции из независимого read-only брокерского маршрута."+suffix+incomeNote+" История, XIRR/CAGR и рыночный контекст догружаются отдельно.");
+     setReason("Основной dashboard временно недоступен или отвечает медленно. Уже загружены подтверждённые стоимость и позиции из независимого read-only брокерского маршрута."+suffix+incomeNote+" История, XIRR/CAGR и рыночный контекст догружаются отдельно.");
      retryStep.current=Math.max(retryStep.current,3);
      scheduleRetry();
     }else{
