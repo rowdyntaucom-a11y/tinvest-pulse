@@ -1,0 +1,31 @@
+.v3-history-figure{--qv-chart-grid:color-mix(in srgb,var(--v3-line) 72%,transparent);--qv-chart-fill:color-mix(in srgb,var(--v3-accent) 16%,transparent)}
+.v3-chart-grid{stroke:var(--qv-chart-grid);stroke-width:.55;vector-effect:non-scaling-stroke}
+.v3-chart-baseline{stroke:color-mix(in srgb,var(--v3-muted) 48%,transparent);stroke-width:.7;stroke-dasharray:2 2;vector-effect:non-scaling-stroke}
+.v3-chart-area{fill:var(--qv-chart-fill);stroke:none;pointer-events:none}
+.v3-history-range{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 2px 2px;color:var(--v3-muted);font-size:8px;font-variant-numeric:tabular-nums}
+.v3-history-range strong{color:var(--v3-text);font-size:9px;font-weight:800}
+.v3-history-point{box-shadow:0 6px 18px rgba(15,23,42,.06)}
+.v3-history-point::before{content:"Выбранная точка";grid-column:1/-1;color:var(--v3-muted);font-size:7px;font-weight:750;letter-spacing:.05em;text-transform:uppercase}
+.v3-history-depth{margin-top:8px}
+.v3-history-depth>div{min-width:0}
+.v3-history-depth strong{font-variant-numeric:tabular-nums}
+.sb-result-chart .v3-history-figure{padding-top:2px}
+.sb-result-chart .v3-chart.is-interactive{border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--v3-accent) 4%,transparent),transparent 68%)}
+@media(max-width:520px){
+ .sb-result-chart{padding:12px 10px 11px!important}
+ .sb-result-chart .v3-history-toolbar{position:sticky;top:55px;z-index:6;padding:6px 0 7px;background:color-mix(in srgb,var(--s-card) 94%,transparent);backdrop-filter:blur(12px)}
+ .sb-result-chart .v3-chart.is-interactive{min-height:214px!important;height:214px!important}
+ .sb-result-chart .v3-history-axis{top:94px;font-size:8px}
+ .v3-history-point{grid-template-columns:1fr auto;padding:9px 10px;gap:3px 8px}
+ .v3-history-point strong{font-size:13px!important}
+ .v3-history-point small{grid-column:1/-1;font-size:8px}
+ .v3-history-range{font-size:7.5px;margin-top:7px}
+ .v3-history-range strong{font-size:8.5px}
+ .v3-history-depth{grid-template-columns:1fr!important;gap:6px!important}
+ .v3-history-depth>div{padding:9px 10px!important;border-radius:10px!important}
+ .v3-history-depth span{font-size:8px!important}
+ .v3-history-depth strong{font-size:13px!important}
+ .v3-history-depth small{font-size:7.5px!important}
+}
+@media(min-width:760px){.sb-result-chart .v3-chart.is-interactive{min-height:300px!important;height:300px!important}}
+@media(prefers-reduced-motion:reduce){.v3-history-point{scroll-behavior:auto}}
