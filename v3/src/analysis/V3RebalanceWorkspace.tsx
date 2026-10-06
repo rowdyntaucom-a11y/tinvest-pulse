@@ -3,6 +3,7 @@ import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{calculateAllocationDrift,PERSONAL_STRATEGY_V1,type StrategyConfig}from"../../../v2/src/features/analytics/drift";
 import{calculateRebalanceScenario,type RebalanceScenarioMode}from"../../../v2/src/features/analytics/rebalanceScenarios";
 import{V3GlossaryHelp}from"../help/V3GlossaryHelp";
+import{V3RebalanceVisualBridgeV119}from"./V3RebalanceVisualBridgeV119";
 import"../styles/samuraiRebalance.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -115,6 +116,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
        </article>)}
       </div>
       {!scenario.exactTargetPossible&&scenario.reason&&<p className="sam-rebalance__warning">{scenario.reason}</p>}
+      <V3RebalanceVisualBridgeV119 drift={drift} scenario={scenario}/>
      </>}
     </section>
 
