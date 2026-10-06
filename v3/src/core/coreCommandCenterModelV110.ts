@@ -20,7 +20,8 @@ export function buildCommandCenterModelV110(positions:PositionSnapshot[],history
  const valid=positions.filter(row=>finite(row.currentValue)&&row.currentValue>0);
  const total=valid.reduce((sum,row)=>sum+row.currentValue,0);
  const profit=valid.reduce((sum,row)=>sum+(finite(row.expectedYield)?row.expectedYield:0),0);
- const profitPct=total>0?profit/(total-profit)*100:null;
+ const costBasis=total-profit;
+ const profitPct=costBasis>0?profit/costBasis*100:null;
  const positiveCapital=valid.filter(row=>finite(row.expectedYield)&&row.expectedYield>0).reduce((sum,row)=>sum+row.currentValue,0);
  const negativeCapital=valid.filter(row=>finite(row.expectedYield)&&row.expectedYield<0).reduce((sum,row)=>sum+row.currentValue,0);
  const flatCapital=Math.max(0,total-positiveCapital-negativeCapital);
@@ -36,7 +37,7 @@ export function buildCommandCenterModelV110(positions:PositionSnapshot[],history
  for(const point of hist){peak=Math.max(peak,point.value!);const dd=peak>0?(point.value!-peak)/peak*100:0;maxDd=Math.min(maxDd,dd);peakValue=Math.max(peakValue??0,point.value!)}
  if(hist.length&&peak>0)currentDd=(hist.at(-1)!.value!-peak)/peak*100;
  const values=hist.map(point=>point.value!),min=Math.min(...values,0),max=Math.max(...values,1),span=Math.max(1,max-min);
- const curve=hist.map((point,index)=>({x:hist.length<2?50:index/(hist.length-1)*100,y:94-(point.value!-min)/span*84,value:point.value!,invested:finite(point.invested)?point.invested:null,date:String(point.date??point.time??"")}));
+ const curve=hist.map((point,index)=>({x:hist.length<2?50:index/(hist.length-1)*100,y:94-(point.value!-min)/span*84,value:point.value!,invested:finite(point.invested)?point.invested:null,date:point.date}));
  const first=hist[0],last=hist.at(-1),capitalDelta=first&&last?last.value!-first.value!:null;
  const firstInvested=first&&finite(first.invested)?first.invested:null,lastInvested=last&&finite(last.invested)?last.invested:null,investedDelta=firstInvested!=null&&lastInvested!=null?lastInvested-firstInvested:null;
  const incomeTotal=income.trusted&&finite(income.total)?income.total:null,incomeMonthly=income.trusted&&finite(income.monthly)?income.monthly:null,incomeAnnual=income.trusted&&finite(income.annual)?income.annual:null;
