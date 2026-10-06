@@ -17,10 +17,12 @@ test("portfolio weight is neutral and explicitly labelled",()=>{
  assert.doesNotMatch(core,/function AssetRow[\s\S]*?<em>\{dec\.format\(w\)\}%<\/em>/);
 });
 
-test("portfolio professional analytics are gated and split into subviews",()=>{
+test("portfolio professional analytics are gated and split into persistent subviews",()=>{
  assert.match(core,/Проф\. анализ/);
  assert.match(depth,/useState<DepthMode>\("overview"\)/);
- for(const mode of["overview","equity","bonds","positions"])assert.match(depth,new RegExp('mode==="'+mode+'"'));
+ assert.match(depth,/hidden=\{mode!=="overview"\}/);
+ for(const mode of["equity","bonds","positions"])assert.match(depth,new RegExp('visited\\.has\\("'+mode+'"\\)'));
+ assert.match(depth,/aria-pressed=\{mode===id\}/);
  assert.doesNotMatch(depth,/01 · СОСТАВ/);
  assert.match(depth,/showClassSummary=\{false\}/);
 });
