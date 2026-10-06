@@ -1,6 +1,7 @@
 import{useMemo}from"react";
 import type{DriftResult}from"../../../v2/src/features/analytics/drift";
 import type{RebalanceScenarioResult}from"../../../v2/src/features/analytics/rebalanceScenarios";
+import{buildRebalanceVisualBridgeModelV119}from"./rebalanceVisualBridgeModelV119";
 import"../styles/rebalanceVisualBridgeV119.css";
 
 type Props={drift:DriftResult;scenario:RebalanceScenarioResult};
@@ -12,25 +13,7 @@ function percent(value:number|null|undefined){return typeof value==="number"&&Nu
 function modeName(mode:RebalanceScenarioResult["mode"]){return mode==="ADD_CAPITAL"?"Довнесение":mode==="WITHDRAW_CAPITAL"?"Вывод":"Перераспределение"}
 
 export function V3RebalanceVisualBridgeV119({drift,scenario}:Props){
- const model=useMemo(()=>{
-  if(!drift.available||!scenario.available||scenario.assignedValueBefore<=0||scenario.assignedValueAfter==null||scenario.rows.length!==drift.rows.length)return null;
-  const rows=scenario.rows.map(row=>({
-   ...row,
-   currentShare:row.currentValue/scenario.assignedValueBefore,
-   targetShare:row.targetWeight,
-   deltaMagnitude:Math.abs(row.deltaValue),
-  }));
-  const absoluteDelta=rows.reduce((sum,row)=>sum+row.deltaMagnitude,0);
-  const displayedMovement=scenario.mode==="REBALANCE_EXISTING"?absoluteDelta/2:absoluteDelta;
-  const displayedMovementLabel=scenario.mode==="REBALANCE_EXISTING"?"внутренний перенос":"Σ |дельт|";
-  const maxDelta=Math.max(1,...rows.map(row=>row.deltaMagnitude));
-  const minimum=scenario.minimumFlowForExactTarget;
-  const thresholdMax=scenario.mode==="REBALANCE_EXISTING"?1:Math.max(1,scenario.requestedFlow,minimum??0);
-  const thresholdGap=scenario.mode==="REBALANCE_EXISTING"||minimum==null?null:scenario.requestedFlow-minimum;
-  const directionConflict=rows.filter(row=>scenario.mode==="ADD_CAPITAL"?row.deltaValue<0:scenario.mode==="WITHDRAW_CAPITAL"?row.deltaValue>0:false);
-  const coverage=Math.max(0,Math.min(1,1-scenario.unassignedWeight));
-  return{rows,absoluteDelta,displayedMovement,displayedMovementLabel,maxDelta,minimum,thresholdMax,thresholdGap,directionConflict,coverage};
- },[drift,scenario]);
+ const model=useMemo(()=>buildRebalanceVisualBridgeModelV119(drift,scenario),[drift,scenario]);
  if(!model)return null;
  return <section className="v3-rebalance-bridge-v119" aria-label="Визуальная проверка сценария ребалансировки">
   <header><div><span>04 · ВИЗУАЛЬНАЯ СВЕРКА</span><strong>До → целевая структура</strong><p>Одна шкала для текущей и целевой доли внутри двухклассовой части портфеля. Денежная дельта берётся из уже рассчитанного сценария.</p></div><small>{modeName(scenario.mode)}</small></header>
@@ -38,7 +21,7 @@ export function V3RebalanceVisualBridgeV119({drift,scenario}:Props){
    <article><span>Капитал классов до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
    <i aria-hidden="true">→</i>
    <article><span>После заданного потока</span><strong>{money(scenario.assignedValueAfter)}</strong></article>
-   <article><span>Охват модели</span><strong>{percent(model.coverage)}</strong><small>вне модели {percent(scenario.unassignedWeight)}</small></article>
+   <article><span>Охват модели сейчас</span><strong>{percent(model.coverage)}</strong><small>вне модели {percent(scenario.unassignedWeight)}</small></article>
   </div>
   <section className="v3-rebalance-bridge-v119__classes"><header><div><span>КЛАССЫ</span><strong>Текущая доля и цель</strong></div><small>доля внутри двухклассовой части · 0–100%</small></header>{model.rows.map(row=><article key={row.key}>
    <div className="v3-rebalance-bridge-v119__row-head"><strong>{row.label}</strong><span>сейчас {percent(row.currentShare)} · цель {percent(row.targetShare)}</span></div>
