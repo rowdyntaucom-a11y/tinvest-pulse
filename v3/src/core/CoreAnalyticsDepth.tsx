@@ -6,6 +6,7 @@ import{V3RiskLayer}from"../analysis/V3RiskLayer";
 import{V3MarketLayer}from"../analysis/V3MarketLayer";
 import{filterHistoryWindow,type V3HistoryWindow}from"../history/historyLens";import{V3GlossaryHelp}from"../help/V3GlossaryHelp";
 import"../styles/analysisDepth.css";
+import{CoreDrawdownEpisodesV121}from"./CoreDrawdownEpisodesV121";
 
 export type CoreAnalyticsMarketContext={
  riskFreeRate:number|null;
@@ -96,7 +97,7 @@ export function CoreAnalyticsDepth({
   <section className="core-analytics-depth__evidence" aria-label="Основа расчёта"><span>ОСНОВА РАСЧЁТА</span><div><article><b>{history.length}</b><small>точек истории</small></article><article><b>{positions.length}</b><small>текущих позиций</small></article><article><b>{relative.available?relative.overlapPoints:"—"}</b><small>общих точек с IMOEX</small></article></div><p>{integrity==="OK"?"История прошла проверку целостности.":"История ограничена: недоступные метрики остаются пустыми."}</p></section>
   <div className="core-analytics-depth__stage">
    {section==="return"&&<V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/>}
-   {section==="risk"&&<V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/>}
+   {section==="risk"&&<><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/></>}
    {section==="benchmark"&&<V3MarketLayer relative={relative} window={window} onWindowChange={setWindow} market={market}/>}
   </div>
   <footer>Все показатели описательные. VaR/CVaR, корреляция, beta, excess return и rolling-метрики основаны на доступной подтверждённой истории и не являются прогнозом или торговым сигналом.</footer>
