@@ -41,7 +41,7 @@ export function CorePortfolioVisualIntelligenceV106({positions}:Props){
  },[positions]);
  if(!host||model.total<=0)return null;
  let offset=0;
- return createPortal(<section className="core-portfolio-visual-v106" aria-label="Визуальная карта портфеля">
+ return createPortal(<section className="core-portfolio-visual-v106" aria-label="Визуальная структура текущего портфеля">
   <header><span><b>Структура капитала</b><small>концентрация и точные веса крупнейших позиций</small></span><strong>{model.rank.length} позиций</strong></header>
   <div className="core-portfolio-visual-v106__grid">
    <article className="core-portfolio-visual-v106__curve"><div><span>Накопленная концентрация</span><b>от крупнейшей позиции</b></div><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Накопленная доля капитала по позициям от крупнейшей к меньшей"><g className="grid">{[25,50,75].map(v=><line key={v} x1="0" y1={92-v*.82} x2="100" y2={92-v*.82}/>)}</g><polyline points={model.curve.map(p=>`${p.x},${p.y}`).join(" ")}/></svg><div className="core-portfolio-visual-v106__concentration-cues"><span>Топ-1 <b>{pct.format(model.top1)}%</b></span><span>Топ-3 <b>{pct.format(model.top3)}%</b></span><span>Топ-5 <b>{pct.format(model.top5)}%</b></span></div><div className="core-portfolio-visual-v106__ranking" aria-label="Крупнейшие позиции"><div className="head"><span>Крупнейшие позиции</span><b>вес · стоимость</b></div>{model.leaders.map(row=><div className="row" key={row.index+row.ticker}><i>{row.index}</i><span><b>{row.ticker}</b><small>{row.name}</small></span><strong>{pct.format(row.share)}%</strong><em>{money.format(row.value)} ₽</em></div>)}</div><footer><span>{model.rank[0]?.ticker||"—"}</span><span>все позиции</span></footer></article>
