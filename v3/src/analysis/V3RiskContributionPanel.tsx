@@ -85,13 +85,13 @@ export function V3RiskContributionPanel({positions,totalPortfolioValue,onOpenAss
       <small className="v3-analysis-method-note">Signed risk contribution может быть отрицательным из-за диверсификации. Это не прибыль/убыток и не оценка качества актива. Веса — текущая рыночная стоимость только внутри покрытой выборки.</small>
     </>}
 
-    <section className="v3-correlation-depth">
+    <section className="v3-correlation-depth" aria-label="Исторические парные корреляции активов">
       <div className="v3-analysis-layer-head is-small"><div><span>Связь активов</span><h3>Парные корреляции <V3MetricHelp topic="correlation"/></h3></div><b>{corr.readyPairs}/{pairTotal}</b></div>
       {corr.readyPairs>0?<><div className="v3-correlation-summary">
         <article><span>Макс. ρ</span><strong>{corr.highest?ratio.format(corr.highest.correlation):"—"}</strong><small>{corr.highest?corr.highest.a+" ↔ "+corr.highest.b:"—"}</small></article>
         <article><span>Мин. ρ</span><strong>{corr.lowest?ratio.format(corr.lowest.correlation):"—"}</strong><small>{corr.lowest?corr.lowest.a+" ↔ "+corr.lowest.b:"—"}</small></article>
       </div>
-      <div className="v3-correlation-pairs">{corr.strongestAbsolute.map(pair=>{
+      <div className="v3-correlation-pairs" aria-label="Сильнейшие доступные корреляционные пары">{corr.strongestAbsolute.map(pair=>{
         const aPosition=resolvePositionByKey(positions,pair.aKey),bPosition=resolvePositionByKey(positions,pair.bKey);
         return <article key={pair.aKey+"|"+pair.bKey}>
           <div className="v3-correlation-assets"><button type="button" disabled={!aPosition} onClick={()=>{if(aPosition)onOpenAsset?.(aPosition)}}>{pair.a}</button><i aria-hidden="true">↔</i><button type="button" disabled={!bPosition} onClick={()=>{if(bPosition)onOpenAsset?.(bPosition)}}>{pair.b}</button></div>
