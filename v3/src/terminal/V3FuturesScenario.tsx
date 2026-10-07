@@ -50,7 +50,7 @@ export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}
    <article><span>Basis годовой</span><strong>{metric(result.annualizedBasisPct,v=>(v>0?"+":"")+ratio.format(v)+"%")}</strong><small>простая annualized оценка, не прогноз</small></article>
   </div>
   <section className="v3-futures-risk" aria-label="Стресс-профиль фьючерса">
-   <div className="v3-futures-risk__head"><div><span>DERIVATIVES INTELLIGENCE V2</span><strong>Stress matrix</strong></div><small>{risk.complete?"SPEC COMPLETE":"SPEC INCOMPLETE"}</small></div>
+   <div className="v3-futures-risk__head"><div><span>DERIVATIVES INTELLIGENCE V2</span><strong>Stress matrix</strong></div><small role="status">{risk.complete?"SPEC COMPLETE":"SPEC INCOMPLETE"}</small></div>
    <div className="v3-futures-risk__summary">
     <article><span>P/L на 1% цены</span><strong>{metric(risk.onePercentPnl,v=>money.format(v)+" ₽")}</strong><small>абсолютная чувствительность позиции</small></article>
     <article><span>Ход цены ≈ размер ГО</span><strong>{metric(risk.priceMoveToMarginLossPct,v=>ratio.format(v)+"%")}</strong><small>арифметический ориентир, не liquidation price</small></article>
