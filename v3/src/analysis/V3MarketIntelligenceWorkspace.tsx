@@ -44,7 +44,7 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
  const portfolioRows=useMemo(()=>(data?.rows??[]).filter(row=>pulse.portfolioTickers.has(row.secid.toUpperCase())).sort((a,b)=>b.turnoverRub-a.turnoverRub),[data,pulse.portfolioTickers]);
  return <section className="v3-market-intelligence" aria-label="Рыночная аналитика" data-market-mode={mode}>
   <header><div><span>РЫНОЧНАЯ АНАЛИТИКА // РАБОЧАЯ ОБЛАСТЬ</span><h3>Рынок и портфель</h3><p>Публичный TQBR-срез, техническая история текущих позиций и пересечение с портфелем — в одном режиме только чтения.</p></div><strong>MOEX</strong></header>
-  <nav className="v3-market-intelligence__nav" aria-label="Раздел рыночной аналитики">{MODES.map(([id,label,note])=><button type="button" key={id} className={mode===id?"is-active":""} aria-pressed={mode===id} onClick={()=>selectMode(id)}><strong>{label}</strong><small>{note}</small></button>)}</nav>
+  <nav className="v3-market-intelligence__nav" aria-label="Раздел рыночной аналитики" role="tablist">{MODES.map(([id,label,note])=><button type="button" key={id} role="tab" aria-selected={mode===id} className={mode===id?"is-active":""} aria-pressed={mode===id} onClick={()=>selectMode(id)}><strong>{label}</strong><small>{note}</small></button>)}</nav>
   <div className="v3-market-intelligence__stage">
    <section className="v3-market-mode" hidden={mode!=="pulse"} aria-hidden={mode!=="pulse"}>
     <div className="v3-market-pulse">
