@@ -26,9 +26,11 @@
   .sb .v3-section-sheet{
     backdrop-filter:none!important;
     background:rgba(9,14,20,.16)!important;
+    overscroll-behavior:contain;
   }
   .sb .v3-section-sheet>section{
     box-shadow:0 -14px 36px rgba(15,23,42,.18)!important;
+    overscroll-behavior:contain;
   }
   .sb .sb-nav button{min-height:48px;touch-action:manipulation}
   .sb .sb-nav button span{line-height:1.15}
