@@ -98,7 +98,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
     <section className="sam-rebalance__scenario" aria-label="Сценарий изменения структуры портфеля">
      <div className="sam-rebalance__section-title"><div><span>03 · СЦЕНАРИЙ</span><h3>Как меняется структура</h3></div><small id="rebalance-mode-note">без списка заявок</small></div>
      <div className="sam-rebalance__modes" role="group" aria-label="Тип сценария ребалансировки" aria-describedby="rebalance-mode-note">
-      {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
+      {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} aria-label={"Сценарий: "+modeLabel(item)} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
      </div>
      {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
      {!scenario?.available?<div className="sam-rebalance__gate is-inner" role="status">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
