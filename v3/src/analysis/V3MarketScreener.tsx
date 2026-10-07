@@ -91,7 +91,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
    <div className="sam-screener__meta"><span>{data.source??"MOEX ISS"} · {data.board??"TQBR"}</span><strong>{rows.length} из {data.rows.length}</strong><small>{data.fetchedAt?"обновлено "+new Date(data.fetchedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):""}</small></div>
    <div className="sam-screener__rows" role="table" aria-label="Результаты скринера">
     <div className="sam-screener__row is-head" role="row"><span>Бумага</span><span>Цена</span><span>День</span><span>Оборот</span><span>Сделки</span></div>
-    {visible.map(row=><article className={"sam-screener__row "+(selectedSecid===row.secid?"is-selected":"")} role="row" key={row.secid} tabIndex={0} aria-label={"Открыть рыночный контекст "+row.secid} onClick={()=>setSelectedSecid(row.secid)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedSecid(row.secid)}}}>
+    {visible.map(row=><article className={"sam-screener__row "+(selectedSecid===row.secid?"is-selected":"")} role="row" key={row.secid} tabIndex={0} aria-label={"Открыть рыночный контекст "+row.secid} onClick={()=>setSelectedSecid(row.secid)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedSecid(row.secid)}else if(e.key==="Escape"&&selectedSecid===row.secid){setSelectedSecid(null)}}}>
      <div><strong>{row.secid}</strong><small>{row.name} · {listingText(row.listingLevel)} · лот {row.lotSize??"—"}</small></div>
      <b>{money.format(row.last)} ₽</b>
      <b className={changeClass(row.dayChangePct)}>{changeText(row.dayChangePct)}</b>
