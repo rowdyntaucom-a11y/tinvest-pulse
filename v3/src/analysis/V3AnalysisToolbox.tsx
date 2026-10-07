@@ -58,7 +58,7 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
   {catalogOpen&&<div className="v3-pro-tools__groups" id="qvanix-tool-catalog" aria-label="Каталог аналитических инструментов">
    {groups.map(group=><section key={group.id}><header>{group.label}</header><nav aria-label={group.label}>{group.items.map(item=><button key={item.id} type="button" className={tool===item.id?"is-active":""} aria-pressed={tool===item.id} aria-label={item.label+": "+item.note} onClick={()=>selectTool(item.id)}><strong>{item.label}</strong><small>{item.note}</small><i aria-hidden="true">{tool===item.id?"●":"›"}</i></button>)}</nav></section>)}
   </div>}
-  <div className="v3-pro-tools__stage" aria-live="polite">
+  <div className="v3-pro-tools__stage" aria-live="polite" aria-label="Рабочая область выбранного инструмента">
    {tools.filter(item=>visited.has(item.id)).map(item=><div className="v3-pro-tools__stage-pane" data-tool={item.id} hidden={tool!==item.id} aria-hidden={tool!==item.id} aria-label={item.label} key={item.id}><Suspense fallback={<ToolLoading label={loadingLabel(item.id)}/>}>{renderTool(item.id)}</Suspense></div>)}
   </div>
  </section>;
