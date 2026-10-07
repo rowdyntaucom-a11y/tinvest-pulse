@@ -10,3 +10,7 @@
 }
 @media(min-width:760px){.sb-scroll-top-v91{right:max(24px,calc((100vw - 1120px)/2));bottom:24px}}
 @media(prefers-reduced-motion:reduce){.sb-scroll-top-v91{animation:none;scroll-behavior:auto}}
+
+/* 2026-10-07 mobile recording: browsers already expose their own touch scroll-top affordance.
+   Keep only one floating control on coarse-pointer devices. */
+@media(pointer:coarse){.sb-scroll-top-v91{display:none!important}}

@@ -32,8 +32,9 @@ export function CorePortfolioWorkspaceRouterV102(){
     if(target&&!target.button.classList.contains("active")){target.button.click();setMode(stored)}else if(active)setMode(active);
    }
   };
-  attach();const observer=new MutationObserver(attach);observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
-  return()=>{observer.disconnect();detach()};
+  let frame=0;const queueAttach=()=>{if(frame)return;frame=window.requestAnimationFrame(()=>{frame=0;attach()})};
+  attach();const observer=new MutationObserver(queueAttach);observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
+  return()=>{if(frame)window.cancelAnimationFrame(frame);observer.disconnect();detach()};
  },[]);
  useEffect(()=>{if(source){const active=activeSourceMode(source);if(active&&active!==mode)setMode(active)}},[source,mode]);
  const visibleModes=useMemo(()=>CORE_PORTFOLIO_WORKSPACE_MODES.filter(([value])=>available.includes(value)),[available]);

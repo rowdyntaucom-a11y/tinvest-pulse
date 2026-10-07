@@ -1,4 +1,7 @@
 export type CoreIncomeWorkspaceMode="summary"|"fact"|"events"|"sources"|"pro";
+export const CORE_INCOME_SCROLL_PREFIX="qvanix-core-income-scroll-v93:" as const;
+export function coreIncomeScrollStorageKey(mode:CoreIncomeWorkspaceMode){return CORE_INCOME_SCROLL_PREFIX+mode}
+export function normalizeCoreIncomeScroll(value:unknown){const n=typeof value==="number"?value:Number(value);return Number.isFinite(n)&&n>0?Math.round(n):0}
 
 export const CORE_INCOME_WORKSPACE_MODES:[CoreIncomeWorkspaceMode,string,string][]=[
  ["summary","Коротко","Главное без диагностической глубины"],
