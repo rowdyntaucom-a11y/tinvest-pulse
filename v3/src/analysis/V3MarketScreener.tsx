@@ -3,6 +3,7 @@ import{loadMarketScreener,type MarketScreenerPayload}from"./marketScreenerApi";
 import{filterMarketScreener,type ScreenerFilters,type ScreenerMove,type ScreenerSort}from"./marketScreenerModel";
 import"../styles/samuraiMarketScreener.css";
 import{V3MarketRelativeV123}from"./V3MarketRelativeV123";
+import{V3MarketTickerLensV129}from"./V3MarketTickerLensV129";
 
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 const compact=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDigits:1});
@@ -33,7 +34,7 @@ function median(values:number[]){
 export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfolioTickers}:{sharedData?:MarketScreenerPayload|null;sharedLoading?:boolean;onRetry?:()=>void;portfolioTickers?:Set<string>}={}){
  const[localData,setLocalData]=useState<MarketScreenerPayload|null>(null),[localLoading,setLocalLoading]=useState(true);
  const controlled=sharedData!==undefined,data=controlled?sharedData:localData,loading=controlled?sharedLoading:localLoading;
- const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false);
+ const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false),[selectedSecid,setSelectedSecid]=useState<string|null>(null);
  useEffect(()=>{
   if(controlled)return;
   const controller=new AbortController();
@@ -66,6 +67,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   </section>}
 
   <V3MarketRelativeV123 rows={sourceRows}/>
+  {selectedSecid&&<V3MarketTickerLensV129 rows={sourceRows} secid={selectedSecid} portfolioTickers={portfolioTickers} onClose={()=>setSelectedSecid(null)}/>}
 
   <div className="sam-screener__search">
    <label><span>Поиск</span><input type="search" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название"/></label>
@@ -89,7 +91,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
    <div className="sam-screener__meta"><span>{data.source??"MOEX ISS"} · {data.board??"TQBR"}</span><strong>{rows.length} из {data.rows.length}</strong><small>{data.fetchedAt?"обновлено "+new Date(data.fetchedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):""}</small></div>
    <div className="sam-screener__rows" role="table" aria-label="Результаты скринера">
     <div className="sam-screener__row is-head" role="row"><span>Бумага</span><span>Цена</span><span>День</span><span>Оборот</span><span>Сделки</span></div>
-    {visible.map(row=><article className="sam-screener__row" role="row" key={row.secid}>
+    {visible.map(row=><article className={"sam-screener__row "+(selectedSecid===row.secid?"is-selected":"")} role="row" key={row.secid} tabIndex={0} onClick={()=>setSelectedSecid(row.secid)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedSecid(row.secid)}}}>
      <div><strong>{row.secid}</strong><small>{row.name} · {listingText(row.listingLevel)} · лот {row.lotSize??"—"}</small></div>
      <b>{money.format(row.last)} ₽</b>
      <b className={changeClass(row.dayChangePct)}>{changeText(row.dayChangePct)}</b>
