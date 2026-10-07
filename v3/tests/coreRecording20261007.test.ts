@@ -12,6 +12,7 @@ const payoutApi=readFileSync(new URL("../../v2/src/lib/payoutsApi.ts",import.met
 const incomeDepth=readFileSync(new URL("../src/income/V3IncomeDepth.tsx",import.meta.url),"utf8");
 const incomeRouter=readFileSync(new URL("../src/core/CoreIncomeWorkspaceRouterV93.tsx",import.meta.url),"utf8");
 const resultRouter=readFileSync(new URL("../src/core/CoreResultWorkspaceRouterV94.tsx",import.meta.url),"utf8");
+const snowball=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
 
 test("touch devices do not render a second floating scroll-top control",()=>{
  assert.equal(shouldShowCoreScrollTop(1000,false,false),true);
@@ -55,5 +56,11 @@ test("income and result subviews remember reading position and support keyboard 
   assert.match(source,/role="tab"/);
   for(const key of["ArrowRight","ArrowLeft","Home","End"])assert.ok(source.includes(key),key);
  }
+});
+
+test("bottom mobile navigation exposes the active page without changing its visual structure",()=>{
+ assert.match(snowball,/aria-label="Основные разделы Core"/);
+ assert.match(snowball,/aria-current=\{tab===id\?"page":undefined\}/);
+ assert.match(snowball,/<i aria-hidden="true">\{icon\}<\/i>/);
 });
 console.log("core recording 2026-10-07: ok");
