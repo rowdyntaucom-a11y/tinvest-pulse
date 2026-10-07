@@ -1,0 +1,7 @@
+import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
+export type PortfolioConcentrationV126={available:boolean;positions:number;total:number;hhi:number|null;effectivePositions:number|null;top1:number;top3:number;top5:number;medianWeight:number|null;largestToMedian:number|null;above10:number;above5:number;tailShare:number;weights:Array<{ticker:string;share:number}>};
+export function buildPortfolioConcentrationV126(rows:PositionSnapshot[]):PortfolioConcentrationV126{
+ const valid=rows.filter(x=>Number.isFinite(x.currentValue)&&x.currentValue>0),total=valid.reduce((s,x)=>s+x.currentValue,0),weights=valid.map(x=>({ticker:x.ticker||"—",share:total?x.currentValue/total:0})).sort((a,b)=>b.share-a.share),shares=weights.map(x=>x.share),hhi=total?shares.reduce((s,x)=>s+x*x,0):null,effective=hhi&&hhi>0?1/hhi:null,asc=[...shares].sort((a,b)=>a-b),median=asc.length?(asc.length%2?asc[Math.floor(asc.length/2)]!:(asc[asc.length/2-1]!+asc[asc.length/2]!)/2):null;
+ const sum=(n:number)=>shares.slice(0,n).reduce((s,x)=>s+x,0),top5=sum(5);
+ return{available:weights.length>0,positions:weights.length,total,hhi,effectivePositions:effective,top1:sum(1),top3:sum(3),top5,medianWeight:median,largestToMedian:median&&median>0?shares[0]!/median:null,above10:shares.filter(x=>x>=.1).length,above5:shares.filter(x=>x>=.05).length,tailShare:Math.max(0,1-top5),weights};
+}
