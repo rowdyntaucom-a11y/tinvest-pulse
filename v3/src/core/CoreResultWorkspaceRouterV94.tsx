@@ -1,10 +1,12 @@
 import{useEffect,useState}from"react";
 import{createPortal}from"react-dom";
-import{CORE_RESULT_WORKSPACE_MODES,normalizeCoreResultWorkspaceMode,type CoreResultWorkspaceMode}from"./coreResultWorkspaceV94";
+import{CORE_RESULT_WORKSPACE_MODES,coreResultScrollStorageKey,normalizeCoreResultScroll,normalizeCoreResultWorkspaceMode,type CoreResultWorkspaceMode}from"./coreResultWorkspaceV94";
 
 const STORAGE_KEY="qvanix-core-result-workspace-v94";
 function readMode():CoreResultWorkspaceMode{try{return normalizeCoreResultWorkspaceMode(sessionStorage.getItem(STORAGE_KEY))}catch{return"summary"}}
 function writeMode(mode:CoreResultWorkspaceMode){try{sessionStorage.setItem(STORAGE_KEY,mode)}catch{}}
+function readScroll(mode:CoreResultWorkspaceMode){try{return normalizeCoreResultScroll(sessionStorage.getItem(coreResultScrollStorageKey(mode)))}catch{return 0}}
+function writeScroll(mode:CoreResultWorkspaceMode,value:number){try{sessionStorage.setItem(coreResultScrollStorageKey(mode),String(normalizeCoreResultScroll(value)))}catch{}}
 function findResultRoot(){
  const lead=document.querySelector<HTMLElement>(".sb-result-lead");
  return lead?.closest<HTMLElement>("main")??null;
@@ -30,7 +32,7 @@ export function CoreResultWorkspaceRouterV94(){
   return()=>{observer.disconnect();detach()};
  },[]);
  useEffect(()=>{if(root)root.dataset.resultWorkspaceV94=mode},[root,mode]);
- const select=(next:CoreResultWorkspaceMode)=>{setMode(next);writeMode(next);window.requestAnimationFrame(()=>host?.scrollIntoView({block:"start",behavior:"auto"}))};
+ const select=(next:CoreResultWorkspaceMode)=>{if(next===mode)return;writeScroll(mode,window.scrollY);setMode(next);writeMode(next);window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{const saved=readScroll(next);if(saved>0)window.scrollTo({top:saved,behavior:"auto"});else host?.scrollIntoView({block:"start",behavior:"auto"})}))};
  if(!host)return null;
  return createPortal(<nav className="sb-result-workspace-v94" aria-label="Режим экрана доходности">{CORE_RESULT_WORKSPACE_MODES.map(([value,label,description])=><button key={value} type="button" className={mode===value?"active":""} aria-pressed={mode===value} onClick={()=>select(value)}><b>{label}</b><small>{description}</small></button>)}</nav>,host);
 }
