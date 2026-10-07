@@ -1,6 +1,7 @@
 import{useEffect,useMemo,useState}from"react";
 import{loadAssetHistory,type AssetHistoryPayload}from"../../../v2/src/lib/assetHistoryApi";
 import{scanFallenAssets,type DiscoveryWindow}from"./fallenAssetDiscovery";
+import{V3FallenBreadthV137}from"./V3FallenBreadthV137";
 import"../styles/samuraiFallenAssets.css";
 
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -45,7 +46,7 @@ export function V3FallenAssetsDiscovery(){
     <article><span>Доступно</span><strong>{payload.availableSeries}</strong><small>{payload.from??"—"} → {payload.to??"—"}</small></article>
     <article><span>Отброшено сканером</span><strong>{scan.rejected}</strong><small>конфликт или мало точек</small></article>
    </div>
-   <div className="sam-fallen__rows">
+   <V3FallenBreadthV137 rows={scan.rows}/><div className="sam-fallen__rows">
     {scan.rows.length?scan.rows.map(row=><article key={row.key} className={"sam-fallen__row is-"+row.bucket.toLowerCase()}>
      <header><div><strong>{row.label}</strong><small>{row.observations} точек · {row.from} → {row.to}</small></div><em>{bucketLabel(row.bucket)}</em></header>
      <div className="sam-fallen__metrics">
