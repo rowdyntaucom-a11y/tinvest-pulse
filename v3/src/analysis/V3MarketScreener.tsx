@@ -2,6 +2,7 @@ import{useEffect,useMemo,useState}from"react";
 import{loadMarketScreener,type MarketScreenerPayload}from"./marketScreenerApi";
 import{filterMarketScreener,type ScreenerFilters,type ScreenerMove,type ScreenerSort}from"./marketScreenerModel";
 import"../styles/samuraiMarketScreener.css";
+import{V3MarketRelativeV123}from"./V3MarketRelativeV123";
 
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 const compact=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDigits:1});
@@ -63,6 +64,8 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
    </div>
    <footer>Сводка описывает только текущие строки публичного TQBR-среза и не является оценкой направления рынка или прогнозом.</footer>
   </section>}
+
+  <V3MarketRelativeV123 rows={sourceRows}/>
 
   <div className="sam-screener__search">
    <label><span>Поиск</span><input type="search" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название"/></label>
