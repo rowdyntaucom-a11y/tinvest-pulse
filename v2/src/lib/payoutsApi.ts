@@ -284,6 +284,7 @@ const normalizeErrors = (value: unknown) => {
 let payoutCache:{value:PayoutCalendar;at:number}|null=null
 let payoutInFlight:Promise<PayoutCalendar>|null=null
 const PAYOUT_CACHE_TTL=5*60*1000
+export function peekPayoutCalendarCache(now=Date.now()):PayoutCalendar|null{if(typeof window==="undefined"||!payoutCache)return null;return now-payoutCache.at<PAYOUT_CACHE_TTL?payoutCache.value:null}
 
 export async function loadPayoutCalendar(options:{force?:boolean;timeoutMs?:number}={}): Promise<PayoutCalendar> {
   // Tests and non-browser consumers expect each mocked fetch to be normalized independently.
