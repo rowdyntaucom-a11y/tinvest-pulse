@@ -1,0 +1,12 @@
+export type ReturnRegimePointV127={date:string;portfolio:number|null};
+export type ReturnRegimeV127={available:boolean;returns:number;positive:number;negative:number;flat:number;positiveShare:number|null;negativeShare:number|null;avgUp:number|null;avgDown:number|null;upDownRatio:number|null;best:number|null;worst:number|null;longestUp:number;longestDown:number;recent:Array<{date:string;value:number;sign:"up"|"down"|"flat"}>;reason:string|null};
+const mean=(v:number[])=>v.length?v.reduce((s,x)=>s+x,0)/v.length:null;
+export function buildReturnRegimeV127(points:ReturnRegimePointV127[]):ReturnRegimeV127{
+ const empty=(reason:string):ReturnRegimeV127=>({available:false,returns:0,positive:0,negative:0,flat:0,positiveShare:null,negativeShare:null,avgUp:null,avgDown:null,upDownRatio:null,best:null,worst:null,longestUp:0,longestDown:0,recent:[],reason});
+ const map=new Map<string,number|null>();for(const p of points){if(!/^\d{4}-\d{2}-\d{2}$/.test(p.date))continue;if(map.has(p.date)&&map.get(p.date)!==p.portfolio)return empty("Конфликт значений на одинаковую дату.");map.set(p.date,p.portfolio)}
+ const rows=[...map].filter((x):x is[string,number]=>typeof x[1]==="number"&&Number.isFinite(x[1])&&x[1]>0).sort((a,b)=>a[0].localeCompare(b[0]));if(rows.length<3)return empty("Недостаточно подтверждённой истории.");
+ const ret=rows.slice(1).map((x,i)=>({date:x[0],value:x[1]/rows[i]![1]-1})),up=ret.filter(x=>x.value>0).map(x=>x.value),down=ret.filter(x=>x.value<0).map(x=>x.value),flat=ret.length-up.length-down.length;
+ let longestUp=0,longestDown=0,cu=0,cd=0;for(const x of ret){cu=x.value>0?cu+1:0;cd=x.value<0?cd+1:0;longestUp=Math.max(longestUp,cu);longestDown=Math.max(longestDown,cd)}
+ const au=mean(up),ad=mean(down),ratio=au!=null&&ad!=null&&ad!==0?au/Math.abs(ad):null;
+ return{available:true,returns:ret.length,positive:up.length,negative:down.length,flat,positiveShare:ret.length?up.length/ret.length:null,negativeShare:ret.length?down.length/ret.length:null,avgUp:au,avgDown:ad,upDownRatio:ratio,best:ret.length?Math.max(...ret.map(x=>x.value)):null,worst:ret.length?Math.min(...ret.map(x=>x.value)):null,longestUp,longestDown,recent:ret.slice(-60).map(x=>({...x,sign:x.value>0?"up":x.value<0?"down":"flat"})),reason:null};
+}
