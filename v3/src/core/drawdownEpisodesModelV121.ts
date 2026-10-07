@@ -1,0 +1,10 @@
+export type DrawdownEpisodeV121={peakDate:string;troughDate:string;recoveryDate:string|null;depth:number;underwaterDays:number;recoveryDays:number|null;open:boolean};
+export type DrawdownEpisodesV121={episodes:DrawdownEpisodeV121[];worst:DrawdownEpisodeV121|null;current:DrawdownEpisodeV121|null;observations:number};
+const day=(a:string,b:string)=>Math.max(0,Math.round((Date.parse(b+"T00:00:00Z")-Date.parse(a+"T00:00:00Z"))/86400000));
+export function buildDrawdownEpisodesV121(input:Array<{date?:string|null;portfolio?:number|null}>):DrawdownEpisodesV121{
+ const rows=input.filter((x):x is{date:string;portfolio:number}=>typeof x.date==="string"&&!!x.date&&typeof x.portfolio==="number"&&Number.isFinite(x.portfolio)&&x.portfolio>0).sort((a,b)=>a.date.localeCompare(b.date));
+ const unique=rows.filter((x,i)=>i===0||x.date!==rows[i-1].date);const episodes:DrawdownEpisodeV121[]=[];let peakValue=unique[0]?.portfolio??0,peakDate=unique[0]?.date??"",active:null|{peakDate:string;troughDate:string;troughValue:number}=null;
+ for(const row of unique){if(row.portfolio>=peakValue){if(active){episodes.push({peakDate:active.peakDate,troughDate:active.troughDate,recoveryDate:row.date,depth:1-active.troughValue/peakValue,underwaterDays:day(active.peakDate,row.date),recoveryDays:day(active.troughDate,row.date),open:false});active=null}peakValue=row.portfolio;peakDate=row.date;continue}if(!active)active={peakDate,troughDate:row.date,troughValue:row.portfolio};else if(row.portfolio<active.troughValue){active.troughDate=row.date;active.troughValue=row.portfolio}}
+ if(active&&unique.length){const last=unique.at(-1)!;episodes.push({peakDate:active.peakDate,troughDate:active.troughDate,recoveryDate:null,depth:1-active.troughValue/peakValue,underwaterDays:day(active.peakDate,last.date),recoveryDays:null,open:true})}
+ const ranked=[...episodes].sort((a,b)=>b.depth-a.depth||b.underwaterDays-a.underwaterDays);return{episodes:ranked,worst:ranked[0]??null,current:episodes.find(x=>x.open)??null,observations:unique.length};
+}
