@@ -34,7 +34,8 @@ function median(values:number[]){
 export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfolioTickers}:{sharedData?:MarketScreenerPayload|null;sharedLoading?:boolean;onRetry?:()=>void;portfolioTickers?:Set<string>}={}){
  const[localData,setLocalData]=useState<MarketScreenerPayload|null>(null),[localLoading,setLocalLoading]=useState(true);
  const controlled=sharedData!==undefined,data=controlled?sharedData:localData,loading=controlled?sharedLoading:localLoading;
- const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false),[selectedSecid,setSelectedSecid]=useState<string|null>(null);\n const resetFilters=()=>{setFilters({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"});setPortfolioOnly(false)};
+ const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false),[selectedSecid,setSelectedSecid]=useState<string|null>(null);
+ const resetFilters=()=>{setFilters({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"});setPortfolioOnly(false)};
  useEffect(()=>{
   if(controlled)return;
   const controller=new AbortController();
