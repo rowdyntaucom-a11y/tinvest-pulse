@@ -70,7 +70,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   {selectedSecid&&<V3MarketTickerLensV129 rows={sourceRows} secid={selectedSecid} portfolioTickers={portfolioTickers} onClose={()=>setSelectedSecid(null)}/>}
 
   <div className="sam-screener__search" role="search"><button type="button" className="sam-screener__reset" onClick={resetFilters} disabled={activeFilters===0}>Сбросить фильтры{activeFilters?" · "+activeFilters:""}</button>
-   <label><span>Поиск</span><input type="search" aria-label="Поиск по тикеру или названию" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название"/></label>
+   <label><span>Поиск</span><input type="search" aria-label="Поиск по тикеру или названию" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название" autoComplete="off" spellCheck={false}/></label>
    <label><span>Уровень листинга</span><select aria-label="Уровень листинга" value={filters.listingLevel} onChange={e=>setFilters(v=>({...v,listingLevel:e.target.value==="all"?"all":Number(e.target.value) as 1|2|3}))}><option value="all">Все</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
   </div>
 
