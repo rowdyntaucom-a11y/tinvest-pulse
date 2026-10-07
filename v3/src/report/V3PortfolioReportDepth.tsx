@@ -2,6 +2,7 @@ import{useMemo}from"react";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{clampPercent}from"../data/units";
 import{buildPortfolioReport,type PortfolioReportRow,type PortfolioReportSlice}from"./portfolioReport";
+import{V3ReportTrustV201}from"./V3ReportTrustV201";
 import{V3ReportPositionScaleV200}from"./V3ReportPositionScaleV200";
 import{V3ReportCategoryEfficiencyV199}from"./V3ReportCategoryEfficiencyV199";
 import{V3ReportReturnDistributionV198}from"./V3ReportReturnDistributionV198";
@@ -67,6 +68,7 @@ export function V3PortfolioReportDepth({positions}:{positions:PositionSnapshot[]
     <article><span>Сверка базы</span><strong>{reconciled?"OK":"РАСХОЖДЕНИЕ"}</strong><small>{reconciled?"P/L согласуется: стоимость − база":"Δ "+signedMoney(reconciliationDelta)}</small></article>
    </div>
    {!reconciled&&<p className="sam-report-depth__warning">P/L открытых позиций и разница «текущая стоимость − вложенная база» расходятся. QVANIX показывает оба факта и не подменяет один другим.</p>}
+   <V3ReportTrustV201 positions={positions}/>
    <V3ReportPositionScaleV200 positions={positions}/>
    <V3ReportCategoryEfficiencyV199 positions={positions}/>
    <V3ReportReturnDistributionV198 positions={positions}/>
