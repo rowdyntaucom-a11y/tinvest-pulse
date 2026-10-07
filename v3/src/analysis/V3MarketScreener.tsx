@@ -79,13 +79,13 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
    <button type="button" className={portfolioOnly?"is-active":""} disabled={!portfolioTickers?.size} aria-label="Фильтр: только бумаги текущего портфеля" aria-pressed={portfolioOnly} onClick={()=>setPortfolioOnly(v=>!v)}><b>{portfolioOnly?"Только мой портфель":"Показать только мой портфель"}</b><small>{portfolioTickers?.size?portfolioTickers.size+" тикеров для точного сопоставления":"портфельные тикеры недоступны"}</small></button>
   </div>
   <div className="sam-screener__filter-block" role="group" aria-label="Фильтр по движению дня">
-   <span>Движение дня</span><div>{MOVE.map(([value,label])=><button type="button" key={value} className={filters.move===value?"is-active":""} aria-pressed={filters.move===value} onClick={()=>setFilters(v=>({...v,move:value}))}>{label}</button>)}</div>
+   <span id="market-move-label">Движение дня</span><div aria-labelledby="market-move-label">{MOVE.map(([value,label])=><button type="button" key={value} className={filters.move===value?"is-active":""} aria-pressed={filters.move===value} onClick={()=>setFilters(v=>({...v,move:value}))}>{label}</button>)}</div>
   </div>
   <div className="sam-screener__filter-block" role="group" aria-label="Фильтр по минимальному обороту">
-   <span>Минимальный оборот</span><div>{TURNOVER.map(([value,label])=><button type="button" key={value} className={filters.minTurnover===value?"is-active":""} aria-pressed={filters.minTurnover===value} onClick={()=>setFilters(v=>({...v,minTurnover:value}))}>{label}</button>)}</div>
+   <span id="market-turnover-label">Минимальный оборот</span><div aria-labelledby="market-turnover-label">{TURNOVER.map(([value,label])=><button type="button" key={value} className={filters.minTurnover===value?"is-active":""} aria-pressed={filters.minTurnover===value} onClick={()=>setFilters(v=>({...v,minTurnover:value}))}>{label}</button>)}</div>
   </div>
   <div className="sam-screener__filter-block" role="group" aria-label="Сортировка результатов скринера">
-   <span>Сортировка</span><div>{SORT.map(([value,label])=><button type="button" key={value} className={filters.sort===value?"is-active":""} aria-pressed={filters.sort===value} onClick={()=>setFilters(v=>({...v,sort:value}))}>{label}</button>)}</div>
+   <span id="market-sort-label">Сортировка</span><div aria-labelledby="market-sort-label">{SORT.map(([value,label])=><button type="button" key={value} className={filters.sort===value?"is-active":""} aria-pressed={filters.sort===value} onClick={()=>setFilters(v=>({...v,sort:value}))}>{label}</button>)}</div>
   </div>
 
   {loading?<div className="sam-screener__gate">Получаем публичный рыночный срез MOEX…</div>:!data?.available?<div className="sam-screener__gate is-warning"><strong>Скринер временно недоступен</strong><small>{data?.reason??"Источник не подтвердил рыночные строки."}</small>{onRetry&&<button type="button" onClick={onRetry}>Повторить сейчас</button>}</div>:<>
