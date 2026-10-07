@@ -34,7 +34,7 @@ function median(values:number[]){
 export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfolioTickers}:{sharedData?:MarketScreenerPayload|null;sharedLoading?:boolean;onRetry?:()=>void;portfolioTickers?:Set<string>}={}){
  const[localData,setLocalData]=useState<MarketScreenerPayload|null>(null),[localLoading,setLocalLoading]=useState(true);
  const controlled=sharedData!==undefined,data=controlled?sharedData:localData,loading=controlled?sharedLoading:localLoading;
- const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false),[selectedSecid,setSelectedSecid]=useState<string|null>(null);
+ const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false),[selectedSecid,setSelectedSecid]=useState<string|null>(null);\n const resetFilters=()=>{setFilters({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"});setPortfolioOnly(false)};
  useEffect(()=>{
   if(controlled)return;
   const controller=new AbortController();
@@ -69,7 +69,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   <V3MarketBreadthV139 rows={sourceRows}/><V3MarketRelativeV123 rows={sourceRows}/>
   {selectedSecid&&<V3MarketTickerLensV129 rows={sourceRows} secid={selectedSecid} portfolioTickers={portfolioTickers} onClose={()=>setSelectedSecid(null)}/>}
 
-  <div className="sam-screener__search">
+  <div className="sam-screener__search"><button type="button" className="sam-screener__reset" onClick={resetFilters} disabled={!filters.query&&filters.move==="all"&&filters.minTurnover===0&&filters.listingLevel==="all"&&filters.sort==="turnover"&&!portfolioOnly}>Сбросить фильтры</button>
    <label><span>Поиск</span><input type="search" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название"/></label>
    <label><span>Уровень листинга</span><select value={filters.listingLevel} onChange={e=>setFilters(v=>({...v,listingLevel:e.target.value==="all"?"all":Number(e.target.value) as 1|2|3}))}><option value="all">Все</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
   </div>
