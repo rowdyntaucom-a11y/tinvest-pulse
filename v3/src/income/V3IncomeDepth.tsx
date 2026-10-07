@@ -26,8 +26,9 @@ import{V3IncomeActiveMonthV172}from"./V3IncomeActiveMonthV172";
 import{V3IncomeYearDepthV175}from"./V3IncomeYearDepthV175";
 import{V3IncomeContinuityMatrixV133}from"./V3IncomeContinuityMatrixV133";
 import{V3IncomeFreshnessV135}from"./V3IncomeFreshnessV135";
+import{readIncomeDepthViewV202,writeIncomeDepthViewV202,type IncomeDepthViewV202}from"./incomeDepthViewMemoryV202";
 
-type View="overview"|"calendar"|"history"|"sources"|"trust"|"market";
+type View=IncomeDepthViewV202;
 const BASIC_VIEW_OPTIONS=[
   {value:"overview",label:"Сводка",description:"Короткий ответ: факт, ближайшая выплата и подтверждённые горизонты."},
   {value:"calendar",label:"Календарь",description:"Подтверждённое 12-месячное расписание будущих выплат."},
@@ -53,10 +54,10 @@ function sourceIdentity(state:string){return state==="EXACT_FIGI"?"FIGI":state==
 
 export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{positions:PositionSnapshot[];onOpenAsset?:(position:PositionSnapshot)=>void;shell?:V3Shell;mode?:V3DetailMode}){
   const warm=peekPayoutCalendarCache();
-  const[calendar,setCalendar]=useState<PayoutCalendar|null>(warm),[loading,setLoading]=useState(!warm),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>("overview"),[selectedMonth,setSelectedMonth]=useState<string|null>(null),samuraiReference=shell==="samurai",proMode=mode==="detailed";
+  const[calendar,setCalendar]=useState<PayoutCalendar|null>(warm),[loading,setLoading]=useState(!warm),[loadedAt,setLoadedAt]=useState(()=>Date.now()),[view,setView]=useState<View>(()=>readIncomeDepthViewV202(mode==="detailed")),[selectedMonth,setSelectedMonth]=useState<string|null>(null),samuraiReference=shell==="samurai",proMode=mode==="detailed";
   const viewOptions=proMode?PRO_VIEW_OPTIONS:BASIC_VIEW_OPTIONS;
   useEffect(()=>{let active=true;const cached=peekPayoutCalendarCache();if(cached){setCalendar(cached);setLoading(false)}else setLoading(true);void loadPayoutCalendar().then(data=>{if(active){setCalendar(data);setLoadedAt(Date.now());setLoading(false)}}).catch(()=>{if(active){if(!cached)setCalendar(null);setLoadedAt(Date.now());setLoading(false)}});return()=>{active=false}},[]);
-  useEffect(()=>{if(!proMode&&(view==="trust"||view==="market"))setView("overview")},[proMode,view]);
+  useEffect(()=>{if(!proMode&&(view==="trust"||view==="market")){setView("overview");writeIncomeDepthViewV202("overview");return}writeIncomeDepthViewV202(view)},[proMode,view]);
   const depth=useMemo(()=>calendar?buildV3IncomeDepth(calendar,positions,loadedAt):null,[calendar,positions,loadedAt]);
   const futureEvents=depth?.trustedIncome.futureEvents??[];
   const workspaceSummary=useMemo(()=>buildIncomeWorkspaceSummary(futureEvents,calendar?.generatedAt??calendar?.period.from),[futureEvents,calendar?.generatedAt,calendar?.period.from]);
