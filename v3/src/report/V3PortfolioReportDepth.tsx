@@ -2,6 +2,14 @@ import{useMemo}from"react";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{clampPercent}from"../data/units";
 import{buildPortfolioReport,type PortfolioReportRow,type PortfolioReportSlice}from"./portfolioReport";
+import{V3ReportTrustV201}from"./V3ReportTrustV201";
+import{V3ReportPositionScaleV200}from"./V3ReportPositionScaleV200";
+import{V3ReportCategoryEfficiencyV199}from"./V3ReportCategoryEfficiencyV199";
+import{V3ReportReturnDistributionV198}from"./V3ReportReturnDistributionV198";
+import{V3ReportConcentrationV197}from"./V3ReportConcentrationV197";
+import{V3ReportPnlAttributionV196}from"./V3ReportPnlAttributionV196";
+import{V3ReportBasisCoverageV195}from"./V3ReportBasisCoverageV195";
+import{V3ReportResultBreadthV194}from"./V3ReportResultBreadthV194";
 import"../styles/samuraiReportDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -60,6 +68,14 @@ export function V3PortfolioReportDepth({positions}:{positions:PositionSnapshot[]
     <article><span>Сверка базы</span><strong>{reconciled?"OK":"РАСХОЖДЕНИЕ"}</strong><small>{reconciled?"P/L согласуется: стоимость − база":"Δ "+signedMoney(reconciliationDelta)}</small></article>
    </div>
    {!reconciled&&<p className="sam-report-depth__warning">P/L открытых позиций и разница «текущая стоимость − вложенная база» расходятся. QVANIX показывает оба факта и не подменяет один другим.</p>}
+   <V3ReportTrustV201 positions={positions}/>
+   <V3ReportPositionScaleV200 positions={positions}/>
+   <V3ReportCategoryEfficiencyV199 positions={positions}/>
+   <V3ReportReturnDistributionV198 positions={positions}/>
+   <V3ReportConcentrationV197 positions={positions}/>
+   <V3ReportPnlAttributionV196 positions={positions}/>
+   <V3ReportBasisCoverageV195 positions={positions}/>
+   <V3ReportResultBreadthV194 positions={positions}/>
    <p className="sam-report-depth__method">Отчёт не использует предположения о пропущенных операциях, налогах или корпоративных действиях. Историческая доходность остаётся в TWR/XIRR, а здесь — текущий срез состава.</p>
   </section>
 
