@@ -14,6 +14,7 @@ import{V3ReturnHitRateV155}from"../analysis/V3ReturnHitRateV155";
 import{V3ReturnStreakDepthV160}from"../analysis/V3ReturnStreakDepthV160";
 import{V3ReturnDownsideV168}from"../analysis/V3ReturnDownsideV168";
 import{V3ReturnBalanceV177}from"../analysis/V3ReturnBalanceV177";
+import{V3ValueHighWaterV209}from"../analysis/V3ValueHighWaterV209";
 import{V3HistoryTrustV210}from"../analysis/V3HistoryTrustV210";
 import{V3CapitalBridgeV204}from"../analysis/V3CapitalBridgeV204";
 import{V3HistoryCoverageV203}from"../analysis/V3HistoryCoverageV203";
@@ -108,6 +109,7 @@ export function CoreAnalyticsDepth({
   <V3HistoryCoverageV203 history={history}/>
   <V3CapitalBridgeV204 history={history}/>
   <V3HistoryTrustV210 history={history}/>
+  <V3ValueHighWaterV209 history={history}/>
   <div className="core-analytics-depth__stage">
    {section==="return"&&<div role="tabpanel" aria-label="Аналитика доходности"><V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/><V3ReturnRegimeV127 history={history}/><V3ReturnTailV145 history={history}/><V3ReturnHitRateV155 history={history}/><V3ReturnStreakDepthV160 history={history}/><V3ReturnDownsideV168 history={history}/><V3ReturnBalanceV177 history={history}/></div>}
    {section==="risk"&&<div role="tabpanel" aria-label="Аналитика риска"><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/><CoreRecoveryDepthV131 history={history}/></div>}
