@@ -17,6 +17,7 @@ import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
 import{V3IncomeSeasonalityV122}from"./V3IncomeSeasonalityV122";
 import{V3IncomeResilienceV128}from"./V3IncomeResilienceV128";
 import{V3IncomeGrowthV143}from"./V3IncomeGrowthV143";
+import{V3IncomeTypeMixV148}from"./V3IncomeTypeMixV148";
 import{V3IncomeContinuityMatrixV133}from"./V3IncomeContinuityMatrixV133";
 import{V3IncomeFreshnessV135}from"./V3IncomeFreshnessV135";
 
@@ -137,7 +138,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
         </div>
         <small className="v3-income-method">Состав показывает только уже полученный пассивный доход после налога. Регулярность — доля полностью наблюдавшихся месяцев, в которых была хотя бы одна фактическая выплата; частичные месяцы не ухудшают показатель.</small>
       </div>
-      <V3IncomeSeasonalityV122 months={depth.realizedHistory.months}/><V3IncomeGrowthV143 months={depth.realizedHistory.months}/><V3IncomeResilienceV128 months={depth.realizedHistory.months} events={depth.trustedIncome.actualEvents}/>
+      <V3IncomeSeasonalityV122 months={depth.realizedHistory.months}/><V3IncomeGrowthV143 months={depth.realizedHistory.months}/><V3IncomeTypeMixV148 months={depth.realizedHistory.months}/><V3IncomeResilienceV128 months={depth.realizedHistory.months} events={depth.trustedIncome.actualEvents}/>
       <div className="v3-income-history-stats">
         <article><span>Месяцев с выплатами</span><strong>{depth.stability.payoutMonths}</strong><small>из {depth.stability.observedMonths} полных</small></article>
         <article><span>Нулевых месяцев</span><strong>{depth.stability.zeroIncomeMonths}</strong><small>только полностью наблюдавшиеся</small></article>
