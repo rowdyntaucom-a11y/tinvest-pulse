@@ -14,6 +14,7 @@ import{V3ReturnHitRateV155}from"../analysis/V3ReturnHitRateV155";
 import{V3ReturnStreakDepthV160}from"../analysis/V3ReturnStreakDepthV160";
 import{V3ReturnDownsideV168}from"../analysis/V3ReturnDownsideV168";
 import{V3ReturnBalanceV177}from"../analysis/V3ReturnBalanceV177";
+import{V3RollingRangeV208}from"../analysis/V3RollingRangeV208";
 import{V3ReturnQuartilesV207}from"../analysis/V3ReturnQuartilesV207";
 import{V3ValueHighWaterV209}from"../analysis/V3ValueHighWaterV209";
 import{V3HistoryTrustV210}from"../analysis/V3HistoryTrustV210";
