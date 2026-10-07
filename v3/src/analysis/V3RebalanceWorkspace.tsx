@@ -64,26 +64,26 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
   </header>
 
   <div className="sam-rebalance__help"><V3GlossaryHelp terms={["drift","coverage"]} label="Как читать ребаланс"/></div>
-  <section className="sam-rebalance__current">
+  <section className="sam-rebalance__current" aria-label="Текущая структура портфеля для сценария" aria-live="polite">
    <article><span>Акции сейчас</span><strong>{percent(equityNow)}</strong><small>{money(current.rows.find(row=>row.key==="equity")?.currentValue)}</small></article>
    <article><span>Облигации сейчас</span><strong>{percent(bondNow)}</strong><small>{money(current.rows.find(row=>row.key==="bond")?.currentValue)}</small></article>
    <article><span>Вне двух классов</span><strong>{percent(current.unassignedWeight)}</strong><small>не меняются сценарием</small></article>
   </section>
 
-  {!current.available?<div className="sam-rebalance__gate">Для расчёта нужен подтверждённый положительный объём акций или облигаций.</div>:<>
-   <section className="sam-rebalance__target">
+  {!current.available?<div className="sam-rebalance__gate" role="status">Для расчёта нужен подтверждённый положительный объём акций или облигаций.</div>:<>
+   <section className="sam-rebalance__target" aria-label="Пользовательская целевая структура">
     <div><span>01 · ЦЕЛЕВАЯ СТРУКТУРА</span><h3>Задайте долю акций</h3><p>Доля облигаций вычисляется прозрачно как 100% минус доля акций. Значения 0% и 100% не поддерживаются двухклассовой моделью v1.</p></div>
     <label>
      <span>Акции, %</span>
-     <input inputMode="decimal" value={targetInput} onChange={event=>setTargetInput(event.target.value)} placeholder="например, 50" aria-label="Целевая доля акций в процентах"/>
+     <input inputMode="decimal" value={targetInput} onChange={event=>setTargetInput(event.target.value)} placeholder="например, 50" aria-label="Целевая доля акций в процентах" autoComplete="off"/>
     </label>
-    <div className="sam-rebalance__derived"><span>Облигации</span><strong>{targetReady?pct.format(100-equityTarget)+"%":"—"}</strong></div>
+    <div className="sam-rebalance__derived" aria-live="polite" aria-label="Автоматически рассчитанная доля облигаций"><span>Облигации</span><strong>{targetReady?pct.format(100-equityTarget)+"%":"—"}</strong></div>
    </section>
 
-   {!targetReady?<div className="sam-rebalance__gate">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
-    <section className="sam-rebalance__drift">
-     <div className="sam-rebalance__section-title"><div><span>02 · DRIFT</span><h3>Текущее отклонение</h3></div><strong className={drift.withinTolerance?"is-ok":"is-watch"}>{drift.withinTolerance?"В ДОПУСКЕ":"ВНЕ ДОПУСКА"}</strong></div>
-     <div className="sam-rebalance__rows">
+   {!targetReady?<div className="sam-rebalance__gate" role="status">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate" role="status">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
+    <section className="sam-rebalance__drift" aria-label="Текущее отклонение от цели">
+     <div className="sam-rebalance__section-title"><div><span>02 · DRIFT</span><h3>Текущее отклонение</h3></div><strong role="status" className={drift.withinTolerance?"is-ok":"is-watch"}>{drift.withinTolerance?"В ДОПУСКЕ":"ВНЕ ДОПУСКА"}</strong></div>
+     <div className="sam-rebalance__rows" aria-label="Отклонения от пользовательской цели">
       {drift.rows.map(row=><article key={row.key}>
        <div><strong>{row.label}</strong><small>текущая стоимость {money(row.currentValue)}</small></div>
        <div><span>Сейчас</span><b>{percent(row.actual)}</b></div>
@@ -95,27 +95,27 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
      {drift.unassignedWeight>0&&<p>За пределами стратегии: {percent(drift.unassignedWeight)} портфеля. Эти активы сохраняются без изменений и не входят в целевые дельты.</p>}
     </section>
 
-    <section className="sam-rebalance__scenario">
-     <div className="sam-rebalance__section-title"><div><span>03 · СЦЕНАРИЙ</span><h3>Как меняется структура</h3></div><small>без списка заявок</small></div>
-     <div className="sam-rebalance__modes" role="group" aria-label="Тип сценария ребалансировки">
-      {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
+    <section className="sam-rebalance__scenario" aria-label="Сценарий изменения структуры портфеля">
+     <div className="sam-rebalance__section-title"><div><span>03 · СЦЕНАРИЙ</span><h3>Как меняется структура</h3></div><small id="rebalance-mode-note">без списка заявок</small></div>
+     <div className="sam-rebalance__modes" role="group" aria-label="Тип сценария ребалансировки" aria-describedby="rebalance-mode-note">
+      {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} aria-label={"Сценарий: "+modeLabel(item)} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
      </div>
-     {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
-     {!scenario?.available?<div className="sam-rebalance__gate is-inner">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
-      <div className="sam-rebalance__scenario-summary">
+     {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽" autoComplete="off"/></label>}
+     {!scenario?.available?<div className="sam-rebalance__gate is-inner" role="status">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
+      <div className="sam-rebalance__scenario-summary" aria-label="Итоги сценария ребалансировки" aria-live="polite">
        <article><span>Капитал класса до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
        <article><span>После сценария</span><strong>{money(scenario.assignedValueAfter)}</strong></article>
        <article><span>Точная цель</span><strong className={scenario.exactTargetPossible?"is-positive":"is-warning"}>{scenario.exactTargetPossible?"Достижима":"Не этим потоком"}</strong></article>
        <article><span>Мин. поток для точной цели</span><strong>{scenario.minimumFlowForExactTarget==null?"—":money(scenario.minimumFlowForExactTarget)}</strong></article>
       </div>
-      <div className="sam-rebalance__deltas">
+      <div className="sam-rebalance__deltas" aria-label="Дельты классов в выбранном сценарии">
        {scenario.rows.map(row=><article key={row.key}>
         <div><strong>{row.label}</strong><small>целевая стоимость {money(row.targetValue)}</small></div>
         <span>Целевая дельта класса</span>
         <b className={row.direction==="INCREASE"?"is-positive":row.direction==="DECREASE"?"is-negative":""}>{signedMoney(row.deltaValue)}</b>
        </article>)}
       </div>
-      {!scenario.exactTargetPossible&&scenario.reason&&<p className="sam-rebalance__warning">{scenario.reason}</p>}
+      {!scenario.exactTargetPossible&&scenario.reason&&<p className="sam-rebalance__warning" role="status">{scenario.reason}</p>}
       <V3RebalanceVisualBridgeV119 drift={drift} scenario={scenario}/>
      </>}
     </section>

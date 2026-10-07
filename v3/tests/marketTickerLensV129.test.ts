@@ -4,5 +4,5 @@ test("v129 calculates selected ticker percentiles and median ratios in same snap
 test("v129 is unavailable for ticker absent from current snapshot",()=>assert.equal(buildMarketTickerLensV129([r("A",1,1,0,0)],"MISS").available,false));
 test("v129 handles unavailable move/range without inventing values",()=>{const m=buildMarketTickerLensV129([r("A",10,1,null,null),r("B",20,2,2,2)],"A");assert.equal(m.movePercentile,null);assert.equal(m.rangePercentile,null);assert.equal(m.moveVsMedian,null);assert.equal(m.rangeVsMedian,null)});
 test("v129 screener rows are keyboard-selectable and lens is descriptive",()=>{assert.match(host,/tabIndex=\{0\}/);assert.match(host,/V3MarketTickerLensV129/);assert.match(ui,/не её качество, будущую доходность или сигнал на сделку/);assert.doesNotMatch(ui,/targetPrice|recommend|order/i)});
-test("v129 responsive layout collapses on mobile",()=>{assert.match(css,/@media\(max-width:680px\)/);assert.match(css,/@media\(max-width:390px\)/);assert.match(css,/font-size:11px/)});
-console.log("marketTickerLensV129: ok");
+test("v129 responsive layout collapses on mobile",()=>{assert.match(css,/sam-screener__row\.is-selected/);assert.match(css,/@media\(max-width:680px\)/);assert.match(css,/@media\(max-width:390px\)/);assert.match(css,/font-size:11px/)});
+assert.match(ui,/aria-hidden/);assert.match(ui,/tabIndex=\{-1\}/);console.log("marketTickerLensV129: ok");

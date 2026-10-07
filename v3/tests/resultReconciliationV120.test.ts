@@ -6,4 +6,4 @@ test("v120 reports evidence coverage without deriving fake additive attribution"
 test("v120 UI explicitly protects non-additive semantics",()=>{assert.match(ui,/Три факта — три разных вопроса/);assert.match(ui,/не складывает эти числа/);assert.match(ui,/не вычисляет «остаток»/);assert.match(ui,/общих подтверждённых точках/);assert.doesNotMatch(ui,/otherRealizedEffects|componentsTotal/)});
 test("v120 is mounted from trusted FACT and history inputs",()=>{assert.match(core,/CoreResultReconciliationV120/);assert.match(core,/totalResult=\{home\.profit\}/);assert.match(core,/openPositionPl=\{profit\}/);assert.match(core,/realizedPayouts=\{income\.total\}/);assert.match(core,/trusted=\{trusted\}/);assert.match(core,/history=\{history\}/)});
 test("v120 is readable on phones and contains no action handlers",()=>{assert.match(css,/@media\(max-width:620px\)/);assert.match(css,/grid-template-columns:1fr/);assert.doesNotMatch(ui,/onClick|order|trade|targetPrice|forecast/iu)});
-console.log("resultReconciliationV120: ok");
+assert.match(ui,/Независимые факты результата/);assert.match(ui,/Покрытие доказательствами/);console.log("resultReconciliationV120: ok");

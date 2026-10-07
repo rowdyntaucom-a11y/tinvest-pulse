@@ -5,4 +5,4 @@ test("v123 computes medians and percentile context from the same snapshot",()=>{
 test("v123 excludes invalid turnover and keeps missing move/range out of their distributions",()=>{const bad=row("BAD",Number.NaN,99,99),a=row("A",10,null,null),b=row("B",20,2,2);const m=buildMarketRelativeV123([bad,a,b]);assert.equal(m.observed,2);assert.equal(m.moveMedian,2);assert.equal(m.rangeMedian,2);assert.equal(m.leaders.find(x=>x.secid==="A")?.movePercentile,null)});
 test("v123 is mounted before screener filters and explicitly rejects attractiveness semantics",()=>{assert.match(screen,/V3MarketRelativeV123 rows=\{sourceRows\}/);assert.match(ui,/не рейтинг качества бумаги/);assert.match(ui,/не торговый сигнал/);assert.doesNotMatch(ui,/targetPrice|forecast|recommend|order|onClick/i)});
 test("v123 phone layout removes wide table dependency and keeps secondary copy readable",()=>{assert.match(css,/@media\(max-width:680px\)/);assert.match(css,/grid-template-columns:58px 1fr/);assert.match(css,/font-size:11px/)});
-console.log("marketRelativeV123: ok");
+assert.match(ui,/aria-hidden/);console.log("marketRelativeV123: ok");

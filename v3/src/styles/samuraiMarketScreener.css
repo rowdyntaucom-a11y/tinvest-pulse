@@ -71,3 +71,5 @@
 .sb .sam-screener__portfolio-filter button small{color:var(--s-muted)}
 .sb .sam-screener__portfolio-filter button.is-active{border-color:#c7d5ed;background:#eef4ff;color:#315fae}
 @media(max-width:520px){.sb .sam-screener__portfolio-filter button{min-height:48px}.sb .sam-screener__portfolio-filter button b{font-size:9.5px}.sb .sam-screener__portfolio-filter button small{font-size:8px}}
+
+.sam-screener__reset{align-self:end;min-height:36px;padding:0 10px;border:1px solid var(--v3-line);border-radius:10px;background:transparent;color:inherit}.sam-screener__reset:disabled{opacity:.35}.sam-screener__row[tabindex="0"]:focus-visible{outline:2px solid var(--v3-accent);outline-offset:2px}@media(max-width:680px){.sam-screener__reset{width:100%}}

@@ -1,4 +1,4 @@
-import type{PayoutEvent}from"../../../v2/src/lib/payoutsApi";import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";import"../core/incomeSourceMonthMatrix.css";
+import type{PayoutEvent}from"../../../v2/src/lib/payoutsApi";import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 const clean=(x:unknown)=>String(x??"").trim(),month=(x:unknown)=>{const s=String(x??"").slice(0,7);return /^\d{4}-\d{2}$/.test(s)&&Number(s.slice(5,7))>=1&&Number(s.slice(5,7))<=12?s:null},gross=(e:PayoutEvent)=>typeof e.gross==="number"&&Number.isFinite(e.gross)?Math.max(0,e.gross):0,isHigh=(e:PayoutEvent)=>String(e.status||"").toUpperCase()!=="FACT"&&String(e.confidence||"").toUpperCase()==="HIGH";
 const range=(from:string|null|undefined,to:string|null|undefined)=>{const a=month(from),b=month(to);if(!a||!b)return[] as string[];const[y,m]=a.split("-").map(Number),out:string[]=[];for(let i=0;i<24;i++){const d=new Date(Date.UTC(y!,m!-1+i,1)),k=d.toISOString().slice(0,7);if(k>b)break;out.push(k)}return out};
 export type IncomeMatrixCell={month:string;gross:number;count:number;couponGross:number;dividendGross:number};

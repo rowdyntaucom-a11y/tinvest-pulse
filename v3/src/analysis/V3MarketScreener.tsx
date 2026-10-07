@@ -3,7 +3,7 @@ import{loadMarketScreener,type MarketScreenerPayload}from"./marketScreenerApi";
 import{filterMarketScreener,type ScreenerFilters,type ScreenerMove,type ScreenerSort}from"./marketScreenerModel";
 import"../styles/samuraiMarketScreener.css";
 import{V3MarketRelativeV123}from"./V3MarketRelativeV123";
-import{V3MarketTickerLensV129}from"./V3MarketTickerLensV129";
+import{V3MarketTickerLensV129}from"./V3MarketTickerLensV129";import{V3MarketBreadthV139}from"./V3MarketBreadthV139";
 
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 const compact=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDigits:1});
@@ -35,6 +35,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
  const[localData,setLocalData]=useState<MarketScreenerPayload|null>(null),[localLoading,setLocalLoading]=useState(true);
  const controlled=sharedData!==undefined,data=controlled?sharedData:localData,loading=controlled?sharedLoading:localLoading;
  const[filters,setFilters]=useState<ScreenerFilters>({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"}),[portfolioOnly,setPortfolioOnly]=useState(false),[selectedSecid,setSelectedSecid]=useState<string|null>(null);
+ const resetFilters=()=>{setFilters({query:"",move:"all",minTurnover:0,listingLevel:"all",sort:"turnover"});setPortfolioOnly(false)};
  useEffect(()=>{
   if(controlled)return;
   const controller=new AbortController();
@@ -51,7 +52,8 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   return{advancing,declining,flat,observed:changes.length,medianChange:median(changes),turnover,trades};
  },[sourceRows]);
  const rows=useMemo(()=>filterMarketScreener(sourceRows.filter(row=>!portfolioOnly||portfolioTickers?.has(row.secid.toUpperCase())),filters),[sourceRows,filters,portfolioOnly,portfolioTickers]);
- const visible=rows.slice(0,60);
+ const visible=rows.slice(0,60),activeFilters=(filters.query?1:0)+(filters.move!=="all"?1:0)+(filters.minTurnover>0?1:0)+(filters.listingLevel!=="all"?1:0)+(filters.sort!=="turnover"?1:0)+(portfolioOnly?1:0);
+ useEffect(()=>{if(selectedSecid&&!sourceRows.some(row=>row.secid===selectedSecid))setSelectedSecid(null)},[sourceRows,selectedSecid]);
 
  return <section className="sam-screener" aria-label="Рыночный скринер">
   <header className="sam-screener__head"><div><span>09 · SCREENER</span><h2>Рыночный скринер</h2><p>Публичный TQBR-срез MOEX. Фильтры сортируют наблюдаемые рыночные параметры и не являются рейтингом инвестиционной привлекательности.</p></div><i aria-hidden="true">篩</i></header>
@@ -66,32 +68,32 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
    <footer>Сводка описывает только текущие строки публичного TQBR-среза и не является оценкой направления рынка или прогнозом.</footer>
   </section>}
 
-  <V3MarketRelativeV123 rows={sourceRows}/>
+  <V3MarketBreadthV139 rows={sourceRows}/><V3MarketRelativeV123 rows={sourceRows}/>
   {selectedSecid&&<V3MarketTickerLensV129 rows={sourceRows} secid={selectedSecid} portfolioTickers={portfolioTickers} onClose={()=>setSelectedSecid(null)}/>}
 
-  <div className="sam-screener__search">
-   <label><span>Поиск</span><input type="search" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название"/></label>
-   <label><span>Уровень листинга</span><select value={filters.listingLevel} onChange={e=>setFilters(v=>({...v,listingLevel:e.target.value==="all"?"all":Number(e.target.value) as 1|2|3}))}><option value="all">Все</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
+  <div className="sam-screener__search" role="search"><button type="button" className="sam-screener__reset" onClick={resetFilters} disabled={activeFilters===0} aria-label={activeFilters?"Сбросить активные фильтры: "+activeFilters:"Фильтры уже сброшены"}>Сбросить фильтры{activeFilters?" · "+activeFilters:""}</button>
+   <label><span>Поиск</span><input type="search" aria-label="Поиск по тикеру или названию" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value.slice(0,80)}))} maxLength={80} placeholder="тикер или название" autoComplete="off" spellCheck={false}/></label>
+   <label><span>Уровень листинга</span><select aria-label="Уровень листинга" value={filters.listingLevel} onChange={e=>setFilters(v=>({...v,listingLevel:e.target.value==="all"?"all":Number(e.target.value) as 1|2|3}))}><option value="all">Все</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
   </div>
 
-  <div className="sam-screener__portfolio-filter">
-   <button type="button" className={portfolioOnly?"is-active":""} disabled={!portfolioTickers?.size} aria-pressed={portfolioOnly} onClick={()=>setPortfolioOnly(v=>!v)}><b>{portfolioOnly?"Только мой портфель":"Показать только мой портфель"}</b><small>{portfolioTickers?.size?portfolioTickers.size+" тикеров для точного сопоставления":"портфельные тикеры недоступны"}</small></button>
+  <div className="sam-screener__portfolio-filter" role="group" aria-label="Ограничение выборки портфелем">
+   <button type="button" className={portfolioOnly?"is-active":""} disabled={!portfolioTickers?.size} aria-label="Фильтр: только бумаги текущего портфеля" aria-pressed={portfolioOnly} onClick={()=>setPortfolioOnly(v=>!v)}><b>{portfolioOnly?"Только мой портфель":"Показать только мой портфель"}</b><small>{portfolioTickers?.size?portfolioTickers.size+" тикеров для точного сопоставления":"портфельные тикеры недоступны"}</small></button>
   </div>
-  <div className="sam-screener__filter-block">
-   <span>Движение дня</span><div>{MOVE.map(([value,label])=><button type="button" key={value} className={filters.move===value?"is-active":""} onClick={()=>setFilters(v=>({...v,move:value}))}>{label}</button>)}</div>
+  <div className="sam-screener__filter-block" role="group" aria-label="Фильтр по движению дня">
+   <span id="market-move-label">Движение дня</span><div aria-labelledby="market-move-label">{MOVE.map(([value,label])=><button type="button" key={value} className={filters.move===value?"is-active":""} aria-pressed={filters.move===value} onClick={()=>setFilters(v=>({...v,move:value}))}>{label}</button>)}</div>
   </div>
-  <div className="sam-screener__filter-block">
-   <span>Минимальный оборот</span><div>{TURNOVER.map(([value,label])=><button type="button" key={value} className={filters.minTurnover===value?"is-active":""} onClick={()=>setFilters(v=>({...v,minTurnover:value}))}>{label}</button>)}</div>
+  <div className="sam-screener__filter-block" role="group" aria-label="Фильтр по минимальному обороту">
+   <span id="market-turnover-label">Минимальный оборот</span><div aria-labelledby="market-turnover-label">{TURNOVER.map(([value,label])=><button type="button" key={value} className={filters.minTurnover===value?"is-active":""} aria-pressed={filters.minTurnover===value} onClick={()=>setFilters(v=>({...v,minTurnover:value}))}>{label}</button>)}</div>
   </div>
-  <div className="sam-screener__filter-block">
-   <span>Сортировка</span><div>{SORT.map(([value,label])=><button type="button" key={value} className={filters.sort===value?"is-active":""} onClick={()=>setFilters(v=>({...v,sort:value}))}>{label}</button>)}</div>
+  <div className="sam-screener__filter-block" role="group" aria-label="Сортировка результатов скринера">
+   <span id="market-sort-label">Сортировка</span><div aria-labelledby="market-sort-label">{SORT.map(([value,label])=><button type="button" key={value} className={filters.sort===value?"is-active":""} aria-pressed={filters.sort===value} onClick={()=>setFilters(v=>({...v,sort:value}))}>{label}</button>)}</div>
   </div>
 
   {loading?<div className="sam-screener__gate">Получаем публичный рыночный срез MOEX…</div>:!data?.available?<div className="sam-screener__gate is-warning"><strong>Скринер временно недоступен</strong><small>{data?.reason??"Источник не подтвердил рыночные строки."}</small>{onRetry&&<button type="button" onClick={onRetry}>Повторить сейчас</button>}</div>:<>
-   <div className="sam-screener__meta"><span>{data.source??"MOEX ISS"} · {data.board??"TQBR"}</span><strong>{rows.length} из {data.rows.length}</strong><small>{data.fetchedAt?"обновлено "+new Date(data.fetchedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):""}</small></div>
-   <div className="sam-screener__rows" role="table" aria-label="Результаты скринера">
-    <div className="sam-screener__row is-head" role="row"><span>Бумага</span><span>Цена</span><span>День</span><span>Оборот</span><span>Сделки</span></div>
-    {visible.map(row=><article className={"sam-screener__row "+(selectedSecid===row.secid?"is-selected":"")} role="row" key={row.secid} tabIndex={0} onClick={()=>setSelectedSecid(row.secid)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedSecid(row.secid)}}}>
+   <div className="sam-screener__meta" aria-live="polite"><span>{data.source??"MOEX ISS"} · {data.board??"TQBR"}</span><strong>{rows.length} из {data.rows.length}</strong><small>{activeFilters?"активных фильтров "+activeFilters:"фильтры по умолчанию"}</small><small>{data.fetchedAt?"обновлено "+new Date(data.fetchedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):""}</small></div>
+   <div className="sam-screener__rows" role="table" aria-label="Результаты скринера" aria-rowcount={visible.length+1}>
+    <div className="sam-screener__row is-head" role="row" aria-rowindex={1}><span role="columnheader">Бумага</span><span role="columnheader">Цена</span><span role="columnheader">День</span><span role="columnheader">Оборот</span><span role="columnheader">Сделки</span></div>
+    {visible.map((row,index)=><article className={"sam-screener__row "+(selectedSecid===row.secid?"is-selected":"")} role="row" aria-rowindex={index+2} aria-selected={selectedSecid===row.secid} key={row.secid} tabIndex={0} aria-label={(selectedSecid===row.secid?"Закрыть":"Открыть")+" рыночный контекст "+row.secid} onClick={()=>setSelectedSecid(v=>v===row.secid?null:row.secid)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedSecid(v=>v===row.secid?null:row.secid)}else if(e.key==="Escape"&&selectedSecid===row.secid){setSelectedSecid(null)}}}>
      <div><strong>{row.secid}</strong><small>{row.name} · {listingText(row.listingLevel)} · лот {row.lotSize??"—"}</small></div>
      <b>{money.format(row.last)} ₽</b>
      <b className={changeClass(row.dayChangePct)}>{changeText(row.dayChangePct)}</b>

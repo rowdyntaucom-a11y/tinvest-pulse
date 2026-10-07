@@ -7,6 +7,7 @@ import{ratioToPercent,clampPercent}from"../data/units";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{buildV3RiskHistoryMatch,summarizeCorrelationPairs}from"./riskHistoryAdapter";
 import{resolvePositionByKey}from"../assets/positionIdentity";
+import{V3CorrelationRegimeV134}from"./V3CorrelationRegimeV134";import{V3RiskDependencyV138}from"./V3RiskDependencyV138";
 
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const signedPct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
@@ -65,7 +66,7 @@ export function V3RiskContributionPanel({positions,totalPortfolioValue,onOpenAss
 
     {!risk.available?<div className={"v3-analysis-gate"+(risk.integrity==="CONFLICT"?" is-danger":"")}>{risk.integrity==="CONFLICT"?"История содержит конфликтующие цены на одинаковые даты. ":""}{risk.reason??risk.note}</div>:<>
       {!completeCoverage&&<div className="v3-analysis-gate">Риск рассчитан только для покрытой market-history части портфеля ({coverageLabel}). Непокрытые позиции не считаются нулевым риском.</div>}
-      <div className="v3-risk-contributors">
+      <div className="v3-risk-contributors" aria-label="Вклад отдельных активов в риск">
         <div className="v3-risk-contributors-head"><span>Актив</span><span>Капитал</span><span>Standalone σ</span><span>Вклад</span></div>
         {rows.map(row=>{
           const share=row.riskContributionShare;
@@ -84,20 +85,20 @@ export function V3RiskContributionPanel({positions,totalPortfolioValue,onOpenAss
       <small className="v3-analysis-method-note">Signed risk contribution может быть отрицательным из-за диверсификации. Это не прибыль/убыток и не оценка качества актива. Веса — текущая рыночная стоимость только внутри покрытой выборки.</small>
     </>}
 
-    <section className="v3-correlation-depth">
+    <section className="v3-correlation-depth" aria-label="Исторические парные корреляции активов">
       <div className="v3-analysis-layer-head is-small"><div><span>Связь активов</span><h3>Парные корреляции <V3MetricHelp topic="correlation"/></h3></div><b>{corr.readyPairs}/{pairTotal}</b></div>
       {corr.readyPairs>0?<><div className="v3-correlation-summary">
         <article><span>Макс. ρ</span><strong>{corr.highest?ratio.format(corr.highest.correlation):"—"}</strong><small>{corr.highest?corr.highest.a+" ↔ "+corr.highest.b:"—"}</small></article>
         <article><span>Мин. ρ</span><strong>{corr.lowest?ratio.format(corr.lowest.correlation):"—"}</strong><small>{corr.lowest?corr.lowest.a+" ↔ "+corr.lowest.b:"—"}</small></article>
       </div>
-      <div className="v3-correlation-pairs">{corr.strongestAbsolute.map(pair=>{
+      <div className="v3-correlation-pairs" aria-label="Сильнейшие доступные корреляционные пары">{corr.strongestAbsolute.map(pair=>{
         const aPosition=resolvePositionByKey(positions,pair.aKey),bPosition=resolvePositionByKey(positions,pair.bKey);
         return <article key={pair.aKey+"|"+pair.bKey}>
           <div className="v3-correlation-assets"><button type="button" disabled={!aPosition} onClick={()=>{if(aPosition)onOpenAsset?.(aPosition)}}>{pair.a}</button><i aria-hidden="true">↔</i><button type="button" disabled={!bPosition} onClick={()=>{if(bPosition)onOpenAsset?.(bPosition)}}>{pair.b}</button></div>
           <strong>{ratio.format(pair.correlation)}</strong><small>{pair.pairedReturns} общих интервалов · {pair.mature?"зрелая":"preview"} · карточки открываются только по точной идентичности</small>
         </article>;
       })}</div></>:<div className="v3-analysis-gate">Для парных корреляций нужно минимум {matrix.minimumPairedReturns} доходностей на одинаковых интервалах наблюдения. Искусственные коэффициенты не подставляются.</div>}
-      <small className="v3-analysis-method-note">Pearson ρ считается по доходностям с одинаковыми границами интервала, не по уровням цен. Корреляция описывает прошлую совместную динамику и не является прогнозом.</small>
+      <small className="v3-analysis-method-note">Pearson ρ считается по доходностям с одинаковыми границами интервала, не по уровням цен. Корреляция описывает прошлую совместную динамику и не является прогнозом.</small><V3RiskDependencyV138 series={match.series} cells={matrix.cells}/><V3CorrelationRegimeV134 series={match.series}/>
     </section>
 
     <div className="v3-risk-provenance">
