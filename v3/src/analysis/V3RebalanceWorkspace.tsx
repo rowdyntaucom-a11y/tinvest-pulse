@@ -75,7 +75,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
     <div><span>01 · ЦЕЛЕВАЯ СТРУКТУРА</span><h3>Задайте долю акций</h3><p>Доля облигаций вычисляется прозрачно как 100% минус доля акций. Значения 0% и 100% не поддерживаются двухклассовой моделью v1.</p></div>
     <label>
      <span>Акции, %</span>
-     <input inputMode="decimal" value={targetInput} onChange={event=>setTargetInput(event.target.value)} placeholder="например, 50" aria-label="Целевая доля акций в процентах"/>
+     <input inputMode="decimal" value={targetInput} onChange={event=>setTargetInput(event.target.value)} placeholder="например, 50" aria-label="Целевая доля акций в процентах" autoComplete="off"/>
     </label>
     <div className="sam-rebalance__derived"><span>Облигации</span><strong>{targetReady?pct.format(100-equityTarget)+"%":"—"}</strong></div>
    </section>
@@ -100,7 +100,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
      <div className="sam-rebalance__modes" role="group" aria-label="Тип сценария ребалансировки" aria-describedby="rebalance-mode-note">
       {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} aria-label={"Сценарий: "+modeLabel(item)} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
      </div>
-     {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
+     {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽" autoComplete="off"/></label>}
      {!scenario?.available?<div className="sam-rebalance__gate is-inner" role="status">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
       <div className="sam-rebalance__scenario-summary" aria-label="Итоги сценария ребалансировки" aria-live="polite">
        <article><span>Капитал класса до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
