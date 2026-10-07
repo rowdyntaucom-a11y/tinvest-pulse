@@ -3,7 +3,7 @@ import{loadMarketScreener,type MarketScreenerPayload}from"./marketScreenerApi";
 import{filterMarketScreener,type ScreenerFilters,type ScreenerMove,type ScreenerSort}from"./marketScreenerModel";
 import"../styles/samuraiMarketScreener.css";
 import{V3MarketRelativeV123}from"./V3MarketRelativeV123";
-import{V3MarketTickerLensV129}from"./V3MarketTickerLensV129";
+import{V3MarketTickerLensV129}from"./V3MarketTickerLensV129";import{V3MarketBreadthV139}from"./V3MarketBreadthV139";
 
 const money=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2});
 const compact=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDigits:1});
@@ -66,7 +66,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
    <footer>Сводка описывает только текущие строки публичного TQBR-среза и не является оценкой направления рынка или прогнозом.</footer>
   </section>}
 
-  <V3MarketRelativeV123 rows={sourceRows}/>
+  <V3MarketBreadthV139 rows={sourceRows}/><V3MarketRelativeV123 rows={sourceRows}/>
   {selectedSecid&&<V3MarketTickerLensV129 rows={sourceRows} secid={selectedSecid} portfolioTickers={portfolioTickers} onClose={()=>setSelectedSecid(null)}/>}
 
   <div className="sam-screener__search">
