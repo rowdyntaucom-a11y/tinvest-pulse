@@ -49,7 +49,7 @@ export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}
    <article><span>Basis</span><strong>{metric(result.basisPct,v=>(v>0?"+":"")+ratio.format(v)+"%")}</strong><small>фьючерс к базовому активу</small></article>
    <article><span>Basis годовой</span><strong>{metric(result.annualizedBasisPct,v=>(v>0?"+":"")+ratio.format(v)+"%")}</strong><small>простая annualized оценка, не прогноз</small></article>
   </div>
-  <section className="v3-futures-risk" aria-label="Стресс-профиль фьючерса" aria-describedby="futures-stress-disclaimer">
+  <section className="v3-futures-risk" aria-label="Стресс-профиль фьючерса" role="region" aria-describedby="futures-stress-disclaimer">
    <div className="v3-futures-risk__head" aria-label="Состояние спецификации стресс-расчёта"><div><span>DERIVATIVES INTELLIGENCE V2</span><strong>Stress matrix</strong></div><small role="status">{risk.complete?"SPEC COMPLETE":"SPEC INCOMPLETE"}</small></div>
    <div className="v3-futures-risk__summary" aria-label="Ключевые показатели стресс-профиля">
     <article><span>P/L на 1% цены</span><strong>{metric(risk.onePercentPnl,v=>money.format(v)+" ₽")}</strong><small>абсолютная чувствительность позиции</small></article>
