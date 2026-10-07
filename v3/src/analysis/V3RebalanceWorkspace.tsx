@@ -64,7 +64,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
   </header>
 
   <div className="sam-rebalance__help"><V3GlossaryHelp terms={["drift","coverage"]} label="Как читать ребаланс"/></div>
-  <section className="sam-rebalance__current">
+  <section className="sam-rebalance__current" aria-label="Текущая структура портфеля для сценария">
    <article><span>Акции сейчас</span><strong>{percent(equityNow)}</strong><small>{money(current.rows.find(row=>row.key==="equity")?.currentValue)}</small></article>
    <article><span>Облигации сейчас</span><strong>{percent(bondNow)}</strong><small>{money(current.rows.find(row=>row.key==="bond")?.currentValue)}</small></article>
    <article><span>Вне двух классов</span><strong>{percent(current.unassignedWeight)}</strong><small>не меняются сценарием</small></article>
@@ -83,7 +83,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
    {!targetReady?<div className="sam-rebalance__gate">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
     <section className="sam-rebalance__drift">
      <div className="sam-rebalance__section-title"><div><span>02 · DRIFT</span><h3>Текущее отклонение</h3></div><strong className={drift.withinTolerance?"is-ok":"is-watch"}>{drift.withinTolerance?"В ДОПУСКЕ":"ВНЕ ДОПУСКА"}</strong></div>
-     <div className="sam-rebalance__rows">
+     <div className="sam-rebalance__rows" aria-label="Отклонения от пользовательской цели">
       {drift.rows.map(row=><article key={row.key}>
        <div><strong>{row.label}</strong><small>текущая стоимость {money(row.currentValue)}</small></div>
        <div><span>Сейчас</span><b>{percent(row.actual)}</b></div>
@@ -98,7 +98,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
     <section className="sam-rebalance__scenario">
      <div className="sam-rebalance__section-title"><div><span>03 · СЦЕНАРИЙ</span><h3>Как меняется структура</h3></div><small>без списка заявок</small></div>
      <div className="sam-rebalance__modes" role="group" aria-label="Тип сценария ребалансировки">
-      {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
+      {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
      </div>
      {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
      {!scenario?.available?<div className="sam-rebalance__gate is-inner">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
@@ -108,7 +108,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
        <article><span>Точная цель</span><strong className={scenario.exactTargetPossible?"is-positive":"is-warning"}>{scenario.exactTargetPossible?"Достижима":"Не этим потоком"}</strong></article>
        <article><span>Мин. поток для точной цели</span><strong>{scenario.minimumFlowForExactTarget==null?"—":money(scenario.minimumFlowForExactTarget)}</strong></article>
       </div>
-      <div className="sam-rebalance__deltas">
+      <div className="sam-rebalance__deltas" aria-label="Дельты классов в выбранном сценарии">
        {scenario.rows.map(row=><article key={row.key}>
         <div><strong>{row.label}</strong><small>целевая стоимость {money(row.targetValue)}</small></div>
         <span>Целевая дельта класса</span>
