@@ -70,7 +70,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
    <article><span>Вне двух классов</span><strong>{percent(current.unassignedWeight)}</strong><small>не меняются сценарием</small></article>
   </section>
 
-  {!current.available?<div className="sam-rebalance__gate">Для расчёта нужен подтверждённый положительный объём акций или облигаций.</div>:<>
+  {!current.available?<div className="sam-rebalance__gate" role="status">Для расчёта нужен подтверждённый положительный объём акций или облигаций.</div>:<>
    <section className="sam-rebalance__target" aria-label="Пользовательская целевая структура">
     <div><span>01 · ЦЕЛЕВАЯ СТРУКТУРА</span><h3>Задайте долю акций</h3><p>Доля облигаций вычисляется прозрачно как 100% минус доля акций. Значения 0% и 100% не поддерживаются двухклассовой моделью v1.</p></div>
     <label>
@@ -80,7 +80,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
     <div className="sam-rebalance__derived"><span>Облигации</span><strong>{targetReady?pct.format(100-equityTarget)+"%":"—"}</strong></div>
    </section>
 
-   {!targetReady?<div className="sam-rebalance__gate">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
+   {!targetReady?<div className="sam-rebalance__gate" role="status">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate" role="status">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
     <section className="sam-rebalance__drift" aria-label="Текущее отклонение от цели">
      <div className="sam-rebalance__section-title"><div><span>02 · DRIFT</span><h3>Текущее отклонение</h3></div><strong role="status" className={drift.withinTolerance?"is-ok":"is-watch"}>{drift.withinTolerance?"В ДОПУСКЕ":"ВНЕ ДОПУСКА"}</strong></div>
      <div className="sam-rebalance__rows" aria-label="Отклонения от пользовательской цели">
@@ -101,7 +101,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
       {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
      </div>
      {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
-     {!scenario?.available?<div className="sam-rebalance__gate is-inner">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
+     {!scenario?.available?<div className="sam-rebalance__gate is-inner" role="status">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
       <div className="sam-rebalance__scenario-summary" aria-label="Итоги сценария ребалансировки" aria-live="polite">
        <article><span>Капитал класса до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
        <article><span>После сценария</span><strong>{money(scenario.assignedValueAfter)}</strong></article>
