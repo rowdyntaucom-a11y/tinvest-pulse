@@ -1,0 +1,10 @@
+import type{MarketScreenerRow}from"./marketScreenerApi";
+export type MarketRelativeV123={observed:number;turnoverMedian:number|null;moveMedian:number|null;rangeMedian:number|null;highLiquidity:number;activeMove:number;wideRange:number;leaders:Array<{secid:string;turnoverPct:number;movePct:number|null;rangePct:number|null;turnoverPercentile:number;movePercentile:number|null;rangePercentile:number|null}>};
+const median=(v:number[])=>{if(!v.length)return null;const a=[...v].sort((x,y)=>x-y),m=Math.floor(a.length/2);return a.length%2?a[m]!:(a[m-1]!+a[m]!)/2};
+const percentile=(v:number[],x:number)=>{if(!v.length)return null;const below=v.filter(n=>n<x).length,equal=v.filter(n=>n===x).length;return(below+equal*.5)/v.length};
+export function buildMarketRelativeV123(rows:MarketScreenerRow[]):MarketRelativeV123{
+ const clean=rows.filter(r=>Number.isFinite(r.turnoverRub)&&r.turnoverRub>=0),turn=clean.map(r=>r.turnoverRub),moves=clean.map(r=>r.dayChangePct).filter((x):x is number=>typeof x==="number"&&Number.isFinite(x)).map(Math.abs),ranges=clean.map(r=>r.rangePct).filter((x):x is number=>typeof x==="number"&&Number.isFinite(x)&&x>=0);
+ const tm=median(turn),mm=median(moves),rm=median(ranges),total=turn.reduce((s,x)=>s+x,0);
+ const leaders=[...clean].sort((a,b)=>b.turnoverRub-a.turnoverRub).slice(0,8).map(r=>({secid:r.secid,turnoverPct:total?r.turnoverRub/total:0,movePct:r.dayChangePct,rangePct:r.rangePct,turnoverPercentile:percentile(turn,r.turnoverRub)??0,movePercentile:r.dayChangePct==null?null:percentile(moves,Math.abs(r.dayChangePct)),rangePercentile:r.rangePct==null?null:percentile(ranges,r.rangePct)}));
+ return{observed:clean.length,turnoverMedian:tm,moveMedian:mm,rangeMedian:rm,highLiquidity:tm==null?0:clean.filter(r=>r.turnoverRub>=tm).length,activeMove:mm==null?0:clean.filter(r=>r.dayChangePct!=null&&Math.abs(r.dayChangePct)>=mm).length,wideRange:rm==null?0:clean.filter(r=>r.rangePct!=null&&r.rangePct>=rm).length,leaders};
+}
