@@ -17,6 +17,7 @@ import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
 import{V3IncomeSeasonalityV122}from"./V3IncomeSeasonalityV122";
 import{V3IncomeResilienceV128}from"./V3IncomeResilienceV128";
 import{V3IncomeContinuityMatrixV133}from"./V3IncomeContinuityMatrixV133";
+import{V3IncomeFreshnessV135}from"./V3IncomeFreshnessV135";
 
 type View="overview"|"calendar"|"history"|"sources"|"trust"|"market";
 const BASIC_VIEW_OPTIONS=[
@@ -174,7 +175,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
       <div className="v3-income-coverage"><span>Покрытие расписания</span><strong>{coverage==null?"—":pct.format(coverage)+"%"}</strong><small>{depth.integrity.resolvedAssets}/{depth.integrity.eligibleAssets||"—"} активов · ошибок {depth.integrity.errors}</small></div>
       <small className="v3-income-method">Факт строится только из реально полученных положительных выплат после налога. 12М — отдельное расписание до налога. YoC доступен лишь когда все события строки несут один FIGI и он однозначно соответствует одной текущей позиции; тикер и название никогда не выбирают cost basis.</small>{samuraiReference&&proMode&&<SamuraiNextCue targetId="sam-income-trust" label="ДАЛЬШЕ · ДАННЫЕ"/>}
     </div>}
-    {proMode&&(samuraiReference||view==="trust")&&<div id="sam-income-trust"><V3IncomeDataTrust calendar={calendar} positions={positions} loadedAt={loadedAt}/>{samuraiReference&&<SamuraiNextCue targetId="sam-income-market" label="ДАЛЬШЕ · РЫНОК"/>}</div>}
+    {proMode&&(samuraiReference||view==="trust")&&<div id="sam-income-trust"><V3IncomeDataTrust calendar={calendar} positions={positions} loadedAt={loadedAt}/><V3IncomeFreshnessV135 calendar={calendar} loadedAt={loadedAt}/>{samuraiReference&&<SamuraiNextCue targetId="sam-income-market" label="ДАЛЬШЕ · РЫНОК"/>}</div>}
     {proMode&&samuraiReference&&<V3DividendDiscovery/>}
     {proMode&&!samuraiReference&&view==="market"&&<V3DividendDiscovery/>}
   </section>
