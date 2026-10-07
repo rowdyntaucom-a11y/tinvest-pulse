@@ -1,5 +1,13 @@
 import{useCallback,useEffect,useMemo,useState}from"react";
 import{loadV3OperationsLedger,type V3OperationKind,type V3OperationsLedger}from"./operationsLedger";
+import{V3OperationsTypeBreadthV193}from"./V3OperationsTypeBreadthV193";
+import{V3OperationsRecencyV192}from"./V3OperationsRecencyV192";
+import{V3OperationsCashBridgeV191}from"./V3OperationsCashBridgeV191";
+import{V3OperationsCadenceV190}from"./V3OperationsCadenceV190";
+import{V3OperationsInstrumentActivityV189}from"./V3OperationsInstrumentActivityV189";
+import{V3OperationsFeeDepthV188}from"./V3OperationsFeeDepthV188";
+import{V3OperationsTradeFlowV187}from"./V3OperationsTradeFlowV187";
+import{V3OperationsDailyV186}from"./V3OperationsDailyV186";
 import"../styles/samuraiOperationsDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -88,6 +96,8 @@ export function V3OperationsDepth(){
       <article><span>Внешних потоков</span><strong>{counts.flow}</strong><small>{ledger.externalCashTotal==null?"агрегат —":signedMoney(ledger.externalCashTotal)}</small></article>
      </div>
 
+     <V3OperationsDailyV186 rows={ledger.rows}/>
+
      <div className="sam-ops-depth__filters" role="group" aria-label="Фильтр операций">
       {FILTERS.map(([id,label])=><button key={id} type="button" className={filter===id?"is-active":""} onClick={()=>{setFilter(id);setExpanded(false)}}>{label}</button>)}
      </div>
@@ -100,6 +110,13 @@ export function V3OperationsDepth(){
       </article>):<div className="sam-ops-depth__empty">В выбранной категории подтверждённых операций нет.</div>}
      </div>
      {ledger.rows.length>14&&<button type="button" className="sam-ops-depth__more" onClick={()=>setExpanded(value=>!value)}>{expanded?"Свернуть журнал":"Показать больше операций"}</button>}
+     <V3OperationsTradeFlowV187 rows={ledger.rows}/>
+     <V3OperationsFeeDepthV188 rows={ledger.rows}/>
+     <V3OperationsInstrumentActivityV189 rows={ledger.rows}/>
+     <V3OperationsCadenceV190 rows={ledger.rows}/>
+     <V3OperationsCashBridgeV191 rows={ledger.rows}/>
+     <V3OperationsRecencyV192 rows={ledger.rows} asOf={ledger.fetchedAt??ledger.coverageTo}/>
+     <V3OperationsTypeBreadthV193 rows={ledger.rows}/>
      <p className="sam-ops-depth__note">Операционный журнал показывает фактические события счёта. Он не является дневником рыночной доходности и не заменяет TWR/XIRR.</p>
     </>}
   </section>
