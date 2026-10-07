@@ -77,7 +77,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
      <span>Акции, %</span>
      <input inputMode="decimal" value={targetInput} onChange={event=>setTargetInput(event.target.value)} placeholder="например, 50" aria-label="Целевая доля акций в процентах" autoComplete="off"/>
     </label>
-    <div className="sam-rebalance__derived"><span>Облигации</span><strong>{targetReady?pct.format(100-equityTarget)+"%":"—"}</strong></div>
+    <div className="sam-rebalance__derived" aria-live="polite" aria-label="Автоматически рассчитанная доля облигаций"><span>Облигации</span><strong>{targetReady?pct.format(100-equityTarget)+"%":"—"}</strong></div>
    </section>
 
    {!targetReady?<div className="sam-rebalance__gate" role="status">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate" role="status">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
