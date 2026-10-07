@@ -6,4 +6,4 @@ test("v124 aligns by exact date and fails closed when common history is insuffic
 test("v124 rejects invalid windows",()=>{const m=buildRollingComparisonV124(scenario([1,2,3]),scenario([1,2,3]),1);assert.equal(m.available,false);assert.match(m.reason??"",/Некорректное/)});
 test("v124 is mounted after common-scale comparison and explicitly non-predictive",()=>{assert.match(lab,/V3StrategyLabComparisonV118[^]*V3StrategyRollingWindowsV124/);assert.match(ui,/не является вероятностью будущего результата/);assert.match(ui,/не выбирает «лучшую» стратегию/);assert.doesNotMatch(ui,/targetPrice|forecast|trade|order|recommend/i)});
 test("v124 mobile layout stacks cards and preserves readable text",()=>{assert.match(css,/@media\(max-width:620px\)/);assert.match(css,/grid-template-columns:1fr/);assert.match(css,/font-size:11px/)});
-console.log("strategyRollingWindowsV124: ok");
+assert.match(ui,/Длина скользящего окна/);assert.match(ui,/role="img"/);console.log("strategyRollingWindowsV124: ok");
