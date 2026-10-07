@@ -9,6 +9,7 @@ const recordingCss=readFileSync(new URL("../src/core/coreRecording20261007.css",
 const root=readFileSync(new URL("../src/core/CoreRoot.tsx",import.meta.url),"utf8");
 const payout=readFileSync(new URL("../src/core/CorePayoutCalendar.tsx",import.meta.url),"utf8");
 const payoutApi=readFileSync(new URL("../../v2/src/lib/payoutsApi.ts",import.meta.url),"utf8");
+const incomeDepth=readFileSync(new URL("../src/income/V3IncomeDepth.tsx",import.meta.url),"utf8");
 const incomeRouter=readFileSync(new URL("../src/core/CoreIncomeWorkspaceRouterV93.tsx",import.meta.url),"utf8");
 const resultRouter=readFileSync(new URL("../src/core/CoreResultWorkspaceRouterV94.tsx",import.meta.url),"utf8");
 
@@ -32,6 +33,8 @@ test("warm payout calendar is reused during compact/full remounts",()=>{
  assert.match(payoutApi,/export function peekPayoutCalendarCache/);
  assert.match(payout,/const warm=peekPayoutCalendarCache\(\)/);
  assert.match(payout,/setData\(cached\);setLoading\(false\)/);
+ assert.match(incomeDepth,/const warm=peekPayoutCalendarCache\(\)/);
+ assert.match(incomeDepth,/if\(cached\)\{setCalendar\(cached\);setLoading\(false\)\}/);
 });
 
 test("deep Core workspaces are prefetched before a fast mobile tab change",()=>{
