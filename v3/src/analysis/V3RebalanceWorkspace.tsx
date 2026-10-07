@@ -115,7 +115,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
         <b className={row.direction==="INCREASE"?"is-positive":row.direction==="DECREASE"?"is-negative":""}>{signedMoney(row.deltaValue)}</b>
        </article>)}
       </div>
-      {!scenario.exactTargetPossible&&scenario.reason&&<p className="sam-rebalance__warning">{scenario.reason}</p>}
+      {!scenario.exactTargetPossible&&scenario.reason&&<p className="sam-rebalance__warning" role="status">{scenario.reason}</p>}
       <V3RebalanceVisualBridgeV119 drift={drift} scenario={scenario}/>
      </>}
     </section>
