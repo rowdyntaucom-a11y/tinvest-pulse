@@ -64,7 +64,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
   </header>
 
   <div className="sam-rebalance__help"><V3GlossaryHelp terms={["drift","coverage"]} label="Как читать ребаланс"/></div>
-  <section className="sam-rebalance__current" aria-label="Текущая структура портфеля для сценария">
+  <section className="sam-rebalance__current" aria-label="Текущая структура портфеля для сценария" aria-live="polite">
    <article><span>Акции сейчас</span><strong>{percent(equityNow)}</strong><small>{money(current.rows.find(row=>row.key==="equity")?.currentValue)}</small></article>
    <article><span>Облигации сейчас</span><strong>{percent(bondNow)}</strong><small>{money(current.rows.find(row=>row.key==="bond")?.currentValue)}</small></article>
    <article><span>Вне двух классов</span><strong>{percent(current.unassignedWeight)}</strong><small>не меняются сценарием</small></article>
