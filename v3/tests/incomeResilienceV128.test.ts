@@ -5,4 +5,4 @@ test("v128 keeps unidentified FACT out of source HHI but exposes FIGI coverage",
 test("v128 fails closed until three complete observed months with positive FACT",()=>{assert.equal(buildIncomeResilienceV128([{key:"a",totalNet:10,complete:true},{key:"b",totalNet:10,complete:true}],[]).available,false);assert.equal(buildIncomeResilienceV128([{key:"a",totalNet:0,complete:true},{key:"b",totalNet:0,complete:true},{key:"c",totalNet:0,complete:true}],[]).available,false)});
 test("v128 mounts after seasonality and is explicitly historical",()=>{assert.match(host,/V3IncomeSeasonalityV122[^]*V3IncomeResilienceV128/);assert.match(ui,/не прогноз будущего дохода/);assert.doesNotMatch(ui,/targetPrice|trade|order|recommend/i)});
 test("v128 responsive layout collapses to one column on narrow mobile",()=>{assert.match(css,/@media\(max-width:680px\)/);assert.match(css,/grid-template-columns:1fr 1fr/);assert.match(css,/@media\(max-width:390px\)/);assert.match(css,/font-size:11px/)});
-console.log("incomeResilienceV128: ok");
+assert.match(ui,/aria-hidden/);console.log("incomeResilienceV128: ok");
