@@ -66,7 +66,7 @@ export function V3RiskContributionPanel({positions,totalPortfolioValue,onOpenAss
 
     {!risk.available?<div className={"v3-analysis-gate"+(risk.integrity==="CONFLICT"?" is-danger":"")}>{risk.integrity==="CONFLICT"?"История содержит конфликтующие цены на одинаковые даты. ":""}{risk.reason??risk.note}</div>:<>
       {!completeCoverage&&<div className="v3-analysis-gate">Риск рассчитан только для покрытой market-history части портфеля ({coverageLabel}). Непокрытые позиции не считаются нулевым риском.</div>}
-      <div className="v3-risk-contributors">
+      <div className="v3-risk-contributors" aria-label="Вклад отдельных активов в риск">
         <div className="v3-risk-contributors-head"><span>Актив</span><span>Капитал</span><span>Standalone σ</span><span>Вклад</span></div>
         {rows.map(row=>{
           const share=row.riskContributionShare;
