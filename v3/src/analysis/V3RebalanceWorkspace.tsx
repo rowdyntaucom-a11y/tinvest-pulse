@@ -71,7 +71,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
   </section>
 
   {!current.available?<div className="sam-rebalance__gate">Для расчёта нужен подтверждённый положительный объём акций или облигаций.</div>:<>
-   <section className="sam-rebalance__target">
+   <section className="sam-rebalance__target" aria-label="Пользовательская целевая структура">
     <div><span>01 · ЦЕЛЕВАЯ СТРУКТУРА</span><h3>Задайте долю акций</h3><p>Доля облигаций вычисляется прозрачно как 100% минус доля акций. Значения 0% и 100% не поддерживаются двухклассовой моделью v1.</p></div>
     <label>
      <span>Акции, %</span>
@@ -81,7 +81,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
    </section>
 
    {!targetReady?<div className="sam-rebalance__gate">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
-    <section className="sam-rebalance__drift">
+    <section className="sam-rebalance__drift" aria-label="Текущее отклонение от цели">
      <div className="sam-rebalance__section-title"><div><span>02 · DRIFT</span><h3>Текущее отклонение</h3></div><strong role="status" className={drift.withinTolerance?"is-ok":"is-watch"}>{drift.withinTolerance?"В ДОПУСКЕ":"ВНЕ ДОПУСКА"}</strong></div>
      <div className="sam-rebalance__rows" aria-label="Отклонения от пользовательской цели">
       {drift.rows.map(row=><article key={row.key}>
