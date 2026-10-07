@@ -102,7 +102,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
      </div>
      {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
      {!scenario?.available?<div className="sam-rebalance__gate is-inner">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
-      <div className="sam-rebalance__scenario-summary" aria-label="Итоги сценария ребалансировки">
+      <div className="sam-rebalance__scenario-summary" aria-label="Итоги сценария ребалансировки" aria-live="polite">
        <article><span>Капитал класса до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
        <article><span>После сценария</span><strong>{money(scenario.assignedValueAfter)}</strong></article>
        <article><span>Точная цель</span><strong className={scenario.exactTargetPossible?"is-positive":"is-warning"}>{scenario.exactTargetPossible?"Достижима":"Не этим потоком"}</strong></article>
