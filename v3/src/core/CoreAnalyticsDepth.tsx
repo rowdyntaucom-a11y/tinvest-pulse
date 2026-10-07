@@ -8,6 +8,12 @@ import{filterHistoryWindow,type V3HistoryWindow}from"../history/historyLens";imp
 import"../styles/analysisDepth.css";
 import{CoreDrawdownEpisodesV121}from"./CoreDrawdownEpisodesV121";
 import{CoreRecoveryDepthV131}from"./CoreRecoveryDepthV131";
+import{V3ReturnRegimeV127}from"../analysis/V3ReturnRegimeV127";
+import{V3ReturnTailV145}from"../analysis/V3ReturnTailV145";
+import{V3ReturnHitRateV155}from"../analysis/V3ReturnHitRateV155";
+import{V3ReturnStreakDepthV160}from"../analysis/V3ReturnStreakDepthV160";
+import{V3ReturnDownsideV168}from"../analysis/V3ReturnDownsideV168";
+import{V3ReturnBalanceV177}from"../analysis/V3ReturnBalanceV177";
 
 export type CoreAnalyticsMarketContext={
  riskFreeRate:number|null;
@@ -91,15 +97,15 @@ export function CoreAnalyticsDepth({
     </div>}
    </div>
   </section>
-  <nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики">
-   {SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
+  <nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики" role="tablist">
+   {SECTIONS.map(([id,label,note])=><button key={id} type="button" role="tab" aria-selected={section===id} className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
   </nav>
   <section className="core-analytics-depth__decision" aria-live="polite"><span>{decision.eyebrow}</span><strong>{decision.title}</strong><p>{decision.text}</p></section>
   <section className="core-analytics-depth__evidence" aria-label="Основа расчёта"><span>ОСНОВА РАСЧЁТА</span><div><article><b>{history.length}</b><small>точек истории</small></article><article><b>{positions.length}</b><small>текущих позиций</small></article><article><b>{relative.available?relative.overlapPoints:"—"}</b><small>общих точек с IMOEX</small></article></div><p>{integrity==="OK"?"История прошла проверку целостности.":"История ограничена: недоступные метрики остаются пустыми."}</p></section>
   <div className="core-analytics-depth__stage">
-   {section==="return"&&<V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/>}
-   {section==="risk"&&<><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/><CoreRecoveryDepthV131 history={history}/></>}
-   {section==="benchmark"&&<V3MarketLayer relative={relative} window={window} onWindowChange={setWindow} market={market}/>}
+   {section==="return"&&<div role="tabpanel" aria-label="Аналитика доходности"><V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/><V3ReturnRegimeV127 history={history}/><V3ReturnTailV145 history={history}/><V3ReturnHitRateV155 history={history}/><V3ReturnStreakDepthV160 history={history}/><V3ReturnDownsideV168 history={history}/><V3ReturnBalanceV177 history={history}/></div>}
+   {section==="risk"&&<div role="tabpanel" aria-label="Аналитика риска"><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/><CoreRecoveryDepthV131 history={history}/></div>}
+   {section==="benchmark"&&<div role="tabpanel" aria-label="Сравнение с IMOEX"><V3MarketLayer relative={relative} window={window} onWindowChange={setWindow} market={market}/></div>}
   </div>
   <footer>Все показатели описательные. VaR/CVaR, корреляция, beta, excess return и rolling-метрики основаны на доступной подтверждённой истории и не являются прогнозом или торговым сигналом.</footer>
  </section>;

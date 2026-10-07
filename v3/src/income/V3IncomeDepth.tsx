@@ -16,6 +16,14 @@ import{V3DividendDiscovery}from"./V3DividendDiscovery";
 import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
 import{V3IncomeSeasonalityV122}from"./V3IncomeSeasonalityV122";
 import{V3IncomeResilienceV128}from"./V3IncomeResilienceV128";
+import{V3IncomeGrowthV143}from"./V3IncomeGrowthV143";
+import{V3IncomeTypeMixV148}from"./V3IncomeTypeMixV148";
+import{V3IncomeActivityStreakV153}from"./V3IncomeActivityStreakV153";
+import{V3IncomeConcentrationTrendV158}from"./V3IncomeConcentrationTrendV158";
+import{V3IncomeVolatilityV163}from"./V3IncomeVolatilityV163";
+import{V3IncomeQuarterDepthV166}from"./V3IncomeQuarterDepthV166";
+import{V3IncomeActiveMonthV172}from"./V3IncomeActiveMonthV172";
+import{V3IncomeYearDepthV175}from"./V3IncomeYearDepthV175";
 import{V3IncomeContinuityMatrixV133}from"./V3IncomeContinuityMatrixV133";
 import{V3IncomeFreshnessV135}from"./V3IncomeFreshnessV135";
 
@@ -136,7 +144,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
         </div>
         <small className="v3-income-method">Состав показывает только уже полученный пассивный доход после налога. Регулярность — доля полностью наблюдавшихся месяцев, в которых была хотя бы одна фактическая выплата; частичные месяцы не ухудшают показатель.</small>
       </div>
-      <V3IncomeSeasonalityV122 months={depth.realizedHistory.months}/><V3IncomeResilienceV128 months={depth.realizedHistory.months} events={depth.trustedIncome.actualEvents}/>
+      <V3IncomeSeasonalityV122 months={depth.realizedHistory.months}/><V3IncomeGrowthV143 months={depth.realizedHistory.months}/><V3IncomeTypeMixV148 months={depth.realizedHistory.months}/><V3IncomeActivityStreakV153 months={depth.realizedHistory.months}/><V3IncomeConcentrationTrendV158 months={depth.realizedHistory.months}/><V3IncomeVolatilityV163 months={depth.realizedHistory.months}/><V3IncomeQuarterDepthV166 months={depth.realizedHistory.months}/><V3IncomeActiveMonthV172 months={depth.realizedHistory.months}/><V3IncomeYearDepthV175 months={depth.realizedHistory.months}/><V3IncomeResilienceV128 months={depth.realizedHistory.months} events={depth.trustedIncome.actualEvents}/>
       <div className="v3-income-history-stats">
         <article><span>Месяцев с выплатами</span><strong>{depth.stability.payoutMonths}</strong><small>из {depth.stability.observedMonths} полных</small></article>
         <article><span>Нулевых месяцев</span><strong>{depth.stability.zeroIncomeMonths}</strong><small>только полностью наблюдавшиеся</small></article>
@@ -152,9 +160,9 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
         <article><span>Источников факта <V3MetricHelp topic="incomeConcentration"/></span><strong>{depth.concentration.sourceCount||"—"}</strong><small>{depth.concentration.effectiveSources==null?"эффективное число —":"эфф. "+depth.concentration.effectiveSources.toLocaleString("ru-RU",{maximumFractionDigits:2})}</small></article>
         <article><span>Главный источник</span><strong>{depth.concentration.topSourceShare==null?"—":pct.format(depth.concentration.topSourceShare*100)+"%"}</strong><small>доля реально полученного net</small></article>
       </div>
-      <V3IncomeContinuityMatrixV133 actual={depth.trustedIncome.actualEvents} future={depth.trustedIncome.futureEvents} positions={positions} from={calendar.period.from} to={calendar.period.to}/><div className="v3-income-source-list">{depth.sourceRows.length?depth.sourceRows.slice(0,12).map(row=>{
+      <V3IncomeContinuityMatrixV133 actual={depth.trustedIncome.actualEvents} future={depth.trustedIncome.futureEvents} positions={positions} from={calendar.period.from} to={calendar.period.to}/><div className="v3-income-source-list" role="list" aria-label="Источники фактического дохода">{depth.sourceRows.length?depth.sourceRows.slice(0,12).map(row=>{
         const matches=row.figi?positions.filter(position=>position.figi?.trim().toUpperCase()===row.figi):[],position=row.matchBasis==="FIGI"&&matches.length===1?matches[0]:null;
-        return <button type="button" key={row.key} className="v3-income-source-row" disabled={!position} onClick={()=>{if(position)onOpenAsset?.(position)}}>
+        return <button type="button" role="listitem" key={row.key} className="v3-income-source-row" disabled={!position} onClick={()=>{if(position)onOpenAsset?.(position)}}>
           <div><strong>{row.ticker}</strong><small>{row.name!==row.ticker?row.name:sourceIdentity(row.identityState)}</small></div>
           <div><span>Факт</span><strong>{row.fact>0?rub2.format(row.fact)+" ₽":"—"}</strong><small>{row.factCount} выплат</small></div>
           <div><span>12М</span><strong>{row.forecast>0?rub2.format(row.forecast)+" ₽":"—"}</strong><small>{row.yoc12m==null?"YoC — · "+sourceIdentity(row.identityState):"YoC "+pct.format(row.yoc12m*100)+"%"}</small></div>

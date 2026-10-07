@@ -3,6 +3,13 @@ import{createPortal}from"react-dom";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{CorePortfolioConcentrationV126}from"./CorePortfolioConcentrationV126";
 import{CoreConcentrationLadderV136}from"./CoreConcentrationLadderV136";
+import{CorePortfolioWeightBandsV147}from"./CorePortfolioWeightBandsV147";
+import{CorePortfolioPnLBreadthV152}from"./CorePortfolioPnLBreadthV152";
+import{CorePortfolioClassBreadthV157}from"./CorePortfolioClassBreadthV157";
+import{CorePortfolioTailV161}from"./CorePortfolioTailV161";
+import{CorePortfolioCostBasisV165}from"./CorePortfolioCostBasisV165";
+import{CorePortfolioPriceDistanceV170}from"./CorePortfolioPriceDistanceV170";
+import{CorePortfolioBasisCoverageV174}from"./CorePortfolioBasisCoverageV174";
 
 type Props={positions:PositionSnapshot[]};
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -34,13 +41,13 @@ export function CorePortfolioVisualIntelligenceV106({positions}:Props){
  },[positions]);
  if(!host||model.total<=0)return null;
  let offset=0;
- return createPortal(<section className="core-portfolio-visual-v106" aria-label="Визуальная карта портфеля">
+ return createPortal(<section className="core-portfolio-visual-v106" aria-label="Визуальная структура текущего портфеля">
   <header><span><b>Структура капитала</b><small>концентрация и точные веса крупнейших позиций</small></span><strong>{model.rank.length} позиций</strong></header>
   <div className="core-portfolio-visual-v106__grid">
    <article className="core-portfolio-visual-v106__curve"><div><span>Накопленная концентрация</span><b>от крупнейшей позиции</b></div><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Накопленная доля капитала по позициям от крупнейшей к меньшей"><g className="grid">{[25,50,75].map(v=><line key={v} x1="0" y1={92-v*.82} x2="100" y2={92-v*.82}/>)}</g><polyline points={model.curve.map(p=>`${p.x},${p.y}`).join(" ")}/></svg><div className="core-portfolio-visual-v106__concentration-cues"><span>Топ-1 <b>{pct.format(model.top1)}%</b></span><span>Топ-3 <b>{pct.format(model.top3)}%</b></span><span>Топ-5 <b>{pct.format(model.top5)}%</b></span></div><div className="core-portfolio-visual-v106__ranking" aria-label="Крупнейшие позиции"><div className="head"><span>Крупнейшие позиции</span><b>вес · стоимость</b></div>{model.leaders.map(row=><div className="row" key={row.index+row.ticker}><i>{row.index}</i><span><b>{row.ticker}</b><small>{row.name}</small></span><strong>{pct.format(row.share)}%</strong><em>{money.format(row.value)} ₽</em></div>)}</div><footer><span>{model.rank[0]?.ticker||"—"}</span><span>все позиции</span></footer></article>
-   <article className="core-portfolio-visual-v106__classes"><div><span>Классы активов</span><b>{money.format(model.total)} ₽</b></div><div className="stack" aria-label="Доли классов активов">{model.classes.map((x,i)=>{const width=x.value/model.total*100,start=offset;offset+=width;return <i key={x.key} className={`c${i}`} style={{width:`${width}%`}} title={`${x.key}: ${pct.format(width)}%`} data-start={start}/>})}</div><ul>{model.classes.map((x,i)=><li key={x.key}><i className={`c${i}`}/><span>{x.key}</span><b>{pct.format(x.value/model.total*100)}%</b></li>)}</ul></article>
-   <article className="core-portfolio-visual-v106__breadth"><div><span>Капитал по знаку P/L</span><b>текущий срез</b></div><div className="breadth" aria-label="Капитал в прибыльных, убыточных и нейтральных позициях"><i className="upbar" style={{width:`${model.positive/model.total*100}%`}}/><i className="downbar" style={{width:`${model.negative/model.total*100}%`}}/><i className="flatbar" style={{width:`${model.flat/model.total*100}%`}}/></div><footer><span className="up">В плюсе {pct.format(model.positive/model.total*100)}%</span><span className="down">В минусе {pct.format(model.negative/model.total*100)}%</span></footer></article>
+   <article className="core-portfolio-visual-v106__classes"><div><span>Классы активов</span><b>{money.format(model.total)} ₽</b></div><div className="stack" role="img" aria-label="Доли классов активов">{model.classes.map((x,i)=>{const width=x.value/model.total*100,start=offset;offset+=width;return <i key={x.key} className={`c${i}`} style={{width:`${width}%`}} title={`${x.key}: ${pct.format(width)}%`} data-start={start}/>})}</div><ul role="list" aria-label="Классы активов портфеля">{model.classes.map((x,i)=><li key={x.key}><i className={`c${i}`}/><span>{x.key}</span><b>{pct.format(x.value/model.total*100)}%</b></li>)}</ul></article>
+   <article className="core-portfolio-visual-v106__breadth"><div><span>Капитал по знаку P/L</span><b>текущий срез</b></div><div className="breadth" role="img" aria-label="Капитал в прибыльных, убыточных и нейтральных позициях"><i className="upbar" style={{width:`${model.positive/model.total*100}%`}}/><i className="downbar" style={{width:`${model.negative/model.total*100}%`}}/><i className="flatbar" style={{width:`${model.flat/model.total*100}%`}}/></div><footer><span className="up">В плюсе {pct.format(model.positive/model.total*100)}%</span><span className="down">В минусе {pct.format(model.negative/model.total*100)}%</span></footer></article>
   </div>
-  <CorePortfolioConcentrationV126 positions={positions}/><CoreConcentrationLadderV136 positions={positions}/><p>Визуализация описывает текущую структуру капитала. Это не прогноз, рейтинг или рекомендация.</p>
+  <CorePortfolioConcentrationV126 positions={positions}/><CoreConcentrationLadderV136 positions={positions}/><CorePortfolioWeightBandsV147 positions={positions}/><CorePortfolioPnLBreadthV152 positions={positions}/><CorePortfolioClassBreadthV157 positions={positions}/><CorePortfolioTailV161 positions={positions}/><CorePortfolioCostBasisV165 positions={positions}/><CorePortfolioPriceDistanceV170 positions={positions}/><CorePortfolioBasisCoverageV174 positions={positions}/><p>Визуализация описывает текущую структуру капитала. Это не прогноз, рейтинг или рекомендация.</p>
  </section>,host);
 }
