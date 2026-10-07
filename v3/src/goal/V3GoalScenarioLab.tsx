@@ -6,6 +6,7 @@ import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import type{V3Shell}from"../app/model";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{calculateV3GoalBootstrap,calculateV3GoalScenario,solveV3RequiredMonthlyContribution}from"./goalScenario";
+import{V3GoalReturnSensitivityV182}from"./V3GoalReturnSensitivityV182";
 import{V3GoalReinvestmentDeltaV181}from"./V3GoalReinvestmentDeltaV181";
 import{V3GoalContributionLoadV180}from"./V3GoalContributionLoadV180";
 import{V3GoalInflationDepthV179}from"./V3GoalInflationDepthV179";
@@ -282,6 +283,7 @@ export function V3GoalScenarioLab({
           <V3GoalInflationDepthV179 input={input!} result={projection}/>
           <V3GoalContributionLoadV180 input={input!} result={projection}/>
           <V3GoalReinvestmentDeltaV181 input={input!}/>
+          <V3GoalReturnSensitivityV182 input={input!}/>
           <small className="v3-goal-scenario-method">{projection.note} Методика {projection.version}. Все будущие параметры — пользовательские предпосылки.</small>
         </section>
       </>}
