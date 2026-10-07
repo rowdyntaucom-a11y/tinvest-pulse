@@ -8,6 +8,8 @@ import{filterHistoryWindow,type V3HistoryWindow}from"../history/historyLens";imp
 import"../styles/analysisDepth.css";
 import{CoreDrawdownEpisodesV121}from"./CoreDrawdownEpisodesV121";
 import{CoreRecoveryDepthV131}from"./CoreRecoveryDepthV131";
+import{V3ReturnRegimeV127}from"../analysis/V3ReturnRegimeV127";
+import{V3ReturnTailV145}from"../analysis/V3ReturnTailV145";
 
 export type CoreAnalyticsMarketContext={
  riskFreeRate:number|null;
@@ -97,7 +99,7 @@ export function CoreAnalyticsDepth({
   <section className="core-analytics-depth__decision" aria-live="polite"><span>{decision.eyebrow}</span><strong>{decision.title}</strong><p>{decision.text}</p></section>
   <section className="core-analytics-depth__evidence" aria-label="Основа расчёта"><span>ОСНОВА РАСЧЁТА</span><div><article><b>{history.length}</b><small>точек истории</small></article><article><b>{positions.length}</b><small>текущих позиций</small></article><article><b>{relative.available?relative.overlapPoints:"—"}</b><small>общих точек с IMOEX</small></article></div><p>{integrity==="OK"?"История прошла проверку целостности.":"История ограничена: недоступные метрики остаются пустыми."}</p></section>
   <div className="core-analytics-depth__stage">
-   {section==="return"&&<V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/>}
+   {section==="return"&&<><V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/><V3ReturnRegimeV127 history={history}/><V3ReturnTailV145 history={history}/></>}
    {section==="risk"&&<><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/><CoreRecoveryDepthV131 history={history}/></>}
    {section==="benchmark"&&<V3MarketLayer relative={relative} window={window} onWindowChange={setWindow} market={market}/>}
   </div>
