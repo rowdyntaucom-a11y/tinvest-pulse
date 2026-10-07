@@ -14,6 +14,7 @@ import{V3ReturnHitRateV155}from"../analysis/V3ReturnHitRateV155";
 import{V3ReturnStreakDepthV160}from"../analysis/V3ReturnStreakDepthV160";
 import{V3ReturnDownsideV168}from"../analysis/V3ReturnDownsideV168";
 import{V3ReturnBalanceV177}from"../analysis/V3ReturnBalanceV177";
+import{V3CapitalBridgeV204}from"../analysis/V3CapitalBridgeV204";
 import{V3HistoryCoverageV203}from"../analysis/V3HistoryCoverageV203";
 
 export type CoreAnalyticsMarketContext={
@@ -104,6 +105,7 @@ export function CoreAnalyticsDepth({
   <section className="core-analytics-depth__decision" aria-live="polite"><span>{decision.eyebrow}</span><strong>{decision.title}</strong><p>{decision.text}</p></section>
   <section className="core-analytics-depth__evidence" aria-label="Основа расчёта"><span>ОСНОВА РАСЧЁТА</span><div><article><b>{history.length}</b><small>точек истории</small></article><article><b>{positions.length}</b><small>текущих позиций</small></article><article><b>{relative.available?relative.overlapPoints:"—"}</b><small>общих точек с IMOEX</small></article></div><p>{integrity==="OK"?"История прошла проверку целостности.":"История ограничена: недоступные метрики остаются пустыми."}</p></section>
   <V3HistoryCoverageV203 history={history}/>
+  <V3CapitalBridgeV204 history={history}/>
   <div className="core-analytics-depth__stage">
    {section==="return"&&<div role="tabpanel" aria-label="Аналитика доходности"><V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/><V3ReturnRegimeV127 history={history}/><V3ReturnTailV145 history={history}/><V3ReturnHitRateV155 history={history}/><V3ReturnStreakDepthV160 history={history}/><V3ReturnDownsideV168 history={history}/><V3ReturnBalanceV177 history={history}/></div>}
    {section==="risk"&&<div role="tabpanel" aria-label="Аналитика риска"><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/><CoreRecoveryDepthV131 history={history}/></div>}
