@@ -10,5 +10,5 @@ export function buildRollingComparisonV124(a:StrategyLabScenarioResult|null,b:St
  if(pairs.length<=windowTradingDays)return empty("Недостаточно общих точек для скользящего окна.");
  const windows:RollingWindowV124[]=[];for(let i=windowTradingDays;i<pairs.length;i++){const s=pairs[i-windowTradingDays]!,e=pairs[i]!,returnA=e.a/s.a-1,returnB=e.b/s.b-1,gap=returnA-returnB;windows.push({startDate:s.date,endDate:e.date,returnA,returnB,gap,leader:Math.abs(gap)<1e-10?"tie":gap>0?"A":"B"})}
  const n=windows.length,aN=windows.filter(x=>x.leader==="A").length,bN=windows.filter(x=>x.leader==="B").length,tN=n-aN-bN;
- return{available:true,windowTradingDays,windows,aLeadShare:aN/n,bLeadShare:bN/n,tieShare:tN/n,medianGap:median(windows.map(x=>x.gap)),bestA:[...windows].sort((x,y)=>y.gap-x.gap)[0]??null,bestB:[...windows].sort((x,y)=>x.gap-y.gap)[0]??null,reason:null};
+ return{available:true,windowTradingDays,windows,aLeadShare:aN/n,bLeadShare:bN/n,tieShare:tN/n,medianGap:median(windows.map(x=>x.gap)),bestA:[...windows].filter(x=>x.gap>1e-10).sort((x,y)=>y.gap-x.gap)[0]??null,bestB:[...windows].filter(x=>x.gap<-1e-10).sort((x,y)=>x.gap-y.gap)[0]??null,reason:null};
 }
