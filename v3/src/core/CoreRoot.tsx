@@ -132,7 +132,7 @@ export function CoreRoot(){
 
  useEffect(()=>{
   if(!trusted)return;
-  const timer=window.setTimeout(()=>{void Promise.allSettled([import("../assets/V3AssetsDepth"),import("../analysis/V3MarketIntelligenceWorkspace"),import("../analysis/V3AnalysisToolbox"),import("./CoreAnalyticsDepth"),import("../income/V3IncomeDepth")])},1400);
+  const timer=window.setTimeout(()=>{void Promise.allSettled([import("../assets/V3AssetsDepth"),import("../analysis/V3MarketIntelligenceWorkspace"),import("../analysis/V3AnalysisToolbox"),import("./CoreAnalyticsDepth"),import("../income/V3IncomeDepth"),import("../operations/V3OperationsDepth"),import("../report/V3PortfolioReportDepth")])},500);
   return()=>window.clearTimeout(timer);
  },[trusted]);
 
