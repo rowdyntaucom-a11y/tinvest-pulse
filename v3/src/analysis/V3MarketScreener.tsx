@@ -52,7 +52,8 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   return{advancing,declining,flat,observed:changes.length,medianChange:median(changes),turnover,trades};
  },[sourceRows]);
  const rows=useMemo(()=>filterMarketScreener(sourceRows.filter(row=>!portfolioOnly||portfolioTickers?.has(row.secid.toUpperCase())),filters),[sourceRows,filters,portfolioOnly,portfolioTickers]);
- const visible=rows.slice(0,60),activeFilters=(filters.query?1:0)+(filters.move!=="all"?1:0)+(filters.minTurnover>0?1:0)+(filters.listingLevel!=="all"?1:0)+(filters.sort!=="turnover"?1:0)+(portfolioOnly?1:0);\n useEffect(()=>{if(selectedSecid&&!sourceRows.some(row=>row.secid===selectedSecid))setSelectedSecid(null)},[sourceRows,selectedSecid]);
+ const visible=rows.slice(0,60),activeFilters=(filters.query?1:0)+(filters.move!=="all"?1:0)+(filters.minTurnover>0?1:0)+(filters.listingLevel!=="all"?1:0)+(filters.sort!=="turnover"?1:0)+(portfolioOnly?1:0);
+ useEffect(()=>{if(selectedSecid&&!sourceRows.some(row=>row.secid===selectedSecid))setSelectedSecid(null)},[sourceRows,selectedSecid]);
 
  return <section className="sam-screener" aria-label="Рыночный скринер">
   <header className="sam-screener__head"><div><span>09 · SCREENER</span><h2>Рыночный скринер</h2><p>Публичный TQBR-срез MOEX. Фильтры сортируют наблюдаемые рыночные параметры и не являются рейтингом инвестиционной привлекательности.</p></div><i aria-hidden="true">篩</i></header>
