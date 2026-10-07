@@ -59,7 +59,7 @@ export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}
    {risk.stress.length>0&&<div className="v3-futures-stress" aria-label="Стресс-сценарии изменения цены">{risk.stress.map(row=><article key={row.movePct}><span>{row.movePct>0?"+":""}{row.movePct}%</span><small>{ratio.format(row.scenarioPrice)}</small><strong className={row.pnl==null?"":row.pnl>0?"is-positive":"is-negative"}>{row.pnl==null?"—":(row.pnl>0?"+":"")+money.format(row.pnl)+" ₽"}</strong><b>{row.marginReturnPct==null?"—":(row.marginReturnPct>0?"+":"")+ratio.format(row.marginReturnPct)+"% ГО"}</b></article>)}</div>}
    <p className="v3-futures-risk__note">Матрица механически двигает цену текущего фьючерса на ±2/5/10%. Это стресс-сценарии, не прогноз вероятности. «Ход цены ≈ ГО» не является ценой ликвидации: реальные требования брокера и биржи могут изменяться.</p>
   </section>
-  {warnings.length>0&&<div className="v3-futures-scenario__warnings">{warnings.map(item=><p key={item}>{item}</p>)}</div>}
+  {warnings.length>0&&<div className="v3-futures-scenario__warnings" role="status" aria-label="Предупреждения сценария">{warnings.map(item=><p key={item}>{item}</p>)}</div>}
   <footer>Не рассчитываются ликвидация, гарантийные требования брокера, вариационная маржа биржи, комиссии, налоги и риск принудительного закрытия без отдельного подтверждённого контракта данных.</footer>
  </section>;
 }
