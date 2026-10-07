@@ -51,7 +51,7 @@ export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}
   </div>
   <section className="v3-futures-risk" aria-label="Стресс-профиль фьючерса">
    <div className="v3-futures-risk__head"><div><span>DERIVATIVES INTELLIGENCE V2</span><strong>Stress matrix</strong></div><small role="status">{risk.complete?"SPEC COMPLETE":"SPEC INCOMPLETE"}</small></div>
-   <div className="v3-futures-risk__summary">
+   <div className="v3-futures-risk__summary" aria-label="Ключевые показатели стресс-профиля">
     <article><span>P/L на 1% цены</span><strong>{metric(risk.onePercentPnl,v=>money.format(v)+" ₽")}</strong><small>абсолютная чувствительность позиции</small></article>
     <article><span>Ход цены ≈ размер ГО</span><strong>{metric(risk.priceMoveToMarginLossPct,v=>ratio.format(v)+"%")}</strong><small>арифметический ориентир, не liquidation price</small></article>
     <article><span>Basis regime</span><strong>{risk.basisState}</strong><small>{risk.expiryBasisDecayPerDayPct==null?"нужны spot + expiry":ratio.format(risk.expiryBasisDecayPerDayPct)+" п.п./день до expiry"}</small></article>
