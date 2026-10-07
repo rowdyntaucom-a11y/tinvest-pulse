@@ -7,7 +7,7 @@ import{ratioToPercent,clampPercent}from"../data/units";
 import{V3MetricHelp}from"../help/V3MetricHelp";
 import{buildV3RiskHistoryMatch,summarizeCorrelationPairs}from"./riskHistoryAdapter";
 import{resolvePositionByKey}from"../assets/positionIdentity";
-import{V3CorrelationRegimeV134}from"./V3CorrelationRegimeV134";
+import{V3CorrelationRegimeV134}from"./V3CorrelationRegimeV134";import{V3RiskDependencyV138}from"./V3RiskDependencyV138";
 
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
 const signedPct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1,signDisplay:"exceptZero"});
@@ -98,7 +98,7 @@ export function V3RiskContributionPanel({positions,totalPortfolioValue,onOpenAss
           <strong>{ratio.format(pair.correlation)}</strong><small>{pair.pairedReturns} общих интервалов · {pair.mature?"зрелая":"preview"} · карточки открываются только по точной идентичности</small>
         </article>;
       })}</div></>:<div className="v3-analysis-gate">Для парных корреляций нужно минимум {matrix.minimumPairedReturns} доходностей на одинаковых интервалах наблюдения. Искусственные коэффициенты не подставляются.</div>}
-      <small className="v3-analysis-method-note">Pearson ρ считается по доходностям с одинаковыми границами интервала, не по уровням цен. Корреляция описывает прошлую совместную динамику и не является прогнозом.</small><V3CorrelationRegimeV134 series={match.series}/>
+      <small className="v3-analysis-method-note">Pearson ρ считается по доходностям с одинаковыми границами интервала, не по уровням цен. Корреляция описывает прошлую совместную динамику и не является прогнозом.</small><V3RiskDependencyV138 series={match.series} cells={matrix.cells}/><V3CorrelationRegimeV134 series={match.series}/>
     </section>
 
     <div className="v3-risk-provenance">
