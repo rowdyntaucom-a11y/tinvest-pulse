@@ -1,0 +1,10 @@
+export type IncomeSeasonMonthV122={month:number;label:string;observations:number;active:number;totalNet:number;averageNet:number|null;medianNet:number|null;regularity:number|null;share:number|null};
+export type IncomeSeasonalityV122={available:boolean;completeObservations:number;yearsCovered:number;activeObservations:number;totalNet:number;months:IncomeSeasonMonthV122[];strongest:IncomeSeasonMonthV122|null;quietest:IncomeSeasonMonthV122|null};
+const labels=["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+const median=(a:number[])=>{if(!a.length)return null;const x=[...a].sort((p,q)=>p-q),n=x.length,m=Math.floor(n/2);return n%2?x[m]!:(x[m-1]!+x[m]!)/2};
+export function buildIncomeSeasonalityV122(input:Array<{key:string;totalNet:number;complete?:boolean}>):IncomeSeasonalityV122{
+ const valid=input.filter(x=>x.complete===true&&/^\d{4}-\d{2}$/.test(x.key)&&Number.isFinite(x.totalNet)&&x.totalNet>=0),totalNet=valid.reduce((s,x)=>s+x.totalNet,0);
+ const months=labels.map((label,i)=>{const rows=valid.filter(x=>Number(x.key.slice(5,7))===i+1),vals=rows.map(x=>x.totalNet),sum=vals.reduce((s,x)=>s+x,0),active=vals.filter(x=>x>0).length;return{month:i+1,label,observations:rows.length,active,totalNet:sum,averageNet:rows.length?sum/rows.length:null,medianNet:median(vals),regularity:rows.length?active/rows.length:null,share:totalNet>0?sum/totalNet:null}});
+ const comparable=months.filter(x=>x.observations>0),ranked=[...comparable].sort((a,b)=>(b.averageNet??0)-(a.averageNet??0)||b.observations-a.observations),quiet=[...comparable].sort((a,b)=>(a.averageNet??0)-(b.averageNet??0)||b.observations-a.observations);
+ return{available:valid.length>=3,completeObservations:valid.length,yearsCovered:new Set(valid.map(x=>x.key.slice(0,4))).size,activeObservations:valid.filter(x=>x.totalNet>0).length,totalNet,months,strongest:ranked[0]??null,quietest:quiet[0]??null};
+}
