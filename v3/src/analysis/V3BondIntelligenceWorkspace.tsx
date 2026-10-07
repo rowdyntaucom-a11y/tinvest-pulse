@@ -3,6 +3,7 @@ import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import"../styles/bondIntelligenceV117.css";
 import{V3BondMaturityConcentrationV125}from"./V3BondMaturityConcentrationV125";
 import{V3BondIssuerMaturityCollisionV132}from"./V3BondIssuerMaturityCollisionV132";
+import{V3BondYearDiversificationV144}from"./V3BondYearDiversificationV144";
 
 type BondFilter="all"|"fixed"|"floating"|"amortizing"|"perpetual";
 type BondSort="capital"|"maturity"|"pnl";
@@ -80,7 +81,7 @@ export function V3BondIntelligenceWorkspace({positions}:{positions:PositionSnaps
    <article><span>Крупнейший эмитент</span><strong>{largestIssuer?.issuer??"—"}</strong><small>{largestIssuer&&bondTotal>0?pct.format(largestIssuer.value/bondTotal*100)+"% облигаций":"—"}</small></article>
    <article><span>Покрытие метаданных</span><strong>{pct.format(metadataCoverage)}%</strong><small>срок {pct.format(maturityCoverage)}% · купон {pct.format(couponCoverage)}%</small></article>
   </div>
-  <V3BondMaturityConcentrationV125 rows={rows.map(r=>({ticker:r.position.ticker,issuer:r.issuer,value:Math.max(0,finite(r.position.currentValue)),maturity:r.maturity,perpetual:r.perpetual}))}/><V3BondIssuerMaturityCollisionV132 rows={rows.map(r=>({ticker:r.position.ticker,issuer:r.issuer,value:Math.max(0,finite(r.position.currentValue)),maturity:r.maturity,perpetual:r.perpetual}))}/>
+  <V3BondMaturityConcentrationV125 rows={rows.map(r=>({ticker:r.position.ticker,issuer:r.issuer,value:Math.max(0,finite(r.position.currentValue)),maturity:r.maturity,perpetual:r.perpetual}))}/><V3BondIssuerMaturityCollisionV132 rows={rows.map(r=>({ticker:r.position.ticker,issuer:r.issuer,value:Math.max(0,finite(r.position.currentValue)),maturity:r.maturity,perpetual:r.perpetual}))}/><V3BondYearDiversificationV144 rows={rows.map(r=>({ticker:r.position.ticker,issuer:r.issuer,value:Math.max(0,finite(r.position.currentValue)),maturity:r.maturity,perpetual:r.perpetual}))}/>
   <div className="v3-bond-intelligence__grid">
    <section className="v3-bond-intelligence__panel"><header><div><span>ЛЕСТНИЦА ПОГАШЕНИЙ</span><strong>Капитал по срокам</strong></div><small>{perpetualCount?`${perpetualCount} бесср.`:"по подтверждённым датам"}</small></header><div className="v3-bond-intelligence__bars">{buckets.map(item=><article key={item.label}><div><strong>{item.label}</strong><span>{item.count} шт. · {compact.format(item.value)} ₽</span></div><i><b style={{width:`${Math.max(2,item.value/maxBucket*100)}%`}}/></i><small>{bondTotal>0?pct.format(item.value/bondTotal*100):"0"}%</small></article>)}</div></section>
    <section className="v3-bond-intelligence__panel"><header><div><span>ЭМИТЕНТЫ</span><strong>Концентрация облигаций</strong></div><small>по текущей стоимости</small></header><div className="v3-bond-intelligence__bars">{issuerRows.slice(0,6).map(item=><article key={item.issuer}><div><strong>{item.issuer}</strong><span>{item.count} поз. · {compact.format(item.value)} ₽</span></div><i><b style={{width:`${Math.max(2,item.value/maxIssuer*100)}%`}}/></i><small>{bondTotal>0?pct.format(item.value/bondTotal*100):"0"}%</small></article>)}</div></section>
