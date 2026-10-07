@@ -1,0 +1,10 @@
+import type{PayoutEvent}from"../../../v2/src/lib/payoutsApi";
+type Month={key:string;totalNet:number;complete?:boolean};
+export type IncomeResilienceV128={available:boolean;completeMonths:number;activeMonths:number;zeroMonths:number;monthHhi:number|null;effectiveMonths:number|null;topMonthShare:number|null;sourceHhi:number|null;effectiveSources:number|null;topSourceShare:number|null;identifiedShare:number|null;continuity:number|null;largestSource:string|null;reason:string|null};
+const pos=(v:unknown)=>typeof v==="number"&&Number.isFinite(v)&&v>0?v:0;
+export function buildIncomeResilienceV128(months:Month[],events:PayoutEvent[]):IncomeResilienceV128{
+ const complete=months.filter(x=>x.complete===true&&Number.isFinite(x.totalNet)&&x.totalNet>=0),monthTotal=complete.reduce((s,x)=>s+x.totalNet,0),active=complete.filter(x=>x.totalNet>0),monthShares=active.map(x=>x.totalNet/monthTotal),monthHhi=monthTotal?monthShares.reduce((s,x)=>s+x*x,0):null;
+ const bySource=new Map<string,{label:string;net:number}>();let identified=0,all=0;for(const e of events){if(String(e.status||"").toUpperCase()!=="FACT")continue;const n=pos(e.net);if(!n)continue;all+=n;const f=String(e.figi||"").trim();if(!f)continue;identified+=n;const r=bySource.get(f)??{label:e.ticker||e.name||f,net:0};r.net+=n;bySource.set(f,r)}
+ const sources=[...bySource.values()].sort((a,b)=>b.net-a.net),sourceShares=identified?sources.map(x=>x.net/identified):[],sourceHhi=identified?sourceShares.reduce((s,x)=>s+x*x,0):null;
+ return{available:complete.length>=3&&monthTotal>0,completeMonths:complete.length,activeMonths:active.length,zeroMonths:complete.length-active.length,monthHhi,effectiveMonths:monthHhi?1/monthHhi:null,topMonthShare:monthShares.length?Math.max(...monthShares):null,sourceHhi,effectiveSources:sourceHhi?1/sourceHhi:null,topSourceShare:sourceShares[0]??null,identifiedShare:all?identified/all:null,continuity:complete.length?active.length/complete.length:null,largestSource:sources[0]?.label??null,reason:complete.length<3?"Нужно минимум 3 полных месяца.":monthTotal<=0?"В полных месяцах нет положительного FACT net.":null};
+}
