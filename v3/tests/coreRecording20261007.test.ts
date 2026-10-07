@@ -55,6 +55,8 @@ test("income and result subviews remember reading position and support keyboard 
  assert.equal(normalizeCoreIncomeScroll("812.4"),812);
  assert.equal(normalizeCoreResultScroll(-2),0);
  for(const source of[incomeRouter,resultRouter]){
+  assert.match(source,/queueAttach/);
+  assert.match(source,/requestAnimationFrame/);
   assert.match(source,/writeScroll\(mode,window\.scrollY\)/);
   assert.match(source,/readScroll\(next\)/);
   assert.match(source,/role="tablist"/);
