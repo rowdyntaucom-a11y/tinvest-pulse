@@ -1,5 +1,6 @@
 import{useCallback,useEffect,useMemo,useState}from"react";
 import{loadV3OperationsLedger,type V3OperationKind,type V3OperationsLedger}from"./operationsLedger";
+import{V3OperationsDailyV186}from"./V3OperationsDailyV186";
 import"../styles/samuraiOperationsDepth.css";
 
 const rub=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
@@ -87,6 +88,8 @@ export function V3OperationsDepth(){
       <article><span>Доходных</span><strong>{counts.income}</strong><small>{ledger.passiveIncomeTotal==null?"агрегат —":rub.format(ledger.passiveIncomeTotal)+" ₽"}</small></article>
       <article><span>Внешних потоков</span><strong>{counts.flow}</strong><small>{ledger.externalCashTotal==null?"агрегат —":signedMoney(ledger.externalCashTotal)}</small></article>
      </div>
+
+     <V3OperationsDailyV186 rows={ledger.rows}/>
 
      <div className="sam-ops-depth__filters" role="group" aria-label="Фильтр операций">
       {FILTERS.map(([id,label])=><button key={id} type="button" className={filter===id?"is-active":""} onClick={()=>{setFilter(id);setExpanded(false)}}>{label}</button>)}
