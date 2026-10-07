@@ -95,14 +95,14 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
      {drift.unassignedWeight>0&&<p>За пределами стратегии: {percent(drift.unassignedWeight)} портфеля. Эти активы сохраняются без изменений и не входят в целевые дельты.</p>}
     </section>
 
-    <section className="sam-rebalance__scenario">
+    <section className="sam-rebalance__scenario" aria-label="Сценарий изменения структуры портфеля">
      <div className="sam-rebalance__section-title"><div><span>03 · СЦЕНАРИЙ</span><h3>Как меняется структура</h3></div><small>без списка заявок</small></div>
      <div className="sam-rebalance__modes" role="group" aria-label="Тип сценария ребалансировки">
       {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
      </div>
      {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
      {!scenario?.available?<div className="sam-rebalance__gate is-inner">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
-      <div className="sam-rebalance__scenario-summary">
+      <div className="sam-rebalance__scenario-summary" aria-label="Итоги сценария ребалансировки">
        <article><span>Капитал класса до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
        <article><span>После сценария</span><strong>{money(scenario.assignedValueAfter)}</strong></article>
        <article><span>Точная цель</span><strong className={scenario.exactTargetPossible?"is-positive":"is-warning"}>{scenario.exactTargetPossible?"Достижима":"Не этим потоком"}</strong></article>
