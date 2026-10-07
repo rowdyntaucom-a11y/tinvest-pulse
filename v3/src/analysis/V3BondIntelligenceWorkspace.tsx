@@ -79,7 +79,7 @@ export function V3BondIntelligenceWorkspace({positions}:{positions:PositionSnaps
  const largestIssuer=issuerRows[0];
  const amortizingCount=rows.filter(r=>r.amortizing===true).length,perpetualCount=rows.filter(r=>r.perpetual===true).length;
  if(!rows.length)return <section className="v3-bond-intelligence"><header><div><span>ОБЛИГАЦИИ // ПРОВЕРЕННЫЕ ПОЛЯ</span><h3>Облигационный контур</h3><p>В текущем подтверждённом снимке портфеля нет облигационных позиций.</p></div><strong>0</strong></header><div className="v3-bond-intelligence__empty">QVANIX не создаёт облигационные метрики без позиций и метаданных брокера.</div></section>;
- return <section className="v3-bond-intelligence" aria-label="Облигационная аналитика">
+ return <section className="v3-bond-intelligence" aria-label="Облигационная аналитика" data-read-only="true">
   <header><div><span>ОБЛИГАЦИИ // ПРОВЕРЕННЫЕ ПОЛЯ</span><h3>Облигационный контур</h3><p>Сроки, эмитенты, валюты и тип купона из текущего брокерского снимка. Без расчёта YTM, duration и купонных сумм, если источник их не передал.</p></div><strong>{rows.length}</strong></header>
   <div className="v3-bond-intelligence__metrics">
    <article><span>Стоимость облигаций</span><strong>{money.format(bondTotal)} ₽</strong><small>{portfolioTotal>0?pct.format(bondTotal/portfolioTotal*100)+"% портфеля":"—"}</small></article>
