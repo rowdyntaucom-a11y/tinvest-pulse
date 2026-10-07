@@ -34,7 +34,7 @@ export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}
  return <section className="v3-pro-tool v3-futures-scenario" aria-label="Сценарий по фьючерсу">
   <header><div><span>DERIVATIVES // READ-ONLY</span><h3>Фьючерс · сценарий</h3><p>Расчёт по введённым параметрам. QVANIX ничего не отправляет брокеру и не создаёт заявку.</p></div><strong>WHAT IF</strong></header>
   <div className="v3-futures-help"><V3GlossaryHelp terms={["basis","margin","pnl"]} label="Что такое Basis и ГО"/></div>
-  <section className="v3-futures-current" aria-label="Текущие фьючерсные позиции">
+  <section className="v3-futures-current" aria-label="Текущие фьючерсные позиции" aria-live="polite">
    <span>ТЕКУЩИЙ ПОРТФЕЛЬ</span>
    <div><article><b>{currentFutures.length}</b><small>фьючерсных позиций</small></article><article><b>{ratio.format(currentContracts)}</b><small>контрактов по модулю количества</small></article><article><b className={currentPnl>0?"is-positive":currentPnl<0?"is-negative":""}>{(currentPnl>0?"+":"")+money.format(currentPnl)} ₽</b><small>P/L открытых фьючерсных позиций</small></article></div>
    {currentFutures.length?<p>{currentFutures.slice(0,6).map(position=>position.ticker).join(" · ")}{currentFutures.length>6?" · …":""}</p>:<p>В подтверждённом составе сейчас нет фьючерсных позиций. Сценарий ниже остаётся ручным WHAT IF.</p>}
