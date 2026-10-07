@@ -100,7 +100,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
      <div className="sam-rebalance__modes" role="group" aria-label="Тип сценария ребалансировки">
       {(["REBALANCE_EXISTING","ADD_CAPITAL","WITHDRAW_CAPITAL"] as RebalanceScenarioMode[]).map(item=><button type="button" key={item} className={mode===item?"is-active":""} aria-pressed={mode===item} onClick={()=>setMode(item)}>{modeLabel(item)}</button>)}
      </div>
-     {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
+     {needsFlow&&<label className="sam-rebalance__flow"><span>{mode==="ADD_CAPITAL"?"Сумма довнесения":"Сумма вывода"}</span><input inputMode="decimal" aria-label={mode==="ADD_CAPITAL"?"Сумма довнесения в рублях":"Сумма вывода в рублях"} value={flowInput} onChange={event=>setFlowInput(event.target.value)} placeholder="Введите ₽"/></label>}
      {!scenario?.available?<div className="sam-rebalance__gate is-inner">{needsFlow&&!flowInput.trim()?"Введите положительную сумму самостоятельно.":scenario?.reason??"Сценарий недоступен."}</div>:<>
       <div className="sam-rebalance__scenario-summary">
        <article><span>Капитал класса до</span><strong>{money(scenario.assignedValueBefore)}</strong></article>
