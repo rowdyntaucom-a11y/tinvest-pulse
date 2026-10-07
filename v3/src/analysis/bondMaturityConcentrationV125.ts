@@ -1,0 +1,13 @@
+export type BondMaturityInputV125={ticker:string;issuer:string;value:number;maturity:string|null;perpetual:boolean|null};
+export type BondMaturityYearV125={year:number;value:number;issues:number;issuers:number;share:number};
+export type BondMaturityConcentrationV125={available:boolean;datedValue:number;undatedValue:number;perpetualValue:number;coverage:number;years:BondMaturityYearV125[];largestYear:BondMaturityYearV125|null;near24mValue:number;near24mShare:number|null;yearHhi:number|null;issuerYearMaxShare:number|null;issuerYearLabel:string|null};
+const validDate=(x:string|null)=>x&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x+"T00:00:00Z"));
+export function buildBondMaturityConcentrationV125(rows:BondMaturityInputV125[],asOf=new Date()):BondMaturityConcentrationV125{
+ const clean=rows.filter(x=>Number.isFinite(x.value)&&x.value>0),total=clean.reduce((s,x)=>s+x.value,0),dated=clean.filter(x=>x.perpetual!==true&&validDate(x.maturity)),datedValue=dated.reduce((s,x)=>s+x.value,0),perpetualValue=clean.filter(x=>x.perpetual===true).reduce((s,x)=>s+x.value,0),undatedValue=Math.max(0,total-datedValue-perpetualValue);
+ const map=new Map<number,{value:number;issues:Set<string>;issuers:Set<string>;issuerValue:Map<string,number>}>();
+ for(const x of dated){const y=Number(x.maturity!.slice(0,4)),r=map.get(y)??{value:0,issues:new Set(),issuers:new Set(),issuerValue:new Map()};r.value+=x.value;r.issues.add(x.ticker);r.issuers.add(x.issuer);r.issuerValue.set(x.issuer,(r.issuerValue.get(x.issuer)??0)+x.value);map.set(y,r)}
+ const years=[...map.entries()].sort((a,b)=>a[0]-b[0]).map(([year,r])=>({year,value:r.value,issues:r.issues.size,issuers:r.issuers.size,share:datedValue?r.value/datedValue:0}));
+ const largestYear=[...years].sort((a,b)=>b.value-a.value)[0]??null,cutoff=new Date(asOf);cutoff.setUTCMonth(cutoff.getUTCMonth()+24);const cut=cutoff.toISOString().slice(0,10),today=asOf.toISOString().slice(0,10),near24mValue=dated.filter(x=>x.maturity!>=today&&x.maturity!<=cut).reduce((s,x)=>s+x.value,0);
+ let issuerYearMaxShare:number|null=null,issuerYearLabel:string|null=null;for(const[y,r]of map){for(const[issuer,value]of r.issuerValue){const share=r.value?value/r.value:0;if(issuerYearMaxShare==null||share>issuerYearMaxShare){issuerYearMaxShare=share;issuerYearLabel=issuer+" · "+y}}}
+ return{available:dated.length>0,datedValue,undatedValue,perpetualValue,coverage:total?(datedValue+perpetualValue)/total:0,years,largestYear,near24mValue,near24mShare:datedValue?near24mValue/datedValue:null,yearHhi:datedValue?years.reduce((s,x)=>s+x.share*x.share,0):null,issuerYearMaxShare,issuerYearLabel};
+}
