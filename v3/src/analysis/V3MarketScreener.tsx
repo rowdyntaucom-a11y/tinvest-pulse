@@ -51,7 +51,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   return{advancing,declining,flat,observed:changes.length,medianChange:median(changes),turnover,trades};
  },[sourceRows]);
  const rows=useMemo(()=>filterMarketScreener(sourceRows.filter(row=>!portfolioOnly||portfolioTickers?.has(row.secid.toUpperCase())),filters),[sourceRows,filters,portfolioOnly,portfolioTickers]);
- const visible=rows.slice(0,60);\n useEffect(()=>{if(selectedSecid&&!sourceRows.some(row=>row.secid===selectedSecid))setSelectedSecid(null)},[sourceRows,selectedSecid]);
+ const visible=rows.slice(0,60),activeFilters=(filters.query?1:0)+(filters.move!=="all"?1:0)+(filters.minTurnover>0?1:0)+(filters.listingLevel!=="all"?1:0)+(filters.sort!=="turnover"?1:0)+(portfolioOnly?1:0);\n useEffect(()=>{if(selectedSecid&&!sourceRows.some(row=>row.secid===selectedSecid))setSelectedSecid(null)},[sourceRows,selectedSecid]);
 
  return <section className="sam-screener" aria-label="Рыночный скринер">
   <header className="sam-screener__head"><div><span>09 · SCREENER</span><h2>Рыночный скринер</h2><p>Публичный TQBR-срез MOEX. Фильтры сортируют наблюдаемые рыночные параметры и не являются рейтингом инвестиционной привлекательности.</p></div><i aria-hidden="true">篩</i></header>
@@ -69,7 +69,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
   <V3MarketBreadthV139 rows={sourceRows}/><V3MarketRelativeV123 rows={sourceRows}/>
   {selectedSecid&&<V3MarketTickerLensV129 rows={sourceRows} secid={selectedSecid} portfolioTickers={portfolioTickers} onClose={()=>setSelectedSecid(null)}/>}
 
-  <div className="sam-screener__search"><button type="button" className="sam-screener__reset" onClick={resetFilters} disabled={!filters.query&&filters.move==="all"&&filters.minTurnover===0&&filters.listingLevel==="all"&&filters.sort==="turnover"&&!portfolioOnly}>Сбросить фильтры</button>
+  <div className="sam-screener__search"><button type="button" className="sam-screener__reset" onClick={resetFilters} disabled={!filters.query&&filters.move==="all"&&filters.minTurnover===0&&filters.listingLevel==="all"&&filters.sort==="turnover"&&!portfolioOnly}>Сбросить фильтры{activeFilters?" · "+activeFilters:""}</button>
    <label><span>Поиск</span><input type="search" value={filters.query} onChange={e=>setFilters(v=>({...v,query:e.target.value}))} placeholder="тикер или название"/></label>
    <label><span>Уровень листинга</span><select value={filters.listingLevel} onChange={e=>setFilters(v=>({...v,listingLevel:e.target.value==="all"?"all":Number(e.target.value) as 1|2|3}))}><option value="all">Все</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
   </div>
