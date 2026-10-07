@@ -30,9 +30,10 @@ export function CoreIncomeWorkspaceRouterV93(){
    if(ledger)ledger.insertAdjacentElement("afterend",nextHost);else next.prepend(nextHost);
    currentRoot=next;currentHost=nextHost;setRoot(next);setHost(nextHost);
   };
+  let frame=0;const queueAttach=()=>{if(frame)return;frame=window.requestAnimationFrame(()=>{frame=0;attach()})};
   attach();
-  const observer=new MutationObserver(attach);observer.observe(document.body,{childList:true,subtree:true});
-  return()=>{observer.disconnect();detach()};
+  const observer=new MutationObserver(queueAttach);observer.observe(document.body,{childList:true,subtree:true});
+  return()=>{if(frame)window.cancelAnimationFrame(frame);observer.disconnect();detach()};
  },[]);
  useEffect(()=>{if(root)root.dataset.incomeWorkspaceV93=mode},[root,mode]);
  const select=(next:CoreIncomeWorkspaceMode)=>{if(next===mode)return;writeScroll(mode,window.scrollY);setMode(next);writeMode(next);window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{const saved=readScroll(next);if(saved>0)window.scrollTo({top:saved,behavior:"auto"});else root?.scrollIntoView({block:"start",behavior:"auto"})}))};
