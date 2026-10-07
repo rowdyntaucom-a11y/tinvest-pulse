@@ -160,9 +160,9 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
         <article><span>Источников факта <V3MetricHelp topic="incomeConcentration"/></span><strong>{depth.concentration.sourceCount||"—"}</strong><small>{depth.concentration.effectiveSources==null?"эффективное число —":"эфф. "+depth.concentration.effectiveSources.toLocaleString("ru-RU",{maximumFractionDigits:2})}</small></article>
         <article><span>Главный источник</span><strong>{depth.concentration.topSourceShare==null?"—":pct.format(depth.concentration.topSourceShare*100)+"%"}</strong><small>доля реально полученного net</small></article>
       </div>
-      <V3IncomeContinuityMatrixV133 actual={depth.trustedIncome.actualEvents} future={depth.trustedIncome.futureEvents} positions={positions} from={calendar.period.from} to={calendar.period.to}/><div className="v3-income-source-list">{depth.sourceRows.length?depth.sourceRows.slice(0,12).map(row=>{
+      <V3IncomeContinuityMatrixV133 actual={depth.trustedIncome.actualEvents} future={depth.trustedIncome.futureEvents} positions={positions} from={calendar.period.from} to={calendar.period.to}/><div className="v3-income-source-list" role="list" aria-label="Источники фактического дохода">{depth.sourceRows.length?depth.sourceRows.slice(0,12).map(row=>{
         const matches=row.figi?positions.filter(position=>position.figi?.trim().toUpperCase()===row.figi):[],position=row.matchBasis==="FIGI"&&matches.length===1?matches[0]:null;
-        return <button type="button" key={row.key} className="v3-income-source-row" disabled={!position} onClick={()=>{if(position)onOpenAsset?.(position)}}>
+        return <button type="button" role="listitem" key={row.key} className="v3-income-source-row" disabled={!position} onClick={()=>{if(position)onOpenAsset?.(position)}}>
           <div><strong>{row.ticker}</strong><small>{row.name!==row.ticker?row.name:sourceIdentity(row.identityState)}</small></div>
           <div><span>Факт</span><strong>{row.fact>0?rub2.format(row.fact)+" ₽":"—"}</strong><small>{row.factCount} выплат</small></div>
           <div><span>12М</span><strong>{row.forecast>0?rub2.format(row.forecast)+" ₽":"—"}</strong><small>{row.yoc12m==null?"YoC — · "+sourceIdentity(row.identityState):"YoC "+pct.format(row.yoc12m*100)+"%"}</small></div>
