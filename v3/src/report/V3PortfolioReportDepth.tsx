@@ -2,6 +2,7 @@ import{useMemo}from"react";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{clampPercent}from"../data/units";
 import{buildPortfolioReport,type PortfolioReportRow,type PortfolioReportSlice}from"./portfolioReport";
+import{V3ReportPnlAttributionV196}from"./V3ReportPnlAttributionV196";
 import{V3ReportBasisCoverageV195}from"./V3ReportBasisCoverageV195";
 import{V3ReportResultBreadthV194}from"./V3ReportResultBreadthV194";
 import"../styles/samuraiReportDepth.css";
@@ -62,6 +63,7 @@ export function V3PortfolioReportDepth({positions}:{positions:PositionSnapshot[]
     <article><span>Сверка базы</span><strong>{reconciled?"OK":"РАСХОЖДЕНИЕ"}</strong><small>{reconciled?"P/L согласуется: стоимость − база":"Δ "+signedMoney(reconciliationDelta)}</small></article>
    </div>
    {!reconciled&&<p className="sam-report-depth__warning">P/L открытых позиций и разница «текущая стоимость − вложенная база» расходятся. QVANIX показывает оба факта и не подменяет один другим.</p>}
+   <V3ReportPnlAttributionV196 positions={positions}/>
    <V3ReportBasisCoverageV195 positions={positions}/>
    <V3ReportResultBreadthV194 positions={positions}/>
    <p className="sam-report-depth__method">Отчёт не использует предположения о пропущенных операциях, налогах или корпоративных действиях. Историческая доходность остаётся в TWR/XIRR, а здесь — текущий срез состава.</p>
