@@ -8,6 +8,7 @@ import{V3StrategyLabComparisonV118}from"./V3StrategyLabComparisonV118";
 import{V3StrategyRollingWindowsV124}from"./V3StrategyRollingWindowsV124";
 import{V3StrategyRobustnessV130}from"./V3StrategyRobustnessV130";
 import{V3StrategyRollingCalendarV141}from"./V3StrategyRollingCalendarV141";
+import{V3StrategyConsistencyV150}from"./V3StrategyConsistencyV150";
 import"../styles/samuraiPortfolioLab.css";
 
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -79,7 +80,7 @@ export function V3PortfolioLab({positions}:{positions:PositionSnapshot[]}){
   <section className="sam-lab__history">
    <div className="sam-lab__title"><div><span>02 · ИСТОРИЯ</span><h3>Одинаковая рыночная выборка</h3></div><small>{source?.equityCode??"MCFTR"} + {source?.bondCode??"RGBITR"}</small></div>
    <div className="sam-lab__windows" role="group" aria-label="Историческое окно">{([1,3,5] as LabWindow[]).map(value=><button type="button" key={value} className={windowYears===value?"is-active":""} aria-pressed={windowYears===value} onClick={()=>setWindowYears(value)}>{value}Г</button>)}</div>
-   {loading?<div className="sam-lab__gate">Получаем историю индексов Московской биржи…</div>:!source?.available?<div className="sam-lab__gate is-warning"><strong>Исторический слой недоступен</strong><small>{userFacingHistoryReason(source?.reason)}</small>{source?.reason&&/[A-Za-z]{4,}/.test(source.reason)&&<details><summary>Техническая деталь</summary><code>{source.reason}</code></details>}</div>:<><div className="sam-lab__history-grid"><HistoryCard label="Сценарий A" result={ha}/><HistoryCard label="Сценарий B" result={hb}/></div><V3StrategyLabComparisonV118 a={ha} b={hb} windowYears={windowYears}/><V3StrategyRollingWindowsV124 a={ha} b={hb}/><V3StrategyRobustnessV130 a={ha} b={hb}/><V3StrategyRollingCalendarV141 a={ha} b={hb}/></>}
+   {loading?<div className="sam-lab__gate">Получаем историю индексов Московской биржи…</div>:!source?.available?<div className="sam-lab__gate is-warning"><strong>Исторический слой недоступен</strong><small>{userFacingHistoryReason(source?.reason)}</small>{source?.reason&&/[A-Za-z]{4,}/.test(source.reason)&&<details><summary>Техническая деталь</summary><code>{source.reason}</code></details>}</div>:<><div className="sam-lab__history-grid"><HistoryCard label="Сценарий A" result={ha}/><HistoryCard label="Сценарий B" result={hb}/></div><V3StrategyLabComparisonV118 a={ha} b={hb} windowYears={windowYears}/><V3StrategyRollingWindowsV124 a={ha} b={hb}/><V3StrategyRobustnessV130 a={ha} b={hb}/><V3StrategyRollingCalendarV141 a={ha} b={hb}/><V3StrategyConsistencyV150 a={ha} b={hb}/></>}
    <p className="sam-lab__method">Методика v1: рублёвые total-return индексы MCFTR (акции, gross dividends) и RGBITR (ОФЗ total return), пересечение торговых дат, ежемесячное восстановление целевых весов, без комиссий, налогов и проскальзывания. Это историческая модель классов, а не реконструкция фактического портфеля пользователя.</p>
   </section>
  </section>;
