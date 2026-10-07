@@ -6,4 +6,4 @@ test("v126 excludes non-positive and invalid capital without inventing exposure"
 test("v126 median and largest-to-median are deterministic",()=>{const m=buildPortfolioConcentrationV126([row("A",40),row("B",30),row("C",20),row("D",10)]);assert.equal(m.medianWeight,.25);assert.equal(m.largestToMedian,1.6)});
 test("v126 is mounted in portfolio visual intelligence and rejects diversification advice semantics",()=>{assert.match(host,/CorePortfolioConcentrationV126 positions=\{positions\}/);assert.match(ui,/не измеряют корреляцию/);assert.match(ui,/не являются рекомендацией/);assert.doesNotMatch(ui,/forecast|targetPrice|trade|order|onClick/i)});
 test("v126 responsive layout collapses 4 to 2 to 1 columns",()=>{assert.match(css,/@media\(max-width:680px\)/);assert.match(css,/grid-template-columns:1fr 1fr/);assert.match(css,/@media\(max-width:390px\)/);assert.match(css,/font-size:11px/)});
-console.log("portfolioConcentrationV126: ok");
+assert.match(ui,/aria-hidden="true"/);console.log("portfolioConcentrationV126: ok");
