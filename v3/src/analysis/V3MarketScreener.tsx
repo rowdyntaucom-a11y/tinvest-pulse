@@ -75,7 +75,7 @@ export function V3MarketScreener({sharedData,sharedLoading=false,onRetry,portfol
    <label><span>Уровень листинга</span><select aria-label="Уровень листинга" value={filters.listingLevel} onChange={e=>setFilters(v=>({...v,listingLevel:e.target.value==="all"?"all":Number(e.target.value) as 1|2|3}))}><option value="all">Все</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
   </div>
 
-  <div className="sam-screener__portfolio-filter">
+  <div className="sam-screener__portfolio-filter" role="group" aria-label="Ограничение выборки портфелем">
    <button type="button" className={portfolioOnly?"is-active":""} disabled={!portfolioTickers?.size} aria-label="Фильтр: только бумаги текущего портфеля" aria-pressed={portfolioOnly} onClick={()=>setPortfolioOnly(v=>!v)}><b>{portfolioOnly?"Только мой портфель":"Показать только мой портфель"}</b><small>{portfolioTickers?.size?portfolioTickers.size+" тикеров для точного сопоставления":"портфельные тикеры недоступны"}</small></button>
   </div>
   <div className="sam-screener__filter-block" role="group" aria-label="Фильтр по движению дня">
