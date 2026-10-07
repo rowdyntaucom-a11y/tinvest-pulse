@@ -49,7 +49,7 @@ export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}
    <article><span>Basis</span><strong>{metric(result.basisPct,v=>(v>0?"+":"")+ratio.format(v)+"%")}</strong><small>фьючерс к базовому активу</small></article>
    <article><span>Basis годовой</span><strong>{metric(result.annualizedBasisPct,v=>(v>0?"+":"")+ratio.format(v)+"%")}</strong><small>простая annualized оценка, не прогноз</small></article>
   </div>
-  <section className="v3-futures-risk" aria-label="Стресс-профиль фьючерса">
+  <section className="v3-futures-risk" aria-label="Стресс-профиль фьючерса" aria-describedby="futures-stress-disclaimer">
    <div className="v3-futures-risk__head"><div><span>DERIVATIVES INTELLIGENCE V2</span><strong>Stress matrix</strong></div><small role="status">{risk.complete?"SPEC COMPLETE":"SPEC INCOMPLETE"}</small></div>
    <div className="v3-futures-risk__summary" aria-label="Ключевые показатели стресс-профиля">
     <article><span>P/L на 1% цены</span><strong>{metric(risk.onePercentPnl,v=>money.format(v)+" ₽")}</strong><small>абсолютная чувствительность позиции</small></article>
@@ -57,7 +57,7 @@ export function V3FuturesScenario({positions=[]}:{positions?:PositionSnapshot[]}
     <article><span>Basis regime</span><strong>{risk.basisState}</strong><small>{risk.expiryBasisDecayPerDayPct==null?"нужны spot + expiry":ratio.format(risk.expiryBasisDecayPerDayPct)+" п.п./день до expiry"}</small></article>
    </div>
    {risk.stress.length>0&&<div className="v3-futures-stress" aria-label="Стресс-сценарии изменения цены">{risk.stress.map(row=><article key={row.movePct}><span>{row.movePct>0?"+":""}{row.movePct}%</span><small>{ratio.format(row.scenarioPrice)}</small><strong className={row.pnl==null?"":row.pnl>0?"is-positive":"is-negative"}>{row.pnl==null?"—":(row.pnl>0?"+":"")+money.format(row.pnl)+" ₽"}</strong><b>{row.marginReturnPct==null?"—":(row.marginReturnPct>0?"+":"")+ratio.format(row.marginReturnPct)+"% ГО"}</b></article>)}</div>}
-   <p className="v3-futures-risk__note">Матрица механически двигает цену текущего фьючерса на ±2/5/10%. Это стресс-сценарии, не прогноз вероятности. «Ход цены ≈ ГО» не является ценой ликвидации: реальные требования брокера и биржи могут изменяться.</p>
+   <p className="v3-futures-risk__note" id="futures-stress-disclaimer">Матрица механически двигает цену текущего фьючерса на ±2/5/10%. Это стресс-сценарии, не прогноз вероятности. «Ход цены ≈ ГО» не является ценой ликвидации: реальные требования брокера и биржи могут изменяться.</p>
   </section>
   {warnings.length>0&&<div className="v3-futures-scenario__warnings" role="status" aria-label="Предупреждения сценария">{warnings.map(item=><p key={item}>{item}</p>)}</div>}
   <footer>Не рассчитываются ликвидация, гарантийные требования брокера, вариационная маржа биржи, комиссии, налоги и риск принудительного закрытия без отдельного подтверждённого контракта данных.</footer>
