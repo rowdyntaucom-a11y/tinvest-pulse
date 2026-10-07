@@ -32,6 +32,10 @@
     box-shadow:0 -14px 36px rgba(15,23,42,.18)!important;
     overscroll-behavior:contain;
   }
+  .sb .core-analytics-depth__picker-backdrop{
+    backdrop-filter:none!important;
+    background:rgba(14,23,36,.14)!important;
+  }
   .sb .sb-nav button{min-height:48px;touch-action:manipulation}
   .sb .sb-nav button span{line-height:1.15}
 }
