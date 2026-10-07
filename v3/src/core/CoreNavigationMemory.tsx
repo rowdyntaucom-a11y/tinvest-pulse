@@ -15,7 +15,10 @@ function restore(label:string){const y=readCoreScrollPosition(label)??0;window.r
 export function CoreNavigationMemory(){
  const[showTop,setShowTop]=useState(false);
  useEffect(()=>{
-  const sync=()=>setShowTop(shouldShowCoreScrollTop(window.scrollY,document.documentElement.classList.contains("qv-input-active")));
+  let frame=0;
+  const coarse=window.matchMedia?.("(pointer: coarse)")?.matches??false;
+  const syncNow=()=>setShowTop(shouldShowCoreScrollTop(window.scrollY,document.documentElement.classList.contains("qv-input-active"),coarse));
+  const sync=()=>{if(frame)return;frame=window.requestAnimationFrame(()=>{frame=0;syncNow()})};
   const onClick=(event:MouseEvent)=>{
    const target=event.target instanceof Element?event.target:null;
    const navButton=target?.closest(".sb-nav button")??null;
@@ -30,8 +33,8 @@ export function CoreNavigationMemory(){
   document.addEventListener("click",onClick,true);
   document.addEventListener("focusin",sync,true);
   document.addEventListener("focusout",sync,true);
-  sync();
-  return()=>{window.removeEventListener("scroll",sync);document.removeEventListener("click",onClick,true);document.removeEventListener("focusin",sync,true);document.removeEventListener("focusout",sync,true)};
+  syncNow();
+  return()=>{if(frame)window.cancelAnimationFrame(frame);window.removeEventListener("scroll",sync);document.removeEventListener("click",onClick,true);document.removeEventListener("focusin",sync,true);document.removeEventListener("focusout",sync,true)};
  },[]);
  const toTop=()=>window.scrollTo({top:0,behavior:reduceMotion()?"auto":"smooth"});
  return showTop?<button type="button" className="sb-scroll-top-v91" aria-label="К началу раздела" title="К началу раздела" onClick={toTop}><span aria-hidden="true">↑</span><small>НАВЕРХ</small></button>:null;
