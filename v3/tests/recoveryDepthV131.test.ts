@@ -4,4 +4,4 @@ test("v131 measures only closed recovery episodes for duration statistics",()=>{
 test("v131 fails closed on conflicting same-date portfolio values",()=>assert.equal(buildRecoveryDepthV131(h([["2026-01-01",100],["2026-01-01",90],["2026-01-02",100]])).available,false));
 test("v131 mounted after episode view and does not forecast open recovery",()=>{assert.match(host,/CoreDrawdownEpisodesV121[^]*CoreRecoveryDepthV131/);assert.match(ui,/не являются оценкой срока её будущего восстановления/);assert.doesNotMatch(ui,/targetPrice|order|recommend/i)});
 test("v131 responsive KPI and horizontal episode history",()=>{assert.match(css,/grid-template-columns:repeat\(4,1fr\)/);assert.match(css,/@media\(max-width:680px\)/);assert.match(css,/overflow-x:auto/);assert.match(css,/@media\(max-width:390px\)/)});
-console.log("recoveryDepthV131: ok");
+test("CoreRecoveryDepthV131 has an accessible region label",()=>assert.match(ui,/Историческая глубина восстановления портфеля/));console.log("recoveryDepthV131: ok");
