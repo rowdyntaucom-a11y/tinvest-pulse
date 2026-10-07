@@ -55,7 +55,7 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
    <div><span>СЕЙЧАС</span><strong>{selected?.label??"Инструмент"}</strong><p>{selected?.hero}</p></div>
    <button type="button" aria-expanded={catalogOpen} aria-controls="qvanix-tool-catalog" onClick={()=>setCatalogOpen(open=>!open)}>{catalogOpen?"Скрыть выбор":"Сменить инструмент"}</button>
   </section>
-  {catalogOpen&&<div className="v3-pro-tools__groups" id="qvanix-tool-catalog">
+  {catalogOpen&&<div className="v3-pro-tools__groups" id="qvanix-tool-catalog" aria-label="Каталог аналитических инструментов">
    {groups.map(group=><section key={group.id}><header>{group.label}</header><nav aria-label={group.label}>{group.items.map(item=><button key={item.id} type="button" className={tool===item.id?"is-active":""} aria-pressed={tool===item.id} aria-label={item.label+": "+item.note} onClick={()=>selectTool(item.id)}><strong>{item.label}</strong><small>{item.note}</small><i aria-hidden="true">{tool===item.id?"●":"›"}</i></button>)}</nav></section>)}
   </div>}
   <div className="v3-pro-tools__stage" aria-live="polite">
