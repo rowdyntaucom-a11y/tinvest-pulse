@@ -33,9 +33,9 @@ assert.match(portfolioApi,/32_000/);
 assert.match(portfolioApi,/dashboard timeout/);
 
 assert.match(preview,/routePath=req\.url\.split\("\?"\)\[0\],isDashboard=routePath==="\/api\/dashboard"/);
-assert.match(preview,/delays=isDashboard\?\[0,1200,2500,4500,6500\]/);
+assert.match(preview,/delays=isDashboard\?\[0,1200,2500,4500,7000,10000,14000,18000\]/);
 assert.match(preview,/isBrokerRecovery=\["\/api\/portfolio","\/api\/accounts","\/api\/operations-summary"\]/);
-assert.match(preview,/attemptTimeoutMs=isDashboard\?4500:isBrokerRecovery\?3500:18000/);
+assert.match(preview,/attemptTimeoutMs=isDashboard\?9000:isBrokerRecovery\?7000:18000/);
 assert.match(preview,/QVANIX_BROKER_RECOVERY_PROXY/);
 assert.match(preview,/QVANIX_DASHBOARD_PROXY/);
 
