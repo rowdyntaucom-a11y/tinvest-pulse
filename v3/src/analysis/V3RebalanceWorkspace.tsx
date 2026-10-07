@@ -82,7 +82,7 @@ export function V3RebalanceWorkspace({positions}:{positions:PositionSnapshot[]})
 
    {!targetReady?<div className="sam-rebalance__gate">Введите собственную целевую долю акций от 1% до 99%. QVANIX не подставляет стратегию автоматически.</div>:drift&&!drift.available?<div className="sam-rebalance__gate">{drift.reason??"Структуру нельзя рассчитать по текущему снимку."}</div>:drift&&<>
     <section className="sam-rebalance__drift">
-     <div className="sam-rebalance__section-title"><div><span>02 · DRIFT</span><h3>Текущее отклонение</h3></div><strong className={drift.withinTolerance?"is-ok":"is-watch"}>{drift.withinTolerance?"В ДОПУСКЕ":"ВНЕ ДОПУСКА"}</strong></div>
+     <div className="sam-rebalance__section-title"><div><span>02 · DRIFT</span><h3>Текущее отклонение</h3></div><strong role="status" className={drift.withinTolerance?"is-ok":"is-watch"}>{drift.withinTolerance?"В ДОПУСКЕ":"ВНЕ ДОПУСКА"}</strong></div>
      <div className="sam-rebalance__rows" aria-label="Отклонения от пользовательской цели">
       {drift.rows.map(row=><article key={row.key}>
        <div><strong>{row.label}</strong><small>текущая стоимость {money(row.currentValue)}</small></div>
