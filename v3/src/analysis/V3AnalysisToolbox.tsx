@@ -50,8 +50,8 @@ export function V3AnalysisToolbox({positions,includeMarket=true}:{positions:Posi
  const loadingLabel=(id:ToolId)=>id==="rebalance"?"Открываем ребалансировку…":id==="bonds"?"Открываем облигационный контур…":id==="lab"?"Открываем лабораторию…":id==="market"?"Открываем рыночную аналитику…":id==="futures"?"Открываем сценарий фьючерса…":"Открываем отчёт…";
  return <section className="v3-pro-tools" aria-label="Профессиональные инструменты аналитики">
   <header><div><span>ПРОФЕССИОНАЛЬНЫЕ ИНСТРУМЕНТЫ</span><h2>Инструменты</h2><p>Рабочие модули сгруппированы по задаче. Тяжёлый инструмент подключается только при первом открытии, а его локальное состояние сохраняется при переключении.</p></div><small>ТОЛЬКО ЧТЕНИЕ</small></header>
-  <section className="v3-pro-tools__glossary"><button type="button" aria-expanded={glossaryOpen} onClick={()=>setGlossaryOpen(open=>!open)}><span>Что означают термины на этой странице</span><strong>{glossaryOpen?"Скрыть":"Открыть глоссарий"}</strong></button>{glossaryOpen&&<div>{TERMS.map(item=><article key={item.term}><strong>{item.term}</strong><p>{item.copy}</p></article>)}</div>}</section>
-  <section className={"v3-pro-tools__focus"+(catalogOpen?" is-catalog-open":" is-focused")}>
+  <section className="v3-pro-tools__glossary" aria-label="Глоссарий профессиональных инструментов"><button type="button" aria-expanded={glossaryOpen} onClick={()=>setGlossaryOpen(open=>!open)}><span>Что означают термины на этой странице</span><strong>{glossaryOpen?"Скрыть":"Открыть глоссарий"}</strong></button>{glossaryOpen&&<div>{TERMS.map(item=><article key={item.term}><strong>{item.term}</strong><p>{item.copy}</p></article>)}</div>}</section>
+  <section className={"v3-pro-tools__focus"+(catalogOpen?" is-catalog-open":" is-focused")} aria-label="Текущий выбранный инструмент">
    <div><span>СЕЙЧАС</span><strong>{selected?.label??"Инструмент"}</strong><p>{selected?.hero}</p></div>
    <button type="button" aria-expanded={catalogOpen} aria-controls="qvanix-tool-catalog" onClick={()=>setCatalogOpen(open=>!open)}>{catalogOpen?"Скрыть выбор":"Сменить инструмент"}</button>
   </section>
