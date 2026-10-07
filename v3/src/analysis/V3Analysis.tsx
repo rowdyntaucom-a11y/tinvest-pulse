@@ -11,6 +11,7 @@ import{V3ImpactTreemap}from"./V3ImpactTreemap";
 import{buildV3AnalysisDepth,buildV3RelativeDepth}from"./analysisDepth";
 import{buildAnalysisWorkspaceSummary}from"./analysisWorkspaceSummary";
 import{V3ReturnLayer}from"./V3ReturnLayer";
+import{V3ReturnRegimeV127}from"./V3ReturnRegimeV127";
 import{V3RiskLayer}from"./V3RiskLayer";
 import{V3MarketLayer}from"./V3MarketLayer";
 import{SamuraiWorkspaceChrome}from"../samurai/SamuraiWorkspaceChrome";
@@ -74,7 +75,7 @@ export function V3Analysis({items,history,market,trusted,shell,mode,portfolioVal
    </div>}
 
    {((samuraiReference&&trusted)||(mode==="detailed"&&section==="return"))&&trusted&&<div id="sam-analysis-return" className={samuraiReference?"sam-reference-chapter":undefined}>
-    <V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/>
+    <V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/><V3ReturnRegimeV127 history={trustedHistory.map(x=>({date:x.date,portfolio:x.portfolio}))}/>
     {samuraiReference&&<SamuraiNextCue targetId="sam-analysis-risk" label="ДАЛЬШЕ · РИСК"/>}
    </div>}
 
