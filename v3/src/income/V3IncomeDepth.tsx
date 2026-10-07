@@ -23,6 +23,7 @@ import{V3IncomeConcentrationTrendV158}from"./V3IncomeConcentrationTrendV158";
 import{V3IncomeVolatilityV163}from"./V3IncomeVolatilityV163";
 import{V3IncomeQuarterDepthV166}from"./V3IncomeQuarterDepthV166";
 import{V3IncomeActiveMonthV172}from"./V3IncomeActiveMonthV172";
+import{V3IncomeYearDepthV175}from"./V3IncomeYearDepthV175";
 import{V3IncomeContinuityMatrixV133}from"./V3IncomeContinuityMatrixV133";
 import{V3IncomeFreshnessV135}from"./V3IncomeFreshnessV135";
 
@@ -143,7 +144,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
         </div>
         <small className="v3-income-method">Состав показывает только уже полученный пассивный доход после налога. Регулярность — доля полностью наблюдавшихся месяцев, в которых была хотя бы одна фактическая выплата; частичные месяцы не ухудшают показатель.</small>
       </div>
-      <V3IncomeSeasonalityV122 months={depth.realizedHistory.months}/><V3IncomeGrowthV143 months={depth.realizedHistory.months}/><V3IncomeTypeMixV148 months={depth.realizedHistory.months}/><V3IncomeActivityStreakV153 months={depth.realizedHistory.months}/><V3IncomeConcentrationTrendV158 months={depth.realizedHistory.months}/><V3IncomeVolatilityV163 months={depth.realizedHistory.months}/><V3IncomeQuarterDepthV166 months={depth.realizedHistory.months}/><V3IncomeActiveMonthV172 months={depth.realizedHistory.months}/><V3IncomeResilienceV128 months={depth.realizedHistory.months} events={depth.trustedIncome.actualEvents}/>
+      <V3IncomeSeasonalityV122 months={depth.realizedHistory.months}/><V3IncomeGrowthV143 months={depth.realizedHistory.months}/><V3IncomeTypeMixV148 months={depth.realizedHistory.months}/><V3IncomeActivityStreakV153 months={depth.realizedHistory.months}/><V3IncomeConcentrationTrendV158 months={depth.realizedHistory.months}/><V3IncomeVolatilityV163 months={depth.realizedHistory.months}/><V3IncomeQuarterDepthV166 months={depth.realizedHistory.months}/><V3IncomeActiveMonthV172 months={depth.realizedHistory.months}/><V3IncomeYearDepthV175 months={depth.realizedHistory.months}/><V3IncomeResilienceV128 months={depth.realizedHistory.months} events={depth.trustedIncome.actualEvents}/>
       <div className="v3-income-history-stats">
         <article><span>Месяцев с выплатами</span><strong>{depth.stability.payoutMonths}</strong><small>из {depth.stability.observedMonths} полных</small></article>
         <article><span>Нулевых месяцев</span><strong>{depth.stability.zeroIncomeMonths}</strong><small>только полностью наблюдавшиеся</small></article>
