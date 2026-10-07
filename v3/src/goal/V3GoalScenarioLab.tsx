@@ -6,6 +6,7 @@ import{V3SectionSelector}from"../navigation/V3SectionSelector";
 import type{V3Shell}from"../app/model";
 import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{calculateV3GoalBootstrap,calculateV3GoalScenario,solveV3RequiredMonthlyContribution}from"./goalScenario";
+import{V3GoalCapitalAttributionV178}from"./V3GoalCapitalAttributionV178";
 import"../styles/goalScenarioLab.css";
 
 type Tab="scenario"|"history";
@@ -274,6 +275,7 @@ export function V3GoalScenarioLab({
           </div></details>
           <ScenarioChart series={projection.series} hasBenchmark={projection.finalBenchmarkCapital!=null} inflationAdjust={inflationAdjust}/>
           <ScenarioTable series={projection.series}/>
+          <V3GoalCapitalAttributionV178 input={input!} result={projection}/>
           <small className="v3-goal-scenario-method">{projection.note} Методика {projection.version}. Все будущие параметры — пользовательские предпосылки.</small>
         </section>
       </>}
