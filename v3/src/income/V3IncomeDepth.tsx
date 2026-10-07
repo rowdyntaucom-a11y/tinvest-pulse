@@ -14,6 +14,7 @@ import{SamuraiChapterNav,SamuraiNextCue}from"../samurai/SamuraiChapterNav";
 import{V3IncomeForwardPanel}from"./V3IncomeCalendarV2";
 import{V3DividendDiscovery}from"./V3DividendDiscovery";
 import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
+import{V3IncomeSeasonalityV122}from"./V3IncomeSeasonalityV122";
 
 type View="overview"|"calendar"|"history"|"sources"|"trust"|"market";
 const BASIC_VIEW_OPTIONS=[
@@ -132,6 +133,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
         </div>
         <small className="v3-income-method">Состав показывает только уже полученный пассивный доход после налога. Регулярность — доля полностью наблюдавшихся месяцев, в которых была хотя бы одна фактическая выплата; частичные месяцы не ухудшают показатель.</small>
       </div>
+      <V3IncomeSeasonalityV122 months={depth.realizedHistory.months}/>
       <div className="v3-income-history-stats">
         <article><span>Месяцев с выплатами</span><strong>{depth.stability.payoutMonths}</strong><small>из {depth.stability.observedMonths} полных</small></article>
         <article><span>Нулевых месяцев</span><strong>{depth.stability.zeroIncomeMonths}</strong><small>только полностью наблюдавшиеся</small></article>
