@@ -29,6 +29,7 @@ test("recording pass keeps mobile task controls readable and away from bottom na
  assert.match(recordingCss,/min-height:76px!important/);
  assert.match(recordingCss,/\.v3-section-sheet\{[\s\S]*backdrop-filter:none!important/);
  assert.match(recordingCss,/overscroll-behavior:contain/);
+ assert.match(recordingCss,/core-analytics-depth__picker-backdrop/);
 });
 
 test("warm payout calendar is reused during compact/full remounts",()=>{
