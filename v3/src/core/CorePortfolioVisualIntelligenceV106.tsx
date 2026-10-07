@@ -9,6 +9,7 @@ import{CorePortfolioClassBreadthV157}from"./CorePortfolioClassBreadthV157";
 import{CorePortfolioTailV161}from"./CorePortfolioTailV161";
 import{CorePortfolioCostBasisV165}from"./CorePortfolioCostBasisV165";
 import{CorePortfolioPriceDistanceV170}from"./CorePortfolioPriceDistanceV170";
+import{CorePortfolioBasisCoverageV174}from"./CorePortfolioBasisCoverageV174";
 
 type Props={positions:PositionSnapshot[]};
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -47,6 +48,6 @@ export function CorePortfolioVisualIntelligenceV106({positions}:Props){
    <article className="core-portfolio-visual-v106__classes"><div><span>Классы активов</span><b>{money.format(model.total)} ₽</b></div><div className="stack" role="img" aria-label="Доли классов активов">{model.classes.map((x,i)=>{const width=x.value/model.total*100,start=offset;offset+=width;return <i key={x.key} className={`c${i}`} style={{width:`${width}%`}} title={`${x.key}: ${pct.format(width)}%`} data-start={start}/>})}</div><ul>{model.classes.map((x,i)=><li key={x.key}><i className={`c${i}`}/><span>{x.key}</span><b>{pct.format(x.value/model.total*100)}%</b></li>)}</ul></article>
    <article className="core-portfolio-visual-v106__breadth"><div><span>Капитал по знаку P/L</span><b>текущий срез</b></div><div className="breadth" role="img" aria-label="Капитал в прибыльных, убыточных и нейтральных позициях"><i className="upbar" style={{width:`${model.positive/model.total*100}%`}}/><i className="downbar" style={{width:`${model.negative/model.total*100}%`}}/><i className="flatbar" style={{width:`${model.flat/model.total*100}%`}}/></div><footer><span className="up">В плюсе {pct.format(model.positive/model.total*100)}%</span><span className="down">В минусе {pct.format(model.negative/model.total*100)}%</span></footer></article>
   </div>
-  <CorePortfolioConcentrationV126 positions={positions}/><CoreConcentrationLadderV136 positions={positions}/><CorePortfolioWeightBandsV147 positions={positions}/><CorePortfolioPnLBreadthV152 positions={positions}/><CorePortfolioClassBreadthV157 positions={positions}/><CorePortfolioTailV161 positions={positions}/><CorePortfolioCostBasisV165 positions={positions}/><CorePortfolioPriceDistanceV170 positions={positions}/><p>Визуализация описывает текущую структуру капитала. Это не прогноз, рейтинг или рекомендация.</p>
+  <CorePortfolioConcentrationV126 positions={positions}/><CoreConcentrationLadderV136 positions={positions}/><CorePortfolioWeightBandsV147 positions={positions}/><CorePortfolioPnLBreadthV152 positions={positions}/><CorePortfolioClassBreadthV157 positions={positions}/><CorePortfolioTailV161 positions={positions}/><CorePortfolioCostBasisV165 positions={positions}/><CorePortfolioPriceDistanceV170 positions={positions}/><CorePortfolioBasisCoverageV174 positions={positions}/><p>Визуализация описывает текущую структуру капитала. Это не прогноз, рейтинг или рекомендация.</p>
  </section>,host);
 }
