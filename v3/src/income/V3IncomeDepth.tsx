@@ -16,6 +16,7 @@ import{V3DividendDiscovery}from"./V3DividendDiscovery";
 import{V3IncomeDataTrust}from"./V3IncomeDataTrust";
 import{V3IncomeSeasonalityV122}from"./V3IncomeSeasonalityV122";
 import{V3IncomeResilienceV128}from"./V3IncomeResilienceV128";
+import{V3IncomeContinuityMatrixV133}from"./V3IncomeContinuityMatrixV133";
 
 type View="overview"|"calendar"|"history"|"sources"|"trust"|"market";
 const BASIC_VIEW_OPTIONS=[
@@ -150,7 +151,7 @@ export function V3IncomeDepth({positions,onOpenAsset,shell,mode="detailed"}:{pos
         <article><span>Источников факта <V3MetricHelp topic="incomeConcentration"/></span><strong>{depth.concentration.sourceCount||"—"}</strong><small>{depth.concentration.effectiveSources==null?"эффективное число —":"эфф. "+depth.concentration.effectiveSources.toLocaleString("ru-RU",{maximumFractionDigits:2})}</small></article>
         <article><span>Главный источник</span><strong>{depth.concentration.topSourceShare==null?"—":pct.format(depth.concentration.topSourceShare*100)+"%"}</strong><small>доля реально полученного net</small></article>
       </div>
-      <div className="v3-income-source-list">{depth.sourceRows.length?depth.sourceRows.slice(0,12).map(row=>{
+      <V3IncomeContinuityMatrixV133 actual={depth.trustedIncome.actualEvents} future={depth.trustedIncome.futureEvents} positions={positions} from={calendar.period.from} to={calendar.period.to}/><div className="v3-income-source-list">{depth.sourceRows.length?depth.sourceRows.slice(0,12).map(row=>{
         const matches=row.figi?positions.filter(position=>position.figi?.trim().toUpperCase()===row.figi):[],position=row.matchBasis==="FIGI"&&matches.length===1?matches[0]:null;
         return <button type="button" key={row.key} className="v3-income-source-row" disabled={!position} onClick={()=>{if(position)onOpenAsset?.(position)}}>
           <div><strong>{row.ticker}</strong><small>{row.name!==row.ticker?row.name:sourceIdentity(row.identityState)}</small></div>
