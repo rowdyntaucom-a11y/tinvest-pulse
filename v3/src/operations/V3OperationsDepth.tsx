@@ -1,5 +1,6 @@
 import{useCallback,useEffect,useMemo,useState}from"react";
 import{loadV3OperationsLedger,type V3OperationKind,type V3OperationsLedger}from"./operationsLedger";
+import{V3OperationsCashBridgeV191}from"./V3OperationsCashBridgeV191";
 import{V3OperationsCadenceV190}from"./V3OperationsCadenceV190";
 import{V3OperationsInstrumentActivityV189}from"./V3OperationsInstrumentActivityV189";
 import{V3OperationsFeeDepthV188}from"./V3OperationsFeeDepthV188";
@@ -111,6 +112,7 @@ export function V3OperationsDepth(){
      <V3OperationsFeeDepthV188 rows={ledger.rows}/>
      <V3OperationsInstrumentActivityV189 rows={ledger.rows}/>
      <V3OperationsCadenceV190 rows={ledger.rows}/>
+     <V3OperationsCashBridgeV191 rows={ledger.rows}/>
      <p className="sam-ops-depth__note">Операционный журнал показывает фактические события счёта. Он не является дневником рыночной доходности и не заменяет TWR/XIRR.</p>
     </>}
   </section>
