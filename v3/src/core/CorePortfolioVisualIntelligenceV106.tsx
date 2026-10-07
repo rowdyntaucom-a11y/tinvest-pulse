@@ -2,6 +2,7 @@ import{useEffect,useMemo,useState}from"react";
 import{createPortal}from"react-dom";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{CorePortfolioConcentrationV126}from"./CorePortfolioConcentrationV126";
+import{CoreConcentrationLadderV136}from"./CoreConcentrationLadderV136";
 
 type Props={positions:PositionSnapshot[]};
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:1});
@@ -40,6 +41,6 @@ export function CorePortfolioVisualIntelligenceV106({positions}:Props){
    <article className="core-portfolio-visual-v106__classes"><div><span>Классы активов</span><b>{money.format(model.total)} ₽</b></div><div className="stack" aria-label="Доли классов активов">{model.classes.map((x,i)=>{const width=x.value/model.total*100,start=offset;offset+=width;return <i key={x.key} className={`c${i}`} style={{width:`${width}%`}} title={`${x.key}: ${pct.format(width)}%`} data-start={start}/>})}</div><ul>{model.classes.map((x,i)=><li key={x.key}><i className={`c${i}`}/><span>{x.key}</span><b>{pct.format(x.value/model.total*100)}%</b></li>)}</ul></article>
    <article className="core-portfolio-visual-v106__breadth"><div><span>Капитал по знаку P/L</span><b>текущий срез</b></div><div className="breadth" aria-label="Капитал в прибыльных, убыточных и нейтральных позициях"><i className="upbar" style={{width:`${model.positive/model.total*100}%`}}/><i className="downbar" style={{width:`${model.negative/model.total*100}%`}}/><i className="flatbar" style={{width:`${model.flat/model.total*100}%`}}/></div><footer><span className="up">В плюсе {pct.format(model.positive/model.total*100)}%</span><span className="down">В минусе {pct.format(model.negative/model.total*100)}%</span></footer></article>
   </div>
-  <CorePortfolioConcentrationV126 positions={positions}/><p>Визуализация описывает текущую структуру капитала. Это не прогноз, рейтинг или рекомендация.</p>
+  <CorePortfolioConcentrationV126 positions={positions}/><CoreConcentrationLadderV136 positions={positions}/><p>Визуализация описывает текущую структуру капитала. Это не прогноз, рейтинг или рекомендация.</p>
  </section>,host);
 }
