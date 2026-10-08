@@ -5,7 +5,7 @@ function reduceMotion(){return window.matchMedia?.("(prefers-reduced-motion: red
 /**
  * V221: SnowballCore is the single owner of active-workspace + scroll restoration.
  * This component deliberately owns only the floating "back to top" affordance.
- * Keeping a second click/sessionStorage restoration loop here caused competing
+ * Keeping a second legacy navigation restoration loop here caused competing
  * requestAnimationFrame scrollTo calls when market/screener DOM changed.
  */
 export function CoreNavigationMemory(){
