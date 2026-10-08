@@ -43,7 +43,7 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
   }).finally(()=>{if(!controller.signal.aborted)setLoading(false)});
   return()=>{controller.abort();if(retryTimer!=null)window.clearTimeout(retryTimer)};
  },[attempt]);
- const selectMode=(next:Mode)=>{if(next===mode)return;const beforeY=window.scrollY;setMode(next);writeMode(next);setVisited(prev=>{if(prev.has(next))return prev;const copy=new Set(prev);copy.add(next);return copy});if(scrollFrame!=null)window.cancelAnimationFrame(scrollFrame);scrollFrame=window.requestAnimationFrame(()=>{scrollFrame=window.requestAnimationFrame(()=>{scrollFrame=null;if(Math.abs(window.scrollY-beforeY)>2)window.scrollTo({top:beforeY,behavior:"auto"})})})};
+ const selectMode=(next:Mode)=>{if(next===mode)return;const beforeY=window.scrollY;setMode(next);writeMode(next);setVisited(prev=>{if(prev.has(next))return prev;const copy=new Set(prev);copy.add(next);return copy});if(scrollFrame.current!=null)window.cancelAnimationFrame(scrollFrame.current);scrollFrame.current=window.requestAnimationFrame(()=>{scrollFrame.current=window.requestAnimationFrame(()=>{scrollFrame.current=null;if(Math.abs(window.scrollY-beforeY)>2)window.scrollTo({top:beforeY,behavior:"auto"})})})};
  useEffect(()=>()=>{if(scrollFrame.current!=null)window.cancelAnimationFrame(scrollFrame.current)},[]);
  const manualRetry=()=>setAttempt(value=>Math.max(value+1,MARKET_RETRY_DELAYS.length+1));
  const pulse=useMemo(()=>buildMarketPulse(data?.rows??[],positions),[data,positions]);
