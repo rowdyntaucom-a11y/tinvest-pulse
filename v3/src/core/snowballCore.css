@@ -1278,3 +1278,11 @@
 .sb-analytic-list .sb-analytic-row>i{display:block;min-width:80px}
 .sb-analytic-list .sb-analytic-row>strong{white-space:nowrap;text-align:right}
 @media(max-width:520px){.sb-analytic-list .sb-analytic-row{grid-template-columns:minmax(82px,.8fr) minmax(72px,1fr) auto;gap:7px;padding:8px 0}}
+
+/* v218 — Compact is a real workspace, not Full with smaller spacing */
+.sb-compact-stage{width:min(calc(100% - 32px),1040px);margin:0 auto;padding-top:14px}
+.sb[data-density="compact"] .sb-compact-stage{min-height:calc(100vh - 150px)}
+.sb[data-density="compact"] .qcompact{animation:sbCompactIn .16s ease-out}
+@keyframes sbCompactIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:520px){.sb-compact-stage{width:calc(100% - 20px);padding-top:9px;padding-bottom:74px}.sb[data-density="compact"] .sb-compact-stage{min-height:calc(100vh - 132px)}}
+@media(prefers-reduced-motion:reduce){.sb[data-density="compact"] .qcompact{animation:none}}
