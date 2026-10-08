@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const source=readFileSync(new URL("../src/core/CoreNavigationMemory.tsx",import.meta.url),"utf8");
+assert.match(source,/qvanix-core-active-section-v212/);
+assert.match(source,/VALID_SECTIONS=new Set\(\["Обзор","Портфель","Доходность","Выплаты","Аналитика"\]\)/);
+assert.match(source,/sessionStorage\.setItem\(ACTIVE_KEY,label\)/);
+assert.match(source,/window\.addEventListener\("pagehide",onPageHide\)/);
+assert.match(source,/document\.addEventListener\("visibilitychange",onVisibility\)/);
+assert.match(source,/navButtonFor\(wanted\)/);
+assert.match(source,/button\.click\(\);restore\(wanted\)/);
+assert.match(source,/writeCoreScrollPosition\(current,window\.scrollY\)/);
+console.log("mobile navigation continuity v212 regression: ok");
