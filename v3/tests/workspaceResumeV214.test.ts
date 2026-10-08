@@ -1,0 +1,15 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const state=readFileSync(new URL("../src/core/coreWorkspaceStateV213.ts",import.meta.url),"utf8");
+const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+assert.match(state,/qvanix-core-workspace-state-v214/);
+assert.match(state,/LEGACY_KEY="qvanix-core-workspace-state-v213"/);
+assert.match(state,/tab:new Set\(\["home","portfolio","result","income","more"\]\)/);
+assert.match(state,/qvanix-core-scroll-v214/);
+assert.match(state,/Number\.isFinite\(y\)&&y>=0/);
+assert.match(core,/useState<Tab>\(restored\.tab\)/);
+assert.match(core,/writeCoreWorkspaceState\(\{tab,portfolioMode,incomeMode,hub,analyticsMode,resultWindow,resultChartMode\}\)/);
+assert.match(core,/writeCoreScroll\(tab,window\.scrollY\)/);
+assert.match(core,/readCoreScroll\(x\)/);
+assert.match(core,/visibilitychange/);
+assert.match(core,/pagehide/);
+console.log("workspace resume v214 regression: ok");
