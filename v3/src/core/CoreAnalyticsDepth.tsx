@@ -6,6 +6,7 @@ import{V3RiskLayer}from"../analysis/V3RiskLayer";
 import{V3MarketLayer}from"../analysis/V3MarketLayer";
 import{filterHistoryWindow,type V3HistoryWindow}from"../history/historyLens";import{V3GlossaryHelp}from"../help/V3GlossaryHelp";
 import"../styles/analysisDepth.css";
+import{readAnalyticsSectionV211,writeAnalyticsSectionV211}from"./analyticsSectionMemoryV211";
 import{CoreDrawdownEpisodesV121}from"./CoreDrawdownEpisodesV121";
 import{CoreRecoveryDepthV131}from"./CoreRecoveryDepthV131";
 import{V3ReturnRegimeV127}from"../analysis/V3ReturnRegimeV127";
@@ -48,16 +49,41 @@ export function CoreAnalyticsDepth({
  totalPortfolioValue:number;
  onOpenAsset?:(position:PositionSnapshot)=>void;
 }){
- const[section,setSection]=useState<Section>("return");
+ const[section,setSection]=useState<Section>(readAnalyticsSectionV211);
+ useEffect(()=>writeAnalyticsSectionV211(section),[section]);
  const[window,setWindow]=useState<V3HistoryWindow>("all");
  const[pickerOpen,setPickerOpen]=useState(false);
  const[plainOpen,setPlainOpen]=useState(false);
  const pickerRef=useRef<HTMLDivElement|null>(null);
+ const pickerTriggerRef=useRef<HTMLButtonElement|null>(null);
  useEffect(()=>{
   if(!pickerOpen)return;
-  const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape")setPickerOpen(false)};
+  const dialog=pickerRef.current;
+  const previousOverflow=document.body.style.overflow;
+  document.body.style.overflow="hidden";
+  const focusFrame=requestAnimationFrame(()=>{
+   const selected=dialog?.querySelector<HTMLButtonElement>('nav button[aria-pressed="true"]');
+   (selected??dialog?.querySelector<HTMLButtonElement>("button"))?.focus();
+  });
+  const onKey=(event:KeyboardEvent)=>{
+   if(event.key==="Escape"){event.preventDefault();setPickerOpen(false);return}
+   if(event.key!=="Tab"||!dialog)return;
+   const controls=Array.from(dialog.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
+   if(!controls.length)return;
+   const first=controls[0],last=controls[controls.length-1];
+   if(event.shiftKey&&(document.activeElement===first||!dialog.contains(document.activeElement))){
+    event.preventDefault();last.focus();
+   }else if(!event.shiftKey&&(document.activeElement===last||!dialog.contains(document.activeElement))){
+    event.preventDefault();first.focus();
+   }
+  };
   document.addEventListener("keydown",onKey);
-  return()=>document.removeEventListener("keydown",onKey);
+  return()=>{
+   cancelAnimationFrame(focusFrame);
+   document.removeEventListener("keydown",onKey);
+   document.body.style.overflow=previousOverflow;
+   pickerTriggerRef.current?.focus();
+  };
  },[pickerOpen]);
  const depth=useMemo(()=>buildV3AnalysisDepth(history,positions,market.riskFreeRate),[history,positions,market.riskFreeRate]);
  const relative=useMemo(()=>buildV3RelativeDepth(filterHistoryWindow(history,window)),[history,window]);
@@ -96,8 +122,8 @@ export function CoreAnalyticsDepth({
   <section className="core-analytics-depth__route" aria-label="Текущий раздел аналитики">
    <span>ПРОФЕССИОНАЛЬНЫЙ СЛОЙ</span><strong>{sectionMeta[1]}</strong><small>{sectionMeta[2]}</small>
    <div className="core-analytics-depth__picker-anchor">
-    <div className="core-analytics-depth__picker-control"><b>Раздел</b><button type="button" aria-haspopup="dialog" aria-expanded={pickerOpen} onClick={()=>setPickerOpen(true)}><span>{sectionMeta[1]}</span><i aria-hidden="true">⌄</i></button></div>
-    {pickerOpen&&<div className="core-analytics-depth__picker-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setPickerOpen(false)}}>
+    <div className="core-analytics-depth__picker-control"><b>Раздел</b><button ref={pickerTriggerRef} type="button" aria-haspopup="dialog" aria-expanded={pickerOpen} onClick={()=>setPickerOpen(true)}><span>{sectionMeta[1]}</span><i aria-hidden="true">⌄</i></button></div>
+    {pickerOpen&&<div className="core-analytics-depth__picker-backdrop" role="presentation" onPointerDown={event=>{if(event.target===event.currentTarget)setPickerOpen(false)}}>
      <div ref={pickerRef} className="core-analytics-depth__picker" role="dialog" aria-modal="true" aria-label="Выбрать раздел глубокой аналитики">
       <header><div><span>АНАЛИТИКА</span><strong>Выберите срез</strong></div><button type="button" aria-label="Закрыть" onClick={()=>setPickerOpen(false)}>×</button></header>
       <nav>{SECTIONS.map(([id,label,note])=><button key={id} type="button" className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>{setSection(id);setPickerOpen(false)}}><span><strong>{label}</strong><small>{note}</small></span><i aria-hidden="true">{section===id?"✓":"›"}</i></button>)}</nav>
@@ -105,8 +131,16 @@ export function CoreAnalyticsDepth({
     </div>}
    </div>
   </section>
-  <nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики" role="tablist">
-   {SECTIONS.map(([id,label,note])=><button key={id} type="button" role="tab" aria-selected={section===id} className={section===id?"is-active":""} aria-pressed={section===id} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
+  <nav className="core-analytics-depth__nav" aria-label="Раздел глубокой аналитики" role="tablist" onKeyDown={event=>{
+   if(!["ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+   event.preventDefault();
+   const index=SECTIONS.findIndex(([id])=>id===section);
+   const next=event.key==="Home"?0:event.key==="End"?SECTIONS.length-1:
+    (index+(event.key==="ArrowRight"?1:-1)+SECTIONS.length)%SECTIONS.length;
+   setSection(SECTIONS[next][0]);
+   event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+  }}>
+   {SECTIONS.map(([id,label,note])=><button key={id} type="button" role="tab" aria-selected={section===id} tabIndex={section===id?0:-1} aria-controls={section===id?"core-analytics-active-panel":undefined} id={`core-analytics-tab-${id}`} className={section===id?"is-active":""} onClick={()=>setSection(id)}><strong>{label}</strong><small>{note}</small></button>)}
   </nav>
   <section className="core-analytics-depth__decision" aria-live="polite"><span>{decision.eyebrow}</span><strong>{decision.title}</strong><p>{decision.text}</p></section>
   <section className="core-analytics-depth__evidence" aria-label="Основа расчёта"><span>ОСНОВА РАСЧЁТА</span><div><article><b>{history.length}</b><small>точек истории</small></article><article><b>{positions.length}</b><small>текущих позиций</small></article><article><b>{relative.available?relative.overlapPoints:"—"}</b><small>общих точек с IMOEX</small></article></div><p>{integrity==="OK"?"История прошла проверку целостности.":"История ограничена: недоступные метрики остаются пустыми."}</p></section>
@@ -115,9 +149,9 @@ export function CoreAnalyticsDepth({
   <V3HistoryTrustV210 history={history}/>
   <V3ValueHighWaterV209 history={history}/>
   <div className="core-analytics-depth__stage">
-   {section==="return"&&<div role="tabpanel" aria-label="Аналитика доходности"><V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/><V3ReturnRegimeV127 history={history}/><V3ReturnTailV145 history={history}/><V3ReturnHitRateV155 history={history}/><V3ReturnStreakDepthV160 history={history}/><V3ReturnDownsideV168 history={history}/><V3ReturnBalanceV177 history={history}/></div>}
-   {section==="risk"&&<div role="tabpanel" aria-label="Аналитика риска"><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/><CoreRecoveryDepthV131 history={history}/></div>}
-   {section==="benchmark"&&<div role="tabpanel" aria-label="Сравнение с IMOEX"><V3MarketLayer relative={relative} window={window} onWindowChange={setWindow} market={market}/></div>}
+   {section==="return"&&<div id="core-analytics-active-panel" role="tabpanel" aria-labelledby={`core-analytics-tab-return`} tabIndex={0}><V3ReturnLayer portfolio={depth.portfolio} rolling={depth.rolling} riskFreeRate={market.riskFreeRate} riskFreeRateDate={market.riskFreeRateDate}/><V3ReturnRegimeV127 history={history}/><V3ReturnTailV145 history={history}/><V3ReturnHitRateV155 history={history}/><V3ReturnStreakDepthV160 history={history}/><V3ReturnDownsideV168 history={history}/><V3ReturnBalanceV177 history={history}/></div>}
+   {section==="risk"&&<div id="core-analytics-active-panel" role="tabpanel" aria-labelledby={`core-analytics-tab-risk`} tabIndex={0}><V3RiskLayer portfolio={depth.portfolio} tail={depth.tail} positions={positions} totalPortfolioValue={totalPortfolioValue} onOpenAsset={onOpenAsset}/><CoreDrawdownEpisodesV121 history={history}/><CoreRecoveryDepthV131 history={history}/></div>}
+   {section==="benchmark"&&<div id="core-analytics-active-panel" role="tabpanel" aria-labelledby={`core-analytics-tab-benchmark`} tabIndex={0}><V3MarketLayer relative={relative} window={window} onWindowChange={setWindow} market={market}/></div>}
   </div>
   <footer>Все показатели описательные. VaR/CVaR, корреляция, beta, excess return и rolling-метрики основаны на доступной подтверждённой истории и не являются прогнозом или торговым сигналом.</footer>
  </section>;
