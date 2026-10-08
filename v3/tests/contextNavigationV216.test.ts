@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.match(core,/scrollFrame=useRef<number\|null>/);
+assert.match(core,/cancelAnimationFrame\(scrollFrame\.current\)/);
+assert.match(core,/if\(x===tab\)return/);
+assert.doesNotMatch(core,/if\(x===tab\)\{resetViewport\(\);return\}/);
+assert.match(core,/className="sb-market-row" onClick=\{\(\)=>onOpenAsset\(x\)\}/);
+assert.match(css,/\.sb-market-table \.sb-market-row/);
+assert.match(css,/focus-visible/);
+console.log("context navigation v216 regression: ok");
