@@ -1,4 +1,4 @@
-import{lazy,Suspense,useEffect,useMemo,useState}from"react";
+import{lazy,Suspense,useEffect,useMemo,useRef,useState}from"react";
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{loadMarketScreener,type MarketScreenerPayload}from"./marketScreenerApi";
 import{buildMarketPulse}from"./marketIntelligenceModel";
@@ -26,6 +26,7 @@ function MarketStageLoading({label}:{label:string}){return <div className="v3-ma
 
 export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSnapshot[]}){
  const initialMode=readMode();
+ const stageRef=useRef<HTMLDivElement|null>(null),scrollFrame=useRef<number|null>(null);
  const[mode,setMode]=useState<Mode>(initialMode),[visited,setVisited]=useState<Set<Mode>>(()=>new Set<Mode>(["pulse",initialMode])),[data,setData]=useState<MarketScreenerPayload|null>(null),[loading,setLoading]=useState(true),[attempt,setAttempt]=useState(0);
  useEffect(()=>{
   const controller=new AbortController();
@@ -42,14 +43,15 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
   }).finally(()=>{if(!controller.signal.aborted)setLoading(false)});
   return()=>{controller.abort();if(retryTimer!=null)window.clearTimeout(retryTimer)};
  },[attempt]);
- const selectMode=(next:Mode)=>{setMode(next);writeMode(next);setVisited(prev=>{if(prev.has(next))return prev;const copy=new Set(prev);copy.add(next);return copy});window.requestAnimationFrame(()=>document.querySelector<HTMLElement>(".v3-market-intelligence__stage")?.scrollIntoView({block:"nearest",behavior:"auto"}))};
+ const selectMode=(next:Mode)=>{if(next===mode)return;const beforeY=window.scrollY;setMode(next);writeMode(next);setVisited(prev=>{if(prev.has(next))return prev;const copy=new Set(prev);copy.add(next);return copy});if(scrollFrame.current!=null)window.cancelAnimationFrame(scrollFrame.current);scrollFrame.current=window.requestAnimationFrame(()=>{scrollFrame.current=window.requestAnimationFrame(()=>{scrollFrame.current=null;if(Math.abs(window.scrollY-beforeY)>2)window.scrollTo({top:beforeY,behavior:"auto"})})})};
+ useEffect(()=>()=>{if(scrollFrame.current!=null)window.cancelAnimationFrame(scrollFrame.current)},[]);
  const manualRetry=()=>setAttempt(value=>Math.max(value+1,MARKET_RETRY_DELAYS.length+1));
  const pulse=useMemo(()=>buildMarketPulse(data?.rows??[],positions),[data,positions]);
  const portfolioRows=useMemo(()=>(data?.rows??[]).filter(row=>pulse.portfolioTickers.has(row.secid.toUpperCase())).sort((a,b)=>b.turnoverRub-a.turnoverRub),[data,pulse.portfolioTickers]);
  return <section className="v3-market-intelligence" aria-label="Рыночная аналитика" data-market-mode={mode}>
   <header><div><span>РЫНОЧНАЯ АНАЛИТИКА // РАБОЧАЯ ОБЛАСТЬ</span><h3>Рынок и портфель</h3><p>Публичный TQBR-срез, техническая история текущих позиций и пересечение с портфелем — в одном режиме только чтения.</p></div><strong>MOEX</strong></header>
   <nav className="v3-market-intelligence__nav" aria-label="Раздел рыночной аналитики" role="tablist">{MODES.map(([id,label,note])=><button type="button" key={id} role="tab" aria-selected={mode===id} className={mode===id?"is-active":""} aria-pressed={mode===id} onClick={()=>selectMode(id)}><strong>{label}</strong><small>{note}</small></button>)}</nav>
-  <div className="v3-market-intelligence__stage">
+  <div ref={stageRef} className="v3-market-intelligence__stage" data-scroll-owner="market-workspace">
    <section className="v3-market-mode" role="tabpanel" aria-label="Пульс рынка" hidden={mode!=="pulse"} aria-hidden={mode!=="pulse"}>
     <div className="v3-market-pulse">
      {loading?<div className="v3-market-pulse__gate is-loading"><span>ПОДТВЕРЖДАЕМ РЫНОЧНЫЙ СРЕЗ</span><strong>Получаем публичные строки MOEX TQBR{attempt?" повторно":""}</strong><div><article><b>TQBR</b><small>источник рынка</small></article><article><b>{positions.length}</b><small>позиций для сопоставления</small></article></div><small>До ответа источника QVANIX не показывает рыночные движения как подтверждённые.</small></div>:!data?.available?<div className="v3-market-pulse__gate"><strong>Рыночный срез сейчас не подтверждён источником.</strong><small>{data?.reason??"Источник не подтвердил рыночные строки"}{attempt<MARKET_RETRY_DELAYS.length?" — пробуем ещё раз автоматически.":"."}</small><button type="button" aria-label="Обновить рыночный срез" onClick={manualRetry}>Повторить сейчас</button></div>:<>
