@@ -1257,3 +1257,12 @@
  .sb[data-density="full"] .sb-chart .v3-history-chart{height:158px!important;min-height:158px!important}
  .sb[data-density="full"] .sb-asset{padding:11px 0}
 }
+
+/* v216 — actionable analytical rows and stable contextual navigation */
+.sb-market-table .sb-market-row{width:100%;border:0;border-bottom:1px solid var(--s-line);background:transparent;color:inherit;font:inherit;text-align:inherit;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:10px 0;cursor:pointer}
+.sb-market-table .sb-market-row:last-child{border-bottom:0}
+.sb-market-table .sb-market-row:hover{background:rgba(15,23,42,.025)}
+.sb-market-table .sb-market-row:focus-visible,.sb-asset:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.sb-market-table .sb-market-row>strong,.sb-market-table .sb-market-row>em{white-space:nowrap}
+.sb-market-table .sb-market-row>em{font-style:normal;font-weight:700}
+@media(max-width:520px){.sb-market-table .sb-market-row{grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:9px 0}.sb-market-table .sb-market-row>strong{display:none}}
