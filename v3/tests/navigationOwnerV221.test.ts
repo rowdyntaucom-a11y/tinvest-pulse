@@ -1,0 +1,10 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const nav=readFileSync(new URL("../src/core/CoreNavigationMemory.tsx",import.meta.url),"utf8");
+const market=readFileSync(new URL("../src/core/CoreMarketCommandCenterV116.tsx",import.meta.url),"utf8");
+assert.doesNotMatch(nav,/ACTIVE_KEY|readCoreActiveSection|writeCoreActiveSection|navButtonFor|button\.click\(\)|sessionStorage/);
+assert.match(nav,/shouldShowCoreScrollTop/);
+assert.match(nav,/sb-scroll-top-v91/);
+assert.match(market,/const anchor=window\.scrollY/);
+assert.match(market,/Math\.abs\(window\.scrollY-anchor\)>1/);
+assert.match(market,/window\.scrollTo\(\{top:anchor,behavior:"auto"\}\)/);
+console.log("navigation owner v221 regression: ok");
