@@ -7,6 +7,7 @@ import{shouldApplyRefresh,V3_REFRESH_INTERVAL_MS,V3_FOCUS_REFRESH_MIN_AGE_MS}fro
 import{loadPortfolioHistory,type PortfolioSnapshot}from"../../../v2/src/lib/portfolioApi";
 import{loadPayoutCalendar}from"../../../v2/src/lib/payoutsApi";
 import{loadMarketScreener}from"../analysis/marketScreenerApi";
+import{parseTrustedSnapshotCache}from"../data/trustedSnapshotCache";
 
 const CACHE_KEY="qvanix-core-trusted-snapshot-v2";
 const CACHE_MAX_AGE_MS=24*60*60_000;
@@ -14,12 +15,8 @@ const RETRY_DELAYS=[2000,5000,10000,20000,30000,60000] as const;
 // Previous cold-start profile: 3000 / 7000 / 15000 / 30000 / 60000 ms; v67 begins recovery sooner.
 
 const readCache=():PortfolioSnapshot|null=>{
- try{
-  const raw=localStorage.getItem(CACHE_KEY);
-  if(!raw)return null;
-  const x=JSON.parse(raw) as {savedAt:number;snapshot:PortfolioSnapshot};
-  return Date.now()-x.savedAt<=CACHE_MAX_AGE_MS?x.snapshot:null;
- }catch{return null}
+ try{return parseTrustedSnapshotCache(localStorage.getItem(CACHE_KEY),Date.now(),CACHE_MAX_AGE_MS)}
+ catch{return null}
 };
 const writeCache=(snapshot:PortfolioSnapshot)=>{
  try{localStorage.setItem(CACHE_KEY,JSON.stringify({savedAt:Date.now(),snapshot}))}catch{}
@@ -41,6 +38,7 @@ function friendlyLoadError(error:unknown){
 
 export function CoreRoot(){
  const cached=useRef<PortfolioSnapshot|null>(readCache());
+ const published=useRef<PortfolioSnapshot>(cached.current??EMPTY);
  const[snapshot,setSnapshot]=useState<PortfolioSnapshot>(cached.current??EMPTY);
  const[trusted,setTrusted]=useState(Boolean(cached.current));
  const[state,setState]=useState<V3LoadState>(cached.current?"stale":"loading");
@@ -73,12 +71,25 @@ export function CoreRoot(){
    const next=toV3LoadState(result.trust),ok=isV3VerifiedLive(result.trust);
    setState(next);
    if(ok){
-    let nextSnapshot=result.snapshot;
-    if(nextSnapshot.history.length<2){const recovered=await loadPortfolioHistory();if(recovered.length>=2)nextSnapshot={...nextSnapshot,history:recovered}}
+    // Publish verified broker data before optional history enrichment.
+    const nextSnapshot=result.snapshot;
+    published.current=nextSnapshot;
     setSnapshot(nextSnapshot);
     cached.current=nextSnapshot;
     writeCache(nextSnapshot);
     setTrusted(true);
+    if(nextSnapshot.history.length<2){
+     void loadPortfolioHistory().then(recovered=>{
+      if(!shouldApplyRefresh(id,req.current,active.current)||published.current!==nextSnapshot||recovered.length<2)return;
+      const enriched={...nextSnapshot,history:recovered};
+      published.current=enriched;
+      cached.current=enriched;
+      writeCache(enriched);
+      setSnapshot(enriched);
+     }).catch(()=>{
+      // An unavailable history endpoint must not downgrade a verified portfolio.
+     });
+    }
     if(nextSnapshot.source==="portfolio"){
      const recovery=nextSnapshot.recoveryContext;
      const recoveredParts=[recovery?.account?"счёт":null,recovery?.operations&&recovery?.passiveIncomeComplete?"выплаты":null].filter(Boolean);
