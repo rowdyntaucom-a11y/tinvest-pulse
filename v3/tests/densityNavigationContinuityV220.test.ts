@@ -1,0 +1,14 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const compact=readFileSync(new URL("../src/core/CoreCompactCockpit.tsx",import.meta.url),"utf8");
+assert.match(core,/densityScroll=useRef<Record<string,number>>/);
+assert.match(core,/setDensity=\(next:"brief"\|"compact"\|"full"\)/);
+assert.match(core,/if\(next===density\.mode\)return/);
+assert.match(core,/densityScroll\.current\[density\.mode\+"\:"+tab\+"\:"+hub\]=window\.scrollY/);
+assert.match(core,/scrollToStable\(densityScroll\.current\[key\]\?\?readCoreScroll\(tab\)\)/);
+assert.match(core,/onClick=\{\(\)=>setDensity\(id\)\}/);
+assert.match(core,/setDensity\("full"\)/);
+assert.doesNotMatch(compact,/>FULL →</);
+assert.match(compact,/>ПОДРОБНО →</);
+assert.match(compact,/aria-label=\{"Компактный режим · "\+areaLabel\}/);
+console.log("density navigation continuity v220 regression: ok");
