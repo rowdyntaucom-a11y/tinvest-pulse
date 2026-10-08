@@ -1,0 +1,17 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const model=readFileSync(new URL("../src/core/coreWorkspaceStateV213.ts",import.meta.url),"utf8");
+const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+assert.match(model,/qvanix-core-workspace-state-v213/);
+assert.match(model,/portfolioMode:new Set\(\["assets","structure","compare","map","depth"\]\)/);
+assert.match(model,/hub:new Set\(\["analytics","market","tools"\]\)/);
+assert.match(model,/resultWindow:new Set\(\["7d","30d","90d","180d","ytd","365d","5y","all"\]\)/);
+assert.match(model,/catch\{return CORE_WORKSPACE_DEFAULTS\}/);
+assert.match(core,/readCoreWorkspaceState\(\)/);
+assert.match(core,/restored\.portfolioMode/);
+assert.match(core,/restored\.incomeMode/);
+assert.match(core,/restored\.hub/);
+assert.match(core,/restored\.analyticsMode/);
+assert.match(core,/restored\.resultWindow/);
+assert.match(core,/restored\.resultChartMode/);
+assert.match(core,/writeCoreWorkspaceState\(\{portfolioMode,incomeMode,hub,analyticsMode,resultWindow,resultChartMode\}\)/);
+console.log("workspace state continuity v213 regression: ok");
