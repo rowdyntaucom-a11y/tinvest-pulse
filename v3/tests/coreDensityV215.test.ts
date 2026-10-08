@@ -1,0 +1,17 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const hook=readFileSync(new URL("../src/core/useCoreDensity.ts",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.match(hook,/CoreDensityMode="brief"\|"compact"\|"full"/);
+assert.match(hook,/qvanix\.core\.density\.v215/);
+assert.match(hook,/return"compact"/);
+assert.match(core,/data-density=\{density\.mode\}/);
+assert.match(core,/\["brief","Кратко"\]/);
+assert.match(core,/\["compact","Компакт"\]/);
+assert.match(core,/\["full","Полный"\]/);
+assert.match(core,/aria-pressed=\{density\.mode===id\}/);
+assert.match(css,/data-density="brief"/);
+assert.match(css,/data-density="compact"/);
+assert.match(css,/data-density="full"/);
+assert.match(css,/sb-density-secondary\{display:none!important\}/);
+console.log("core density v215 regression: ok");
