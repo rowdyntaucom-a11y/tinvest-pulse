@@ -1,0 +1,11 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const core=readFileSync(new URL("../src/core/SnowballCore.tsx",import.meta.url),"utf8");
+const css=readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
+assert.match(core,/import\{CoreCompactCockpit\}from"\.\/CoreCompactCockpit"/);
+assert.match(core,/density\.mode==="compact"&&!asset/);
+assert.match(core,/<CoreCompactCockpit area=\{compactArea\}/);
+assert.match(core,/density\.setMode\("full"\);resetViewport\(\)/);
+assert.match(core,/compactArea=tab==="home"\?"overview"/);
+assert.match(css,/\.sb-compact-stage/);
+assert.match(css,/Compact is a real workspace/);
+console.log("true density modes v218 regression: ok");
