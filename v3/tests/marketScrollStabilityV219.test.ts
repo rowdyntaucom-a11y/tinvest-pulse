@@ -1,0 +1,10 @@
+import assert from"node:assert/strict";import{readFileSync}from"node:fs";
+const source=readFileSync(new URL("../src/analysis/V3MarketIntelligenceWorkspace.tsx",import.meta.url),"utf8");
+assert.doesNotMatch(source,/scrollIntoView\(/,"market mode switching must not own page navigation");
+assert.match(source,/const beforeY=window\.scrollY/);
+assert.match(source,/Math\.abs\(window\.scrollY-beforeY\)>2/);
+assert.match(source,/window\.scrollTo\(\{top:beforeY,behavior:"auto"\}\)/);
+assert.match(source,/if\(next===mode\)return/);
+assert.match(source,/data-scroll-owner="market-workspace"/);
+assert.match(source,/cancelAnimationFrame\(scrollFrame\.current\)/);
+console.log("market scroll stability v219 regression: ok");
