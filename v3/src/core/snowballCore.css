@@ -1266,3 +1266,15 @@
 .sb-market-table .sb-market-row>strong,.sb-market-table .sb-market-row>em{white-space:nowrap}
 .sb-market-table .sb-market-row>em{font-style:normal;font-weight:700}
 @media(max-width:520px){.sb-market-table .sb-market-row{grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:9px 0}.sb-market-table .sb-market-row>strong{display:none}}
+
+/* v217 — analytical surfaces behave like navigation, not static decoration */
+.sb-pulse-kpis .sb-pulse-kpi-action{border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:0;min-width:0;cursor:pointer}
+.sb-pulse-kpis .sb-pulse-kpi-action:disabled{cursor:default}
+.sb-pulse-kpis .sb-pulse-kpi-action:not(:disabled):hover strong,.sb-pulse-kpis .sb-pulse-kpi-action:not(:disabled):focus-visible strong{text-decoration:underline;text-underline-offset:3px}
+.sb-pulse-kpis .sb-pulse-kpi-action:focus-visible,.sb-analytic-list .sb-analytic-row:focus-visible{outline:2px solid currentColor;outline-offset:4px;border-radius:10px}
+.sb-analytic-list .sb-analytic-row{width:100%;border:0;border-bottom:1px solid var(--s-line);background:transparent;color:inherit;font:inherit;text-align:left;display:grid;grid-template-columns:minmax(90px,.7fr) minmax(100px,1fr) auto;align-items:center;gap:10px;padding:9px 0;cursor:pointer}
+.sb-analytic-list .sb-analytic-row:last-child{border-bottom:0}
+.sb-analytic-list .sb-analytic-row:hover{background:rgba(15,23,42,.025)}
+.sb-analytic-list .sb-analytic-row>i{display:block;min-width:80px}
+.sb-analytic-list .sb-analytic-row>strong{white-space:nowrap;text-align:right}
+@media(max-width:520px){.sb-analytic-list .sb-analytic-row{grid-template-columns:minmax(82px,.8fr) minmax(72px,1fr) auto;gap:7px;padding:8px 0}}
