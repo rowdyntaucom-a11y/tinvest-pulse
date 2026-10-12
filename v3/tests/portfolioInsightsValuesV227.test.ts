@@ -10,3 +10,6 @@ test("identical duplicate history observations are deduplicated without losing p
 
 test("impossible calendar dates never enter portfolio or IMOEX history",()=>{const rows=buildPortfolioInsights([],[point("2026-02-30",120,120),point("2026-01-01",100,100),point("2026-02-01",110,105)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Рост IMOEX")!-5)<1e-8)});
 test("a single IMOEX observation cannot imply benchmark growth",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,100)],true);assert.equal(by(rows,"Рост IMOEX"),null);assert.equal(by(rows,"Просадка IMOEX"),null)});
+
+test("rebased index 1.0 to 1.15 computes returns even without crossing 2",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",1,100),point("2026-01-02",1.1,105),point("2026-01-03",1.15,108)],true);assert.ok(Math.abs(by(rows,"Рост индекса портфеля")!-15)<1e-8);assert.ok(Math.abs(by(rows,"Рост портфеля за период IMOEX")!-15)<1e-8);assert.ok(Math.abs(by(rows,"Разница доходностей")!-7)<1e-8)});
+test("small legacy decimal returns still cannot masquerade as a wealth index",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",0.15,100),point("2026-01-02",0.18,105)],true);assert.equal(by(rows,"Рост индекса портфеля"),null);assert.equal(by(rows,"Разница доходностей"),null)});

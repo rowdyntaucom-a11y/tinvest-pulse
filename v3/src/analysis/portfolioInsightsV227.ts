@@ -11,7 +11,7 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  const validPositions=positions.filter(p=>Number.isFinite(p.currentValue)&&p.currentValue>=0&&Number.isFinite(p.expectedYield)&&Number.isFinite(p.costBasis)&&p.costBasis>=0);
  positions=validPositions;
  const values=positions.map(p=>p.currentValue),total=sum(values),sorted=[...positions].sort((a,b)=>b.currentValue-a.currentValue);
- const isIndexSeries=(xs:HistoryPoint[])=>xs.length>1&&xs.every(x=>x.portfolio!=null&&Number.isFinite(x.portfolio)&&x.portfolio>0)&&xs.some(x=>x.portfolio!>=2);
+ const isIndexSeries=(xs:HistoryPoint[])=>xs.length>1&&xs.every(x=>x.portfolio!=null&&Number.isFinite(x.portfolio)&&x.portfolio>0)&&(xs.some(x=>x.portfolio!>=2)||(xs[0].portfolio!>=0.95&&xs[0].portfolio!<=1.05));
  const validDate=(date:string)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return false;const timestamp=Date.parse(date);return Number.isFinite(timestamp)&&new Date(timestamp).toISOString().slice(0,10)===date};
  const uniqueByDate=(xs:HistoryPoint[])=>{const dates=new Map<string,HistoryPoint>();const conflicts=new Set<string>();for(const x of xs){if(!validDate(x.date))continue;const old=dates.get(x.date);if(old&&(old.portfolio!==x.portfolio||old.imoex!==x.imoex))conflicts.add(x.date);else if(!old)dates.set(x.date,x)}return [...dates.values()].filter(x=>!conflicts.has(x.date)).sort((a,b)=>a.date.localeCompare(b.date))};
  const valid=uniqueByDate(history.filter(p=>p.portfolio!=null&&Number.isFinite(p.portfolio)&&p.portfolio>0));
