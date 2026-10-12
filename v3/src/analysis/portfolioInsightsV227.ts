@@ -12,9 +12,9 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  positions=validPositions;
  const values=positions.map(p=>p.currentValue),total=sum(values),sorted=[...positions].sort((a,b)=>b.currentValue-a.currentValue);
  const valid=history.filter(p=>p.portfolio!=null&&Number.isFinite(p.portfolio)&&p.portfolio>0).sort((a,b)=>a.date.localeCompare(b.date));
- const returns=valid.slice(1).map((p,i)=>p.portfolio!/valid[i].portfolio!-1);
+ const returns=valid.slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(valid[i].date))/86400000;return days>0&&days<=7?[p.portfolio!/valid[i].portfolio!-1]:[]});
  const paired=history.filter(p=>p.portfolio!=null&&p.imoex!=null&&p.portfolio>0&&p.imoex>0&&Number.isFinite(p.portfolio)&&Number.isFinite(p.imoex)).sort((a,b)=>a.date.localeCompare(b.date));
- const pairedReturns=paired.slice(1).map((p,i)=>({port:p.portfolio!/paired[i].portfolio!-1,index:p.imoex!/paired[i].imoex!-1}));
+ const pairedReturns=paired.slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(paired[i].date))/86400000;return days>0&&days<=7?[{port:p.portfolio!/paired[i].portfolio!-1,index:p.imoex!/paired[i].imoex!-1}]:[]});
  return [
  {group:"Портфель",label:"Число позиций",unit:"count",value:finite(positions.length)}, // 1
  {group:"Портфель",label:"Стоимость позиций",unit:"rub",value:finite(sum(values))}, // 2
