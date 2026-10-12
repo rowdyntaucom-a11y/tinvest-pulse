@@ -10,3 +10,5 @@ test("starred analytics persist locally and filter without losing current search
 test("analytics supports per-session baseline comparisons with account isolation",()=>{assert.match(ui,/const saveBaseline=/);assert.match(ui,/baseline\?\.account===/);assert.match(ui,/Сравнить с фиксацией/);assert.match(ui,/item\.value-baseline\.metrics\[item\.label\]/)});
 
 test("comparison CSV receives only the active matching-account baseline",()=>{assert.match(ui,/comparable&&baseline\?baseline:undefined/);assert.match(ui,/Скачать сравнение CSV/)});
+
+test("baseline comparison filters only changed valid metrics",()=>{assert.match(ui,/changedOnly\|\|!comparable/);assert.match(ui,/x\.value!==baseline\.metrics\[x\.label\]/);assert.match(ui,/Только изменившиеся/)});
