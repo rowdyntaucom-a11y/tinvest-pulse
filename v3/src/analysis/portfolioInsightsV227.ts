@@ -12,13 +12,13 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  positions=validPositions;
  const values=positions.map(p=>p.currentValue),total=sum(values),sorted=[...positions].sort((a,b)=>b.currentValue-a.currentValue);
  const isIndexSeries=(xs:HistoryPoint[])=>xs.length>1&&xs.every(x=>x.portfolio!=null&&Number.isFinite(x.portfolio)&&x.portfolio>0)&&xs.some(x=>x.portfolio!>=2);
- const validDate=(date:string)=>/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date));
+ const validDate=(date:string)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return false;const timestamp=Date.parse(date);return Number.isFinite(timestamp)&&new Date(timestamp).toISOString().slice(0,10)===date};
  const uniqueByDate=(xs:HistoryPoint[])=>{const dates=new Map<string,HistoryPoint>();const conflicts=new Set<string>();for(const x of xs){if(!validDate(x.date))continue;const old=dates.get(x.date);if(old&&(old.portfolio!==x.portfolio||old.imoex!==x.imoex))conflicts.add(x.date);else if(!old)dates.set(x.date,x)}return [...dates.values()].filter(x=>!conflicts.has(x.date)).sort((a,b)=>a.date.localeCompare(b.date))};
  const valid=uniqueByDate(history.filter(p=>p.portfolio!=null&&Number.isFinite(p.portfolio)&&p.portfolio>0));
  const validIndex=isIndexSeries(valid);
  const returns=(validIndex?valid:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(valid[i].date))/86400000;return days>0&&days<=7?[p.portfolio!/valid[i].portfolio!-1]:[]});
  const paired=uniqueByDate(history.filter(p=>p.portfolio!=null&&p.imoex!=null&&p.portfolio>0&&p.imoex>0&&Number.isFinite(p.portfolio)&&Number.isFinite(p.imoex)));
- const pairedIndex=isIndexSeries(paired);
+ const pairedIndex=isIndexSeries(paired);const benchmarkReliable=paired.length>1&&paired.every(x=>x.imoex!=null&&Number.isFinite(x.imoex)&&x.imoex>0);
  const pairedReturns=(pairedIndex?paired:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(paired[i].date))/86400000;return days>0&&days<=7?[{port:p.portfolio!/paired[i].portfolio!-1,index:p.imoex!/paired[i].imoex!-1}]:[]});
  return [
  {group:"Портфель",label:"Число позиций",unit:"count",value:finite(positions.length)}, // 1
@@ -62,10 +62,10 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  {group:"История",label:"Лучший интервал",unit:"pct",value:finite(returns.length?returns.reduce((max,n)=>Math.max(max,n),-Infinity)*100:null)}, // 39
  {group:"История",label:"Худший интервал",unit:"pct",value:finite(returns.length?returns.reduce((min,n)=>Math.min(min,n),Infinity)*100:null)}, // 40
  {group:"IMOEX",label:"Совместных точек",unit:"count",value:finite(paired.length)}, // 41
- {group:"IMOEX",label:"Рост IMOEX",unit:"pct",value:finite(growth(paired.map(p=>p.imoex!)))}, // 42
+ {group:"IMOEX",label:"Рост IMOEX",unit:"pct",value:finite(benchmarkReliable?growth(paired.map(p=>p.imoex!)):null)}, // 42
  {group:"IMOEX",label:"Рост портфеля за период IMOEX",unit:"pct",value:finite(growth((pairedIndex?paired:[]).map(p=>p.portfolio!)))}, // 43
  {group:"IMOEX",label:"Разница доходностей",unit:"pct",value:finite(pairedIndex&&paired.length>1&&growth(paired.map(p=>p.imoex!))!=null&&growth(paired.map(p=>p.portfolio!))!=null?growth(paired.map(p=>p.portfolio!))!-growth(paired.map(p=>p.imoex!))!:null)}, // 44
- {group:"IMOEX",label:"Просадка IMOEX",unit:"pct",value:finite(drawdown(paired.map(p=>p.imoex!)))}, // 45
+ {group:"IMOEX",label:"Просадка IMOEX",unit:"pct",value:finite(benchmarkReliable?drawdown(paired.map(p=>p.imoex!)):null)}, // 45
  {group:"IMOEX",label:"Просадка портфеля на общем периоде",unit:"pct",value:finite(drawdown((pairedIndex?paired:[]).map(p=>p.portfolio!)))}, // 46
  {group:"IMOEX",label:"Портфель опередил IMOEX",unit:"count",value:finite(pairedReturns.length?pairedReturns.filter(x=>x.port>x.index).length:null)}, // 47
  {group:"IMOEX",label:"IMOEX опередил портфель",unit:"count",value:finite(pairedReturns.length?pairedReturns.filter(x=>x.port<x.index).length:null)}, // 48
