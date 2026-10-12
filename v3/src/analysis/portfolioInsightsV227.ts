@@ -11,10 +11,13 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  const validPositions=positions.filter(p=>Number.isFinite(p.currentValue)&&p.currentValue>=0&&Number.isFinite(p.expectedYield)&&Number.isFinite(p.costBasis));
  positions=validPositions;
  const values=positions.map(p=>p.currentValue),total=sum(values),sorted=[...positions].sort((a,b)=>b.currentValue-a.currentValue);
+ const isIndexSeries=(xs:HistoryPoint[])=>xs.length>1&&xs.every(x=>x.portfolio!=null&&Number.isFinite(x.portfolio)&&x.portfolio>0)&&xs.some(x=>x.portfolio!>=2);
  const valid=history.filter(p=>p.portfolio!=null&&Number.isFinite(p.portfolio)&&p.portfolio>0).sort((a,b)=>a.date.localeCompare(b.date));
- const returns=valid.slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(valid[i].date))/86400000;return days>0&&days<=7?[p.portfolio!/valid[i].portfolio!-1]:[]});
+ const validIndex=isIndexSeries(valid);
+ const returns=(validIndex?valid:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(valid[i].date))/86400000;return days>0&&days<=7?[p.portfolio!/valid[i].portfolio!-1]:[]});
  const paired=history.filter(p=>p.portfolio!=null&&p.imoex!=null&&p.portfolio>0&&p.imoex>0&&Number.isFinite(p.portfolio)&&Number.isFinite(p.imoex)).sort((a,b)=>a.date.localeCompare(b.date));
- const pairedReturns=paired.slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(paired[i].date))/86400000;return days>0&&days<=7?[{port:p.portfolio!/paired[i].portfolio!-1,index:p.imoex!/paired[i].imoex!-1}]:[]});
+ const pairedIndex=isIndexSeries(paired);
+ const pairedReturns=(pairedIndex?paired:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(paired[i].date))/86400000;return days>0&&days<=7?[{port:p.portfolio!/paired[i].portfolio!-1,index:p.imoex!/paired[i].imoex!-1}]:[]});
  return [
  {group:"Портфель",label:"Число позиций",unit:"count",value:finite(positions.length)}, // 1
  {group:"Портфель",label:"Стоимость позиций",unit:"rub",value:finite(sum(values))}, // 2
@@ -49,8 +52,8 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  {group:"История",label:"Точек истории",unit:"count",value:finite(valid.length)}, // 31
  {group:"История",label:"Первое значение индекса",unit:"number",value:finite(valid[0]?.portfolio??null)}, // 32
  {group:"История",label:"Последнее значение индекса",unit:"number",value:finite(valid.at(-1)?.portfolio??null)}, // 33
- {group:"История",label:"Рост индекса портфеля",unit:"pct",value:finite(growth(valid.map(p=>p.portfolio!)))}, // 34
- {group:"История",label:"Максимальная просадка",unit:"pct",value:finite(drawdown(valid.map(p=>p.portfolio!)))}, // 35
+ {group:"История",label:"Рост индекса портфеля",unit:"pct",value:finite(growth((validIndex?valid:[]).map(p=>p.portfolio!)))}, // 34
+ {group:"История",label:"Максимальная просадка",unit:"pct",value:finite(drawdown((validIndex?valid:[]).map(p=>p.portfolio!)))}, // 35
  {group:"История",label:"Положительных интервалов",unit:"count",value:finite(returns.length?returns.filter(v=>v>0).length:null)}, // 36
  {group:"История",label:"Отрицательных интервалов",unit:"count",value:finite(returns.length?returns.filter(v=>v<0).length:null)}, // 37
  {group:"История",label:"Доля положительных интервалов",unit:"pct",value:finite(ratio(returns.filter(v=>v>0).length,returns.length))}, // 38
@@ -58,10 +61,10 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  {group:"История",label:"Худший интервал",unit:"pct",value:finite(returns.length?Math.min(...returns)*100:null)}, // 40
  {group:"IMOEX",label:"Совместных точек",unit:"count",value:finite(paired.length)}, // 41
  {group:"IMOEX",label:"Рост IMOEX",unit:"pct",value:finite(growth(paired.map(p=>p.imoex!)))}, // 42
- {group:"IMOEX",label:"Рост портфеля за период IMOEX",unit:"pct",value:finite(growth(paired.map(p=>p.portfolio!)))}, // 43
- {group:"IMOEX",label:"Разница доходностей",unit:"pct",value:finite(paired.length>1&&growth(paired.map(p=>p.imoex!))!=null&&growth(paired.map(p=>p.portfolio!))!=null?growth(paired.map(p=>p.portfolio!))!-growth(paired.map(p=>p.imoex!))!:null)}, // 44
+ {group:"IMOEX",label:"Рост портфеля за период IMOEX",unit:"pct",value:finite(growth((pairedIndex?paired:[]).map(p=>p.portfolio!)))}, // 43
+ {group:"IMOEX",label:"Разница доходностей",unit:"pct",value:finite(pairedIndex&&paired.length>1&&growth(paired.map(p=>p.imoex!))!=null&&growth(paired.map(p=>p.portfolio!))!=null?growth(paired.map(p=>p.portfolio!))!-growth(paired.map(p=>p.imoex!))!:null)}, // 44
  {group:"IMOEX",label:"Просадка IMOEX",unit:"pct",value:finite(drawdown(paired.map(p=>p.imoex!)))}, // 45
- {group:"IMOEX",label:"Просадка портфеля на общем периоде",unit:"pct",value:finite(drawdown(paired.map(p=>p.portfolio!)))}, // 46
+ {group:"IMOEX",label:"Просадка портфеля на общем периоде",unit:"pct",value:finite(drawdown((pairedIndex?paired:[]).map(p=>p.portfolio!)))}, // 46
  {group:"IMOEX",label:"Портфель опередил IMOEX",unit:"count",value:finite(pairedReturns.length?pairedReturns.filter(x=>x.port>x.index).length:null)}, // 47
  {group:"IMOEX",label:"IMOEX опередил портфель",unit:"count",value:finite(pairedReturns.length?pairedReturns.filter(x=>x.port<x.index).length:null)}, // 48
  {group:"IMOEX",label:"Доля интервалов с опережением",unit:"pct",value:finite(ratio(pairedReturns.filter(x=>x.port>x.index).length,pairedReturns.length))}, // 49
