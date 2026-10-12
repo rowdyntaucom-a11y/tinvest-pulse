@@ -2,3 +2,5 @@ import test from"node:test";import assert from"node:assert/strict";import{readFi
 test("compact overview and performance share validated risk and benchmark calculations",()=>{assert.match(ui,/function calcRisk\(history:HistoryPoint\[\]\)\{return buildPortfolioInsights\(\[\],history,true\)/);assert.match(ui,/alpha=home\.isTrusted\?insights\.find\(x=>x\.label==="Разница доходностей"\)/);assert.doesNotMatch(ui,/bench\.at\(-1\)/)});
 
 test("analytics explorer has live text search, group selection and accessible count",()=>{assert.match(ui,/type="search" aria-label="Поиск показателя"/);assert.match(ui,/aria-label="Группа показателей"/);assert.match(ui,/filteredInsights=useMemo/);assert.match(ui,/Найдено: \{filteredInsights.length\} из \{insights.length\}/)});
+
+test("analytics sorting offers name and numerical order with missing values last",()=>{assert.match(ui,/aria-label="Сортировка показателей"/);assert.match(ui,/value="highest"/);assert.match(ui,/value="lowest"/);assert.match(ui,/a\.value==null\?1:b\.value==null\?-1/);assert.match(ui,/insightSort==="name"/)});
