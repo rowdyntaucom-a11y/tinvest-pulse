@@ -10,3 +10,5 @@ test("identical duplicate history observations are deduplicated without losing p
 
 test("impossible calendar dates never enter portfolio or IMOEX history",()=>{const rows=buildPortfolioInsights([],[point("2026-02-30",120,120),point("2026-01-01",100,100),point("2026-02-01",110,105)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Рост IMOEX")!-5)<1e-8)});
 test("a single IMOEX observation cannot imply benchmark growth",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,100)],true);assert.equal(by(rows,"Рост IMOEX"),null);assert.equal(by(rows,"Просадка IMOEX"),null)});
+
+test("benchmark excludes dates invalidated by conflicting portfolio values",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,100),point("2026-01-01",120,null),point("2026-01-02",110,105),point("2026-01-03",115,108)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Рост IMOEX")!-(108/105-1)*100)<1e-8)});
