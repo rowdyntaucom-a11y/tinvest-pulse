@@ -41,3 +41,7 @@
 .qc-insight-star{position:absolute;left:7px;top:8px;min-width:26px;min-height:30px;border:0;background:transparent;color:inherit;font-size:22px;cursor:pointer}
 .qc-insight-star[aria-pressed=true]{color:#e8b84c}
 .qc-insight-toolbar button[aria-pressed=true]{font-weight:800;text-decoration:underline}
+
+.qc-baseline-status{grid-column:1/-1;opacity:.8;font-size:12px}
+.qc-insight-delta{font-variant-numeric:tabular-nums;font-size:12px;opacity:.9}
+.qc-insight-toolbar button:disabled{opacity:.45;cursor:not-allowed}
