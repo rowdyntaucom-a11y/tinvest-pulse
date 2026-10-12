@@ -18,6 +18,7 @@ const compact=new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionD
 const pct=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const MARKET_RETRY_DELAYS=[2500,6000] as const;
 const MODE_KEY="qvanix-market-workspace-v98";
+export const QVANIX_MARKET_NAVIGATE="qvanix:market:navigate";
 type Mode="pulse"|"screener"|"discovery";
 const MODES:Array<[Mode,string,string]>= [["pulse","Пульс","рынок · портфель"],["screener","Скринер","фильтры · ликвидность"],["discovery","История","просадки · SMA"]];
 function readMode():Mode{try{const value=sessionStorage.getItem(MODE_KEY);return value==="screener"||value==="discovery"?value:"pulse"}catch{return"pulse"}}
@@ -45,6 +46,7 @@ export function V3MarketIntelligenceWorkspace({positions}:{positions:PositionSna
  },[attempt]);
  const selectMode=(next:Mode)=>{if(next===mode)return;const beforeY=window.scrollY;setMode(next);writeMode(next);setVisited(prev=>{if(prev.has(next))return prev;const copy=new Set(prev);copy.add(next);return copy});if(scrollFrame.current!=null)window.cancelAnimationFrame(scrollFrame.current);scrollFrame.current=window.requestAnimationFrame(()=>{scrollFrame.current=window.requestAnimationFrame(()=>{scrollFrame.current=null;if(Math.abs(window.scrollY-beforeY)>2)window.scrollTo({top:beforeY,behavior:"auto"})})})};
  useEffect(()=>()=>{if(scrollFrame.current!=null)window.cancelAnimationFrame(scrollFrame.current)},[]);
+ useEffect(()=>{const onNavigate=(event:Event)=>{const requested=(event as CustomEvent<{mode?:string}>).detail?.mode;if(requested==="pulse"||requested==="screener"||requested==="discovery")selectMode(requested)};window.addEventListener(QVANIX_MARKET_NAVIGATE,onNavigate);return()=>window.removeEventListener(QVANIX_MARKET_NAVIGATE,onNavigate)},[mode]);
  const manualRetry=()=>setAttempt(value=>Math.max(value+1,MARKET_RETRY_DELAYS.length+1));
  const pulse=useMemo(()=>buildMarketPulse(data?.rows??[],positions),[data,positions]);
  const portfolioRows=useMemo(()=>(data?.rows??[]).filter(row=>pulse.portfolioTickers.has(row.secid.toUpperCase())).sort((a,b)=>b.turnoverRub-a.turnoverRub),[data,pulse.portfolioTickers]);
