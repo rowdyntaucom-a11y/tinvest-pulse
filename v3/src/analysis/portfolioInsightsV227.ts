@@ -12,7 +12,7 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  positions=validPositions;
  const values=positions.map(p=>p.currentValue),total=sum(values),sorted=[...positions].sort((a,b)=>b.currentValue-a.currentValue);
  const isIndexSeries=(xs:HistoryPoint[])=>xs.length>1&&xs.every(x=>x.portfolio!=null&&Number.isFinite(x.portfolio)&&x.portfolio>0)&&xs.some(x=>x.portfolio!>=2);
- const validDate=(date:string)=>/^\\d{4}-\\d{2}-\\d{2}$/.test(date)&&Number.isFinite(Date.parse(date));
+ const validDate=(date:string)=>/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date));
  const uniqueByDate=(xs:HistoryPoint[])=>{const seen=new Set<string>();return xs.filter(x=>{if(!validDate(x.date)||seen.has(x.date))return false;seen.add(x.date);return true}).sort((a,b)=>a.date.localeCompare(b.date))};
  const valid=uniqueByDate(history.filter(p=>p.portfolio!=null&&Number.isFinite(p.portfolio)&&p.portfolio>0));
  const validIndex=isIndexSeries(valid);
