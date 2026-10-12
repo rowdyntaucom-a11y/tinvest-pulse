@@ -59,3 +59,16 @@
 .qc-period-values strong{font-size:clamp(14px,2.2vw,20px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .qc-period-foot{display:grid;gap:3px;opacity:.85}.qc-period-foot small{font-size:11px}.qc-period-unavailable{margin:0;padding:12px 0}
 @media(max-width:460px){.qc-benchmark-periods{padding:9px}.qc-period-picker{gap:3px}.qc-period-picker button{font-size:11px}.qc-period-values{gap:4px}.qc-period-values>div{padding:8px 5px}.qc-period-values strong{font-size:14px}}
+
+/* v246: truth-preserving comparison chart, themed by current shell */
+.qc-verified-chart{margin:12px 0 4px;min-width:0;padding:12px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);border-radius:12px;background:color-mix(in srgb,currentColor 4%,transparent)}
+.qc-verified-chart figcaption{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:7px}.qc-verified-chart figcaption strong{font-size:14px}
+.qc-chart-legend{display:flex;gap:14px;font-size:12px}.qc-chart-legend>span:before{content:"";display:inline-block;vertical-align:middle;width:22px;margin-right:5px;border-top:3px solid currentColor}
+.qc-legend-imoex:before{border-top-style:dashed!important;opacity:.65}
+.qc-verified-chart svg{display:block;width:100%;height:auto;max-height:270px;overflow:visible}
+.qc-chart-axis{fill:currentColor;font-size:11px;opacity:.78}.qc-chart-base{stroke:currentColor;stroke-dasharray:2 4;opacity:.35}
+.qc-chart-portfolio{fill:none;stroke:currentColor;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.qc-chart-imoex{fill:none;stroke:currentColor;stroke-width:2.5;stroke-dasharray:6 5;stroke-linejoin:round;opacity:.66}
+.qc-chart-dot-p{fill:currentColor}.qc-chart-dot-i{fill:var(--qc-bg,#101720);stroke:currentColor;stroke-width:1.7}
+.qc-verified-chart small{display:block;font-size:11px;line-height:1.5;opacity:.8}
+@media(max-width:460px){.qc-verified-chart{padding:8px}.qc-chart-legend{gap:9px;font-size:11px}.qc-verified-chart figcaption strong{font-size:13px}}
