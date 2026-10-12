@@ -28,3 +28,7 @@
 .qc-insight-filters input,.qc-insight-filters select{width:100%;min-width:0;min-height:40px;padding:8px 10px;border:1px solid color-mix(in srgb,currentColor 30%,transparent);border-radius:8px;background:var(--qc-bg,#101720);color:inherit;font:inherit;font-size:14px}
 .qc-insight-filters small{grid-column:1/-1;font-size:12px;opacity:.8}
 @media(max-width:480px){.qc-insight-filters{grid-template-columns:1fr}.qc-insight-filters small{grid-column:1}}
+
+.qc-insight-toolbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qc-insight-toolbar button{padding:8px 12px;min-height:38px;border-radius:8px;cursor:pointer}
+.qc-insight-toolbar button:disabled{opacity:.45;cursor:not-allowed}
