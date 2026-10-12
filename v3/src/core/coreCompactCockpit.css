@@ -36,3 +36,8 @@
 .qc-insight-filters{grid-template-columns:repeat(3,minmax(0,1fr))}
 .qc-insight-toolbar{grid-column:1/-1}
 @media(max-width:600px){.qc-insight-filters{grid-template-columns:1fr}}
+
+.qc-insight{position:relative;padding-left:36px}
+.qc-insight-star{position:absolute;left:7px;top:8px;min-width:26px;min-height:30px;border:0;background:transparent;color:inherit;font-size:22px;cursor:pointer}
+.qc-insight-star[aria-pressed=true]{color:#e8b84c}
+.qc-insight-toolbar button[aria-pressed=true]{font-weight:800;text-decoration:underline}
