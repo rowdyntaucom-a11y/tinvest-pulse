@@ -17,7 +17,7 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  const valid=uniqueByDate(history.filter(p=>p.portfolio!=null&&Number.isFinite(p.portfolio)&&p.portfolio>0));
  const validIndex=isIndexSeries(valid);
  const returns=(validIndex?valid:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(valid[i].date))/86400000;return days>0&&days<=7?[p.portfolio!/valid[i].portfolio!-1]:[]});
- const paired=uniqueByDate(history.filter(p=>p.portfolio!=null&&p.imoex!=null&&p.portfolio>0&&p.imoex>0&&Number.isFinite(p.portfolio)&&Number.isFinite(p.imoex))).filter(p=>valid.some(v=>v.date===p.date));
+ const validDates=new Set(valid.map(p=>p.date));const paired=uniqueByDate(history.filter(p=>p.portfolio!=null&&p.imoex!=null&&p.portfolio>0&&p.imoex>0&&Number.isFinite(p.portfolio)&&Number.isFinite(p.imoex))).filter(p=>validDates.has(p.date));
  const pairedIndex=isIndexSeries(paired);
  const pairedReturns=(pairedIndex?paired:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(paired[i].date))/86400000;return days>0&&days<=7?[{port:p.portfolio!/paired[i].portfolio!-1,index:p.imoex!/paired[i].imoex!-1}]:[]});
  return [
