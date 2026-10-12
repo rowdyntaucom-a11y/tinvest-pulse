@@ -1,4 +1,5 @@
 import type{PortfolioSnapshot,HistoryPoint}from"../../../v2/src/lib/portfolioApi";
+import{strictHistoryDate,resolveValidatedHistory}from"../analysis/validatedHistoryV244.ts";
 
 export type V3HomePosition={
  ticker:string;
@@ -28,19 +29,35 @@ export type V3HomeViewModel={
  isTrusted:boolean;
 };
 
-function latestVerifiedTwr(history:HistoryPoint[]){
- const series=history.map(x=>x.portfolio).filter((x):x is number=>typeof x==="number"&&Number.isFinite(x));
- if(!series.length)return null;
- const latest=series[series.length-1];
- // Two historical contracts exist: legacy decimal TWR and the current rebased wealth index.
- // Decimal history is already a return. Index history is normalized to its first valid level.
- if(Math.abs(latest)<2&&series.every(x=>Math.abs(x)<2))return latest;
- if(series.length<2)return null;
- const base=series[0];
- if(base<=0||latest<=0)return null;
- const value=latest/base-1;
- // Historical reconstruction with missing prices must fail closed rather than publish an extreme result.
- return Number.isFinite(value)&&value>-0.99&&value<=5?value:null;
+/**
+ * A legacy decimal TWR observation is an already-computed cumulative return.
+ * A positive rebased wealth index must instead be divided by its initial level.
+ * Never treat a value near 1.0 as a 100% return.
+ */
+export function latestVerifiedTwr(history:HistoryPoint[]):number|null{
+ const observed=new Map<string,number>();
+ const conflicts=new Set<string>();
+ for(const item of history){
+  if(!strictHistoryDate(item.date)||typeof item.portfolio!=="number"||!Number.isFinite(item.portfolio))continue;
+  const existing=observed.get(item.date);
+  if(existing!==undefined&&existing!==item.portfolio)conflicts.add(item.date);
+  else if(existing===undefined)observed.set(item.date,item.portfolio);
+ }
+ const ordered=[...observed.entries()].sort(([a],[b])=>a.localeCompare(b));
+ if(ordered.length===0||conflicts.has(ordered.at(-1)![0]))return null;
+ const {points,isPortfolioIndex}=resolveValidatedHistory(history);
+ if(isPortfolioIndex){
+  if(points.length<2||points.at(-1)!.date!==ordered.at(-1)![0])return null;
+  const start=points[0].portfolio!,end=points.at(-1)!.portfolio!;
+  if(start<=0||end<=0)return null;
+  const result=end/start-1;
+  return Number.isFinite(result)&&result>-0.99&&result<=5?result:null;
+ }
+ // A single observation close to 1.0 is ambiguous: it could be a rebased index.
+ // Decimal returns require every valid observation to fall strictly below 95% in magnitude.
+ const decimals=ordered.filter(([date])=>!conflicts.has(date)).map(([,value])=>value);
+ if(decimals.length===0||decimals.some(v=>Math.abs(v)>=0.95))return null;
+ return decimals.at(-1)!;
 }
 
 export function buildV3HomeViewModel(snapshot:PortfolioSnapshot,isTrusted:boolean):V3HomeViewModel{
