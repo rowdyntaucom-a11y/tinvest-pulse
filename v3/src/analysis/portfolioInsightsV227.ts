@@ -1,4 +1,5 @@
 import type{HistoryPoint,PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
+import{resolveValidatedHistory}from"./validatedHistoryV244.ts";
 export type PortfolioInsight={group:string;label:string;unit:"rub"|"pct"|"count"|"number";value:number|null};
 const finite=(n:number|null|undefined):number|null=>typeof n==="number"&&Number.isFinite(n)?n:null;
 const sum=(v:number[])=>v.reduce((a,b)=>a+(Number.isFinite(b)?b:0),0);
@@ -11,24 +12,7 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  const validPositions=positions.filter(p=>Number.isFinite(p.currentValue)&&p.currentValue>=0&&Number.isFinite(p.expectedYield)&&Number.isFinite(p.costBasis)&&p.costBasis>=0);
  positions=validPositions;
  const values=positions.map(p=>p.currentValue),total=sum(values),sorted=[...positions].sort((a,b)=>b.currentValue-a.currentValue);
- const isIndexSeries=(xs:HistoryPoint[])=>xs.length>1&&xs.every(x=>x.portfolio!=null&&Number.isFinite(x.portfolio)&&x.portfolio>0)&&(xs.some(x=>x.portfolio!>=2)||(xs[0].portfolio!>=0.95&&xs[0].portfolio!<=1.05));
- const validDate=(date:string)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return false;const timestamp=Date.parse(date);return Number.isFinite(timestamp)&&new Date(timestamp).toISOString().slice(0,10)===date};
- // Resolve portfolio conflicts before matching IMOEX. A missing benchmark is not a disagreement.
- // A conflicting portfolio value invalidates the entire day; conflicting IMOEX invalidates only benchmark pairing.
- const byDate=new Map<string,{portfolio:number;imoex:number|null;portfolioConflict:boolean;benchmarkConflict:boolean}>();
- for(const observation of history){
-  if(!validDate(observation.date)||typeof observation.portfolio!=="number"||!Number.isFinite(observation.portfolio)||observation.portfolio<=0)continue;
-  const benchmark=typeof observation.imoex==="number"&&Number.isFinite(observation.imoex)&&observation.imoex>0?observation.imoex:null;
-  const previous=byDate.get(observation.date);
-  if(!previous){byDate.set(observation.date,{portfolio:observation.portfolio,imoex:benchmark,portfolioConflict:false,benchmarkConflict:false});continue}
-  if(previous.portfolio!==observation.portfolio)previous.portfolioConflict=true;
-  if(benchmark!==null){
-   if(previous.imoex!==null&&previous.imoex!==benchmark)previous.benchmarkConflict=true;
-   else if(previous.imoex===null)previous.imoex=benchmark;
-  }
- }
- const valid:HistoryPoint[]=[...byDate.entries()].filter(([,p])=>!p.portfolioConflict).sort(([a],[b])=>a.localeCompare(b)).map(([date,p])=>({date,portfolio:p.portfolio,imoex:p.benchmarkConflict?null:p.imoex,value:null,invested:null}));
- const validIndex=isIndexSeries(valid);
+ const {points:valid,isPortfolioIndex:validIndex}=resolveValidatedHistory(history);
  const returns=(validIndex?valid:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(valid[i].date))/86400000;return days>0&&days<=7?[p.portfolio!/valid[i].portfolio!-1]:[]});
  // Pair only canonical, validated observations. Subset detection must not reclassify rebased indices.
  const paired=valid.filter(p=>p.portfolio!=null&&p.imoex!=null&&p.portfolio>0&&p.imoex>0&&Number.isFinite(p.portfolio)&&Number.isFinite(p.imoex));
