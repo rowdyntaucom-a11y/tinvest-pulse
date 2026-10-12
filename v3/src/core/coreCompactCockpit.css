@@ -47,3 +47,15 @@
 .qc-insight-toolbar button:disabled{opacity:.45;cursor:not-allowed}
 
 .qc-insight-evidence{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:10px;background:color-mix(in srgb,currentColor 5%,transparent);min-width:0}.qc-insight-evidence strong{font-size:14px;font-variant-numeric:tabular-nums}.qc-insight-evidence span,.qc-insight-evidence details{font-size:12px;line-height:1.5;opacity:.88}.qc-insight-evidence summary{cursor:pointer;min-height:26px}.qc-insight-evidence ul{margin:6px 0 0;padding-left:18px}.qc-insight-evidence li+li{margin-top:5px}
+
+/* v244 — evidence-based performance periods; no decorative overlay above the workspace */
+.qc-benchmark-periods{display:grid;gap:10px;min-width:0;margin-top:12px;padding:12px;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:12px;background:color-mix(in srgb,currentColor 3%,transparent)}
+.qc-period-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.qc-period-picker button{min-height:42px;min-width:0;padding:5px 3px;border-radius:8px;border:1px solid color-mix(in srgb,currentColor 22%,transparent);background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}
+.qc-period-picker button[aria-pressed=true]{font-weight:800;border-color:currentColor;background:color-mix(in srgb,currentColor 13%,transparent)}
+.qc-period-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.qc-period-values>div{display:grid;gap:5px;min-width:0;padding:10px 6px;border-radius:8px;background:color-mix(in srgb,currentColor 5%,transparent)}
+.qc-period-values span,.qc-period-foot,.qc-period-unavailable{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.qc-period-values strong{font-size:clamp(14px,2.2vw,20px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.qc-period-foot{display:grid;gap:3px;opacity:.85}.qc-period-foot small{font-size:11px}.qc-period-unavailable{margin:0;padding:12px 0}
+@media(max-width:460px){.qc-benchmark-periods{padding:9px}.qc-period-picker{gap:3px}.qc-period-picker button{font-size:11px}.qc-period-values{gap:4px}.qc-period-values>div{padding:8px 5px}.qc-period-values strong{font-size:14px}}
