@@ -13,7 +13,7 @@ export function buildPortfolioInsights(positions:PositionSnapshot[],history:Hist
  const values=positions.map(p=>p.currentValue),total=sum(values),sorted=[...positions].sort((a,b)=>b.currentValue-a.currentValue);
  const isIndexSeries=(xs:HistoryPoint[])=>xs.length>1&&xs.every(x=>x.portfolio!=null&&Number.isFinite(x.portfolio)&&x.portfolio>0)&&xs.some(x=>x.portfolio!>=2);
  const validDate=(date:string)=>/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date));
- const uniqueByDate=(xs:HistoryPoint[])=>{const seen=new Set<string>();return xs.filter(x=>{if(!validDate(x.date)||seen.has(x.date))return false;seen.add(x.date);return true}).sort((a,b)=>a.date.localeCompare(b.date))};
+ const uniqueByDate=(xs:HistoryPoint[])=>{const dates=new Map<string,HistoryPoint>();const conflicts=new Set<string>();for(const x of xs){if(!validDate(x.date))continue;const old=dates.get(x.date);if(old&&(old.portfolio!==x.portfolio||old.imoex!==x.imoex))conflicts.add(x.date);else if(!old)dates.set(x.date,x)}return [...dates.values()].filter(x=>!conflicts.has(x.date)).sort((a,b)=>a.date.localeCompare(b.date))};
  const valid=uniqueByDate(history.filter(p=>p.portfolio!=null&&Number.isFinite(p.portfolio)&&p.portfolio>0));
  const validIndex=isIndexSeries(valid);
  const returns=(validIndex?valid:[]).slice(1).flatMap((p,i)=>{const days=(Date.parse(p.date)-Date.parse(valid[i].date))/86400000;return days>0&&days<=7?[p.portfolio!/valid[i].portfolio!-1]:[]});
