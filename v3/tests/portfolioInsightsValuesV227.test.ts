@@ -13,3 +13,17 @@ test("a single IMOEX observation cannot imply benchmark growth",()=>{const rows=
 
 test("rebased index 1.0 to 1.15 computes returns even without crossing 2",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",1,100),point("2026-01-02",1.1,105),point("2026-01-03",1.15,108)],true);assert.ok(Math.abs(by(rows,"Рост индекса портфеля")!-15)<1e-8);assert.ok(Math.abs(by(rows,"Рост портфеля за период IMOEX")!-15)<1e-8);assert.ok(Math.abs(by(rows,"Разница доходностей")!-7)<1e-8)});
 test("small legacy decimal returns still cannot masquerade as a wealth index",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",0.15,100),point("2026-01-02",0.18,105)],true);assert.equal(by(rows,"Рост индекса портфеля"),null);assert.equal(by(rows,"Разница доходностей"),null)});
+
+test("IMOEX cannot reintroduce a portfolio day invalidated by inconsistent duplicate values",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,100),point("2026-01-01",120,null),point("2026-01-02",110,105),point("2026-01-03",115,108)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Рост IMOEX")!-(108/105-1)*100)<1e-8)});
+
+test("missing IMOEX on an otherwise identical date does not erase a valid observation",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,null),point("2026-01-01",100,100),point("2026-01-02",110,105)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Разница доходностей")!-5)<1e-8)});
+
+test("contradictory IMOEX quotes invalidate benchmark pairing without hiding valid portfolio history",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,100),point("2026-01-01",100,120),point("2026-01-02",110,105)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),1);assert.equal(by(rows,"Рост IMOEX"),null);assert.equal(by(rows,"Разница доходностей"),null);assert.ok(Math.abs(by(rows,"Рост индекса портфеля")!-10)<1e-8)});
+
+test("conflicting third IMOEX quote cannot reinstate an already invalid benchmark day",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,100),point("2026-01-01",100,120),point("2026-01-01",100,100),point("2026-01-02",110,105)],true);assert.equal(by(rows,"Совместных точек"),1)});
+
+test("paired subset retains index classification from full validated portfolio series",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",1,null),point("2026-01-02",1.1,105),point("2026-01-03",1.15,108)],true);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Рост портфеля за период IMOEX")!-(1.15/1.1-1)*100)<1e-8);assert.ok(by(rows,"Разница доходностей")!==null)});
+
+test("leap-year February 29 is permitted but February 29 in non-leap year is rejected",()=>{const rows=buildPortfolioInsights([],[point("2024-02-29",100,100),point("2025-02-29",200,200),point("2024-03-01",110,105)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Рост IMOEX")!-5)<1e-8)});
+
+test("legacy fractional daily-return history cannot gain benchmark alpha after deduplication",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",0.15,100),point("2026-01-01",0.15,null),point("2026-01-02",0.18,105)],true);assert.equal(by(rows,"Совместных точек"),2);assert.equal(by(rows,"Разница доходностей"),null);assert.equal(by(rows,"Рост портфеля за период IMOEX"),null)});
