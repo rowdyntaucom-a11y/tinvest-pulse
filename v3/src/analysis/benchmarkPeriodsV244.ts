@@ -1,5 +1,5 @@
 import type{HistoryPoint}from"../../../v2/src/lib/portfolioApi";
-import{resolveValidatedHistory}from"./validatedHistoryV244";
+import{resolveValidatedHistory}from"./validatedHistoryV244.ts";
 export type BenchmarkPeriod="1m"|"3m"|"6m"|"12m"|"all";
 export const BENCHMARK_PERIODS:{value:BenchmarkPeriod;label:string}[]=[{value:"1m",label:"1 мес."},{value:"3m",label:"3 мес."},{value:"6m",label:"6 мес."},{value:"12m",label:"1 год"},{value:"all",label:"Всё"}];
 type ComparisonStatus="ok"|"untrusted"|"not_index"|"no_overlap"|"stale"|"short_window";
