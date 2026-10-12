@@ -7,3 +7,5 @@ test("negative cost basis is excluded from allocation and PnL",()=>{const rows=b
 test("large portfolios do not overflow argument stack while calculating extremes",()=>{const rows=buildPortfolioInsights(Array.from({length:110000},(_,i)=>make("T"+i,1,i===0?100:i===1?-100:0,1)),[],true);assert.equal(by(rows,"Число позиций"),110000);assert.equal(by(rows,"Лучший результат, ₽"),100);assert.equal(by(rows,"Худший результат, ₽"),-100)});
 
 test("identical duplicate history observations are deduplicated without losing performance",()=>{const rows=buildPortfolioInsights([],[point("2026-01-01",100,100),point("2026-01-01",100,100),point("2026-01-02",110,105)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Разница доходностей")!-5)<1e-8)});
+
+test("calendar-invalid dates are excluded rather than silently normalized",()=>{const rows=buildPortfolioInsights([],[point("2026-02-30",100,100),point("2026-01-01",100,100),point("2026-01-02",110,105)],true);assert.equal(by(rows,"Точек истории"),2);assert.equal(by(rows,"Совместных точек"),2);assert.ok(Math.abs(by(rows,"Разница доходностей")!-5)<1e-8)});
