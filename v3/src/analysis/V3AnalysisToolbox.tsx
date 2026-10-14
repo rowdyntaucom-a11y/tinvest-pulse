@@ -17,7 +17,7 @@ function ToolLoading({label}:{label:string}){
  return <div className="v3-pro-tools__loading" aria-live="polite"><i/><div><strong>{label}</strong><small>Модуль подключается к текущим подтверждённым данным.</small><span aria-hidden="true"><b/><b/><b/></span></div></div>;
 }
 
-/** No WHAT IF, target-weight simulator or hypothetical futures tool in portfolio reporting. */
+/** Read-only portfolio evidence: bonds and current-position reports only. */
 export function V3AnalysisToolbox({positions}:{positions:PositionSnapshot[]}){
  const[tool,setTool]=useState<FactualToolId>(readStoredTool);
  const[visited,setVisited]=useState<Set<FactualToolId>>(()=>new Set([readStoredTool()]));
