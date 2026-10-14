@@ -13,7 +13,7 @@ export function classifyPosition(position:Pick<PositionSnapshot,"instrumentType"
  if(["share","stock","equity"].includes(kind))return"equities";
  if(["bond","bonds"].includes(kind)){
   const ticker=position.ticker.trim().toUpperCase();
-  return /^SU\d{5,}/.test(ticker)||/\bОФЗ\b/i.test(position.name)?"government_bonds":"corporate_bonds";
+  return /^SU\d{5,}/.test(ticker)||/(?:^|[^A-Za-zА-Яа-яЁё])ОФЗ(?:$|[^A-Za-zА-Яа-яЁё])/i.test(position.name)?"government_bonds":"corporate_bonds";
  }
  if(["etf","sp","mutualfund","fund","investment_fund","bpif"].includes(kind))return"funds";
  if(["future","futures"].includes(kind))return"futures";
