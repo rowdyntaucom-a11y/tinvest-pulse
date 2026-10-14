@@ -71,7 +71,9 @@ export function calculateMonthlyPerformance(history:HistoryPoint[],trusted:boole
    months.push({month,year,monthNumber:m,quality,startDate:startPoint.date,endDate:end.date,points:inMonth.length,maxGapDays,portfolioPct:port,imoexPct:index,alphaPp:alpha,reason:labels[quality]});
   }
  }
- return{trusted:true,years,months:months.reverse(),reason:null};
+ // Present years newest first, but January through December chronologically inside each year.
+ months.sort((a,b)=>b.year-a.year||a.monthNumber-b.monthNumber);
+ return{trusted:true,years,months,reason:null};
 }
 export function monthlyPerformanceCsv(result:MonthlyPerformance,year?:number):string|null{
  if(!result.trusted||!result.years.length)return null;
