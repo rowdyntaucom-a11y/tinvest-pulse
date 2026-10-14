@@ -9,7 +9,8 @@ const market=readFileSync(new URL("../src/analysis/V3MarketLayer.tsx",import.met
 const toolbox=readFileSync(new URL("../src/analysis/V3AnalysisToolbox.tsx",import.meta.url),"utf8");
 const coreCss=readFileSync(new URL("../src/core/snowballCore.css",import.meta.url),"utf8");
 const analysisCss=readFileSync(new URL("../src/styles/analysisDepth.css",import.meta.url),"utf8");
-const toolsCss=readFileSync(new URL("../src/core/lightCoreProTools.css",import.meta.url),"utf8");\nconst factualCss=readFileSync(new URL("../src/styles/proToolsWorkspaceV100.css",import.meta.url),"utf8");
+const toolsCss=readFileSync(new URL("../src/core/lightCoreProTools.css",import.meta.url),"utf8");
+const factualCss=readFileSync(new URL("../src/styles/proToolsWorkspaceV100.css",import.meta.url),"utf8");
 
 test("analytics has an explicit quick layer and professional layer",()=>{
  for(const token of["БЫСТРЫЙ СЛОЙ","Структура","P/L","Риск","Профи","Главный ответ сверху, детали ниже"])assert.ok(core.includes(token));
