@@ -8,11 +8,13 @@ const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",imp
 const toolbox=readFileSync(new URL("../src/analysis/V3AnalysisToolbox.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/samuraiRebalance.css",import.meta.url),"utf8");
 
-test("Samurai exposes rebalancing inside the consolidated professional toolbox",()=>{
+test("Samurai exposes factual reports but isolates archived user-driven rebalancing calculations",()=>{
  assert.match(analysis,/sam-analysis-tools/);
  assert.match(analysis,/V3AnalysisToolbox/);
- assert.match(toolbox,/V3RebalanceWorkspace/);
- assert.match(atlas,/Инструменты/);
+ assert.doesNotMatch(toolbox,/V3RebalanceWorkspace/);
+ assert.match(toolbox,/V3BondIntelligenceWorkspace/);
+ assert.match(toolbox,/V3PortfolioReportDepth/);
+ assert.match(atlas,/Отчёты/);
 });
 
 test("rebalance target is user-authored and two-class complement is explicit",()=>{
