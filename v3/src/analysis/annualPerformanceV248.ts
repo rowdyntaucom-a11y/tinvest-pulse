@@ -44,7 +44,7 @@ export function calculateAnnualPerformance(history:HistoryPoint[],trusted:boolea
   const end=current.at(-1)!;
   const observations=validPrior?[baseline,...current]:current;
   const gaps=observations.slice(1).map((point,index)=>days(observations[index].date,point.date));
-  const maxGapDays=Math.max(0,...gaps);
+  const maxGapDays=gaps.reduce((worst,gap)=>Math.max(worst,gap),0);
   const spanDays=days(baseline.date,end.date);
   const from=baseline.date,to=end.date;
   if(spanDays<=0||observations.length<2){
@@ -70,6 +70,6 @@ export function annualPerformanceCsv(result:AnnualPerformance):string|null{
   if(!Number.isInteger(row.year)||row.year<1900||row.year>9999)return null;
   lines.push([String(row.year),row.reason,row.startDate??"",row.endDate??"",String(row.points),row.portfolioPct===null?"":String(row.portfolioPct),row.imoexPct===null?"":String(row.imoexPct),row.alphaPp===null?"":String(row.alphaPp),String(row.maxGapDays)]);
  }
- const safeCell=(cell:string)=>'"'+(/^[\s]*[=+@-]/.test(cell)?"'":"")+cell.replace(/"/g,'""')+'"';
+ const safeCell=(cell:string)=>{const formula=/^[\s]*[=+@-]/.test(cell)&&!/^[+-](?:\d+(?:\.\d*)?|\.\d+)$/.test(cell);return '"' +(formula?"'":"")+cell.replace(/"/g,'""')+'"'};
  return"\uFEFF"+lines.map(row=>row.map(safeCell).join(";")).join("\r\n")+"\r\n";
 }
