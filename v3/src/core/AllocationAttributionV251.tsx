@@ -41,7 +41,7 @@ export function AllocationAttributionV251({positions,trusted,onOpenAsset}:{posit
  <div className="qc-allocation-list">
  {limited.map(item=><button type="button" key={item.id} className="qc-allocation-position" onClick={()=>{const source=sourceById.get(item.id);if(source)onOpenAsset(source)}} aria-label={"Открыть актив "+item.ticker}>
  <span className="qc-allocation-identity"><b>{item.ticker||"—"}</b><small>{item.name||ASSET_NAMES[item.assetClass]}</small></span>
- <span className="qc-allocation-share"><span>{pct(item.weightPct)} от учтённой стоимости</span><i><em style={{width:Math.max(0,Math.min(100,item.weightPct))+"%"}}/></i></span>
+ <span className="qc-allocation-share"><span>{pct(item.weightPct)} от учтённой стоимости</span><i><em style={{width:Math.max(0,Math.min(100,item.weightPct??0))+"%"}}/></i></span>
  <span className="qc-allocation-money"><b>{cash(item.currentValue)}</b><small>{cash(item.unrealizedPnl)} · {pct(item.costReturnPct)}</small></span>
  </button>)}
  </div>
