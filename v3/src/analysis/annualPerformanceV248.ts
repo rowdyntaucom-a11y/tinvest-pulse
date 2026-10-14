@@ -66,9 +66,10 @@ export function calculateAnnualPerformance(history:HistoryPoint[],trusted:boolea
 export function annualPerformanceCsv(result:AnnualPerformance):string|null{
  if(!result.trusted||!result.rows.length)return null;
  const lines=[["QVANIX · календарные результаты"],["Год","Статус","Начало периода","Конец периода","Общих точек","Портфель, %","IMOEX, %","Разница, п.п.","Максимальный перерыв, дней"]];
+ const formatValue=(n:number|null)=>n===null?"":String(Number(n.toFixed(10)));
  for(const row of result.rows){
   if(!Number.isInteger(row.year)||row.year<1900||row.year>9999)return null;
-  lines.push([String(row.year),row.reason,row.startDate??"",row.endDate??"",String(row.points),row.portfolioPct===null?"":String(row.portfolioPct),row.imoexPct===null?"":String(row.imoexPct),row.alphaPp===null?"":String(row.alphaPp),String(row.maxGapDays)]);
+  lines.push([String(row.year),row.reason,row.startDate??"",row.endDate??"",String(row.points),formatValue(row.portfolioPct),formatValue(row.imoexPct),formatValue(row.alphaPp),String(row.maxGapDays)]);
  }
  const safeCell=(cell:string)=>{const formula=/^[\s]*[=+@-]/.test(cell)&&!/^[+-](?:\d+(?:\.\d*)?|\.\d+)$/.test(cell);return '"' +(formula?"'":"")+cell.replace(/"/g,'""')+'"'};
  return"\uFEFF"+lines.map(row=>row.map(safeCell).join(";")).join("\r\n")+"\r\n";
