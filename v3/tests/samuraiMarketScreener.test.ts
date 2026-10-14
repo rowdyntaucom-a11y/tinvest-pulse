@@ -8,10 +8,11 @@ const ui=readFileSync(new URL("../src/analysis/V3MarketScreener.tsx",import.meta
 const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/samuraiMarketScreener.css",import.meta.url),"utf8");
 
-test("Samurai exposes the public screener inside the professional toolbox",()=>{
+test("Samurai keeps the public screener accessible via read-only trust gate without duplicating it in reports",()=>{
  assert.match(analysis,/sam-analysis-tools/);
- assert.match(toolbox,/V3MarketIntelligenceWorkspace/);
- assert.match(toolbox,/Рынок/);
+ assert.match(analysis,/inlineTools=\{\{tools:<Suspense/);
+ assert.doesNotMatch(toolbox,/V3MarketIntelligenceWorkspace/);
+ assert.match(toolbox,/V3BondIntelligenceWorkspace/);
  assert.match(atlas,/id:"tools"/);
 });
 

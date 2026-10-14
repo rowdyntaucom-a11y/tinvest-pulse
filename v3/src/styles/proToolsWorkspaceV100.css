@@ -15,3 +15,17 @@
 }
 @media(max-width:359px){.v3-pro-tools__focus{top:74px}.v3-pro-tools__stage{scroll-margin-top:124px}}
 @media(prefers-reduced-motion:reduce){.v3-pro-tools__groups{scroll-behavior:auto}}
+
+/* v252: direct factual destinations, without layered catalogs or simulator cards. */
+.v3-factual-tools-v252{min-width:0}
+.v3-factual-tools-v252>header{padding-bottom:8px}
+.v3-factual-tools-v252>header p{max-width:52ch;line-height:1.5}
+.v3-factual-tools__nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.v3-factual-tools__nav button{display:grid;align-content:center;gap:4px;min-height:56px;min-width:0;padding:9px 12px;color:inherit;background:color-mix(in srgb,currentColor 3%,transparent);border:1px solid color-mix(in srgb,currentColor 22%,transparent);border-radius:11px;cursor:pointer;text-align:left;touch-action:manipulation}
+.v3-factual-tools__nav button[aria-pressed=true]{border-width:2px;border-color:currentColor;background:color-mix(in srgb,currentColor 7%,transparent)}
+.v3-factual-tools__nav button:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+.v3-factual-tools__nav button strong{font-size:13px;line-height:1.4}
+.v3-factual-tools__nav button small{font-size:11px;opacity:.75;line-height:1.4;overflow-wrap:anywhere}
+.v3-factual-tools__description{margin:4px 0 12px;font-size:12px;line-height:1.5;opacity:.85}
+.v3-factual-tools-v252 .v3-pro-tools__stage{margin:0;min-width:0}
+@media(max-width:420px){.v3-factual-tools__nav{gap:6px}.v3-factual-tools__nav button{min-height:56px;padding:9px 7px}.v3-factual-tools__nav button strong{font-size:12px}.v3-factual-tools__nav button small{font-size:10px}}

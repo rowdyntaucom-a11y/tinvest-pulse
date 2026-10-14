@@ -8,7 +8,7 @@ assert.match(core,/К активам/);
 assert.match(core,/Карта позиций/);
 const guide=core.slice(core.indexOf("function WorkspaceGuide"),core.indexOf("function PortfolioContributionMap"));
 assert.doesNotMatch(guide,/onHub\("market"\)|onHub\("tools"\)/,"analytics guide must not duplicate the primary hub tabs");
-assert.match(tools,/useState\(false\)/,"tools catalog should start closed so the calculation is immediately visible");
+assert.match(tools,/v3-factual-tools__nav/,"bonds and reports should be immediately available without catalog steps");assert.doesNotMatch(tools,/catalogOpen/);
 assert.match(css,/v68 · mobile density \+ navigation simplification/);
 assert.match(css,/grid-template-areas:"identity weight value pnl"/);
 assert.match(css,/min-height:48px/);

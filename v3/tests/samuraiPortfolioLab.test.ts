@@ -9,11 +9,13 @@ const atlas=readFileSync(new URL("../src/samurai/SamuraiFailClosedAtlas.tsx",imp
 const api=readFileSync(new URL("../src/analysis/strategyLabApi.ts",import.meta.url),"utf8");
 const css=readFileSync(new URL("../src/styles/samuraiPortfolioLab.css",import.meta.url),"utf8");
 
-test("Samurai exposes Portfolio Lab inside the consolidated professional toolbox",()=>{
+test("Samurai defaults to factual reports while isolated strategy lab mathematics stay regression-tested",()=>{
  assert.match(analysis,/sam-analysis-tools/);
- assert.match(toolbox,/V3PortfolioLab/);
- assert.match(toolbox,/Лаборатория/);
- assert.match(atlas,/Инструменты/);
+ assert.doesNotMatch(toolbox,/V3PortfolioLab/);
+ assert.doesNotMatch(toolbox,/Лаборатория/);
+ assert.match(toolbox,/V3BondIntelligenceWorkspace/);
+ assert.match(toolbox,/V3PortfolioReportDepth/);
+ assert.match(atlas,/Отчёты/);
 });
 
 test("Portfolio Lab compares two user-authored strategies without choosing a winner",()=>{
