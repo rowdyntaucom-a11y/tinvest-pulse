@@ -92,3 +92,26 @@
 .qc-chart-observation>div b{font-size:14px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .qc-chart-observation small{font-size:11px;line-height:1.5;opacity:.82}
 @media(max-width:460px){.qc-chart-navigation{grid-template-columns:40px minmax(0,1fr) 40px 58px;gap:4px}.qc-chart-navigation button{min-width:40px;padding:3px}.qc-chart-navigation .qc-chart-export{padding:3px}.qc-chart-observation>div{gap:4px}.qc-chart-observation>div b{font-size:12px}}
+
+/* v248: calendar-year comparison with explicit coverage status and two-sided alpha bars. */
+.qc-annual-performance{margin:12px 0 4px;min-width:0;padding:12px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);border-radius:12px;background:color-mix(in srgb,currentColor 4%,transparent)}
+.qc-annual-performance>summary{cursor:pointer;min-height:44px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:800}
+.qc-annual-performance>summary small{font-size:11px;font-weight:400;opacity:.85}
+.qc-annual-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0}
+.qc-annual-heading span{font-weight:700;font-size:13px}
+.qc-annual-heading button{min-height:40px;padding:5px 12px;border:1px solid color-mix(in srgb,currentColor 30%,transparent);border-radius:8px;background:transparent;color:inherit;cursor:pointer}
+.qc-annual-rows{display:grid;gap:10px}
+.qc-annual-row{display:grid;gap:8px;min-width:0;padding:11px;border:1px solid color-mix(in srgb,currentColor 15%,transparent);border-radius:9px}
+.qc-annual-row>header{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
+.qc-annual-row>header strong{font-size:16px}
+.qc-annual-row>header small{font-size:11px;opacity:.8}
+.qc-annual-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.qc-annual-results>span{display:grid;gap:4px;font-size:11px;overflow-wrap:anywhere}
+.qc-annual-results b{font-size:14px;font-variant-numeric:tabular-nums}
+.qc-annual-bar{position:relative;height:10px;border-radius:6px;background:color-mix(in srgb,currentColor 7%,transparent);overflow:hidden}
+.qc-annual-zero{position:absolute;left:50%;top:0;height:100%;border-left:1px solid currentColor;opacity:.5}
+.qc-annual-fill{position:absolute;top:1px;height:8px;border-radius:4px;background:currentColor;opacity:.8}
+.qc-annual-fill.is-negative{opacity:.4}
+.qc-annual-dates,.qc-annual-explanation{font-size:11px;line-height:1.5;opacity:.8;overflow-wrap:anywhere}
+.qc-annual-explanation{display:block;margin-top:10px}
+@media(max-width:460px){.qc-annual-performance{padding:9px}.qc-annual-results{gap:4px}.qc-annual-results b{font-size:12px}.qc-annual-row{padding:9px}}
