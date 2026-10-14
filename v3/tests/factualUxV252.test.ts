@@ -107,10 +107,12 @@ test("report navigation is usable with touch and keyboard, including narrow phon
  assert.match(style,/@media\(max-width:420px\)/);
  assert.match(style,/touch-action:manipulation/);
 });
-test("mobile report cards disclose their values rather than presenting unsupported predictions",()=>{
- assert.match(toolbox,/Фактический состав облигаций/);
- assert.match(toolbox,/Текущие позиции/);
- assert.doesNotMatch(toolbox,/возможная доходность|прогноз на год|будущая цена/i);
+test("mobile report cards use evidence descriptions rather than unsupported predictions",()=>{
+ assert.match(toolbox,/FACTUAL_TOOLS.find/);
+ const content=FACTUAL_TOOLS.map(x=>x.hero).join(" ");
+ assert.match(content,/Фактический состав облигаций/);
+ assert.match(content,/Текущие позиции/);
+ assert.doesNotMatch(content,/возможная доходность|прогноз на год|будущая цена/i);
 });
 test("data integrity rules and interactive order execution are untouched",()=>{
  for(const source of[toolbox,compact,core,analysis])assert.doesNotMatch(source,/submitOrder|placeOrder|sendOrder/);
