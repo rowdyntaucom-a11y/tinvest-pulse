@@ -72,3 +72,23 @@
 .qc-chart-dot-p{fill:currentColor}.qc-chart-dot-i{fill:var(--qc-bg,#101720);stroke:currentColor;stroke-width:1.7}
 .qc-verified-chart small{display:block;font-size:11px;line-height:1.5;opacity:.8}
 @media(max-width:460px){.qc-verified-chart{padding:8px}.qc-chart-legend{gap:9px;font-size:11px}.qc-verified-chart figcaption strong{font-size:13px}}
+
+/* v247: inspect actual historical points without blocking vertical smartphone swipes. */
+.qc-verified-chart svg{touch-action:pan-y;cursor:crosshair}
+.qc-chart-cursor{stroke:currentColor;stroke-width:1;stroke-dasharray:3 5;opacity:.55;pointer-events:none}
+.qc-chart-selected-p{fill:currentColor;stroke:var(--qc-bg,#101720);stroke-width:2;pointer-events:none}
+.qc-chart-selected-i{fill:var(--qc-bg,#101720);stroke:currentColor;stroke-width:2;pointer-events:none}
+.qc-chart-navigation{display:grid;grid-template-columns:44px minmax(0,1fr) 44px auto;align-items:center;gap:6px;margin:8px 0}
+.qc-chart-navigation button{min-width:44px;min-height:44px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);border-radius:9px;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.qc-chart-navigation button:disabled{cursor:not-allowed;opacity:.35}
+.qc-chart-navigation label{display:grid;gap:4px;min-width:0;font-size:12px}
+.qc-chart-navigation label span{overflow-wrap:anywhere}
+.qc-chart-navigation input[type="range"]{width:100%;min-width:0;accent-color:currentColor;cursor:pointer}
+.qc-chart-navigation .qc-chart-export{padding:5px 10px;font-weight:700;font-size:12px;white-space:nowrap}
+.qc-chart-observation{display:grid;gap:7px;padding:9px 11px;border-radius:9px;background:color-mix(in srgb,currentColor 6%,transparent);margin-bottom:8px}
+.qc-chart-observation>strong{font-size:13px;font-variant-numeric:tabular-nums}
+.qc-chart-observation>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.qc-chart-observation>div span{display:grid;gap:3px;font-size:11px;line-height:1.4}
+.qc-chart-observation>div b{font-size:14px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.qc-chart-observation small{font-size:11px;line-height:1.5;opacity:.82}
+@media(max-width:460px){.qc-chart-navigation{grid-template-columns:40px minmax(0,1fr) 40px 58px;gap:4px}.qc-chart-navigation button{min-width:40px;padding:3px}.qc-chart-navigation .qc-chart-export{padding:3px}.qc-chart-observation>div{gap:4px}.qc-chart-observation>div b{font-size:12px}}
