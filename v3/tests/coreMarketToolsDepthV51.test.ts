@@ -28,8 +28,8 @@ test("market workspace shows coverage and passes exact tickers to screener",()=>
  assert.match(screener,/portfolioTickers\?\.has\(row\.secid\.toUpperCase\(\)\)/);
 });
 
-test("futures tool separates verified current positions from manual what-if",()=>{
- assert.match(toolbox,/V3FuturesScenario positions=\{positions\}/);
+test("retired futures scenario remains safely isolated from broker-backed reports",()=>{
+ assert.doesNotMatch(toolbox,/V3FuturesScenario positions=\{positions\}|V3FuturesScenario=lazy/);\n assert.match(toolbox,/V3PortfolioReportDepth positions=\{positions\}/);
  assert.match(futures,/ТЕКУЩИЙ ПОРТФЕЛЬ/);
  assert.match(futures,/фьючерсных позиций/);
  assert.match(futures,/P\/L открытых фьючерсных позиций/);
