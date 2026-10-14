@@ -27,10 +27,10 @@ const totalOf=(values:number[])=>values.reduce((acc,v)=>acc+v,0);
 export function buildAllocationAttribution(positions:PositionSnapshot[],trusted:boolean):AllocationAttribution{
  const empty:AllocationAttribution={trusted:false,count:0,total:null,costBasis:null,unrealizedPnl:null,unrealizedPct:null,hhi:null,top1Pct:null,top5Pct:null,unreconciledCount:0,classes:[],positions:[],reason:"Брокерские данные не подтверждены."};
  if(!trusted)return empty;
- const records=positions.filter(x=>finite(x.currentValue)&&x.currentValue>=0&&finite(x.expectedYield)&&finite(x.costBasis)&&x.costBasis>=0);
- const total=totalOf(records.map(x=>x.currentValue)),cost=totalOf(records.map(x=>x.costBasis)),unrealized=totalOf(records.map(x=>x.expectedYield));
+ const records=positions.map((position,index)=>({position,index})).filter(({position:x})=>finite(x.currentValue)&&x.currentValue>=0&&finite(x.expectedYield)&&finite(x.costBasis)&&x.costBasis>=0);
+ const total=totalOf(records.map(x=>x.position.currentValue)),cost=totalOf(records.map(x=>x.position.costBasis)),unrealized=totalOf(records.map(x=>x.position.expectedYield));
  if(![total,cost,unrealized].every(finite))return{...empty,trusted:true,reason:"Агрегаты позиций выходят за пределы конечных чисел."};
- const valid=records.map((position,index)=>{
+ const valid=records.map(({position,index})=>{
   const difference=(position.currentValue-position.costBasis)-position.expectedYield;
   return{id:(position.instrumentUid||position.figi||position.ticker)+"-"+index,ticker:position.ticker,name:position.name,
    assetClass:classifyPosition(position),currentValue:position.currentValue,costBasis:position.costBasis,
