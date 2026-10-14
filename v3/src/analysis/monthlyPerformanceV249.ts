@@ -36,7 +36,8 @@ export function calculateMonthlyPerformance(history:HistoryPoint[],trusted:boole
  if(!isPortfolioIndex)return{trusted:true,years:[],months:[],reason:"История не подтверждена как индекс доходности без пополнений и выводов."};
  if(!points.length)return{trusted:true,years:[],months:[],reason:"Нет подтверждённой истории портфеля."};
  const years=[...new Set(points.map(p=>Number(p.date.slice(0,4))))].sort((a,b)=>b-a);
- const quotes=points.filter(paired),byMonth=new Map<string,HistoryPoint[]>();
+ const quotes=points.filter(paired),byMonth=new Map<string,HistoryPoint[]>(),portfolioByMonth=new Map<string,HistoryPoint[]>();
+ for(const p of points){const k=p.date.slice(0,7),group=portfolioByMonth.get(k)??[];group.push(p);portfolioByMonth.set(k,group)}
  for(const p of quotes){const k=p.date.slice(0,7);const list=byMonth.get(k)??[];list.push(p);byMonth.set(k,list)}
  const months:MonthlyComparison[]=[];
  let priorIndex=0,prior:HistoryPoint|null=null;
@@ -48,7 +49,7 @@ export function calculateMonthlyPerformance(history:HistoryPoint[],trusted:boole
    const lastOfMonth=new Date(Date.UTC(year,m,0)).toISOString().slice(0,10);
    while(priorIndex<quotes.length&&quotes[priorIndex].date<start){prior=quotes[priorIndex];priorIndex++}
    const inMonth=byMonth.get(month)??[];
-   const portfolioMonth=points.filter(p=>p.date.slice(0,7)===month);
+   const portfolioMonth=portfolioByMonth.get(month)??[];
    if(!portfolioMonth.length){months.push(empty(month,"no_data"));continue}
    if(!inMonth.length){months.push(empty(month,"no_benchmark",portfolioMonth[0].date,portfolioMonth.at(-1)!.date));continue}
    const validPrior=prior!==null&&between(prior.date,start)<=7;
