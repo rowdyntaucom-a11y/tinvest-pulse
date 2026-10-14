@@ -1,8 +1,8 @@
 import type{PositionSnapshot}from"../../../v2/src/lib/portfolioApi";
 
 export type AssetClass="government_bonds"|"corporate_bonds"|"equities"|"funds"|"futures"|"currencies"|"other";
-export type AttributionPosition={id:string;ticker:string;name:string;assetClass:AssetClass;currentValue:number;costBasis:number;unrealizedPnl:number;weightPct:number;costReturnPct:number|null;basisDifference:number;};
-export type AttributionGroup={assetClass:AssetClass;title:string;positions:number;currentValue:number;costBasis:number;unrealizedPnl:number;weightPct:number;costReturnPct:number|null;};
+export type AttributionPosition={id:string;ticker:string;name:string;assetClass:AssetClass;currentValue:number;costBasis:number;unrealizedPnl:number;weightPct:number|null;costReturnPct:number|null;basisDifference:number;};
+export type AttributionGroup={assetClass:AssetClass;title:string;positions:number;currentValue:number;costBasis:number;unrealizedPnl:number;weightPct:number|null;costReturnPct:number|null;};
 export type AllocationAttribution={trusted:boolean;count:number;total:number|null;costBasis:number|null;unrealizedPnl:number|null;unrealizedPct:number|null;hhi:number|null;top1Pct:number|null;top5Pct:number|null;unreconciledCount:number;classes:AttributionGroup[];positions:AttributionPosition[];reason:string|null};
 export const ASSET_NAMES:Record<AssetClass,string>={
  government_bonds:"ОФЗ и госбумаги",corporate_bonds:"Корпоративные облигации",equities:"Акции",funds:"Фонды",futures:"Фьючерсы",currencies:"Валюты",other:"Прочие инструменты"
@@ -34,13 +34,13 @@ export function buildAllocationAttribution(positions:PositionSnapshot[],trusted:
   const difference=(position.currentValue-position.costBasis)-position.expectedYield;
   return{id:(position.instrumentUid||position.figi||position.ticker)+"-"+index,ticker:position.ticker,name:position.name,
    assetClass:classifyPosition(position),currentValue:position.currentValue,costBasis:position.costBasis,
-   unrealizedPnl:position.expectedYield,weightPct:pct(position.currentValue,total)??0,
+   unrealizedPnl:position.expectedYield,weightPct:pct(position.currentValue,total),
    costReturnPct:pct(position.expectedYield,position.costBasis),basisDifference:difference};
  }).sort((a,b)=>b.currentValue-a.currentValue||a.id.localeCompare(b.id));
  const groups:AttributionGroup[]=ASSET_ORDER.map(assetClass=>{
   const rows=valid.filter(x=>x.assetClass===assetClass);
   const market=totalOf(rows.map(x=>x.currentValue)),basis=totalOf(rows.map(x=>x.costBasis)),pnl=totalOf(rows.map(x=>x.unrealizedPnl));
-  return{assetClass,title:ASSET_NAMES[assetClass],positions:rows.length,currentValue:market,costBasis:basis,unrealizedPnl:pnl,weightPct:pct(market,total)??0,costReturnPct:pct(pnl,basis)};
+  return{assetClass,title:ASSET_NAMES[assetClass],positions:rows.length,currentValue:market,costBasis:basis,unrealizedPnl:pnl,weightPct:pct(market,total),costReturnPct:pct(pnl,basis)};
  }).filter(group=>group.positions>0);
  const hhi=total>0?valid.reduce((v,x)=>v+(x.currentValue/total)**2,0)*10000:null;
  return{trusted:true,count:valid.length,total,costBasis:cost,unrealizedPnl:unrealized,unrealizedPct:pct(unrealized,cost),hhi,
